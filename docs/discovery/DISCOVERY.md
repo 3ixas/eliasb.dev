@@ -157,9 +157,10 @@ Build and review privately in stages. Change `eliasb.dev` only after the coheren
 
 ## Open decisions
 
-The discovery tree is complete. The following design decisions intentionally belong to the concept phase:
+The discovery tree is complete. Cabinet of Curiosities was selected on 2026-09-14, with Living Editorial supplying the structural foundation. Signals and Systems will be limited to softened, contained data treatments because the site-wide concept felt too harsh.
 
-- Selection or combination of the three visual concepts.
+The following design decisions remain in the selected-direction phase:
+
 - The final type system, colour accents, illustration approach, photographic prominence, and motion language.
 - The visual composition of signals and their authored fallback states.
 

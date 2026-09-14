@@ -2,17 +2,9 @@
 
 import Link from "next/link";
 import { conceptDirections, type ConceptDirection } from "@/lib/concepts";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function ConceptToolbar({ direction }: { direction: ConceptDirection }) {
-  function toggleTheme() {
-    const root = document.documentElement;
-    const current = root.dataset.theme ??
-      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-    const next = current === "light" ? "dark" : "light";
-    root.dataset.theme = next;
-    localStorage.setItem("elias-theme", next);
-  }
-
   function replayEntrance() {
     window.dispatchEvent(new Event("replay-concept-entrance"));
   }
@@ -34,9 +26,7 @@ export function ConceptToolbar({ direction }: { direction: ConceptDirection }) {
       </div>
       <div className="toolbar-actions">
         <button type="button" onClick={replayEntrance}>Replay intro</button>
-        <button type="button" onClick={toggleTheme} aria-label="Switch between light and dark theme">
-          Switch theme
-        </button>
+        <ThemeToggle />
       </div>
     </aside>
   );

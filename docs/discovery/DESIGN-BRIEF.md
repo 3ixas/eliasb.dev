@@ -93,7 +93,7 @@ Explore three directions independently before selecting or combining them:
 2. **Cabinet of Curiosities:** tactile books, posters, records, project artifacts, photographs, and personal objects.
 3. **Signals and Systems:** restrained grids, traces, diagrams, timelines, live data, and system states softened by editorial and personal material.
 
-The working hypothesis is a Living Editorial foundation, memorable Cabinet interactions, and Signals and Systems language for data. It remains a hypothesis until the comparison is complete.
+Selected direction: Cabinet of Curiosities, grounded by Living Editorial's hierarchy, whitespace, and restraint. Signals and Systems will not define the overall environment because it felt too harsh, but restrained pieces of its data language can appear inside relevant GitHub, training, fantasy, and system views.
 
 Compare the same representative slice in every direction: entrance, introduction, one selected project, the current-life glimpse, and one Library interaction. Produce desktop and mobile compositions, then a focused coded prototype for motion and interaction. Evaluate clarity, distinctiveness, personal specificity, warmth, accessibility, mobile behaviour, performance, and maintenance before combining ideas.
 
@@ -133,9 +133,9 @@ Do not change the live domain during design and development. Validate the comple
 
 ## Delivery sequence
 
-1. Establish the repository and carry these canonical documents into it.
-2. Produce the three comparable visual concepts.
-3. Select and document the visual system, then build the homepage.
+1. Establish the repository and carry these canonical documents into it. **Complete.**
+2. Produce the three comparable visual concepts. **Complete.**
+3. Select and document the visual system, then build the homepage. **Selected; homepage refinement in progress.**
 4. Build the three Work case studies.
 5. Build Lab, Library, and About.
 6. Add integrations and their designed fallback states.
@@ -146,4 +146,4 @@ The coherent launch experience should be complete before the domain changes. Lat
 
 ## Discovery status
 
-The discovery decision tree is complete. Repository creation and implementation begin only after Elias confirms that this brief reflects the shared understanding.
+The discovery decision tree is complete and approved. Cabinet of Curiosities is the selected visual direction, with Living Editorial as its structural foundation. Implementation is active.

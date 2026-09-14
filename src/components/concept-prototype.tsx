@@ -3,14 +3,21 @@ import Link from "next/link";
 import { ConceptToolbar } from "@/components/concept-toolbar";
 import { LocalTime } from "@/components/local-time";
 import { SignatureLine } from "@/components/signature-line";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { conceptDirections, type ConceptDirection } from "@/lib/concepts";
 
-export function ConceptPrototype({ direction }: { direction: ConceptDirection }) {
+export function ConceptPrototype({
+  direction,
+  reviewMode = true,
+}: {
+  direction: ConceptDirection;
+  reviewMode?: boolean;
+}) {
   const concept = conceptDirections[direction];
 
   return (
-    <div className={`prototype prototype-${direction}`}>
-      <ConceptToolbar direction={direction} />
+    <div className={`prototype prototype-${direction} ${reviewMode ? "review-experience" : "selected-experience"}`}>
+      {reviewMode && <ConceptToolbar direction={direction} />}
       <header className="site-header">
         <a href="#top" className="site-mark" aria-label="Elias B. home">E/B</a>
         <nav aria-label="Primary navigation">
@@ -19,7 +26,10 @@ export function ConceptPrototype({ direction }: { direction: ConceptDirection })
           <a href="#library">Library</a>
           <a href="#about">About</a>
         </nav>
-        <a href="#about" className="say-hello">Say hello ↓</a>
+        <div className="site-header-actions">
+          {!reviewMode && <ThemeToggle compact />}
+          <a href="#about" className="say-hello">Say hello ↓</a>
+        </div>
       </header>
 
       <main id="top">
@@ -31,7 +41,10 @@ export function ConceptPrototype({ direction }: { direction: ConceptDirection })
               I work across engineering, product, and interface design—turning
               consequential systems into tools people can understand and trust.
             </p>
-            <p className="concept-thesis"><span>{concept.number}</span>{concept.thesis}</p>
+            <p className="concept-thesis">
+              <span>{reviewMode ? concept.number : "Now"}</span>
+              {reviewMode ? concept.thesis : "Building a more personal corner of the internet."}
+            </p>
           </div>
           <a className="scroll-cue" href="#work">Selected work <span>↓</span></a>
         </section>
@@ -91,7 +104,7 @@ export function ConceptPrototype({ direction }: { direction: ConceptDirection })
             <article className="signal signal-building">
               <p>Building</p>
               <strong>Personal site 2.0</strong>
-              <span>Three visual directions in progress</span>
+              <span>{reviewMode ? "Three visual directions in review" : "Cabinet direction selected · Homepage in progress"}</span>
               <div className="activity-trace" aria-hidden="true">{Array.from({ length: 28 }, (_, i) => <i key={i} />)}</div>
             </article>
             <article className="signal signal-presence">
@@ -173,8 +186,8 @@ export function ConceptPrototype({ direction }: { direction: ConceptDirection })
       </main>
 
       <footer className="site-footer">
-        <p>Designed and built by Elias B. · Concept {concept.number}</p>
-        <div><Link href="https://github.com/3ixas">GitHub ↗</Link><a href="#top">Back to top ↑</a></div>
+        <p>{reviewMode ? `Designed and built by Elias B. · Concept ${concept.number}` : "Designed and built by Elias B."}</p>
+        <div>{!reviewMode && <Link href="/concepts">Design study ↗</Link>}<Link href="https://github.com/3ixas">GitHub ↗</Link><a href="#top">Back to top ↑</a></div>
       </footer>
     </div>
   );

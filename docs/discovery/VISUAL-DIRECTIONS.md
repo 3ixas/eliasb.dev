@@ -1,5 +1,11 @@
 # Visual direction territories
 
+## Selection
+
+Elias selected **Cabinet of Curiosities** on 2026-09-14, with **Living Editorial** providing its structural and typographic foundation. Signals and Systems will not define the whole site because it felt too harsh; its visual language remains available for small, contained data experiences.
+
+The selected direction is specified in `docs/design/SELECTED-DIRECTION.md`. The original territories remain below as decision history.
+
 These three territories are approved for exploration. They must use the same confirmed content hierarchy so the comparison tests visual and interaction choices rather than different product scopes.
 
 ## 1. Living Editorial
@@ -67,7 +73,7 @@ Precise, alive, intelligent, and quietly technical.
 
 Feeling like a dashboard or monitoring product instead of a personal site.
 
-## Evaluation rule
+## Original evaluation rule
 
 Each direction must be assessed for clarity, distinctiveness, personal specificity, emotional warmth, mobile behaviour, accessibility, performance, and maintainability. Do not merge the concepts until each has been evaluated on its own terms.
 
