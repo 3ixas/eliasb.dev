@@ -10,7 +10,7 @@ Checked against official sources on 2026-09-13. These are feasibility findings, 
 - **Spotify:** the selected public playlist is presented through Spotify's official embed inside a site-designed Library section.
 - **Books:** the public Goodreads `currently-reading` RSS feed supplies the current title, author, cover, and source link. The site retains a last-known fallback and keeps personal notes site-owned.
 - **Films:** the public Letterboxd RSS feed supplies the latest diary entry, year, rating, poster, and source link, with a last-known fallback.
-- **Training:** the homepage links to Elias's public Strava profile while keeping the cross-sport summary authored. The selected launch treatment is Strava's official last-week running summary inside a site-designed frame; activation awaits the embed code from Elias's profile.
+- **Training:** Strava's official last-week running summary is active inside a site-designed homepage frame. The broader `Lift · Run · Muay Thai` context and public profile link remain around it. The taller latest-activities embed is retained as an available source for a later training surface.
 
 The connected sources use Next.js’s persistent Data Cache and bundled last-known fallbacks. Public account identifiers live in typed site content; only the optional GitHub token is an environment secret. The accepted durable Blob snapshot remains the deployment-hardening architecture once the Vercel project is configured.
 

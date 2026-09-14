@@ -3,6 +3,7 @@ import Link from "next/link";
 import { LocalTime } from "@/components/local-time";
 import { SignatureLine } from "@/components/signature-line";
 import { SiteHeader } from "@/components/site/site-header";
+import { integrationConfig } from "@/content/integration-config";
 import { labNotes, profile, projects } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
 import type { PersonalSignal } from "@/integrations/types";
@@ -131,7 +132,7 @@ export async function Homepage() {
           </div>
         </section>
 
-        <section className="currently-section" aria-labelledby="currently-title">
+        <section className="currently-section" id="now" aria-labelledby="currently-title">
           <div className="section-heading compact">
             <p>02 / Now, approximately</p>
             <h2 id="currently-title">
@@ -180,14 +181,15 @@ export async function Homepage() {
               <p>Training</p>
               <SignalStatus signal={signals.training} />
               <strong>{signals.training.headline}</strong>
-              <div className="training-bars" aria-hidden="true">
-                <i />
-                <i />
-                <i />
-                <i />
-                <i />
-                <i />
-                <i />
+              <div className="strava-summary-frame">
+                <iframe
+                  title="Elias’s weekly running summary on Strava"
+                  src={integrationConfig.strava.weeklySummaryEmbedUrl}
+                  width="300"
+                  height="160"
+                  loading="lazy"
+                  scrolling="no"
+                />
               </div>
               <span>{signals.training.description}</span>
               {signals.training.href && <a className="signal-source-link" href={signals.training.href} target="_blank" rel="noreferrer">Strava ↗</a>}

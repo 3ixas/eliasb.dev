@@ -24,6 +24,10 @@ export const integrationConfig = {
   },
   strava: {
     profileUrl: "https://www.strava.com/athletes/79346179",
+    weeklySummaryEmbedUrl:
+      "https://www.strava.com/athletes/79346179/activity-summary/ca6f4763b80b9c7cd9b0d56ab5c62da15055ea91",
+    latestActivitiesEmbedUrl:
+      "https://www.strava.com/athletes/79346179/latest-rides/ca6f4763b80b9c7cd9b0d56ab5c62da15055ea91",
   },
   status: {
     message: "Building this corner of the internet.",

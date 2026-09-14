@@ -172,11 +172,9 @@ button { color: inherit; font: inherit; }
 .mini-book img { object-fit: cover; }
 .mini-book span { font: 9px/1.1 var(--serif); }
 .mini-book i { position: absolute; right: 8px; bottom: 8px; width: 28px; height: 28px; border: 1px solid #ece8dc; border-radius: 50%; }
-.training-bars { display: flex; gap: 6px; align-items: end; height: 74px; margin-top: auto; }
-.training-bars i { flex: 1; height: 25%; background: var(--line); }
-.training-bars i:nth-child(2), .training-bars i:nth-child(5) { height: 65%; background: var(--accent); }
-.training-bars i:nth-child(3) { height: 90%; }
-.training-bars i:nth-child(6) { height: 52%; }
+.signal-training { min-height: 405px; }
+.strava-summary-frame { width: min(100%, 300px); margin: 22px auto 4px; overflow: hidden; background: #fff; border: 1px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); }
+.strava-summary-frame iframe { display: block; width: 300px; max-width: 100%; border: 0; }
 .matchup { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; }
 .matchup b { display: grid; height: 46px; place-items: center; color: var(--paper); background: var(--ink); font: 12px/1 var(--mono); }
 .matchup i { font: 9px/1 var(--mono); }
