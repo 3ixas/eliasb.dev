@@ -37,36 +37,6 @@ export const labItems = [
   },
 ] as const;
 
-export const libraryObjects = [
-  {
-    number: "001",
-    kind: "Reading",
-    title: "The next marked page",
-    status: "Current selection pending",
-    description:
-      "The current book will become a tactile object with its cover, progress, and one short note about why it has stayed with me.",
-    className: "library-object-book",
-  },
-  {
-    number: "002",
-    kind: "Cinema",
-    title: "A film worth returning to",
-    status: "Letterboxd connection pending",
-    description:
-      "Recent films will arrive as poster-led entries, with ratings or notes only when I have intentionally made them public.",
-    className: "library-object-poster",
-  },
-  {
-    number: "003",
-    kind: "Music",
-    title: "The current rotation",
-    status: "Playlist selection pending",
-    description:
-      "A manually maintained Spotify playlist will sit inside an authored sleeve with a date and a short description of the mood.",
-    className: "library-object-record",
-  },
-] as const;
-
 export const journey = [
   {
     label: "Earlier",

@@ -166,11 +166,15 @@ export async function Homepage() {
               <p>On the shelf</p>
               <SignalStatus signal={signals.reading} />
               <div className="mini-book" aria-hidden="true">
-                <span>Next read</span>
-                <i />
+                {signals.reading.coverUrl ? (
+                  <Image src={signals.reading.coverUrl} alt="" fill sizes="82px" />
+                ) : (
+                  <><span>Current read</span><i /></>
+                )}
               </div>
               <strong>{signals.reading.headline}</strong>
               <span>{signals.reading.description}</span>
+              {signals.reading.href && <a className="signal-source-link" href={signals.reading.href} target="_blank" rel="noreferrer">Goodreads ↗</a>}
             </article>
             <article className="signal signal-training">
               <p>Training</p>
@@ -186,6 +190,7 @@ export async function Homepage() {
                 <i />
               </div>
               <span>{signals.training.description}</span>
+              {signals.training.href && <a className="signal-source-link" href={signals.training.href} target="_blank" rel="noreferrer">Strava ↗</a>}
             </article>
             <article className="signal signal-fantasy">
               <p>Fantasy football</p>
@@ -203,8 +208,16 @@ export async function Homepage() {
               <p>Listening / watching</p>
               <SignalStatus signal={signals.culture} />
               <strong>{signals.culture.headline}</strong>
+              {signals.culture.filmYear && (
+                <span className="culture-meta">
+                  {signals.culture.filmYear}{signals.culture.filmRating ? ` · ${signals.culture.filmRating} ★` : ""}
+                </span>
+              )}
               <span>{signals.culture.description}</span>
-              {signals.culture.href && <a className="signal-source-link" href={signals.culture.href} target="_blank" rel="noreferrer">Open playlist ↗</a>}
+              <div className="signal-source-links">
+                {signals.culture.filmHref && <a className="signal-source-link" href={signals.culture.filmHref} target="_blank" rel="noreferrer">Letterboxd ↗</a>}
+                <a className="signal-source-link" href={signals.culture.playlistHref} target="_blank" rel="noreferrer">Playlist ↗</a>
+              </div>
             </article>
           </div>
         </section>

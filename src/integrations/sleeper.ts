@@ -1,4 +1,5 @@
 import { signalFallbacks } from "@/content/signal-fallbacks";
+import { integrationConfig } from "@/content/integration-config";
 import type { FantasySignal } from "@/integrations/types";
 
 const SLEEPER_API = "https://api.sleeper.app/v1";
@@ -27,9 +28,7 @@ function score(value: number | undefined) {
 }
 
 export async function getFantasySignal(): Promise<FantasySignal> {
-  const username = process.env.SLEEPER_USERNAME;
-  const leagueId = process.env.SLEEPER_LEAGUE_ID;
-  if (!username || !leagueId) return signalFallbacks.fantasy;
+  const { username, leagueId } = integrationConfig.sleeper;
 
   try {
     const [user, state, rosters] = await Promise.all([

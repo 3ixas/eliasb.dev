@@ -5,12 +5,14 @@ Checked against official sources on 2026-09-13. These are feasibility findings, 
 ## Implementation status
 
 - **GitHub:** connected through a server-only adapter with six-hour revalidation. It uses public events without credentials and can add aggregate private contribution counts when `GITHUB_SIGNAL_TOKEN` is configured. Private repository names never reach the page.
-- **Sleeper:** the anonymised matchup adapter is implemented and activates only when `SLEEPER_USERNAME` and `SLEEPER_LEAGUE_ID` are configured.
-- **Manual status:** implemented with an optional expiry through `SITE_STATUS` and `SITE_STATUS_EXPIRES_AT`, preventing an old note from appearing current indefinitely.
-- **Spotify:** a validated public playlist URL can activate the authored playlist link. The final embed treatment awaits the chosen playlist.
-- **Books, films, and training:** retain explicit designed states until the selected book, Letterboxd profile, and permitted training source are supplied.
+- **Sleeper:** connected to Elias's 2026 showcase league through the public, read-only API. The opponent remains anonymised as `OPP`.
+- **Manual status:** stored as public site content with an expiry, preventing an old note from appearing current indefinitely.
+- **Spotify:** the selected public playlist is presented through Spotify's official embed inside a site-designed Library section.
+- **Books:** the public Goodreads `currently-reading` RSS feed supplies the current title, author, cover, and source link. The site retains a last-known fallback and keeps personal notes site-owned.
+- **Films:** the public Letterboxd RSS feed supplies the latest diary entry, year, rating, poster, and source link, with a last-known fallback.
+- **Training:** the homepage links to Elias's public Strava profile while keeping the cross-sport summary independently authored. A richer display requires a suitable official Strava embed.
 
-The first connected sources use Next.js’s persistent Data Cache and bundled fallbacks. The accepted durable Blob snapshot remains the launch architecture once the remaining account-specific sources are available and the Vercel project is configured.
+The connected sources use Next.js’s persistent Data Cache and bundled last-known fallbacks. Public account identifiers live in typed site content; only the optional GitHub token is an environment secret. The accepted durable Blob snapshot remains the deployment-hardening architecture once the Vercel project is configured.
 
 ## Shared approach
 

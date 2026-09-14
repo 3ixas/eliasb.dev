@@ -6,17 +6,14 @@ The homepage now uses verified public profile and project material. These inputs
 
 - **Portrait options:** the current public portrait is in place as a working choice. Compare it with Elias’s newer photographs before locking the crop and treatment.
 - **Public email:** choose the address that will become the primary contact action. LinkedIn is the temporary working destination.
-- **Current book:** title, author, cover, reading progress if useful, and one short personal note.
-- **Cinema:** Letterboxd username or profile URL and the preferred treatment for recent films.
-- **Music:** public Spotify playlist URL for the manually maintained “currently listening” collection.
-- **Training:** Strava profile or activity embed choice, plus any independently maintained metrics Elias wants to publish.
-- **Fantasy football:** Sleeper username, league ID for the showcase redraft league, and the names that should be anonymised.
-- **Manual status:** a short default status and how often Elias expects to change it.
+- **Current-book note:** Goodreads now supplies the current title and cover; add one short authored note when Elias has a thought worth attaching to it.
+- **Training embed:** the public Strava profile is linked. Choose a specific official activity or summary embed only if it adds more than the profile link.
+- **Manual status cadence:** the first status expires on 14 October 2026. Decide whether future statuses should usually last two weeks or one month after observing the upkeep.
 
 ## Content still to author
 
 - Final editorial review of the Threshold, Argus Risk, and Flowtime case-study narratives.
-- The first real Library entry.
+- The first authored Library note beyond the connected live shelf.
 - Final editorial approval of the About journey from data and marketing through AI model training into software engineering.
 - Authored Lab notes for specific interface studies, failed ideas, and fantasy-football experiments as they become publishable.
 

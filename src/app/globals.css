@@ -165,7 +165,11 @@ button { color: inherit; font: inherit; }
 .signal-footnote { display: flex; justify-content: space-between; gap: 15px; margin-top: 12px; color: var(--muted); font: 8px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
 .signal-footnote a { padding-bottom: 2px; border-bottom: 1px solid currentColor; }
 .signal-source-link { width: fit-content; margin-top: 14px; padding-bottom: 2px; border-bottom: 1px solid currentColor; color: var(--muted); font: 8px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.signal-source-links { display: flex; gap: 14px; margin-top: 14px; }
+.signal-source-links .signal-source-link { margin-top: 0; }
+.signal .culture-meta { width: fit-content; padding: 4px 6px; color: var(--ink); border: 1px solid var(--line); font: 9px/1 var(--mono); }
 .mini-book { position: relative; width: 82px; height: 112px; margin: auto; padding: 9px; color: #ece8dc; background: #c45335; box-shadow: 8px 8px 0 color-mix(in srgb, var(--ink) 12%, transparent); transform: rotate(-4deg); }
+.mini-book img { object-fit: cover; }
 .mini-book span { font: 9px/1.1 var(--serif); }
 .mini-book i { position: absolute; right: 8px; bottom: 8px; width: 28px; height: 28px; border: 1px solid #ece8dc; border-radius: 50%; }
 .training-bars { display: flex; gap: 6px; align-items: end; height: 74px; margin-top: auto; }
@@ -426,20 +430,29 @@ button { color: inherit; font: inherit; }
 .library-object summary::-webkit-details-marker { display: none; }
 .library-object summary > span, .library-object summary > i { font: 10px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
 .library-object summary > strong { margin-top: auto; font: 400 clamp(34px, 4vw, 58px)/.9 var(--display); letter-spacing: -.04em; }
+.library-object summary > img { position: relative; width: min(54%, 180px); height: auto; margin: auto; object-fit: cover; box-shadow: 6px 7px 0 #282116; }
 .library-object summary > i { margin-top: 30px; font-style: normal; }
 .library-object > div { position: absolute; inset: 0; padding: 28px; color: #282116; background: #f5f0df; border: 1px solid #282116; box-shadow: 10px 12px 0 #282116; }
 .library-object > div > p, .library-object > div > small { font: 9px/1.35 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
 .library-object > div h3 { margin: 60px 0 25px; font: 400 36px/.95 var(--display); }
 .library-object > div > span { display: block; font-size: 14px; line-height: 1.55; }
+.library-object > div > a { display: inline-block; margin-top: 25px; padding-bottom: 3px; border-bottom: 1px solid currentColor; font: 9px/1.35 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
 .library-object > div > small { position: absolute; bottom: 25px; }
 .library-object[open] summary { transform: rotateY(-150deg); }
 .library-object-book { transform: rotate(-1.5deg); }
 .library-object-poster { transform: translateY(-30px) rotate(1deg); }
 .library-object-poster summary { color: #f3eee5; background: #283b50; }
+.library-object-poster summary > img { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; margin: 0; box-shadow: none; filter: brightness(.53) saturate(.76); }
+.library-object-poster summary > span, .library-object-poster summary > strong, .library-object-poster summary > i { position: relative; z-index: 1; }
 .library-object-record { transform: rotate(-.5deg); }
 .library-object-record summary { color: #f3eee5; background: #1f6c59; border-radius: 50%; }
 .library-object-record > div { border-radius: 50%; }
 .library-index { --paper: #e8e1d4; --ink: #282116; --muted: #746b5d; margin-top: 18px; padding: clamp(75px, 12vw, 155px) clamp(22px, 5vw, 76px); color: var(--ink); background: var(--paper); border: 1px solid var(--ink); border-radius: 12px; }
+.playlist-room { display: grid; grid-template-columns: .7fr 1.3fr; gap: clamp(35px, 8vw, 120px); align-items: center; margin-top: 18px; padding: clamp(60px, 9vw, 120px) clamp(22px, 6vw, 95px); color: #f3eee5; background: #1f6c59; border: 1px solid #282116; border-radius: 12px; box-shadow: 7px 7px 0 #282116; }
+.playlist-room p { margin: 0 0 30px; font: 10px/1.35 var(--mono); letter-spacing: .1em; text-transform: uppercase; opacity: .7; }
+.playlist-room h2 { margin: 0 0 26px; font: 400 clamp(44px, 6vw, 82px)/.9 var(--display); letter-spacing: -.05em; }
+.playlist-room span { display: block; max-width: 540px; font-size: 14px; line-height: 1.55; opacity: .78; }
+.playlist-room iframe { border: 0; border-radius: 12px; box-shadow: 10px 12px 0 #282116; }
 .library-index h2 { max-width: 990px; margin: 40px 0 85px; font: 400 clamp(47px, 7vw, 96px)/.9 var(--display); letter-spacing: -.055em; }
 .library-index > div { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--ink); border-left: 1px solid var(--ink); }
 .library-index article { position: relative; min-height: 310px; padding: 30px; border-right: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
@@ -572,6 +585,7 @@ button { color: inherit; font: inherit; }
   .library-object { min-height: 390px; width: min(88%, 390px); margin: auto; }
   .library-object-poster { transform: rotate(1deg); }
   .library-object-record { width: min(82%, 350px); }
+  .playlist-room { grid-template-columns: 1fr; padding: 55px 18px 65px; }
   .library-index > div { grid-template-columns: 1fr; }
   .about-hero { grid-template-columns: 1fr; padding: 65px 17px 55px; }
   .about-hero h1 { font-size: clamp(51px, 15vw, 74px); }

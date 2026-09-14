@@ -24,6 +24,20 @@ export type PersonalSignal = {
   href?: string;
 };
 
+export type ReadingSignal = PersonalSignal & {
+  author?: string;
+  coverUrl?: string;
+};
+
+export type CultureSignal = PersonalSignal & {
+  filmTitle?: string;
+  filmYear?: string;
+  filmRating?: string;
+  filmPosterUrl?: string;
+  filmHref?: string;
+  playlistHref: string;
+};
+
 export type FantasySignal = PersonalSignal & {
   leftLabel: string;
   matchupLabel: string;
@@ -32,9 +46,9 @@ export type FantasySignal = PersonalSignal & {
 
 export type HomepageSignals = {
   github: GitHubSignal;
-  reading: PersonalSignal;
+  reading: ReadingSignal;
   training: PersonalSignal;
   fantasy: FantasySignal;
-  culture: PersonalSignal;
+  culture: CultureSignal;
   status: PersonalSignal;
 };

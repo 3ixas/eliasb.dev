@@ -1,22 +1,29 @@
 import { signalFallbacks } from "@/content/signal-fallbacks";
+import { integrationConfig } from "@/content/integration-config";
 import { getGitHubSignal } from "@/integrations/github";
+import { getReadingSignal } from "@/integrations/goodreads";
+import { getCultureSignal } from "@/integrations/letterboxd";
 import { getFantasySignal } from "@/integrations/sleeper";
 import type { HomepageSignals } from "@/integrations/types";
 
 export async function getHomepageSignals(): Promise<HomepageSignals> {
-  const [github, fantasy] = await Promise.all([getGitHubSignal(), getFantasySignal()]);
-  const statusText = process.env.SITE_STATUS?.trim();
-  const statusExpiresAt = process.env.SITE_STATUS_EXPIRES_AT;
+  const [github, fantasy, reading, culture] = await Promise.all([
+    getGitHubSignal(),
+    getFantasySignal(),
+    getReadingSignal(),
+    getCultureSignal(),
+  ]);
+  const statusText = integrationConfig.status.message;
+  const statusExpiresAt = integrationConfig.status.expiresAt;
   const statusIsCurrent = statusText && (
     !statusExpiresAt || Number.isNaN(Date.parse(statusExpiresAt)) || Date.parse(statusExpiresAt) > Date.now()
   );
-  const playlistUrl = process.env.SPOTIFY_PLAYLIST_URL?.trim();
-  const hasPublicPlaylist = !!playlistUrl && /^https:\/\/open\.spotify\.com\/playlist\//.test(playlistUrl);
-
   return {
     ...signalFallbacks,
     github,
     fantasy,
+    reading,
+    culture,
     status: statusIsCurrent
       ? {
           state: "curated",
@@ -25,14 +32,5 @@ export async function getHomepageSignals(): Promise<HomepageSignals> {
           description: "London · manually updated",
         }
       : signalFallbacks.status,
-    culture: hasPublicPlaylist
-      ? {
-          state: "curated",
-          statusLabel: "Playlist live",
-          headline: "The current rotation",
-          description: "A manually kept Spotify playlist, surrounded by notes and recent cinema.",
-          href: playlistUrl,
-        }
-      : signalFallbacks.culture,
   };
 }
