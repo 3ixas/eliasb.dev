@@ -19,7 +19,7 @@ export function ConceptPrototype({ direction }: { direction: ConceptDirection })
           <a href="#library">Library</a>
           <a href="#about">About</a>
         </nav>
-        <a href="mailto:hello@eliasb.dev" className="say-hello">Say hello ↗</a>
+        <a href="#about" className="say-hello">Say hello ↓</a>
       </header>
 
       <main id="top">
@@ -168,7 +168,7 @@ export function ConceptPrototype({ direction }: { direction: ConceptDirection })
             </p>
             <p className="photo-placeholder">Real portrait to be tested here</p>
           </div>
-          <a href="mailto:hello@eliasb.dev" className="contact-link">hello@eliasb.dev <span>↗</span></a>
+          <span className="contact-link contact-pending">Email address pending <span>↗</span></span>
         </section>
       </main>
 
