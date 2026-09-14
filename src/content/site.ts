@@ -9,10 +9,10 @@ export const profile = {
   about:
     "I’m based in London and currently work on high-performance pricing and risk systems. Outside work, I build my own products end to end: finding the problem, shaping the interaction, writing the code, and returning to the awkward parts until they make sense.",
   links: {
+    email: "mailto:eliasthebennett@gmail.com",
     github: "https://github.com/3ixas",
     linkedin: "https://linkedin.com/in/elias-t-bennett/",
-    resume:
-      "https://drive.google.com/file/d/1aiC3EBfxrfcbGTkETDpzRi7FYlfTPYWQ/view?usp=sharing",
+    resume: undefined as string | undefined,
   },
 } as const;
 

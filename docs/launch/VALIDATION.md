@@ -22,8 +22,7 @@ Validated on 14 September 2026 against an optimized local production build.
 - Create private-review Vercel deployments for the new site and the old-site archive.
 - Run Lighthouse or PageSpeed against the public preview URL. Local response timings are useful as a server baseline but do not prove field Core Web Vitals.
 - Confirm Safari and Firefox rendering. Only Chromium and Chrome were available during local automation.
-- Confirm the public Google Drive résumé link in a browser session that is not relying on owner access.
-- Choose the public contact email and replace the temporary LinkedIn-first contact treatment.
+- Add the current résumé once its replacement public URL is available. The previous Google Drive file returns “Page Not Found,” so its link is hidden rather than shipped broken.
 
 ## Old-site preservation and cutover
 

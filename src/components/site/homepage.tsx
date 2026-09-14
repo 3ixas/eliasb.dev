@@ -320,9 +320,11 @@ export async function Homepage() {
                 <a href={profile.links.linkedin} target="_blank" rel="noreferrer">
                   LinkedIn ↗
                 </a>
-                <a href={profile.links.resume} target="_blank" rel="noreferrer">
-                  Résumé ↗
-                </a>
+                {profile.links.resume && (
+                  <a href={profile.links.resume} target="_blank" rel="noreferrer">
+                    Résumé ↗
+                  </a>
+                )}
               </div>
             </div>
             <figure className="portrait-frame">
@@ -338,10 +340,10 @@ export async function Homepage() {
           </div>
           <div id="contact" className="contact-block">
             <p>Have a complex problem worth making simpler?</p>
-            <a className="contact-link" href={profile.links.linkedin} target="_blank" rel="noreferrer">
+            <a className="contact-link" href={profile.links.email}>
               Start a conversation <span>↗</span>
             </a>
-            <span>Email will become the primary contact once the public address is chosen.</span>
+            <span>eliasthebennett@gmail.com</span>
           </div>
         </section>
       </main>

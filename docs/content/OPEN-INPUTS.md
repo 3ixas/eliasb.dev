@@ -4,7 +4,7 @@ The homepage now uses verified public profile and project material. These inputs
 
 ## Needed before public launch
 
-- **Public email:** choose the address that will become the primary contact action. LinkedIn is the temporary working destination.
+- **Résumé:** upload the current CV to a public location and provide its new stable URL. The previous Google Drive file no longer exists, so the unavailable link is hidden until it can be replaced.
 - **Current-book note:** Goodreads now supplies the current title and cover; add one short authored note when Elias has a thought worth attaching to it.
 - **Manual status cadence:** the first status expires on 14 October 2026. Decide whether future statuses should usually last two weeks or one month after observing the upkeep.
 
@@ -13,4 +13,4 @@ The homepage now uses verified public profile and project material. These inputs
 - The first authored Library note beyond the connected live shelf.
 - Authored Lab notes for specific interface studies, failed ideas, and fantasy-football experiments as they become publishable.
 
-The Threshold, Argus Risk, and Flowtime narratives and the About journey have completed their editorial pass. No remaining authored note blocks launch. Each unresolved live signal has a stable fallback state until its source is connected.
+The public contact action now uses `eliasthebennett@gmail.com`. The Threshold, Argus Risk, and Flowtime narratives and the About journey have completed their editorial pass. No remaining authored note blocks launch. Each unresolved live signal has a stable fallback state until its source is connected.

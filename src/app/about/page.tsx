@@ -73,11 +73,11 @@ export default function AboutPage() {
         <section className="about-contact" id="contact" aria-labelledby="about-contact-title">
           <p>Have a complex problem worth making simpler?</p>
           <h2 id="about-contact-title">Let’s talk.</h2>
-          <a href={profile.links.linkedin} target="_blank" rel="noreferrer">Start a conversation <span>↗</span></a>
+          <a href={profile.links.email}>Start a conversation <span>↗</span></a>
           <div>
-            <span>Public email pending</span>
+            <span>eliasthebennett@gmail.com</span>
             <a href={profile.links.github} target="_blank" rel="noreferrer">GitHub ↗</a>
-            <a href={profile.links.resume} target="_blank" rel="noreferrer">Résumé ↗</a>
+            {profile.links.resume && <a href={profile.links.resume} target="_blank" rel="noreferrer">Résumé ↗</a>}
           </div>
         </section>
       </main>
