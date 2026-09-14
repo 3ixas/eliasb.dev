@@ -23,8 +23,14 @@ export type TrainingCategory = {
   count: number;
 };
 
+export type TrainingDay = {
+  day: string;
+  activity: string;
+};
+
 export type TrainingSignal = PersonalSignal & {
   weekly: TrainingCategory[];
+  schedule?: readonly TrainingDay[];
   totalActivities: number;
   windowLabel: string;
   updatedAt: string | null;
@@ -59,6 +65,7 @@ export type ReadingSignal = PersonalSignal & {
   author?: string;
   coverUrl?: string;
   bookDescription?: string;
+  updatedAt: string | null;
 };
 
 export type CultureSignal = PersonalSignal & {
@@ -69,6 +76,7 @@ export type CultureSignal = PersonalSignal & {
   filmPosterUrl?: string;
   filmHref?: string;
   playlistHref: string;
+  updatedAt: string | null;
 };
 
 export type FantasySignal = PersonalSignal & {

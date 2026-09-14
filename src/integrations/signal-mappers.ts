@@ -18,6 +18,8 @@ export type TrainingCategoryShape = {
   count: number;
 };
 
+export const GITHUB_ACTIVITY_DAYS = 371;
+
 export const TRAINING_CATEGORIES: TrainingCategoryShape[] = [
   { label: "Lift", count: 0 },
   { label: "Run", count: 0 },
@@ -33,7 +35,7 @@ export function datesForWindow(length: number, now = new Date()): ActivityDay[] 
   });
 }
 
-export function mapPublicActivity(events: GitHubEventShape[], length = 28, now = new Date()) {
+export function mapPublicActivity(events: GitHubEventShape[], length = GITHUB_ACTIVITY_DAYS, now = new Date()) {
   const activity = datesForWindow(length, now);
   const byDate = new Map(activity.map((day, index) => [day.date, index]));
 
@@ -45,7 +47,7 @@ export function mapPublicActivity(events: GitHubEventShape[], length = 28, now =
   return activity;
 }
 
-export function mapContributionDays(days: ContributionDayShape[], length = 28, now = new Date()) {
+export function mapContributionDays(days: ContributionDayShape[], length = GITHUB_ACTIVITY_DAYS, now = new Date()) {
   const byDate = new Map(days.map((day) => [day.date, day.contributionCount]));
 
   return datesForWindow(length, now).map((day) => ({

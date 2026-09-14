@@ -1,6 +1,6 @@
 export const profile = {
   name: "Elias Bennett",
-  shortName: "Elias B.",
+  shortName: "Elias",
   role: "Software engineer",
   location: "London",
   statement: "I build thoughtful software for complex problems.",
@@ -40,7 +40,7 @@ export const projects = [
     index: "02",
     name: "Argus Risk",
     eyebrow: "Event-driven systems",
-    detail: "Kafka · PostgreSQL · SignalR · Next.js",
+    detail: "C# · .NET · Kafka · PostgreSQL · SignalR · Next.js",
     image: "/work/argus/overview.webp",
     imageAlt: "Argus Risk interface showing event-driven risk positions",
     codeUrl: "https://github.com/3ixas/argus-risk",
@@ -49,7 +49,7 @@ export const projects = [
     index: "03",
     name: "Flowtime",
     eyebrow: "Offline-first interaction",
-    detail: "Focus state that survives refreshes, mistakes, and interruptions.",
+    detail: "Next.js · TypeScript · localStorage · Service Worker",
     image: "/work/flowtime/timer.jpg",
     imageAlt: "Flowtime focus timer interface",
     liveUrl: "https://flowtime-focus-timer.vercel.app",
@@ -64,7 +64,8 @@ export const labNotes = [
     kind: "History experiment",
     description:
       "A character-led way to ask questions of history, built around a witty and eccentric professor.",
-    href: "/lab",
+    href: "/lab#lab-01",
+    treatment: "professor",
   },
   {
     index: "02",
@@ -73,6 +74,7 @@ export const labNotes = [
     description:
       "Small experiments with rankings, matchups, predictions, and the weekly chaos of a redraft league.",
     href: "/lab#lab-02",
+    treatment: "fantasy",
   },
   {
     index: "03",
@@ -81,5 +83,6 @@ export const labNotes = [
     description:
       "Components, interaction ideas, failed directions, and notes from learning how products should feel.",
     href: "/lab#lab-03",
+    treatment: "interface",
   },
 ] as const;

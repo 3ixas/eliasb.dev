@@ -12,6 +12,11 @@ export const metadata: Metadata = {
   description: "Books, cinema, history, science fiction, and music kept within reach by Elias Bennett.",
 };
 
+function freshnessLabel(updatedAt: string | null) {
+  if (!updatedAt) return "Stable fallback";
+  return `Updated ${new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" }).format(new Date(updatedAt))}`;
+}
+
 export default async function LibraryPage() {
   const [reading, culture, history] = await Promise.all([
     getReadingSignal(),
@@ -52,6 +57,7 @@ export default async function LibraryPage() {
                 <p>Currently reading</p>
                 <h3>{reading.headline}</h3>
                 <span>{reading.bookDescription ?? `${reading.author ? `By ${reading.author}. ` : ""}A book I’m currently reading; notes will follow.`}</span>
+                <small className="library-freshness">{freshnessLabel(reading.updatedAt)}</small>
                 {reading.href && <a href={reading.href} target="_blank" rel="noreferrer">View on Goodreads <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
             </ClosableDetails>
             <ClosableDetails
@@ -69,6 +75,7 @@ export default async function LibraryPage() {
                 <h3>{culture.filmTitle ?? culture.headline}</h3>
                 <span>{culture.filmDescription ?? "The latest film in my diary. I keep the rating and notes on Letterboxd."}</span>
                 <span>{culture.filmYear}{culture.filmRating ? ` · ${culture.filmRating} out of 5` : ""}</span>
+                <small className="library-freshness">{freshnessLabel(culture.updatedAt)}</small>
                 {culture.filmHref && <a href={culture.filmHref} target="_blank" rel="noreferrer">View on Letterboxd <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
             </ClosableDetails>
           </div>
@@ -110,7 +117,6 @@ export default async function LibraryPage() {
                 {history.statusLabel} <span className="arrow-mark" aria-hidden="true">↗︎</span>
               </a>
             </article>
-            <article><span>SF</span><h3>Science fiction</h3><p>Stories I return to when I want to think about technology, power, and society.</p></article>
           </div>
         </section>
       </main>

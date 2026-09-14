@@ -1,11 +1,12 @@
 import { signalFallbacks } from "@/content/signal-fallbacks";
-import { mapContributionDays, mapPublicActivity } from "@/integrations/signal-mappers";
+import { GITHUB_ACTIVITY_DAYS, mapContributionDays, mapPublicActivity } from "@/integrations/signal-mappers";
 import type { ActivityDay, GitHubSignal } from "@/integrations/types";
 
 const GITHUB_LOGIN = "3ixas";
 const GITHUB_PROFILE = `https://github.com/${GITHUB_LOGIN}`;
 const API_VERSION = "2026-03-10";
-const ACTIVITY_DAYS = 28;
+const ACTIVITY_DAYS = GITHUB_ACTIVITY_DAYS;
+const CONTRIBUTION_WINDOW_DAYS = 365;
 
 type GitHubEvent = {
   type: string;
@@ -69,7 +70,7 @@ function describeEvent(event: GitHubEvent) {
 async function fetchContributionActivity(token: string): Promise<ContributionSnapshot | null> {
   const to = new Date();
   const from = new Date(to);
-  from.setUTCDate(to.getUTCDate() - (ACTIVITY_DAYS - 1));
+  from.setUTCDate(to.getUTCDate() - (CONTRIBUTION_WINDOW_DAYS - 1));
 
   const response = await fetch("https://api.github.com/graphql", {
     method: "POST",
@@ -154,12 +155,12 @@ export async function getGitHubSignal(): Promise<GitHubSignal> {
     return {
       state: "live",
       statusLabel: "Live · all contributions",
-      headline: `${contributions.totalContributions} contributions in 28 days`,
+      headline: `${contributions.totalContributions} contributions in the last year`,
       description: latest
         ? `${describeEvent(latest)} · private work is included in the total without repository details.`
         : "Public and private contribution totals are included without repository details.",
       activity: contributions.activity,
-      activityLabel: "GitHub contributions over the last 28 days, including private totals",
+      activityLabel: "GitHub contributions over the last year, including private totals",
       totalContributions: contributions.totalContributions,
       privateContributions: contributions.privateContributions,
       updatedAt: new Date().toISOString(),
@@ -175,7 +176,7 @@ export async function getGitHubSignal(): Promise<GitHubSignal> {
       headline: describeEvent(latest),
       description: "Recent public building activity from GitHub. Private totals need the site token.",
       activity,
-      activityLabel: "Public GitHub activity over the last 28 days",
+      activityLabel: "Public GitHub activity over the last year",
       updatedAt: new Date().toISOString(),
       href: GITHUB_PROFILE,
     };
@@ -191,7 +192,7 @@ export async function getGitHubSignal(): Promise<GitHubSignal> {
         ? "No public events appeared in the recent window; private totals need a working site token."
         : "No public GitHub events appeared in the recent activity window.",
       activity: mapPublicActivity(events),
-      activityLabel: "Public GitHub activity over the last 28 days",
+      activityLabel: "Public GitHub activity over the last year",
       updatedAt: new Date().toISOString(),
     };
   }

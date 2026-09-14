@@ -14,14 +14,24 @@ function recentDates(length: number) {
   });
 }
 
+const TYPICAL_TRAINING_WEEK = [
+  { day: "Mon", activity: "Full body" },
+  { day: "Tue", activity: "Zone 2 run" },
+  { day: "Wed", activity: "Full body" },
+  { day: "Thu", activity: "Interval run" },
+  { day: "Fri", activity: "Full body" },
+  { day: "Sat", activity: "Zone 2 rowing machine" },
+  { day: "Sun", activity: "Interval assault bike" },
+] as const;
+
 export const signalFallbacks: HomepageSignals = {
   github: {
     state: "unavailable",
     statusLabel: "Public only",
     headline: "Building eliasb.dev, again",
     description: "Public GitHub activity is visible here; private contribution totals need the site token.",
-    activity: recentDates(28),
-    activityLabel: "Public activity is temporarily unavailable",
+    activity: recentDates(371),
+    activityLabel: "Public GitHub activity over the last year",
     updatedAt: null,
     href: "https://github.com/3ixas",
   },
@@ -37,15 +47,16 @@ export const signalFallbacks: HomepageSignals = {
     headline: "Dark Age",
     description: "By Pierce Brown · Goodreads may be temporarily unavailable",
     author: "Pierce Brown",
+    bookDescription: "A stable snapshot of the current Goodreads shelf until the next successful lookup.",
     coverUrl: "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1525464420l/29226553._SY475_.jpg",
     href: "https://www.goodreads.com/book/show/29226553-dark-age",
+    updatedAt: null,
   },
   training: {
     state: "curated",
-    statusLabel: "Public log",
-    headline: "Lift · Run · Muay Thai",
-    description: "Strava shows the public log; the wider training rhythm stays private.",
-    href: "https://www.strava.com/athletes/79346179",
+    statusLabel: "Typical week",
+    headline: "A typical training week",
+    description: "Authored schedule · not synced to a fitness service.",
     weekly: [
       { label: "Lift", count: 0 },
       { label: "Run", count: 0 },
@@ -53,8 +64,9 @@ export const signalFallbacks: HomepageSignals = {
       { label: "Other", count: 0 },
     ],
     totalActivities: 0,
-    windowLabel: "This week",
+    windowLabel: "Typical week",
     updatedAt: null,
+    schedule: TYPICAL_TRAINING_WEEK,
   },
   fantasy: {
     state: "pending",
@@ -69,7 +81,7 @@ export const signalFallbacks: HomepageSignals = {
     state: "curated",
     statusLabel: "Last known culture",
     headline: "Avengers: Infinity War",
-    description: "The latest film in my diary, alongside a playlist I’m enjoying.",
+    description: "The latest film logged in my Letterboxd diary.",
     href: "https://open.spotify.com/playlist/3t859SH3i1qKfvsDlGWm9F",
     filmTitle: "Avengers: Infinity War",
     filmYear: "2018",
@@ -78,5 +90,6 @@ export const signalFallbacks: HomepageSignals = {
     filmPosterUrl: "https://a.ltrbxd.com/resized/film-poster/2/2/6/6/6/1/226661-avengers-infinity-war-0-600-0-900-crop.jpg?v=8b35f60c0c",
     filmHref: "https://letterboxd.com/3lxas/film/avengers-infinity-war/",
     playlistHref: "https://open.spotify.com/playlist/3t859SH3i1qKfvsDlGWm9F",
+    updatedAt: null,
   },
 };

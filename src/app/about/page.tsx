@@ -47,7 +47,13 @@ export default function AboutPage() {
         </section>
 
         <section className="journey-section" aria-labelledby="journey-title">
-          <div className="journey-heading"><p>A short path here</p><h2 id="journey-title">Different work, one recurring question.</h2></div>
+          <div className="journey-heading">
+            <p>A short path here</p>
+            <div>
+              <h2 id="journey-title">The thread through all of it.</h2>
+              <span className="journey-question">How do you make complicated things easier to understand?</span>
+            </div>
+          </div>
           <ol>
             {journey.map((step, index) => (
               <li key={step.label}>
@@ -67,6 +73,8 @@ export default function AboutPage() {
             <li><span>02</span><strong>Run</strong><p>Distance and a clearer head.</p></li>
             <li><span>03</span><strong>Muay Thai</strong><p>Technique under pressure.</p></li>
             <li><span>04</span><strong>Football</strong><p>Watching, arguing, modelling.</p></li>
+            <li><span>05</span><strong>Reading</strong><p>Stories and ideas kept within reach.</p></li>
+            <li><span>06</span><strong>History</strong><p>Patterns, people, and the details that stay useful.</p></li>
           </ul>
         </section>
 
