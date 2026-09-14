@@ -1,0 +1,27 @@
+# Site signal contracts
+
+The homepage and Library render small server-owned snapshots. External services are queried from server components only; no token, route, location, or private repository detail is sent to the browser.
+
+## GitHub contributions
+
+- `GITHUB_SIGNAL_TOKEN` is optional and server-only.
+- With the token, the GraphQL `ContributionsCollection` supplies the last 28 days of calendar counts, the aggregate total, and the restricted/private aggregate count. The page may show those numbers, but never a private repository name, branch, event, or message.
+- Without the token, the REST public-events endpoint supplies a clearly labelled public-only trace. If either endpoint is unavailable, the authored fallback stays visible.
+- Responses are cached for six hours and requests time out after 3.5 seconds.
+
+## Strava training
+
+- `STRAVA_ACCESS_TOKEN` or the OAuth client and refresh-token trio (`STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `STRAVA_REFRESH_TOKEN`) are optional server-only credentials.
+- The activities endpoint is queried from the Monday of the current week and reduced to counts for Lift, Run, Muay Thai, and Other. Routes, exact locations, heart rate, body measurements, and activity names never enter the render model.
+- The site-owned training card shows the window, grouped counts, update context, and a link to the public athlete profile. Without credentials or when the API fails, it shows the authored Lift · Run · Muay Thai rhythm and says that it is a curated public-log fallback.
+- Activity responses are cached for 30 minutes. OAuth and activity requests time out after 4–5 seconds.
+
+## History
+
+- The Library requests the Wikimedia/English Wikipedia `onthisday` feed for the Monday of the current week.
+- The response is reduced to at most three events with a year, text, and a source page link. It is cached for seven days and has a deterministic authored fallback when the feed is unavailable or malformed.
+- The card calls itself a weekly note; it does not promise daily maintenance or present fallback text as a live lookup.
+
+## Verification boundary
+
+All three adapters validate response shape before mapping. Empty, partial, timeout, non-2xx, and malformed responses resolve to a truthful fallback instead of an empty dashboard or a client-side error.

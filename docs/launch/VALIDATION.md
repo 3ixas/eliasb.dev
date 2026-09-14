@@ -6,7 +6,7 @@ Validated on 14 September 2026 against an optimized local production build.
 
 - All eight launch routes render at `320px`, `390px`, and desktop widths without horizontal overflow.
 - Every launch route has one `h1`, meaningful image alternatives where images convey content, titled embeds, and a visible keyboard skip link.
-- Keyboard focus follows the visual navigation order and remains clear of the fixed mobile navigation. Embedded Strava content is removed from the page tab sequence because the same data has a labelled direct link.
+- Keyboard focus follows the visual navigation order and remains clear of the fixed mobile navigation. Training data is rendered by the site-owned summary; the Strava profile remains a labelled source link.
 - Text contrast passes the WCAG AA thresholds used by the automated computed-style audit in both themes across every launch route.
 - Reduced-motion visitors receive a simple reveal in place of the typed entrance.
 - The Library's native disclosure interactions open and close by keyboard and pointer without production console warnings.
@@ -21,7 +21,7 @@ Validated on 14 September 2026 against an optimized local production build.
 
 - The old site is preserved at `https://eliasb-v1.vercel.app` and the unindexed new-site review build is at `https://eliasb-dev.vercel.app`.
 - A mobile Lighthouse run against the public review build scored 98 Performance, 100 Accessibility, 96 Best Practices, and 66 SEO. The lab metrics were 1.4s FCP, 1.7s LCP, 110ms Total Blocking Time, and 0.001 CLS.
-- The SEO score is intentionally reduced by `noindex, nofollow`. The remaining Best Practices findings come from third-party cookie and back-forward-cache behaviour inside the official Strava iframe.
+- The SEO score is intentionally reduced by `noindex, nofollow`. Any remaining third-party findings should be rechecked after the new site-owned training summary is deployed.
 
 ## Remaining production checks
 

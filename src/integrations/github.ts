@@ -1,4 +1,5 @@
 import { signalFallbacks } from "@/content/signal-fallbacks";
+import { mapContributionDays, mapPublicActivity } from "@/integrations/signal-mappers";
 import type { ActivityDay, GitHubSignal } from "@/integrations/types";
 
 const GITHUB_LOGIN = "3ixas";
@@ -10,6 +11,12 @@ type GitHubEvent = {
   type: string;
   repo: { name: string };
   created_at: string;
+};
+
+type ContributionSnapshot = {
+  activity: ActivityDay[];
+  totalContributions: number;
+  privateContributions: number;
 };
 
 type ContributionResponse = {
@@ -27,16 +34,6 @@ type ContributionResponse = {
     };
   };
 };
-
-function datesForWindow(length = ACTIVITY_DAYS): ActivityDay[] {
-  const today = new Date();
-
-  return Array.from({ length }, (_, index) => {
-    const date = new Date(today);
-    date.setUTCDate(today.getUTCDate() - (length - index - 1));
-    return { date: date.toISOString().slice(0, 10), count: 0 };
-  });
-}
 
 function isGitHubEvent(value: unknown): value is GitHubEvent {
   if (!value || typeof value !== "object") return false;
@@ -69,19 +66,7 @@ function describeEvent(event: GitHubEvent) {
   }
 }
 
-function mapPublicActivity(events: GitHubEvent[]) {
-  const activity = datesForWindow();
-  const byDate = new Map(activity.map((day, index) => [day.date, index]));
-
-  for (const event of events) {
-    const index = byDate.get(event.created_at.slice(0, 10));
-    if (index !== undefined) activity[index].count += 1;
-  }
-
-  return activity;
-}
-
-async function fetchContributionActivity(token: string): Promise<ActivityDay[] | null> {
+async function fetchContributionActivity(token: string): Promise<ContributionSnapshot | null> {
   const to = new Date();
   const from = new Date(to);
   from.setUTCDate(to.getUTCDate() - (ACTIVITY_DAYS - 1));
@@ -115,18 +100,24 @@ async function fetchContributionActivity(token: string): Promise<ActivityDay[] |
   if (!response.ok) return null;
 
   const result = (await response.json()) as ContributionResponse;
-  const days = result.data?.user?.contributionsCollection?.contributionCalendar?.weeks
+  const collection = result.data?.user?.contributionsCollection;
+  const calendar = collection?.contributionCalendar;
+  const days = calendar?.weeks
     ?.flatMap((week) => week.contributionDays ?? [])
     .filter((day): day is { date: string; contributionCount: number } =>
-      typeof day.date === "string" && typeof day.contributionCount === "number"
+      typeof day.date === "string" && typeof day.contributionCount === "number",
     );
 
-  if (!days?.length) return null;
+  if (!calendar || !days?.length || typeof calendar.totalContributions !== "number") return null;
 
-  const requestedDates = new Set(datesForWindow().map((day) => day.date));
-  return days
-    .filter((day) => requestedDates.has(day.date))
-    .map((day) => ({ date: day.date, count: day.contributionCount }));
+  return {
+    activity: mapContributionDays(days, ACTIVITY_DAYS),
+    totalContributions: calendar.totalContributions,
+    privateContributions:
+      typeof collection?.restrictedContributionsCount === "number"
+        ? collection.restrictedContributionsCount
+        : 0,
+  };
 }
 
 async function fetchPublicEvents(): Promise<GitHubEvent[]> {
@@ -150,43 +141,60 @@ async function fetchPublicEvents(): Promise<GitHubEvent[]> {
 }
 
 export async function getGitHubSignal(): Promise<GitHubSignal> {
-  try {
-    const events = await fetchPublicEvents();
-    const latest = events[0];
-    const token = process.env.GITHUB_SIGNAL_TOKEN;
-    const contributions = token ? await fetchContributionActivity(token).catch(() => null) : null;
-    const activity = contributions ?? mapPublicActivity(events);
+  const token = process.env.GITHUB_SIGNAL_TOKEN;
+  const [eventsResult, contributionResult] = await Promise.allSettled([
+    fetchPublicEvents(),
+    token ? fetchContributionActivity(token) : Promise.resolve(null),
+  ]);
+  const events = eventsResult.status === "fulfilled" ? eventsResult.value : [];
+  const contributions = contributionResult.status === "fulfilled" ? contributionResult.value : null;
+  const latest = events[0];
 
-    if (!latest) {
-      return {
-        ...signalFallbacks.github,
-        state: "live",
-        statusLabel: "Live · public",
-        headline: "Quiet in public, building in private",
-        description: "No public GitHub events appeared in the recent activity window.",
-        activity,
-        activityLabel: contributions
-          ? "GitHub contributions over the last 28 days"
-          : "Public GitHub activity over the last 28 days",
-        updatedAt: new Date().toISOString(),
-      };
-    }
-
+  if (contributions) {
     return {
       state: "live",
-      statusLabel: contributions ? "Live · all contributions" : "Live · public",
-      headline: describeEvent(latest),
-      description: contributions
-        ? "Recent building activity, including private contribution counts without repository details."
-        : "Recent public building activity from GitHub. Private totals need the site token.",
-      activity,
-      activityLabel: contributions
-        ? "GitHub contributions over the last 28 days"
-        : "Public GitHub activity over the last 28 days",
+      statusLabel: "Live · all contributions",
+      headline: `${contributions.totalContributions} contributions in 28 days`,
+      description: latest
+        ? `${describeEvent(latest)} · private work is included in the total without repository details.`
+        : "Public and private contribution totals are included without repository details.",
+      activity: contributions.activity,
+      activityLabel: "GitHub contributions over the last 28 days, including private totals",
+      totalContributions: contributions.totalContributions,
+      privateContributions: contributions.privateContributions,
       updatedAt: new Date().toISOString(),
       href: GITHUB_PROFILE,
     };
-  } catch {
-    return signalFallbacks.github;
   }
+
+  if (latest) {
+    const activity = mapPublicActivity(events);
+    return {
+      state: "live",
+      statusLabel: token ? "Live · public only" : "Live · public",
+      headline: describeEvent(latest),
+      description: "Recent public building activity from GitHub. Private totals need the site token.",
+      activity,
+      activityLabel: "Public GitHub activity over the last 28 days",
+      updatedAt: new Date().toISOString(),
+      href: GITHUB_PROFILE,
+    };
+  }
+
+  if (eventsResult.status === "fulfilled") {
+    return {
+      ...signalFallbacks.github,
+      state: "live",
+      statusLabel: token ? "Live · public only" : "Live · public",
+      headline: "Quiet in public, building in private",
+      description: token
+        ? "No public events appeared in the recent window; private totals need a working site token."
+        : "No public GitHub events appeared in the recent activity window.",
+      activity: mapPublicActivity(events),
+      activityLabel: "Public GitHub activity over the last 28 days",
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  return signalFallbacks.github;
 }

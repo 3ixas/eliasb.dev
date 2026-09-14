@@ -4,14 +4,16 @@ import { getGitHubSignal } from "@/integrations/github";
 import { getReadingSignal } from "@/integrations/goodreads";
 import { getCultureSignal } from "@/integrations/letterboxd";
 import { getFantasySignal } from "@/integrations/sleeper";
+import { getTrainingSignal } from "@/integrations/strava";
 import type { HomepageSignals } from "@/integrations/types";
 
 export async function getHomepageSignals(): Promise<HomepageSignals> {
-  const [github, fantasy, reading, culture] = await Promise.all([
+  const [github, fantasy, reading, culture, training] = await Promise.all([
     getGitHubSignal(),
     getFantasySignal(),
     getReadingSignal(),
     getCultureSignal(),
+    getTrainingSignal(),
   ]);
   const statusText = integrationConfig.status.message;
   const statusExpiresAt = integrationConfig.status.expiresAt;
@@ -24,6 +26,7 @@ export async function getHomepageSignals(): Promise<HomepageSignals> {
     fantasy,
     reading,
     culture,
+    training,
     status: statusIsCurrent
       ? {
           state: "curated",
