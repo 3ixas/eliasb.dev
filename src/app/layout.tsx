@@ -3,10 +3,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Elias B. — Personal site concept study",
+    default: "Elias B. — Thoughtful software for complex problems",
     template: "%s · Elias B.",
   },
-  description: "Three visual directions for the next version of eliasb.dev.",
+  description:
+    "The work, experiments, interests, and current signals of London-based software engineer Elias Bennett.",
   robots: { index: false, follow: false },
 };
 

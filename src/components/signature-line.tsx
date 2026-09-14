@@ -2,9 +2,15 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-const statement = "I build thoughtful software for complex problems.";
+const defaultStatement = "I build thoughtful software for complex problems.";
 
-export function SignatureLine({ direction }: { direction: string }) {
+export function SignatureLine({
+  direction,
+  statement = defaultStatement,
+}: {
+  direction: string;
+  statement?: string;
+}) {
   const [visible, setVisible] = useState(statement);
   const [complete, setComplete] = useState(true);
 
@@ -30,7 +36,7 @@ export function SignatureLine({ direction }: { direction: string }) {
     }, 38);
 
     return () => window.clearInterval(timer);
-  }, [direction]);
+  }, [direction, statement]);
 
   useEffect(() => {
     let stop: (() => void) | undefined;

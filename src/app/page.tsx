@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ConceptPrototype } from "@/components/concept-prototype";
+import { Homepage } from "@/components/site/homepage";
 
 export const metadata: Metadata = {
   title: "Elias B. — Thoughtful software for complex problems",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <ConceptPrototype direction="cabinet-of-curiosities" reviewMode={false} />;
+  return <Homepage />;
 }
