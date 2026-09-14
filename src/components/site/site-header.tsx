@@ -9,9 +9,9 @@ export function SiteHeader() {
       </a>
       <nav aria-label="Primary navigation">
         <Link href="/work">Work</Link>
-        <a href="#lab">Lab</a>
-        <a href="#library">Library</a>
-        <a href="#about">About</a>
+        <Link href="/lab">Lab</Link>
+        <Link href="/library">Library</Link>
+        <Link href="/about">About</Link>
       </nav>
       <div className="site-header-actions">
         <ThemeToggle compact />

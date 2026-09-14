@@ -206,6 +206,9 @@ export function Homepage() {
               );
             })}
           </div>
+          <Link className="section-link" href="/lab">
+            Explore the Lab <span>↗</span>
+          </Link>
         </section>
 
         <section className="library-section" id="library" aria-labelledby="library-title">
@@ -243,6 +246,9 @@ export function Homepage() {
               </div>
             </details>
           </div>
+          <Link className="section-link" href="/library">
+            Enter the Library <span>↗</span>
+          </Link>
         </section>
 
         <section className="about-section" id="about" aria-labelledby="about-title">
@@ -256,6 +262,7 @@ export function Homepage() {
             <div className="about-prose">
               <p>{profile.about}</p>
               <div className="profile-links" aria-label="Profile links">
+                <Link href="/about">More about me →</Link>
                 <a href={profile.links.github} target="_blank" rel="noreferrer">
                   GitHub ↗
                 </a>

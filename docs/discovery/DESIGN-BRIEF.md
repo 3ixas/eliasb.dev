@@ -137,7 +137,7 @@ Do not change the live domain during design and development. Validate the comple
 2. Produce the three comparable visual concepts. **Complete.**
 3. Select and document the visual system, then build the homepage. **Complete.**
 4. Build the three Work case studies. **Complete.**
-5. Build Lab, Library, and About.
+5. Build Lab, Library, and About. **Complete.**
 6. Add integrations and their designed fallback states.
 7. Validate responsive behavior, accessibility, browser support, and performance.
 8. Validate the production deployment and cut over `eliasb.dev`.
