@@ -31,9 +31,9 @@ export const caseStudies = {
     name: "Threshold",
     kind: "Product engineering · Data visualization",
     year: "2026",
-    headline: "The number that matters isn’t rent. It’s readiness.",
+    headline: "Affordability starts before the first month’s rent.",
     summary:
-      "Threshold turns the scattered costs of moving into one explainable picture: what is due on day one, what repeats each month, and whether a chosen scenario is actually affordable.",
+      "Threshold gathers the costs of moving into one scenario: cash needed upfront, monthly spending, and the gap between current savings and a chosen move.",
     role: "Independent product, design, data modelling, and frontend engineering",
     stack: ["React 19", "TypeScript", "MapLibre", "URLSearchParams", "Vitest"],
     liveUrl: "https://threshold-beta.vercel.app",
@@ -67,16 +67,16 @@ export const caseStudies = {
     chapters: [
       {
         eyebrow: "01 / Frame the decision",
-        title: "Monthly rent answers only half the question.",
+        title: "Monthly affordability can hide the cost that stops a move.",
         body: [
-          "Moving is a threshold decision. A person can afford the monthly total and still be blocked by a deposit, first month’s rent, moving costs, or furnishing an empty place.",
-          "The product separates those horizons before it asks whether the move is possible. That structure makes the result legible to someone who does not want to audit a spreadsheet.",
+          "A person may be able to cover the monthly total and still be blocked by a deposit, first month’s rent, moving costs, or furnishing an empty place.",
+          "Threshold separates upfront and recurring costs before calculating the savings gap and time to move. Someone can understand the result without having to audit a spreadsheet.",
         ],
         notes: ["Upfront total", "Monthly total", "Savings gap", "Time to move"],
       },
       {
         eyebrow: "02 / Make assumptions visible",
-        title: "A useful estimate should show where it came from.",
+        title: "Every estimate should expose its assumptions.",
         body: [
           "Each city is a typed configuration of districts, rent bands, transport rules, deposits, utilities, and local charges. London and the Swiss cities can share a calculation engine without pretending their costs work the same way.",
           "Defaults are starting points rather than hidden truth. People can override food, transport, broadband, moving, furniture, health insurance, income, and savings, while the interface keeps the published data date visible.",
@@ -85,7 +85,7 @@ export const caseStudies = {
       },
       {
         eyebrow: "03 / Let the state travel",
-        title: "The URL is the save button and the share button.",
+        title: "The URL saves the whole scenario.",
         body: [
           "Every meaningful input serialises into URL parameters. Opening the link reconstructs the same district, property, household, lifestyle, and affordability scenario.",
           "This removes account creation and global state from a product that does not need either. It also makes comparisons easy to discuss: the scenario itself can be copied, reviewed, and changed.",
@@ -94,7 +94,7 @@ export const caseStudies = {
       },
     ],
     takeaway:
-      "Threshold taught me to treat transparency as part of the interface: show the assumptions, preserve the scenario, and make uncertainty editable.",
+      "Building Threshold changed how I think about transparency in an interface. The assumptions stay visible, the scenario can travel, and uncertain values remain editable.",
   },
   "argus-risk": {
     slug: "argus-risk",
@@ -102,9 +102,9 @@ export const caseStudies = {
     name: "Argus Risk",
     kind: "Distributed systems · Financial simulation",
     year: "2026",
-    headline: "Risk is a moving picture. The interface must show whether you can trust it.",
+    headline: "Live risk numbers need a visible chain of trust.",
     summary:
-      "Argus is a local educational simulator for a multi-currency equity risk platform. It follows market data and trades through an event-driven system, calculates live portfolio state, and explains freshness, failure, and replay in the browser.",
+      "Argus is a local educational simulator for a multi-currency equity risk platform. It follows simulated market data and trades through an event-driven system, calculates portfolio state, and exposes freshness, failure, and replay in the browser.",
     role: "Independent system architecture, backend, simulation, observability, and dashboard engineering",
     stack: [".NET 8", "Kafka / Redpanda", "PostgreSQL / Marten", "SignalR", "Next.js"],
     codeUrl: "https://github.com/3ixas/argus-risk",
@@ -131,7 +131,7 @@ export const caseStudies = {
     chapters: [
       {
         eyebrow: "01 / Follow the event",
-        title: "A trade should remain explainable after it becomes a dashboard number.",
+        title: "Follow a trade from event to screen.",
         body: [
           "Simulated prices, FX rates, and trades enter separate Kafka topics. The risk engine consumes them, projects position state, publishes snapshots, and persists the history needed for replay. The API then pushes each snapshot to the Next.js dashboard through SignalR.",
           "The services communicate through events instead of a chain of direct calls. That separation makes the journey visible and lets each part be restarted or inspected independently in the local Docker environment.",
@@ -140,7 +140,7 @@ export const caseStudies = {
       },
       {
         eyebrow: "02 / Preserve the why",
-        title: "Current state is a projection, not the source of truth.",
+        title: "Rebuild position state from the events that changed it.",
         body: [
           "Position changes are appended as immutable Marten events: opened, increased, decreased, reversed, or closed. Replaying those events reconstructs the position at a point in time and preserves the path that produced it.",
           "FIFO cost basis and the risk calculations stay in pure functions with no infrastructure dependencies. The same inputs produce the same result, which makes correctness testable and replay meaningful.",
@@ -149,7 +149,7 @@ export const caseStudies = {
       },
       {
         eyebrow: "03 / Design for doubt",
-        title: "A live number without freshness is only decoration.",
+        title: "Show when a live number is stale.",
         body: [
           "The interface pairs portfolio values with connection state, price freshness, alerts, and reconciliation. When a source stalls, the useful question is no longer only ‘what is the value?’ but ‘how old is it, what failed, and can the system recover?’",
           "Replay, checksums, metrics, traces, and degraded states are part of the product story. Argus is deliberately a simulator, but it explores the operational questions that make real-time software believable.",
@@ -158,7 +158,7 @@ export const caseStudies = {
       },
     ],
     takeaway:
-      "Argus sharpened the link between backend correctness and interface trust: operational state belongs in the product, where a person can act on it.",
+      "Argus put backend correctness and interface trust into the same design problem. The dashboard has to show enough operational state for someone to know when its numbers are usable.",
   },
   flowtime: {
     slug: "flowtime",
@@ -168,7 +168,7 @@ export const caseStudies = {
     year: "2026",
     headline: "A timer should remember the work, even when the tab forgets.",
     summary:
-      "Flowtime is a private-by-default focus timer that adapts breaks to the length of a session. Its harder problem is continuity: keeping time accurate and making interruption, recovery, and local data ownership feel calm.",
+      "Flowtime is a private-by-default focus timer that adapts breaks to the length of a session. The harder part is continuity: keeping time accurate through sleeping tabs, browser closures, and interrupted sessions.",
     role: "Independent product, interaction design, frontend engineering, and accessibility",
     stack: ["Next.js", "TypeScript", "localStorage", "Service Worker", "Vitest"],
     liveUrl: "https://flowtime-focus-timer.vercel.app",
@@ -189,7 +189,7 @@ export const caseStudies = {
     chapters: [
       {
         eyebrow: "01 / Time from truth",
-        title: "Intervals wake the screen. Timestamps tell the time.",
+        title: "Calculate elapsed time from timestamps, not ticks.",
         body: [
           "A long-running interval slowly drifts and browsers throttle background tabs. Flowtime stores the session’s absolute start time and derives elapsed time from the difference to the current timestamp on every tick.",
           "The display can pause, the tab can sleep, and the calculation still returns to the correct duration. That small architectural choice protects the central promise of the product.",
@@ -198,7 +198,7 @@ export const caseStudies = {
       },
       {
         eyebrow: "02 / Recovery is a state",
-        title: "Closing the tab should create a choice, not erase a session.",
+        title: "Closing the tab should open a recovery choice.",
         body: [
           "An active session is stored locally with its start time, task, and tags. When Flowtime opens again, it detects the unfinished state and offers a deliberate recovery path instead of silently resuming or discarding the work.",
           "The timer moves through explicit stopped, running, results, break, paused-break, and complete states. Each transition has a bounded action, which keeps edge cases understandable in code and in the interface.",
@@ -207,7 +207,7 @@ export const caseStudies = {
       },
       {
         eyebrow: "03 / Keep it personal",
-        title: "Useful history does not require an account.",
+        title: "Keep the history on the device.",
         body: [
           "Completed sessions, tags, notes, settings, and the active session remain in localStorage. A service worker keeps the app shell available offline, while CSV export gives the person a route out of the product.",
           "Keyboard shortcuts, live timer announcements, visible focus, reduced motion, labelled charts, and recoverable dialogs are treated as interaction requirements rather than a final audit pass.",
@@ -216,7 +216,7 @@ export const caseStudies = {
       },
     ],
     takeaway:
-      "Flowtime made resilience feel like an interface material: preserve intent, expose recovery, and let the person own the record of their attention.",
+      "Flowtime reinforced a rule I now bring to other interfaces: protect the person’s intent through interruption and make recovery explicit.",
   },
 } as const satisfies Record<CaseStudySlug, CaseStudy>;
 

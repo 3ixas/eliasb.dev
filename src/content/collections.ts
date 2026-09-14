@@ -18,7 +18,7 @@ export const labItems = [
     kind: "Football · Data · Prediction",
     description:
       "A home for matchup views, rankings, draft tools, and eventually a small prediction model built around one Sleeper redraft league.",
-    note: "League connection and member anonymisation are still pending. The first release will show the format without pretending forecast confidence.",
+    note: "The live homepage matchup is connected and the other managers stay anonymous. Rankings and prediction experiments can grow here without presenting guesses as certainty.",
     liveUrl: undefined,
     codeUrl: undefined,
     treatment: "fantasy",
@@ -42,18 +42,18 @@ export const journey = [
     label: "Earlier",
     title: "Data and marketing",
     description:
-      "I began closer to analysis, audiences, and the question of why people respond to one experience and ignore another.",
+      "I started in marketing, close to data, experiments, and the question of why one experience earns attention while another loses it.",
   },
   {
     label: "Then",
     title: "AI model training",
     description:
-      "Evaluating and curating code for language models made precision, clear reasoning, and the limits of automated answers tangible.",
+      "Training and evaluating code for language models made precision matter in a different way. A plausible answer was never enough if the reasoning or code did not hold up.",
   },
   {
     label: "Now",
     title: "Software engineering",
     description:
-      "I work on high-performance financial risk systems and build personal products across systems, interfaces, and data.",
+      "Today I build high-performance pricing and risk software in C#, alongside personal products in TypeScript and Python. The common thread is making complicated behaviour easier to reason about.",
   },
 ] as const;

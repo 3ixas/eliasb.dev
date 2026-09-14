@@ -5,9 +5,9 @@ export const profile = {
   location: "London",
   statement: "I build thoughtful software for complex problems.",
   introduction:
-    "I work across engineering, product, and interface design—turning consequential systems into tools people can understand and trust.",
+    "I’m a software engineer who works across systems, data, and interfaces. I care about how a product feels, how it behaves when things go wrong, and whether the person using it can understand what is happening.",
   about:
-    "I’m a London-based software engineer interested in the point where systems thinking, product judgment, and visual craft meet. I currently work on high-performance financial risk systems, and I keep a lab for the smaller ideas, interface studies, and experiments that teach me something new.",
+    "I’m based in London and currently work on high-performance pricing and risk systems. Outside work, I build my own products end to end: finding the problem, shaping the interaction, writing the code, and returning to the awkward parts until they make sense.",
   links: {
     github: "https://github.com/3ixas",
     linkedin: "https://linkedin.com/in/elias-t-bennett/",
@@ -23,7 +23,7 @@ export const projects = [
     eyebrow: "Product engineering · Data visualization · 2026",
     thesis: "Making the cost of a decision visible.",
     description:
-      "A rental-affordability calculator for London, Basel, and Zurich. It turns salary, moving costs, and local assumptions into a clear, shareable picture of what independent living really costs.",
+      "A rental-affordability calculator for London, Basel, and Zurich. It brings salary, moving costs, and local assumptions into one shareable picture of what it takes to move.",
     qualities: [
       "Shareable URL state",
       "Typed city configuration",
