@@ -17,19 +17,23 @@ Validated on 14 September 2026 against an optimized local production build.
 - `robots.txt`, `sitemap.xml`, canonical metadata, social metadata, and the generated Open Graph image are present. Preview builds remain `noindex, nofollow` until `SITE_INDEXABLE=true` is deliberately set for the public launch.
 - `pnpm lint`, `pnpm build --webpack`, the route crawl, and `git diff --check` pass.
 
-## Production-preview checks
+## Public preview evidence
 
-- Create private-review Vercel deployments for the new site and the old-site archive.
-- Run Lighthouse or PageSpeed against the public preview URL. Local response timings are useful as a server baseline but do not prove field Core Web Vitals.
+- The old site is preserved at `https://eliasb-v1.vercel.app` and the unindexed new-site review build is at `https://eliasb-dev.vercel.app`.
+- A mobile Lighthouse run against the public review build scored 98 Performance, 100 Accessibility, 96 Best Practices, and 66 SEO. The lab metrics were 1.4s FCP, 1.7s LCP, 110ms Total Blocking Time, and 0.001 CLS.
+- The SEO score is intentionally reduced by `noindex, nofollow`. The remaining Best Practices findings come from third-party cookie and back-forward-cache behaviour inside the official Strava iframe.
+
+## Remaining production checks
+
 - Confirm Safari and Firefox rendering. Only Chromium and Chrome were available during local automation.
 - Add the current résumé once its replacement public URL is available. The previous Google Drive file returns “Page Not Found,” so its link is hidden rather than shipped broken.
 
 ## Old-site preservation and cutover
 
-1. Import `3ixas/personal-portfolio-v1` into a separate Vercel project as a static site with no build command and the repository root as its output.
-2. Verify the assigned stable `*.vercel.app` project URL before changing `eliasb.dev`. The exact hostname depends on project-name availability.
+1. Import `3ixas/personal-portfolio-v1` into a separate Vercel project as a static site with no build command and the repository root as its output. **Complete.**
+2. Verify the assigned stable `*.vercel.app` project URL before changing `eliasb.dev`. **Complete: `https://eliasb-v1.vercel.app`.**
 3. Keep the old GitHub Pages deployment intact during the rollback window.
-4. Deploy and approve the new site on its own Vercel preview URL.
+4. Deploy and approve the new site on its own Vercel review URL. **Deployed unindexed at `https://eliasb-dev.vercel.app`; final approval pending.**
 5. Move `eliasb.dev` and `www.eliasb.dev` to the new Vercel project only after the preview checks pass.
 6. Set `SITE_INDEXABLE=true` for the approved production deployment and verify redirects, metadata, integrations, and analytics after cutover.
 
