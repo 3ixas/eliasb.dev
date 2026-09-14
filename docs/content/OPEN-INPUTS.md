@@ -7,7 +7,7 @@ The homepage now uses verified public profile and project material. These inputs
 - **Portrait options:** the current public portrait is in place as a working choice. Compare it with Elias’s newer photographs before locking the crop and treatment.
 - **Public email:** choose the address that will become the primary contact action. LinkedIn is the temporary working destination.
 - **Current-book note:** Goodreads now supplies the current title and cover; add one short authored note when Elias has a thought worth attaching to it.
-- **Training embed:** the public Strava profile is linked. Choose a specific official activity or summary embed only if it adds more than the profile link.
+- **Training embed code:** copy the official last-week running summary from Strava's website under Profile → Share your Activities. The launch treatment and surrounding copy are approved.
 - **Manual status cadence:** the first status expires on 14 October 2026. Decide whether future statuses should usually last two weeks or one month after observing the upkeep.
 
 ## Content still to author

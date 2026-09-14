@@ -10,7 +10,7 @@ Checked against official sources on 2026-09-13. These are feasibility findings, 
 - **Spotify:** the selected public playlist is presented through Spotify's official embed inside a site-designed Library section.
 - **Books:** the public Goodreads `currently-reading` RSS feed supplies the current title, author, cover, and source link. The site retains a last-known fallback and keeps personal notes site-owned.
 - **Films:** the public Letterboxd RSS feed supplies the latest diary entry, year, rating, poster, and source link, with a last-known fallback.
-- **Training:** the homepage links to Elias's public Strava profile while keeping the cross-sport summary independently authored. A richer display requires a suitable official Strava embed.
+- **Training:** the homepage links to Elias's public Strava profile while keeping the cross-sport summary authored. The selected launch treatment is Strava's official last-week running summary inside a site-designed frame; activation awaits the embed code from Elias's profile.
 
 The connected sources use Next.js’s persistent Data Cache and bundled last-known fallbacks. Public account identifiers live in typed site content; only the optional GitHub token is an environment secret. The accepted durable Blob snapshot remains the deployment-hardening architecture once the Vercel project is configured.
 
@@ -71,7 +71,7 @@ Viable approaches:
 
 Webhooks remain part of the Strava API and do not avoid the public-display restriction. Manual account exports do not clearly provide a supported automatic-publication route. Automated custom public display of Strava-derived activity would require written approval from Strava.
 
-The recommended launch approach is an official recent-activity or weekly-summary embed inside a designed frame, plus a separate site-owned visualization of deliberately chosen totals or activity types. Keep exact routes, gym location, body measurements, heart-rate data, and detailed schedules private. The official embed offers low maintenance but limited visual control and sport coverage.
+The confirmed launch approach is Strava's official last-week running summary inside a designed frame, surrounded by the broader authored `Lift · Run · Muay Thai` context and a link to Elias's profile. A separately maintained combined activity visualization is deferred because its weekly upkeep is not justified for launch. Keep exact routes, gym location, body measurements, heart-rate data, and detailed schedules private. The official embed offers low maintenance but limited visual control and sport coverage.
 
 Sources: [Strava API Agreement](https://www.strava.com/legal/api_policy), [Strava embeds](https://support.strava.com/en-us/articles/15402053-sharing-your-activities-and-routes-with-a-strava-embed), [Strava data exports](https://support.strava.com/en-us/articles/15401919-exporting-your-data-and-bulk-export).
 
