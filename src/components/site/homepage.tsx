@@ -31,9 +31,9 @@ export async function Homepage() {
   const signals = await getHomepageSignals();
 
   return (
-    <div className="prototype prototype-cabinet-of-curiosities selected-experience">
+    <div className="prototype prototype-cabinet-of-curiosities selected-experience" id="top">
       <SiteHeader />
-      <main id="top">
+      <main id="main-content">
         <section className="hero" aria-labelledby="hero-kicker">
           <p className="hero-kicker" id="hero-kicker">
             {profile.shortName} · {profile.role} · {profile.location}
@@ -69,6 +69,7 @@ export async function Homepage() {
                 alt={threshold.imageAlt}
                 width={1804}
                 height={1376}
+                sizes="(max-width: 800px) calc(100vw - 56px), 65vw"
                 priority
               />
               <span className="project-index">{threshold.index}</span>
@@ -118,6 +119,7 @@ export async function Homepage() {
                 alt={flowtime.imageAlt}
                 width={1280}
                 height={640}
+                sizes="(max-width: 800px) calc(100vw - 68px), 40vw"
               />
               <div className="rail-links">
                 <Link href="/work/flowtime">Case study →</Link>
@@ -185,6 +187,7 @@ export async function Homepage() {
                 <iframe
                   title="Elias’s weekly running summary on Strava"
                   src={integrationConfig.strava.weeklySummaryEmbedUrl}
+                  tabIndex={-1}
                   width="300"
                   height="160"
                   loading="lazy"
@@ -328,6 +331,7 @@ export async function Homepage() {
                 alt="Elias Bennett smiling in a white dinner jacket"
                 width={1200}
                 height={1500}
+                sizes="(max-width: 800px) calc(100vw - 56px), 45vw"
               />
               <figcaption>Off duty, approximately</figcaption>
             </figure>

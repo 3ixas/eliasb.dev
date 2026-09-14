@@ -1,14 +1,25 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+const isIndexable = process.env.SITE_INDEXABLE === "true";
+
 export const metadata: Metadata = {
+  metadataBase: new URL("https://eliasb.dev"),
   title: {
     default: "Elias B. — Thoughtful software for complex problems",
     template: "%s · Elias B.",
   },
   description:
     "The work, experiments, interests, and current signals of London-based software engineer Elias Bennett.",
-  robots: { index: false, follow: false },
+  openGraph: {
+    type: "website",
+    siteName: "Elias B.",
+    title: "Elias B. — Thoughtful software for complex problems",
+    description:
+      "The work, experiments, interests, and current signals of London-based software engineer Elias Bennett.",
+  },
+  twitter: { card: "summary_large_image" },
+  robots: { index: isIndexable, follow: isIndexable },
 };
 
 const themeScript = `

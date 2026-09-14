@@ -6,6 +6,7 @@ type Destination = "work" | "lab" | "library" | "about";
 export function PageHeader({ active }: { active?: Destination }) {
   return (
     <header className="page-header">
+      <a className="skip-link" href="#main-content">Skip to content</a>
       <Link href="/" className="site-mark" aria-label="Elias B. homepage">
         E/B
       </Link>

@@ -61,7 +61,7 @@ export const labNotes = [
     kind: "History experiment",
     description:
       "A character-led way to ask questions of history, built around a witty and eccentric professor.",
-    href: "https://askprofessorpast.com",
+    href: "/lab",
   },
   {
     index: "02",

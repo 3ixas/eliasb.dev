@@ -7,7 +7,7 @@ export const labItems = [
     description:
       "A personality-led history chatbot that turns a search-shaped question into a conversation with an eccentric professor.",
     note: "The original experiment is live. A more deliberate rebuild is currently at the specification and visual-system stage.",
-    liveUrl: "https://askprofessorpast.com",
+    liveUrl: undefined,
     codeUrl: "https://github.com/3ixas/ask-professor-past",
     treatment: "professor",
   },

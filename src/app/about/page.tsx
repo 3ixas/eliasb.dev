@@ -14,7 +14,7 @@ export default function AboutPage() {
   return (
     <div className="collection-page about-page">
       <PageHeader active="about" />
-      <main>
+      <main id="main-content">
         <header className="about-hero">
           <div>
             <p>About · Elias Bennett</p>
@@ -26,6 +26,7 @@ export default function AboutPage() {
               alt="Elias Bennett standing on a boat with the coastline behind him"
               width={1200}
               height={1600}
+              sizes="(max-width: 800px) 92vw, 42vw"
               priority
             />
             <figcaption>Based in London · <LocalTime /></figcaption>

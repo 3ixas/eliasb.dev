@@ -14,8 +14,8 @@ export default function WorkPage() {
 
   return (
     <div className="work-index-page">
-      <PageHeader />
-      <main>
+      <PageHeader active="work" />
+      <main id="main-content">
         <header className="work-index-hero">
           <p>Selected work · 2026</p>
           <h1>Three ways of making complex state <em>understandable.</em></h1>
@@ -36,6 +36,7 @@ export default function WorkPage() {
                   alt={study.hero.alt}
                   width={study.hero.width}
                   height={study.hero.height}
+                  sizes="(max-width: 800px) calc(100vw - 56px), 55vw"
                 />
                 <span className="work-card-arrow">Read case study ↗</span>
               </Link>

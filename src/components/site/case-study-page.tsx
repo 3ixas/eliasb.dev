@@ -7,7 +7,7 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
   return (
     <div className={`case-study case-${study.slug}`}>
       <PageHeader active="work" />
-      <main>
+      <main id="main-content">
         <header className="case-hero">
           <div className="case-crumbs">
             <Link href="/work">← All work</Link>
@@ -35,6 +35,7 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
             alt={study.hero.alt}
             width={study.hero.width}
             height={study.hero.height}
+            sizes="(max-width: 800px) calc(100vw - 48px), 90vw"
             priority
           />
           <figcaption>{study.name} · {study.kind}</figcaption>
@@ -68,6 +69,7 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
                     alt={study.gallery[index].alt}
                     width={study.gallery[index].width}
                     height={study.gallery[index].height}
+                    sizes="(max-width: 800px) calc(100vw - 48px), 72vw"
                   />
                 </figure>
               )}

@@ -16,7 +16,7 @@ export default async function LibraryPage() {
   return (
     <div className="collection-page library-page">
       <PageHeader active="library" />
-      <main>
+      <main id="main-content">
         <header className="collection-hero library-hero">
           <p>Library · Culture and curiosities</p>
           <h1>A shelf for ideas I want to keep <em>within reach.</em></h1>
@@ -35,7 +35,7 @@ export default async function LibraryPage() {
             <details className="library-object library-object-book">
               <summary>
                 <span>Reading · {reading.statusLabel}</span>
-                {reading.coverUrl && <Image src={reading.coverUrl} alt="" width={180} height={270} />}
+                {reading.coverUrl && <Image src={reading.coverUrl} alt="" width={180} height={270} sizes="180px" />}
                 <strong>{reading.headline}</strong>
                 <i>001</i>
               </summary>

@@ -129,7 +129,7 @@ The accepted rationale is in `docs/adr/0001-nextjs-vercel-and-snapshot-architect
 - Canonical hostname: `eliasb.dev`.
 - Redirect `www.eliasb.dev` to the apex hostname.
 
-Do not change the live domain during design and development. Validate the complete site on its Vercel URL, preserve unrelated DNS records, and keep the old GitHub Pages deployment available at its `github.io` address during a rollback window.
+Do not change the live domain during design and development. Validate the complete site on its Vercel URL and preserve unrelated DNS records. Before cutover, deploy the old static site as its own Vercel project and verify its stable `*.vercel.app` URL. Keep its GitHub Pages deployment available during the rollback window as well.
 
 ## Delivery sequence
 
@@ -139,7 +139,7 @@ Do not change the live domain during design and development. Validate the comple
 4. Build the three Work case studies. **Complete.**
 5. Build Lab, Library, and About. **Complete.**
 6. Add integrations and their designed fallback states. **Complete:** GitHub, Goodreads, Letterboxd, Sleeper, Spotify, Strava, local time, and expiring status are connected with source-appropriate fallbacks.
-7. Validate responsive behavior, accessibility, browser support, and performance.
+7. Validate responsive behavior, accessibility, browser support, and performance. **Local production validation complete; public preview performance and Safari/Firefox checks remain.**
 8. Validate the production deployment and cut over `eliasb.dev`.
 
 The coherent launch experience should be complete before the domain changes. Later entries, experiments, and richer fantasy predictions can expand after launch without blocking it.

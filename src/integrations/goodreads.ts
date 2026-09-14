@@ -25,7 +25,7 @@ export async function getReadingSignal(): Promise<ReadingSignal> {
       description: `By ${author} · from my Goodreads shelf`,
       author,
       coverUrl: rssValue(item, "book_large_image_url") ?? rssValue(item, "book_image_url"),
-      href: rssValue(item, "link") ?? integrationConfig.goodreads.profileUrl,
+      href: integrationConfig.goodreads.profileUrl,
     };
   } catch {
     return signalFallbacks.reading;
