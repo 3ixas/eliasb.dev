@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   },
   description:
     "The work, experiments, interests, and current signals of London-based software engineer Elias Bennett.",
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: "/icon.svg",
     shortcut: "/icon.svg",
