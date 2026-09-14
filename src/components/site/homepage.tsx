@@ -4,10 +4,31 @@ import { LocalTime } from "@/components/local-time";
 import { SignatureLine } from "@/components/signature-line";
 import { SiteHeader } from "@/components/site/site-header";
 import { labNotes, profile, projects } from "@/content/site";
+import { getHomepageSignals } from "@/integrations/homepage";
+import type { PersonalSignal } from "@/integrations/types";
 
 const [threshold, argus, flowtime] = projects;
 
-export function Homepage() {
+function SignalStatus({ signal }: { signal: Pick<PersonalSignal, "state" | "statusLabel"> }) {
+  return <span className="signal-status" data-state={signal.state}>{signal.statusLabel}</span>;
+}
+
+function activityLevel(count: number) {
+  if (count >= 4) return "4";
+  if (count >= 3) return "3";
+  if (count >= 2) return "2";
+  if (count >= 1) return "1";
+  return "0";
+}
+
+function freshnessLabel(updatedAt: string | null) {
+  if (!updatedAt) return "Stable fallback";
+  return `Updated ${new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" }).format(new Date(updatedAt))}`;
+}
+
+export async function Homepage() {
+  const signals = await getHomepageSignals();
+
   return (
     <div className="prototype prototype-cabinet-of-curiosities selected-experience">
       <SiteHeader />
@@ -119,34 +140,42 @@ export function Homepage() {
           </div>
           <div className="signal-grid">
             <article className="signal signal-building">
-              <p>Building</p>
-              <strong>eliasb.dev, again</strong>
-              <span>Cabinet direction selected · the real homepage is taking shape</span>
-              <div className="activity-trace" aria-hidden="true">
-                {Array.from({ length: 28 }, (_, index) => (
-                  <i key={index} />
+              <p>Recent building</p>
+              <SignalStatus signal={signals.github} />
+              <strong>{signals.github.headline}</strong>
+              <span>{signals.github.description}</span>
+              <div className="activity-trace" role="img" aria-label={signals.github.activityLabel}>
+                {signals.github.activity.map((day) => (
+                  <i key={day.date} data-level={activityLevel(day.count)} aria-hidden="true" />
                 ))}
+              </div>
+              <div className="signal-footnote">
+                <a href={signals.github.href} target="_blank" rel="noreferrer">GitHub ↗</a>
+                <span>{freshnessLabel(signals.github.updatedAt)}</span>
               </div>
             </article>
             <article className="signal signal-presence">
               <p>Local signal</p>
+              <SignalStatus signal={signals.status} />
               <strong>
                 <LocalTime />
               </strong>
-              <span>Probably thinking through an interface.</span>
+              <span>{signals.status.headline}</span>
             </article>
             <article className="signal signal-reading">
               <p>On the shelf</p>
+              <SignalStatus signal={signals.reading} />
               <div className="mini-book" aria-hidden="true">
                 <span>Next read</span>
                 <i />
               </div>
-              <strong>First shelf in progress</strong>
-              <span>Current book and cover will live here</span>
+              <strong>{signals.reading.headline}</strong>
+              <span>{signals.reading.description}</span>
             </article>
             <article className="signal signal-training">
               <p>Training</p>
-              <strong>Lift · Run · Muay Thai</strong>
+              <SignalStatus signal={signals.training} />
+              <strong>{signals.training.headline}</strong>
               <div className="training-bars" aria-hidden="true">
                 <i />
                 <i />
@@ -156,22 +185,26 @@ export function Homepage() {
                 <i />
                 <i />
               </div>
-              <span>Weekly rhythm · Strava connection planned</span>
+              <span>{signals.training.description}</span>
             </article>
             <article className="signal signal-fantasy">
               <p>Fantasy football</p>
-              <strong>Main redraft league</strong>
+              <SignalStatus signal={signals.fantasy} />
+              <strong>{signals.fantasy.headline}</strong>
               <span className="matchup">
-                <b>EB</b>
-                <i>in season</i>
-                <b>—</b>
+                <b>{signals.fantasy.leftLabel}</b>
+                <i>{signals.fantasy.matchupLabel}</i>
+                <b>{signals.fantasy.rightLabel}</b>
               </span>
-              <span>Sleeper matchup data will appear here</span>
+              <span>{signals.fantasy.description}</span>
+              {signals.fantasy.href && <a className="signal-source-link" href={signals.fantasy.href} target="_blank" rel="noreferrer">Sleeper ↗</a>}
             </article>
             <article className="signal signal-culture">
               <p>Listening / watching</p>
-              <strong>The current rotation</strong>
-              <span>Spotify playlist · Letterboxd diary · coming into focus</span>
+              <SignalStatus signal={signals.culture} />
+              <strong>{signals.culture.headline}</strong>
+              <span>{signals.culture.description}</span>
+              {signals.culture.href && <a className="signal-source-link" href={signals.culture.href} target="_blank" rel="noreferrer">Open playlist ↗</a>}
             </article>
           </div>
         </section>

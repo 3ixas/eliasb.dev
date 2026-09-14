@@ -2,6 +2,16 @@
 
 Checked against official sources on 2026-09-13. These are feasibility findings, not final architecture decisions.
 
+## Implementation status
+
+- **GitHub:** connected through a server-only adapter with six-hour revalidation. It uses public events without credentials and can add aggregate private contribution counts when `GITHUB_SIGNAL_TOKEN` is configured. Private repository names never reach the page.
+- **Sleeper:** the anonymised matchup adapter is implemented and activates only when `SLEEPER_USERNAME` and `SLEEPER_LEAGUE_ID` are configured.
+- **Manual status:** implemented with an optional expiry through `SITE_STATUS` and `SITE_STATUS_EXPIRES_AT`, preventing an old note from appearing current indefinitely.
+- **Spotify:** a validated public playlist URL can activate the authored playlist link. The final embed treatment awaits the chosen playlist.
+- **Books, films, and training:** retain explicit designed states until the selected book, Letterboxd profile, and permitted training source are supplied.
+
+The first connected sources use Next.js’s persistent Data Cache and bundled fallbacks. The accepted durable Blob snapshot remains the launch architecture once the remaining account-specific sources are available and the Vercel project is configured.
+
 ## Shared approach
 
 Fetch external data away from the visitor's browser, normalize it into small site-owned snapshots, retain the last successful result, and show when it was updated. Each experience needs a designed loading, stale, unavailable, and empty state. Secrets must never reach the browser.
