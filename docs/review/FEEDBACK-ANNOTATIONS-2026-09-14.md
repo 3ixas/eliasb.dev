@@ -35,11 +35,12 @@ The annotations are treated as product requirements. The screenshots are evidenc
 10. Change the GitHub contribution signal from a 28-day strip to a year view comparable to GitHub's contribution calendar. The headline and accessible label must say that the total covers the year, and private repository names/details must remain hidden.
 11. The culture signal should be a watching card only. Remove its duplicate Playlist link and change the heading from `Listening / watching` to `Watching`.
 12. The homepage Spotify panel should contain the actual Spotify playlist embed, surrounded by the site's own heading and short description. The dedicated Library playlist panel remains the canonical full-size embed.
+13. The Letterboxd card must refresh often enough to reflect a newly logged film. The current public RSS feed contains `The Invite` (logged 14 September 2026), while the review deployment still shows the previous cached item, `Avengers: Infinity War`. Reduce the feed and homepage revalidation window to a short, documented interval (recommended: 15–30 minutes), keep the authored film only as a failure fallback, and expose enough freshness context to make a stale integration diagnosable.
 
 ### Lab
 
-13. Every Lab card must have a real destination. Ask Professor Past should point to `/lab#lab-01`; Fantasy models and Interface studies should keep their stable anchors. The card should show a clear open action and remain keyboard reachable.
-14. Add one visual asset to each Lab card. These should be site-owned editorial illustrations or real project imagery where available, not fabricated product screenshots. The initial direction is a small typographic/diagrammatic illustration for Professor Past, an NFL/data visual for Fantasy models, and a component/state study for Interface studies.
+14. Every Lab card must have a real destination. Ask Professor Past should point to `/lab#lab-01`; Fantasy models and Interface studies should keep their stable anchors. The card should show a clear open action and remain keyboard reachable.
+15. Add one visual asset to each Lab card. These should be site-owned editorial illustrations or real project imagery where available, not fabricated product screenshots. The initial direction is a small typographic/diagrammatic illustration for Professor Past, an NFL/data visual for Fantasy models, and a component/state study for Interface studies.
 
 ## Explicit non-goals
 
@@ -58,9 +59,9 @@ Owns the short display name, Argus and Flowtime stack labels, GitHub chip spacin
 
 Owns the London visual, authored seven-day training schedule, NFL-inspired matchup treatment, and the annual GitHub contribution calendar. It includes the data-shape changes and the no-live-data wording needed to keep the surfaces truthful.
 
-### Slice C — Watching and Spotify separation
+### Slice C — Watching, Letterboxd freshness, and Spotify separation
 
-Owns the watching-only culture card, removal of the duplicate playlist link, and the homepage Spotify embed. It verifies the embed remains responsive and that the Library panel still works as the full-size version.
+Owns the watching-only culture card, Letterboxd refresh interval/freshness context, removal of the duplicate playlist link, and the homepage Spotify embed. It verifies the feed picks up a newly logged film within the documented interval, the embed remains responsive, and the Library panel still works as the full-size version.
 
 ### Slice D — Lab destinations and imagery
 
