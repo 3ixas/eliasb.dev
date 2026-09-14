@@ -23,7 +23,7 @@ export default function LabPage() {
 
         <section className="lab-board" aria-label="Lab projects">
           {labItems.map((item) => (
-            <article key={item.index} className={`lab-specimen specimen-${item.treatment}`}>
+            <article id={`lab-${item.index}`} key={item.index} className={`lab-specimen specimen-${item.treatment}`}>
               <div className="specimen-meta">
                 <span>{item.index}</span>
                 <span>{item.status}</span>
@@ -40,8 +40,8 @@ export default function LabPage() {
                 <span>{item.note}</span>
                 {(item.liveUrl || item.codeUrl) && (
                   <div className="specimen-links">
-                    {item.liveUrl && <a href={item.liveUrl} target="_blank" rel="noreferrer">Open experiment ↗</a>}
-                    {item.codeUrl && <a href={item.codeUrl} target="_blank" rel="noreferrer">Source ↗</a>}
+                    {item.liveUrl && <a href={item.liveUrl} target="_blank" rel="noreferrer">Open experiment <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
+                    {item.codeUrl && <a href={item.codeUrl} target="_blank" rel="noreferrer">Source <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
                   </div>
                 )}
               </div>

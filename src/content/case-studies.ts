@@ -29,7 +29,7 @@ export const caseStudies = {
     slug: "threshold",
     index: "01",
     name: "Threshold",
-    kind: "Product engineering · Data visualization",
+    kind: "Product engineering · Data visualisation",
     year: "2026",
     headline: "Affordability starts before the first month’s rent.",
     summary:

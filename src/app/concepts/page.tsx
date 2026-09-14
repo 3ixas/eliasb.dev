@@ -67,7 +67,7 @@ export default function ConceptIndex() {
                 <strong>{concept.title}</strong>
                 <span className="concept-description">{concept.description}</span>
               </span>
-              <span className="concept-arrow" aria-hidden="true">↗</span>
+              <span className="concept-arrow arrow-mark" aria-hidden="true">↗︎</span>
             </Link>
           </li>
         ))}
@@ -75,7 +75,7 @@ export default function ConceptIndex() {
 
       <footer className="index-footer">
         <p>Selected: Cabinet personality with Living Editorial discipline.</p>
-        <Link href="https://github.com/3ixas/eliasb.dev">Repository ↗</Link>
+        <Link href="https://github.com/3ixas/eliasb.dev">Repository <span className="arrow-mark" aria-hidden="true">↗︎</span></Link>
       </footer>
     </main>
   );

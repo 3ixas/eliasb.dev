@@ -100,7 +100,9 @@ async function fetchContributionActivity(token: string): Promise<ActivityDay[] |
           contributionsCollection(from: $from, to: $to) {
             contributionCalendar {
               weeks { contributionDays { date contributionCount } }
+              totalContributions
             }
+            restrictedContributionsCount
           }
         }
       }`,
@@ -176,7 +178,7 @@ export async function getGitHubSignal(): Promise<GitHubSignal> {
       headline: describeEvent(latest),
       description: contributions
         ? "Recent building activity, including private contribution counts without repository details."
-        : "Recent public building activity from GitHub. Private repository details stay private.",
+        : "Recent public building activity from GitHub. Private totals need the site token.",
       activity,
       activityLabel: contributions
         ? "GitHub contributions over the last 28 days"

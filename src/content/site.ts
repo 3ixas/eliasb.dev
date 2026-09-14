@@ -20,7 +20,7 @@ export const projects = [
   {
     index: "01",
     name: "Threshold",
-    eyebrow: "Product engineering · Data visualization · 2026",
+    eyebrow: "Product engineering · Data visualisation · 2026",
     thesis: "Making the cost of a decision visible.",
     description:
       "A rental-affordability calculator for London, Basel, and Zurich. It brings salary, moving costs, and local assumptions into one shareable picture of what it takes to move.",
@@ -40,6 +40,8 @@ export const projects = [
     name: "Argus Risk",
     eyebrow: "Event-driven systems",
     detail: "Kafka · PostgreSQL · SignalR · Next.js",
+    image: "/work/argus/overview.webp",
+    imageAlt: "Argus Risk interface showing event-driven risk positions",
     codeUrl: "https://github.com/3ixas/argus-risk",
   },
   {
@@ -47,7 +49,7 @@ export const projects = [
     name: "Flowtime",
     eyebrow: "Offline-first interaction",
     detail: "Focus state that survives refreshes, mistakes, and interruptions.",
-    image: "/projects/flowtime.jpg",
+    image: "/work/flowtime/timer.jpg",
     imageAlt: "Flowtime focus timer interface",
     liveUrl: "https://flowtime-focus-timer.vercel.app",
     codeUrl: "https://github.com/3ixas/flowtime-focus-timer",
@@ -69,7 +71,7 @@ export const labNotes = [
     kind: "Football · Data",
     description:
       "Small experiments with rankings, matchups, predictions, and the weekly chaos of a redraft league.",
-    href: undefined,
+    href: "/lab#lab-02",
   },
   {
     index: "03",
@@ -77,6 +79,6 @@ export const labNotes = [
     kind: "Work in progress",
     description:
       "Components, interaction ideas, failed directions, and notes from learning how products should feel.",
-    href: undefined,
+    href: "/lab#lab-03",
   },
 ] as const;

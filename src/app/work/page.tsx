@@ -38,7 +38,7 @@ export default function WorkPage() {
                   height={study.hero.height}
                   sizes="(max-width: 800px) calc(100vw - 56px), 55vw"
                 />
-                <span className="work-card-arrow">Read case study ↗</span>
+                <span className="work-card-arrow">Read case study <span className="arrow-mark" aria-hidden="true">↗︎</span></span>
               </Link>
             </li>
           ))}
