@@ -135,8 +135,8 @@ Do not change the live domain during design and development. Validate the comple
 
 1. Establish the repository and carry these canonical documents into it. **Complete.**
 2. Produce the three comparable visual concepts. **Complete.**
-3. Select and document the visual system, then build the homepage. **Selected; homepage refinement in progress.**
-4. Build the three Work case studies.
+3. Select and document the visual system, then build the homepage. **Complete.**
+4. Build the three Work case studies. **Complete.**
 5. Build Lab, Library, and About.
 6. Add integrations and their designed fallback states.
 7. Validate responsive behavior, accessibility, browser support, and performance.

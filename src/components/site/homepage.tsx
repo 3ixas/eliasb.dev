@@ -37,12 +37,10 @@ export function Homepage() {
             </h2>
           </div>
           <article className="project-feature">
-            <a
+            <Link
               className="project-visual"
-              href={threshold.liveUrl}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Open Threshold"
+              href="/work/threshold"
+              aria-label="Read the Threshold case study"
             >
               <Image
                 src={threshold.image}
@@ -52,7 +50,7 @@ export function Homepage() {
                 priority
               />
               <span className="project-index">{threshold.index}</span>
-            </a>
+            </Link>
             <div className="project-copy">
               <p className="project-type">{threshold.eyebrow}</p>
               <h3>{threshold.name}</h3>
@@ -63,8 +61,9 @@ export function Homepage() {
                 ))}
               </ul>
               <div className="project-links">
+                <Link href="/work/threshold">Read case study →</Link>
                 <a href={threshold.liveUrl} target="_blank" rel="noreferrer">
-                  Visit project ↗
+                  Open project ↗
                 </a>
                 <a href={threshold.codeUrl} target="_blank" rel="noreferrer">
                   View code ↗
@@ -82,8 +81,9 @@ export function Homepage() {
               </div>
               <p>{argus.detail}</p>
               <a href={argus.codeUrl} target="_blank" rel="noreferrer">
-                Explore the system ↗
+                Source ↗
               </a>
+              <Link href="/work/argus-risk">Read case study →</Link>
             </article>
             <article>
               <span>{flowtime.index}</span>
@@ -98,6 +98,7 @@ export function Homepage() {
                 height={640}
               />
               <div className="rail-links">
+                <Link href="/work/flowtime">Case study →</Link>
                 <a href={flowtime.liveUrl} target="_blank" rel="noreferrer">
                   Visit ↗
                 </a>

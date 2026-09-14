@@ -15,7 +15,7 @@ The homepage now uses verified public profile and project material. These inputs
 
 ## Content still to author
 
-- Full Threshold, Argus Risk, and Flowtime case-study narratives.
+- Final editorial review of the Threshold, Argus Risk, and Flowtime case-study narratives.
 - The first real Library entry.
 - A short account of the path from earlier AI/data/marketing work into software engineering, if it strengthens the About page.
 - Lab notes for interface studies, failed ideas, and fantasy-football experiments.

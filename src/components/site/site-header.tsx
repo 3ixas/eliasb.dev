@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export function SiteHeader() {
@@ -7,7 +8,7 @@ export function SiteHeader() {
         E/B
       </a>
       <nav aria-label="Primary navigation">
-        <a href="#work">Work</a>
+        <Link href="/work">Work</Link>
         <a href="#lab">Lab</a>
         <a href="#library">Library</a>
         <a href="#about">About</a>

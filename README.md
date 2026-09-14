@@ -10,7 +10,7 @@ Cabinet of Curiosities is the selected homepage direction, with Living Editorial
 2. Cabinet of Curiosities
 3. Signals and Systems
 
-The root route is now a maintainable production homepage, separate from the archived concept renderer. It uses verified project links, public profile links, and Elias’s current portrait while account-specific integrations and authored Library content remain in progress. The site remains marked `noindex` until launch.
+The root route is now a maintainable production homepage, separate from the archived concept renderer. `/work` and the Threshold, Argus Risk, and Flowtime detail routes provide layered case studies grounded in their source repositories. Account-specific integrations and authored Library content remain in progress. The site remains marked `noindex` until launch.
 
 ## Development
 
