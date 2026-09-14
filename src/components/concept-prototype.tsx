@@ -66,7 +66,7 @@ export function ConceptPrototype({
               <span className="project-index">01</span>
             </div>
             <div className="project-copy">
-              <p className="project-type">Product engineering · Data visualization · 2026</p>
+              <p className="project-type">Product engineering · Data visualisation · 2026</p>
               <h3>Threshold</h3>
               <p>
                 A rental-affordability calculator for London, Basel, and Zurich.

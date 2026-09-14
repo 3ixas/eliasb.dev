@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-type Destination = "work" | "lab" | "library" | "about";
+type Destination = "home" | "work" | "lab" | "library" | "about";
 
 export function PageHeader({ active }: { active?: Destination }) {
   return (
@@ -11,6 +11,7 @@ export function PageHeader({ active }: { active?: Destination }) {
         E/B
       </Link>
       <nav aria-label="Primary navigation">
+        <Link href="/" aria-current={active === "home" ? "page" : undefined}>Home</Link>
         <Link href="/work" aria-current={active === "work" ? "page" : undefined}>Work</Link>
         <Link href="/lab" aria-current={active === "lab" ? "page" : undefined}>Lab</Link>
         <Link href="/library" aria-current={active === "library" ? "page" : undefined}>Library</Link>

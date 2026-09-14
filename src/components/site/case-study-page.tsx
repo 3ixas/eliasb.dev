@@ -24,8 +24,8 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
             </dl>
           </div>
           <div className="case-actions">
-            {study.liveUrl && <a href={study.liveUrl} target="_blank" rel="noreferrer">Open project ↗</a>}
-            <a href={study.codeUrl} target="_blank" rel="noreferrer">View source ↗</a>
+            {study.liveUrl && <a href={study.liveUrl} target="_blank" rel="noreferrer">Open project <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
+            <a href={study.codeUrl} target="_blank" rel="noreferrer">View source <span className="arrow-mark" aria-hidden="true">↗︎</span></a>
           </div>
         </header>
 
@@ -83,8 +83,8 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
         </section>
 
         <nav className="case-next" aria-label="More case studies">
-          <Link href="/work">See all work <span>↗</span></Link>
-          <Link href="/#contact">Start a conversation <span>↗</span></Link>
+          <Link href="/work">See all work <span className="arrow-mark" aria-hidden="true">↗︎</span></Link>
+          <Link href="/#contact">Start a conversation <span className="arrow-mark" aria-hidden="true">↗︎</span></Link>
         </nav>
       </main>
     </div>

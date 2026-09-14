@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { LocalTime } from "@/components/local-time";
+import { ClosableDetails } from "@/components/site/closable-details";
 import { SignatureLine } from "@/components/signature-line";
 import { SiteHeader } from "@/components/site/site-header";
-import { integrationConfig } from "@/content/integration-config";
 import { labNotes, profile, projects } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
 import type { PersonalSignal } from "@/integrations/types";
@@ -27,12 +27,22 @@ function freshnessLabel(updatedAt: string | null) {
   return `Updated ${new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" }).format(new Date(updatedAt))}`;
 }
 
+function scoreWidth(left?: number, right?: number) {
+  if (!left && !right) return { left: "50%", right: "50%" };
+  const total = (left ?? 0) + (right ?? 0);
+  if (!total) return { left: "50%", right: "50%" };
+  return {
+    left: `${Math.max(12, Math.round(((left ?? 0) / total) * 100))}%`,
+    right: `${Math.max(12, Math.round(((right ?? 0) / total) * 100))}%`,
+  };
+}
+
 export async function Homepage() {
   const signals = await getHomepageSignals();
 
   return (
     <div className="prototype prototype-cabinet-of-curiosities selected-experience" id="top">
-      <SiteHeader />
+      <SiteHeader active="home" />
       <main id="main-content">
         <section className="hero" aria-labelledby="hero-kicker">
           <p className="hero-kicker" id="hero-kicker">
@@ -84,12 +94,12 @@ export async function Homepage() {
                 ))}
               </ul>
               <div className="project-links">
-                <Link href="/work/threshold">Read case study →</Link>
+                <Link href="/work/threshold">Read case study <span className="arrow-mark" aria-hidden="true">→</span></Link>
                 <a href={threshold.liveUrl} target="_blank" rel="noreferrer">
-                  Open project ↗
+                  Open project <span className="arrow-mark" aria-hidden="true">↗︎</span>
                 </a>
                 <a href={threshold.codeUrl} target="_blank" rel="noreferrer">
-                  View code ↗
+                  View code <span className="arrow-mark" aria-hidden="true">↗︎</span>
                 </a>
               </div>
             </div>
@@ -98,22 +108,25 @@ export async function Homepage() {
           <div className="project-rail" aria-label="More selected work">
             <article>
               <span>{argus.index}</span>
+              <Image
+                src={argus.image}
+                alt={argus.imageAlt}
+                width={1280}
+                height={770}
+                sizes="(max-width: 800px) calc(100vw - 68px), 40vw"
+              />
               <div>
                 <p>{argus.eyebrow}</p>
                 <h3>{argus.name}</h3>
               </div>
               <p>{argus.detail}</p>
               <a href={argus.codeUrl} target="_blank" rel="noreferrer">
-                Source ↗
+                Source <span className="arrow-mark" aria-hidden="true">↗︎</span>
               </a>
-              <Link href="/work/argus-risk">Read case study →</Link>
+              <Link href="/work/argus-risk">Read case study <span className="arrow-mark" aria-hidden="true">→</span></Link>
             </article>
             <article>
               <span>{flowtime.index}</span>
-              <div>
-                <p>{flowtime.eyebrow}</p>
-                <h3>{flowtime.name}</h3>
-              </div>
               <Image
                 src={flowtime.image}
                 alt={flowtime.imageAlt}
@@ -121,13 +134,17 @@ export async function Homepage() {
                 height={640}
                 sizes="(max-width: 800px) calc(100vw - 68px), 40vw"
               />
+              <div>
+                <p>{flowtime.eyebrow}</p>
+                <h3>{flowtime.name}</h3>
+              </div>
               <div className="rail-links">
-                <Link href="/work/flowtime">Case study →</Link>
+                <Link href="/work/flowtime">Case study <span className="arrow-mark" aria-hidden="true">→</span></Link>
                 <a href={flowtime.liveUrl} target="_blank" rel="noreferrer">
-                  Visit ↗
+                  Visit <span className="arrow-mark" aria-hidden="true">↗︎</span>
                 </a>
                 <a href={flowtime.codeUrl} target="_blank" rel="noreferrer">
-                  Code ↗
+                  Code <span className="arrow-mark" aria-hidden="true">↗︎</span>
                 </a>
               </div>
             </article>
@@ -153,7 +170,7 @@ export async function Homepage() {
                 ))}
               </div>
               <div className="signal-footnote">
-                <a href={signals.github.href} target="_blank" rel="noreferrer">GitHub ↗</a>
+                <a href={signals.github.href} target="_blank" rel="noreferrer">GitHub <span className="arrow-mark" aria-hidden="true">↗︎</span></a>
                 <span>{freshnessLabel(signals.github.updatedAt)}</span>
               </div>
             </article>
@@ -177,25 +194,19 @@ export async function Homepage() {
               </div>
               <strong>{signals.reading.headline}</strong>
               <span>{signals.reading.description}</span>
-              {signals.reading.href && <a className="signal-source-link" href={signals.reading.href} target="_blank" rel="noreferrer">Goodreads ↗</a>}
+              {signals.reading.href && <a className="signal-source-link" href={signals.reading.href} target="_blank" rel="noreferrer">Goodreads <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
             </article>
             <article className="signal signal-training">
               <p>Training</p>
               <SignalStatus signal={signals.training} />
               <strong>{signals.training.headline}</strong>
-              <div className="strava-summary-frame">
-                <iframe
-                  title="Elias’s weekly running summary on Strava"
-                  src={integrationConfig.strava.weeklySummaryEmbedUrl}
-                  tabIndex={-1}
-                  width="300"
-                  height="160"
-                  loading="lazy"
-                  scrolling="no"
-                />
+              <div className="training-rhythm" aria-label="Training categories">
+                <span>Lift</span>
+                <span>Run</span>
+                <span>Muay Thai</span>
               </div>
               <span>{signals.training.description}</span>
-              {signals.training.href && <a className="signal-source-link" href={signals.training.href} target="_blank" rel="noreferrer">Strava ↗</a>}
+              {signals.training.href && <a className="signal-source-link" href={signals.training.href} target="_blank" rel="noreferrer">Strava <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
             </article>
             <article className="signal signal-fantasy">
               <p>Fantasy football</p>
@@ -206,13 +217,27 @@ export async function Homepage() {
                 <i>{signals.fantasy.matchupLabel}</i>
                 <b>{signals.fantasy.rightLabel}</b>
               </span>
+              <div className="matchup-bars" aria-hidden="true">
+                <i style={{ width: scoreWidth(signals.fantasy.leftScore, signals.fantasy.rightScore).left }} />
+                <i style={{ width: scoreWidth(signals.fantasy.leftScore, signals.fantasy.rightScore).right }} />
+              </div>
               <span>{signals.fantasy.description}</span>
-              {signals.fantasy.href && <a className="signal-source-link" href={signals.fantasy.href} target="_blank" rel="noreferrer">Sleeper ↗</a>}
+              {signals.fantasy.href && <a className="signal-source-link" href={signals.fantasy.href} target="_blank" rel="noreferrer">Sleeper <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
             </article>
             <article className="signal signal-culture">
               <p>Listening / watching</p>
               <SignalStatus signal={signals.culture} />
               <strong>{signals.culture.headline}</strong>
+              {signals.culture.filmPosterUrl && (
+                <Image
+                  className="culture-poster"
+                  src={signals.culture.filmPosterUrl}
+                  alt=""
+                  width={240}
+                  height={360}
+                  sizes="120px"
+                />
+              )}
               {signals.culture.filmYear && (
                 <span className="culture-meta">
                   {signals.culture.filmYear}{signals.culture.filmRating ? ` · ${signals.culture.filmRating} ★` : ""}
@@ -220,9 +245,18 @@ export async function Homepage() {
               )}
               <span>{signals.culture.description}</span>
               <div className="signal-source-links">
-                {signals.culture.filmHref && <a className="signal-source-link" href={signals.culture.filmHref} target="_blank" rel="noreferrer">Letterboxd ↗</a>}
-                <a className="signal-source-link" href={signals.culture.playlistHref} target="_blank" rel="noreferrer">Playlist ↗</a>
+                {signals.culture.filmHref && <a className="signal-source-link" href={signals.culture.filmHref} target="_blank" rel="noreferrer">Letterboxd <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
+                <a className="signal-source-link" href={signals.culture.playlistHref} target="_blank" rel="noreferrer">Playlist <span className="arrow-mark" aria-hidden="true">↗︎</span></a>
               </div>
+            </article>
+            <article className="signal signal-playlist">
+              <p>Currently listening</p>
+              <SignalStatus signal={{ state: "curated", statusLabel: "Spotify" }} />
+              <strong>Some tunes I’m listening to.</strong>
+              <a className="playlist-tile" href={signals.culture.playlistHref} target="_blank" rel="noreferrer">
+                <span>My current playlist</span>
+                <b>Open in Spotify <span className="arrow-mark" aria-hidden="true">↗︎</span></b>
+              </a>
             </article>
           </div>
         </section>
@@ -242,23 +276,19 @@ export async function Homepage() {
                   <p>{note.kind}</p>
                   <h3>{note.title}</h3>
                   <span className="lab-description">{note.description}</span>
-                  <span className="lab-arrow">{note.href ? "Open ↗" : "In the lab →"}</span>
+                  <span className="lab-arrow">{note.href ? <>Open <span className="arrow-mark" aria-hidden="true">↗︎</span></> : <>In the lab <span className="arrow-mark" aria-hidden="true">→</span></>}</span>
                 </>
               );
 
-              return note.href ? (
-                <a key={note.index} className="lab-card" href={note.href} target="_blank" rel="noreferrer">
+              return (
+                <Link key={note.index} className="lab-card" href={note.href}>
                   {content}
-                </a>
-              ) : (
-                <article key={note.index} className="lab-card">
-                  {content}
-                </article>
+                </Link>
               );
             })}
           </div>
           <Link className="section-link" href="/lab">
-            Explore the Lab <span>↗</span>
+            Explore the Lab <span className="arrow-mark" aria-hidden="true">↗︎</span>
           </Link>
         </section>
 
@@ -273,32 +303,35 @@ export async function Homepage() {
             <div className="shelf-note">
               <p>Books · cinema · history · science fiction · music</p>
               <p>
-                A cultural notebook for the things I’m reading, watching, and returning to—built as a shelf of objects rather than a feed.
+                Books, films, history, science fiction, and music I’m spending time with.
               </p>
             </div>
-            <details className="book-object">
-              <summary>
-                <span className="book-spine">
-                  FIELD NOTES <i>001</i>
-                </span>
-                <span className="book-cover">
-                  <small>From the Library</small>
-                  <strong>What makes a system feel human?</strong>
-                  <em>Open the object →</em>
-                </span>
-              </summary>
-              <div className="book-pages">
-                <p className="page-number">01—02</p>
-                <blockquote>Clarity is a form of care.</blockquote>
-                <p>
-                  A recurring thread in the things I make: complex state becomes useful only when a person can see what happened and decide what to do next.
-                </p>
-                <span>The first authored Library entry will replace this field note</span>
-              </div>
-            </details>
+            <ClosableDetails
+              className="book-object"
+              contentClassName="book-pages"
+              summary={(
+                <>
+                  <span className="book-spine">
+                    FIELD NOTES <i>001</i>
+                  </span>
+                  <span className="book-cover">
+                    <small>From the Library</small>
+                    <strong>What makes a system feel human?</strong>
+                    <em>Open the object <span className="arrow-mark" aria-hidden="true">→</span></em>
+                  </span>
+                </>
+              )}
+            >
+              <p className="page-number">01—02</p>
+              <blockquote>Clarity is a form of care.</blockquote>
+              <p>
+                A recurring thread in the things I make: complex state becomes useful only when a person can see what happened and decide what to do next.
+              </p>
+              <span>The first authored Library entry will replace this field note</span>
+            </ClosableDetails>
           </div>
           <Link className="section-link" href="/library">
-            Enter the Library <span>↗</span>
+            Enter the Library <span className="arrow-mark" aria-hidden="true">↗︎</span>
           </Link>
         </section>
 
@@ -313,16 +346,16 @@ export async function Homepage() {
             <div className="about-prose">
               <p>{profile.about}</p>
               <div className="profile-links" aria-label="Profile links">
-                <Link href="/about">More about me →</Link>
+                <Link href="/about">More about me <span className="arrow-mark" aria-hidden="true">→</span></Link>
                 <a href={profile.links.github} target="_blank" rel="noreferrer">
-                  GitHub ↗
+                  GitHub <span className="arrow-mark" aria-hidden="true">↗︎</span>
                 </a>
                 <a href={profile.links.linkedin} target="_blank" rel="noreferrer">
-                  LinkedIn ↗
+                  LinkedIn <span className="arrow-mark" aria-hidden="true">↗︎</span>
                 </a>
                 {profile.links.resume && (
                   <a href={profile.links.resume} target="_blank" rel="noreferrer">
-                    Résumé ↗
+                    Résumé <span className="arrow-mark" aria-hidden="true">↗︎</span>
                   </a>
                 )}
               </div>
@@ -341,7 +374,7 @@ export async function Homepage() {
           <div id="contact" className="contact-block">
             <p>Have a complex problem worth making simpler?</p>
             <a className="contact-link" href={profile.links.email}>
-              Start a conversation <span>↗</span>
+              Start a conversation <span className="arrow-mark" aria-hidden="true">↗︎</span>
             </a>
             <span>eliasthebennett@gmail.com</span>
           </div>
@@ -351,9 +384,9 @@ export async function Homepage() {
       <footer className="site-footer">
         <p>Designed and built by {profile.shortName}</p>
         <div>
-          <Link href="/concepts">Design study ↗</Link>
+          <Link href="/concepts">Design study <span className="arrow-mark" aria-hidden="true">↗︎</span></Link>
           <a href={profile.links.github} target="_blank" rel="noreferrer">
-            GitHub ↗
+            GitHub <span className="arrow-mark" aria-hidden="true">↗︎</span>
           </a>
           <a href="#top">Back to top ↑</a>
         </div>
