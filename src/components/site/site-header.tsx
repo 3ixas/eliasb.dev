@@ -5,7 +5,7 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <a className="skip-link" href="#main-content">Skip to content</a>
-      <a href="#top" className="site-mark" aria-label="Elias B. home">
+      <a href="#top" className="site-mark" aria-label="E/B — Elias B. home">
         E/B
       </a>
       <nav aria-label="Primary navigation">

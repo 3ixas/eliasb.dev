@@ -62,7 +62,7 @@ export async function Homepage() {
             <Link
               className="project-visual"
               href="/work/threshold"
-              aria-label="Read the Threshold case study"
+              aria-label={`${threshold.index} — Read the Threshold case study`}
             >
               <Image
                 src={threshold.image}
@@ -170,7 +170,7 @@ export async function Homepage() {
               <SignalStatus signal={signals.reading} />
               <div className="mini-book" aria-hidden="true">
                 {signals.reading.coverUrl ? (
-                  <Image src={signals.reading.coverUrl} alt="" fill sizes="82px" />
+                  <Image src={signals.reading.coverUrl} alt="" fill sizes="96px" />
                 ) : (
                   <><span>Current read</span><i /></>
                 )}
