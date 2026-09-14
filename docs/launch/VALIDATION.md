@@ -13,6 +13,7 @@ Validated on 14 September 2026 against an optimized local production build.
 - Chrome and the Chromium-based in-app browser render the homepage without overflow or site-origin console errors.
 - All internal links resolve. The Ask Professor Past live URL was removed because the public deployment returns `404`; the source link remains in Lab.
 - The Goodreads link now resolves to the public profile rather than an account sign-in route.
+- The résumé link resolves to the current Google Docs CV, which is shared with anyone who has the link and does not require sign-in.
 - Responsive `sizes` hints keep the main About image's initial optimized candidate at `384px` instead of requesting the desktop-width candidate on narrow displays.
 - `robots.txt`, `sitemap.xml`, canonical metadata, social metadata, and the generated Open Graph image are present. Preview builds remain `noindex, nofollow` until `SITE_INDEXABLE=true` is deliberately set for the public launch.
 - `pnpm lint`, `pnpm build --webpack`, the route crawl, and `git diff --check` pass.
@@ -26,7 +27,6 @@ Validated on 14 September 2026 against an optimized local production build.
 ## Remaining production checks
 
 - Confirm Safari and Firefox rendering. Only Chromium and Chrome were available during local automation.
-- Add the current résumé once its replacement public URL is available. The previous Google Drive file returns “Page Not Found,” so its link is hidden rather than shipped broken.
 
 ## Old-site preservation and cutover
 
