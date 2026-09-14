@@ -10,7 +10,7 @@ Checked against official sources on 2026-09-13. These are feasibility findings, 
 - **Spotify:** the selected public playlist is presented through Spotify's official embed inside a site-designed Library section.
 - **Books:** the public Goodreads `currently-reading` RSS feed supplies the current title, author, cover, and source link. The site retains a last-known fallback and keeps personal notes site-owned.
 - **Films:** the public Letterboxd RSS feed supplies the latest diary entry, year, rating, poster, and source link, with a last-known fallback.
-- **Training:** Strava's official last-week running summary is active inside a site-designed homepage frame. The broader `Lift · Run · Muay Thai` context and public profile link remain around it. The taller latest-activities embed is retained as an available source for a later training surface.
+- **Training:** Strava's optional server-side activity contract supplies a current-week, site-owned count of Lift, Run, Muay Thai, and Other activity. When credentials are absent or the API fails, the authored `Lift · Run · Muay Thai` rhythm remains visible.
 
 The connected sources use Next.js’s persistent Data Cache and bundled last-known fallbacks. Public account identifiers live in typed site content; only the optional GitHub token is an environment secret. The accepted durable Blob snapshot remains the deployment-hardening architecture once the Vercel project is configured.
 
@@ -61,19 +61,9 @@ Sources: [Letterboxd API access](https://letterboxd.com/api-beta/access/), [Lett
 
 ## Training
 
-**Conditional.** Strava's API Agreement effective 1 June 2026 restricts API-derived athlete data to display for the authenticated athlete. It does not support a custom public training-summary widget.
+The implementation is intentionally opt-in and server-only. Credentials are not bundled into the client, and the public surface is reduced to broad counts with no routes, exact locations, body measurements, heart-rate data, or detailed schedules. Confirm Strava's current API and public-display terms before enabling the credentials on the production deployment.
 
-Viable approaches:
-
-1. Use an official Strava embed for a public activity, route, recent uploads, or last-week running or cycling summary.
-2. Maintain an independent, manually authored training summary that does not derive from the Strava API.
-3. Use original activity files or measurements obtained directly from the recording device or another independently controlled source, before they enter Strava.
-
-Webhooks remain part of the Strava API and do not avoid the public-display restriction. Manual account exports do not clearly provide a supported automatic-publication route. Automated custom public display of Strava-derived activity would require written approval from Strava.
-
-The confirmed launch approach is Strava's official last-week running summary inside a designed frame, surrounded by the broader authored `Lift · Run · Muay Thai` context and a link to Elias's profile. A separately maintained combined activity visualization is deferred because its weekly upkeep is not justified for launch. Keep exact routes, gym location, body measurements, heart-rate data, and detailed schedules private. The official embed offers low maintenance but limited visual control and sport coverage.
-
-Sources: [Strava API Agreement](https://www.strava.com/legal/api_policy), [Strava embeds](https://support.strava.com/en-us/articles/15402053-sharing-your-activities-and-routes-with-a-strava-embed), [Strava data exports](https://support.strava.com/en-us/articles/15401919-exporting-your-data-and-bulk-export).
+Sources: [Strava API Agreement](https://www.strava.com/legal/api_policy), [Strava athlete activities](https://developers.strava.com/docs/reference/#api-Athletes-getLoggedInAthleteActivities), [Strava embeds](https://support.strava.com/en-us/articles/15402053-sharing-your-activities-and-routes-with-a-strava-embed).
 
 ## Fantasy football
 

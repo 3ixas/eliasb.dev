@@ -164,6 +164,18 @@ export async function Homepage() {
               <SignalStatus signal={signals.github} />
               <strong>{signals.github.headline}</strong>
               <span>{signals.github.description}</span>
+              {signals.github.totalContributions !== undefined && (
+                <div className="signal-metrics" aria-label="GitHub contribution totals">
+                  <b>{signals.github.totalContributions}</b>
+                  <span>contributions</span>
+                  {signals.github.privateContributions !== undefined && (
+                    <>
+                      <b>{signals.github.privateContributions}</b>
+                      <span>private</span>
+                    </>
+                  )}
+                </div>
+              )}
               <div className="activity-trace" role="img" aria-label={signals.github.activityLabel}>
                 {signals.github.activity.map((day) => (
                   <i key={day.date} data-level={activityLevel(day.count)} aria-hidden="true" />
@@ -200,13 +212,20 @@ export async function Homepage() {
               <p>Training</p>
               <SignalStatus signal={signals.training} />
               <strong>{signals.training.headline}</strong>
-              <div className="training-rhythm" aria-label="Training categories">
-                <span>Lift</span>
-                <span>Run</span>
-                <span>Muay Thai</span>
+              <div className="training-rhythm" aria-label={`${signals.training.windowLabel} training by type`}>
+                {signals.training.weekly.map((category) => (
+                  <div className="training-metric" key={category.label}>
+                    <i style={{ height: `${Math.max(8, Math.min(100, category.count * 24 + 8))}%` }} aria-hidden="true" />
+                    <b>{category.count}</b>
+                    <span>{category.label}</span>
+                  </div>
+                ))}
               </div>
               <span>{signals.training.description}</span>
-              {signals.training.href && <a className="signal-source-link" href={signals.training.href} target="_blank" rel="noreferrer">Strava <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
+              <div className="signal-footnote">
+                {signals.training.href && <a href={signals.training.href} target="_blank" rel="noreferrer">Strava <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
+                <span>{freshnessLabel(signals.training.updatedAt)}</span>
+              </div>
             </article>
             <article className="signal signal-fantasy">
               <p>Fantasy football</p>
@@ -327,7 +346,7 @@ export async function Homepage() {
               <p>
                 A recurring thread in the things I make: complex state becomes useful only when a person can see what happened and decide what to do next.
               </p>
-              <span>The first authored Library entry will replace this field note</span>
+              <span>A short note about clarity and useful software.</span>
             </ClosableDetails>
           </div>
           <Link className="section-link" href="/library">

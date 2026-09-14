@@ -12,8 +12,39 @@ export type GitHubSignal = {
   description: string;
   activity: ActivityDay[];
   activityLabel: string;
+  totalContributions?: number;
+  privateContributions?: number;
   updatedAt: string | null;
   href: string;
+};
+
+export type TrainingCategory = {
+  label: string;
+  count: number;
+};
+
+export type TrainingSignal = PersonalSignal & {
+  weekly: TrainingCategory[];
+  totalActivities: number;
+  windowLabel: string;
+  updatedAt: string | null;
+};
+
+export type HistoryEvent = {
+  year: number;
+  text: string;
+  sourceUrl: string;
+};
+
+export type HistorySignal = {
+  state: SignalState;
+  statusLabel: string;
+  headline: string;
+  description: string;
+  dateLabel: string;
+  events: HistoryEvent[];
+  sourceUrl: string;
+  updatedAt: string | null;
 };
 
 export type PersonalSignal = {
@@ -51,7 +82,7 @@ export type FantasySignal = PersonalSignal & {
 export type HomepageSignals = {
   github: GitHubSignal;
   reading: ReadingSignal;
-  training: PersonalSignal;
+  training: TrainingSignal;
   fantasy: FantasySignal;
   culture: CultureSignal;
   status: PersonalSignal;

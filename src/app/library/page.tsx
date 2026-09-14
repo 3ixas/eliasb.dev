@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/site/page-header";
 import { integrationConfig } from "@/content/integration-config";
 import { getReadingSignal } from "@/integrations/goodreads";
 import { getCultureSignal } from "@/integrations/letterboxd";
+import { getHistorySignal } from "@/integrations/history";
 
 export const metadata: Metadata = {
   title: "Library",
@@ -12,7 +13,11 @@ export const metadata: Metadata = {
 };
 
 export default async function LibraryPage() {
-  const [reading, culture] = await Promise.all([getReadingSignal(), getCultureSignal()]);
+  const [reading, culture, history] = await Promise.all([
+    getReadingSignal(),
+    getCultureSignal(),
+    getHistorySignal(),
+  ]);
 
   return (
     <div className="collection-page library-page">
@@ -86,10 +91,25 @@ export default async function LibraryPage() {
         </section>
 
         <section className="library-index" aria-labelledby="library-index-title">
-          <p>More to come</p>
-          <h2 id="library-index-title">History is one of the subjects I keep coming back to.</h2>
+          <p>History · a small weekly note</p>
+          <h2 id="library-index-title">A few things that happened this week.</h2>
           <div>
-            <article><span>H</span><h3>History</h3><p>People, systems, and turning points I want to understand better.</p></article>
+            <article className="history-card">
+              <span>{history.dateLabel}</span>
+              <h3>{history.headline}</h3>
+              <div className="history-events">
+                {history.events.map((event) => (
+                  <p key={`${event.year}-${event.text}`}>
+                    <strong>{event.year}</strong> {event.text}
+                    <a href={event.sourceUrl} target="_blank" rel="noreferrer">Source <span className="arrow-mark" aria-hidden="true">↗︎</span></a>
+                  </p>
+                ))}
+              </div>
+              <small>{history.description}</small>
+              <a className="history-source" href={history.sourceUrl} target="_blank" rel="noreferrer">
+                {history.statusLabel} <span className="arrow-mark" aria-hidden="true">↗︎</span>
+              </a>
+            </article>
             <article><span>SF</span><h3>Science fiction</h3><p>Stories I return to when I want to think about technology, power, and society.</p></article>
           </div>
         </section>

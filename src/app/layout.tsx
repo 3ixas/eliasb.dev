@@ -11,6 +11,11 @@ export const metadata: Metadata = {
   },
   description:
     "The work, experiments, interests, and current signals of London-based software engineer Elias Bennett.",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
   openGraph: {
     type: "website",
     siteName: "Elias B.",
@@ -18,7 +23,13 @@ export const metadata: Metadata = {
     description:
       "The work, experiments, interests, and current signals of London-based software engineer Elias Bennett.",
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "Elias B. — Thoughtful software for complex problems",
+    description:
+      "The work, experiments, interests, and current signals of London-based software engineer Elias Bennett.",
+    images: ["/opengraph-image"],
+  },
   robots: { index: isIndexable, follow: isIndexable },
 };
 

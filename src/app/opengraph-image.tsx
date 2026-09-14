@@ -34,7 +34,9 @@ export default function OpenGraphImage() {
           fontWeight: 700,
         }}
       >
-        <span>E/B</span>
+        <span>
+          E<span style={{ color: "#e95f38" }}>/</span>B
+        </span>
         <span style={{ fontSize: 14, fontWeight: 400, letterSpacing: 2 }}>
           SOFTWARE ENGINEER · LONDON
         </span>

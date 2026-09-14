@@ -46,6 +46,15 @@ export const signalFallbacks: HomepageSignals = {
     headline: "Lift · Run · Muay Thai",
     description: "Strava shows the public log; the wider training rhythm stays private.",
     href: "https://www.strava.com/athletes/79346179",
+    weekly: [
+      { label: "Lift", count: 0 },
+      { label: "Run", count: 0 },
+      { label: "Muay Thai", count: 0 },
+      { label: "Other", count: 0 },
+    ],
+    totalActivities: 0,
+    windowLabel: "This week",
+    updatedAt: null,
   },
   fantasy: {
     state: "pending",
