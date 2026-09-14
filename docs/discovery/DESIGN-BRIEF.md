@@ -138,7 +138,7 @@ Do not change the live domain during design and development. Validate the comple
 3. Select and document the visual system, then build the homepage. **Complete.**
 4. Build the three Work case studies. **Complete.**
 5. Build Lab, Library, and About. **Complete.**
-6. Add integrations and their designed fallback states. **In progress: GitHub is live; Sleeper, Spotify, and expiring manual-status paths are implemented; remaining activation depends on Elias’s public inputs.**
+6. Add integrations and their designed fallback states. **Complete:** GitHub, Goodreads, Letterboxd, Sleeper, Spotify, Strava, local time, and expiring status are connected with source-appropriate fallbacks.
 7. Validate responsive behavior, accessibility, browser support, and performance.
 8. Validate the production deployment and cut over `eliasb.dev`.
 

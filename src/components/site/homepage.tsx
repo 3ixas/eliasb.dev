@@ -324,12 +324,12 @@ export async function Homepage() {
             </div>
             <figure className="portrait-frame">
               <Image
-                src="/profile/elias.webp"
-                alt="Elias Bennett smiling outdoors"
-                width={968}
-                height={968}
+                src="/profile/elias-evening.webp"
+                alt="Elias Bennett smiling in a white dinner jacket"
+                width={1200}
+                height={1500}
               />
-              <figcaption>London, approximately</figcaption>
+              <figcaption>Off duty, approximately</figcaption>
             </figure>
           </div>
           <div id="contact" className="contact-block">

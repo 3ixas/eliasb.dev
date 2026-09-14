@@ -21,8 +21,14 @@ export default function AboutPage() {
             <h1>Engineer by trade.<br /><em>Curious by default.</em></h1>
           </div>
           <figure>
-            <Image src="/profile/elias.webp" alt="Elias Bennett smiling outdoors" width={968} height={968} priority />
-            <figcaption>London · <LocalTime /></figcaption>
+            <Image
+              src="/profile/elias-coast.webp"
+              alt="Elias Bennett standing on a boat with the coastline behind him"
+              width={1200}
+              height={1600}
+              priority
+            />
+            <figcaption>Based in London · <LocalTime /></figcaption>
           </figure>
         </header>
 

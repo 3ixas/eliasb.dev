@@ -4,7 +4,6 @@ The homepage now uses verified public profile and project material. These inputs
 
 ## Needed for the next content pass
 
-- **Portrait options:** the current public portrait is in place as a working choice. Compare it with Elias’s newer photographs before locking the crop and treatment.
 - **Public email:** choose the address that will become the primary contact action. LinkedIn is the temporary working destination.
 - **Current-book note:** Goodreads now supplies the current title and cover; add one short authored note when Elias has a thought worth attaching to it.
 - **Manual status cadence:** the first status expires on 14 October 2026. Decide whether future statuses should usually last two weeks or one month after observing the upkeep.
