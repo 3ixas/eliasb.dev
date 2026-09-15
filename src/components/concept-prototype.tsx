@@ -81,7 +81,7 @@ export function ConceptPrototype({
               <a href="https://threshold-beta.vercel.app" target="_blank" rel="noreferrer">Visit project ↗</a>
             </div>
           </article>
-          <div className="project-rail" aria-label="More selected work">
+          <div className="project-rail" role="region" aria-label="More selected work">
             <article>
               <span>02</span>
               <div><p>Event-driven systems</p><h3>Argus Risk</h3></div>

@@ -10,6 +10,8 @@ export const labItems = [
     liveUrl: undefined,
     codeUrl: "https://github.com/3ixas/ask-professor-past",
     treatment: "professor",
+    image: "/lab/professor-past.webp",
+    imageAlt: "Warm illustrated portrait of the eccentric Professor Past",
   },
   {
     index: "02",
@@ -22,6 +24,8 @@ export const labItems = [
     liveUrl: undefined,
     codeUrl: undefined,
     treatment: "fantasy",
+    image: "/signals/football-stadium.jpg",
+    imageAlt: "Aerial view of a football stadium and marked field",
   },
   {
     index: "03",
@@ -34,6 +38,8 @@ export const labItems = [
     liveUrl: undefined,
     codeUrl: undefined,
     treatment: "interface",
+    image: "/lab/flowtime-interface.jpg",
+    imageAlt: "Flowtime focus timer interface showing an idle session",
   },
 ] as const;
 

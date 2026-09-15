@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { PageHeader } from "@/components/site/page-header";
 import { labItems } from "@/content/collections";
@@ -28,10 +29,9 @@ export default function LabPage() {
                 <span>{item.index}</span>
                 <span>{item.status}</span>
               </div>
-              <div className="specimen-object" aria-hidden="true">
-                {item.treatment === "professor" && <><i>PAST</i><b>?</b><span>III</span></>}
-                {item.treatment === "fantasy" && <><b>EB</b><i>v</i><b>—</b><span>WEEK · —</span></>}
-                {item.treatment === "interface" && <><i /><i /><i /><span>STATE / STUDY</span></>}
+              <div className="specimen-object">
+                <Image src={item.image} alt={item.imageAlt} fill sizes="(max-width: 800px) min(82vw, 330px), 33vw" />
+                <span>{item.title}</span>
               </div>
               <div className="specimen-copy">
                 <p>{item.kind}</p>
