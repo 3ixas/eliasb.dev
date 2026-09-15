@@ -2,7 +2,7 @@
 
 The homepage now uses verified public profile and project material. These inputs remain deliberately open because they need Elias’s current choices or account-specific identifiers.
 
-## Needed before public launch
+## Open inputs after launch
 
 - **Current-book note:** Goodreads now supplies the current title and cover; add one short authored note when Elias has a thought worth attaching to it.
 - **Manual status cadence:** the first status expires on 14 October 2026. Decide whether future statuses should usually last two weeks or one month after observing the upkeep.

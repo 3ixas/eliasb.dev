@@ -1,13 +1,13 @@
 # Launch validation
 
-Validated on 15 September 2026 against the local Next.js production build and the Vercel review deployment.
+Validated on 15 September 2026 against the local Next.js production build, the Vercel deployment, and the launched custom domain.
 
 ## Final QA update
 
 - The selected Cabinet homepage, work, Lab, Library, and About routes were exercised at desktop and 390px mobile widths in Chromium. The skip link, primary navigation, disclosures, source links, Spotify embeds, and lazy-loaded imagery were checked.
 - The homepage and dedicated Lab now use bundled imagery for London, football, Professor Past, and Flowtime. Sources and licences are recorded in [`docs/content/IMAGE-CREDITS.md`](../content/IMAGE-CREDITS.md).
-- `SITE_INDEXABLE=false` is now pinned in Vercel Production alongside `GITHUB_SIGNAL_TOKEN`. The preview remains deliberately hidden from search until the custom domain serves this deployment.
-- `eliasb.dev` is attached to the `eliasb-dev` Vercel project. Vercel still reports the domain as unverified because DNS currently points at GitHub Pages; the required cutover record is `A eliasb.dev 76.76.21.21`.
+- `SITE_INDEXABLE=true` is pinned in Vercel Production alongside `GITHUB_SIGNAL_TOKEN`. Production is now indexable.
+- `eliasb.dev` is attached to the `eliasb-dev` Vercel project and resolves through Cloudflare to Vercel. The apex redirects to `https://www.eliasb.dev`, which serves the production deployment.
 
 ## Passed locally
 
@@ -22,28 +22,27 @@ Validated on 15 September 2026 against the local Next.js production build and th
 - The Goodreads link now resolves to the public profile rather than an account sign-in route.
 - The résumé link resolves to the current Google Docs CV, which is shared with anyone who has the link and does not require sign-in.
 - Responsive `sizes` hints keep the main About image's initial optimized candidate at `384px` instead of requesting the desktop-width candidate on narrow displays.
-- `robots.txt`, `sitemap.xml`, canonical metadata, social metadata, and the generated Open Graph image are present. Preview builds remain `noindex, nofollow` until `SITE_INDEXABLE=true` is deliberately set for the public launch.
+- `robots.txt`, `sitemap.xml`, canonical metadata, social metadata, and the generated Open Graph image are present. Production robots allow indexing and continue to disallow the archived `/concepts/` route.
 - `pnpm exec tsc --noEmit --incremental false`, `pnpm lint`, `pnpm verify:signals`, `pnpm build`, the sequential route crawl, and `git diff --check` pass.
 
-## Public preview evidence
+## Public deployment evidence
 
-- The old site is preserved at `https://eliasb-v1.vercel.app` and the unindexed new-site review build is at `https://eliasb-dev.vercel.app`.
-- A mobile Lighthouse run against the public review build scored 98 Performance, 100 Accessibility, 96 Best Practices, and 66 SEO. The lab metrics were 1.4s FCP, 1.7s LCP, 110ms Total Blocking Time, and 0.001 CLS.
-- The SEO score is intentionally reduced by `noindex, nofollow`. Any remaining third-party findings should be rechecked after the new site-owned training summary is deployed.
+- The old site is preserved at `https://eliasb-v1.vercel.app`; the launched site is at `https://www.eliasb.dev`, with `https://eliasb.dev` redirecting to it. The Vercel alias remains available at `https://eliasb-dev.vercel.app`.
+- The earlier mobile Lighthouse run against the public review build scored 98 Performance, 100 Accessibility, 96 Best Practices, and 66 SEO. The lab metrics were 1.4s FCP, 1.7s LCP, 110ms Total Blocking Time, and 0.001 CLS.
+- The earlier SEO score reflected the intentional `noindex, nofollow` preview state. The launched deployment now permits indexing.
 
-## Remaining production checks
+## Remaining follow-up checks
 
 - Confirm Safari and Firefox rendering. Only Chromium and Chrome were available during local automation.
-- Change the root DNS A record to `76.76.21.21`, wait for Vercel verification, and confirm `https://eliasb.dev` serves the new Vercel deployment.
-- After DNS verification, set `SITE_INDEXABLE=true` for Vercel Production, redeploy, and verify `robots.txt`, canonical metadata, sitemap, integrations, and redirects on the custom domain.
+- Recheck the third-party Spotify iframe findings if the embedded player is replaced or its accessibility changes.
 
 ## Old-site preservation and cutover
 
 1. Import `3ixas/personal-portfolio-v1` into a separate Vercel project as a static site with no build command and the repository root as its output. **Complete.**
 2. Verify the assigned stable `*.vercel.app` project URL before changing `eliasb.dev`. **Complete: `https://eliasb-v1.vercel.app`.**
 3. Keep the old GitHub Pages deployment intact during the rollback window.
-4. Deploy and approve the new site on its own Vercel review URL. **Deployed unindexed at `https://eliasb-dev.vercel.app`; final approval pending.**
-5. **In progress:** `eliasb.dev` is attached to the new Vercel project; update its DNS A record from GitHub Pages to `76.76.21.21` and wait for verification. Keep the old GitHub Pages deployment intact until the rollback window closes.
-6. Set `SITE_INDEXABLE=true` for the approved production deployment and verify redirects, metadata, integrations, and analytics after cutover.
+4. Deploy and approve the new site on its own Vercel review URL. **Complete: production deployment is aliased at `https://www.eliasb.dev`.**
+5. **Complete:** `eliasb.dev` is attached to the new Vercel project, redirects to `www`, and serves the Vercel deployment. Keep the old GitHub Pages deployment intact until the rollback window closes.
+6. **Complete:** `SITE_INDEXABLE=true` is set for the approved Production deployment; redirects, metadata, sitemap, integrations, and routes were verified after cutover.
 
-The launch decision is **hold for DNS cutover**. The Vercel project and production environment are configured, but indexing must remain disabled while `eliasb.dev` still resolves to GitHub Pages.
+The launch decision is **launched**. Vercel Production serves `https://www.eliasb.dev`, the apex redirects correctly, and indexing is enabled.

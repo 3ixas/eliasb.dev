@@ -10,7 +10,7 @@ Cabinet of Curiosities is the selected homepage direction, with Living Editorial
 2. Cabinet of Curiosities
 3. Signals and Systems
 
-The root route is now a maintainable production homepage, separate from the archived concept renderer. `/work` and the Threshold, Argus Risk, and Flowtime detail routes provide layered case studies grounded in their source repositories. `/lab`, `/library`, and `/about` extend the selected direction into dedicated personal spaces. GitHub, Goodreads, Letterboxd, Sleeper, Spotify, optional server-side Strava counts, Wikimedia history, local time, and the expiring status are connected with designed fallback states. Final QA is complete locally, with launch configuration attached to Vercel and the custom-domain DNS cutover still outstanding. The site remains marked `noindex` until that cutover is verified.
+The root route is now a maintainable production homepage, separate from the archived concept renderer. `/work` and the Threshold, Argus Risk, and Flowtime detail routes provide layered case studies grounded in their source repositories. `/lab`, `/library`, and `/about` extend the selected direction into dedicated personal spaces. GitHub, Goodreads, Letterboxd, Sleeper, Spotify, optional server-side Strava counts, Wikimedia history, local time, and the expiring status are connected with designed fallback states. Final QA is complete and the site is live on Vercel at `https://www.eliasb.dev`; the apex `https://eliasb.dev` redirects there. Production indexing is enabled, while the old GitHub Pages deployment remains available during the rollback window.
 
 ## Development
 
