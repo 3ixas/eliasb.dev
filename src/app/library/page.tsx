@@ -48,7 +48,11 @@ export default async function LibraryPage() {
               summary={(
                 <>
                 <span>Reading · {reading.statusLabel}</span>
-                {reading.coverUrl && <Image src={reading.coverUrl} alt="" width={180} height={270} sizes="180px" />}
+                {reading.coverUrl && (
+                  <span className="library-book-cover" aria-hidden="true">
+                    <Image src={reading.coverUrl} alt="" fill sizes="180px" />
+                  </span>
+                )}
                 <strong>{reading.headline}</strong>
                 <i>001</i>
                 </>
@@ -86,6 +90,9 @@ export default async function LibraryPage() {
             <p>Now playing · Spotify</p>
             <h2 id="playlist-title">Some tunes I’m listening to.</h2>
             <span>A playlist I update when I find something I want to keep playing.</span>
+            <a className="playlist-open-link" href={integrationConfig.spotify.playlistUrl} target="_blank" rel="noreferrer">
+              Open playlist in Spotify <span className="arrow-mark" aria-hidden="true">↗︎</span>
+            </a>
           </div>
           <iframe
             title="Elias’s currently listening Spotify playlist"

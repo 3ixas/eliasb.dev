@@ -312,6 +312,9 @@ export async function Homepage() {
                 loading="lazy"
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
               />
+              <a className="playlist-open-link" href={integrationConfig.spotify.playlistUrl} target="_blank" rel="noreferrer">
+                Open playlist in Spotify <span className="arrow-mark" aria-hidden="true">↗︎</span>
+              </a>
             </article>
           </div>
         </section>
