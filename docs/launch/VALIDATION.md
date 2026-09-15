@@ -4,7 +4,7 @@ Validated on 15 September 2026 against the local Next.js production build, the V
 
 ## Final QA update
 
-- The selected Cabinet homepage, work, Lab, Library, and About routes were exercised at desktop and 390px mobile widths in Chromium. The skip link, primary navigation, disclosures, source links, Spotify embeds, and lazy-loaded imagery were checked.
+- The selected Cabinet homepage, work, Lab, Library, and About routes were exercised at desktop and 390px mobile widths in Chromium, Firefox, and the WebKit engine. The skip link, primary navigation, disclosures, source links, Spotify embeds, and lazy-loaded imagery were checked.
 - The homepage and dedicated Lab now use bundled imagery for London, football, Professor Past, and Flowtime. Sources and licences are recorded in [`docs/content/IMAGE-CREDITS.md`](../content/IMAGE-CREDITS.md).
 - `SITE_INDEXABLE=true` is pinned in Vercel Production alongside `GITHUB_SIGNAL_TOKEN`. Production is now indexable.
 - `eliasb.dev` is attached to the `eliasb-dev` Vercel project and resolves through Cloudflare to Vercel. The apex redirects to `https://www.eliasb.dev`, which serves the production deployment.
@@ -14,10 +14,10 @@ Validated on 15 September 2026 against the local Next.js production build, the V
 - All eight launch routes render at `320px`, `390px`, and desktop widths without horizontal overflow.
 - Every launch route has one `h1`, meaningful image alternatives where images convey content, titled embeds, and a visible keyboard skip link.
 - Keyboard focus follows the visual navigation order and remains clear of the fixed mobile navigation. Training data is rendered by the site-owned summary; the Strava profile remains a labelled source link.
-- Site-owned text contrast passes the WCAG AA thresholds used by the automated computed-style audit in both themes across the launch routes. The Library audit still reports contrast and ARIA findings inside Spotify's third-party iframe, which the site cannot modify without hiding the player.
-- Reduced-motion visitors receive a simple reveal in place of the typed entrance.
-- The Library's native disclosure interactions open and close by keyboard and pointer without production console warnings.
-- Chrome and the Chromium-based in-app browser render the homepage without overflow or site-origin console errors.
+- Site-owned text contrast passes the WCAG AA thresholds used by the automated computed-style audit in both themes across the launch routes. The Library keeps a visible `Open playlist in Spotify` fallback link; the remaining axe findings are confined to Spotify's third-party iframe, which the site cannot modify without hiding the player.
+- Reduced-motion visitors receive a simple reveal in place of the typed entrance; this was checked in Firefox and WebKit as well as Chromium.
+- The Library's native disclosure interactions open and close by keyboard and pointer without site-origin console errors.
+- Chromium, Firefox, and WebKit render the checked routes without overflow, error overlays, or site-origin console errors.
 - All internal links resolve. The Ask Professor Past live URL was removed because the public deployment returns `404`; the source link remains in Lab.
 - The Goodreads link now resolves to the public profile rather than an account sign-in route.
 - The résumé link resolves to the current Google Docs CV, which is shared with anyone who has the link and does not require sign-in.
@@ -31,10 +31,10 @@ Validated on 15 September 2026 against the local Next.js production build, the V
 - The earlier mobile Lighthouse run against the public review build scored 98 Performance, 100 Accessibility, 96 Best Practices, and 66 SEO. The lab metrics were 1.4s FCP, 1.7s LCP, 110ms Total Blocking Time, and 0.001 CLS.
 - The earlier SEO score reflected the intentional `noindex, nofollow` preview state. The launched deployment now permits indexing.
 
-## Remaining follow-up checks
+## Known platform limitations
 
-- Confirm Safari and Firefox rendering. Only Chromium and Chrome were available during local automation.
-- Recheck the third-party Spotify iframe findings if the embedded player is replaced or its accessibility changes.
+- Native Safari WebDriver was not run because macOS requires enabling Safari's `Allow Remote Automation` security setting. The WebKit engine passed the same route, responsive, keyboard, disclosure, reduced-motion, and console checks.
+- Spotify's cross-origin iframe retains its own ARIA list-structure and subdued-track contrast findings. The site supplies a titled embed and a keyboard-visible direct Spotify link as the accessible fallback.
 
 ## Old-site preservation and cutover
 
