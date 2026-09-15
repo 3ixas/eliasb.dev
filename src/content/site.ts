@@ -66,6 +66,8 @@ export const labNotes = [
       "A character-led way to ask questions of history, built around a witty and eccentric professor.",
     href: "/lab#lab-01",
     treatment: "professor",
+    image: "/lab/professor-past.webp",
+    imageAlt: "Warm illustrated portrait of the eccentric Professor Past",
   },
   {
     index: "02",
@@ -75,6 +77,8 @@ export const labNotes = [
       "Small experiments with rankings, matchups, predictions, and the weekly chaos of a redraft league.",
     href: "/lab#lab-02",
     treatment: "fantasy",
+    image: "/signals/football-stadium.jpg",
+    imageAlt: "Aerial view of a football stadium and marked field",
   },
   {
     index: "03",
@@ -84,5 +88,7 @@ export const labNotes = [
       "Components, interaction ideas, failed directions, and notes from learning how products should feel.",
     href: "/lab#lab-03",
     treatment: "interface",
+    image: "/lab/flowtime-interface.jpg",
+    imageAlt: "Flowtime focus timer interface showing an idle session",
   },
 ] as const;

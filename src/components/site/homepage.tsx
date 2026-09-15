@@ -106,7 +106,7 @@ export async function Homepage() {
             </div>
           </article>
 
-          <div className="project-rail" aria-label="More selected work">
+          <div className="project-rail" role="region" aria-label="More selected work">
             <article>
               <span>{argus.index}</span>
               <Image
@@ -191,9 +191,15 @@ export async function Homepage() {
             <article className="signal signal-presence">
               <p>Local signal</p>
               <SignalStatus signal={signals.status} />
-              <div className="london-signal-art" aria-hidden="true">
-                <i /><i /><i /><i /><b />
-              </div>
+              <figure className="london-signal-visual">
+                <Image
+                  src="/signals/london-st-pauls.jpg"
+                  alt="London skyline from the Thames, with St Paul’s Cathedral and the City beyond"
+                  fill
+                  sizes="(max-width: 800px) calc(100vw - 100px), 22vw"
+                />
+                <figcaption>London · home base</figcaption>
+              </figure>
               <strong>
                 <LocalTime />
               </strong>
@@ -218,7 +224,7 @@ export async function Homepage() {
               <SignalStatus signal={signals.training} />
               <strong>{signals.training.headline}</strong>
               {signals.training.schedule ? (
-                <div className="training-schedule" aria-label={`${signals.training.windowLabel} training schedule`}>
+                <div className="training-schedule" role="group" aria-label={`${signals.training.windowLabel} training schedule`}>
                   {signals.training.schedule.map((day) => (
                     <div className="training-day" key={day.day}>
                       <b>{day.day}</b>
@@ -246,7 +252,15 @@ export async function Homepage() {
             <article className="signal signal-fantasy">
               <p>Fantasy football</p>
               <SignalStatus signal={signals.fantasy} />
-              <div className="fantasy-field" aria-hidden="true"><i /><i /><i /></div>
+              <figure className="fantasy-field">
+                <Image
+                  src="/signals/football-stadium.jpg"
+                  alt=""
+                  fill
+                  sizes="(max-width: 800px) calc(100vw - 100px), 30vw"
+                />
+                <figcaption>NFL · week 1</figcaption>
+              </figure>
               <strong>{signals.fantasy.headline}</strong>
               <span className="matchup">
                 <b>{signals.fantasy.leftLabel}</b>
@@ -314,10 +328,13 @@ export async function Homepage() {
               const content = (
                 <>
                   <span className="lab-index">{note.index}</span>
-                  <span className={`lab-card-visual lab-card-visual-${note.treatment}`} aria-hidden="true">
-                    {note.treatment === "professor" && <><i>PAST</i><b>?</b></>}
-                    {note.treatment === "fantasy" && <><b>EB</b><i>VS</i><b>—</b></>}
-                    {note.treatment === "interface" && <><i /><i /><i /></>}
+                  <span className={`lab-card-visual lab-card-visual-${note.treatment}`}>
+                    <Image
+                      src={note.image}
+                      alt={note.imageAlt}
+                      fill
+                      sizes="(max-width: 800px) calc(100vw - 100px), 30vw"
+                    />
                   </span>
                   <p>{note.kind}</p>
                   <h3>{note.title}</h3>
@@ -390,7 +407,7 @@ export async function Homepage() {
           <div className="about-copy">
             <div className="about-prose">
               <p>{profile.about}</p>
-              <div className="profile-links" aria-label="Profile links">
+              <nav className="profile-links" aria-label="Profile links">
                 <Link href="/about">More about me <span className="arrow-mark" aria-hidden="true">→</span></Link>
                 <a href={profile.links.github} target="_blank" rel="noreferrer">
                   GitHub <span className="arrow-mark" aria-hidden="true">↗︎</span>
@@ -403,7 +420,7 @@ export async function Homepage() {
                     Résumé <span className="arrow-mark" aria-hidden="true">↗︎</span>
                   </a>
                 )}
-              </div>
+              </nav>
             </div>
             <figure className="portrait-frame">
               <Image

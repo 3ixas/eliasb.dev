@@ -1,13 +1,20 @@
 # Launch validation
 
-Validated on 14 September 2026 against an optimized local production build.
+Validated on 15 September 2026 against the local Next.js production build and the Vercel review deployment.
+
+## Final QA update
+
+- The selected Cabinet homepage, work, Lab, Library, and About routes were exercised at desktop and 390px mobile widths in Chromium. The skip link, primary navigation, disclosures, source links, Spotify embeds, and lazy-loaded imagery were checked.
+- The homepage and dedicated Lab now use bundled imagery for London, football, Professor Past, and Flowtime. Sources and licences are recorded in [`docs/content/IMAGE-CREDITS.md`](../content/IMAGE-CREDITS.md).
+- `SITE_INDEXABLE=false` is now pinned in Vercel Production alongside `GITHUB_SIGNAL_TOKEN`. The preview remains deliberately hidden from search until the custom domain serves this deployment.
+- `eliasb.dev` is attached to the `eliasb-dev` Vercel project. Vercel still reports the domain as unverified because DNS currently points at GitHub Pages; the required cutover record is `A eliasb.dev 76.76.21.21`.
 
 ## Passed locally
 
 - All eight launch routes render at `320px`, `390px`, and desktop widths without horizontal overflow.
 - Every launch route has one `h1`, meaningful image alternatives where images convey content, titled embeds, and a visible keyboard skip link.
 - Keyboard focus follows the visual navigation order and remains clear of the fixed mobile navigation. Training data is rendered by the site-owned summary; the Strava profile remains a labelled source link.
-- Text contrast passes the WCAG AA thresholds used by the automated computed-style audit in both themes across every launch route.
+- Site-owned text contrast passes the WCAG AA thresholds used by the automated computed-style audit in both themes across the launch routes. The Library audit still reports contrast and ARIA findings inside Spotify's third-party iframe, which the site cannot modify without hiding the player.
 - Reduced-motion visitors receive a simple reveal in place of the typed entrance.
 - The Library's native disclosure interactions open and close by keyboard and pointer without production console warnings.
 - Chrome and the Chromium-based in-app browser render the homepage without overflow or site-origin console errors.
@@ -16,7 +23,7 @@ Validated on 14 September 2026 against an optimized local production build.
 - The résumé link resolves to the current Google Docs CV, which is shared with anyone who has the link and does not require sign-in.
 - Responsive `sizes` hints keep the main About image's initial optimized candidate at `384px` instead of requesting the desktop-width candidate on narrow displays.
 - `robots.txt`, `sitemap.xml`, canonical metadata, social metadata, and the generated Open Graph image are present. Preview builds remain `noindex, nofollow` until `SITE_INDEXABLE=true` is deliberately set for the public launch.
-- `pnpm lint`, `pnpm build --webpack`, the route crawl, and `git diff --check` pass.
+- `pnpm exec tsc --noEmit --incremental false`, `pnpm lint`, `pnpm verify:signals`, `pnpm build`, the sequential route crawl, and `git diff --check` pass.
 
 ## Public preview evidence
 
@@ -27,6 +34,8 @@ Validated on 14 September 2026 against an optimized local production build.
 ## Remaining production checks
 
 - Confirm Safari and Firefox rendering. Only Chromium and Chrome were available during local automation.
+- Change the root DNS A record to `76.76.21.21`, wait for Vercel verification, and confirm `https://eliasb.dev` serves the new Vercel deployment.
+- After DNS verification, set `SITE_INDEXABLE=true` for Vercel Production, redeploy, and verify `robots.txt`, canonical metadata, sitemap, integrations, and redirects on the custom domain.
 
 ## Old-site preservation and cutover
 
@@ -34,7 +43,7 @@ Validated on 14 September 2026 against an optimized local production build.
 2. Verify the assigned stable `*.vercel.app` project URL before changing `eliasb.dev`. **Complete: `https://eliasb-v1.vercel.app`.**
 3. Keep the old GitHub Pages deployment intact during the rollback window.
 4. Deploy and approve the new site on its own Vercel review URL. **Deployed unindexed at `https://eliasb-dev.vercel.app`; final approval pending.**
-5. Move `eliasb.dev` and `www.eliasb.dev` to the new Vercel project only after the preview checks pass.
+5. **In progress:** `eliasb.dev` is attached to the new Vercel project; update its DNS A record from GitHub Pages to `76.76.21.21` and wait for verification. Keep the old GitHub Pages deployment intact until the rollback window closes.
 6. Set `SITE_INDEXABLE=true` for the approved production deployment and verify redirects, metadata, integrations, and analytics after cutover.
 
-No DNS, deployment, or indexing change is part of this local validation commit.
+The launch decision is **hold for DNS cutover**. The Vercel project and production environment are configured, but indexing must remain disabled while `eliasb.dev` still resolves to GitHub Pages.
