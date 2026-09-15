@@ -4,6 +4,7 @@ import { LocalTime } from "@/components/local-time";
 import { ClosableDetails } from "@/components/site/closable-details";
 import { SignatureLine } from "@/components/signature-line";
 import { SiteHeader } from "@/components/site/site-header";
+import { integrationConfig } from "@/content/integration-config";
 import { labNotes, profile, projects } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
 import type { PersonalSignal } from "@/integrations/types";
@@ -138,6 +139,7 @@ export async function Homepage() {
                 <p>{flowtime.eyebrow}</p>
                 <h3>{flowtime.name}</h3>
               </div>
+              <p>{flowtime.detail}</p>
               <div className="rail-links">
                 <Link href="/work/flowtime">Case study <span className="arrow-mark" aria-hidden="true">→</span></Link>
                 <a href={flowtime.liveUrl} target="_blank" rel="noreferrer">
@@ -189,6 +191,9 @@ export async function Homepage() {
             <article className="signal signal-presence">
               <p>Local signal</p>
               <SignalStatus signal={signals.status} />
+              <div className="london-signal-art" aria-hidden="true">
+                <i /><i /><i /><i /><b />
+              </div>
               <strong>
                 <LocalTime />
               </strong>
@@ -212,15 +217,26 @@ export async function Homepage() {
               <p>Training</p>
               <SignalStatus signal={signals.training} />
               <strong>{signals.training.headline}</strong>
-              <div className="training-rhythm" aria-label={`${signals.training.windowLabel} training by type`}>
-                {signals.training.weekly.map((category) => (
-                  <div className="training-metric" key={category.label}>
-                    <i style={{ height: `${Math.max(8, Math.min(100, category.count * 24 + 8))}%` }} aria-hidden="true" />
-                    <b>{category.count}</b>
-                    <span>{category.label}</span>
-                  </div>
-                ))}
-              </div>
+              {signals.training.schedule ? (
+                <div className="training-schedule" aria-label={`${signals.training.windowLabel} training schedule`}>
+                  {signals.training.schedule.map((day) => (
+                    <div className="training-day" key={day.day}>
+                      <b>{day.day}</b>
+                      <span>{day.activity}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="training-rhythm" aria-label={`${signals.training.windowLabel} training by type`}>
+                  {signals.training.weekly.map((category) => (
+                    <div className="training-metric" key={category.label}>
+                      <i style={{ height: `${Math.max(8, Math.min(100, category.count * 24 + 8))}%` }} aria-hidden="true" />
+                      <b>{category.count}</b>
+                      <span>{category.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
               <span>{signals.training.description}</span>
               <div className="signal-footnote">
                 {signals.training.href && <a href={signals.training.href} target="_blank" rel="noreferrer">Strava <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
@@ -230,6 +246,7 @@ export async function Homepage() {
             <article className="signal signal-fantasy">
               <p>Fantasy football</p>
               <SignalStatus signal={signals.fantasy} />
+              <div className="fantasy-field" aria-hidden="true"><i /><i /><i /></div>
               <strong>{signals.fantasy.headline}</strong>
               <span className="matchup">
                 <b>{signals.fantasy.leftLabel}</b>
@@ -244,7 +261,7 @@ export async function Homepage() {
               {signals.fantasy.href && <a className="signal-source-link" href={signals.fantasy.href} target="_blank" rel="noreferrer">Sleeper <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
             </article>
             <article className="signal signal-culture">
-              <p>Listening / watching</p>
+              <p>Watching</p>
               <SignalStatus signal={signals.culture} />
               <strong>{signals.culture.headline}</strong>
               {signals.culture.filmPosterUrl && (
@@ -263,19 +280,24 @@ export async function Homepage() {
                 </span>
               )}
               <span>{signals.culture.description}</span>
+              <span className="culture-freshness">{freshnessLabel(signals.culture.updatedAt)}</span>
               <div className="signal-source-links">
                 {signals.culture.filmHref && <a className="signal-source-link" href={signals.culture.filmHref} target="_blank" rel="noreferrer">Letterboxd <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
-                <a className="signal-source-link" href={signals.culture.playlistHref} target="_blank" rel="noreferrer">Playlist <span className="arrow-mark" aria-hidden="true">↗︎</span></a>
               </div>
             </article>
             <article className="signal signal-playlist">
               <p>Currently listening</p>
               <SignalStatus signal={{ state: "curated", statusLabel: "Spotify" }} />
-              <strong>Some tunes I’m listening to.</strong>
-              <a className="playlist-tile" href={signals.culture.playlistHref} target="_blank" rel="noreferrer">
-                <span>My current playlist</span>
-                <b>Open in Spotify <span className="arrow-mark" aria-hidden="true">↗︎</span></b>
-              </a>
+              <strong>A playlist with the aux cable.</strong>
+              <p className="playlist-description">Kept by hand, played through Spotify, and allowed to change.</p>
+              <iframe
+                className="spotify-embed"
+                title="Elias’s current Spotify playlist"
+                src={`https://open.spotify.com/embed/playlist/${integrationConfig.spotify.playlistId}?utm_source=generator&theme=0`}
+                height="152"
+                loading="lazy"
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              />
             </article>
           </div>
         </section>
@@ -292,6 +314,11 @@ export async function Homepage() {
               const content = (
                 <>
                   <span className="lab-index">{note.index}</span>
+                  <span className={`lab-card-visual lab-card-visual-${note.treatment}`} aria-hidden="true">
+                    {note.treatment === "professor" && <><i>PAST</i><b>?</b></>}
+                    {note.treatment === "fantasy" && <><b>EB</b><i>VS</i><b>—</b></>}
+                    {note.treatment === "interface" && <><i /><i /><i /></>}
+                  </span>
                   <p>{note.kind}</p>
                   <h3>{note.title}</h3>
                   <span className="lab-description">{note.description}</span>
@@ -320,7 +347,6 @@ export async function Homepage() {
           </div>
           <div className="library-stage">
             <div className="shelf-note">
-              <p>Books · cinema · history · science fiction · music</p>
               <p>
                 Books, films, history, science fiction, and music I’m spending time with.
               </p>

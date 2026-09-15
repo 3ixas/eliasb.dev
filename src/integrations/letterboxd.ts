@@ -6,7 +6,7 @@ import type { CultureSignal } from "@/integrations/types";
 export async function getCultureSignal(): Promise<CultureSignal> {
   try {
     const response = await fetch(integrationConfig.letterboxd.feedUrl, {
-      next: { revalidate: 21600, tags: ["letterboxd-signal"] },
+      next: { revalidate: 900, tags: ["letterboxd-signal"] },
       signal: AbortSignal.timeout(3500),
     });
     if (!response.ok) throw new Error(`Letterboxd returned ${response.status}`);
@@ -19,7 +19,7 @@ export async function getCultureSignal(): Promise<CultureSignal> {
       state: "live",
       statusLabel: "Culture live",
       headline: filmTitle,
-      description: "The latest film in my diary, alongside a playlist I’m enjoying.",
+      description: "The latest film logged in my Letterboxd diary.",
       href: integrationConfig.spotify.playlistUrl,
       filmTitle,
       filmYear: rssValue(item, "letterboxd:filmYear"),
@@ -28,6 +28,7 @@ export async function getCultureSignal(): Promise<CultureSignal> {
       filmPosterUrl: firstImageUrl(item),
       filmHref: rssValue(item, "link") ?? integrationConfig.letterboxd.profileUrl,
       playlistHref: integrationConfig.spotify.playlistUrl,
+      updatedAt: new Date().toISOString(),
     };
   } catch {
     return signalFallbacks.culture;

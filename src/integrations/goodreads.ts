@@ -3,10 +3,26 @@ import { signalFallbacks } from "@/content/signal-fallbacks";
 import { rssItems, rssValue } from "@/integrations/rss";
 import type { ReadingSignal } from "@/integrations/types";
 
+function summaryText(value: string | undefined) {
+  if (!value) return undefined;
+  const plain = value
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!plain) return undefined;
+  if (plain.length <= 220) return plain;
+  const sentence = plain.slice(0, 220).replace(/\s+\S*$/, "").trim();
+  return `${sentence}…`;
+}
+
 export async function getReadingSignal(): Promise<ReadingSignal> {
   try {
     const response = await fetch(integrationConfig.goodreads.currentlyReadingFeedUrl, {
-      next: { revalidate: 21600, tags: ["goodreads-signal"] },
+      next: { revalidate: 1800, tags: ["goodreads-signal"] },
       signal: AbortSignal.timeout(3500),
     });
     if (!response.ok) throw new Error(`Goodreads returned ${response.status}`);
@@ -24,9 +40,10 @@ export async function getReadingSignal(): Promise<ReadingSignal> {
       headline: title,
       description: `By ${author} · from my Goodreads shelf`,
       author,
-      bookDescription: rssValue(item, "book_description"),
+      bookDescription: summaryText(rssValue(item, "book_description")),
       coverUrl: rssValue(item, "book_large_image_url") ?? rssValue(item, "book_image_url"),
       href: integrationConfig.goodreads.profileUrl,
+      updatedAt: new Date().toISOString(),
     };
   } catch {
     return signalFallbacks.reading;

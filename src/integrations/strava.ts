@@ -29,8 +29,9 @@ function fallbackTraining(): TrainingSignal {
     ...signalFallbacks.training,
     weekly: TRAINING_CATEGORIES,
     totalActivities: 0,
-    windowLabel: "This week",
+    windowLabel: "Typical week",
     updatedAt: null,
+    href: undefined,
   };
 }
 
