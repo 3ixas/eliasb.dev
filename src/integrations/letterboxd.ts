@@ -1,6 +1,7 @@
 import { integrationConfig } from "@/content/integration-config";
 import { signalFallbacks } from "@/content/signal-fallbacks";
 import { firstImageUrl, rssItems, rssValue } from "@/integrations/rss";
+import { trustedHttpsUrl } from "@/integrations/safe-url";
 import type { CultureSignal } from "@/integrations/types";
 
 export async function getCultureSignal(): Promise<CultureSignal> {
@@ -25,8 +26,8 @@ export async function getCultureSignal(): Promise<CultureSignal> {
       filmYear: rssValue(item, "letterboxd:filmYear"),
       filmRating: rssValue(item, "letterboxd:memberRating"),
       filmDescription: "The latest film in my diary. I keep the rating and notes on Letterboxd.",
-      filmPosterUrl: firstImageUrl(item),
-      filmHref: rssValue(item, "link") ?? integrationConfig.letterboxd.profileUrl,
+      filmPosterUrl: trustedHttpsUrl(firstImageUrl(item), ["a.ltrbxd.com"]),
+      filmHref: trustedHttpsUrl(rssValue(item, "link"), ["letterboxd.com", "www.letterboxd.com"]) ?? integrationConfig.letterboxd.profileUrl,
       playlistHref: integrationConfig.spotify.playlistUrl,
       updatedAt: new Date().toISOString(),
     };

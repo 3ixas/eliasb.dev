@@ -1,6 +1,7 @@
 import { integrationConfig } from "@/content/integration-config";
 import { signalFallbacks } from "@/content/signal-fallbacks";
 import { rssItems, rssValue } from "@/integrations/rss";
+import { trustedHttpsUrl } from "@/integrations/safe-url";
 import type { ReadingSignal } from "@/integrations/types";
 
 function summaryText(value: string | undefined) {
@@ -41,7 +42,10 @@ export async function getReadingSignal(): Promise<ReadingSignal> {
       description: `By ${author} · from my Goodreads shelf`,
       author,
       bookDescription: summaryText(rssValue(item, "book_description")),
-      coverUrl: rssValue(item, "book_large_image_url") ?? rssValue(item, "book_image_url"),
+      coverUrl: trustedHttpsUrl(
+        rssValue(item, "book_large_image_url") ?? rssValue(item, "book_image_url"),
+        ["i.gr-assets.com"],
+      ),
       href: integrationConfig.goodreads.profileUrl,
       updatedAt: new Date().toISOString(),
     };
