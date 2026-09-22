@@ -7,7 +7,7 @@ Checked against official sources on 2026-09-13. These are feasibility findings, 
 - **GitHub:** connected through a server-only adapter with six-hour revalidation. It uses public events without credentials and can add aggregate private contribution counts when `GITHUB_SIGNAL_TOKEN` is configured. Private repository names never reach the page.
 - **Sleeper:** connected to Elias's 2026 showcase league through the public, read-only API. The opponent remains anonymised as `OPP`.
 - **Manual status:** stored as public site content with an expiry, preventing an old note from appearing current indefinitely.
-- **Spotify:** the selected public playlist is presented through Spotify's official embed inside a site-designed Library section.
+- **Spotify:** the selected public playlist is presented through Spotify's official embed inside the site-designed Outside work section.
 - **Books:** the public Goodreads `currently-reading` RSS feed supplies the current title, author, cover, and source link. The site retains a last-known fallback and keeps personal notes site-owned.
 - **Films:** the public Letterboxd RSS feed supplies the latest diary entry, year, rating, poster, and source link, with a last-known fallback.
 - **Training:** Strava's optional server-side activity contract supplies a current-week, site-owned count of Lift, Run, Muay Thai, and Other activity. When credentials are absent or the API fails, the authored `Lift · Run · Muay Thai` rhythm remains visible.

@@ -83,8 +83,8 @@ Design the same representative slice in every direction:
 
 1. Signature entrance and introduction.
 2. One selected project.
-3. The current-life glimpse.
-4. One Library interaction.
+3. The Outside work collection.
+4. One tactile interaction within that collection.
 
 Produce desktop and mobile compositions first, then a focused coded prototype for motion and interaction. Use real project screenshots, one or two candidate photographs, and representative books, films, and music so the evaluation reflects Elias's actual material.
 

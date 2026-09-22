@@ -31,17 +31,16 @@ The entrance must not require interaction or block access long enough to need a 
 
 ## Information architecture
 
-Use a substantial homepage with four primary destinations: **Work, Lab, Library, About**.
+Use a substantial one-page homepage with four primary destinations: **Work, Outside work, Experiments, About**. Navigation moves between homepage sections; Work also retains a full case-study archive.
 
 Homepage order:
 
 1. Signature entrance.
 2. Concise introduction to Elias and the intersection of engineering, product, and design.
 3. Selected work: Threshold, Argus Risk, then Flowtime.
-4. A composed glimpse of current building, local time and status, reading, cinema, music, training, and fantasy football.
-5. Lab preview.
-6. Library preview.
-7. About, email, résumé, GitHub, and LinkedIn.
+4. Outside work: a flexible collection of current building, London status, reading, cinema, music, training, fantasy football, and history.
+5. Experiments: a compact occasional preview of Lab material.
+6. About, email, résumé, GitHub, and LinkedIn.
 
 Email is the primary action. Résumé, GitHub, and LinkedIn are visible secondary actions.
 
@@ -53,27 +52,27 @@ Each flagship project receives a separate layered case study. The opening should
 2. **Argus Risk** demonstrates architecture and system behaviour. Describe it as a local educational simulator.
 3. **Flowtime** demonstrates state design, resilience, accessibility, and interaction refinement.
 
-Ask Professor Past belongs in the Lab after its public documentation is corrected. Home Secretary is supporting university work. Risk Event Tracker and Connect Four are not flagship projects. Claims must demonstrate judgment without inventing users, traction, production scale, or founding experience.
+Ask Professor Past belongs in Experiments after its public documentation is corrected. Home Secretary is supporting university work. Risk Event Tracker and Connect Four are not flagship projects. Claims must demonstrate judgment without inventing users, traction, production scale, or founding experience.
 
 The connecting narrative is that Elias makes consequential or messy states understandable through interface craft and humane correctness: recovery, accessibility, data ownership, shareable state, explicit uncertainty, and operational reliability.
 
-## Lab
+## Experiments
 
-Lab is an exploratory collection of experiments, works in progress, failed ideas, making notes, interface studies, small tools, Ask Professor Past, and fantasy-football work. An item receives its own page only when its content or interaction merits one. It does not require a publishing schedule.
+Experiments is a compact homepage collection of occasional Lab material: works in progress, failed ideas, making notes, interface studies, small tools, Ask Professor Past, and fantasy-football work. It does not require a publishing schedule or a primary navigation tab. The existing `/lab` path remains a compatibility route to this section.
 
-## Library
+## Outside work
 
-Library is one cohesive cultural space rather than a conventional blog or feed. It can contain books, cinema, history, science fiction, and music. Books, pages, movie posters, records, shelves, or related objects can become tactile interactions. Entries can open as overlays or pages when Elias has something meaningful to say.
+Outside work is one flexible homepage collection rather than separate Now and Library destinations. It gathers GitHub activity, London status, training, fantasy football, books, cinema, history, and music. Cards can be grouped and arranged according to the material, and entries can open as disclosures or source links when there is something meaningful to show. Science fiction is not a standalone category until it has a concrete entry.
 
 ## About and personal texture
 
-About combines Elias's personal story, a real photograph, safe professional context, current status, local time, training, contact details, and external profiles. Test both a prominent portrait and a smaller natural photograph during concept work.
+About combines Elias's personal story, the white-tux photograph, safe professional context, the connecting thread through his work, contact details, and external profiles. The portrait choice is settled; the coast photograph is not the primary About image.
 
 Lifting, running, Muay Thai, football, and fantasy sports should add human texture. Do not publish routes, exact locations or schedules, heart-rate data, body measurements, or other sensitive training information.
 
 ## Live and maintained signals
 
-Distribute signals through the places where they make narrative sense. The homepage shows a composed current-life glimpse rather than a widget grid.
+Keep personal signals together in the Outside work section. The cards can vary in treatment and grouping without becoming a rigid widget taxonomy.
 
 - **GitHub:** public activity plus aggregate private contribution counts; never expose private repository names or details.
 - **Books:** site-owned reading data enriched with Open Library metadata and covers; allow an interactive book or shelf treatment.
@@ -95,7 +94,7 @@ Explore three directions independently before selecting or combining them:
 
 Selected direction: Cabinet of Curiosities, grounded by Living Editorial's hierarchy, whitespace, and restraint. Signals and Systems will not define the overall environment because it felt too harsh, but restrained pieces of its data language can appear inside relevant GitHub, training, fantasy, and system views.
 
-Compare the same representative slice in every direction: entrance, introduction, one selected project, the current-life glimpse, and one Library interaction. Produce desktop and mobile compositions, then a focused coded prototype for motion and interaction. Evaluate clarity, distinctiveness, personal specificity, warmth, accessibility, mobile behaviour, performance, and maintenance before combining ideas.
+Compare the same representative slice in every direction: entrance, introduction, one selected project, the Outside work collection, and one tactile interaction. Produce desktop and mobile compositions, then a focused coded prototype for motion and interaction. Evaluate clarity, distinctiveness, personal specificity, warmth, accessibility, mobile behaviour, performance, and maintenance before combining ideas.
 
 Use real project screenshots, one or two candidate photographs, and representative books, films, and music in the first serious concepts. Use temporary material only where credentials or final data are unavailable.
 
@@ -137,7 +136,7 @@ Do not change the live domain during design and development. Validate the comple
 2. Produce the three comparable visual concepts. **Complete.**
 3. Select and document the visual system, then build the homepage. **Complete.**
 4. Build the three Work case studies. **Complete.**
-5. Build Lab, Library, and About. **Complete.**
+5. Build the unified Outside work and Experiments sections, then complete the homepage About section. **Next architecture pass.**
 6. Add integrations and their designed fallback states. **Complete:** GitHub, Goodreads, Letterboxd, Sleeper, Spotify, Strava, local time, and expiring status are connected with source-appropriate fallbacks.
 7. Validate responsive behavior, accessibility, browser support, and performance. **Local production validation complete; public preview performance and Safari/Firefox checks remain.**
 8. Validate the production deployment and cut over `eliasb.dev`.
