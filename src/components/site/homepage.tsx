@@ -2,15 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { LocalTime } from "@/components/local-time";
 import { ClosableDetails } from "@/components/site/closable-details";
+import { FeaturedWork } from "@/components/site/featured-work";
 import { SignatureLine } from "@/components/signature-line";
 import { SiteHeader } from "@/components/site/site-header";
 import { journey, labItems } from "@/content/collections";
 import { integrationConfig } from "@/content/integration-config";
-import { profile, projects } from "@/content/site";
+import { profile } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
 import type { PersonalSignal } from "@/integrations/types";
-
-const [threshold, argus, flowtime] = projects;
 
 const interests = [
   ["01", "Lift", "Strength, repetition, patience."],
@@ -20,7 +19,6 @@ const interests = [
   ["05", "Reading", "Stories and ideas kept within reach."],
   ["06", "History", "Patterns, people, and the details that stay useful."],
 ] as const;
-
 function SignalStatus({ signal }: { signal: Pick<PersonalSignal, "state" | "statusLabel"> }) {
   return <span className="signal-status" data-state={signal.state}>{signal.statusLabel}</span>;
 }
@@ -72,96 +70,7 @@ export async function Homepage() {
           </a>
         </section>
 
-        <section className="work-section" id="work" aria-labelledby="work-title">
-          <div className="section-heading">
-            <p>01 / Selected work</p>
-            <h2 id="work-title">
-              Making the cost of a decision <em>visible.</em>
-            </h2>
-          </div>
-          <article className="project-feature">
-            <Link
-              className="project-visual"
-              href="/work/threshold"
-              aria-label={`${threshold.index} — Read the Threshold case study`}
-            >
-              <Image
-                src={threshold.image}
-                alt={threshold.imageAlt}
-                width={1804}
-                height={1376}
-                sizes="(max-width: 800px) calc(100vw - 56px), 65vw"
-                priority
-              />
-              <span className="project-index">{threshold.index}</span>
-            </Link>
-            <div className="project-copy">
-              <p className="project-type">{threshold.eyebrow}</p>
-              <h3>{threshold.name}</h3>
-              <p>{threshold.description}</p>
-              <ul aria-label="Threshold qualities">
-                {threshold.qualities.map((quality) => (
-                  <li key={quality}>{quality}</li>
-                ))}
-              </ul>
-              <div className="project-links">
-                <Link href="/work/threshold">Read case study <span className="arrow-mark" aria-hidden="true">→</span></Link>
-                <a href={threshold.liveUrl} target="_blank" rel="noreferrer">
-                  Open project <span className="arrow-mark" aria-hidden="true">↗︎</span>
-                </a>
-                <a href={threshold.codeUrl} target="_blank" rel="noreferrer">
-                  View code <span className="arrow-mark" aria-hidden="true">↗︎</span>
-                </a>
-              </div>
-            </div>
-          </article>
-
-          <div className="project-rail" role="region" aria-label="More selected work">
-            <article>
-              <span>{argus.index}</span>
-              <Image
-                src={argus.image}
-                alt={argus.imageAlt}
-                width={1280}
-                height={770}
-                sizes="(max-width: 800px) calc(100vw - 68px), 40vw"
-              />
-              <div>
-                <p>{argus.eyebrow}</p>
-                <h3>{argus.name}</h3>
-              </div>
-              <p>{argus.detail}</p>
-              <a href={argus.codeUrl} target="_blank" rel="noreferrer">
-                Source <span className="arrow-mark" aria-hidden="true">↗︎</span>
-              </a>
-              <Link href="/work/argus-risk">Read case study <span className="arrow-mark" aria-hidden="true">→</span></Link>
-            </article>
-            <article>
-              <span>{flowtime.index}</span>
-              <Image
-                src={flowtime.image}
-                alt={flowtime.imageAlt}
-                width={1280}
-                height={640}
-                sizes="(max-width: 800px) calc(100vw - 68px), 40vw"
-              />
-              <div>
-                <p>{flowtime.eyebrow}</p>
-                <h3>{flowtime.name}</h3>
-              </div>
-              <p>{flowtime.detail}</p>
-              <div className="rail-links">
-                <Link href="/work/flowtime">Case study <span className="arrow-mark" aria-hidden="true">→</span></Link>
-                <a href={flowtime.liveUrl} target="_blank" rel="noreferrer">
-                  Visit <span className="arrow-mark" aria-hidden="true">↗︎</span>
-                </a>
-                <a href={flowtime.codeUrl} target="_blank" rel="noreferrer">
-                  Code <span className="arrow-mark" aria-hidden="true">↗︎</span>
-                </a>
-              </div>
-            </article>
-          </div>
-        </section>
+        <FeaturedWork />
 
         <section className="outside-work-section" id="outside-work" aria-label="Outside work">
           <section className="currently-section" aria-labelledby="currently-title">
