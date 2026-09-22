@@ -85,6 +85,7 @@ export type FantasySignal = PersonalSignal & {
   rightLabel: string;
   leftScore?: number;
   rightScore?: number;
+  updatedAt: string | null;
 };
 
 export type HomepageSignals = {

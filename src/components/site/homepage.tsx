@@ -3,6 +3,11 @@ import Link from "next/link";
 import { LocalTime } from "@/components/local-time";
 import { ClosableDetails } from "@/components/site/closable-details";
 import { FeaturedWork } from "@/components/site/featured-work";
+import {
+  SignalFreshness,
+  SignalPresentation,
+  SignalStatus,
+} from "@/components/site/signal-presentation";
 import { SignatureLine } from "@/components/signature-line";
 import { SiteHeader } from "@/components/site/site-header";
 import { journey, labItems } from "@/content/collections";
@@ -10,7 +15,6 @@ import { integrationConfig } from "@/content/integration-config";
 import { profile } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
 import { getHistorySignal } from "@/integrations/history";
-import type { PersonalSignal } from "@/integrations/types";
 
 const interests = [
   ["01", "Lift", "Strength, repetition, patience."],
@@ -20,21 +24,12 @@ const interests = [
   ["05", "Reading", "Stories and ideas kept within reach."],
   ["06", "History", "Patterns, people, and the details that stay useful."],
 ] as const;
-function SignalStatus({ signal }: { signal: Pick<PersonalSignal, "state" | "statusLabel"> }) {
-  return <span className="signal-status" data-state={signal.state}>{signal.statusLabel}</span>;
-}
-
 function activityLevel(count: number) {
   if (count >= 4) return "4";
   if (count >= 3) return "3";
   if (count >= 2) return "2";
   if (count >= 1) return "1";
   return "0";
-}
-
-function freshnessLabel(updatedAt: string | null) {
-  if (!updatedAt) return "Stable fallback";
-  return `Updated ${new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" }).format(new Date(updatedAt))}`;
 }
 
 function scoreWidth(left?: number, right?: number) {
@@ -51,9 +46,9 @@ export async function Homepage() {
   const [signals, history] = await Promise.all([getHomepageSignals(), getHistorySignal()]);
 
   return (
-    <div className="prototype prototype-cabinet-of-curiosities selected-experience" id="top">
+    <div className="prototype prototype-cabinet-of-curiosities selected-experience" id="top" tabIndex={-1}>
       <SiteHeader />
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1}>
         <section className="hero" aria-labelledby="hero-kicker">
           <p className="hero-kicker" id="hero-kicker">
             {profile.shortName} · {profile.role} · {profile.location}
@@ -73,7 +68,7 @@ export async function Homepage() {
 
         <FeaturedWork />
 
-        <section className="outside-work-section" id="outside-work" aria-labelledby="outside-work-title">
+        <section className="outside-work-section" id="outside-work" tabIndex={-1} aria-labelledby="outside-work-title">
           <div className="currently-section">
             <div className="section-heading compact">
               <p>02 / Outside work</p>
@@ -84,30 +79,33 @@ export async function Homepage() {
             <div className="signal-grid">
               <article className="signal signal-building">
                 <p>Recent building</p>
-                <SignalStatus signal={signals.github} />
-                <strong>{signals.github.headline}</strong>
-                <span>{signals.github.description}</span>
-                {signals.github.totalContributions !== undefined && (
-                  <div className="signal-metrics" aria-label="GitHub contribution totals">
-                    <b>{signals.github.totalContributions}</b>
-                    <span>contributions</span>
-                    {signals.github.privateContributions !== undefined && (
-                      <>
-                        <b>{signals.github.privateContributions}</b>
-                        <span>private</span>
-                      </>
-                    )}
+                <SignalPresentation
+                  signal={signals.github}
+                  source={{
+                    label: signals.github.state === "unavailable" ? "GitHub fallback" : "GitHub",
+                    href: signals.github.href,
+                  }}
+                >
+                  <strong>{signals.github.headline}</strong>
+                  <span>{signals.github.description}</span>
+                  {signals.github.totalContributions !== undefined && (
+                    <div className="signal-metrics" aria-label="GitHub contribution totals">
+                      <b>{signals.github.totalContributions}</b>
+                      <span>contributions</span>
+                      {signals.github.privateContributions !== undefined && (
+                        <>
+                          <b>{signals.github.privateContributions}</b>
+                          <span>private</span>
+                        </>
+                      )}
+                    </div>
+                  )}
+                  <div className="activity-trace" role="img" aria-label={signals.github.activityLabel}>
+                    {signals.github.activity.map((day) => (
+                      <i key={day.date} data-level={activityLevel(day.count)} aria-hidden="true" />
+                    ))}
                   </div>
-                )}
-                <div className="activity-trace" role="img" aria-label={signals.github.activityLabel}>
-                  {signals.github.activity.map((day) => (
-                    <i key={day.date} data-level={activityLevel(day.count)} aria-hidden="true" />
-                  ))}
-                </div>
-                <div className="signal-footnote">
-                  <a href={signals.github.href} target="_blank" rel="noreferrer">GitHub <span className="arrow-mark" aria-hidden="true">↗︎</span></a>
-                  <span>{freshnessLabel(signals.github.updatedAt)}</span>
-                </div>
+                </SignalPresentation>
               </article>
               <article className="signal signal-presence">
                 <p>Local signal</p>
@@ -128,58 +126,67 @@ export async function Homepage() {
               </article>
               <article className="signal signal-training">
                 <p>Training</p>
-                <SignalStatus signal={signals.training} />
-                <strong>{signals.training.headline}</strong>
-                {signals.training.schedule ? (
-                  <div className="training-schedule" role="group" aria-label={`${signals.training.windowLabel} training schedule`}>
-                    {signals.training.schedule.map((day) => (
-                      <div className="training-day" key={day.day}>
-                        <b>{day.day}</b>
-                        <span>{day.activity}</span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="training-rhythm" aria-label={`${signals.training.windowLabel} training by type`}>
-                    {signals.training.weekly.map((category) => (
-                      <div className="training-metric" key={category.label}>
-                        <i style={{ height: `${Math.max(8, Math.min(100, category.count * 24 + 8))}%` }} aria-hidden="true" />
-                        <b>{category.count}</b>
-                        <span>{category.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <span>{signals.training.description}</span>
-                <div className="signal-footnote">
-                  {signals.training.href && <a href={signals.training.href} target="_blank" rel="noreferrer">Strava <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
-                  <span>{freshnessLabel(signals.training.updatedAt)}</span>
-                </div>
+                <SignalPresentation
+                  signal={signals.training}
+                  source={{
+                    label: signals.training.href ? "Strava" : "Authored schedule",
+                    href: signals.training.href,
+                  }}
+                >
+                  <strong>{signals.training.headline}</strong>
+                  {signals.training.schedule ? (
+                    <div className="training-schedule" role="group" aria-label={`${signals.training.windowLabel} training schedule`}>
+                      {signals.training.schedule.map((day) => (
+                        <div className="training-day" key={day.day}>
+                          <b>{day.day}</b>
+                          <span>{day.activity}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="training-rhythm" aria-label={`${signals.training.windowLabel} training by type`}>
+                      {signals.training.weekly.map((category) => (
+                        <div className="training-metric" key={category.label}>
+                          <i style={{ height: `${Math.max(8, Math.min(100, category.count * 24 + 8))}%` }} aria-hidden="true" />
+                          <b>{category.count}</b>
+                          <span>{category.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <span>{signals.training.description}</span>
+                </SignalPresentation>
               </article>
               <article className="signal signal-fantasy">
                 <p>Fantasy football</p>
-                <SignalStatus signal={signals.fantasy} />
-                <figure className="fantasy-field">
-                  <Image
-                    src="/signals/football-stadium.jpg"
-                    alt=""
-                    fill
-                    sizes="(max-width: 800px) calc(100vw - 100px), 30vw"
-                  />
-                  <figcaption>NFL · week 1</figcaption>
-                </figure>
-                <strong>{signals.fantasy.headline}</strong>
-                <span className="matchup">
-                  <b>{signals.fantasy.leftLabel}</b>
-                  <i>{signals.fantasy.matchupLabel}</i>
-                  <b>{signals.fantasy.rightLabel}</b>
-                </span>
-                <div className="matchup-bars" aria-hidden="true">
-                  <i style={{ width: scoreWidth(signals.fantasy.leftScore, signals.fantasy.rightScore).left }} />
-                  <i style={{ width: scoreWidth(signals.fantasy.leftScore, signals.fantasy.rightScore).right }} />
-                </div>
-                <span>{signals.fantasy.description}</span>
-                {signals.fantasy.href && <a className="signal-source-link" href={signals.fantasy.href} target="_blank" rel="noreferrer">Sleeper <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
+                <SignalPresentation
+                  signal={signals.fantasy}
+                  source={{
+                    label: signals.fantasy.href ? "Sleeper" : "Sleeper pending",
+                    href: signals.fantasy.href,
+                  }}
+                >
+                  <figure className="fantasy-field">
+                    <Image
+                      src="/signals/football-stadium.jpg"
+                      alt=""
+                      fill
+                      sizes="(max-width: 800px) calc(100vw - 100px), 30vw"
+                    />
+                    <figcaption>NFL · week 1</figcaption>
+                  </figure>
+                  <strong>{signals.fantasy.headline}</strong>
+                  <span className="matchup">
+                    <b>{signals.fantasy.leftLabel}</b>
+                    <i>{signals.fantasy.matchupLabel}</i>
+                    <b>{signals.fantasy.rightLabel}</b>
+                  </span>
+                  <div className="matchup-bars" aria-hidden="true">
+                    <i style={{ width: scoreWidth(signals.fantasy.leftScore, signals.fantasy.rightScore).left }} />
+                    <i style={{ width: scoreWidth(signals.fantasy.leftScore, signals.fantasy.rightScore).right }} />
+                  </div>
+                  <span>{signals.fantasy.description}</span>
+                </SignalPresentation>
               </article>
             </div>
           </div>
@@ -216,7 +223,7 @@ export async function Homepage() {
                 <span>
                   {signals.reading.bookDescription ?? `${signals.reading.author ? `By ${signals.reading.author}. ` : ""}${signals.reading.description}`}
                 </span>
-                <small className="library-freshness">{freshnessLabel(signals.reading.updatedAt)}</small>
+                <SignalFreshness signal={signals.reading} className="library-freshness" />
                 {signals.reading.href && <a href={signals.reading.href} target="_blank" rel="noreferrer">View on Goodreads <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
               </ClosableDetails>
               <ClosableDetails
@@ -240,7 +247,7 @@ export async function Homepage() {
                 {signals.culture.filmYear && (
                   <span>{signals.culture.filmYear}{signals.culture.filmRating ? ` · ${signals.culture.filmRating} out of 5` : ""}</span>
                 )}
-                <small className="library-freshness">{freshnessLabel(signals.culture.updatedAt)}</small>
+                <SignalFreshness signal={signals.culture} className="library-freshness" />
                 {signals.culture.filmHref && <a href={signals.culture.filmHref} target="_blank" rel="noreferrer">View on Letterboxd <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
               </ClosableDetails>
             </div>
@@ -290,7 +297,7 @@ export async function Homepage() {
           </section>
         </section>
 
-        <section className="lab-section experiments-section" id="experiments" aria-labelledby="experiments-title">
+        <section className="lab-section experiments-section" id="experiments" tabIndex={-1} aria-labelledby="experiments-title">
           <div className="section-heading compact">
             <p>03 / Experiments</p>
             <div>
@@ -364,7 +371,7 @@ export async function Homepage() {
           </div>
         </section>
 
-        <section className="about-section" id="about" aria-labelledby="about-title">
+        <section className="about-section" id="about" tabIndex={-1} aria-labelledby="about-title">
           <p>04 / About</p>
           <h2 id="about-title">
             Engineer by trade.
@@ -439,7 +446,7 @@ export async function Homepage() {
           </div>
         </section>
 
-        <section id="contact" className="contact-block contact-section" aria-labelledby="contact-title">
+        <section id="contact" tabIndex={-1} className="contact-block contact-section" aria-labelledby="contact-title">
           <p>05 / Contact</p>
           <h2 id="contact-title">Have a complex problem worth making simpler?</h2>
           <a className="contact-link" href={profile.links.email}>

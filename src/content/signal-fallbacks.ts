@@ -76,6 +76,7 @@ export const signalFallbacks: HomepageSignals = {
     leftLabel: "EB",
     matchupLabel: "in season",
     rightLabel: "—",
+    updatedAt: null,
   },
   culture: {
     state: "curated",

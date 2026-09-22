@@ -66,6 +66,7 @@ export async function getFantasySignal(): Promise<FantasySignal> {
       rightLabel: `OPP ${score(opponent?.points)}`,
       leftScore: ownMatchup?.points,
       rightScore: opponent?.points,
+      updatedAt: new Date().toISOString(),
       href: `https://sleeper.com/leagues/${leagueId}`,
     };
   } catch {

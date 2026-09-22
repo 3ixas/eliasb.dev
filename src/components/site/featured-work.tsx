@@ -124,7 +124,7 @@ export function FeaturedWork() {
   const [lead, ...rail] = featuredProjects;
 
   return (
-    <section className="work-section" id="work" aria-labelledby="work-title">
+    <section className="work-section" id="work" tabIndex={-1} aria-labelledby="work-title">
       <div className="section-heading">
         <p>01 / Featured work</p>
         <h2 id="work-title">

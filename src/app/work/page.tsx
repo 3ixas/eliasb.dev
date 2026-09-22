@@ -15,7 +15,7 @@ export default function WorkPage() {
   return (
     <div className="work-index-page">
       <PageHeader />
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1}>
         <header className="work-index-hero">
           <p>Work archive · {studies.length} case studies</p>
           <h1>A growing collection of complex state made <em>understandable.</em></h1>

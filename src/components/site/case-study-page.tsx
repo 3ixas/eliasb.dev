@@ -7,7 +7,7 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
   return (
     <div className={`case-study case-${study.slug}`}>
       <PageHeader />
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1}>
         <header className="case-hero">
           <div className="case-crumbs">
             <Link href="/work">← All work</Link>
