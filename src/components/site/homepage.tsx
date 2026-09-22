@@ -4,12 +4,22 @@ import { LocalTime } from "@/components/local-time";
 import { ClosableDetails } from "@/components/site/closable-details";
 import { SignatureLine } from "@/components/signature-line";
 import { SiteHeader } from "@/components/site/site-header";
+import { journey, labItems } from "@/content/collections";
 import { integrationConfig } from "@/content/integration-config";
-import { labNotes, profile, projects } from "@/content/site";
+import { profile, projects } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
 import type { PersonalSignal } from "@/integrations/types";
 
 const [threshold, argus, flowtime] = projects;
+
+const interests = [
+  ["01", "Lift", "Strength, repetition, patience."],
+  ["02", "Run", "Distance and a clearer head."],
+  ["03", "Muay Thai", "Technique under pressure."],
+  ["04", "Football", "Watching, arguing, modelling."],
+  ["05", "Reading", "Stories and ideas kept within reach."],
+  ["06", "History", "Patterns, people, and the details that stay useful."],
+] as const;
 
 function SignalStatus({ signal }: { signal: Pick<PersonalSignal, "state" | "statusLabel"> }) {
   return <span className="signal-status" data-state={signal.state}>{signal.statusLabel}</span>;
@@ -365,15 +375,22 @@ export async function Homepage() {
           </section>
         </section>
 
-        <section className="lab-section" id="experiments" aria-labelledby="lab-title">
+        <section className="lab-section experiments-section" id="experiments" aria-labelledby="experiments-title">
           <div className="section-heading compact">
-            <p>03 / Lab</p>
-            <h2 id="lab-title">
-              Small bets, unfinished ideas, and <em>useful mistakes.</em>
-            </h2>
+            <p>03 / Experiments</p>
+            <div>
+              <h2 id="experiments-title">
+                Small bets, unfinished ideas, and <em>useful mistakes.</em>
+              </h2>
+              <p className="section-supporting-copy">
+                Occasional work in progress, interface studies, and notes from making things. No schedule, just ideas worth keeping.
+              </p>
+            </div>
           </div>
           <div className="lab-grid">
-            {labNotes.map((note) => {
+            {labItems.map((note) => {
+              const externalHref = note.liveUrl ?? note.codeUrl;
+              const actionLabel = note.liveUrl ? "Open experiment" : note.codeUrl ? "View source" : "Read experiment note";
               const content = (
                 <>
                   <span className="lab-index">{note.index}</span>
@@ -388,20 +405,48 @@ export async function Homepage() {
                   <p>{note.kind}</p>
                   <h3>{note.title}</h3>
                   <span className="lab-description">{note.description}</span>
-                  <span className="lab-arrow">{note.href ? <>Open <span className="arrow-mark" aria-hidden="true">↗︎</span></> : <>In the lab <span className="arrow-mark" aria-hidden="true">→</span></>}</span>
+                  <span className="lab-arrow">{actionLabel} <span className="arrow-mark" aria-hidden="true">{externalHref ? "↗︎" : "→"}</span></span>
                 </>
               );
 
+              if (!externalHref) {
+                return (
+                  <details key={note.index} className="lab-card lab-card-disclosure">
+                    <summary>
+                      <span className="lab-index">{note.index}</span>
+                      <span className={`lab-card-visual lab-card-visual-${note.treatment}`}>
+                        <Image
+                          src={note.image}
+                          alt={note.imageAlt}
+                          fill
+                          sizes="(max-width: 800px) calc(100vw - 100px), 30vw"
+                        />
+                      </span>
+                      <span className="lab-kind">{note.kind}</span>
+                      <h3>{note.title}</h3>
+                      <span className="lab-description">{note.description}</span>
+                      <span className="lab-arrow">{actionLabel} <span className="arrow-mark" aria-hidden="true">→</span></span>
+                    </summary>
+                    <div className="lab-note">
+                      <p>{note.note}</p>
+                    </div>
+                  </details>
+                );
+              }
+
               return (
-                <Link key={note.index} className="lab-card" href={note.href}>
+                <a
+                  key={note.index}
+                  className="lab-card"
+                  href={externalHref}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   {content}
-                </Link>
+                </a>
               );
             })}
           </div>
-          <Link className="section-link" href="/lab">
-            Explore the Lab <span className="arrow-mark" aria-hidden="true">↗︎</span>
-          </Link>
         </section>
 
         <section className="about-section" id="about" aria-labelledby="about-title">
@@ -414,8 +459,11 @@ export async function Homepage() {
           <div className="about-copy">
             <div className="about-prose">
               <p>{profile.about}</p>
+              <p className="about-supporting-copy">
+                I like software that respects the person using it: clear enough to understand, resilient when things go wrong, and considered down to the awkward states.
+              </p>
               <nav className="profile-links" aria-label="Profile links">
-                <Link href="/about">More about me <span className="arrow-mark" aria-hidden="true">→</span></Link>
+                <a href="#contact">Start a conversation <span className="arrow-mark" aria-hidden="true">↓</span></a>
                 <a href={profile.links.github} target="_blank" rel="noreferrer">
                   GitHub <span className="arrow-mark" aria-hidden="true">↗︎</span>
                 </a>
@@ -439,6 +487,40 @@ export async function Homepage() {
               />
               <figcaption>Off duty, approximately</figcaption>
             </figure>
+          </div>
+          <div className="about-thread">
+            <div className="about-thread-heading">
+              <p>Connecting thread</p>
+              <div>
+                <h3 id="about-thread-title">The thread through all of it.</h3>
+                <span>How do you make complicated things easier to understand?</span>
+              </div>
+            </div>
+            <ol aria-labelledby="about-thread-title">
+              {journey.map((step, index) => (
+                <li key={step.label}>
+                  <span>0{index + 1}</span>
+                  <p>{step.label}</p>
+                  <h4>{step.title}</h4>
+                  <div>{step.description}</div>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <div className="about-interests">
+            <div>
+              <p>Outside the editor</p>
+              <h3 id="about-interests-title">A few other ways I measure a week.</h3>
+            </div>
+            <ul aria-labelledby="about-interests-title">
+              {interests.map(([index, title, description]) => (
+                <li key={index}>
+                  <span>{index}</span>
+                  <strong>{title}</strong>
+                  <p>{description}</p>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
 
