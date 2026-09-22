@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="collection-page about-page">
-      <PageHeader active="about" />
+      <PageHeader />
       <main id="main-content">
         <header className="about-hero">
           <div>

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function LabPage() {
   return (
     <div className="collection-page lab-page">
-      <PageHeader active="lab" />
+      <PageHeader />
       <main id="main-content">
         <header className="collection-hero lab-hero">
           <p>Lab · Experiments and useful mistakes</p>

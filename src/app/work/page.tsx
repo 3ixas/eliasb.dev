@@ -14,7 +14,7 @@ export default function WorkPage() {
 
   return (
     <div className="work-index-page">
-      <PageHeader active="work" />
+      <PageHeader />
       <main id="main-content">
         <header className="work-index-hero">
           <p>Selected work · 2026</p>

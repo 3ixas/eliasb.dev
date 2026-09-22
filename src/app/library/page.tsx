@@ -26,7 +26,7 @@ export default async function LibraryPage() {
 
   return (
     <div className="collection-page library-page">
-      <PageHeader active="library" />
+      <PageHeader />
       <main id="main-content">
         <header className="collection-hero library-hero">
           <p>Library · Culture and curiosities</p>
