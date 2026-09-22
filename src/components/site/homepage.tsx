@@ -9,6 +9,7 @@ import { journey, labItems } from "@/content/collections";
 import { integrationConfig } from "@/content/integration-config";
 import { profile } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
+import { getHistorySignal } from "@/integrations/history";
 import type { PersonalSignal } from "@/integrations/types";
 
 const interests = [
@@ -47,7 +48,7 @@ function scoreWidth(left?: number, right?: number) {
 }
 
 export async function Homepage() {
-  const signals = await getHomepageSignals();
+  const [signals, history] = await Promise.all([getHomepageSignals(), getHistorySignal()]);
 
   return (
     <div className="prototype prototype-cabinet-of-curiosities selected-experience" id="top">
@@ -72,12 +73,12 @@ export async function Homepage() {
 
         <FeaturedWork />
 
-        <section className="outside-work-section" id="outside-work" aria-label="Outside work">
-          <section className="currently-section" aria-labelledby="currently-title">
+        <section className="outside-work-section" id="outside-work" aria-labelledby="outside-work-title">
+          <div className="currently-section">
             <div className="section-heading compact">
-              <p>02 / Now, approximately</p>
-              <h2 id="currently-title">
-                A few signals from <em>outside the résumé.</em>
+              <p>02 / Outside work</p>
+              <h2 id="outside-work-title">
+                Some of what I’m into <em>lately.</em>
               </h2>
             </div>
             <div className="signal-grid">
@@ -124,20 +125,6 @@ export async function Homepage() {
                   <LocalTime />
                 </strong>
                 <span>{signals.status.headline}</span>
-              </article>
-              <article className="signal signal-reading">
-                <p>On the shelf</p>
-                <SignalStatus signal={signals.reading} />
-                <div className="mini-book" aria-hidden="true">
-                  {signals.reading.coverUrl ? (
-                    <Image src={signals.reading.coverUrl} alt="" fill sizes="96px" />
-                  ) : (
-                    <><span>Current read</span><i /></>
-                  )}
-                </div>
-                <strong>{signals.reading.headline}</strong>
-                <span>{signals.reading.description}</span>
-                {signals.reading.href && <a className="signal-source-link" href={signals.reading.href} target="_blank" rel="noreferrer">Goodreads <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
               </article>
               <article className="signal signal-training">
                 <p>Training</p>
@@ -194,93 +181,112 @@ export async function Homepage() {
                 <span>{signals.fantasy.description}</span>
                 {signals.fantasy.href && <a className="signal-source-link" href={signals.fantasy.href} target="_blank" rel="noreferrer">Sleeper <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
               </article>
-              <article className="signal signal-culture">
-                <p>Watching</p>
-                <SignalStatus signal={signals.culture} />
-                <strong>{signals.culture.headline}</strong>
-                {signals.culture.filmPosterUrl && (
-                  <Image
-                    className="culture-poster"
-                    src={signals.culture.filmPosterUrl}
-                    alt=""
-                    width={240}
-                    height={360}
-                    sizes="120px"
-                  />
-                )}
-                {signals.culture.filmYear && (
-                  <span className="culture-meta">
-                    {signals.culture.filmYear}{signals.culture.filmRating ? ` · ${signals.culture.filmRating} ★` : ""}
-                  </span>
-                )}
-                <span>{signals.culture.description}</span>
-                <span className="culture-freshness">{freshnessLabel(signals.culture.updatedAt)}</span>
-                <div className="signal-source-links">
-                  {signals.culture.filmHref && <a className="signal-source-link" href={signals.culture.filmHref} target="_blank" rel="noreferrer">Letterboxd <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
-                </div>
-              </article>
-              <article className="signal signal-playlist">
-                <p>Currently listening</p>
-                <SignalStatus signal={{ state: "curated", statusLabel: "Spotify" }} />
-                <strong>A playlist with the aux cable.</strong>
-                <p className="playlist-description">Kept by hand, played through Spotify, and allowed to change.</p>
-                <iframe
-                  className="spotify-embed"
-                  title="Elias’s current Spotify playlist"
-                  src={`https://open.spotify.com/embed/playlist/${integrationConfig.spotify.playlistId}?utm_source=generator&theme=0`}
-                  height="152"
-                  loading="lazy"
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                />
-                <a className="playlist-open-link" href={integrationConfig.spotify.playlistUrl} target="_blank" rel="noreferrer">
-                  Open playlist in Spotify <span className="arrow-mark" aria-hidden="true">↗︎</span>
-                </a>
-              </article>
             </div>
-          </section>
+          </div>
 
 
 
-          <section className="library-section" aria-labelledby="library-title">
+          <section className="library-section outside-work-culture" aria-labelledby="culture-title">
             <div className="section-heading compact">
-              <p>Library</p>
-              <h2 id="library-title">
-                Ideas I keep <em>within reach.</em>
+              <p>Culture and curiosities</p>
+              <h2 id="culture-title">
+                Things I keep <em>within reach.</em>
               </h2>
             </div>
-            <div className="library-stage">
-              <div className="shelf-note">
-                <p>
-                  Books, films, history, science fiction, and music I’m spending time with.
-                </p>
-              </div>
+            <div className="library-objects">
               <ClosableDetails
-                className="book-object"
-                contentClassName="book-pages"
+                className="library-object library-object-book"
+                contentClassName="library-object-pages"
                 summary={(
                   <>
-                    <span className="book-spine">
-                      FIELD NOTES <i>001</i>
-                    </span>
-                    <span className="book-cover">
-                      <small>From the Library</small>
-                      <strong>What makes a system feel human?</strong>
-                      <em>Open the object <span className="arrow-mark" aria-hidden="true">→</span></em>
-                    </span>
+                    <span>Reading</span>
+                    <SignalStatus signal={signals.reading} />
+                    {signals.reading.coverUrl && (
+                      <span className="library-book-cover" aria-hidden="true">
+                        <Image src={signals.reading.coverUrl} alt="" fill sizes="180px" />
+                      </span>
+                    )}
+                    <strong>{signals.reading.headline}</strong>
+                    <i>001</i>
                   </>
                 )}
               >
-                <p className="page-number">01—02</p>
-                <blockquote>Clarity is a form of care.</blockquote>
-                <p>
-                  A recurring thread in the things I make: complex state becomes useful only when a person can see what happened and decide what to do next.
-                </p>
-                <span>A short note about clarity and useful software.</span>
+                <p>Currently reading</p>
+                <h3>{signals.reading.headline}</h3>
+                <span>
+                  {signals.reading.bookDescription ?? `${signals.reading.author ? `By ${signals.reading.author}. ` : ""}${signals.reading.description}`}
+                </span>
+                <small className="library-freshness">{freshnessLabel(signals.reading.updatedAt)}</small>
+                {signals.reading.href && <a href={signals.reading.href} target="_blank" rel="noreferrer">View on Goodreads <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
+              </ClosableDetails>
+              <ClosableDetails
+                className="library-object library-object-poster"
+                contentClassName="library-object-pages"
+                summary={(
+                  <>
+                    <span>Cinema</span>
+                    <SignalStatus signal={signals.culture} />
+                    {signals.culture.filmPosterUrl && (
+                      <Image src={signals.culture.filmPosterUrl} alt="" fill sizes="(max-width: 800px) 88vw, 30vw" />
+                    )}
+                    <strong>{signals.culture.filmTitle ?? signals.culture.headline}</strong>
+                    <i>002</i>
+                  </>
+                )}
+              >
+                <p>Recently watched</p>
+                <h3>{signals.culture.filmTitle ?? signals.culture.headline}</h3>
+                <span>{signals.culture.filmDescription ?? signals.culture.description}</span>
+                {signals.culture.filmYear && (
+                  <span>{signals.culture.filmYear}{signals.culture.filmRating ? ` · ${signals.culture.filmRating} out of 5` : ""}</span>
+                )}
+                <small className="library-freshness">{freshnessLabel(signals.culture.updatedAt)}</small>
+                {signals.culture.filmHref && <a href={signals.culture.filmHref} target="_blank" rel="noreferrer">View on Letterboxd <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
               </ClosableDetails>
             </div>
-            <Link className="section-link" href="/library">
-              Enter the Library <span className="arrow-mark" aria-hidden="true">↗︎</span>
-            </Link>
+
+            <div className="playlist-room outside-work-playlist">
+              <div>
+                <p>Music · Spotify</p>
+                <SignalStatus signal={{ state: "curated", statusLabel: "Curated playlist" }} />
+                <h3>A playlist with the aux cable.</h3>
+                <span>Kept by hand, played through Spotify, and allowed to change.</span>
+                <a className="playlist-open-link" href={integrationConfig.spotify.playlistUrl} target="_blank" rel="noreferrer">
+                  Open playlist in Spotify <span className="arrow-mark" aria-hidden="true">↗︎</span>
+                </a>
+              </div>
+              <iframe
+                title="Elias’s current Spotify playlist"
+                src={`https://open.spotify.com/embed/playlist/${integrationConfig.spotify.playlistId}?utm_source=generator&theme=0`}
+                width="100%"
+                height="352"
+                loading="lazy"
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              />
+            </div>
+
+            <div className="library-index outside-work-history" aria-labelledby="history-title">
+              <p>History · a small weekly note</p>
+              <h2 id="history-title">A few things that happened this week.</h2>
+              <div>
+                <article className="history-card">
+                  <span>{history.dateLabel}</span>
+                  <h3>{history.headline}</h3>
+                  <div className="history-events">
+                    {history.events.map((event) => (
+                      <p key={`${event.year}-${event.text}`}>
+                        <strong>{event.year}</strong> {event.text}
+                        <a href={event.sourceUrl} target="_blank" rel="noreferrer">Source <span className="arrow-mark" aria-hidden="true">↗︎</span></a>
+                      </p>
+                    ))}
+                  </div>
+                  <small>{history.description}</small>
+                  <a className="history-source" href={history.sourceUrl} target="_blank" rel="noreferrer">
+                    {history.statusLabel} <span className="arrow-mark" aria-hidden="true">↗︎</span>
+                  </a>
+                </article>
+              </div>
+            </div>
           </section>
         </section>
 
