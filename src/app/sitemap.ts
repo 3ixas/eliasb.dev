@@ -7,9 +7,6 @@ const routes = [
   "/work/threshold",
   "/work/argus-risk",
   "/work/flowtime",
-  "/lab",
-  "/library",
-  "/about",
 ] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {

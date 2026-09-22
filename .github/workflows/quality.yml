@@ -46,5 +46,8 @@ jobs:
       - name: Build with webpack
         run: pnpm build --webpack
 
+      - name: Verify canonical routes
+        run: pnpm verify:routes
+
       - name: Check diff whitespace
         run: git diff --check

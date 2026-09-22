@@ -6,6 +6,7 @@ import { caseStudies } from "@/content/case-studies";
 export const metadata: Metadata = {
   title: "Work",
   description: "Selected product and systems case studies by Elias Bennett.",
+  alternates: { canonical: "/work" },
 };
 
 export default function WorkPage() {
