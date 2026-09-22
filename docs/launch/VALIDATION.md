@@ -1,48 +1,58 @@
 # Launch validation
 
-Validated on 15 September 2026 against the local Next.js production build, the Vercel deployment, and the launched custom domain.
+Final-slice verification date: 2026-09-22.
 
-## Final QA update
+The release-verification fix is based on worker revision `09c986fea2881c7f7c7ccb44b1a1e83c0dd66f5e`. The exact code revision used for the final-slice checks and browser run is `8f85ee559a551370dfcfea0d73f548451b175ff9`, tested on 2026-09-22.
 
-- The selected Cabinet homepage, work, Lab, Library, and About routes were exercised at desktop and 390px mobile widths in Chromium, Firefox, and the WebKit engine. The skip link, primary navigation, disclosures, source links, Spotify embeds, and lazy-loaded imagery were checked.
-- The homepage and dedicated Lab now use bundled imagery for London, football, Professor Past, and Flowtime. Sources and licences are recorded in [`docs/content/IMAGE-CREDITS.md`](../content/IMAGE-CREDITS.md).
-- `SITE_INDEXABLE=true` is pinned in Vercel Production alongside `GITHUB_SIGNAL_TOKEN`. Production is now indexable.
-- `eliasb.dev` is attached to the `eliasb-dev` Vercel project and resolves through Cloudflare to Vercel. The apex redirects to `https://www.eliasb.dev`, which serves the production deployment.
+`pnpm verify:release` is a deterministic production contract check. It starts the local Next.js production server and inspects HTTP responses, rendered HTML, redirects, sitemap, the complete normalized indexable robots policy, and internal links. It does not prove browser focus, scrolling, disclosure behaviour, theme changes, reduced-motion rendering, responsive layout, or cross-origin iframe behaviour. Those claims require the browser QA record below.
 
-## Passed locally
+## Final-slice claim-to-check matrix
 
-- All eight launch routes render at `320px`, `390px`, and desktop widths without horizontal overflow.
-- Every launch route has one `h1`, meaningful image alternatives where images convey content, titled embeds, and a visible keyboard skip link.
-- Keyboard focus follows the visual navigation order and remains clear of the fixed mobile navigation. Training data is rendered by the site-owned summary; the Strava profile remains a labelled source link.
-- Site-owned text contrast passes the WCAG AA thresholds used by the automated computed-style audit in both themes across the launch routes. The Library keeps a visible `Open playlist in Spotify` fallback link; the remaining axe findings are confined to Spotify's third-party iframe, which the site cannot modify without hiding the player.
-- Reduced-motion visitors receive a simple reveal in place of the typed entrance; this was checked in Firefox and WebKit as well as Chromium.
-- The Library's native disclosure interactions open and close by keyboard and pointer without site-origin console errors.
-- Chromium, Firefox, and WebKit render the checked routes without overflow, error overlays, or site-origin console errors.
-- All internal links resolve. The Ask Professor Past live URL was removed because the public deployment returns `404`; the source link remains in Lab.
-- The Goodreads link now resolves to the public profile rather than an account sign-in route.
-- The résumé link resolves to the current Google Docs CV, which is shared with anyone who has the link and does not require sign-in.
-- Responsive `sizes` hints keep the main About image's initial optimized candidate at `384px` instead of requesting the desktop-width candidate on narrow displays.
-- `robots.txt`, `sitemap.xml`, canonical metadata, social metadata, and the generated Open Graph image are present. Production robots allow indexing and continue to disallow the archived `/concepts/` route.
-- `pnpm exec tsc --noEmit --incremental false`, `pnpm lint`, `pnpm verify:signals`, `pnpm build`, the sequential route crawl, and `git diff --check` pass.
+| Claim | Check and expected result | Evidence / status |
+| --- | --- | --- |
+| The root route is the canonical one-page surface. | `pnpm verify:release` starts the built server, requests `/`, and expects HTTP 200, the `#top` and `main#main-content` targets, and the canonical homepage HTML. | Pass: deterministic production contract check. |
+| The primary navigation and homepage anchor graph are stable. | The production contract check expects Home, Work, Outside work, and About to target `#top`, `#work`, `#outside-work`, and `#about`; every homepage hash link must resolve to an element. Browser QA activates the links and checks the visible target. | Pass: static contract plus final-slice browser QA. |
+| Required sections and copy remain present. | The production contract check checks semantic sections for Work, Outside work, Experiments, About, and Contact, their labelled headings, the approved “Some of what I’m into lately.” copy, and omission of a standalone science-fiction category. | Pass: deterministic rendered HTML check. |
+| Featured Work still reaches the archive and case studies. | The production contract check checks the `/work` archive action and the Threshold and Argus Risk case-study links; route checks request `/work` and each current case-study page. | Pass: deterministic route and link checks. |
+| Compatibility and canonical Work routes remain valid. | `pnpm verify:routes` checks permanent `/about`, `/library`, and `/lab` redirects, canonical Work URLs, the sitemap route set, and exclusion of compatibility paths from the sitemap. Browser QA requests each compatibility route. | Pass: route contract plus browser QA. |
+| Desktop and mobile layouts remain usable. | Final-slice browser QA runs the built site at desktop and `390px` mobile widths, checks responsive layout and horizontal overflow, and opens long-content surfaces. Browser QA is the evidence for responsive behaviour. | Pass: final-slice browser QA. |
+| Keyboard navigation, focus, headings, anchors, disclosures, and source links remain usable. | Final-slice browser QA uses keyboard focus, activates the skip link and anchor navigation, opens and closes native disclosures, and checks visible source links and their external link targets. The production contract check verifies the focusable `#top`, `main`, and section targets plus the static markup contract. | Pass: final-slice browser QA plus deterministic markup checks. |
+| Reduced-motion behaviour remains available. | Final-slice browser QA creates a reduced-motion context and checks that the page remains visible without waiting for entrance motion. Browser QA is the evidence for reduced-motion behaviour. | Pass: final-slice browser QA. |
+| Light and dark themes retain readable site-owned content. | Final-slice browser QA activates the theme toggle and checks the rendered page remains readable. Browser QA is the evidence for theme behaviour. | Pass: final-slice browser QA. |
+| Long content, images, and Spotify fallback remain reviewable. | The production contract check checks long experiment descriptions, image alternatives and responsive image sources, the titled official Spotify iframe, and the visible `Open playlist in Spotify` direct link. Browser QA checks the fallback link and the responsive panel. | Pass: static markup contract plus final-slice browser QA. |
+| Signal states remain truthful and identifiable. | `pnpm verify:signals` renders the production signal presentation with deterministic fixtures for live, cached, authored/curated, missing/pending, and fallback/unavailable states and asserts visible status, freshness, and source wording. The production build check observes the current network result separately; one network build does not cover every state. | Pass: deterministic state fixtures plus current rendered output. |
+| Quality gates run at the final revision. | Run `pnpm lint`, `pnpm exec tsc --noEmit --incremental false`, `pnpm verify:signals`, `SITE_INDEXABLE=true pnpm build --webpack`, `pnpm verify:routes`, `pnpm verify:release`, and `git diff --check` in that order. | Pass when each command exits 0; observations are recorded below. |
+| The Spotify accessibility findings have a known platform boundary. | Site-owned checks cover the titled iframe and direct fallback link. Spotify’s cross-origin iframe retains its own ARIA list-structure and subdued-track contrast findings, which the site cannot modify without hiding the player. | Accepted limitation: keep the accessible fallback and recheck if the embed changes. |
 
-## Public deployment evidence
+## Final-slice command observations
 
-- The old site is preserved at `https://eliasb-v1.vercel.app`; the launched site is at `https://www.eliasb.dev`, with `https://eliasb.dev` redirecting to it. The Vercel alias remains available at `https://eliasb-dev.vercel.app`.
-- The earlier mobile Lighthouse run against the public review build scored 98 Performance, 100 Accessibility, 96 Best Practices, and 66 SEO. The lab metrics were 1.4s FCP, 1.7s LCP, 110ms Total Blocking Time, and 0.001 CLS.
-- The earlier SEO score reflected the intentional `noindex, nofollow` preview state. The launched deployment now permits indexing.
+These commands were run from the worktree at code revision `8f85ee559a551370dfcfea0d73f548451b175ff9` on 2026-09-22.
 
-## Known platform limitations
+| Command | Observation |
+| --- | --- |
+| `pnpm lint` | Passed. |
+| `pnpm exec tsc --noEmit --incremental false` | Passed. |
+| `pnpm verify:signals` | Passed. The deterministic mapper, fallback, and five-state presentation fixtures, including live and pending fantasy states, passed. |
+| `SITE_INDEXABLE=true pnpm build --webpack` | Passed. The current production build completed successfully. |
+| `pnpm verify:routes` | Passed. Redirect, canonical, and sitemap checks passed against the built server. |
+| `pnpm verify:release` | Passed. Deterministic production contract checks passed against the built server. |
+| `/Library/Frameworks/Python.framework/Versions/3.13/bin/python3 /private/tmp/eliasb_release_browser_qa.py` | Passed in installed Chromium at desktop and `390px` mobile widths; Firefox and WebKit executables were unavailable. |
+| `git diff --check` | Passed. |
 
-- Native Safari WebDriver was not run because macOS requires enabling Safari's `Allow Remote Automation` security setting. The WebKit engine passed the same route, responsive, keyboard, disclosure, reduced-motion, and console checks.
-- Spotify's cross-origin iframe retains its own ARIA list-structure and subdued-track contrast findings. The site supplies a titled embed and a keyboard-visible direct Spotify link as the accessible fallback.
+## Final-slice browser QA
 
-## Old-site preservation and cutover
+Browser QA was run against the local production build at code revision `8f85ee559a551370dfcfea0d73f548451b175ff9` on 2026-09-22. The local Playwright runtime was used from `/Library/Frameworks/Python.framework/Versions/3.13/bin/python3`; it is already installed on the workstation and was not added to project dependencies or CI.
 
-1. Import `3ixas/personal-portfolio-v1` into a separate Vercel project as a static site with no build command and the repository root as its output. **Complete.**
-2. Verify the assigned stable `*.vercel.app` project URL before changing `eliasb.dev`. **Complete: `https://eliasb-v1.vercel.app`.**
-3. Keep the old GitHub Pages deployment intact during the rollback window.
-4. Deploy and approve the new site on its own Vercel review URL. **Complete: production deployment is aliased at `https://www.eliasb.dev`.**
-5. **Complete:** `eliasb.dev` is attached to the new Vercel project, redirects to `www`, and serves the Vercel deployment. Keep the old GitHub Pages deployment intact until the rollback window closes.
-6. **Complete:** `SITE_INDEXABLE=true` is set for the approved Production deployment; redirects, metadata, sitemap, integrations, and routes were verified after cutover.
+The run covered the installed Chromium engine at a desktop viewport and `390px` mobile width. It checked the homepage, Work archive, all current case studies, and compatibility routes. On the homepage it verified keyboard focus and visible focus rings, `#top` anchor navigation, skip-link navigation, native reading/cinema/experiment disclosures, the theme toggle, reduced-motion rendering, source links, the Spotify direct fallback link, responsive single-column signal and playlist layout, and horizontal-overflow absence. Compatibility routes returned their expected redirects and the target anchors rendered.
 
-The launch decision is **launched**. Vercel Production serves `https://www.eliasb.dev`, the apex redirects correctly, and indexing is enabled.
+Observed result: all requested browser checks passed in installed Chromium on the local built slice. Firefox and WebKit were skipped because their Playwright browser executables are not installed on this workstation; no browser download or project dependency was added for this verification. Native Safari WebDriver remains outside this run because macOS requires enabling Safari’s `Allow Remote Automation` setting.
+
+## Historical launch evidence
+
+The browser and deployment evidence dated 15 September 2026 below is retained as historical launch context. It is not final-slice proof for the release-verification fix or for any later revision.
+
+- The selected Cabinet homepage, Work, Lab, Library, and About routes were previously exercised at desktop and `390px` mobile widths in Chromium, Firefox, and WebKit.
+- The earlier launch checks covered the skip link, primary navigation, disclosures, source links, Spotify embeds, lazy-loaded imagery, reduced motion, themes, overflow, and site-origin console errors.
+- The old site remains preserved at `https://eliasb-v1.vercel.app`; the launch deployment was previously served at `https://www.eliasb.dev`, with `https://eliasb.dev` redirecting to it. No deployment or external integration change is part of this verification fix.
+
+The Spotify limitation remains unchanged. Spotify’s cross-origin iframe retains its own ARIA list-structure and subdued-track contrast findings. The site supplies a titled embed and a keyboard-visible direct Spotify link as the accessible fallback.

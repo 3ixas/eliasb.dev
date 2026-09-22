@@ -17,8 +17,28 @@ export const profile = {
   },
 } as const;
 
+export type ProjectSlug = "threshold" | "argus-risk" | "flowtime";
+
+export type HomepageProject = {
+  slug: ProjectSlug;
+  index: string;
+  name: string;
+  eyebrow: string;
+  thesis?: string;
+  description: string;
+  detail?: string;
+  image: string;
+  imageAlt: string;
+  codeUrl: string;
+  liveUrl?: string;
+  qualities?: readonly string[];
+  imageWidth: number;
+  imageHeight: number;
+};
+
 export const projects = [
   {
+    slug: "threshold",
     index: "01",
     name: "Threshold",
     eyebrow: "Product engineering · Data visualisation · 2026",
@@ -35,27 +55,48 @@ export const projects = [
       "Threshold landing page showing rental affordability choices for London, Basel, and Zurich",
     liveUrl: "https://threshold-beta.vercel.app",
     codeUrl: "https://github.com/3ixas/threshold",
+    imageWidth: 1804,
+    imageHeight: 1376,
   },
   {
+    slug: "argus-risk",
     index: "02",
     name: "Argus Risk",
     eyebrow: "Event-driven systems",
+    description:
+      "A local risk simulator that makes event-driven state, freshness, and failure visible from market input to dashboard.",
     detail: "C# · .NET · Kafka · PostgreSQL · SignalR · Next.js",
     image: "/work/argus/overview.webp",
     imageAlt: "Argus Risk interface showing event-driven risk positions",
     codeUrl: "https://github.com/3ixas/argus-risk",
+    imageWidth: 1280,
+    imageHeight: 770,
   },
   {
+    slug: "flowtime",
     index: "03",
     name: "Flowtime",
     eyebrow: "Offline-first interaction",
+    description:
+      "A private focus timer that keeps work recoverable through sleeping tabs, browser closures, and interrupted sessions.",
     detail: "Next.js · TypeScript · localStorage · Service Worker",
     image: "/work/flowtime/timer.jpg",
     imageAlt: "Flowtime focus timer interface",
     liveUrl: "https://flowtime-focus-timer.vercel.app",
     codeUrl: "https://github.com/3ixas/flowtime-focus-timer",
+    imageWidth: 1280,
+    imageHeight: 640,
   },
-] as const;
+] as const satisfies readonly HomepageProject[];
+
+/** Edit this ordered list by hand when the homepage's editorial selection changes. */
+export const featuredProjectSlugs = ["threshold", "argus-risk"] as const satisfies readonly ProjectSlug[];
+
+export const featuredProjects = featuredProjectSlugs.map((slug): HomepageProject => {
+  const project = projects.find((candidate) => candidate.slug === slug);
+  if (!project) throw new Error(`Featured project is missing from the project catalogue: ${slug}`);
+  return project;
+});
 
 export const labNotes = [
   {

@@ -1,5 +1,5 @@
 # Keep the Library label for now
 
-Status: accepted for this pass
+Status: superseded by [ADR 0003](./0003-one-page-personal-surface.md) on 2026-09-21.
 
-The visible navigation label remains **Library**, and the route remains `/library`. The label is accurate for the current mix of books, films, music, history, and science fiction, and no replacement beside **Lab** has been selected yet. Candidate labels (Shelf, Notes, Culture, and Archive) remain open for a later design review; this pass does not silently rename the navigation.
+The original decision kept **Library** as the visible navigation label and `/library` as its route. The current architecture replaces that primary destination with the homepage **Outside work** section; `/library` remains only as a compatibility route.

@@ -65,7 +65,7 @@ The integrations should form part of a composed personal experience rather than 
 
 Confirmed integration direction:
 
-- Distribute the live signals through their relevant parts of the site. Show only a composed current-life glimpse on the homepage.
+- Keep the live signals together in the homepage Outside work section, where they can form one composed view of Elias outside the case studies.
 - Include aggregate private GitHub contribution counts. Do not expose private repository names or activity details.
 - Use a public Letterboxd feed and poster-led film experience.
 - Use an official Strava embed for current public activity, paired with a custom site-owned training visualization. Do not expose routes, exact locations, heart-rate data, body measurements, or detailed schedules.
@@ -76,11 +76,12 @@ Confirmed integration direction:
 
 ## Information architecture and case studies
 
-- Use a hybrid structure: a substantial homepage tells the main story and links to deeper project and personal experiences.
-- Use the primary navigation **Work, Lab, Library, About**.
-- **Lab** contains experiments, works in progress, lessons from making, Ask Professor Past, and the fantasy-football experience.
-- **Library** contains books, cinema, history, science fiction, and music.
-- The homepage should include the signature entrance, concise introduction, three selected projects, a glimpse of current activity, personal texture, and contact information.
+- Use a one-page homepage as the canonical personal surface, with navigation anchors for **Home, Work, Outside work, and About**.
+- Keep **Work** as both a curated homepage selection and a complete `/work` case-study archive with stable `/work/[slug]` pages.
+- Keep **Experiments** as a compact, occasional homepage section for Lab material; it does not need a primary navigation tab or publishing schedule.
+- Use **Outside work** as one flexible section for GitHub activity, London status, training, fantasy football, reading, cinema, Spotify, and history.
+- The homepage should include the signature entrance, concise introduction, featured projects, the unified personal collection, occasional experiments, the white-tux portrait, and contact information.
+- Preserve `/about`, `/library`, and `/lab` as compatibility routes to their homepage anchors.
 - Use layered project case studies. Each begins with an accessible visual story and offers optional technical depth.
 - Threshold emphasises product and visual reasoning.
 - Argus Risk emphasises architecture and system behaviour.
@@ -88,20 +89,19 @@ Confirmed integration direction:
 
 Confirmed detailed page model:
 
-- **Work** has an index, separate case studies for Threshold, Argus Risk, and Flowtime, concise professional experience, and a résumé link.
-- **Lab** is an exploratory collection of experiments, works in progress, making notes, interface studies, Ask Professor Past, and the fantasy-football experience. Individual items receive pages only when their content warrants one.
-- **Library** is one cohesive interactive space for books, cinema, history, science fiction, and Spotify. Individual entries may open as overlays or pages when there is something meaningful to say.
-- **About** contains the personal story and photograph, safe professional context, training and Strava, current status, contact details, résumé, GitHub, and LinkedIn.
+- **Work** has a curated homepage selection, a complete archive, separate case studies for Threshold, Argus Risk, and Flowtime, concise professional experience, and a résumé link.
+- **Experiments** is an occasional homepage collection of works in progress, making notes, interface studies, Ask Professor Past, and fantasy-football experiments. Individual items receive pages only when their content warrants one.
+- **Outside work** is one flexible collection for books, cinema, history, Spotify, GitHub activity, training, fantasy football, and London status. Cards may open as disclosures or source links when there is something meaningful to say.
+- **About** contains the personal story, white-tux photograph, safe professional context, the connecting thread, contact details, résumé, GitHub, and LinkedIn.
 
 Confirmed homepage narrative order:
 
 1. Signature entrance using “I build thoughtful software for complex problems.”
 2. Concise introduction covering Elias, financial-systems work, and the intersection of engineering, product, and design.
-3. Selected work: Threshold, Argus Risk, then Flowtime.
-4. A composed current-life glimpse spanning current building, local time and status, reading, cinema, music, training, and fantasy football.
-5. A preview from the Lab.
-6. A preview from the Library.
-7. About, contact, résumé, GitHub, and LinkedIn.
+3. Featured Work: a flexible, manually curated selection of the strongest projects.
+4. Outside work: current building, London status, reading, cinema, music, training, fantasy football, and history.
+5. Experiments: an occasional preview of Lab material.
+6. About, contact, résumé, GitHub, and LinkedIn.
 
 ## Visual concept territories
 
@@ -130,7 +130,7 @@ Build and review privately in stages. Change `eliasb.dev` only after the coheren
 1. Content architecture and three visual concepts.
 2. Selected visual system and homepage.
 3. Work case studies.
-4. Lab, Library, and About.
+4. Experiments, Outside work, and About as homepage sections, with Work retaining its full archive.
 5. Integrations and designed fallback states.
 6. Responsive, accessibility, and performance validation.
 7. Domain cutover.
@@ -166,7 +166,7 @@ The following design decisions remain in the selected-direction phase:
 
 Confirmed final policies:
 
-- Compare the same homepage and Library slice in all three visual directions at desktop and mobile sizes, followed by focused coded interaction prototypes.
+- Compare the same homepage and Outside work slice in all three visual directions at desktop and mobile sizes, followed by focused coded interaction prototypes.
 - Follow the visitor's system theme initially and preserve a manual light/dark preference.
 - Use privacy-conscious page-view and performance analytics without advertising cookies, invasive profiles, or session replay.
 - Support current Safari, Chrome, Firefox, and Edge across desktop and mobile, with core content available through progressive enhancement.

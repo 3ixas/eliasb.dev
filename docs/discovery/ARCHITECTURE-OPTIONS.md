@@ -57,7 +57,7 @@ Decision: use Vercel as the single platform. Start with Hobby and daily snapshot
 
 ## Content maintenance
 
-Use repository-owned MDX and typed data at launch. This supports version control, typed fields, code review, static rendering, and the custom interactive structures required by Work, Lab, and Library. A CMS or private editing interface would introduce authentication, schema, and hosting work before there is evidence that editing files is a problem.
+Use repository-owned MDX and typed data at launch. This supports version control, typed fields, code review, static rendering, and the custom interactive structures required by the Work archive, Experiments, and Outside work. A CMS or private editing interface would introduce authentication, schema, and hosting work before there is evidence that editing files is a problem.
 
 The Spotify playlist remains editable in Spotify. The site status, book choices, personal notes, and independent training summary remain small authored data files.
 

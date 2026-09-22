@@ -15,7 +15,11 @@ export async function generateMetadata({
   const { slug } = await params;
   if (!isCaseStudySlug(slug)) return {};
   const study = caseStudies[slug];
-  return { title: study.name, description: study.summary };
+  return {
+    title: study.name,
+    description: study.summary,
+    alternates: { canonical: `/work/${slug}` },
+  };
 }
 
 export default async function WorkDetailPage({

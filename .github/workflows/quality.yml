@@ -44,7 +44,13 @@ jobs:
         run: pnpm verify:signals
 
       - name: Build with webpack
-        run: pnpm build --webpack
+        run: SITE_INDEXABLE=true pnpm build --webpack
+
+      - name: Verify canonical routes
+        run: pnpm verify:routes
+
+      - name: Verify release surface
+        run: pnpm verify:release
 
       - name: Check diff whitespace
         run: git diff --check

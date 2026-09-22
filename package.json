@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "verify:signals": "node --no-warnings --experimental-strip-types scripts/verify-signal-contracts.mjs"
+    "verify:signals": "node --no-warnings --experimental-strip-types scripts/verify-signal-contracts.mjs",
+    "verify:routes": "node scripts/verify-canonical-routes.mjs",
+    "verify:release": "node scripts/verify-release.mjs"
   },
   "dependencies": {
     "next": "16.3.5",

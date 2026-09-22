@@ -6,8 +6,8 @@ import type { CaseStudy } from "@/content/case-studies";
 export function CaseStudyPage({ study }: { study: CaseStudy }) {
   return (
     <div className={`case-study case-${study.slug}`}>
-      <PageHeader active="work" />
-      <main id="main-content">
+      <PageHeader />
+      <main id="main-content" tabIndex={-1}>
         <header className="case-hero">
           <div className="case-crumbs">
             <Link href="/work">← All work</Link>

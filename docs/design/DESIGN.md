@@ -5,15 +5,15 @@
 - **Product:** eliasb.dev, Elias Bennett's personal portfolio and cultural notebook.
 - **Design decision:** preserve and sharpen the selected Cabinet of Curiosities direction, using Living Editorial for hierarchy and Signals and Systems only inside relevant data views.
 - **Problem and user:** prospective collaborators, employers, and fellow builders should understand Elias's work and judgment quickly, then have room to explore the person and the artefacts around the work.
-- **Primary journey:** arrive at the homepage → understand the promise and point of view → inspect selected work → browse current signals → explore Lab or Library → reach About and contact.
+- **Primary journey:** arrive at the homepage → understand the promise and point of view → inspect featured work → browse Outside work → explore occasional Experiments → reach About and contact.
 - **Success:** the visitor can find the next meaningful thing without explanation, while the site feels personal, tactile, calm, and technically trustworthy.
 
 ## Scope
 
-- **Surfaces:** `/`, `/work`, `/work/[slug]`, `/lab`, `/library`, `/about`, and the mobile navigation shell.
+- **Surfaces:** `/`, `/work`, `/work/[slug]`, compatibility redirects for `/lab`, `/library`, and `/about`, and the mobile navigation shell.
 - **Target devices:** narrow touch layouts from 320px through desktop widths; pointer, keyboard, light theme, dark theme, and reduced-motion preferences.
-- **Included states:** first entrance, returning visitor, live signal, cached signal, authored fallback, missing imagery, open Library object, external-link handoff, focus-visible, loading imagery, and long content.
-- **Explicitly excluded:** new information architecture, new personal claims, new third-party credentials, new paid services, a new visual world, and replacing the Spotify player.
+- **Included states:** first entrance, returning visitor, live signal, cached signal, authored fallback, missing imagery, open Outside work object, external-link handoff, focus-visible, loading imagery, and long content.
+- **Explicitly excluded:** a second personal destination taxonomy, new personal claims, new third-party credentials, new paid services, a new visual world, and replacing the Spotify player.
 - **Constraints:** Next.js App Router, server-owned integrations with truthful fallback labels, project-owned CSS/components, semantic HTML, WCAG-conscious keyboard and focus behavior, responsive images, and no animation that delays access to content.
 
 ## References
@@ -29,12 +29,12 @@ No external visual reference or Stitch exploration is needed for this pass: the 
 
 ## Design DNA
 
-- **Content priority and reading path:** premise first, selected work second, current life third, exploratory Lab/Library fourth, contact always reachable.
+- **Content priority and reading path:** premise first, featured Work second, Outside work third, occasional Experiments fourth, contact always reachable.
 - **Layout, grid, rhythm, and density:** generous section openings; asymmetrical editorial grids; tactile cards and framed images; dense mono labels only where they add orientation; mobile becomes a single readable column with a persistent bottom navigation.
 - **Typography roles:** serif display for statements and artefact titles; sans for explanatory copy and controls; mono for labels, status, dates, metrics, and source links.
 - **Colour roles:** warm paper/canvas and ink as the base; burnt orange for emphasis and action; green, ochre, blue, and terracotta reserved for object identity or meaningful status; focus remains visibly distinct from decoration.
 - **Surfaces, borders, shadows, and radii:** paper cards, thin ink rules, small rounded frames, offset shadows, and restrained rotations that make objects feel handled without harming reading order.
-- **Components and interaction feedback:** shared headers, source links, signal status pills, framed imagery, Library disclosures, theme toggle, and explicit external-link affordances; hover is enhancement, not the only path.
+- **Components and interaction feedback:** shared headers, source links, signal status pills, framed imagery, Outside work disclosures, theme toggle, and explicit external-link affordances; hover is enhancement, not the only path.
 - **Motion purpose and pacing:** the hero entrance reveals hierarchy; object opening and route entry preserve continuity; hover lift/rotation confirms affordance; all motion is interruptible and collapses to immediate state changes for reduced-motion users.
 - **Platform and accessibility assumptions:** semantic headings and links remain primary; keyboard focus is visible; content does not depend on hover, animation, or the third-party Spotify iframe; reduced motion, narrow screens, zoom, slow images, and fallback data are first-class states.
 
@@ -43,10 +43,10 @@ No external visual reference or Stitch exploration is needed for this pass: the 
 | Screen | User decision | Empty | Loading | Error | Success | Other states |
 | --- | --- | --- | --- | --- | --- | --- |
 | Homepage | What should I explore next? | Authored signal cards | Image/iframe loading | Signal fallback | Work and contact visible | First entrance, returning visitor, reduced motion, light/dark |
-| Work index | Which case study is relevant? | Not applicable | Image loading | Missing image fallback | Three linked case studies | Hover/focus, narrow card stack |
+| Work archive | Which case study is relevant? | Not applicable | Image loading | Missing image fallback | All linked case studies | Hover/focus, narrow card stack |
 | Case study | Do I want the reasoning and source? | Missing optional live link | Hero/gallery image loading | External project unavailable | Layered narrative and source links | Back to work, reduced motion |
-| Lab | Which experiment is worth opening? | A rough or unfinished item remains legible | Image loading | Missing optional live/code link | Image, description, and clear open action | Touch/pointer, focus, long descriptions |
-| Library | What should I pick up or revisit? | Authored reading/cinema/history fallback | Feed/image/Spotify loading | Cached or authored state | Disclosure object, source, and playlist | Open/close by keyboard and pointer |
+| Outside work | What should I pick up, follow, or revisit? | Authored signal and culture fallback | Feed/image/Spotify loading | Cached or authored state | Flexible signal collection with clear sources | Cards may regroup; open/close by keyboard and pointer |
+| Experiments | Which occasional idea is worth opening? | A rough or unfinished item remains legible | Image loading | Missing optional live/code link | Image, description, and clear open action | Touch/pointer, focus, long descriptions |
 | About | Does the person and contact context fit? | No empty state | Portrait loading | Contact link failure is external | Story, journey, life texture, contact | Local time, theme, reduced motion |
 
 ## Stitch exploration record

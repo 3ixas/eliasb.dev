@@ -1,50 +1,51 @@
 # Personal site map
 
-## Home
+## Canonical homepage
 
-The main authored journey through the site:
+The homepage is the primary authored journey through the site:
 
-1. Signature entrance.
-2. Concise introduction.
-3. Selected work: Threshold, Argus Risk, Flowtime.
-4. Composed current-life glimpse.
-5. Lab preview.
-6. Library preview.
-7. About and contact.
+1. Signature entrance and concise introduction.
+2. Featured Work: a flexible, manually curated selection of the projects Elias most wants visitors to see.
+3. Outside work: one flexible collection of building activity, London status, training, fantasy football, reading, cinema, Spotify, and history.
+4. Experiments: an occasional compact area for Lab material.
+5. About, the white-tux portrait, and contact.
 
-## Work
+The primary navigation is Home, Work, Outside work, and About. The navigation moves through homepage anchors; the homepage does not need separate primary destinations for Lab or Library.
 
-- Work index.
+## Work archive
+
+`/work` is the complete case-study archive. The homepage selection is curated independently from the archive, so the archive can grow without making the homepage unwieldy.
+
 - Threshold case study: product and visual reasoning.
 - Argus Risk case study: architecture and system behaviour.
 - Flowtime case study: state, resilience, accessibility, and interaction refinement.
-- Concise professional experience and résumé link.
+- Future project case studies as they become substantial enough to document.
 
-Each case study starts with a visual story understandable in about two minutes, then offers optional technical depth.
+Each case study lives at `/work/[slug]`, starts with a visual story understandable in about two minutes, and then offers optional technical depth.
 
-## Lab
+## Compatibility routes
 
-- Experiments and works in progress.
-- Making notes and interface studies.
-- Ask Professor Past.
-- Fantasy-football experience.
-- Detail pages only for items that merit deeper explanation or interaction.
+- `/about` redirects to the homepage About section.
+- `/library` redirects to the homepage Outside work section.
+- `/lab` redirects to the homepage Experiments section.
+- `/work` remains the full archive rather than redirecting to the homepage.
 
-## Library
+## Outside work
 
-A cohesive interactive space rather than a conventional post feed:
+One responsive collection rather than separate Now and Library destinations:
 
-- Books and reading notes.
-- Cinema journey and recent Letterboxd activity.
-- History and science fiction.
-- Curated Spotify playlist.
-- Overlays or detail pages where an item has meaningful commentary.
+- GitHub activity and current building.
+- London time and manually controlled status.
+- Training and fantasy football.
+- Current book, recent Letterboxd activity, and Spotify playlist.
+- A small history note.
+
+Cards can be grouped and arranged according to the material. Science fiction is not a standalone visible category until there is a concrete entry that earns space.
 
 ## About
 
-- Personal story and real photograph.
+- Personal story and the selected white-tux photograph.
 - Safe description of current financial-systems work.
-- Training visualization and official Strava presence.
-- Current status and local time.
+- The connecting professional thread and personal texture.
 - Email as the primary action.
 - Résumé, GitHub, and LinkedIn as secondary links.
