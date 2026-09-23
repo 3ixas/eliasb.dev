@@ -630,14 +630,15 @@ button { color: inherit; font: inherit; }
 .library-index article > span { position: absolute; top: 24px; right: 24px; color: var(--accent); font: 10px/1 var(--mono); }
 .library-index h3 { margin: 105px 0 25px; font: 400 clamp(38px, 5vw, 66px)/1 var(--display); }
 .library-index article p { max-width: 490px; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
-.history-card { grid-column: 1 / -1; min-height: 0; }
-.history-card h3 { margin-bottom: 35px; }
-.history-events { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-.history-events p { max-width: none !important; }
-.history-events strong { color: var(--accent); font: 400 22px/1 var(--display); }
+.history-card { display: grid; grid-column: 1 / -1; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "heading date" "events events" "meta meta" "source source"; min-height: 0; column-gap: 24px; background: color-mix(in srgb, var(--accent) 8%, var(--paper)); }
+.outside-work-history .history-card > span { position: static; grid-area: date; align-self: start; width: fit-content; padding: 8px 10px; color: var(--library-playlist-ink); background: var(--library-accent); }
+.history-card h3 { grid-area: heading; max-width: 12ch; margin: 0 0 35px; font-size: clamp(46px, 6vw, 76px); }
+.history-events { display: grid; grid-area: events; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.history-card .history-events p { max-width: none; padding: 18px; background: var(--paper); border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--paper)); box-shadow: 4px 5px 0 color-mix(in srgb, var(--accent) 28%, var(--paper)); }
+.history-events strong { display: block; margin-bottom: 10px; color: var(--accent); font: 400 clamp(30px, 4vw, 44px)/1 var(--display); }
 .history-events a, .history-source { display: inline-block; margin-top: 12px; padding-bottom: 3px; border-bottom: 1px solid currentColor; color: var(--ink); font: 9px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
-.history-card small { display: block; max-width: 680px; margin-top: 32px; color: var(--muted); font-size: 12px; line-height: 1.5; }
-.history-source { color: var(--accent); }
+.history-card small { grid-area: meta; display: block; max-width: 680px; margin-top: 32px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.history-card .history-source { grid-area: source; justify-self: start; color: var(--accent); }
 
 .about-page { background-image: radial-gradient(color-mix(in srgb, var(--ink) 10%, transparent) .55px, transparent .55px); background-size: 5px 5px; }
 .about-hero { display: grid; grid-template-columns: 1.16fr .84fr; gap: clamp(35px, 8vw, 120px); align-items: center; min-height: calc(100svh - 108px); padding: clamp(55px, 8vw, 110px) clamp(22px, 5vw, 76px); background: var(--paper); border: 1px solid var(--ink); border-radius: 12px; box-shadow: 7px 7px 0 var(--ink); }
@@ -709,6 +710,7 @@ button { color: inherit; font: inherit; }
   .featured-work-list .project-feature:nth-child(even) .project-visual,
   .featured-work-list .project-feature:nth-child(even) .project-copy { grid-column: auto; grid-row: auto; }
   .featured-work-list .project-copy { position: static; }
+  .history-events { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 800px) {
@@ -813,6 +815,8 @@ button { color: inherit; font: inherit; }
   .library-object { min-height: 390px; width: min(88%, 390px); margin: auto; }
   .library-object-poster { transform: rotate(1deg); }
   .library-object-record { width: min(82%, 350px); }
+  .history-card { grid-template-columns: 1fr; grid-template-areas: "date" "heading" "events" "meta" "source"; }
+  .outside-work-history .history-card > span { justify-self: start; margin-bottom: 20px; }
   .history-events { grid-template-columns: 1fr; }
   .playlist-room { grid-template-columns: 1fr; padding: 55px 18px 65px; }
   .library-index > div { grid-template-columns: 1fr; }
