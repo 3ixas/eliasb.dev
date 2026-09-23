@@ -16,14 +16,6 @@ import { profile } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
 import { getHistorySignal } from "@/integrations/history";
 
-const interests = [
-  ["01", "Lift", "Strength, repetition, patience."],
-  ["02", "Run", "Distance and a clearer head."],
-  ["03", "Muay Thai", "Technique under pressure."],
-  ["04", "Football", "Watching, arguing, modelling."],
-  ["05", "Reading", "Stories and ideas kept within reach."],
-  ["06", "History", "Patterns, people, and the details that stay useful."],
-] as const;
 function activityLevel(count: number) {
   if (count >= 4) return "4";
   if (count >= 3) return "3";
@@ -382,7 +374,7 @@ export async function Homepage() {
             <div className="about-prose">
               <p>{profile.about}</p>
               <p className="about-supporting-copy">
-                I like software that respects the person using it: clear enough to understand, resilient when things go wrong, and considered down to the awkward states.
+                I like software that respects the person using it: clear enough to understand, resilient when things go wrong, and considered down to the details.
               </p>
               <nav className="profile-links" aria-label="Profile links">
                 <a href="#contact">Start a conversation <span className="arrow-mark" aria-hidden="true">↓</span></a>
@@ -410,15 +402,15 @@ export async function Homepage() {
               <figcaption>Off duty, approximately</figcaption>
             </figure>
           </div>
-          <div className="about-thread">
-            <div className="about-thread-heading">
-              <p>Connecting thread</p>
+          <div className="about-career-path">
+            <div className="about-career-heading">
+              <p>Career path</p>
               <div>
-                <h3 id="about-thread-title">The thread through all of it.</h3>
-                <span>How do you make complicated things easier to understand?</span>
+                <h3 id="about-career-title">My career so far.</h3>
+                <span>From data and marketing, through AI model training, to software engineering.</span>
               </div>
             </div>
-            <ol aria-labelledby="about-thread-title">
+            <ol aria-labelledby="about-career-title">
               {journey.map((step, index) => (
                 <li key={step.label}>
                   <span>0{index + 1}</span>
@@ -428,21 +420,6 @@ export async function Homepage() {
                 </li>
               ))}
             </ol>
-          </div>
-          <div className="about-interests">
-            <div>
-              <p>Outside the editor</p>
-              <h3 id="about-interests-title">A few other ways I measure a week.</h3>
-            </div>
-            <ul aria-labelledby="about-interests-title">
-              {interests.map(([index, title, description]) => (
-                <li key={index}>
-                  <span>{index}</span>
-                  <strong>{title}</strong>
-                  <p>{description}</p>
-                </li>
-              ))}
-            </ul>
           </div>
         </section>
 

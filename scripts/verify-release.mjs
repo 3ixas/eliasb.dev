@@ -177,6 +177,17 @@ function verifyHomepage(markup) {
 
   const outsideWorkTitle = markup.match(/<h2\b[^>]*\bid="outside-work-title"[^>]*>([\s\S]*?)<\/h2>/i)?.[1] ?? "";
   equal(plainText(outsideWorkTitle), "Some of what I’m into lately.", "Homepage #outside-work-title rendered text");
+  const aboutStart = markup.indexOf('<section class="about-section"');
+  const contactStart = markup.indexOf('<section id="contact"');
+  const aboutSection = aboutStart >= 0 && contactStart > aboutStart ? markup.slice(aboutStart, contactStart) : "";
+  check(Boolean(aboutSection), "Homepage should render its About section before Contact");
+  check(aboutSection.includes("Career path"), "About should identify the career overview");
+  check(aboutSection.includes("My career so far."), "About should introduce the career progression plainly");
+  const careerStages = [...aboutSection.matchAll(/<h4\b[^>]*>([\s\S]*?)<\/h4>/gi)].map(([, title]) => plainText(title));
+  equal(careerStages.join("|"), "Data and marketing|AI model training|Software engineering", "About career stages should remain in sequence");
+  equal((aboutSection.match(/\bawkward\b/gi) ?? []).length, 1, "About should avoid repeating the word awkward");
+  check(!aboutSection.includes("Outside the editor"), "About should not repeat the interests gathered in Library");
+  check(!aboutSection.includes("A few other ways I measure a week."), "About should not render the duplicate interests grid");
   check(!plainText(markup).toLowerCase().includes("science fiction"), "Homepage should omit a standalone science-fiction category");
   check(markup.includes('href="/work"'), "Homepage should link to the complete Work archive");
   check(markup.includes('href="/work/threshold"'), "Homepage should link to the Threshold case study");

@@ -309,23 +309,18 @@ button { color: inherit; font: inherit; }
 .contact-block > span { display: block; margin-top: 12px; }
 .contact-link { display: flex; justify-content: space-between; padding: 20px 0 12px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); font: 400 clamp(35px, 7vw, 94px)/1 var(--display); letter-spacing: -.05em; }
 .contact-link span { color: var(--accent); }
-.about-thread, .about-interests { margin-top: clamp(75px, 10vw, 135px); padding-top: clamp(35px, 5vw, 65px); border-top: 1px solid var(--line); }
-.about-thread-heading, .about-interests { display: grid; grid-template-columns: .38fr 1.62fr; gap: 30px; }
-.about-thread-heading > p, .about-interests > div > p { margin: 0; color: var(--muted); font: 10px/1.35 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
-.about-thread-heading h3, .about-interests h3 { max-width: 900px; margin: 0; font: 400 clamp(42px, 6vw, 82px)/.9 var(--display); letter-spacing: -.05em; }
-.about-thread-heading > div { display: flex; flex-direction: column; gap: 24px; }
-.about-thread-heading > div > span { max-width: 600px; color: var(--accent); font: 400 clamp(20px, 2.4vw, 32px)/1.15 var(--display); }
-.about-thread ol { margin: 100px 0 0; padding: 0; border-top: 1px solid var(--line); list-style: none; }
-.about-thread li { display: grid; grid-template-columns: 70px .3fr .7fr 1fr; gap: 25px; align-items: baseline; padding: 30px 0; border-bottom: 1px solid var(--line); }
-.about-thread li > span, .about-thread li > p { margin: 0; color: var(--muted); font: 10px/1.35 var(--mono); text-transform: uppercase; }
-.about-thread li h4 { margin: 0; font: 400 clamp(30px, 3.5vw, 49px)/1 var(--display); }
-.about-thread li > div { color: var(--muted); font-size: 14px; line-height: 1.55; }
-.about-interests { align-items: start; }
-.about-interests ul { display: grid; grid-template-columns: repeat(3, 1fr); margin: 0; padding: 0; border-top: 1px solid var(--line); border-left: 1px solid var(--line); list-style: none; }
-.about-interests li { display: flex; min-height: 190px; flex-direction: column; padding: 18px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.about-interests li > span { color: var(--accent); font: 10px/1 var(--mono); }
-.about-interests li strong { margin-top: auto; font: 400 clamp(27px, 3.5vw, 47px)/1 var(--display); }
-.about-interests li p { margin: 14px 0 0; color: var(--muted); font-size: 12px; line-height: 1.4; }
+.about-career-path { margin-top: clamp(75px, 10vw, 135px); padding-top: clamp(35px, 5vw, 65px); border-top: 1px solid var(--line); }
+.about-career-heading { display: grid; grid-template-columns: .38fr 1.62fr; gap: 30px; align-items: start; }
+.about-career-heading > p { width: fit-content; margin: 0; padding: 8px 10px; color: var(--paper); background: var(--accent); font: 10px/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.about-career-heading > div { display: flex; flex-direction: column; gap: 24px; }
+.about-career-heading h3 { max-width: 900px; margin: 0; font: 400 clamp(42px, 6vw, 82px)/.9 var(--display); letter-spacing: -.05em; }
+.about-career-heading > div > span { max-width: 700px; color: var(--muted); font-size: clamp(16px, 1.8vw, 22px); line-height: 1.45; }
+.about-career-path ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: clamp(48px, 7vw, 90px) 0 0; padding: 0; list-style: none; }
+.about-career-path li { display: grid; grid-template-columns: 38px 1fr; grid-template-areas: "number era" "title title" "description description"; align-content: start; gap: 22px 14px; padding: 22px; background: var(--soft); border: 1px solid var(--line); border-top: 3px solid var(--accent); box-shadow: 5px 6px 0 color-mix(in srgb, var(--accent) 24%, transparent); }
+.about-career-path li > span { display: grid; grid-area: number; width: 34px; height: 34px; place-items: center; color: var(--paper); background: var(--accent); border-radius: 50%; font: 10px/1 var(--mono); }
+.about-career-path li > p { grid-area: era; align-self: center; margin: 0; color: var(--muted); font: 10px/1.35 var(--mono); text-transform: uppercase; }
+.about-career-path li h4 { grid-area: title; margin: 0; font: 400 clamp(30px, 3.2vw, 43px)/1 var(--display); }
+.about-career-path li > div { grid-area: description; color: var(--muted); font-size: 14px; line-height: 1.55; }
 .site-footer { display: flex; justify-content: space-between; padding: 30px clamp(22px, 4vw, 64px); color: var(--muted); border-top: 1px solid var(--line); font: 9px/1.4 var(--mono); text-transform: uppercase; }
 .site-footer div { display: flex; gap: 25px; }
 
@@ -761,12 +756,8 @@ button { color: inherit; font: inherit; }
   .book-cover { padding: 25px; }
   .book-object[open] summary { transform: rotateY(-145deg); }
   .about-copy { gap: 38px; margin: 55px 0; }
-  .about-thread-heading, .about-interests { grid-template-columns: 1fr; }
-  .about-thread-heading > p, .about-interests > div > p { margin-bottom: 25px; }
-  .about-thread ol { margin-top: 65px; }
-  .about-thread li { grid-template-columns: 42px 1fr; }
-  .about-thread li h4, .about-thread li > div { grid-column: 2; }
-  .about-interests ul { grid-template-columns: 1fr; }
+  .about-career-heading { grid-template-columns: 1fr; gap: 22px; }
+  .about-career-path ol { grid-template-columns: 1fr; margin-top: 48px; }
   .site-footer { margin-bottom: 74px; }
   .prototype-cabinet-of-curiosities .site-header { margin: 10px; }
   .prototype-cabinet-of-curiosities .work-section, .prototype-cabinet-of-curiosities .currently-section, .prototype-cabinet-of-curiosities .lab-section, .prototype-cabinet-of-curiosities .library-section, .prototype-cabinet-of-curiosities .about-section, .prototype-cabinet-of-curiosities .contact-section { margin: 10px; padding-right: 18px; padding-left: 18px; }
