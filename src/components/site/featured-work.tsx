@@ -31,7 +31,7 @@ function ProjectLinks({ project }: { project: HomepageProject }) {
   );
 }
 
-function LeadProject({ project }: { project: HomepageProject }) {
+function FeaturedProject({ project, priority }: { project: HomepageProject; priority: boolean }) {
   return (
     <article className="project-feature">
       <Link
@@ -44,8 +44,8 @@ function LeadProject({ project }: { project: HomepageProject }) {
           alt={project.imageAlt}
           width={project.imageWidth}
           height={project.imageHeight}
-          sizes="(max-width: 800px) calc(100vw - 56px), 65vw"
-          priority
+          sizes="(max-width: 800px) calc(100vw - 56px), (max-width: 900px) 92vw, 65vw"
+          priority={priority}
         />
         <span className="project-index">{project.index}</span>
       </Link>
@@ -53,45 +53,13 @@ function LeadProject({ project }: { project: HomepageProject }) {
         <p className="project-type">{project.eyebrow}</p>
         <h3>{project.name}</h3>
         <p>{project.description}</p>
+        {project.detail && <p className="project-detail">{project.detail}</p>}
         {project.qualities && (
           <ul aria-label={`${project.name} qualities`}>
             {project.qualities.map((quality) => <li key={quality}>{quality}</li>)}
           </ul>
         )}
         <ProjectLinks project={project} />
-      </div>
-    </article>
-  );
-}
-
-function RailProject({ project }: { project: HomepageProject }) {
-  return (
-    <article>
-      <span>{project.index}</span>
-      <Image
-        src={project.image}
-        alt={project.imageAlt}
-        width={project.imageWidth}
-        height={project.imageHeight}
-        sizes="(max-width: 800px) calc(100vw - 68px), 40vw"
-      />
-      <div>
-        <p>{project.eyebrow}</p>
-        <h3>{project.name}</h3>
-      </div>
-      <p>{project.detail ?? project.description}</p>
-      <div className="rail-links">
-        <Link href={caseStudyHref(project)}>
-          Read case study <span className="arrow-mark" aria-hidden="true">→</span>
-        </Link>
-        {project.liveUrl && (
-          <a href={project.liveUrl} target="_blank" rel="noreferrer">
-            Visit <span className="arrow-mark" aria-hidden="true">↗︎</span>
-          </a>
-        )}
-        <a href={project.codeUrl} target="_blank" rel="noreferrer">
-          Code <span className="arrow-mark" aria-hidden="true">↗︎</span>
-        </a>
       </div>
     </article>
   );
@@ -121,8 +89,6 @@ export function WorkArchiveCard({ study }: { study: WorkArchiveCardProps }) {
 }
 
 export function FeaturedWork() {
-  const [lead, ...rail] = featuredProjects;
-
   return (
     <section className="work-section" id="work" tabIndex={-1} aria-labelledby="work-title">
       <div className="section-heading">
@@ -131,12 +97,11 @@ export function FeaturedWork() {
           A few projects I want to put <em>first.</em>
         </h2>
       </div>
-      {lead && <LeadProject project={lead} />}
-      {rail.length > 0 && (
-        <div className="project-rail" role="region" aria-label="More featured work">
-          {rail.map((project) => <RailProject key={project.slug} project={project} />)}
-        </div>
-      )}
+      <div className="featured-work-list">
+        {featuredProjects.map((project, index) => (
+          <FeaturedProject key={project.slug} project={project} priority={index === 0} />
+        ))}
+      </div>
       <Link className="section-link" href="/work">
         View all work <span className="arrow-mark" aria-hidden="true">↗︎</span>
       </Link>

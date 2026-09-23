@@ -181,6 +181,7 @@ function verifyHomepage(markup) {
   check(markup.includes('href="/work"'), "Homepage should link to the complete Work archive");
   check(markup.includes('href="/work/threshold"'), "Homepage should link to the Threshold case study");
   check(markup.includes('href="/work/argus-risk"'), "Homepage should link to the Argus Risk case study");
+  check(markup.includes('href="/work/flowtime"'), "Homepage should link to the Flowtime case study");
 
   const imageTags = tags(markup, "img");
   check(imageTags.length >= 8, "Homepage should render the authored imagery and signal imagery");

@@ -90,7 +90,7 @@ export const projects = [
 ] as const satisfies readonly HomepageProject[];
 
 /** Edit this ordered list by hand when the homepage's editorial selection changes. */
-export const featuredProjectSlugs = ["threshold", "argus-risk"] as const satisfies readonly ProjectSlug[];
+export const featuredProjectSlugs = ["threshold", "argus-risk", "flowtime"] as const satisfies readonly ProjectSlug[];
 
 export const featuredProjects = featuredProjectSlugs.map((slug): HomepageProject => {
   const project = projects.find((candidate) => candidate.slug === slug);
