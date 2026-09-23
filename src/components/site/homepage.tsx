@@ -256,8 +256,8 @@ export async function Homepage() {
               <div>
                 <p>Music · Spotify</p>
                 <SignalStatus signal={{ state: "curated", statusLabel: "Curated playlist" }} />
-                <h3>A playlist with the aux cable.</h3>
-                <span>Kept by hand, played through Spotify, and allowed to change.</span>
+                <h3>What I’m listening to</h3>
+                <span>A playlist I update by hand and listen to on Spotify.</span>
                 <a className="playlist-open-link" href={integrationConfig.spotify.playlistUrl} target="_blank" rel="noreferrer">
                   Open playlist in Spotify <span className="arrow-mark" aria-hidden="true">↗︎</span>
                 </a>
@@ -266,7 +266,7 @@ export async function Homepage() {
                 title="Elias’s current Spotify playlist"
                 src={`https://open.spotify.com/embed/playlist/${integrationConfig.spotify.playlistId}?utm_source=generator&theme=0`}
                 width="100%"
-                height="352"
+                height="480"
                 loading="lazy"
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
               />
