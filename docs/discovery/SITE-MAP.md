@@ -6,11 +6,11 @@ The homepage is the primary authored journey through the site:
 
 1. Signature entrance and concise introduction.
 2. Featured Work: a flexible, manually curated selection of the projects Elias most wants visitors to see.
-3. Outside work: one flexible collection of building activity, London status, training, fantasy football, reading, cinema, Spotify, and history.
+3. Personal signals: one flexible collection of building activity, London status, training, fantasy football, reading, cinema, Spotify, and history, reached through Library in the primary navigation.
 4. Experiments: an occasional compact area for Lab material.
 5. About, the white-tux portrait, and contact.
 
-The primary navigation is Home, Work, Outside work, and About. The navigation moves through homepage anchors; the homepage does not need separate primary destinations for Lab or Library.
+The primary navigation is Home, Work, Library, and About. Library reaches the unified Personal signals section; Experiments remains a homepage section rather than a separate primary destination.
 
 ## Work archive
 
@@ -26,13 +26,13 @@ Each case study lives at `/work/[slug]`, starts with a visual story understandab
 ## Compatibility routes
 
 - `/about` redirects to the homepage About section.
-- `/library` redirects to the homepage Outside work section.
+- `/library` redirects to the homepage Personal signals section.
 - `/lab` redirects to the homepage Experiments section.
 - `/work` remains the full archive rather than redirecting to the homepage.
 
-## Outside work
+## Personal signals section (Library destination)
 
-One responsive collection rather than separate Now and Library destinations:
+Library is the navigation label for one responsive collection, not a separate page or a Now/Library split:
 
 - GitHub activity and current building.
 - London time and manually controlled status.

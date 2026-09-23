@@ -40,11 +40,11 @@ A compact, occasional homepage section for Lab material such as Ask Professor Pa
 _Avoid_: A second full publishing destination that Elias must maintain.
 
 **Library**:
-The legacy name for the site's cultural material. It is no longer a primary destination or navigation label; that material now lives inside **Outside work**.
+The public primary-navigation label for the unified Personal signals section. It takes visitors to the existing one-page collection and does not create a separate Library page.
 _Avoid_: Treating the legacy `/library` path as a separate content system.
 
 **Personal signals section**:
-The single homepage section, visibly labelled **Outside work**, that gathers current building, London status, training, fantasy football, reading, cinema, music, and history as a view of Elias outside the case studies. Its cards can be grouped and arranged according to the material rather than a fixed taxonomy.
+The single homepage section reached by the **Library** navigation item. Its stable anchor remains #outside-work. It gathers current building, London status, training, fantasy football, reading, cinema, music, and history as personal signals alongside the case studies. Its cards can be grouped and arranged according to the material rather than a fixed taxonomy.
 _Avoid_: Splitting personality across separate Now and Library sections, or presenting science fiction as a standalone category without enough material to support it.
 
 **About section**:

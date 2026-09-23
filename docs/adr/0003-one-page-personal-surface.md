@@ -17,3 +17,7 @@ The About story, personal texture, contact links, and white-tux portrait also li
 This reduces duplicated content and maintenance while preserving a clear professional entry point and the Work archive's capacity to grow. It also makes the site's personal material feel like one coherent view of Elias outside the projects rather than a set of loosely related destinations. The cost is a route and component refactor, plus careful anchor redirects and canonical metadata for existing paths.
 
 The implementation should keep authored data in the repository, preserve the existing signal fallbacks and accessibility behavior, and treat the single homepage as a composition rather than a rigid card taxonomy.
+
+## Follow-up decision — navigation label
+
+After the 22 September 2026 review, the primary navigation uses **Library** for the existing unified Personal signals destination. This changes the label only: the #outside-work anchor remains stable, /library remains a compatibility route, and no separate Library page returns. This supersedes the primary-navigation label in this ADR; the one-page structure and flexible collection remain unchanged.

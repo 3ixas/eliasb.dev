@@ -11,7 +11,7 @@ export function PageHeader() {
       <nav aria-label="Primary navigation">
         <Link href="/#top">Home</Link>
         <Link href="/#work">Work</Link>
-        <Link href="/#outside-work">Outside work</Link>
+        <Link href="/#outside-work">Library</Link>
         <Link href="/#about">About</Link>
       </nav>
       <ThemeToggle compact />

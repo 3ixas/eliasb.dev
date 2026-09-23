@@ -159,6 +159,8 @@ function verifyHomepage(markup) {
   const nav = markup.match(/<nav aria-label="Primary navigation">([\s\S]*?)<\/nav>/i)?.[1] ?? "";
   const navHrefs = hrefs(nav).map(({ href }) => href);
   equal(navHrefs.join("|"), "#top|#work|#outside-work|#about", "Homepage primary navigation targets");
+  const navLabels = [...nav.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/gi)].map(([, content]) => plainText(content));
+  equal(navLabels.join("|"), "Home|Work|Library|About", "Homepage primary navigation labels");
 
   const pageIds = ids(markup);
   for (const sectionId of requiredHomepageSections) {

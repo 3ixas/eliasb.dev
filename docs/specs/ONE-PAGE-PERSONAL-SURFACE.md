@@ -16,7 +16,7 @@ The homepage will contain:
 4. Experiments: a compact, occasional area for Lab material.
 5. About, the selected white-tux portrait, and contact.
 
-Primary navigation will be Home, Work, Outside work, and About. These items move between homepage anchors. Work also provides a View all work action to the complete Work archive at /work.
+The primary navigation is Home, Work, Library, and About. These items move between homepage anchors; Library reaches the unified Personal signals section. Work also provides a View all work action to the complete Work archive at /work.
 
 Work keeps two layers:
 
@@ -49,7 +49,7 @@ Lab becomes the visible Experiments section and leaves the primary navigation. L
 
 10. As a visitor, I want existing case-study URLs to remain stable, so that shared links and search results continue to work after the homepage architecture changes.
 
-11. As a visitor, I want the Outside work navigation item to reach one unified personal section, so that I can explore Elias’s interests and current activity in one place.
+11. As a visitor, I want the Library navigation item to reach one unified personal section, so that I can explore Elias’s interests and current activity in one place.
 
 12. As a visitor, I want to see GitHub activity in Outside work, so that I can understand what Elias has been building recently.
 
@@ -85,7 +85,7 @@ Lab becomes the visible Experiments section and leaves the primary navigation. L
 
 28. As a visitor using an old About URL, I want to reach the homepage About section, so that existing bookmarks remain useful.
 
-29. As a visitor using an old Library URL, I want to reach the homepage Outside work section, so that existing links do not lead to a retired destination.
+29. As a visitor using an old Library URL, I want to reach the homepage Personal signals section, so that existing links do not lead to a retired destination.
 
 30. As a visitor using an old Lab URL, I want to reach the homepage Experiments section, so that existing links remain meaningful.
 
@@ -108,7 +108,7 @@ Lab becomes the visible Experiments section and leaves the primary navigation. L
 ## Implementation Decisions
 
 - The homepage composition becomes the highest implementation seam. It owns the section order, anchor IDs, primary navigation destinations, featured Work selection, Outside work composition, Experiments preview, About content, portrait, and contact.
-- The shared site header and mobile navigation use the destinations Home, Work, Outside work, and About. Work navigates to the homepage Work anchor; a separate action opens the full Work archive.
+- The shared site header and mobile navigation use the destinations Home, Work, Library, and About; Library reaches the unified Personal signals section. Work navigates to the homepage Work anchor; a separate action opens the full Work archive.
 - The homepage uses stable semantic anchors for the top, Work, Outside work, Experiments, About, and contact sections. Navigation and deep links preserve meaningful hash targets and remain progressively usable without motion.
 - Featured Work is a manually ordered authored collection with a flexible count. It is independent from the complete Work archive and does not automatically become a feed of the newest projects.
 - The Work archive remains a full route and accepts new case-study entries. Existing case-study routes remain stable. Archive ordering remains editorial, with room for new additions without changing the homepage composition.
@@ -156,6 +156,6 @@ Lab becomes the visible Experiments section and leaves the primary navigation. L
 ## Further Notes
 
 - The accepted architecture decision is recorded in ADR 0003, and the domain glossary now uses One-page home, Featured work, Work archive, Experiments section, Personal signals section, and About section.
-- The former Library label decision is superseded. Outside work is the public navigation label because the unified section includes both cultural material and current activity.
+- The earlier decision to use Outside work as the public navigation label is superseded by the 22 September 2026 feedback decision: Library labels the unified Personal signals section. The #outside-work anchor and /library compatibility route remain in place.
 - The implementation should be split into dependency-aware slices after this parent issue: route and navigation foundation, homepage section composition, Work archive/featured boundary, compatibility routes and metadata, and responsive/accessibility verification.
 - The site remains a personal portfolio and cultural notebook rather than a blog or dashboard. The architecture should make future updates easier without making the experience feel like a feed.
