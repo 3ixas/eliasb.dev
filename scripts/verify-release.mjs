@@ -218,6 +218,8 @@ function verifyHomepage(markup) {
   check(!/\b[\w.-]+\/[\w.-]+\b/.test(githubCalendarLabel), "GitHub contribution description should not expose repository details");
 
   const text = plainText(markup);
+  check(/Goodreads/i.test(text) && /(Currently reading|Last known book)/i.test(text), "Reading signal should identify Goodreads and the current or last known book");
+  check(/Letterboxd/i.test(text) && /(Most recently watched|Last known film)/i.test(text), "Cinema signal should identify Letterboxd and the most recent or last known film");
   check(text.includes("anonymous"), "Fantasy football output should keep opposing managers anonymous");
   check(text.includes("Strava") || (text.includes("Typical week") && text.includes("Authored schedule")), "Training output should distinguish live activity from an authored typical week");
   check(text.includes("rather than a live workout log") || /Strava activit(?:y|ies)/.test(text), "Training output should explain whether the displayed week is planned or logged");

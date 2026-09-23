@@ -206,7 +206,7 @@ export async function Homepage() {
                 contentClassName="library-object-pages"
                 summary={(
                   <>
-                    <span>Reading</span>
+                    <span>Goodreads</span>
                     <SignalStatus signal={signals.reading} />
                     {signals.reading.coverUrl && (
                       <span className="library-book-cover" aria-hidden="true">
@@ -218,7 +218,7 @@ export async function Homepage() {
                   </>
                 )}
               >
-                <p>Currently reading</p>
+                <p>{signals.reading.state === "live" ? "Currently reading" : "Reading"}</p>
                 <h3>{signals.reading.headline}</h3>
                 <span>
                   {signals.reading.bookDescription ?? `${signals.reading.author ? `By ${signals.reading.author}. ` : ""}${signals.reading.description}`}
@@ -231,7 +231,7 @@ export async function Homepage() {
                 contentClassName="library-object-pages"
                 summary={(
                   <>
-                    <span>Cinema</span>
+                    <span>Letterboxd</span>
                     <SignalStatus signal={signals.culture} />
                     {signals.culture.filmPosterUrl && (
                       <Image src={signals.culture.filmPosterUrl} alt="" fill sizes="(max-width: 800px) 88vw, 30vw" />
@@ -241,7 +241,7 @@ export async function Homepage() {
                   </>
                 )}
               >
-                <p>Recently watched</p>
+                <p>{signals.culture.state === "live" ? "Most recently watched" : "Last film I watched and logged"}</p>
                 <h3>{signals.culture.filmTitle ?? signals.culture.headline}</h3>
                 <span>{signals.culture.filmDescription ?? signals.culture.description}</span>
                 {signals.culture.filmYear && (

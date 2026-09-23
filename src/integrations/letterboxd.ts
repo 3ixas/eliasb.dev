@@ -18,7 +18,7 @@ export async function getCultureSignal(): Promise<CultureSignal> {
 
     return {
       state: "live",
-      statusLabel: "Culture live",
+      statusLabel: "Most recently watched",
       headline: filmTitle,
       description: "The latest film logged in my Letterboxd diary.",
       href: integrationConfig.spotify.playlistUrl,

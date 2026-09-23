@@ -17,6 +17,10 @@ const signalStates = new Set(["live", "curated", "pending", "unavailable"]);
 const sleeperHref = `https://sleeper.com/leagues/${integrationConfig.sleeper.leagueId}`;
 
 assert.equal(signalFallbacks.fantasy.href ?? null, null);
+assert.equal(signalFallbacks.reading.statusLabel, "Last known book");
+assert.match(signalFallbacks.reading.bookDescription ?? "", /last book I had marked as reading on Goodreads/i);
+assert.equal(signalFallbacks.culture.statusLabel, "Last known film");
+assert.match(signalFallbacks.culture.description, /when the feed last updated/i);
 
 /** @type {import("../src/integrations/types.ts").FantasySignal} */
 const fantasyLiveSignal = {
