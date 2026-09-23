@@ -56,7 +56,7 @@ export const signalFallbacks: HomepageSignals = {
     state: "curated",
     statusLabel: "Typical week",
     headline: "A typical training week",
-    description: "Authored schedule · not synced to a fitness service.",
+    description: "My usual plan for the week, rather than a live workout log.",
     weekly: [
       { label: "Lift", count: 0 },
       { label: "Run", count: 0 },

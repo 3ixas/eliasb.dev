@@ -209,9 +209,18 @@ function verifyHomepage(markup) {
     check(signalStates.has(state), `Signal state ${state} must use the shared signal contract`);
     check(Boolean(label.trim()), "Signal states must have a visible label");
   }
+  const githubCalendar = [...markup.matchAll(/<[a-z][^>]*>/gi)]
+    .map(([tag]) => tag)
+    .find((tag) => attribute(tag, "role") === "img" && /GitHub/i.test(attribute(tag, "aria-label") ?? ""));
+  check(githubCalendar, "GitHub contribution view should have a named image description");
+  const githubCalendarLabel = attribute(githubCalendar ?? "", "aria-label") ?? "";
+  check(/GitHub (contributions|activity).*last year/i.test(githubCalendarLabel), "GitHub contribution view should describe the yearly aggregate");
+  check(!/\b[\w.-]+\/[\w.-]+\b/.test(githubCalendarLabel), "GitHub contribution description should not expose repository details");
+
   const text = plainText(markup);
   check(text.includes("anonymous"), "Fantasy football output should keep opposing managers anonymous");
-  check(text.includes("not synced to a fitness service") || text.includes("fitness service"), "Training output should distinguish authored data from a fitness sync");
+  check(text.includes("Strava") || (text.includes("Typical week") && text.includes("Authored schedule")), "Training output should distinguish live activity from an authored typical week");
+  check(text.includes("rather than a live workout log") || /Strava activit(?:y|ies)/.test(text), "Training output should explain whether the displayed week is planned or logged");
   check(text.includes("Wikimedia") || text.includes("fallback"), "History output should identify its live or fallback source");
   check(/Stable fallback|Updated \d{1,2} [A-Z][a-z]{2,4}/.test(text), "Signal cards should expose visible freshness wording");
   check(["GitHub", "Goodreads", "Letterboxd", "Sleeper", "Wikimedia"].some((source) => text.includes(source)), "Signal cards should expose visible source wording");

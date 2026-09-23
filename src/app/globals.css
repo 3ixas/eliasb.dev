@@ -370,6 +370,36 @@ button { color: inherit; font: inherit; }
 .prototype-cabinet-of-curiosities .signal:nth-child(4) { --ink: #11100e; --accent: #002515; background: color-mix(in srgb, var(--accent) 20%, var(--paper)); }
 :root[data-theme="dark"] .prototype-cabinet-of-curiosities .signal:nth-child(4) { --ink: #f0e8d8; --muted: #cfc4b2; --accent: #67c5a7; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .prototype-cabinet-of-curiosities .signal:nth-child(4) { --ink: #f0e8d8; --muted: #cfc4b2; --accent: #67c5a7; } }
+
+/* Keep the Personal signals cards balanced and readable in the selected home design. */
+.prototype-cabinet-of-curiosities .currently-section .signal-building { grid-column: span 8; min-height: 370px; }
+.prototype-cabinet-of-curiosities .currently-section .signal-presence { grid-column: span 4; }
+.prototype-cabinet-of-curiosities .currently-section .signal-training,
+.prototype-cabinet-of-curiosities .currently-section .signal-fantasy { grid-column: span 6; }
+.prototype-cabinet-of-curiosities .currently-section .signal-building .activity-trace {
+  height: 76px;
+  grid-template-rows: repeat(7, minmax(4px, 1fr));
+  gap: 4px;
+  margin-top: 24px;
+}
+.prototype-cabinet-of-curiosities .currently-section .signal-training {
+  --ink: #17100a;
+  --muted: #17100a;
+  --accent: #0b4938;
+  color: var(--ink);
+  background: #df8b73;
+}
+.prototype-cabinet-of-curiosities .currently-section .signal-training .training-day {
+  color: #fff7ea;
+  background: #0b4938;
+  border-color: #282116;
+}
+.prototype-cabinet-of-curiosities .currently-section .signal-training .training-day b { color: #b6f0d7; }
+.prototype-cabinet-of-curiosities .currently-section .signal-training .training-day span {
+  color: #fff7ea;
+  font-size: 11px;
+  line-height: 1.35;
+}
 .prototype-cabinet-of-curiosities .library-stage { background: #473321; border: 12px solid #4d3925; border-radius: 8px; box-shadow: inset 0 0 0 1px #b89b74; }
 .prototype-cabinet-of-curiosities .shelf-note { color: #fff7ea; }
 .prototype-cabinet-of-curiosities .shelf-note p:first-child,
@@ -711,10 +741,15 @@ button { color: inherit; font: inherit; }
   .project-rail article { grid-template-columns: 42px 1fr; padding: 20px 0; }
   .project-rail article > p { grid-column: 2; margin: 0; }
   .signal-building, .signal-presence, .signal-reading, .signal-training, .signal-fantasy, .signal-culture, .signal-playlist { grid-column: span 12; }
+  .prototype-cabinet-of-curiosities .currently-section .signal-building,
+  .prototype-cabinet-of-curiosities .currently-section .signal-presence,
+  .prototype-cabinet-of-curiosities .currently-section .signal-training,
+  .prototype-cabinet-of-curiosities .currently-section .signal-fantasy { grid-column: span 12; }
   .signal { min-height: 225px; }
   .signal-building { min-height: 290px; }
   .signal-training { min-height: 0; }
   .activity-trace { gap: 2px; }
+  .prototype-cabinet-of-curiosities .currently-section .signal-building .activity-trace { height: 68px; gap: 2px; }
   .training-schedule { grid-template-columns: 1fr; }
   .spotify-embed { min-height: 152px; }
   .library-stage { min-height: 760px; align-items: start; }
