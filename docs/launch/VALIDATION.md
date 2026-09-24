@@ -82,3 +82,11 @@ The temporary local Playwright harness was run with `/Library/Frameworks/Python.
 | `SITE_INDEXABLE=true pnpm verify:release` | Passed with 182 checks. |
 | `/Library/Frameworks/Python.framework/Versions/3.13/bin/python3 /private/tmp/eliasb_issue39_browser_qa.py` | Passed site-owned checks in Chromium, Firefox, and WebKit at all three viewports and across the listed routes. Firefox’s Spotify iframe error was recorded separately; WebKit anchor Tab order remains subject to the macOS setting above. |
 | `git diff --check` | Passed after recording this QA result. |
+
+## Whole-site dogfood follow-up — 2026-09-24
+
+The [whole-site dogfood report](../dogfood-reports/2026-09-24-codex-one-page-personal-surface-dogfood.md) records the candidate revision, route and interaction coverage, mobile and desktop screenshots, and remaining platform boundaries. It extends the issue #39 evidence for the follow-up branch.
+
+The candidate revision f1c8af89d5b03c29c8c2c832ad5cecc8aa92dae7 passed 556 installed Playwright browser assertions with zero failures across Chromium, Firefox, and WebKit at desktop, tablet, and mobile widths. Lint, TypeScript, signal, build, canonical-route, and release checks passed; the release verifier passed 182 assertions. No site-owned functional defect was found.
+
+A read-only request to the public root returned HTTP 200 but showed the earlier “Outside work” navigation and previous hero copy. Production therefore does not verify this candidate revision. Firefox continues to report React error #418 inside Spotify’s cross-origin embed while the site host remains error-free and its direct playlist fallback works. Playwright WebKit anchor Tab order remains inconclusive under the workstation’s current macOS keyboard-navigation setting; native Safari and screen-reader testing were not part of this run.
