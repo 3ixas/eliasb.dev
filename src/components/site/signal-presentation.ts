@@ -15,12 +15,13 @@ function isCached(signal: PresentedSignal) {
 }
 
 export function formatSignalFreshness(signal: PresentedSignal) {
-  if (isCached(signal)) return "Cached for seven days";
-  if (signal.state === "pending") return "Awaiting connection";
-  if (!signal.updatedAt || signal.state === "unavailable") return "Stable fallback";
+  if (isCached(signal)) return "Cached for up to seven days";
+  if (signal.state === "pending") return "Waiting to connect";
+  if (signal.state === "unavailable") return "I couldn’t fetch a live update";
+  if (!signal.updatedAt) return "Saved details";
 
   const date = new Date(signal.updatedAt);
-  if (Number.isNaN(date.getTime())) return "Freshness unavailable";
+  if (Number.isNaN(date.getTime())) return "Update time unavailable";
 
   return `Updated ${new Intl.DateTimeFormat("en-GB", {
     day: "numeric",

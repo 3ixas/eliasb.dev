@@ -3,11 +3,11 @@ export const profile = {
   shortName: "Elias",
   role: "Software engineer",
   location: "London",
-  statement: "I build thoughtful software for complex problems.",
+  statement: "I build software that makes complex things easier to understand.",
   introduction:
-    "I’m a software engineer who works across systems, data, and interfaces. I care about how a product feels, how it behaves when things go wrong, and whether the person using it can understand what is happening.",
+    "I work across systems, data, and interfaces. I like understanding how a product works underneath as well as how it feels to use.",
   about:
-    "I’m based in London and currently work on high-performance pricing and risk systems. Outside work, I build my own products end to end: finding the problem, shaping the interaction, writing the code, and returning to the awkward parts until they make sense.",
+    "I’m based in London, where I work on high-performance pricing and risk systems. Outside work, I build my own products end to end: I find the problem, shape the experience, write the code, and work through the awkward parts until they make sense.",
   links: {
     email: "mailto:eliasthebennett@gmail.com",
     github: "https://github.com/3ixas",
@@ -44,7 +44,7 @@ export const projects = [
     eyebrow: "Product engineering · Data visualisation · 2026",
     thesis: "Making the cost of a decision visible.",
     description:
-      "A rental-affordability calculator for London, Basel, and Zurich. It brings salary, moving costs, and local assumptions into one shareable picture of what it takes to move.",
+      "A rental affordability calculator for London, Basel, and Zurich. It brings salary, moving costs, and local assumptions together to show what it might take to move.",
     qualities: [
       "Shareable URL state",
       "Typed city configuration",
@@ -64,7 +64,7 @@ export const projects = [
     name: "Argus Risk",
     eyebrow: "Event-driven systems",
     description:
-      "A local risk simulator that makes event-driven state, freshness, and failure visible from market input to dashboard.",
+      "A local educational simulator for a multi-currency risk platform. It follows simulated market data and trades through the system and shows their effect on a portfolio dashboard.",
     detail: "C# · .NET · Kafka · PostgreSQL · SignalR · Next.js",
     image: "/work/argus/overview.webp",
     imageAlt: "Argus Risk interface showing event-driven risk positions",
@@ -78,7 +78,7 @@ export const projects = [
     name: "Flowtime",
     eyebrow: "Offline-first interaction",
     description:
-      "A private focus timer that keeps work recoverable through sleeping tabs, browser closures, and interrupted sessions.",
+      "A focus timer that keeps session history on your device and adapts breaks to the time you worked. It stays accurate through sleeping tabs, closed browsers, and interruptions.",
     detail: "Next.js · TypeScript · localStorage · Service Worker",
     image: "/work/flowtime/timer.jpg",
     imageAlt: "Flowtime focus timer interface",
@@ -90,7 +90,7 @@ export const projects = [
 ] as const satisfies readonly HomepageProject[];
 
 /** Edit this ordered list by hand when the homepage's editorial selection changes. */
-export const featuredProjectSlugs = ["threshold", "argus-risk"] as const satisfies readonly ProjectSlug[];
+export const featuredProjectSlugs = ["threshold", "argus-risk", "flowtime"] as const satisfies readonly ProjectSlug[];
 
 export const featuredProjects = featuredProjectSlugs.map((slug): HomepageProject => {
   const project = projects.find((candidate) => candidate.slug === slug);

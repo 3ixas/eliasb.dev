@@ -97,9 +97,9 @@ function fallbackSignal(now = new Date()): HistorySignal {
   const event = fallbackForWeek(start);
   return {
     state: "curated",
-    statusLabel: "Authored fallback",
+    statusLabel: "Saved example",
     headline: "This week in history",
-    description: "Wikimedia is unavailable, so this fixed note is shown until the next successful lookup.",
+    description: "Wikimedia’s weekly events aren’t available right now, so I’m showing one of my saved examples.",
     dateLabel: dateLabel(start),
     events: [event],
     sourceUrl: "https://en.wikipedia.org/wiki/Portal:History",
@@ -128,7 +128,7 @@ export async function getHistorySignal(): Promise<HistorySignal> {
       state: "live",
       statusLabel: "Wikimedia · cached",
       headline: "This week in history",
-      description: "A few events from the Monday of this week, looked up from Wikimedia and cached for seven days.",
+      description: "I fetch this list from Wikimedia, then cache it for up to seven days.",
       dateLabel: dateLabel(start),
       events,
       sourceUrl,

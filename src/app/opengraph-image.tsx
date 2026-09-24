@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Elias B. — thoughtful software for complex problems";
+export const alt = "Elias B. — software that makes complex things easier to understand";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -55,12 +55,12 @@ export default function OpenGraphImage() {
             display: "flex",
             maxWidth: 790,
             fontFamily: "Georgia",
-            fontSize: 88,
+            fontSize: 72,
             lineHeight: 0.9,
             letterSpacing: -5,
           }}
         >
-          I build thoughtful software for complex problems.
+          I build software that makes complex things easier to understand.
         </div>
         <div
           style={{
@@ -79,7 +79,7 @@ export default function OpenGraphImage() {
             transform: "rotate(2deg)",
           }}
         >
-          A personal corner of the internet.
+          Projects and a few things I enjoy.
         </div>
       </div>
     </div>,

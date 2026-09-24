@@ -32,7 +32,7 @@ export async function getHomepageSignals(): Promise<HomepageSignals> {
           state: "curated",
           statusLabel: "Current note",
           headline: statusText,
-          description: "London · manually updated",
+          description: "I’m in London. I update this note from time to time.",
         }
       : signalFallbacks.status,
   };

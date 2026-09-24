@@ -159,6 +159,8 @@ function verifyHomepage(markup) {
   const nav = markup.match(/<nav aria-label="Primary navigation">([\s\S]*?)<\/nav>/i)?.[1] ?? "";
   const navHrefs = hrefs(nav).map(({ href }) => href);
   equal(navHrefs.join("|"), "#top|#work|#outside-work|#about", "Homepage primary navigation targets");
+  const navLabels = [...nav.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/gi)].map(([, content]) => plainText(content));
+  equal(navLabels.join("|"), "Home|Work|Library|About", "Homepage primary navigation labels");
 
   const pageIds = ids(markup);
   for (const sectionId of requiredHomepageSections) {
@@ -175,10 +177,22 @@ function verifyHomepage(markup) {
 
   const outsideWorkTitle = markup.match(/<h2\b[^>]*\bid="outside-work-title"[^>]*>([\s\S]*?)<\/h2>/i)?.[1] ?? "";
   equal(plainText(outsideWorkTitle), "Some of what I’m into lately.", "Homepage #outside-work-title rendered text");
+  const aboutStart = markup.indexOf('<section class="about-section"');
+  const contactStart = markup.indexOf('<section id="contact"');
+  const aboutSection = aboutStart >= 0 && contactStart > aboutStart ? markup.slice(aboutStart, contactStart) : "";
+  check(Boolean(aboutSection), "Homepage should render its About section before Contact");
+  check(aboutSection.includes("Career path"), "About should identify the career overview");
+  check(aboutSection.includes("My career so far."), "About should introduce the career progression plainly");
+  const careerStages = [...aboutSection.matchAll(/<h4\b[^>]*>([\s\S]*?)<\/h4>/gi)].map(([, title]) => plainText(title));
+  equal(careerStages.join("|"), "Data and marketing|AI model training|Software engineering", "About career stages should remain in sequence");
+  equal((aboutSection.match(/\bawkward\b/gi) ?? []).length, 1, "About should avoid repeating the word awkward");
+  check(!aboutSection.includes("Outside the editor"), "About should not repeat the interests gathered in Library");
+  check(!aboutSection.includes("A few other ways I measure a week."), "About should not render the duplicate interests grid");
   check(!plainText(markup).toLowerCase().includes("science fiction"), "Homepage should omit a standalone science-fiction category");
   check(markup.includes('href="/work"'), "Homepage should link to the complete Work archive");
   check(markup.includes('href="/work/threshold"'), "Homepage should link to the Threshold case study");
   check(markup.includes('href="/work/argus-risk"'), "Homepage should link to the Argus Risk case study");
+  check(markup.includes('href="/work/flowtime"'), "Homepage should link to the Flowtime case study");
 
   const imageTags = tags(markup, "img");
   check(imageTags.length >= 8, "Homepage should render the authored imagery and signal imagery");
@@ -206,23 +220,36 @@ function verifyHomepage(markup) {
     check(signalStates.has(state), `Signal state ${state} must use the shared signal contract`);
     check(Boolean(label.trim()), "Signal states must have a visible label");
   }
+  const githubCalendar = [...markup.matchAll(/<[a-z][^>]*>/gi)]
+    .map(([tag]) => tag)
+    .find((tag) => attribute(tag, "role") === "img" && /GitHub/i.test(attribute(tag, "aria-label") ?? ""));
+  check(githubCalendar, "GitHub contribution view should have a named image description");
+  const githubCalendarLabel = attribute(githubCalendar ?? "", "aria-label") ?? "";
+  check(/GitHub (contributions|activity).*last year/i.test(githubCalendarLabel), "GitHub contribution view should describe the yearly aggregate");
+  check(!/\b[\w.-]+\/[\w.-]+\b/.test(githubCalendarLabel), "GitHub contribution description should not expose repository details");
+
   const text = plainText(markup);
-  check(text.includes("anonymous"), "Fantasy football output should keep opposing managers anonymous");
-  check(text.includes("not synced to a fitness service") || text.includes("fitness service"), "Training output should distinguish authored data from a fitness sync");
+  check(/Goodreads/i.test(text) && /(Currently reading|Last known book)/i.test(text), "Reading signal should identify Goodreads and the current or last known book");
+  check(/Letterboxd/i.test(text) && /(Most recently watched|Last known film)/i.test(text), "Cinema signal should identify Letterboxd and the most recent or last known film");
+  check(/anonymous|managers’ names will stay private/i.test(text), "Fantasy football output should keep opposing managers anonymous");
+  check(text.includes("Strava") || (text.includes("Typical week") && text.includes("My weekly plan")), "Training output should distinguish live activity from an authored typical week");
+  check(text.includes("not a live workout log") || /Strava activit(?:y|ies)/.test(text), "Training output should explain whether the displayed week is planned or logged");
   check(text.includes("Wikimedia") || text.includes("fallback"), "History output should identify its live or fallback source");
-  check(/Stable fallback|Updated \d{1,2} [A-Z][a-z]{2,4}/.test(text), "Signal cards should expose visible freshness wording");
+  check(/Saved details|Waiting to connect|couldn’t fetch a live update|Updated \d{1,2} [A-Z][a-z]{2,4}|Wikimedia · cached/i.test(text), "Signal cards should expose visible freshness wording");
   check(["GitHub", "Goodreads", "Letterboxd", "Sleeper", "Wikimedia"].some((source) => text.includes(source)), "Signal cards should expose visible source wording");
   check(!/(ghp_|github_pat_|sk-[A-Za-z0-9]|STRAVA_CLIENT_SECRET)/i.test(text), "Rendered output must not contain credential-like values");
 
   const descriptions = [...markup.matchAll(/<span class="lab-description">([\s\S]*?)<\/span>/gi)]
     .map(([, description]) => plainText(description));
   check(descriptions.length >= 3 && descriptions.every((description) => description.length >= 60), "Long experiment descriptions should remain present in the rendered output");
+  check(text.includes("V1 of Professor Past"), "Professor Past should be identified as V1 without implying a rebuild request");
 
   const fantasyCard = markup.match(/<article class="signal signal-fantasy">([\s\S]*?)<\/article>/i)?.[1] ?? "";
   const fantasyStatus = fantasyCard.match(/<span class="signal-status" data-state="([^"]+)">([^<]*)<\/span>/i);
   check(fantasyStatus, "Fantasy football card should expose a signal state");
   if (fantasyStatus?.[1] === "pending") {
-    check(plainText(fantasyCard).includes("Sleeper pending"), "Pending fantasy state should show its Sleeper pending wording");
+    check(plainText(fantasyCard).includes("My league isn’t connected yet"), "Pending fantasy state should explain that the league is not connected yet");
+    check(plainText(fantasyCard).includes("Sleeper"), "Pending fantasy state should identify the intended data source");
     check(!hrefs(fantasyCard).some(({ href }) => href?.includes("sleeper.com")), "Pending fantasy state should not expose a Sleeper source link");
   }
   if (fantasyStatus?.[1] === "live") {

@@ -16,14 +16,6 @@ import { profile } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
 import { getHistorySignal } from "@/integrations/history";
 
-const interests = [
-  ["01", "Lift", "Strength, repetition, patience."],
-  ["02", "Run", "Distance and a clearer head."],
-  ["03", "Muay Thai", "Technique under pressure."],
-  ["04", "Football", "Watching, arguing, modelling."],
-  ["05", "Reading", "Stories and ideas kept within reach."],
-  ["06", "History", "Patterns, people, and the details that stay useful."],
-] as const;
 function activityLevel(count: number) {
   if (count >= 4) return "4";
   if (count >= 3) return "3";
@@ -57,8 +49,8 @@ export async function Homepage() {
           <div className="hero-lower">
             <p className="hero-copy">{profile.introduction}</p>
             <p className="concept-thesis">
-              <span>Now</span>
-              Building a more personal corner of the internet.
+              <span>Here</span>
+              My projects, a few experiments, and some things I enjoy.
             </p>
           </div>
           <a className="scroll-cue" href="#work">
@@ -82,7 +74,7 @@ export async function Homepage() {
                 <SignalPresentation
                   signal={signals.github}
                   source={{
-                    label: signals.github.state === "unavailable" ? "GitHub fallback" : "GitHub",
+                    label: signals.github.state === "unavailable" ? "GitHub activity" : "GitHub",
                     href: signals.github.href,
                   }}
                 >
@@ -129,7 +121,7 @@ export async function Homepage() {
                 <SignalPresentation
                   signal={signals.training}
                   source={{
-                    label: signals.training.href ? "Strava" : "Authored schedule",
+                    label: signals.training.href ? "Strava" : "My weekly plan",
                     href: signals.training.href,
                   }}
                 >
@@ -162,7 +154,7 @@ export async function Homepage() {
                 <SignalPresentation
                   signal={signals.fantasy}
                   source={{
-                    label: signals.fantasy.href ? "Sleeper" : "Sleeper pending",
+                    label: "Sleeper",
                     href: signals.fantasy.href,
                   }}
                 >
@@ -195,9 +187,9 @@ export async function Homepage() {
 
           <section className="library-section outside-work-culture" aria-labelledby="culture-title">
             <div className="section-heading compact">
-              <p>Culture and curiosities</p>
+              <p>Books, films, music and history</p>
               <h2 id="culture-title">
-                Things I keep <em>within reach.</em>
+                A few things I enjoy <em>outside work.</em>
               </h2>
             </div>
             <div className="library-objects">
@@ -206,7 +198,7 @@ export async function Homepage() {
                 contentClassName="library-object-pages"
                 summary={(
                   <>
-                    <span>Reading</span>
+                    <span>Goodreads</span>
                     <SignalStatus signal={signals.reading} />
                     {signals.reading.coverUrl && (
                       <span className="library-book-cover" aria-hidden="true">
@@ -218,7 +210,7 @@ export async function Homepage() {
                   </>
                 )}
               >
-                <p>Currently reading</p>
+                <p>{signals.reading.state === "live" ? "Currently reading" : "Reading"}</p>
                 <h3>{signals.reading.headline}</h3>
                 <span>
                   {signals.reading.bookDescription ?? `${signals.reading.author ? `By ${signals.reading.author}. ` : ""}${signals.reading.description}`}
@@ -231,7 +223,7 @@ export async function Homepage() {
                 contentClassName="library-object-pages"
                 summary={(
                   <>
-                    <span>Cinema</span>
+                    <span>Letterboxd</span>
                     <SignalStatus signal={signals.culture} />
                     {signals.culture.filmPosterUrl && (
                       <Image src={signals.culture.filmPosterUrl} alt="" fill sizes="(max-width: 800px) 88vw, 30vw" />
@@ -241,7 +233,7 @@ export async function Homepage() {
                   </>
                 )}
               >
-                <p>Recently watched</p>
+                <p>{signals.culture.state === "live" ? "Most recent film in my Letterboxd diary" : "Last known film in my Letterboxd diary"}</p>
                 <h3>{signals.culture.filmTitle ?? signals.culture.headline}</h3>
                 <span>{signals.culture.filmDescription ?? signals.culture.description}</span>
                 {signals.culture.filmYear && (
@@ -255,9 +247,9 @@ export async function Homepage() {
             <div className="playlist-room outside-work-playlist">
               <div>
                 <p>Music · Spotify</p>
-                <SignalStatus signal={{ state: "curated", statusLabel: "Curated playlist" }} />
-                <h3>A playlist with the aux cable.</h3>
-                <span>Kept by hand, played through Spotify, and allowed to change.</span>
+                <SignalStatus signal={{ state: "curated", statusLabel: "My playlist" }} />
+                <h3>What I’m listening to</h3>
+                <span>I add songs as I find them.</span>
                 <a className="playlist-open-link" href={integrationConfig.spotify.playlistUrl} target="_blank" rel="noreferrer">
                   Open playlist in Spotify <span className="arrow-mark" aria-hidden="true">↗︎</span>
                 </a>
@@ -266,19 +258,18 @@ export async function Homepage() {
                 title="Elias’s current Spotify playlist"
                 src={`https://open.spotify.com/embed/playlist/${integrationConfig.spotify.playlistId}?utm_source=generator&theme=0`}
                 width="100%"
-                height="352"
+                height="480"
                 loading="lazy"
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
               />
             </div>
 
             <div className="library-index outside-work-history" aria-labelledby="history-title">
-              <p>History · a small weekly note</p>
-              <h2 id="history-title">A few things that happened this week.</h2>
+              <p>History</p>
+              <h2 id="history-title">{history.headline}</h2>
               <div>
                 <article className="history-card">
                   <span>{history.dateLabel}</span>
-                  <h3>{history.headline}</h3>
                   <div className="history-events">
                     {history.events.map((event) => (
                       <p key={`${event.year}-${event.text}`}>
@@ -289,7 +280,7 @@ export async function Homepage() {
                   </div>
                   <small>{history.description}</small>
                   <a className="history-source" href={history.sourceUrl} target="_blank" rel="noreferrer">
-                    {history.statusLabel} <span className="arrow-mark" aria-hidden="true">↗︎</span>
+                    {history.state === "live" ? "View this week’s Wikimedia events" : "Browse Wikipedia history"} <span className="arrow-mark" aria-hidden="true">↗︎</span>
                   </a>
                 </article>
               </div>
@@ -302,10 +293,10 @@ export async function Homepage() {
             <p>03 / Experiments</p>
             <div>
               <h2 id="experiments-title">
-                Small bets, unfinished ideas, and <em>useful mistakes.</em>
+                Things I’m trying <em>out.</em>
               </h2>
               <p className="section-supporting-copy">
-                Occasional work in progress, interface studies, and notes from making things. No schedule, just ideas worth keeping.
+                Side projects, interface studies, and notes from things I’m making.
               </p>
             </div>
           </div>
@@ -373,16 +364,12 @@ export async function Homepage() {
 
         <section className="about-section" id="about" tabIndex={-1} aria-labelledby="about-title">
           <p>04 / About</p>
-          <h2 id="about-title">
-            Engineer by trade.
-            <br />
-            <em>Curious by default.</em>
-          </h2>
+          <h2 id="about-title">A bit about me.</h2>
           <div className="about-copy">
             <div className="about-prose">
               <p>{profile.about}</p>
               <p className="about-supporting-copy">
-                I like software that respects the person using it: clear enough to understand, resilient when things go wrong, and considered down to the awkward states.
+                I like software that respects the person using it: clear about what’s happening, dependable when things go wrong, and careful with the details.
               </p>
               <nav className="profile-links" aria-label="Profile links">
                 <a href="#contact">Start a conversation <span className="arrow-mark" aria-hidden="true">↓</span></a>
@@ -410,15 +397,15 @@ export async function Homepage() {
               <figcaption>Off duty, approximately</figcaption>
             </figure>
           </div>
-          <div className="about-thread">
-            <div className="about-thread-heading">
-              <p>Connecting thread</p>
+          <div className="about-career-path">
+            <div className="about-career-heading">
+              <p>Career path</p>
               <div>
-                <h3 id="about-thread-title">The thread through all of it.</h3>
-                <span>How do you make complicated things easier to understand?</span>
+                <h3 id="about-career-title">My career so far.</h3>
+                <span>I started in marketing and data, moved into AI model training, and now work in software engineering.</span>
               </div>
             </div>
-            <ol aria-labelledby="about-thread-title">
+            <ol aria-labelledby="about-career-title">
               {journey.map((step, index) => (
                 <li key={step.label}>
                   <span>0{index + 1}</span>
@@ -429,28 +416,13 @@ export async function Homepage() {
               ))}
             </ol>
           </div>
-          <div className="about-interests">
-            <div>
-              <p>Outside the editor</p>
-              <h3 id="about-interests-title">A few other ways I measure a week.</h3>
-            </div>
-            <ul aria-labelledby="about-interests-title">
-              {interests.map(([index, title, description]) => (
-                <li key={index}>
-                  <span>{index}</span>
-                  <strong>{title}</strong>
-                  <p>{description}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
         </section>
 
         <section id="contact" tabIndex={-1} className="contact-block contact-section" aria-labelledby="contact-title">
           <p>05 / Contact</p>
-          <h2 id="contact-title">Have a complex problem worth making simpler?</h2>
+          <h2 id="contact-title">Get in touch.</h2>
           <a className="contact-link" href={profile.links.email}>
-            Start a conversation <span className="arrow-mark" aria-hidden="true">↗︎</span>
+            Email me <span className="arrow-mark" aria-hidden="true">↗︎</span>
           </a>
           <span>eliasthebennett@gmail.com</span>
         </section>

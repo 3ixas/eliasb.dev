@@ -26,7 +26,7 @@ export const integrationConfig = {
     profileUrl: "https://www.strava.com/athletes/79346179",
   },
   status: {
-    message: "Building this corner of the internet.",
+    message: "Working on a few things here.",
     expiresAt: "2026-10-14T23:59:59+01:00",
   },
 } as const;

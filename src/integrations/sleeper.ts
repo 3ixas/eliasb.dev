@@ -60,7 +60,7 @@ export async function getFantasySignal(): Promise<FantasySignal> {
       state: "live",
       statusLabel: `Live · week ${week}`,
       headline: `${record} this season`,
-      description: "The showcase matchup is live; every other manager remains anonymous.",
+      description: "My matchup is live, and I keep the other managers anonymous.",
       leftLabel: `EB ${score(ownMatchup?.points)}`,
       matchupLabel: `week ${week}`,
       rightLabel: `OPP ${score(opponent?.points)}`,

@@ -31,14 +31,14 @@ The entrance must not require interaction or block access long enough to need a 
 
 ## Information architecture
 
-Use a substantial one-page homepage with four primary destinations: **Work, Outside work, Experiments, About**. Navigation moves between homepage sections; Work also retains a full case-study archive.
+Use a substantial one-page homepage with four primary destinations: **Work, Library, Experiments, About**. Library reaches the unified Personal signals section; navigation moves between homepage anchors, and Work retains a full case-study archive.
 
 Homepage order:
 
 1. Signature entrance.
 2. Concise introduction to Elias and the intersection of engineering, product, and design.
 3. Selected work: Threshold, Argus Risk, then Flowtime.
-4. Outside work: a flexible collection of current building, London status, reading, cinema, music, training, fantasy football, and history.
+4. Personal signals, reached through Library: a flexible collection of current building, London status, reading, cinema, music, training, fantasy football, and history.
 5. Experiments: a compact occasional preview of Lab material.
 6. About, email, résumé, GitHub, and LinkedIn.
 
@@ -60,9 +60,9 @@ The connecting narrative is that Elias makes consequential or messy states under
 
 Experiments is a compact homepage collection of occasional Lab material: works in progress, failed ideas, making notes, interface studies, small tools, Ask Professor Past, and fantasy-football work. It does not require a publishing schedule or a primary navigation tab. The existing `/lab` path remains a compatibility route to this section.
 
-## Outside work
+## Personal signals section
 
-Outside work is one flexible homepage collection rather than separate Now and Library destinations. It gathers GitHub activity, London status, training, fantasy football, books, cinema, history, and music. Cards can be grouped and arranged according to the material, and entries can open as disclosures or source links when there is something meaningful to show. Science fiction is not a standalone category until it has a concrete entry.
+The Personal signals section is one flexible homepage collection reached through Library, rather than separate Now and Library destinations. It gathers GitHub activity, London status, training, fantasy football, books, cinema, history, and music. Cards can be grouped and arranged according to the material, and entries can open as disclosures or source links when there is something meaningful to show. Science fiction is not a standalone category until it has a concrete entry.
 
 ## About and personal texture
 
@@ -72,7 +72,7 @@ Lifting, running, Muay Thai, football, and fantasy sports should add human textu
 
 ## Live and maintained signals
 
-Keep personal signals together in the Outside work section. The cards can vary in treatment and grouping without becoming a rigid widget taxonomy.
+Keep personal signals together in the Library destination. The cards can vary in treatment and grouping without becoming a rigid widget taxonomy.
 
 - **GitHub:** public activity plus aggregate private contribution counts; never expose private repository names or details.
 - **Books:** site-owned reading data enriched with Open Library metadata and covers; allow an interactive book or shelf treatment.
@@ -94,7 +94,7 @@ Explore three directions independently before selecting or combining them:
 
 Selected direction: Cabinet of Curiosities, grounded by Living Editorial's hierarchy, whitespace, and restraint. Signals and Systems will not define the overall environment because it felt too harsh, but restrained pieces of its data language can appear inside relevant GitHub, training, fantasy, and system views.
 
-Compare the same representative slice in every direction: entrance, introduction, one selected project, the Outside work collection, and one tactile interaction. Produce desktop and mobile compositions, then a focused coded prototype for motion and interaction. Evaluate clarity, distinctiveness, personal specificity, warmth, accessibility, mobile behaviour, performance, and maintenance before combining ideas.
+Compare the same representative slice in every direction: entrance, introduction, one selected project, the Personal signals collection, and one tactile interaction. Produce desktop and mobile compositions, then a focused coded prototype for motion and interaction. Evaluate clarity, distinctiveness, personal specificity, warmth, accessibility, mobile behaviour, performance, and maintenance before combining ideas.
 
 Use real project screenshots, one or two candidate photographs, and representative books, films, and music in the first serious concepts. Use temporary material only where credentials or final data are unavailable.
 
@@ -136,7 +136,7 @@ Do not change the live domain during design and development. Validate the comple
 2. Produce the three comparable visual concepts. **Complete.**
 3. Select and document the visual system, then build the homepage. **Complete.**
 4. Build the three Work case studies. **Complete.**
-5. Build the unified Outside work and Experiments sections, then complete the homepage About section. **Next architecture pass.**
+5. Build the unified Personal signals and Experiments sections, then complete the homepage About section. **Next architecture pass.**
 6. Add integrations and their designed fallback states. **Complete:** GitHub, Goodreads, Letterboxd, Sleeper, Spotify, Strava, local time, and expiring status are connected with source-appropriate fallbacks.
 7. Validate responsive behavior, accessibility, browser support, and performance. **Local production validation complete; public preview performance and Safari/Firefox checks remain.**
 8. Validate the production deployment and cut over `eliasb.dev`.

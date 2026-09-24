@@ -18,14 +18,14 @@ export async function getCultureSignal(): Promise<CultureSignal> {
 
     return {
       state: "live",
-      statusLabel: "Culture live",
+      statusLabel: "Most recently watched",
       headline: filmTitle,
-      description: "The latest film logged in my Letterboxd diary.",
+      description: "The latest film I logged in my Letterboxd diary.",
       href: integrationConfig.spotify.playlistUrl,
       filmTitle,
       filmYear: rssValue(item, "letterboxd:filmYear"),
       filmRating: rssValue(item, "letterboxd:memberRating"),
-      filmDescription: "The latest film in my diary. I keep the rating and notes on Letterboxd.",
+      filmDescription: "I keep my rating and notes on Letterboxd.",
       filmPosterUrl: trustedHttpsUrl(firstImageUrl(item), ["a.ltrbxd.com"]),
       filmHref: trustedHttpsUrl(rssValue(item, "link"), ["letterboxd.com", "www.letterboxd.com"]) ?? integrationConfig.letterboxd.profileUrl,
       playlistHref: integrationConfig.spotify.playlistUrl,

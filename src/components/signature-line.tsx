@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-const defaultStatement = "I build thoughtful software for complex problems.";
+const defaultStatement = "I build software that makes complex things easier to understand.";
 type EntrancePhase = "ready" | "typing" | "settling" | "revealing" | "complete";
 
 export function SignatureLine({

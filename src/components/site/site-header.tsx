@@ -10,7 +10,7 @@ export function SiteHeader() {
       <nav aria-label="Primary navigation">
         <a href="#top">Home</a>
         <a href="#work">Work</a>
-        <a href="#outside-work">Outside work</a>
+        <a href="#outside-work">Library</a>
         <a href="#about">About</a>
       </nav>
       <div className="site-header-actions">
