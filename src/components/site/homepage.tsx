@@ -47,7 +47,10 @@ export async function Homepage() {
           </p>
           <SignatureLine direction="selected-homepage" statement={profile.statement} />
           <div className="hero-lower">
-            <p className="hero-copy">{profile.introduction}</p>
+            <div className="hero-introduction">
+              <p className="hero-introduction-label">How I work</p>
+              <p className="hero-copy">{profile.introduction}</p>
+            </div>
             <p className="concept-thesis">
               <span>Here</span>
               My projects, a few experiments, and some things I enjoy.

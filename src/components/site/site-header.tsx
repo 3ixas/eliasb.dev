@@ -1,4 +1,5 @@
 import { ThemeToggle } from "@/components/theme-toggle";
+import { HomeNavigation } from "@/components/site/home-navigation";
 
 export function SiteHeader() {
   return (
@@ -7,12 +8,7 @@ export function SiteHeader() {
       <a href="#top" className="site-mark" aria-label="E/B — Elias B. home">
         E/B
       </a>
-      <nav aria-label="Primary navigation">
-        <a href="#top">Home</a>
-        <a href="#work">Work</a>
-        <a href="#outside-work">Library</a>
-        <a href="#about">About</a>
-      </nav>
+      <HomeNavigation />
       <div className="site-header-actions">
         <ThemeToggle compact />
         <a href="#contact" className="say-hello">
