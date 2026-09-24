@@ -157,8 +157,8 @@ export async function getGitHubSignal(): Promise<GitHubSignal> {
       statusLabel: "Live · all contributions",
       headline: `${contributions.totalContributions} contributions in the last year`,
       description: latest
-        ? `${describeEvent(latest)} · private work is included in the total without repository details.`
-        : "Public and private contribution totals are included without repository details.",
+        ? `${describeEvent(latest)} · the total includes private contributions, without naming those repositories.`
+        : "The total includes public and private contributions, without naming private repositories.",
       activity: contributions.activity,
       activityLabel: "GitHub contributions over the last year, including private totals",
       totalContributions: contributions.totalContributions,
@@ -174,7 +174,7 @@ export async function getGitHubSignal(): Promise<GitHubSignal> {
       state: "live",
       statusLabel: token ? "Live · public only" : "Live · public",
       headline: describeEvent(latest),
-      description: "Recent public building activity from GitHub. Private totals need the site token.",
+      description: "A recent event from my public GitHub profile. Private contribution totals aren’t shown here.",
       activity,
       activityLabel: "Public GitHub activity over the last year",
       updatedAt: new Date().toISOString(),
@@ -187,10 +187,10 @@ export async function getGitHubSignal(): Promise<GitHubSignal> {
       ...signalFallbacks.github,
       state: "live",
       statusLabel: token ? "Live · public only" : "Live · public",
-      headline: "Quiet in public, building in private",
+      headline: "No recent public GitHub activity",
       description: token
-        ? "No public events appeared in the recent window; private totals need a working site token."
-        : "No public GitHub events appeared in the recent activity window.",
+        ? "There are no recent public events, and I couldn’t load the private contribution total this time."
+        : "This chart only shows public activity.",
       activity: mapPublicActivity(events),
       activityLabel: "Public GitHub activity over the last year",
       updatedAt: new Date().toISOString(),

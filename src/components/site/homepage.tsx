@@ -49,8 +49,8 @@ export async function Homepage() {
           <div className="hero-lower">
             <p className="hero-copy">{profile.introduction}</p>
             <p className="concept-thesis">
-              <span>Now</span>
-              Building a more personal corner of the internet.
+              <span>Here</span>
+              My projects, a few experiments, and some things I enjoy.
             </p>
           </div>
           <a className="scroll-cue" href="#work">
@@ -74,7 +74,7 @@ export async function Homepage() {
                 <SignalPresentation
                   signal={signals.github}
                   source={{
-                    label: signals.github.state === "unavailable" ? "GitHub fallback" : "GitHub",
+                    label: signals.github.state === "unavailable" ? "GitHub activity" : "GitHub",
                     href: signals.github.href,
                   }}
                 >
@@ -121,7 +121,7 @@ export async function Homepage() {
                 <SignalPresentation
                   signal={signals.training}
                   source={{
-                    label: signals.training.href ? "Strava" : "Authored schedule",
+                    label: signals.training.href ? "Strava" : "My weekly plan",
                     href: signals.training.href,
                   }}
                 >
@@ -154,7 +154,7 @@ export async function Homepage() {
                 <SignalPresentation
                   signal={signals.fantasy}
                   source={{
-                    label: signals.fantasy.href ? "Sleeper" : "Sleeper pending",
+                    label: "Sleeper",
                     href: signals.fantasy.href,
                   }}
                 >
@@ -187,9 +187,9 @@ export async function Homepage() {
 
           <section className="library-section outside-work-culture" aria-labelledby="culture-title">
             <div className="section-heading compact">
-              <p>Culture and curiosities</p>
+              <p>Books, films, music and history</p>
               <h2 id="culture-title">
-                Things I keep <em>within reach.</em>
+                A few things I enjoy <em>outside work.</em>
               </h2>
             </div>
             <div className="library-objects">
@@ -233,7 +233,7 @@ export async function Homepage() {
                   </>
                 )}
               >
-                <p>{signals.culture.state === "live" ? "Most recently watched" : "Last film I watched and logged"}</p>
+                <p>{signals.culture.state === "live" ? "Most recent film in my Letterboxd diary" : "Last known film in my Letterboxd diary"}</p>
                 <h3>{signals.culture.filmTitle ?? signals.culture.headline}</h3>
                 <span>{signals.culture.filmDescription ?? signals.culture.description}</span>
                 {signals.culture.filmYear && (
@@ -247,9 +247,9 @@ export async function Homepage() {
             <div className="playlist-room outside-work-playlist">
               <div>
                 <p>Music · Spotify</p>
-                <SignalStatus signal={{ state: "curated", statusLabel: "Curated playlist" }} />
+                <SignalStatus signal={{ state: "curated", statusLabel: "My playlist" }} />
                 <h3>What I’m listening to</h3>
-                <span>A playlist I update by hand and listen to on Spotify.</span>
+                <span>I add songs as I find them.</span>
                 <a className="playlist-open-link" href={integrationConfig.spotify.playlistUrl} target="_blank" rel="noreferrer">
                   Open playlist in Spotify <span className="arrow-mark" aria-hidden="true">↗︎</span>
                 </a>
@@ -265,12 +265,11 @@ export async function Homepage() {
             </div>
 
             <div className="library-index outside-work-history" aria-labelledby="history-title">
-              <p>History · a small weekly note</p>
-              <h2 id="history-title">A few things that happened this week.</h2>
+              <p>History</p>
+              <h2 id="history-title">{history.headline}</h2>
               <div>
                 <article className="history-card">
                   <span>{history.dateLabel}</span>
-                  <h3>{history.headline}</h3>
                   <div className="history-events">
                     {history.events.map((event) => (
                       <p key={`${event.year}-${event.text}`}>
@@ -281,7 +280,7 @@ export async function Homepage() {
                   </div>
                   <small>{history.description}</small>
                   <a className="history-source" href={history.sourceUrl} target="_blank" rel="noreferrer">
-                    {history.statusLabel} <span className="arrow-mark" aria-hidden="true">↗︎</span>
+                    {history.state === "live" ? "View this week’s Wikimedia events" : "Browse Wikipedia history"} <span className="arrow-mark" aria-hidden="true">↗︎</span>
                   </a>
                 </article>
               </div>
@@ -294,10 +293,10 @@ export async function Homepage() {
             <p>03 / Experiments</p>
             <div>
               <h2 id="experiments-title">
-                Small bets, unfinished ideas, and <em>useful mistakes.</em>
+                Things I’m trying <em>out.</em>
               </h2>
               <p className="section-supporting-copy">
-                Occasional work in progress, interface studies, and notes from making things. No schedule, just ideas worth keeping.
+                Side projects, interface studies, and notes from things I’m making.
               </p>
             </div>
           </div>
@@ -365,16 +364,12 @@ export async function Homepage() {
 
         <section className="about-section" id="about" tabIndex={-1} aria-labelledby="about-title">
           <p>04 / About</p>
-          <h2 id="about-title">
-            Engineer by trade.
-            <br />
-            <em>Curious by default.</em>
-          </h2>
+          <h2 id="about-title">A bit about me.</h2>
           <div className="about-copy">
             <div className="about-prose">
               <p>{profile.about}</p>
               <p className="about-supporting-copy">
-                I like software that respects the person using it: clear enough to understand, resilient when things go wrong, and considered down to the details.
+                I like software that respects the person using it: clear about what’s happening, dependable when things go wrong, and careful with the details.
               </p>
               <nav className="profile-links" aria-label="Profile links">
                 <a href="#contact">Start a conversation <span className="arrow-mark" aria-hidden="true">↓</span></a>
@@ -407,7 +402,7 @@ export async function Homepage() {
               <p>Career path</p>
               <div>
                 <h3 id="about-career-title">My career so far.</h3>
-                <span>From data and marketing, through AI model training, to software engineering.</span>
+                <span>I started in marketing and data, moved into AI model training, and now work in software engineering.</span>
               </div>
             </div>
             <ol aria-labelledby="about-career-title">
@@ -425,9 +420,9 @@ export async function Homepage() {
 
         <section id="contact" tabIndex={-1} className="contact-block contact-section" aria-labelledby="contact-title">
           <p>05 / Contact</p>
-          <h2 id="contact-title">Have a complex problem worth making simpler?</h2>
+          <h2 id="contact-title">Get in touch.</h2>
           <a className="contact-link" href={profile.links.email}>
-            Start a conversation <span className="arrow-mark" aria-hidden="true">↗︎</span>
+            Email me <span className="arrow-mark" aria-hidden="true">↗︎</span>
           </a>
           <span>eliasthebennett@gmail.com</span>
         </section>

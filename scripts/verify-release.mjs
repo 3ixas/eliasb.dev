@@ -231,23 +231,25 @@ function verifyHomepage(markup) {
   const text = plainText(markup);
   check(/Goodreads/i.test(text) && /(Currently reading|Last known book)/i.test(text), "Reading signal should identify Goodreads and the current or last known book");
   check(/Letterboxd/i.test(text) && /(Most recently watched|Last known film)/i.test(text), "Cinema signal should identify Letterboxd and the most recent or last known film");
-  check(text.includes("anonymous"), "Fantasy football output should keep opposing managers anonymous");
-  check(text.includes("Strava") || (text.includes("Typical week") && text.includes("Authored schedule")), "Training output should distinguish live activity from an authored typical week");
-  check(text.includes("rather than a live workout log") || /Strava activit(?:y|ies)/.test(text), "Training output should explain whether the displayed week is planned or logged");
+  check(/anonymous|managers’ names will stay private/i.test(text), "Fantasy football output should keep opposing managers anonymous");
+  check(text.includes("Strava") || (text.includes("Typical week") && text.includes("My weekly plan")), "Training output should distinguish live activity from an authored typical week");
+  check(text.includes("not a live workout log") || /Strava activit(?:y|ies)/.test(text), "Training output should explain whether the displayed week is planned or logged");
   check(text.includes("Wikimedia") || text.includes("fallback"), "History output should identify its live or fallback source");
-  check(/Stable fallback|Updated \d{1,2} [A-Z][a-z]{2,4}/.test(text), "Signal cards should expose visible freshness wording");
+  check(/Saved details|Waiting to connect|couldn’t fetch a live update|Updated \d{1,2} [A-Z][a-z]{2,4}|Wikimedia · cached/i.test(text), "Signal cards should expose visible freshness wording");
   check(["GitHub", "Goodreads", "Letterboxd", "Sleeper", "Wikimedia"].some((source) => text.includes(source)), "Signal cards should expose visible source wording");
   check(!/(ghp_|github_pat_|sk-[A-Za-z0-9]|STRAVA_CLIENT_SECRET)/i.test(text), "Rendered output must not contain credential-like values");
 
   const descriptions = [...markup.matchAll(/<span class="lab-description">([\s\S]*?)<\/span>/gi)]
     .map(([, description]) => plainText(description));
   check(descriptions.length >= 3 && descriptions.every((description) => description.length >= 60), "Long experiment descriptions should remain present in the rendered output");
+  check(text.includes("V1 of Professor Past"), "Professor Past should be identified as V1 without implying a rebuild request");
 
   const fantasyCard = markup.match(/<article class="signal signal-fantasy">([\s\S]*?)<\/article>/i)?.[1] ?? "";
   const fantasyStatus = fantasyCard.match(/<span class="signal-status" data-state="([^"]+)">([^<]*)<\/span>/i);
   check(fantasyStatus, "Fantasy football card should expose a signal state");
   if (fantasyStatus?.[1] === "pending") {
-    check(plainText(fantasyCard).includes("Sleeper pending"), "Pending fantasy state should show its Sleeper pending wording");
+    check(plainText(fantasyCard).includes("My league isn’t connected yet"), "Pending fantasy state should explain that the league is not connected yet");
+    check(plainText(fantasyCard).includes("Sleeper"), "Pending fantasy state should identify the intended data source");
     check(!hrefs(fantasyCard).some(({ href }) => href?.includes("sleeper.com")), "Pending fantasy state should not expose a Sleeper source link");
   }
   if (fantasyStatus?.[1] === "live") {

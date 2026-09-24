@@ -17,9 +17,9 @@ export default function WorkPage() {
       <PageHeader />
       <main id="main-content" tabIndex={-1}>
         <header className="work-index-hero">
-          <p>Work archive · {studies.length} case studies</p>
-          <h1>A growing collection of complex state made <em>understandable.</em></h1>
-          <span>Product decisions, system behaviour, and the details that help people trust what they see.</span>
+          <p>{studies.length} case studies</p>
+          <h1>A closer look at how I built these projects.</h1>
+          <span>What I set out to solve, the choices I made, and what I learned along the way.</span>
         </header>
         <ol className="work-index-list">
           {studies.map((study) => <WorkArchiveCard key={study.slug} study={study} />)}

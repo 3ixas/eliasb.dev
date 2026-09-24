@@ -28,18 +28,18 @@ export const signalFallbacks: HomepageSignals = {
   github: {
     state: "unavailable",
     statusLabel: "Public only",
-    headline: "Building eliasb.dev, again",
-    description: "Public GitHub activity is visible here; private contribution totals need the site token.",
+    headline: "Recent GitHub activity",
+    description: "The chart shows public contributions only.",
     activity: recentDates(371),
-    activityLabel: "Public GitHub activity over the last year",
+    activityLabel: "GitHub contributions over the last year are currently unavailable",
     updatedAt: null,
     href: "https://github.com/3ixas",
   },
   status: {
     state: "curated",
-    statusLabel: "Curated",
+    statusLabel: "A note from me",
     headline: "Probably thinking through an interface.",
-    description: "London · manually updated when the mood changes",
+    description: "A note from London, which I update from time to time.",
   },
   reading: {
     state: "curated",
@@ -55,8 +55,8 @@ export const signalFallbacks: HomepageSignals = {
   training: {
     state: "curated",
     statusLabel: "Typical week",
-    headline: "A typical training week",
-    description: "My usual plan for the week, rather than a live workout log.",
+    headline: "My usual training week",
+    description: "This is my usual plan, not a live workout log.",
     weekly: [
       { label: "Lift", count: 0 },
       { label: "Run", count: 0 },
@@ -70,9 +70,9 @@ export const signalFallbacks: HomepageSignals = {
   },
   fantasy: {
     state: "pending",
-    statusLabel: "Sleeper pending",
+    statusLabel: "My league isn’t connected yet",
     headline: "Main redraft league",
-    description: "The seasonal view is ready for an anonymised league connection.",
+    description: "I keep the other managers’ names private.",
     leftLabel: "EB",
     matchupLabel: "in season",
     rightLabel: "—",

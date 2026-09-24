@@ -6,11 +6,11 @@ const isIndexable = process.env.SITE_INDEXABLE === "true";
 export const metadata: Metadata = {
   metadataBase: new URL("https://eliasb.dev"),
   title: {
-    default: "Elias B. — Thoughtful software for complex problems",
+    default: "Elias B. — Software that makes complex things easier to understand",
     template: "%s · Elias B.",
   },
   description:
-    "The work, experiments, interests, and current signals of London-based software engineer Elias Bennett.",
+    "Projects, ideas, and interests from Elias Bennett, a software engineer in London.",
   alternates: {
     canonical: "/",
   },
@@ -22,15 +22,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Elias B.",
-    title: "Elias B. — Thoughtful software for complex problems",
+    title: "Elias B. — Software that makes complex things easier to understand",
     description:
-      "The work, experiments, interests, and current signals of London-based software engineer Elias Bennett.",
+      "Projects, ideas, and interests from Elias Bennett, a software engineer in London.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Elias B. — Thoughtful software for complex problems",
+    title: "Elias B. — Software that makes complex things easier to understand",
     description:
-      "The work, experiments, interests, and current signals of London-based software engineer Elias Bennett.",
+      "Projects, ideas, and interests from Elias Bennett, a software engineer in London.",
     images: ["/opengraph-image"],
   },
   robots: { index: isIndexable, follow: isIndexable },

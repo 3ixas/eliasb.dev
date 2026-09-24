@@ -3,10 +3,10 @@ export const labItems = [
     index: "01",
     status: "Public experiment",
     title: "Ask Professor Past",
-    kind: "History · Character · AI",
+    kind: "History experiment",
     description:
-      "A personality-led history chatbot that turns a search-shaped question into a conversation with an eccentric professor.",
-    note: "The original experiment is live. A more deliberate rebuild is currently at the specification and visual-system stage.",
+      "This is V1 of Professor Past: a history chatbot where you can ask an eccentric professor about the past.",
+    note: "This is the first version of the Professor Past project: the original history chatbot, built around an eccentric professor.",
     liveUrl: undefined,
     codeUrl: "https://github.com/3ixas/ask-professor-past",
     treatment: "professor",
@@ -19,8 +19,8 @@ export const labItems = [
     title: "Fantasy football models",
     kind: "Football · Data · Prediction",
     description:
-      "A home for matchup views, rankings, draft tools, and eventually a small prediction model built around one Sleeper redraft league.",
-    note: "The live homepage matchup is connected and the other managers stay anonymous. Rankings and prediction experiments can grow here without presenting guesses as certainty.",
+      "I’m exploring matchup views, rankings, and draft tools for my Sleeper redraft league, with a small prediction model as a possible next step.",
+    note: "The homepage shows the live matchup when Sleeper is connected. I keep the other managers anonymous, and I’m still experimenting with rankings and predictions.",
     liveUrl: undefined,
     codeUrl: undefined,
     treatment: "fantasy",
@@ -33,8 +33,8 @@ export const labItems = [
     title: "Interface studies",
     kind: "Interaction · Craft · Notes",
     description:
-      "Small studies of states, controls, motion, and recovery—the parts of an interface that usually decide whether a product feels considered.",
-    note: "Studies will appear when there is a real decision, failed direction, or reusable lesson worth preserving.",
+      "Small interface studies about states, controls, motion, and the details that make a product easier to use.",
+    note: "I’ll add a study when there’s a decision or lesson worth sharing, including ideas that didn’t work.",
     liveUrl: undefined,
     codeUrl: undefined,
     treatment: "interface",
@@ -48,18 +48,18 @@ export const journey = [
     label: "Earlier",
     title: "Data and marketing",
     description:
-      "I started in marketing, close to data, experiments, and the question of why one experience earns attention while another loses it.",
+      "I started in marketing, working with data and experiments. I became curious about why some experiences worked better than others.",
   },
   {
     label: "Then",
     title: "AI model training",
     description:
-      "Training and evaluating code for language models made precision matter in a different way. A plausible answer was never enough if the reasoning or code did not hold up.",
+      "Training and evaluating code for language models taught me to check whether an answer actually holds up. A plausible response was not enough if its reasoning or code was wrong.",
   },
   {
     label: "Now",
     title: "Software engineering",
     description:
-      "Today I build high-performance pricing and risk software in C#, alongside personal products in TypeScript and Python. The common thread is making complicated behaviour easier to reason about.",
+      "Today I build high-performance pricing and risk software in C#, alongside personal products in TypeScript and Python.",
   },
 ] as const;

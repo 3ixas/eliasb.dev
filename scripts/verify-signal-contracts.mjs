@@ -52,25 +52,25 @@ const signalPresentationFixtures = [
     name: "cached",
     signal: { state: "live", statusLabel: "Wikimedia · cached", updatedAt: null },
     source: { label: "Wikimedia", href: "https://en.wikipedia.org/wiki/Portal:History" },
-    expected: { status: "Wikimedia · cached", freshness: "Cached for seven days", source: "Wikimedia" },
+    expected: { status: "Wikimedia · cached", freshness: "Cached for up to seven days", source: "Wikimedia" },
   },
   {
     name: "authored",
     signal: { state: "curated", statusLabel: "Typical week", updatedAt: null },
-    source: { label: "Authored schedule", href: null },
-    expected: { status: "Typical week", freshness: "Stable fallback", source: "Authored schedule" },
+    source: { label: "My weekly plan", href: null },
+    expected: { status: "Typical week", freshness: "Saved details", source: "My weekly plan" },
   },
   {
     name: "fantasy-pending",
     signal: fantasyPendingSignal,
-    source: { label: "Sleeper pending", href: null },
-    expected: { status: "Sleeper pending", freshness: "Awaiting connection", source: "Sleeper pending" },
+    source: { label: "Sleeper", href: null },
+    expected: { status: "My league isn’t connected yet", freshness: "Waiting to connect", source: "Sleeper" },
   },
   {
     name: "unavailable",
     signal: { state: "unavailable", statusLabel: "Public only", updatedAt: null },
-    source: { label: "GitHub fallback", href: signalFallbacks.github.href },
-    expected: { status: "Public only", freshness: "Stable fallback", source: "GitHub fallback" },
+    source: { label: "GitHub activity", href: signalFallbacks.github.href },
+    expected: { status: "Public only", freshness: "I couldn’t fetch a live update", source: "GitHub activity" },
   },
 ];
 
@@ -95,7 +95,7 @@ for (const fixture of signalPresentationFixtures) {
 
 const fantasyPendingMarkup = renderToStaticMarkup(createElement(SignalPresentation, {
   signal: fantasyPendingSignal,
-  source: { label: "Sleeper pending", href: null },
+  source: { label: "Sleeper", href: null },
 }));
 assert.equal(fantasyPendingMarkup.includes("href="), false, "Pending fantasy presenter should not expose a source href");
 assert.equal(fantasyPendingMarkup.includes("<a "), false, "Pending fantasy presenter should not expose a Sleeper link");
