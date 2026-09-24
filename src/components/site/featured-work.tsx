@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { CaseStudy } from "@/content/case-studies";
+import { caseStudies, type CaseStudy } from "@/content/case-studies";
 import { featuredProjects } from "@/content/site";
 import type { HomepageProject } from "@/content/site";
 
@@ -32,8 +32,10 @@ function ProjectLinks({ project }: { project: HomepageProject }) {
 }
 
 function FeaturedProject({ project, priority }: { project: HomepageProject; priority: boolean }) {
+  const study = caseStudies[project.slug];
+
   return (
-    <article className="project-feature">
+    <article className={`project-feature project-feature--${project.slug}`}>
       <Link
         className="project-visual"
         href={caseStudyHref(project)}
@@ -53,12 +55,17 @@ function FeaturedProject({ project, priority }: { project: HomepageProject; prio
         <p className="project-type">{project.eyebrow}</p>
         <h3>{project.name}</h3>
         <p>{project.description}</p>
-        {project.detail && <p className="project-detail">{project.detail}</p>}
         {project.qualities && (
           <ul aria-label={`${project.name} qualities`}>
             {project.qualities.map((quality) => <li key={quality}>{quality}</li>)}
           </ul>
         )}
+        <dl className="project-stack">
+          <div>
+            <dt>Built with</dt>
+            <dd>{study.stack.join(" · ")}</dd>
+          </div>
+        </dl>
         <ProjectLinks project={project} />
       </div>
     </article>

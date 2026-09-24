@@ -153,17 +153,36 @@ button { color: inherit; font: inherit; }
 .featured-work-list .project-feature:nth-child(even) .project-visual { grid-column: 2; grid-row: 1; }
 .featured-work-list .project-feature:nth-child(even) .project-copy { grid-column: 1; grid-row: 1; }
 .project-visual { position: relative; overflow: hidden; background: var(--soft); border-radius: var(--radius); }
-.project-visual img { display: block; width: 100%; height: auto; transition: transform 1s cubic-bezier(.2,.8,.2,1); }
-.project-visual:hover img { transform: scale(1.018); }
+.project-visual img { display: block; width: 100%; height: auto; transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+.project-visual:focus-visible img { transform: scale(1.018); }
 .project-index { position: absolute; top: 14px; right: 14px; display: grid; width: 38px; height: 38px; place-items: center; color: #f4f0e7; background: #151512; border-radius: 50%; font: 10px/1 var(--mono); }
-.project-copy { position: sticky; top: 88px; }
+.project-copy { position: sticky; top: 88px; transition: border-color .28s ease, box-shadow .28s ease; }
 .project-copy h3 { margin: 18px 0 24px; font: 400 clamp(48px, 6vw, 92px)/.9 var(--display); letter-spacing: -.055em; }
 .project-copy > p:not(.project-type) { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.6; }
-.project-copy > p.project-detail { margin-top: 18px; color: var(--muted); font: 10px/1.5 var(--mono); letter-spacing: .04em; }
 .project-copy ul { margin: 35px 0; padding: 0; border-top: 1px solid var(--line); list-style: none; }
 .project-copy li { padding: 10px 0; border-bottom: 1px solid var(--line); font: 10px/1.3 var(--mono); text-transform: uppercase; }
+.project-stack { margin: 34px 0 40px; padding: 16px 0; border-block: 1px solid var(--line); }
+.project-stack > div { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 14px; align-items: baseline; }
+.project-stack dt { color: var(--project-accent); font: 9px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.project-stack dd { margin: 0; color: var(--muted); font: 11px/1.65 var(--mono); }
 .project-links { display: flex; flex-wrap: wrap; gap: 20px; }
 .project-links a { display: inline-block; padding-bottom: 4px; border-bottom: 1px solid currentColor; font-size: 13px; }
+.project-feature--threshold { --project-accent: #1e6b58; }
+.project-feature--argus-risk { --project-accent: #496b91; }
+.project-feature--flowtime { --project-accent: #6a599f; }
+:root[data-theme="dark"] .project-feature--threshold { --project-accent: #67c5a7; }
+:root[data-theme="dark"] .project-feature--argus-risk { --project-accent: #8eb6e0; }
+:root[data-theme="dark"] .project-feature--flowtime { --project-accent: #b8a8ef; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .project-feature--threshold { --project-accent: #67c5a7; }
+  :root:not([data-theme="light"]) .project-feature--argus-risk { --project-accent: #8eb6e0; }
+  :root:not([data-theme="light"]) .project-feature--flowtime { --project-accent: #b8a8ef; }
+}
+.project-feature:focus-within .project-copy { border-color: var(--project-accent); box-shadow: 5px 6px 0 color-mix(in srgb, var(--project-accent) 34%, transparent); }
+@media (hover: hover) and (pointer: fine) {
+  .project-feature:hover .project-copy { border-color: var(--project-accent); box-shadow: 5px 6px 0 color-mix(in srgb, var(--project-accent) 34%, transparent); }
+  .project-visual:hover img { transform: scale(1.018); }
+}
 .project-rail { margin-top: clamp(70px, 10vw, 140px); border-top: 1px solid var(--line); }
 .project-rail article { display: grid; grid-template-columns: .2fr 1fr 1fr; gap: 20px; align-items: center; min-height: 120px; border-bottom: 1px solid var(--line); }
 .project-rail article > span, .project-rail article > p, .project-rail article div p { color: var(--muted); font: 10px/1.3 var(--mono); text-transform: uppercase; }
@@ -343,7 +362,7 @@ button { color: inherit; font: inherit; }
 .prototype-cabinet-of-curiosities .concept-thesis span { color: #125344; }
 .prototype-cabinet-of-curiosities .work-section, .prototype-cabinet-of-curiosities .currently-section, .prototype-cabinet-of-curiosities .lab-section, .prototype-cabinet-of-curiosities .library-section, .prototype-cabinet-of-curiosities .about-section, .prototype-cabinet-of-curiosities .contact-section { margin: 18px; background: var(--paper); border: 1px solid var(--ink); border-radius: 12px; box-shadow: 7px 7px 0 var(--ink); }
 .prototype-cabinet-of-curiosities .project-visual { padding: 10px 10px 34px; background: #faf7ee; box-shadow: 10px 12px 0 color-mix(in srgb, var(--ink) 17%, transparent); transform: rotate(-1.5deg); }
-.prototype-cabinet-of-curiosities .project-copy { padding: 25px; color: var(--ink); background: color-mix(in srgb, var(--accent) 14%, var(--paper)); border: 1px solid var(--ink); border-radius: 7px; transform: rotate(1deg); }
+.prototype-cabinet-of-curiosities .project-copy { padding: 25px; color: var(--ink); background: color-mix(in srgb, var(--project-accent) 14%, var(--paper)); border: 1px solid var(--ink); border-top: 3px solid var(--project-accent); border-radius: 7px; transform: rotate(1deg); }
 .prototype-cabinet-of-curiosities .project-copy li,
 .prototype-cabinet-of-curiosities .project-copy .project-links a { color: var(--ink); }
 .prototype-cabinet-of-curiosities .project-rail { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; border: 0; }

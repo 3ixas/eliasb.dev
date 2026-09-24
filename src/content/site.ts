@@ -26,7 +26,6 @@ export type HomepageProject = {
   eyebrow: string;
   thesis?: string;
   description: string;
-  detail?: string;
   image: string;
   imageAlt: string;
   codeUrl: string;
@@ -65,7 +64,6 @@ export const projects = [
     eyebrow: "Event-driven systems",
     description:
       "A local educational simulator for a multi-currency risk platform. It follows simulated market data and trades through the system and shows their effect on a portfolio dashboard.",
-    detail: "C# · .NET · Kafka · PostgreSQL · SignalR · Next.js",
     image: "/work/argus/overview.webp",
     imageAlt: "Argus Risk interface showing event-driven risk positions",
     codeUrl: "https://github.com/3ixas/argus-risk",
@@ -79,7 +77,6 @@ export const projects = [
     eyebrow: "Offline-first interaction",
     description:
       "A focus timer that keeps session history on your device and adapts breaks to the time you worked. It stays accurate through sleeping tabs, closed browsers, and interruptions.",
-    detail: "Next.js · TypeScript · localStorage · Service Worker",
     image: "/work/flowtime/timer.jpg",
     imageAlt: "Flowtime focus timer interface",
     liveUrl: "https://flowtime-focus-timer.vercel.app",

@@ -35,7 +35,16 @@ export const caseStudies = {
     summary:
       "Threshold gathers the costs of moving into one scenario: cash needed upfront, monthly spending, and the gap between current savings and a chosen move.",
     role: "Independent product, design, data modelling, and frontend engineering",
-    stack: ["React 19", "TypeScript", "MapLibre", "URLSearchParams", "Vitest"],
+    stack: [
+      "React 19",
+      "TypeScript",
+      "Vite",
+      "React Router",
+      "React Map GL",
+      "MapLibre GL JS",
+      "URLSearchParams",
+      "Vitest",
+    ],
     liveUrl: "https://threshold-beta.vercel.app",
     codeUrl: "https://github.com/3ixas/threshold",
     hero: {
