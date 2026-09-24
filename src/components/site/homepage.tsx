@@ -250,14 +250,18 @@ export async function Homepage() {
               <div>
                 <article className="history-card">
                   <span>{history.dateLabel}</span>
-                  <div className="history-events">
+                  <ol className="history-events" aria-label="Historical moments">
                     {history.events.map((event) => (
-                      <p key={`${event.year}-${event.text}`}>
-                        <strong>{event.year}</strong> {event.text}
-                        <a href={event.sourceUrl} target="_blank" rel="noreferrer">Source <span className="arrow-mark" aria-hidden="true">↗︎</span></a>
-                      </p>
+                      <li className="history-event" key={`${event.year}-${event.kind}-${event.text}`}>
+                        <div className="history-event-meta">
+                          <span className="history-event-kind">{event.kind === "birth" ? "Born" : "On this day"}</span>
+                          <strong>{event.year}</strong>
+                        </div>
+                        <p>{event.text}</p>
+                        <a href={event.sourceUrl} target="_blank" rel="noreferrer">Read the record <span className="arrow-mark" aria-hidden="true">↗︎</span></a>
+                      </li>
                     ))}
-                  </div>
+                  </ol>
                   <small>{history.description}</small>
                   <a className="history-source" href={history.sourceUrl} target="_blank" rel="noreferrer">
                     {history.state === "live" ? "View this week’s Wikimedia events" : "Browse Wikipedia history"} <span className="arrow-mark" aria-hidden="true">↗︎</span>

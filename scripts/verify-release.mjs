@@ -241,6 +241,18 @@ function verifyHomepage(markup) {
     check((trainingCard.match(/class="training-day"/g) ?? []).length === 7, "Authored training schedule should retain all seven days");
   }
   check(text.includes("Wikimedia") || text.includes("fallback"), "History output should identify its live or fallback source");
+  const historyCard = markup.match(/<article class="history-card">([\s\S]*?)<\/article>/i)?.[1] ?? "";
+  const historyEvents = [...historyCard.matchAll(/<li class="history-event">([\s\S]*?)<\/li>/gi)].map(([, event]) => event);
+  equal(historyEvents.length, 3, "History should show three historical moments");
+  const historyYears = historyEvents.map((event) => Number(event.match(/<strong\b[^>]*>(\d{1,4})<\/strong>/i)?.[1] ?? 0));
+  check(historyYears.every((year) => year > 0), "Each history moment should show its year");
+  check(new Set(historyYears.map((year) => Math.floor((year - 1) / 100))).size >= 3, "History should span at least three centuries");
+  check(historyYears.some((year) => year < 1900), "History should include a moment before 1900");
+  for (const event of historyEvents) {
+    const record = hrefs(event).find(({ href }) => href?.startsWith("https://"));
+    check(record, "Each history moment should link directly to its source");
+    check(plainText(event).includes("Read the record"), "Each history source link should have a clear label");
+  }
   check(/Saved details|Waiting to connect|couldn’t fetch a live update|Updated \d{1,2} [A-Z][a-z]{2,4}|Wikimedia · cached/i.test(text), "Signal cards should expose visible freshness wording");
   check(["GitHub", "Goodreads", "Letterboxd", "Sleeper", "Wikimedia"].some((source) => text.includes(source)), "Signal cards should expose visible source wording");
   check(!/(ghp_|github_pat_|sk-[A-Za-z0-9]|STRAVA_CLIENT_SECRET)/i.test(text), "Rendered output must not contain credential-like values");
