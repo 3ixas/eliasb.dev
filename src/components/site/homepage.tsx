@@ -83,16 +83,10 @@ export async function Homepage() {
                 >
                   <strong>{signals.github.headline}</strong>
                   <span>{signals.github.description}</span>
-                  {signals.github.totalContributions !== undefined && (
-                    <div className="signal-metrics" aria-label="GitHub contribution totals">
-                      <b>{signals.github.totalContributions}</b>
-                      <span>contributions</span>
-                      {signals.github.privateContributions !== undefined && (
-                        <>
-                          <b>{signals.github.privateContributions}</b>
-                          <span>private</span>
-                        </>
-                      )}
+                  {signals.github.privateContributions !== undefined && (
+                    <div className="signal-metrics" role="group" aria-label="Private contribution count">
+                      <b>{signals.github.privateContributions}</b>
+                      <span>private</span>
                     </div>
                   )}
                   <div className="activity-trace" role="img" aria-label={signals.github.activityLabel}>
