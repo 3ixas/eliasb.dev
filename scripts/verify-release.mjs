@@ -233,7 +233,13 @@ function verifyHomepage(markup) {
   check(/Letterboxd/i.test(text) && /(Most recently watched|Last known film)/i.test(text), "Cinema signal should identify Letterboxd and the most recent or last known film");
   check(/anonymous|managers’ names will stay private/i.test(text), "Fantasy football output should keep opposing managers anonymous");
   check(text.includes("Strava") || (text.includes("Typical week") && text.includes("My weekly plan")), "Training output should distinguish live activity from an authored typical week");
-  check(text.includes("not a live workout log") || /Strava activit(?:y|ies)/.test(text), "Training output should explain whether the displayed week is planned or logged");
+  const trainingCard = markup.match(/<article class="signal signal-training">([\s\S]*?)<\/article>/i)?.[1] ?? "";
+  const trainingText = plainText(trainingCard);
+  if (trainingText.includes("My weekly training plan")) {
+    check(trainingText.includes("Maintained by hand"), "Authored training schedule should explain how it is maintained");
+    check(!/not a live workout log|usual plan/i.test(trainingText), "Authored training schedule should not repeat its static-plan disclaimer");
+    check((trainingCard.match(/class="training-day"/g) ?? []).length === 7, "Authored training schedule should retain all seven days");
+  }
   check(text.includes("Wikimedia") || text.includes("fallback"), "History output should identify its live or fallback source");
   check(/Saved details|Waiting to connect|couldn’t fetch a live update|Updated \d{1,2} [A-Z][a-z]{2,4}|Wikimedia · cached/i.test(text), "Signal cards should expose visible freshness wording");
   check(["GitHub", "Goodreads", "Letterboxd", "Sleeper", "Wikimedia"].some((source) => text.includes(source)), "Signal cards should expose visible source wording");
@@ -247,6 +253,10 @@ function verifyHomepage(markup) {
   const fantasyCard = markup.match(/<article class="signal signal-fantasy">([\s\S]*?)<\/article>/i)?.[1] ?? "";
   const fantasyStatus = fantasyCard.match(/<span class="signal-status" data-state="([^"]+)">([^<]*)<\/span>/i);
   check(fantasyStatus, "Fantasy football card should expose a signal state");
+  const fantasyText = plainText(fantasyCard);
+  check(fantasyText.includes("Weekly matchup"), "Fantasy football card should label the matchup");
+  check(fantasyText.includes("My team") && fantasyText.includes("Opponent"), "Fantasy matchup should identify whose scores are shown");
+  check(!fantasyText.includes("NFL · week 1"), "Fantasy matchup should not show a hard-coded week");
   if (fantasyStatus?.[1] === "pending") {
     check(plainText(fantasyCard).includes("My league isn’t connected yet"), "Pending fantasy state should explain that the league is not connected yet");
     check(plainText(fantasyCard).includes("Sleeper"), "Pending fantasy state should identify the intended data source");
@@ -254,6 +264,7 @@ function verifyHomepage(markup) {
   }
   if (fantasyStatus?.[1] === "live") {
     check(hrefs(fantasyCard).some(({ href }) => href?.includes("sleeper.com")), "Live fantasy state should retain its Sleeper source link");
+    check(/Week \d+/.test(fantasyText), "Live fantasy matchup should show the current source week");
   }
 
   const sourceHosts = ["github.com", "goodreads.com", "letterboxd.com", "wikipedia.org"];

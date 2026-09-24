@@ -9,7 +9,8 @@ import {
   startOfUtcWeek,
 } from "../src/integrations/signal-mappers.ts";
 import { integrationConfig } from "../src/content/integration-config.ts";
-import { signalFallbacks } from "../src/content/signal-fallbacks.ts";
+import { fantasySourceUnavailable, fantasyWeekUnavailable, signalFallbacks } from "../src/content/signal-fallbacks.ts";
+import { FantasyMatchup } from "../src/components/site/fantasy-matchup.ts";
 import { SignalPresentation } from "../src/components/site/signal-presentation.ts";
 
 const now = new Date("2026-09-16T12:00:00.000Z");
@@ -26,27 +27,27 @@ assert.match(signalFallbacks.culture.description, /when the feed last updated/i)
 const fantasyLiveSignal = {
   ...signalFallbacks.fantasy,
   state: "live",
-  statusLabel: "Live · week 1",
+  statusLabel: "Live",
   headline: "1–0 this season",
-  description: "The showcase matchup is live; every other manager remains anonymous.",
-  leftLabel: "EB 112.4",
-  matchupLabel: "week 1",
-  rightLabel: "OPP 98.7",
-  leftScore: 112.4,
-  rightScore: 98.7,
+  description: "I share my score here; the other managers’ names stay private.",
+  matchupLabel: "Week 1",
+  teamScore: 112.4,
+  opponentScore: 98.7,
   updatedAt: "2026-09-22T12:00:00.000Z",
   href: sleeperHref,
 };
 
 /** @type {import("../src/integrations/types.ts").FantasySignal} */
 const fantasyPendingSignal = signalFallbacks.fantasy;
+const fantasyWeekUnavailableSignal = fantasyWeekUnavailable(sleeperHref);
+const fantasySourceUnavailableSignal = fantasySourceUnavailable(sleeperHref, 3);
 
 const signalPresentationFixtures = [
   {
     name: "fantasy-live",
     signal: fantasyLiveSignal,
     source: { label: "Sleeper", href: sleeperHref },
-    expected: { status: "Live · week 1", freshness: "Updated 22 Sep", source: "Sleeper" },
+    expected: { status: "Live", freshness: "Updated 22 Sep", source: "Sleeper" },
   },
   {
     name: "cached",
@@ -58,13 +59,20 @@ const signalPresentationFixtures = [
     name: "authored",
     signal: { state: "curated", statusLabel: "Typical week", updatedAt: null },
     source: { label: "My weekly plan", href: null },
-    expected: { status: "Typical week", freshness: "Saved details", source: "My weekly plan" },
+    authoredLabel: "Maintained by hand",
+    expected: { status: "Typical week", freshness: "Maintained by hand", source: "My weekly plan" },
   },
   {
     name: "fantasy-pending",
     signal: fantasyPendingSignal,
     source: { label: "Sleeper", href: null },
     expected: { status: "My league isn’t connected yet", freshness: "Waiting to connect", source: "Sleeper" },
+  },
+  {
+    name: "fantasy-source-unavailable",
+    signal: fantasySourceUnavailableSignal,
+    source: { label: "Sleeper", href: sleeperHref },
+    expected: { status: "Sleeper unavailable", freshness: "I couldn’t fetch a live update", source: "Sleeper" },
   },
   {
     name: "unavailable",
@@ -74,12 +82,13 @@ const signalPresentationFixtures = [
   },
 ];
 
-assert.deepEqual(signalPresentationFixtures.map(({ name }) => name), ["fantasy-live", "cached", "authored", "fantasy-pending", "unavailable"]);
+assert.deepEqual(signalPresentationFixtures.map(({ name }) => name), ["fantasy-live", "cached", "authored", "fantasy-pending", "fantasy-source-unavailable", "unavailable"]);
 for (const fixture of signalPresentationFixtures) {
   assert.ok(signalStates.has(fixture.signal.state), `${fixture.name} fixture should use a shared signal state`);
   const markup = renderToStaticMarkup(createElement(SignalPresentation, {
     signal: fixture.signal,
     source: fixture.source,
+    authoredLabel: fixture.authoredLabel,
   }));
   const visibleText = markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
   assert.match(markup, new RegExp(`data-state="${fixture.signal.state}"`), `${fixture.name} fixture should expose its state`);
@@ -99,6 +108,24 @@ const fantasyPendingMarkup = renderToStaticMarkup(createElement(SignalPresentati
 }));
 assert.equal(fantasyPendingMarkup.includes("href="), false, "Pending fantasy presenter should not expose a source href");
 assert.equal(fantasyPendingMarkup.includes("<a "), false, "Pending fantasy presenter should not expose a Sleeper link");
+
+const unavailableWeekMarkup = renderToStaticMarkup(createElement(SignalPresentation, {
+  signal: fantasyWeekUnavailableSignal,
+  source: { label: "Sleeper", href: fantasyWeekUnavailableSignal.href },
+}));
+assert.match(unavailableWeekMarkup, /Week data unavailable/);
+assert.match(unavailableWeekMarkup, new RegExp(`href="${sleeperHref}"`));
+assert.equal(unavailableWeekMarkup.includes("My league isn’t connected yet"), false, "A missing week should not imply the league is disconnected");
+
+
+const liveMatchupMarkup = renderToStaticMarkup(createElement(FantasyMatchup, { signal: fantasyLiveSignal }));
+assert.match(liveMatchupMarkup, /Weekly matchup[\s\S]*Week 1/);
+assert.match(liveMatchupMarkup, /My team[\s\S]*112\.4[\s\S]*Opponent[\s\S]*98\.7/);
+assert.match(liveMatchupMarkup, /class="matchup-bars"/, "Known scores should have a visual score comparison");
+
+const pendingMatchupMarkup = renderToStaticMarkup(createElement(FantasyMatchup, { signal: fantasyPendingSignal }));
+assert.match(pendingMatchupMarkup, /My team[\s\S]*—[\s\S]*Opponent[\s\S]*—/);
+assert.equal(pendingMatchupMarkup.includes('class="matchup-bars"'), false, "Unknown scores should not imply an equal matchup");
 
 assert.equal(GITHUB_ACTIVITY_DAYS, 371);
 assert.equal(signalFallbacks.github.activity.length, GITHUB_ACTIVITY_DAYS);

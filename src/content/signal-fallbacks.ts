@@ -1,4 +1,4 @@
-import type { HomepageSignals } from "@/integrations/types";
+import type { FantasySignal, HomepageSignals } from "@/integrations/types";
 
 function recentDates(length: number) {
   const today = new Date();
@@ -55,8 +55,8 @@ export const signalFallbacks: HomepageSignals = {
   training: {
     state: "curated",
     statusLabel: "Typical week",
-    headline: "My usual training week",
-    description: "This is my usual plan, not a live workout log.",
+    headline: "My weekly training plan",
+    description: "I update this plan by hand.",
     weekly: [
       { label: "Lift", count: 0 },
       { label: "Run", count: 0 },
@@ -72,10 +72,8 @@ export const signalFallbacks: HomepageSignals = {
     state: "pending",
     statusLabel: "My league isn’t connected yet",
     headline: "Main redraft league",
-    description: "I keep the other managers’ names private.",
-    leftLabel: "EB",
-    matchupLabel: "in season",
-    rightLabel: "—",
+    description: "I’ll show my score here when the league connects; other managers’ names stay private.",
+    matchupLabel: "Week unavailable",
     updatedAt: null,
   },
   culture: {
@@ -94,3 +92,42 @@ export const signalFallbacks: HomepageSignals = {
     updatedAt: null,
   },
 };
+
+function unavailableFantasySignal({
+  href,
+  statusLabel,
+  description,
+  matchupLabel,
+}: {
+  href: string;
+  statusLabel: string;
+  description: string;
+  matchupLabel: string;
+}): FantasySignal {
+  return {
+    ...signalFallbacks.fantasy,
+    state: "unavailable",
+    statusLabel,
+    description,
+    matchupLabel,
+    href,
+  };
+}
+
+export function fantasyWeekUnavailable(href: string): FantasySignal {
+  return unavailableFantasySignal({
+    href,
+    statusLabel: "Week data unavailable",
+    description: "Sleeper hasn’t returned the current week yet; I keep the other managers’ names private.",
+    matchupLabel: "Week unavailable",
+  });
+}
+
+export function fantasySourceUnavailable(href: string, week?: number): FantasySignal {
+  return unavailableFantasySignal({
+    href,
+    statusLabel: "Sleeper unavailable",
+    description: "Sleeper hasn’t returned the current matchup; the other managers’ names stay private.",
+    matchupLabel: week ? `Week ${week}` : "Week unavailable",
+  });
+}

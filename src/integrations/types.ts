@@ -80,11 +80,9 @@ export type CultureSignal = PersonalSignal & {
 };
 
 export type FantasySignal = PersonalSignal & {
-  leftLabel: string;
   matchupLabel: string;
-  rightLabel: string;
-  leftScore?: number;
-  rightScore?: number;
+  teamScore?: number;
+  opponentScore?: number;
   updatedAt: string | null;
 };
 

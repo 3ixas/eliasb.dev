@@ -14,11 +14,11 @@ function isCached(signal: PresentedSignal) {
   return /cached/i.test(signal.statusLabel);
 }
 
-export function formatSignalFreshness(signal: PresentedSignal) {
+export function formatSignalFreshness(signal: PresentedSignal, authoredLabel?: string) {
   if (isCached(signal)) return "Cached for up to seven days";
   if (signal.state === "pending") return "Waiting to connect";
   if (signal.state === "unavailable") return "I couldn’t fetch a live update";
-  if (!signal.updatedAt) return "Saved details";
+  if (!signal.updatedAt) return authoredLabel ?? "Saved details";
 
   const date = new Date(signal.updatedAt);
   if (Number.isNaN(date.getTime())) return "Update time unavailable";
@@ -40,21 +40,25 @@ export function SignalStatus({ signal }: { signal: PresentedSignal }) {
 
 export function SignalFreshness({
   signal,
+  authoredLabel,
   className = "signal-freshness",
 }: {
   signal: PresentedSignal;
+  authoredLabel?: string;
   className?: string;
 }) {
-  return createElement("span", { className }, formatSignalFreshness(signal));
+  return createElement("span", { className }, formatSignalFreshness(signal, authoredLabel));
 }
 
 export function SignalFootnote({
   signal,
   source,
+  authoredLabel,
   className = "signal-footnote",
 }: {
   signal: PresentedSignal;
   source: SignalSource;
+  authoredLabel?: string;
   className?: string;
 }) {
   const sourceElement = source.href
@@ -70,17 +74,19 @@ export function SignalFootnote({
     "div",
     { className },
     sourceElement,
-    createElement(SignalFreshness, { signal }),
+    createElement(SignalFreshness, { signal, authoredLabel }),
   );
 }
 
 export function SignalPresentation({
   signal,
   source,
+  authoredLabel,
   children,
 }: {
   signal: PresentedSignal;
   source: SignalSource;
+  authoredLabel?: string;
   children?: ReactNode;
 }) {
   return createElement(
@@ -88,6 +94,6 @@ export function SignalPresentation({
     null,
     createElement(SignalStatus, { signal }),
     children,
-    createElement(SignalFootnote, { signal, source }),
+    createElement(SignalFootnote, { signal, source, authoredLabel }),
   );
 }

@@ -3,6 +3,8 @@ import Link from "next/link";
 import { LocalTime } from "@/components/local-time";
 import { ClosableDetails } from "@/components/site/closable-details";
 import { FeaturedWork } from "@/components/site/featured-work";
+import { FantasyMatchup } from "@/components/site/fantasy-matchup";
+import { InViewMotion } from "@/components/site/in-view-motion";
 import {
   SignalFreshness,
   SignalPresentation,
@@ -24,18 +26,9 @@ function activityLevel(count: number) {
   return "0";
 }
 
-function scoreWidth(left?: number, right?: number) {
-  if (!left && !right) return { left: "50%", right: "50%" };
-  const total = (left ?? 0) + (right ?? 0);
-  if (!total) return { left: "50%", right: "50%" };
-  return {
-    left: `${Math.max(12, Math.round(((left ?? 0) / total) * 100))}%`,
-    right: `${Math.max(12, Math.round(((right ?? 0) / total) * 100))}%`,
-  };
-}
-
 export async function Homepage() {
   const [signals, history] = await Promise.all([getHomepageSignals(), getHistorySignal()]);
+  const hasAuthoredTrainingSchedule = signals.training.state === "curated" && Boolean(signals.training.schedule);
 
   return (
     <div className="prototype prototype-cabinet-of-curiosities selected-experience" id="top" tabIndex={-1}>
@@ -117,6 +110,7 @@ export async function Homepage() {
                 <p>Training</p>
                 <SignalPresentation
                   signal={signals.training}
+                  authoredLabel={hasAuthoredTrainingSchedule ? "Maintained by hand" : undefined}
                   source={{
                     label: signals.training.href ? "Strava" : "My weekly plan",
                     href: signals.training.href,
@@ -124,14 +118,16 @@ export async function Homepage() {
                 >
                   <strong>{signals.training.headline}</strong>
                   {signals.training.schedule ? (
-                    <div className="training-schedule" role="group" aria-label={`${signals.training.windowLabel} training schedule`}>
-                      {signals.training.schedule.map((day) => (
-                        <div className="training-day" key={day.day}>
-                          <b>{day.day}</b>
-                          <span>{day.activity}</span>
-                        </div>
-                      ))}
-                    </div>
+                    <InViewMotion>
+                      <div className="training-schedule" role="group" aria-label={`${signals.training.windowLabel} training schedule`}>
+                        {signals.training.schedule.map((day) => (
+                          <div className="training-day" key={day.day}>
+                            <b>{day.day}</b>
+                            <span>{day.activity}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </InViewMotion>
                   ) : (
                     <div className="training-rhythm" aria-label={`${signals.training.windowLabel} training by type`}>
                       {signals.training.weekly.map((category) => (
@@ -143,7 +139,7 @@ export async function Homepage() {
                       ))}
                     </div>
                   )}
-                  <span>{signals.training.description}</span>
+                  {!hasAuthoredTrainingSchedule && <span>{signals.training.description}</span>}
                 </SignalPresentation>
               </article>
               <article className="signal signal-fantasy">
@@ -155,25 +151,12 @@ export async function Homepage() {
                     href: signals.fantasy.href,
                   }}
                 >
-                  <figure className="fantasy-field">
-                    <Image
-                      src="/signals/football-stadium.jpg"
-                      alt=""
-                      fill
-                      sizes="(max-width: 800px) calc(100vw - 100px), 30vw"
-                    />
-                    <figcaption>NFL · week 1</figcaption>
-                  </figure>
-                  <strong>{signals.fantasy.headline}</strong>
-                  <span className="matchup">
-                    <b>{signals.fantasy.leftLabel}</b>
-                    <i>{signals.fantasy.matchupLabel}</i>
-                    <b>{signals.fantasy.rightLabel}</b>
-                  </span>
-                  <div className="matchup-bars" aria-hidden="true">
-                    <i style={{ width: scoreWidth(signals.fantasy.leftScore, signals.fantasy.rightScore).left }} />
-                    <i style={{ width: scoreWidth(signals.fantasy.leftScore, signals.fantasy.rightScore).right }} />
-                  </div>
+                  <InViewMotion>
+                    <FantasyMatchup signal={signals.fantasy} />
+                  </InViewMotion>
+                  {signals.fantasy.state === "live" && (
+                    <strong className="fantasy-season-record">{signals.fantasy.headline}</strong>
+                  )}
                   <span>{signals.fantasy.description}</span>
                 </SignalPresentation>
               </article>
