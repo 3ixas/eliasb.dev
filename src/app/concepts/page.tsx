@@ -32,7 +32,12 @@ export default function ConceptIndex() {
     <main className="concept-index">
       <header className="index-header">
         <Link href="/" className="index-mark" aria-label="Elias B. homepage">
-          EB<span>26</span>
+          <span className="index-mark-brand" aria-hidden="true">
+            <span>E</span>
+            <span className="brand-slash">/</span>
+            <span>B</span>
+          </span>
+          <span className="index-mark-version" aria-hidden="true">26</span>
         </Link>
         <p>Private design study · September 2026</p>
       </header>

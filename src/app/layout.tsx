@@ -41,6 +41,7 @@ const themeScript = `
   try {
     const saved = localStorage.getItem('elias-theme');
     if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
+    else delete document.documentElement.dataset.theme;
   } catch (_) {}
   try {
     (() => {
