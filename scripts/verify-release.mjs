@@ -16,10 +16,32 @@ const canonicalPages = [
   "/work/argus-risk",
   "/work/flowtime",
 ];
-const expectedSitemapUrls = new Set(canonicalPages.map((route) => route === "/" ? "https://eliasb.dev" : `https://eliasb.dev${route}`));
+const expectedSitemapUrls = new Set(canonicalPages.map((route) => route === "/" ? "https://www.eliasb.dev" : `https://www.eliasb.dev${route}`));
+const expectedWorkSocialCards = new Map([
+  ["/work", {
+    title: "Work · Elias B.",
+    image: "/work/threshold/landing.webp",
+    alt: "Threshold landing page introducing the real cost of moving out",
+  }],
+  ["/work/threshold", {
+    title: "Threshold · Elias B.",
+    image: "/work/threshold/landing.webp",
+    alt: "Threshold landing page introducing the real cost of moving out",
+  }],
+  ["/work/argus-risk", {
+    title: "Argus Risk · Elias B.",
+    image: "/work/argus/overview.webp",
+    alt: "Argus Risk dashboard showing portfolio value, profit and loss, exposure, and system status",
+  }],
+  ["/work/flowtime", {
+    title: "Flowtime · Elias B.",
+    image: "/work/flowtime/timer.jpg",
+    alt: "Flowtime focus timer interface",
+  }],
+]);
 const expectedIndexableRobots = [
   ["user-agent: *", "allow: /", "disallow: /concepts/"],
-  ["host: https://eliasb.dev", "sitemap: https://eliasb.dev/sitemap.xml"],
+  ["host: https://www.eliasb.dev", "sitemap: https://www.eliasb.dev/sitemap.xml"],
 ];
 
 const requiredHomepageSections = ["work", "outside-work", "experiments", "about", "contact"];
@@ -46,12 +68,16 @@ function attribute(tag, name) {
     ?? null;
 }
 
+function metaContent(document, key, attributeName = "property") {
+  const tag = tags(document, "meta").find((candidate) => attribute(candidate, attributeName) === key);
+  return attribute(tag ?? "", "content");
+}
+
 function bodyMarkup(document) {
   const start = document.indexOf("<body");
   const end = document.indexOf("</body>");
   const body = document.slice(start >= 0 ? start : 0, end >= 0 ? end : document.length);
-  const script = body.indexOf("<script");
-  return script >= 0 ? body.slice(0, script) : body;
+  return body.replace(/<script\b[\s\S]*?<\/script>/gi, "");
 }
 
 function plainText(markup) {
@@ -323,13 +349,67 @@ async function verifyRoutes(baseUrl, pages) {
     pages.set(route, page);
     equal(page.response.status, 200, `${route} should render successfully`);
     verifyPageShell(page.markup, route);
+    if (route.startsWith("/work")) await verifyWorkSocialMetadata(baseUrl, page.document, route);
   }
+
+  const conceptIndex = await fetchPage(baseUrl, "/concepts");
+  pages.set("/concepts", conceptIndex);
+  equal(conceptIndex.response.status, 200, "Concept direction index should render successfully");
+  equal(tags(conceptIndex.markup, "h1").length, 1, "Concept direction index should have one h1");
+  const conceptLinks = hrefs(conceptIndex.markup)
+    .map(({ href }) => href)
+    .filter((href) => href?.startsWith("/concepts/"))
+    .sort();
+  equal(
+    conceptLinks.join("|"),
+    "/concepts/cabinet-of-curiosities|/concepts/living-editorial|/concepts/signals-and-systems",
+    "Concept index should link to each design direction",
+  );
+
+  const conceptPrototype = await fetchPage(baseUrl, "/concepts/cabinet-of-curiosities");
+  pages.set("/concepts/cabinet-of-curiosities", conceptPrototype);
+  equal(conceptPrototype.response.status, 200, "Selected concept direction should render successfully");
+  const toolbar = conceptPrototype.markup.match(/<aside\b[^>]*aria-label="Concept controls"[^>]*>[\s\S]*?<\/aside>/i)?.[0] ?? "";
+  check(Boolean(toolbar), "Selected concept direction should expose its controls");
+  const backLink = hrefs(toolbar).find(({ tag }) => attribute(tag, "class") === "toolbar-back");
+  const backLinkText = toolbar.match(/<a\b[^>]*class="toolbar-back"[^>]*>([\s\S]*?)<\/a>/i)?.[1] ?? "";
+  equal(plainText(backLinkText), "All directions", "Concept toolbar back-link label");
+  equal(backLink?.href, "/concepts", "Concept toolbar should return to the direction index");
+  const selectedDirection = tags(toolbar, "a")
+    .find((tag) => attribute(tag, "aria-current") === "page");
+  equal(attribute(selectedDirection ?? "", "href"), "/concepts/cabinet-of-curiosities", "Concept toolbar selected direction");
 
   for (const [route, location] of compatibilityRedirects) {
     const response = await fetch(new URL(route, baseUrl), { redirect: "manual" });
     equal(response.status, 308, `${route} should permanently redirect`);
     equal(response.headers.get("location"), location, `${route} compatibility target`);
   }
+}
+
+async function verifyWorkSocialMetadata(baseUrl, document, route) {
+  const expected = expectedWorkSocialCards.get(route);
+  if (!expected) return;
+
+  const description = metaContent(document, "description", "name");
+  const expectedUrl = `https://www.eliasb.dev${route}`;
+  const ogImage = metaContent(document, "og:image");
+  const twitterImage = metaContent(document, "twitter:image", "name");
+
+  check(Boolean(description), `${route} should expose its own search description`);
+  equal(metaContent(document, "og:title"), expected.title, `${route} Open Graph title`);
+  equal(metaContent(document, "og:description"), description, `${route} Open Graph description`);
+  equal(metaContent(document, "og:url"), expectedUrl, `${route} Open Graph URL`);
+  check(ogImage?.endsWith(expected.image), `${route} Open Graph image should use its project artwork`);
+  equal(metaContent(document, "og:image:alt"), expected.alt, `${route} Open Graph image alternative text`);
+  equal(metaContent(document, "twitter:card", "name"), "summary_large_image", `${route} Twitter card type`);
+  equal(metaContent(document, "twitter:title", "name"), expected.title, `${route} Twitter title`);
+  equal(metaContent(document, "twitter:description", "name"), description, `${route} Twitter description`);
+  check(twitterImage?.endsWith(expected.image), `${route} Twitter image should use its project artwork`);
+  equal(metaContent(document, "twitter:image:alt", "name"), expected.alt, `${route} Twitter image alternative text`);
+
+  const imageResponse = await fetch(new URL(expected.image, baseUrl), { redirect: "manual" });
+  equal(imageResponse.status, 200, `${route} social image should return 200`);
+  check(imageResponse.headers.get("content-type")?.startsWith("image/"), `${route} social image should have an image content type`);
 }
 
 async function verifyInternalLinks(baseUrl, pages) {

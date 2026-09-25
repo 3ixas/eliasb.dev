@@ -7,6 +7,28 @@ export const metadata: Metadata = {
   title: "Work",
   description: "Selected product and systems case studies by Elias Bennett.",
   alternates: { canonical: "/work" },
+  openGraph: {
+    type: "website",
+    siteName: "Elias B.",
+    url: "/work",
+    title: "Work · Elias B.",
+    description: "Selected product and systems case studies by Elias Bennett.",
+    images: [{
+      url: "/work/threshold/landing.webp",
+      width: 2294,
+      height: 1750,
+      alt: "Threshold landing page introducing the real cost of moving out",
+    }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Work · Elias B.",
+    description: "Selected product and systems case studies by Elias Bennett.",
+    images: [{
+      url: "/work/threshold/landing.webp",
+      alt: "Threshold landing page introducing the real cost of moving out",
+    }],
+  },
 };
 
 export default function WorkPage() {

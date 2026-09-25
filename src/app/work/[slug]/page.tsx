@@ -19,6 +19,25 @@ export async function generateMetadata({
     title: study.name,
     description: study.summary,
     alternates: { canonical: `/work/${slug}` },
+    openGraph: {
+      type: "website",
+      siteName: "Elias B.",
+      url: `/work/${slug}`,
+      title: `${study.name} · Elias B.`,
+      description: study.summary,
+      images: [{
+        url: study.hero.src,
+        width: study.hero.width,
+        height: study.hero.height,
+        alt: study.hero.alt,
+      }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${study.name} · Elias B.`,
+      description: study.summary,
+      images: [{ url: study.hero.src, alt: study.hero.alt }],
+    },
   };
 }
 
