@@ -93,5 +93,4 @@ export type HomepageSignals = {
   training: TrainingSignal;
   fantasy: FantasySignal;
   culture: CultureSignal;
-  status: PersonalSignal;
 };

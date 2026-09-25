@@ -128,7 +128,7 @@ try {
   };
   const insufficientHistory = await getHistorySignal(historyNow);
   assert.equal(insufficientHistory.state, "curated");
-  assert.match(insufficientHistory.description, /couldn’t get a varied live list this week/i);
+  assert.equal(insufficientHistory.description, "");
 
   globalThis.fetch = async () => { throw new Error("simulated Wikimedia outage"); };
   const savedHistory = await getHistorySignal(historyNow);
@@ -136,17 +136,16 @@ try {
   assert.equal(savedHistory.headline, "A few moments in history");
   assert.equal(savedHistory.dateLabel, "Saved examples");
   assert.deepEqual(savedHistory.events.map(({ year }) => year), [1866, 1933, 2003]);
-  assert.match(savedHistory.description, /couldn’t get a varied live list this week/i);
-  assert.match(savedHistory.description, /three saved examples from different eras/i);
+  assert.equal(savedHistory.description, "");
 } finally {
   globalThis.fetch = originalFetch;
 }
 
 assert.equal(signalFallbacks.fantasy.href ?? null, null);
-assert.equal(signalFallbacks.reading.statusLabel, "Last known book");
-assert.match(signalFallbacks.reading.bookDescription ?? "", /last book I had marked as reading on Goodreads/i);
-assert.equal(signalFallbacks.culture.statusLabel, "Last known film");
-assert.match(signalFallbacks.culture.description, /when the feed last updated/i);
+assert.equal(signalFallbacks.reading.statusLabel, "Last on Goodreads");
+assert.equal(signalFallbacks.reading.bookDescription, "");
+assert.equal(signalFallbacks.culture.statusLabel, "Last logged");
+assert.equal(signalFallbacks.culture.description, "");
 
 /** @type {import("../src/integrations/types.ts").FantasySignal} */
 const fantasyLiveSignal = {
@@ -154,7 +153,7 @@ const fantasyLiveSignal = {
   state: "live",
   statusLabel: "Live",
   headline: "1–0 this season",
-  description: "I share my score here; the other managers’ names stay private.",
+  description: "",
   matchupLabel: "Week 1",
   teamScore: 112.4,
   opponentScore: 98.7,
@@ -178,32 +177,31 @@ const signalPresentationFixtures = [
     name: "cached",
     signal: { state: "live", statusLabel: "Wikimedia · cached", updatedAt: null },
     source: { label: "Wikimedia", href: "https://en.wikipedia.org/wiki/Portal:History" },
-    expected: { status: "Wikimedia · cached", freshness: "Cached for up to seven days", source: "Wikimedia" },
+    expected: { status: "Wikimedia · cached", source: "Wikimedia" },
   },
   {
     name: "authored",
     signal: { state: "curated", statusLabel: "Typical week", updatedAt: null },
     source: { label: "My weekly plan", href: null },
-    authoredLabel: "Maintained by hand",
-    expected: { status: "Typical week", freshness: "Maintained by hand", source: "My weekly plan" },
+    expected: { status: "Typical week", source: "My weekly plan" },
   },
   {
     name: "fantasy-pending",
     signal: fantasyPendingSignal,
     source: { label: "Sleeper", href: null },
-    expected: { status: "My league isn’t connected yet", freshness: "Waiting to connect", source: "Sleeper" },
+    expected: { status: "No matchup just yet", source: "Sleeper" },
   },
   {
     name: "fantasy-source-unavailable",
     signal: fantasySourceUnavailableSignal,
     source: { label: "Sleeper", href: sleeperHref },
-    expected: { status: "Sleeper unavailable", freshness: "I couldn’t fetch a live update", source: "Sleeper" },
+    expected: { status: "No live update from Sleeper", source: "Sleeper" },
   },
   {
     name: "unavailable",
     signal: { state: "unavailable", statusLabel: "Public only", updatedAt: null },
     source: { label: "GitHub activity", href: signalFallbacks.github.href },
-    expected: { status: "Public only", freshness: "I couldn’t fetch a live update", source: "GitHub activity" },
+    expected: { status: "Public only", source: "GitHub activity" },
   },
 ];
 
@@ -213,12 +211,15 @@ for (const fixture of signalPresentationFixtures) {
   const markup = renderToStaticMarkup(createElement(SignalPresentation, {
     signal: fixture.signal,
     source: fixture.source,
-    authoredLabel: fixture.authoredLabel,
   }));
   const visibleText = markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
   assert.match(markup, new RegExp(`data-state="${fixture.signal.state}"`), `${fixture.name} fixture should expose its state`);
   assert.ok(visibleText.includes(fixture.expected.status), `${fixture.name} fixture should expose its visible status`);
-  assert.ok(visibleText.includes(fixture.expected.freshness), `${fixture.name} fixture should expose truthful freshness`);
+  if (fixture.expected.freshness) {
+    assert.ok(visibleText.includes(fixture.expected.freshness), `${fixture.name} fixture should expose a useful update date`);
+  } else {
+    assert.equal(markup.includes("signal-freshness"), false, `${fixture.name} fixture should not add generic freshness copy`);
+  }
   assert.ok(visibleText.includes(fixture.expected.source), `${fixture.name} fixture should expose truthful source wording`);
   if (fixture.source.href) {
     assert.ok(markup.includes(`href="${fixture.source.href}"`), `${fixture.name} fixture should expose its source link`);
@@ -238,9 +239,9 @@ const unavailableWeekMarkup = renderToStaticMarkup(createElement(SignalPresentat
   signal: fantasyWeekUnavailableSignal,
   source: { label: "Sleeper", href: fantasyWeekUnavailableSignal.href },
 }));
-assert.match(unavailableWeekMarkup, /Week data unavailable/);
+assert.match(unavailableWeekMarkup, /No current week yet/);
 assert.match(unavailableWeekMarkup, new RegExp(`href="${sleeperHref}"`));
-assert.equal(unavailableWeekMarkup.includes("My league isn’t connected yet"), false, "A missing week should not imply the league is disconnected");
+assert.equal(unavailableWeekMarkup.includes("No matchup just yet"), false, "A missing week should not imply the league is disconnected");
 
 
 const liveMatchupMarkup = renderToStaticMarkup(createElement(FantasyMatchup, { signal: fantasyLiveSignal }));

@@ -33,8 +33,8 @@ export const caseStudies = {
     year: "2026",
     headline: "Affordability starts before the first month’s rent.",
     summary:
-      "Threshold gathers the costs of moving into one scenario: cash needed upfront, monthly spending, and the gap between current savings and a chosen move.",
-    role: "Independent product, design, data modelling, and frontend engineering",
+      "A move costs more than the rent. Threshold puts upfront costs, monthly spending, and the savings gap in one place so you can see what it might take.",
+    role: "I shaped the product, data model, and interface from end to end.",
     stack: [
       "React 19",
       "TypeScript",
@@ -78,26 +78,26 @@ export const caseStudies = {
         eyebrow: "01 / Frame the decision",
         title: "Monthly affordability can hide the cost that stops a move.",
         body: [
-          "A move can still be out of reach even when the monthly rent looks affordable. There’s also the deposit, first month’s rent, moving costs, and furniture to consider.",
-          "Threshold separates upfront and monthly costs, then estimates how much more you’d need to save and how long that might take.",
+          "Rent is only part of the cost. There’s also the deposit, first month’s rent, moving costs, and furniture.",
+          "I split upfront and monthly costs so you can see how much more you need to save, and how long it could take.",
         ],
         notes: ["Upfront total", "Monthly total", "Savings gap", "Time to move"],
       },
       {
         eyebrow: "02 / Make assumptions visible",
-        title: "Every estimate should expose its assumptions.",
+        title: "What goes into the estimate?",
         body: [
-          "Each city is a typed configuration of districts, rent bands, transport rules, deposits, utilities, and local charges. London and the Swiss cities can share a calculation engine without pretending their costs work the same way.",
-          "The default figures are only a starting point. You can change food, transport, broadband, moving, furniture, health insurance, income, and savings; the page also shows when the data was last updated.",
+          "Each city has its own districts, rent bands, transport rules, deposits, and local charges. I let London, Basel, and Zurich share a calculator without pretending they cost the same.",
+          "Change anything from food and transport to income and savings, then see how the estimate shifts. I show when the figures were last refreshed, too.",
         ],
         notes: ["London", "Basel", "Zurich", "Editable defaults"],
       },
       {
         eyebrow: "03 / Share a scenario",
-        title: "Share the full scenario with a link.",
+        title: "Share your scenario with a link.",
         body: [
-          "Every meaningful input serialises into URL parameters. Opening the link reconstructs the same district, property, household, lifestyle, and affordability scenario.",
-          "There’s no account or backend to set up. You can copy a link to share the scenario, then change it to compare a different set of costs.",
+          "The link remembers the choices you made: district, home, household, lifestyle, and budget. Open it again and you’ll see the same scenario.",
+          "No account to set up. Copy the link to share your scenario, then change a few costs to compare another move.",
         ],
         notes: ["No account", "No backend", "Reproducible scenarios", "Pure calculations"],
       },
@@ -113,8 +113,8 @@ export const caseStudies = {
     year: "2026",
     headline: "How simulated market data reaches the dashboard.",
     summary:
-      "Argus is a local educational simulator for a multi-currency equity risk platform. It follows simulated prices and trades through an event-driven system, calculates portfolio risk, and shows data freshness, failures, and replay in a browser dashboard.",
-    role: "Independent system architecture, backend, simulation, observability, and dashboard engineering",
+      "Argus is a local simulator for a multi-currency risk platform. I built it to follow simulated prices and trades through the event stream, into risk calculations and onto a dashboard.",
+    role: "I designed and built the simulator, backend services, and dashboard.",
     stack: [".NET 8", "Kafka / Redpanda", "PostgreSQL / Marten", "SignalR", "Next.js"],
     codeUrl: "https://github.com/3ixas/argus-risk",
     hero: {
@@ -140,28 +140,28 @@ export const caseStudies = {
     chapters: [
       {
         eyebrow: "01 / Follow the event",
-        title: "How a trade reaches the dashboard.",
+        title: "Follow a trade from Kafka to the dashboard.",
         body: [
-          "Simulated prices, FX rates, and trades arrive through separate Kafka topics. The risk engine combines them into portfolio snapshots, which the API sends to the Next.js dashboard with SignalR. Marten stores the event history for replay.",
-          "The services communicate through events, so I can inspect or restart each one independently in the local Docker environment.",
+          "Simulated prices, FX rates, and trades arrive on separate Kafka topics. The risk engine rolls them into portfolio snapshots, and SignalR streams those to the Next.js dashboard. Marten keeps the event history, so I can replay what happened.",
+          "Events connect the services. I can inspect or restart any of them on their own in Docker.",
         ],
         notes: ["Market data", "Trade events", "Risk engine", "SignalR dashboard"],
       },
       {
         eyebrow: "02 / Reconstruct positions",
-        title: "Rebuild position state from the events that changed it.",
+        title: "Rewind a position to see how it got there.",
         body: [
-          "Position changes are appended as immutable Marten events: opened, increased, decreased, reversed, or closed. Replaying them rebuilds the position at any point in time and shows which changes produced it.",
-          "FIFO cost basis and the risk calculations stay in pure functions with no infrastructure dependencies. The same inputs produce the same result, which makes correctness testable and replay meaningful.",
+          "Every position change becomes a Marten event: opened, increased, decreased, reversed, or closed. Replay the events and you can see how the position changed at any point in time.",
+          "FIFO cost basis and risk calculations live in pure functions. Given the same inputs, I can test and replay the same result.",
         ],
         notes: ["Append-only history", "FIFO cost basis", "Deterministic calculations", "Point-in-time state"],
       },
       {
         eyebrow: "03 / Make stale data visible",
-        title: "Make stale numbers obvious.",
+        title: "Know when a risk number has gone stale.",
         body: [
-          "The dashboard pairs each portfolio value with connection status, price freshness, alerts, and reconciliation. If a source stalls, it shows how old the data is and what has failed, so the operator can judge what is still usable.",
-          "The simulator also includes replay, checksums, metrics, traces, and degraded states. These show how the system behaves when data is late or inconsistent.",
+          "Each portfolio value sits alongside connection status, price age, alerts, and reconciliation. If a feed stalls, you can see what failed and how old the number is.",
+          "I added replay, checksums, metrics, and traces to see what happens when data arrives late or out of order.",
         ],
         notes: ["Staleness", "Reconciliation", "Circuit breaking", "Observability"],
       },
@@ -177,8 +177,8 @@ export const caseStudies = {
     year: "2026",
     headline: "A timer that stays accurate when the tab goes to sleep.",
     summary:
-      "Flowtime keeps session history on your device and adjusts break length to the time you worked. It keeps the timer accurate when a tab sleeps and lets you decide what to do with a session after the browser closes.",
-    role: "Independent product, interaction design, frontend engineering, and accessibility",
+      "Flowtime keeps sessions on your device and gives you a break in proportion to the time you worked. It keeps time when the tab sleeps; if you close the browser, it asks what to do when you come back.",
+    role: "I shaped the product and interaction, then built the frontend with accessibility in mind.",
     stack: ["Next.js", "TypeScript", "localStorage", "Service Worker", "Vitest"],
     liveUrl: "https://flowtime-focus-timer.vercel.app",
     codeUrl: "https://github.com/3ixas/flowtime-focus-timer",
@@ -198,28 +198,28 @@ export const caseStudies = {
     chapters: [
       {
         eyebrow: "01 / Keep time accurate",
-        title: "Calculate elapsed time from timestamps.",
+        title: "The timer keeps its place when the tab sleeps.",
         body: [
-          "Long intervals drift, and browsers slow down background tabs. Flowtime stores the session’s start time and calculates elapsed time from that timestamp.",
-          "The tab can sleep while the display is paused. When it wakes, Flowtime recalculates the elapsed time so the session stays accurate.",
+          "Browsers throttle background tabs, so a timer that counts each second drifts. Flowtime stores when your session started and works out elapsed time from that timestamp instead.",
+          "When the tab wakes, Flowtime checks the clock again. The display can sleep without losing track.",
         ],
         notes: ["Absolute start time", "Derived elapsed time", "Background-safe", "No server clock"],
       },
       {
         eyebrow: "02 / Recover interrupted sessions",
-        title: "Decide what to do when a session is interrupted.",
+        title: "If a session is interrupted, you choose what happens next.",
         body: [
-          "An active session is stored locally with its start time, task, and tags. When Flowtime opens again, it detects unfinished work and lets you choose what happens next instead of silently resuming or discarding it.",
-          "The timer has distinct stopped, running, results, break, paused-break, and complete states, with a defined set of actions in each.",
+          "If you leave mid-session, Flowtime keeps your task and tags on your device. When you come back, you choose whether to pick up where you left off or call it a day.",
+          "Resume, finish the session, skip the break, or start again: Flowtime makes the next step clear.",
         ],
         notes: ["Resume", "End honestly", "Skip break", "Start again"],
       },
       {
         eyebrow: "03 / Keep data on your device",
-        title: "Your session history stays on your device.",
+        title: "Your work history stays on your device.",
         body: [
-          "Completed sessions, tags, notes, settings, and the active session stay in localStorage. A service worker keeps the app shell available offline, and CSV export lets people take their data with them.",
-          "I built keyboard shortcuts, timer announcements, visible focus, reduced motion, labelled charts, and recoverable dialogs into the interaction.",
+          "Sessions, tags, notes, and settings live in your browser. Flowtime works offline, and a CSV export lets you take your data with you.",
+          "The timer works without a mouse, too: keyboard controls, clear screen-reader updates, and focus you can see.",
         ],
         notes: ["Offline shell", "CSV export", "Keyboard control", "Screen-reader state"],
       },

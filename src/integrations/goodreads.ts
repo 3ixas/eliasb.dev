@@ -39,7 +39,7 @@ export async function getReadingSignal(): Promise<ReadingSignal> {
       state: "live",
       statusLabel: "Currently reading",
       headline: title,
-      description: "It’s on my currently-reading shelf on Goodreads.",
+      description: "",
       author,
       bookDescription: summaryText(rssValue(item, "book_description")),
       coverUrl: trustedHttpsUrl(

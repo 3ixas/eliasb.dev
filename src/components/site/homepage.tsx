@@ -29,7 +29,6 @@ function activityLevel(count: number) {
 
 export async function Homepage() {
   const [signals, history] = await Promise.all([getHomepageSignals(), getHistorySignal()]);
-  const hasAuthoredTrainingSchedule = signals.training.state === "curated" && Boolean(signals.training.schedule);
 
   return (
     <div className="prototype prototype-cabinet-of-curiosities selected-experience" id="top" tabIndex={-1}>
@@ -49,7 +48,7 @@ export async function Homepage() {
             </div>
             <p className="concept-thesis">
               <span>Here</span>
-              My projects, a few experiments, and some things I enjoy.
+              Things I’ve built, things I’m trying, and a few things I enjoy.
             </p>
           </div>
           <a className="scroll-cue" href="#work">
@@ -78,7 +77,7 @@ export async function Homepage() {
                   }}
                 >
                   <strong>{signals.github.headline}</strong>
-                  <span>{signals.github.description}</span>
+                  {signals.github.description && <span>{signals.github.description}</span>}
                   {signals.github.privateContributions !== undefined && (
                     <div className="signal-metrics" role="group" aria-label="Private contribution count">
                       <b>{signals.github.privateContributions}</b>
@@ -93,8 +92,7 @@ export async function Homepage() {
                 </SignalPresentation>
               </article>
               <article className="signal signal-presence">
-                <p>Local signal</p>
-                <SignalStatus signal={signals.status} />
+                <p>Around here</p>
                 <figure className="london-signal-visual">
                   <Image
                     src="/signals/london-st-pauls.jpg"
@@ -107,13 +105,11 @@ export async function Homepage() {
                 <strong>
                   <LocalTime />
                 </strong>
-                <span>{signals.status.headline}</span>
               </article>
               <article className="signal signal-training">
                 <p>Training</p>
                 <SignalPresentation
                   signal={signals.training}
-                  authoredLabel={hasAuthoredTrainingSchedule ? "Maintained by hand" : undefined}
                   source={{
                     label: signals.training.href ? "Strava" : "My weekly plan",
                     href: signals.training.href,
@@ -142,7 +138,7 @@ export async function Homepage() {
                       ))}
                     </div>
                   )}
-                  {!hasAuthoredTrainingSchedule && <span>{signals.training.description}</span>}
+                  {signals.training.description && <span>{signals.training.description}</span>}
                 </SignalPresentation>
               </article>
               <article className="signal signal-fantasy">
@@ -160,7 +156,7 @@ export async function Homepage() {
                   {signals.fantasy.state === "live" && (
                     <strong className="fantasy-season-record">{signals.fantasy.headline}</strong>
                   )}
-                  <span>{signals.fantasy.description}</span>
+                  {signals.fantasy.description && <span>{signals.fantasy.description}</span>}
                 </SignalPresentation>
               </article>
             </div>
@@ -193,11 +189,12 @@ export async function Homepage() {
                   </>
                 )}
               >
-                <p>{signals.reading.state === "live" ? "Currently reading" : "Reading"}</p>
                 <h3>{signals.reading.headline}</h3>
-                <span>
-                  {signals.reading.bookDescription ?? `${signals.reading.author ? `By ${signals.reading.author}. ` : ""}${signals.reading.description}`}
-                </span>
+                {signals.reading.bookDescription ? (
+                  <span>{signals.reading.bookDescription}</span>
+                ) : signals.reading.author ? (
+                  <span>By {signals.reading.author}</span>
+                ) : null}
                 <SignalFreshness signal={signals.reading} className="library-freshness" />
                 {signals.reading.href && <a href={signals.reading.href} target="_blank" rel="noreferrer">View on Goodreads <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
               </ClosableDetails>
@@ -216,9 +213,8 @@ export async function Homepage() {
                   </>
                 )}
               >
-                <p>{signals.culture.state === "live" ? "Most recent film in my Letterboxd diary" : "Last known film in my Letterboxd diary"}</p>
                 <h3>{signals.culture.filmTitle ?? signals.culture.headline}</h3>
-                <span>{signals.culture.filmDescription ?? signals.culture.description}</span>
+                {signals.culture.filmDescription && <span>{signals.culture.filmDescription}</span>}
                 {signals.culture.filmYear && (
                   <span>{signals.culture.filmYear}{signals.culture.filmRating ? ` · ${signals.culture.filmRating} out of 5` : ""}</span>
                 )}
@@ -252,7 +248,7 @@ export async function Homepage() {
               <h2 id="history-title">{history.headline}</h2>
               <div>
                 <article className="history-card">
-                  <span>{history.dateLabel}</span>
+                  {history.dateLabel && <span>{history.dateLabel}</span>}
                   <ol className="history-events" aria-label="Historical moments">
                     {history.events.map((event) => (
                       <li className="history-event" key={`${event.year}-${event.kind}-${event.text}`}>
@@ -265,7 +261,7 @@ export async function Homepage() {
                       </li>
                     ))}
                   </ol>
-                  <small>{history.description}</small>
+                  {history.description && <small>{history.description}</small>}
                   <a className="history-source" href={history.sourceUrl} target="_blank" rel="noreferrer">
                     {history.state === "live" ? "View this week’s Wikimedia events" : "Browse Wikipedia history"} <span className="arrow-mark" aria-hidden="true">↗︎</span>
                   </a>
@@ -356,7 +352,7 @@ export async function Homepage() {
             <div className="about-prose">
               <p>{profile.about}</p>
               <p className="about-supporting-copy">
-                I like software that respects the person using it: clear about what’s happening, dependable when things go wrong, and careful with the details.
+                I like software that tells you what it’s doing, holds up when things go wrong, and gets the small details right.
               </p>
               <a className="about-contact-cta" href="#contact">
                 Start a conversation <span className="arrow-mark" aria-hidden="true">↓</span>
@@ -407,7 +403,7 @@ export async function Homepage() {
 
         <section id="contact" tabIndex={-1} className="contact-block contact-section" aria-labelledby="contact-title">
           <p>05 / Contact</p>
-          <h2 id="contact-title">Get in touch.</h2>
+          <h2 id="contact-title">Let’s talk.</h2>
           <div className="contact-actions">
             <div className="contact-primary-action">
               <a className="contact-link" href={profile.links.email}>
@@ -433,7 +429,7 @@ export async function Homepage() {
       </main>
 
       <footer className="site-footer">
-        <p>Designed and built by {profile.shortName}</p>
+        <p>Made by {profile.shortName}, in London.</p>
         <div>
           <Link href="/concepts">Design study <span className="arrow-mark" aria-hidden="true">↗︎</span></Link>
           <a href={profile.links.github} target="_blank" rel="noreferrer">

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s · Elias B.",
   },
   description:
-    "Projects, ideas, and interests from Elias Bennett, a software engineer in London.",
+    "I’m Elias, a software engineer in London. Here’s what I build and what I get up to outside work.",
   alternates: {
     canonical: "/",
   },

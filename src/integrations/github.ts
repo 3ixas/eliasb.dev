@@ -154,11 +154,11 @@ export async function getGitHubSignal(): Promise<GitHubSignal> {
   if (contributions) {
     return {
       state: "live",
-      statusLabel: "Live · all contributions",
-      headline: `${contributions.totalContributions} contributions over the past year`,
-      description: "Private contributions are part of the total; I keep their repositories private.",
+      statusLabel: "Live · past year",
+      headline: `I’ve made ${contributions.totalContributions} contributions in the past year.`,
+      description: "",
       activity: contributions.activity,
-      activityLabel: "GitHub contributions over the last year, including private totals",
+      activityLabel: "GitHub contributions over the past year",
       totalContributions: contributions.totalContributions,
       privateContributions: contributions.privateContributions,
       updatedAt: new Date().toISOString(),
@@ -172,7 +172,7 @@ export async function getGitHubSignal(): Promise<GitHubSignal> {
       state: "live",
       statusLabel: token ? "Live · public only" : "Live · public",
       headline: describeEvent(latest),
-      description: "Only my public GitHub activity appears here.",
+      description: "",
       activity,
       activityLabel: "Public GitHub activity over the last year",
       updatedAt: new Date().toISOString(),
@@ -185,10 +185,8 @@ export async function getGitHubSignal(): Promise<GitHubSignal> {
       ...signalFallbacks.github,
       state: "live",
       statusLabel: token ? "Live · public only" : "Live · public",
-      headline: "No recent public GitHub activity",
-      description: token
-        ? "No recent public updates, and I couldn’t load the private total this time."
-        : "This chart shows public contributions only.",
+      headline: "A quiet stretch on public GitHub.",
+      description: "",
       activity: mapPublicActivity(events),
       activityLabel: "Public GitHub activity over the last year",
       updatedAt: new Date().toISOString(),

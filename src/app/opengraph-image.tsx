@@ -79,7 +79,7 @@ export default function OpenGraphImage() {
             transform: "rotate(2deg)",
           }}
         >
-          Projects and a few things I enjoy.
+          Work, side projects, and a little life outside work.
         </div>
       </div>
     </div>,
