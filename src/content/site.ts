@@ -3,7 +3,7 @@ export const profile = {
   shortName: "Elias",
   role: "Software engineer",
   location: "London",
-  statement: "I build software that makes complex things easier to understand.",
+  statement: "I build software that untangles complex systems, so they’re easier to understand.",
   introduction:
     "I like getting under the skin of a product: how it works, what the data says, and how it feels to use.",
   about:

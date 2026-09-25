@@ -11,7 +11,7 @@ import {
   SignalPresentation,
   SignalStatus,
 } from "@/components/site/signal-presentation";
-import { SignatureLine, SignatureReplayButton } from "@/components/signature-line";
+import { HomepageSignature } from "@/components/homepage-opening";
 import { SiteHeader } from "@/components/site/site-header";
 import { careerTimeline, labItems } from "@/content/collections";
 import { integrationConfig } from "@/content/integration-config";
@@ -39,8 +39,7 @@ export async function Homepage() {
           <p className="hero-kicker" id="hero-kicker">
             {profile.shortName} · {profile.role} · {profile.location}
           </p>
-          <SignatureLine direction="selected-homepage" statement={profile.statement} />
-          <SignatureReplayButton />
+          <HomepageSignature statement={profile.statement} />
           <div className="hero-lower">
             <div className="hero-introduction">
               <p className="hero-introduction-label">How I work</p>
