@@ -5,12 +5,13 @@ import { ClosableDetails } from "@/components/site/closable-details";
 import { FeaturedWork } from "@/components/site/featured-work";
 import { FantasyMatchup } from "@/components/site/fantasy-matchup";
 import { InViewMotion } from "@/components/site/in-view-motion";
+import { ScrollProgress } from "@/components/site/scroll-progress";
 import {
   SignalFreshness,
   SignalPresentation,
   SignalStatus,
 } from "@/components/site/signal-presentation";
-import { SignatureLine } from "@/components/signature-line";
+import { SignatureLine, SignatureReplayButton } from "@/components/signature-line";
 import { SiteHeader } from "@/components/site/site-header";
 import { careerTimeline, labItems } from "@/content/collections";
 import { integrationConfig } from "@/content/integration-config";
@@ -32,6 +33,7 @@ export async function Homepage() {
 
   return (
     <div className="prototype prototype-cabinet-of-curiosities selected-experience" id="top" tabIndex={-1}>
+      <ScrollProgress />
       <SiteHeader />
       <main id="main-content" tabIndex={-1}>
         <section className="hero" aria-labelledby="hero-kicker">
@@ -39,6 +41,7 @@ export async function Homepage() {
             {profile.shortName} · {profile.role} · {profile.location}
           </p>
           <SignatureLine direction="selected-homepage" statement={profile.statement} />
+          <SignatureReplayButton />
           <div className="hero-lower">
             <div className="hero-introduction">
               <p className="hero-introduction-label">How I work</p>
@@ -50,7 +53,7 @@ export async function Homepage() {
             </p>
           </div>
           <a className="scroll-cue" href="#work">
-            Selected work <span>↓</span>
+            Selected work <span aria-hidden="true">↓</span>
           </a>
         </section>
 
