@@ -41,6 +41,16 @@ export type HistoryEvent = {
   kind: "event" | "birth";
   text: string;
   sourceUrl: string;
+  image?: HistoryImage;
+};
+
+export type HistoryImage = {
+  src: string;
+  alt: string;
+  creator: string;
+  sourceUrl: string;
+  licenseName: string;
+  licenseUrl: string | null;
 };
 
 export type HistorySignal = {

@@ -316,7 +316,7 @@ function verifyHomepage(markup) {
   }
   check(text.includes("Wikimedia") || text.includes("fallback"), "History output should identify its live or fallback source");
   const historyCard = markup.match(/<article class="history-card">([\s\S]*?)<\/article>/i)?.[1] ?? "";
-  const historyEvents = [...historyCard.matchAll(/<li class="history-event">([\s\S]*?)<\/li>/gi)].map(([, event]) => event);
+  const historyEvents = [...historyCard.matchAll(/<li class="history-event(?: [^"]*)?">([\s\S]*?)<\/li>/gi)].map(([, event]) => event);
   equal(historyEvents.length, 3, "History should show three historical moments");
   const historyYears = historyEvents.map((event) => Number(event.match(/<strong\b[^>]*>(\d{1,4})<\/strong>/i)?.[1] ?? 0));
   check(historyYears.every((year) => year > 0), "Each history moment should show its year");
@@ -326,6 +326,14 @@ function verifyHomepage(markup) {
     const record = hrefs(event).find(({ href }) => href?.startsWith("https://"));
     check(record, "Each history moment should link directly to its source");
     check(plainText(event).includes("Read the record"), "Each history source link should have a clear label");
+    if (event.includes("history-event-visual")) {
+      const credits = hrefs(event);
+      check(/<img\b[^>]*alt="[^"]+"/i.test(event), "Each history image should have useful alternative text");
+      check(plainText(event).includes("Image:"), "Each history image should name its creator");
+      check(credits.some(({ href }) => href?.startsWith("https://commons.wikimedia.org/wiki/File:")), "Each history image should link to its Commons file record");
+      check(/(?:CC BY|CC0|Public domain|GFDL|Free Art License)/i.test(plainText(event)), "Each history image should display its reuse license");
+      check(credits.some(({ href }) => href?.startsWith("https://creativecommons.org/") || href?.startsWith("https://commons.wikimedia.org/wiki/File:")), "Each history image should link to its license or Commons reuse record");
+    }
   }
   check(/Updated \d{1,2} [A-Z][a-z]{2,4}|Wikimedia · cached/i.test(text), "Signal cards should expose a useful update date or cache label");
   check(["GitHub", "Goodreads", "Letterboxd", "Sleeper", "Wikimedia"].some((source) => text.includes(source)), "Signal cards should expose visible source wording");

@@ -245,11 +245,30 @@ export async function Homepage() {
                   {history.dateLabel && <span>{history.dateLabel}</span>}
                   <ol className="history-events" aria-label="Historical moments">
                     {history.events.map((event) => (
-                      <li className="history-event" key={`${event.year}-${event.kind}-${event.text}`}>
+                      <li className={`history-event${event.image ? " history-event--illustrated" : ""}`} key={`${event.year}-${event.kind}-${event.text}`}>
                         <div className="history-event-meta">
                           <span className="history-event-kind">{event.kind === "birth" ? "Born" : "On this day"}</span>
                           <strong>{event.year}</strong>
                         </div>
+                        {event.image && (
+                          <figure className="history-event-visual">
+                            <div className="history-event-image-frame">
+                              <Image
+                                src={event.image.src}
+                                alt={event.image.alt}
+                                fill
+                                sizes="(max-width: 700px) calc(100vw - 100px), 22vw"
+                              />
+                            </div>
+                            <figcaption>
+                              <span>Image: {event.image.creator}</span>
+                              <span className="history-event-credit-links">
+                                <a href={event.image.sourceUrl} target="_blank" rel="noreferrer">Commons</a>
+                                <a href={event.image.licenseUrl ?? event.image.sourceUrl} target="_blank" rel="noreferrer">{event.image.licenseName}</a>
+                              </span>
+                            </figcaption>
+                          </figure>
+                        )}
                         <p>{event.text}</p>
                         <a href={event.sourceUrl} target="_blank" rel="noreferrer">Read the record <span className="arrow-mark" aria-hidden="true">↗︎</span></a>
                       </li>

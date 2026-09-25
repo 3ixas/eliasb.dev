@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "i.gr-assets.com" },
       { protocol: "https", hostname: "a.ltrbxd.com" },
+      { protocol: "https", hostname: "upload.wikimedia.org", port: "", pathname: "/wikipedia/commons/**" },
+      { protocol: "https", hostname: "thumb.wikimedia.org", port: "", pathname: "/wikipedia/commons/**" },
     ],
   },
   async headers() {
