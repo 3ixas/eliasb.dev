@@ -38,10 +38,21 @@ export async function Homepage() {
               <p className="hero-introduction-label">How I work</p>
               <p className="hero-copy">{profile.introduction}</p>
             </div>
-            <p className="concept-thesis">
-              <span>Here</span>
-              Things I’ve built, things I’m trying, and a few things I enjoy.
-            </p>
+            <div className="concept-thesis">
+              <figure className="concept-thesis-photo">
+                <Image
+                  src="/profile/elias-coast.webp"
+                  alt="Elias standing aboard a boat, with water and a rocky coastline behind him"
+                  fill
+                  sizes="(max-width: 700px) 100px, 120px"
+                />
+                <figcaption>Out on the water</figcaption>
+              </figure>
+              <p>
+                <span>Here</span>{" "}
+                Things I’ve built, things I’m trying, and a few things I enjoy.
+              </p>
+            </div>
           </div>
           <a className="scroll-cue" href="#work">
             Selected work <span aria-hidden="true">↓</span>
@@ -425,19 +436,29 @@ export async function Homepage() {
               </a>
               <span className="contact-email">eliasthebennett@gmail.com</span>
             </div>
-            <nav className="contact-profile-links" aria-label="Other ways to connect">
-              <a href={profile.links.github} target="_blank" rel="noreferrer">
-                GitHub <span className="arrow-mark" aria-hidden="true">↗︎</span>
-              </a>
-              <a href={profile.links.linkedin} target="_blank" rel="noreferrer">
-                LinkedIn <span className="arrow-mark" aria-hidden="true">↗︎</span>
-              </a>
-              {profile.links.resume && (
-                <a href={profile.links.resume} target="_blank" rel="noreferrer">
-                  Résumé <span className="arrow-mark" aria-hidden="true">↗︎</span>
+            <div className="contact-aside">
+              <figure className="contact-photo">
+                <Image
+                  src="/profile/elias.webp"
+                  alt="Elias smiling outside in a grey jumper"
+                  fill
+                  sizes="(max-width: 420px) 130px, (max-width: 560px) 160px, (max-width: 800px) 250px, (max-width: 1100px) 110px, 180px"
+                />
+              </figure>
+              <nav className="contact-profile-links" aria-label="Other ways to connect">
+                <a href={profile.links.github} target="_blank" rel="noreferrer">
+                  GitHub <span className="arrow-mark" aria-hidden="true">↗︎</span>
                 </a>
-              )}
-            </nav>
+                <a href={profile.links.linkedin} target="_blank" rel="noreferrer">
+                  LinkedIn <span className="arrow-mark" aria-hidden="true">↗︎</span>
+                </a>
+                {profile.links.resume && (
+                  <a href={profile.links.resume} target="_blank" rel="noreferrer">
+                    Résumé <span className="arrow-mark" aria-hidden="true">↗︎</span>
+                  </a>
+                )}
+              </nav>
+            </div>
           </div>
         </section>
       </main>
