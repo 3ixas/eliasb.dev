@@ -3,14 +3,17 @@ import Link from "next/link";
 import { LocalTime } from "@/components/local-time";
 import { ClosableDetails } from "@/components/site/closable-details";
 import { FeaturedWork } from "@/components/site/featured-work";
+import { FantasyMatchup } from "@/components/site/fantasy-matchup";
+import { InViewMotion } from "@/components/site/in-view-motion";
+import { ScrollProgress } from "@/components/site/scroll-progress";
 import {
   SignalFreshness,
   SignalPresentation,
   SignalStatus,
 } from "@/components/site/signal-presentation";
-import { SignatureLine } from "@/components/signature-line";
+import { SignatureLine, SignatureReplayButton } from "@/components/signature-line";
 import { SiteHeader } from "@/components/site/site-header";
-import { journey, labItems } from "@/content/collections";
+import { careerTimeline, labItems } from "@/content/collections";
 import { integrationConfig } from "@/content/integration-config";
 import { profile } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
@@ -24,21 +27,13 @@ function activityLevel(count: number) {
   return "0";
 }
 
-function scoreWidth(left?: number, right?: number) {
-  if (!left && !right) return { left: "50%", right: "50%" };
-  const total = (left ?? 0) + (right ?? 0);
-  if (!total) return { left: "50%", right: "50%" };
-  return {
-    left: `${Math.max(12, Math.round(((left ?? 0) / total) * 100))}%`,
-    right: `${Math.max(12, Math.round(((right ?? 0) / total) * 100))}%`,
-  };
-}
-
 export async function Homepage() {
   const [signals, history] = await Promise.all([getHomepageSignals(), getHistorySignal()]);
+  const hasAuthoredTrainingSchedule = signals.training.state === "curated" && Boolean(signals.training.schedule);
 
   return (
     <div className="prototype prototype-cabinet-of-curiosities selected-experience" id="top" tabIndex={-1}>
+      <ScrollProgress />
       <SiteHeader />
       <main id="main-content" tabIndex={-1}>
         <section className="hero" aria-labelledby="hero-kicker">
@@ -46,15 +41,19 @@ export async function Homepage() {
             {profile.shortName} · {profile.role} · {profile.location}
           </p>
           <SignatureLine direction="selected-homepage" statement={profile.statement} />
+          <SignatureReplayButton />
           <div className="hero-lower">
-            <p className="hero-copy">{profile.introduction}</p>
+            <div className="hero-introduction">
+              <p className="hero-introduction-label">How I work</p>
+              <p className="hero-copy">{profile.introduction}</p>
+            </div>
             <p className="concept-thesis">
               <span>Here</span>
               My projects, a few experiments, and some things I enjoy.
             </p>
           </div>
           <a className="scroll-cue" href="#work">
-            Selected work <span>↓</span>
+            Selected work <span aria-hidden="true">↓</span>
           </a>
         </section>
 
@@ -80,16 +79,10 @@ export async function Homepage() {
                 >
                   <strong>{signals.github.headline}</strong>
                   <span>{signals.github.description}</span>
-                  {signals.github.totalContributions !== undefined && (
-                    <div className="signal-metrics" aria-label="GitHub contribution totals">
-                      <b>{signals.github.totalContributions}</b>
-                      <span>contributions</span>
-                      {signals.github.privateContributions !== undefined && (
-                        <>
-                          <b>{signals.github.privateContributions}</b>
-                          <span>private</span>
-                        </>
-                      )}
+                  {signals.github.privateContributions !== undefined && (
+                    <div className="signal-metrics" role="group" aria-label="Private contribution count">
+                      <b>{signals.github.privateContributions}</b>
+                      <span>private</span>
                     </div>
                   )}
                   <div className="activity-trace" role="img" aria-label={signals.github.activityLabel}>
@@ -120,6 +113,7 @@ export async function Homepage() {
                 <p>Training</p>
                 <SignalPresentation
                   signal={signals.training}
+                  authoredLabel={hasAuthoredTrainingSchedule ? "Maintained by hand" : undefined}
                   source={{
                     label: signals.training.href ? "Strava" : "My weekly plan",
                     href: signals.training.href,
@@ -127,14 +121,16 @@ export async function Homepage() {
                 >
                   <strong>{signals.training.headline}</strong>
                   {signals.training.schedule ? (
-                    <div className="training-schedule" role="group" aria-label={`${signals.training.windowLabel} training schedule`}>
-                      {signals.training.schedule.map((day) => (
-                        <div className="training-day" key={day.day}>
-                          <b>{day.day}</b>
-                          <span>{day.activity}</span>
-                        </div>
-                      ))}
-                    </div>
+                    <InViewMotion>
+                      <div className="training-schedule" role="group" aria-label={`${signals.training.windowLabel} training schedule`}>
+                        {signals.training.schedule.map((day) => (
+                          <div className="training-day" key={day.day}>
+                            <b>{day.day}</b>
+                            <span>{day.activity}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </InViewMotion>
                   ) : (
                     <div className="training-rhythm" aria-label={`${signals.training.windowLabel} training by type`}>
                       {signals.training.weekly.map((category) => (
@@ -146,7 +142,7 @@ export async function Homepage() {
                       ))}
                     </div>
                   )}
-                  <span>{signals.training.description}</span>
+                  {!hasAuthoredTrainingSchedule && <span>{signals.training.description}</span>}
                 </SignalPresentation>
               </article>
               <article className="signal signal-fantasy">
@@ -158,25 +154,12 @@ export async function Homepage() {
                     href: signals.fantasy.href,
                   }}
                 >
-                  <figure className="fantasy-field">
-                    <Image
-                      src="/signals/football-stadium.jpg"
-                      alt=""
-                      fill
-                      sizes="(max-width: 800px) calc(100vw - 100px), 30vw"
-                    />
-                    <figcaption>NFL · week 1</figcaption>
-                  </figure>
-                  <strong>{signals.fantasy.headline}</strong>
-                  <span className="matchup">
-                    <b>{signals.fantasy.leftLabel}</b>
-                    <i>{signals.fantasy.matchupLabel}</i>
-                    <b>{signals.fantasy.rightLabel}</b>
-                  </span>
-                  <div className="matchup-bars" aria-hidden="true">
-                    <i style={{ width: scoreWidth(signals.fantasy.leftScore, signals.fantasy.rightScore).left }} />
-                    <i style={{ width: scoreWidth(signals.fantasy.leftScore, signals.fantasy.rightScore).right }} />
-                  </div>
+                  <InViewMotion>
+                    <FantasyMatchup signal={signals.fantasy} />
+                  </InViewMotion>
+                  {signals.fantasy.state === "live" && (
+                    <strong className="fantasy-season-record">{signals.fantasy.headline}</strong>
+                  )}
                   <span>{signals.fantasy.description}</span>
                 </SignalPresentation>
               </article>
@@ -270,14 +253,18 @@ export async function Homepage() {
               <div>
                 <article className="history-card">
                   <span>{history.dateLabel}</span>
-                  <div className="history-events">
+                  <ol className="history-events" aria-label="Historical moments">
                     {history.events.map((event) => (
-                      <p key={`${event.year}-${event.text}`}>
-                        <strong>{event.year}</strong> {event.text}
-                        <a href={event.sourceUrl} target="_blank" rel="noreferrer">Source <span className="arrow-mark" aria-hidden="true">↗︎</span></a>
-                      </p>
+                      <li className="history-event" key={`${event.year}-${event.kind}-${event.text}`}>
+                        <div className="history-event-meta">
+                          <span className="history-event-kind">{event.kind === "birth" ? "Born" : "On this day"}</span>
+                          <strong>{event.year}</strong>
+                        </div>
+                        <p>{event.text}</p>
+                        <a href={event.sourceUrl} target="_blank" rel="noreferrer">Read the record <span className="arrow-mark" aria-hidden="true">↗︎</span></a>
+                      </li>
                     ))}
-                  </div>
+                  </ol>
                   <small>{history.description}</small>
                   <a className="history-source" href={history.sourceUrl} target="_blank" rel="noreferrer">
                     {history.state === "live" ? "View this week’s Wikimedia events" : "Browse Wikipedia history"} <span className="arrow-mark" aria-hidden="true">↗︎</span>
@@ -371,20 +358,9 @@ export async function Homepage() {
               <p className="about-supporting-copy">
                 I like software that respects the person using it: clear about what’s happening, dependable when things go wrong, and careful with the details.
               </p>
-              <nav className="profile-links" aria-label="Profile links">
-                <a href="#contact">Start a conversation <span className="arrow-mark" aria-hidden="true">↓</span></a>
-                <a href={profile.links.github} target="_blank" rel="noreferrer">
-                  GitHub <span className="arrow-mark" aria-hidden="true">↗︎</span>
-                </a>
-                <a href={profile.links.linkedin} target="_blank" rel="noreferrer">
-                  LinkedIn <span className="arrow-mark" aria-hidden="true">↗︎</span>
-                </a>
-                {profile.links.resume && (
-                  <a href={profile.links.resume} target="_blank" rel="noreferrer">
-                    Résumé <span className="arrow-mark" aria-hidden="true">↗︎</span>
-                  </a>
-                )}
-              </nav>
+              <a className="about-contact-cta" href="#contact">
+                Start a conversation <span className="arrow-mark" aria-hidden="true">↓</span>
+              </a>
             </div>
             <figure className="portrait-frame">
               <Image
@@ -402,16 +378,27 @@ export async function Homepage() {
               <p>Career path</p>
               <div>
                 <h3 id="about-career-title">My career so far.</h3>
-                <span>I started in marketing and data, moved into AI model training, and now work in software engineering.</span>
+                <span>From healthcare marketing to full-stack software and high-performance pricing and risk systems.</span>
               </div>
             </div>
-            <ol aria-labelledby="about-career-title">
-              {journey.map((step, index) => (
-                <li key={step.label}>
-                  <span>0{index + 1}</span>
-                  <p>{step.label}</p>
-                  <h4>{step.title}</h4>
-                  <div>{step.description}</div>
+            <ol className="career-timeline" role="list" aria-labelledby="about-career-title">
+              {careerTimeline.map((entry, index) => (
+                <li className="career-entry" key={entry.employer}>
+                  <div className="career-entry-topline">
+                    <span className="career-entry-index">0{index + 1}</span>
+                    <p className="career-period">
+                      <time dateTime={entry.dates.start.dateTime}>{entry.dates.start.label}</time>
+                      <span aria-hidden="true">—</span>
+                      {entry.dates.end.dateTime ? (
+                        <time dateTime={entry.dates.end.dateTime}>{entry.dates.end.label}</time>
+                      ) : (
+                        <span>{entry.dates.end.label}</span>
+                      )}
+                    </p>
+                  </div>
+                  <h4>{entry.role}</h4>
+                  <p className="career-employer">{entry.employer}</p>
+                  {entry.context && <p className="career-entry-context">{entry.context}</p>}
                 </li>
               ))}
             </ol>
@@ -421,10 +408,27 @@ export async function Homepage() {
         <section id="contact" tabIndex={-1} className="contact-block contact-section" aria-labelledby="contact-title">
           <p>05 / Contact</p>
           <h2 id="contact-title">Get in touch.</h2>
-          <a className="contact-link" href={profile.links.email}>
-            Email me <span className="arrow-mark" aria-hidden="true">↗︎</span>
-          </a>
-          <span>eliasthebennett@gmail.com</span>
+          <div className="contact-actions">
+            <div className="contact-primary-action">
+              <a className="contact-link" href={profile.links.email}>
+                Email me <span className="arrow-mark" aria-hidden="true">↗︎</span>
+              </a>
+              <span className="contact-email">eliasthebennett@gmail.com</span>
+            </div>
+            <nav className="contact-profile-links" aria-label="Other ways to connect">
+              <a href={profile.links.github} target="_blank" rel="noreferrer">
+                GitHub <span className="arrow-mark" aria-hidden="true">↗︎</span>
+              </a>
+              <a href={profile.links.linkedin} target="_blank" rel="noreferrer">
+                LinkedIn <span className="arrow-mark" aria-hidden="true">↗︎</span>
+              </a>
+              {profile.links.resume && (
+                <a href={profile.links.resume} target="_blank" rel="noreferrer">
+                  Résumé <span className="arrow-mark" aria-hidden="true">↗︎</span>
+                </a>
+              )}
+            </nav>
+          </div>
         </section>
       </main>
 

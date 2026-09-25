@@ -38,6 +38,7 @@ export type TrainingSignal = PersonalSignal & {
 
 export type HistoryEvent = {
   year: number;
+  kind: "event" | "birth";
   text: string;
   sourceUrl: string;
 };
@@ -80,11 +81,9 @@ export type CultureSignal = PersonalSignal & {
 };
 
 export type FantasySignal = PersonalSignal & {
-  leftLabel: string;
   matchupLabel: string;
-  rightLabel: string;
-  leftScore?: number;
-  rightScore?: number;
+  teamScore?: number;
+  opponentScore?: number;
   updatedAt: string | null;
 };
 

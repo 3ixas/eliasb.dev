@@ -43,23 +43,32 @@ export const labItems = [
   },
 ] as const;
 
-export const journey = [
+export const careerTimeline = [
   {
-    label: "Earlier",
-    title: "Data and marketing",
-    description:
-      "I started in marketing, working with data and experiments. I became curious about why some experiences worked better than others.",
+    role: "Marketing Executive",
+    employer: "Optegra Eye Healthcare & Kensington Medical",
+    dates: {
+      start: { dateTime: "2021-09", label: "Sept 2021" },
+      end: { dateTime: "2024-08", label: "Aug 2024" },
+    },
+    context: undefined,
   },
   {
-    label: "Then",
-    title: "AI model training",
-    description:
-      "Training and evaluating code for language models taught me to check whether an answer actually holds up. A plausible response was not enough if its reasoning or code was wrong.",
+    role: "Full Stack Software Engineer",
+    employer: "Joveen",
+    dates: {
+      start: { dateTime: "2024-08", label: "Aug 2024" },
+      end: { dateTime: "2025-06", label: "June 2025" },
+    },
+    context: undefined,
   },
   {
-    label: "Now",
-    title: "Software engineering",
-    description:
-      "Today I build high-performance pricing and risk software in C#, alongside personal products in TypeScript and Python.",
+    role: "Software Engineer",
+    employer: "BNP Paribas CIB",
+    dates: {
+      start: { dateTime: "2025-07", label: "July 2025" },
+      end: { dateTime: null, label: "Present" },
+    },
+    context: "High-Performance Computing, Pricing and Risk Systems · through _nology",
   },
 ] as const;

@@ -29,7 +29,7 @@ When a signal looks stale or incomplete, answer these questions in order:
 | Goodreads reading | Goodreads RSS; 30 minutes; 3.5-second request timeout | Authored reading card when the feed is missing, malformed, or unavailable |
 | Strava training | Strava OAuth/activity API; 30 minutes; 4–5-second timeouts | Curated Lift · Run · Muay Thai rhythm when credentials are unavailable or the API fails |
 | Sleeper fantasy | Sleeper public API; 1 hour; 3.5-second request timeout | Authored fantasy matchup when the league or endpoint cannot be read |
-| Wikimedia history | Wikimedia/English Wikipedia On This Day; 7 days; 3.5-second request timeout | Deterministic authored events for the current Monday week |
+| Wikimedia history | Wikimedia/English Wikipedia On This Day `events`, `selected`, and `births` feeds; 7 days; 3.5-second request timeout per feed | If the live feed fails or cannot provide a varied selection, show three source-checked examples spanning three centuries, labelled “Saved examples” rather than presented as this Monday’s events |
 | Spotify playlist | Cross-origin Spotify iframe | A keyboard-accessible titled iframe or Open in Spotify fallback; provider loading is outside site-owned runtime control |
 
 The authoritative signal details live in [`docs/integrations/SIGNALS.md`](../integrations/SIGNALS.md). The card's state label and source link are part of the user-facing contract.

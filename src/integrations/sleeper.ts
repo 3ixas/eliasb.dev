@@ -1,4 +1,4 @@
-import { signalFallbacks } from "@/content/signal-fallbacks";
+import { fantasySourceUnavailable, fantasyWeekUnavailable, signalFallbacks } from "@/content/signal-fallbacks";
 import { integrationConfig } from "@/content/integration-config";
 import type { FantasySignal } from "@/integrations/types";
 
@@ -23,12 +23,10 @@ async function sleeperJson<T>(path: string): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-function score(value: number | undefined) {
-  return typeof value === "number" ? value.toFixed(1) : "—";
-}
-
 export async function getFantasySignal(): Promise<FantasySignal> {
   const { username, leagueId } = integrationConfig.sleeper;
+  const leagueUrl = `https://sleeper.com/leagues/${leagueId}`;
+  let currentWeek: number | undefined;
 
   try {
     const [user, state, rosters] = await Promise.all([
@@ -41,7 +39,11 @@ export async function getFantasySignal(): Promise<FantasySignal> {
     const roster = rosters.find((candidate) => candidate.owner_id === user.user_id);
     if (!roster?.roster_id) return signalFallbacks.fantasy;
 
-    const week = typeof state.week === "number" ? state.week : 1;
+    const week = state.week;
+    if (typeof week !== "number" || !Number.isSafeInteger(week) || week < 1) {
+      return fantasyWeekUnavailable(leagueUrl);
+    }
+    currentWeek = week;
     const matchups = await sleeperJson<SleeperMatchup[]>(
       `/league/${encodeURIComponent(leagueId)}/matchups/${week}`,
     );
@@ -58,18 +60,16 @@ export async function getFantasySignal(): Promise<FantasySignal> {
 
     return {
       state: "live",
-      statusLabel: `Live · week ${week}`,
+      statusLabel: "Live",
       headline: `${record} this season`,
-      description: "My matchup is live, and I keep the other managers anonymous.",
-      leftLabel: `EB ${score(ownMatchup?.points)}`,
-      matchupLabel: `week ${week}`,
-      rightLabel: `OPP ${score(opponent?.points)}`,
-      leftScore: ownMatchup?.points,
-      rightScore: opponent?.points,
+      description: "I share my score here; the other managers’ names stay private.",
+      matchupLabel: `Week ${week}`,
+      teamScore: ownMatchup?.points,
+      opponentScore: opponent?.points,
       updatedAt: new Date().toISOString(),
-      href: `https://sleeper.com/leagues/${leagueId}`,
+      href: leagueUrl,
     };
   } catch {
-    return signalFallbacks.fantasy;
+    return fantasySourceUnavailable(leagueUrl, currentWeek);
   }
 }

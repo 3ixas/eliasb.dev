@@ -3,7 +3,19 @@
 import { useCallback, useEffect, useState } from "react";
 
 const defaultStatement = "I build software that makes complex things easier to understand.";
-type EntrancePhase = "ready" | "typing" | "settling" | "revealing" | "complete";
+type EntrancePhase = "ready" | "typing" | "settling" | "complete";
+
+export function SignatureReplayButton() {
+  return (
+    <button
+      className="signature-replay"
+      type="button"
+      onClick={() => window.dispatchEvent(new Event("replay-concept-entrance"))}
+    >
+      Replay the opening <span className="arrow-mark" aria-hidden="true">↻</span>
+    </button>
+  );
+}
 
 export function SignatureLine({
   direction,
@@ -12,82 +24,80 @@ export function SignatureLine({
   direction: string;
   statement?: string;
 }) {
-  const splitAt = statement.indexOf(" for ");
-  const split = splitAt > 0 ? splitAt : Math.ceil(statement.length * 0.52);
-  const lead = statement.slice(0, split);
-  const tail = statement.slice(split);
   const [phase, setPhase] = useState<EntrancePhase>("ready");
-  const [visibleLead, setVisibleLead] = useState("");
-  const [hasPlayed, setHasPlayed] = useState(false);
+  const [visibleText, setVisibleText] = useState("");
+  const sessionKey = `concept-seen-${direction}`;
+
+  const complete = useCallback(() => {
+    setVisibleText(statement);
+    setPhase("complete");
+  }, [statement]);
 
   const play = useCallback(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduceMotion) {
-      setVisibleLead(lead);
-      setPhase("complete");
-      setHasPlayed(true);
+      complete();
       return;
     }
 
-    setVisibleLead("");
+    const characters = Array.from(statement);
+    setVisibleText("");
     setPhase("typing");
     let index = 0;
     let settleTimer: number | undefined;
-    let revealTimer: number | undefined;
     const timer = window.setInterval(() => {
       index += 1;
-      setVisibleLead(lead.slice(0, index));
-      if (index >= lead.length) {
+      setVisibleText(characters.slice(0, index).join(""));
+      if (index >= characters.length) {
         window.clearInterval(timer);
         setPhase("settling");
         settleTimer = window.setTimeout(() => {
-          setPhase("revealing");
-          revealTimer = window.setTimeout(() => {
-            setPhase("complete");
-            setVisibleLead(lead);
-            setHasPlayed(true);
-            sessionStorage.setItem(`concept-seen-${direction}`, "true");
-          }, 480);
-        }, 280);
+          complete();
+          sessionStorage.setItem(sessionKey, "true");
+        }, 180);
       }
-    }, 46);
+    }, 34);
 
     return () => {
       window.clearInterval(timer);
       if (settleTimer !== undefined) window.clearTimeout(settleTimer);
-      if (revealTimer !== undefined) window.clearTimeout(revealTimer);
     };
-  }, [direction, lead]);
+  }, [complete, sessionKey, statement]);
 
   useEffect(() => {
     let stop: (() => void) | undefined;
-    const seen = sessionStorage.getItem(`concept-seen-${direction}`);
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const seen = sessionStorage.getItem(sessionKey);
     const frame = window.requestAnimationFrame(() => {
-      if (seen) {
-        setVisibleLead(lead);
-        setPhase("complete");
-        setHasPlayed(true);
-      } else {
-        stop = play();
-      }
+      if (seen || motionPreference.matches) complete();
+      else stop = play();
     });
+
+    const finishForReducedMotion = (event: MediaQueryListEvent) => {
+      if (!event.matches) return;
+      window.cancelAnimationFrame(frame);
+      stop?.();
+      stop = undefined;
+      complete();
+    };
     const replay = () => {
       stop?.();
       stop = play();
     };
+    motionPreference.addEventListener("change", finishForReducedMotion);
     window.addEventListener("replay-concept-entrance", replay);
     return () => {
-      if (frame !== undefined) window.cancelAnimationFrame(frame);
+      window.cancelAnimationFrame(frame);
       stop?.();
+      motionPreference.removeEventListener("change", finishForReducedMotion);
       window.removeEventListener("replay-concept-entrance", replay);
     };
-  }, [direction, lead, play]);
+  }, [complete, play, sessionKey]);
 
   return (
-    <h1 className={`signature ${phase} ${hasPlayed ? "has-played" : ""}`} aria-label={statement}>
+    <h1 className={`signature ${phase}`} aria-label={statement}>
       <span className="signature-visible" aria-hidden="true">
-        <span className="signature-lead">{visibleLead}</span>
-        <span className="signature-tail">{tail}</span>
+        <span className="signature-typed-text">{visibleText}</span>
       </span>
       <span className="signature-space" aria-hidden="true">{statement}</span>
     </h1>

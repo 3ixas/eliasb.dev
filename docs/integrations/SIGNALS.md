@@ -18,9 +18,10 @@ The homepage and Library render small server-owned snapshots. External services 
 
 ## History
 
-- The Library requests the Wikimedia/English Wikipedia `onthisday` feed for the Monday of the current week.
-- The response is reduced to at most three events with a year, text, and a source page link. It is cached for seven days and has a deterministic authored fallback when the feed is unavailable or malformed.
-- The card calls itself a weekly note; it does not promise daily maintenance or present fallback text as a live lookup.
+- The Library requests Wikimedia/English Wikipedia `onthisday` `events`, `selected`, and `births` feeds for the Monday of the current week.
+- The selection uses three source-linked historical moments from three centuries, including one before 1900. Each feed is cached for seven days and has a 3.5-second request timeout.
+- If the feed cannot provide a varied selection, the card shows three source-checked examples spanning three centuries. It labels them “Saved examples” and does not present them as this Monday’s events or a live lookup.
+- The live card calls itself a weekly note; it does not promise daily maintenance.
 
 ## Verification boundary
 
