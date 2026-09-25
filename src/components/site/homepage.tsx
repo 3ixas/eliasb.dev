@@ -355,20 +355,9 @@ export async function Homepage() {
               <p className="about-supporting-copy">
                 I like software that respects the person using it: clear about what’s happening, dependable when things go wrong, and careful with the details.
               </p>
-              <nav className="profile-links" aria-label="Profile links">
-                <a href="#contact">Start a conversation <span className="arrow-mark" aria-hidden="true">↓</span></a>
-                <a href={profile.links.github} target="_blank" rel="noreferrer">
-                  GitHub <span className="arrow-mark" aria-hidden="true">↗︎</span>
-                </a>
-                <a href={profile.links.linkedin} target="_blank" rel="noreferrer">
-                  LinkedIn <span className="arrow-mark" aria-hidden="true">↗︎</span>
-                </a>
-                {profile.links.resume && (
-                  <a href={profile.links.resume} target="_blank" rel="noreferrer">
-                    Résumé <span className="arrow-mark" aria-hidden="true">↗︎</span>
-                  </a>
-                )}
-              </nav>
+              <a className="about-contact-cta" href="#contact">
+                Start a conversation <span className="arrow-mark" aria-hidden="true">↓</span>
+              </a>
             </div>
             <figure className="portrait-frame">
               <Image
@@ -416,10 +405,27 @@ export async function Homepage() {
         <section id="contact" tabIndex={-1} className="contact-block contact-section" aria-labelledby="contact-title">
           <p>05 / Contact</p>
           <h2 id="contact-title">Get in touch.</h2>
-          <a className="contact-link" href={profile.links.email}>
-            Email me <span className="arrow-mark" aria-hidden="true">↗︎</span>
-          </a>
-          <span>eliasthebennett@gmail.com</span>
+          <div className="contact-actions">
+            <div className="contact-primary-action">
+              <a className="contact-link" href={profile.links.email}>
+                Email me <span className="arrow-mark" aria-hidden="true">↗︎</span>
+              </a>
+              <span className="contact-email">eliasthebennett@gmail.com</span>
+            </div>
+            <nav className="contact-profile-links" aria-label="Other ways to connect">
+              <a href={profile.links.github} target="_blank" rel="noreferrer">
+                GitHub <span className="arrow-mark" aria-hidden="true">↗︎</span>
+              </a>
+              <a href={profile.links.linkedin} target="_blank" rel="noreferrer">
+                LinkedIn <span className="arrow-mark" aria-hidden="true">↗︎</span>
+              </a>
+              {profile.links.resume && (
+                <a href={profile.links.resume} target="_blank" rel="noreferrer">
+                  Résumé <span className="arrow-mark" aria-hidden="true">↗︎</span>
+                </a>
+              )}
+            </nav>
+          </div>
         </section>
       </main>
 

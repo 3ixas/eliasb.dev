@@ -195,6 +195,27 @@ function verifyHomepage(markup) {
   equal((aboutSection.match(/\bawkward\b/gi) ?? []).length, 1, "About should avoid repeating the word awkward");
   check(!aboutSection.includes("Outside the editor"), "About should not repeat the interests gathered in Library");
   check(!aboutSection.includes("A few other ways I measure a week."), "About should not render the duplicate interests grid");
+  check(!aboutSection.includes("profile-links"), "About should not retain the profile-link group");
+  const aboutContactAction = [...aboutSection.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)]
+    .find(([, tag]) => attribute(tag, "class") === "about-contact-cta");
+  check(Boolean(aboutContactAction), "About should preserve its Contact shortcut");
+  equal(attribute(aboutContactAction?.[1] ?? "", "href"), "#contact", "About conversation action should use the existing Contact anchor");
+  check(plainText(aboutContactAction?.[2] ?? "").includes("Start a conversation"), "About Contact shortcut should retain its clear label");
+  const contactEnd = markup.indexOf("<footer", contactStart);
+  const contactSection = contactStart >= 0 && contactEnd > contactStart ? markup.slice(contactStart, contactEnd) : "";
+  check(Boolean(contactSection), "Homepage should render its Contact section before the footer");
+  const contactActions = contactSection.match(/<nav class="contact-profile-links"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] ?? "";
+  const contactProfiles = [...contactActions.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)];
+  equal(contactProfiles.length, 3, "Contact should present GitHub, LinkedIn, and résumé actions");
+  for (const [index, [, tag, label]] of contactProfiles.entries()) {
+    const expectedLabel = ["GitHub", "LinkedIn", "Résumé"][index];
+    check(plainText(label).includes(expectedLabel), `Contact profile action ${index + 1} should be labelled ${expectedLabel}`);
+    equal(attribute(tag, "target"), "_blank", `${expectedLabel} should preserve its external-link behavior`);
+    check((attribute(tag, "rel") ?? "").split(/\s+/).includes("noreferrer"), `${expectedLabel} should retain safe external-link attributes`);
+  }
+  const emailAction = hrefs(contactSection).find(({ href }) => href?.startsWith("mailto:"));
+  check(emailAction, "Contact should retain the primary email action");
+  check(attribute(emailAction?.tag ?? "", "class") === "contact-link", "Email should remain the primary contact action");
   check(!plainText(markup).toLowerCase().includes("science fiction"), "Homepage should omit a standalone science-fiction category");
   check(markup.includes('href="/work"'), "Homepage should link to the complete Work archive");
   check(markup.includes('href="/work/threshold"'), "Homepage should link to the Threshold case study");

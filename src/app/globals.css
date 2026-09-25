@@ -315,18 +315,24 @@ button { color: inherit; font: inherit; }
 .about-copy { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: end; margin: 80px 0; }
 .about-prose > p { max-width: 650px; margin: 0; font-size: clamp(20px, 2.5vw, 34px); line-height: 1.35; }
 .about-prose > .about-supporting-copy { margin-top: 28px; color: var(--muted); font-size: 15px; line-height: 1.55; }
-.profile-links { display: flex; flex-wrap: wrap; gap: 14px 25px; margin-top: 38px; }
-.profile-links a { padding-bottom: 4px; border-bottom: 1px solid currentColor; font: 11px/1 var(--mono); text-transform: uppercase; }
+.about-contact-cta { display: inline-flex; min-height: 44px; align-items: center; gap: 10px; margin-top: 28px; padding-bottom: 3px; color: var(--accent); border-bottom: 1px solid currentColor; font: 11px/1 var(--mono); letter-spacing: .05em; text-transform: uppercase; }
 .photo-placeholder { display: grid; min-height: 300px; margin: 0; place-items: center; color: var(--muted); background: repeating-linear-gradient(45deg, transparent, transparent 8px, var(--line) 8px, var(--line) 9px); border: 1px solid var(--line); font: 10px/1 var(--mono); text-transform: uppercase; }
 .portrait-frame { position: relative; margin: 0; padding: 10px 10px 38px; color: #282116; background: #f6f0e3; border: 1px solid #282116; box-shadow: 10px 12px 0 #282116; transform: rotate(1.6deg); }
 .portrait-frame img { display: block; width: 100%; height: auto; filter: saturate(.88) contrast(1.02); }
 .portrait-frame figcaption { position: absolute; right: 12px; bottom: 13px; font: 9px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
-.contact-block > p, .contact-block > span { color: var(--muted); font: 10px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
-.contact-block > p { margin: 0; }
-.contact-block > h2 { max-width: 900px; margin: 45px 0 70px; font: 400 clamp(42px, 7vw, 104px)/.9 var(--display); letter-spacing: -.055em; }
-.contact-block > span { display: block; margin-top: 12px; }
-.contact-link { display: flex; justify-content: space-between; padding: 20px 0 12px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); font: 400 clamp(35px, 7vw, 94px)/1 var(--display); letter-spacing: -.05em; }
-.contact-link span { color: var(--accent); }
+.contact-block > p { margin: 0; color: var(--muted); font: 10px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.contact-block > h2 { max-width: 900px; margin: 45px 0 48px; font: 400 clamp(42px, 7vw, 104px)/.9 var(--display); letter-spacing: -.055em; }
+.contact-actions { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(230px, .65fr); gap: 14px; align-items: stretch; }
+.contact-primary-action { display: flex; min-height: 250px; flex-direction: column; justify-content: space-between; padding: clamp(24px, 4vw, 48px); color: var(--paper); background: var(--accent); border: 1px solid var(--ink); box-shadow: 6px 7px 0 var(--ink); }
+.contact-link { display: flex; min-height: 110px; flex: 1; align-items: center; justify-content: space-between; gap: 20px; padding: 0 0 24px; border-bottom: 1px solid currentColor; font: 400 clamp(42px, 6vw, 82px)/.95 var(--display); letter-spacing: -.05em; }
+.contact-link span { color: currentColor; }
+.contact-email { display: block; margin-top: 22px; font: 10px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.contact-profile-links { display: grid; grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.contact-profile-links a { display: flex; min-height: 64px; align-items: center; justify-content: space-between; gap: 15px; padding: 16px 18px; color: var(--ink); background: var(--soft); border: 1px solid var(--line); border-left: 3px solid var(--accent); font: 400 clamp(22px, 2.6vw, 34px)/1 var(--display); transition: color 160ms ease, background-color 160ms ease; }
+.contact-profile-links .arrow-mark { color: var(--accent); font-size: .75em; }
+.contact-link:focus-visible, .contact-profile-links a:hover:focus-visible { outline-color: var(--paper); }
+.contact-profile-links a:hover { color: var(--paper); background: var(--accent); }
+.contact-profile-links a:hover .arrow-mark { color: currentColor; }
 .about-career-path { margin-top: clamp(75px, 10vw, 135px); padding-top: clamp(35px, 5vw, 65px); border-top: 1px solid var(--line); }
 .about-career-heading { display: grid; grid-template-columns: .38fr 1.62fr; gap: 30px; align-items: start; }
 .about-career-heading > p { width: fit-content; margin: 0; padding: 8px 10px; color: var(--paper); background: var(--accent); font: 10px/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
@@ -713,7 +719,6 @@ button { color: inherit; font: inherit; }
 
 .signal-source-link,
 .signal-footnote a,
-.profile-links a,
 .site-footer a,
 .project-rail article > a,
 .rail-links a {
@@ -799,6 +804,9 @@ button { color: inherit; font: inherit; }
   .book-cover { padding: 25px; }
   .book-object[open] summary { transform: rotateY(-145deg); }
   .about-copy { gap: 38px; margin: 55px 0; }
+  .contact-actions { grid-template-columns: 1fr; }
+  .contact-profile-links { grid-template-rows: none; }
+  .contact-profile-links a { min-height: 58px; }
   .about-career-heading { grid-template-columns: 1fr; gap: 22px; }
   .career-timeline { grid-template-columns: 1fr; margin-top: 48px; }
   .site-footer { margin-bottom: 74px; }
