@@ -218,6 +218,11 @@ function verifyHomepage(markup) {
   check(Boolean(aboutSection), "Homepage should render its About section before Contact");
   check(aboutSection.includes("Career path"), "About should identify the career overview");
   check(aboutSection.includes("My career so far."), "About should introduce the career progression plainly");
+  const careerCopy = plainText(aboutSection);
+  check(careerCopy.includes("I like getting under the surface of a product"), "About should explain the personal thread behind the career path");
+  check(careerCopy.includes("Core Web Vitals and split tests"), "About should ground the marketing stage in approved career evidence");
+  check(careerCopy.includes("React, MySQL and a Java/Spring Boot backend"), "About should explain the move into full-stack work with approved evidence");
+  check(careerCopy.includes("These days I work on software that brings market data into pricing and risk calculations"), "About should describe the current role with its verified pricing/risk systems context");
   const careerRoles = [...aboutSection.matchAll(/<h4\b[^>]*>([\s\S]*?)<\/h4>/gi)].map(([, title]) => plainText(title));
   equal(careerRoles.join("|"), "Marketing Executive|Full Stack Software Engineer|Software Engineer", "About career roles should follow the verified chronology");
   const careerEmployers = [...aboutSection.matchAll(/class="career-employer"[^>]*>([\s\S]*?)<\/p>/gi)].map(([, employer]) => plainText(employer));

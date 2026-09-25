@@ -52,6 +52,7 @@ export const careerTimeline = [
       end: { dateTime: "2024-08", label: "Aug 2024" },
     },
     context: undefined,
+    story: "I worked with engineers on website performance, using Core Web Vitals and split tests to help choose what to fix.",
   },
   {
     role: "Full Stack Software Engineer",
@@ -61,6 +62,7 @@ export const careerTimeline = [
       end: { dateTime: "2025-06", label: "June 2025" },
     },
     context: undefined,
+    story: "I moved into the code, improving an ecommerce site across React, MySQL and a Java/Spring Boot backend.",
   },
   {
     role: "Software Engineer",
@@ -70,5 +72,6 @@ export const careerTimeline = [
       end: { dateTime: null, label: "Present" },
     },
     context: "High-Performance Computing, Pricing and Risk Systems · through _nology",
+    story: "These days I work on software that brings market data into pricing and risk calculations.",
   },
 ] as const;

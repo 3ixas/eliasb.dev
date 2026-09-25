@@ -387,7 +387,7 @@ export async function Homepage() {
               <p>Career path</p>
               <div>
                 <h3 id="about-career-title">My career so far.</h3>
-                <span>From healthcare marketing to full-stack software and high-performance pricing and risk systems.</span>
+                <span>I like getting under the surface of a product. I started by using data to improve websites, then moved into building software.</span>
               </div>
             </div>
             <ol className="career-timeline" role="list" aria-labelledby="about-career-title">
@@ -408,6 +408,7 @@ export async function Homepage() {
                   <h4>{entry.role}</h4>
                   <p className="career-employer">{entry.employer}</p>
                   {entry.context && <p className="career-entry-context">{entry.context}</p>}
+                  {entry.story && <p className="career-entry-story">{entry.story}</p>}
                 </li>
               ))}
             </ol>

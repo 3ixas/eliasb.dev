@@ -443,6 +443,7 @@ html[data-home-opening="revealing"] #top > main > .hero > .scroll-cue { animatio
 .career-entry h4 { margin: 30px 0 18px; font: 400 clamp(27px, 2.8vw, 38px)/1 var(--display); }
 .career-employer { width: fit-content; max-width: 100%; margin: 0; padding: 9px 11px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); font: 11px/1.45 var(--mono); overflow-wrap: anywhere; transform-origin: left center; transition: color var(--motion-quick) var(--motion-ease), background-color var(--motion-quick) var(--motion-ease), transform var(--motion-quick) var(--motion-ease); }
 .career-entry-context { margin: 18px 0 0; color: var(--muted); font: 11px/1.55 var(--mono); }
+.career-entry-story { margin: 18px 0 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .career-entry:hover .career-employer { color: var(--paper); background: var(--accent); transform: translateX(7px) rotate(-1deg); }
 }
