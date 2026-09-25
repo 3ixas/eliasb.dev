@@ -275,12 +275,39 @@ html[data-home-opening="revealing"] #top > main > .hero > .scroll-cue { animatio
 .signal-reading > .signal-status { top: 44px; }
 .signal-training, .signal-fantasy, .signal-culture, .signal-playlist { grid-column: span 4; }
 .signal-playlist { grid-column: span 8; }
+.contribution-calendar { margin-top: 22px; }
+.contribution-calendar-heading, .contribution-calendar-footer { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+.contribution-calendar-heading { flex-wrap: wrap; margin-bottom: 13px; color: var(--muted); font: 9px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.contribution-calendar-heading span { white-space: nowrap; }
+.contribution-calendar-viewport { overflow-x: auto; overflow-y: hidden; padding-bottom: 7px; overscroll-behavior-inline: contain; scrollbar-color: color-mix(in srgb, var(--accent) 70%, var(--line)) var(--line); scrollbar-width: thin; }
+.contribution-calendar-grid { width: 100%; min-width: 875px; }
+.contribution-months, .contribution-weekday-row { display: grid; grid-template-columns: 34px repeat(var(--week-count), minmax(12px, 1fr)); column-gap: 4px; }
+.contribution-months { min-height: 18px; align-items: end; color: var(--muted); font: 9px/1 var(--mono); }
+.contribution-months > span:not(:first-child) { white-space: nowrap; }
+.contribution-days { display: grid; row-gap: 4px; }
+.contribution-weekday-row { min-height: 12px; align-items: center; }
+.contribution-weekday-label { color: var(--muted); font: 8px/1 var(--mono); }
+.contribution-day-cell, .contribution-day-empty { display: block; aspect-ratio: 1; }
+.contribution-day { display: block; width: 100%; height: 100%; min-width: 12px; min-height: 12px; padding: 0; cursor: pointer; border: 0; border-radius: 2px; background: var(--line); transition: background-color 160ms var(--motion-ease), box-shadow 160ms var(--motion-ease); }
+.contribution-day[data-level="1"], .contribution-day-swatch[data-level="1"], .contribution-calendar-legend [data-level="1"] { background: color-mix(in srgb, var(--accent) 38%, var(--paper)); }
+.contribution-day[data-level="2"], .contribution-day-swatch[data-level="2"], .contribution-calendar-legend [data-level="2"] { background: color-mix(in srgb, var(--accent) 60%, var(--paper)); }
+.contribution-day[data-level="3"], .contribution-day-swatch[data-level="3"], .contribution-calendar-legend [data-level="3"] { background: color-mix(in srgb, var(--accent) 80%, var(--paper)); }
+.contribution-day[data-level="4"], .contribution-day-swatch[data-level="4"], .contribution-calendar-legend [data-level="4"] { background: var(--accent); }
+.contribution-day[aria-current="date"] { box-shadow: inset 0 0 0 1px var(--ink); }
+.contribution-day:hover, .contribution-day:focus-visible { position: relative; z-index: 1; outline: 2px solid var(--ink); outline-offset: 2px; }
+.contribution-calendar-instructions { margin: 8px 0 0; color: var(--muted); font: 9px/1.4 var(--mono); }
+.contribution-calendar-footer { margin-top: 12px; }
+.contribution-day-detail { display: flex; min-width: 0; gap: 8px; align-items: center; color: var(--muted); font: 9px/1.35 var(--mono); }
+.contribution-day-detail time { color: var(--ink); }
+.contribution-day-swatch, .contribution-calendar-legend i { display: inline-block; width: 12px; height: 12px; flex: 0 0 auto; border-radius: 2px; background: var(--line); }
+.contribution-calendar-legend { display: flex; gap: 4px; align-items: center; color: var(--muted); font: 8px/1 var(--mono); }
+.contribution-calendar-legend span:first-child { margin-right: 3px; }
+.contribution-calendar-legend span:last-child { margin-left: 3px; }
+.contribution-calendar-footer { flex-wrap: wrap; }
+.contribution-calendar-empty { margin: 22px 0 0; padding: 15px 0 4px; color: var(--muted); border-top: 1px solid var(--line); font: 12px/1.45 var(--sans); }
+.contribution-calendar-empty[role="status"] { color: var(--ink); }
 .activity-trace { display: grid; grid-template-columns: repeat(53, minmax(2px, 1fr)); grid-template-rows: repeat(7, minmax(3px, 1fr)); grid-auto-flow: column; gap: 3px; margin-top: 20px; }
 .activity-trace i { aspect-ratio: 1; background: var(--line); }
-.activity-trace i[data-level="1"] { background: color-mix(in srgb, var(--accent) 38%, var(--paper)); }
-.activity-trace i[data-level="2"] { background: color-mix(in srgb, var(--accent) 60%, var(--paper)); }
-.activity-trace i[data-level="3"] { background: color-mix(in srgb, var(--accent) 80%, var(--paper)); }
-.activity-trace i[data-level="4"] { background: var(--accent); }
 .signal-footnote { display: flex; justify-content: space-between; gap: 15px; margin-top: 12px; color: var(--muted); font: 8px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
 .signal-footnote a { padding-bottom: 2px; border-bottom: 1px solid currentColor; }
 .signal-metrics { display: flex; align-items: baseline; gap: 7px; margin-top: 18px; color: var(--muted); font: 9px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
@@ -469,18 +496,10 @@ html[data-home-opening="revealing"] #top > main > .hero > .scroll-cue { animatio
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .prototype-cabinet-of-curiosities .currently-section .signal-fantasy { --ink: #f0e8d8; --muted: #cfc4b2; --accent: #67c5a7; } }
 
 /* Keep the Personal signals cards balanced and readable in the selected home design. */
-.prototype-cabinet-of-curiosities .currently-section .signal-building { grid-column: span 8; min-height: 370px; }
+.prototype-cabinet-of-curiosities .currently-section .signal-building { grid-column: span 12; min-height: 370px; }
 .prototype-cabinet-of-curiosities .currently-section .signal-presence { grid-column: span 4; }
 .prototype-cabinet-of-curiosities .currently-section .signal-training,
 .prototype-cabinet-of-curiosities .currently-section .signal-fantasy { grid-column: span 6; }
-.prototype-cabinet-of-curiosities .currently-section .signal-building .activity-trace {
-  height: auto;
-  max-height: 132px;
-  aspect-ratio: 53 / 7;
-  grid-template-rows: repeat(7, minmax(0, 1fr));
-  gap: 4px;
-  margin-top: 24px;
-}
 .prototype-cabinet-of-curiosities .currently-section .signal-training {
   --ink: #17100a;
   --muted: #17100a;
@@ -867,7 +886,6 @@ html[data-home-opening="revealing"] #top > main > .hero > .scroll-cue { animatio
   .signal-building { min-height: 290px; }
   .signal-training { min-height: 0; }
   .activity-trace { gap: 2px; }
-  .prototype-cabinet-of-curiosities .currently-section .signal-building .activity-trace { height: auto; gap: 2px; }
   .training-schedule { grid-template-columns: 1fr; }
   .spotify-embed { min-height: 152px; }
   .library-stage { min-height: 760px; align-items: start; }

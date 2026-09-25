@@ -3,6 +3,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   GITHUB_ACTIVITY_DAYS,
+  datesForWindow,
   groupTrainingActivities,
   mapContributionDays,
   mapPublicActivity,
@@ -13,6 +14,10 @@ import { getHistorySignal, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "
 import { fantasySourceUnavailable, fantasyWeekUnavailable, signalFallbacks } from "../src/content/signal-fallbacks.ts";
 import { FantasyMatchup } from "../src/components/site/fantasy-matchup.ts";
 import { SignalPresentation } from "../src/components/site/signal-presentation.ts";
+import {
+  createContributionCalendar,
+  moveContributionCalendarIndex,
+} from "../src/components/site/contribution-calendar-model.ts";
 
 const now = new Date("2026-09-16T12:00:00.000Z");
 const signalStates = new Set(["live", "curated", "pending", "unavailable"]);
@@ -253,8 +258,29 @@ const pendingMatchupMarkup = renderToStaticMarkup(createElement(FantasyMatchup, 
 assert.match(pendingMatchupMarkup, /My team[\s\S]*—[\s\S]*Opponent[\s\S]*—/);
 assert.equal(pendingMatchupMarkup.includes('class="matchup-bars"'), false, "Unknown scores should not imply an equal matchup");
 
-assert.equal(GITHUB_ACTIVITY_DAYS, 371);
+assert.equal(GITHUB_ACTIVITY_DAYS, 365);
 assert.equal(signalFallbacks.github.activity.length, GITHUB_ACTIVITY_DAYS);
+const contributionDays = datesForWindow(GITHUB_ACTIVITY_DAYS, now).map((day, index) => ({
+  ...day,
+  count: index === 100 ? 4 : day.count,
+}));
+const contributionCalendar = createContributionCalendar(contributionDays);
+assert.ok(contributionCalendar);
+assert.equal(contributionCalendar.days.length, 365);
+assert.equal(contributionCalendar.weekCount, 53);
+assert.equal(contributionCalendar.rows.flat().filter(Boolean).length, 365);
+assert.equal(contributionCalendar.days[0].date, "2025-09-17");
+assert.equal(contributionCalendar.days.at(-1)?.date, "2026-09-16");
+assert.equal(contributionCalendar.rows.flat().find((day) => day?.count === 4)?.date, contributionDays[100].date);
+assert.ok(contributionCalendar.monthLabels.length >= 12);
+assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "ArrowLeft"), 93);
+assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "ArrowRight"), 107);
+assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "ArrowDown"), 101);
+assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "ArrowUp"), 99);
+assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "Home"), 95);
+assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "End"), 101);
+assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "Escape"), null);
+assert.equal(createContributionCalendar([]), null);
 assert.deepEqual(signalFallbacks.training.schedule?.map(({ day, activity }) => ({ day, activity })), [
   { day: "Mon", activity: "Full body" },
   { day: "Tue", activity: "Zone 2 run" },

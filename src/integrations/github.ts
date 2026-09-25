@@ -5,8 +5,6 @@ import type { ActivityDay, GitHubSignal } from "@/integrations/types";
 const GITHUB_LOGIN = "3ixas";
 const GITHUB_PROFILE = `https://github.com/${GITHUB_LOGIN}`;
 const API_VERSION = "2026-03-10";
-const ACTIVITY_DAYS = GITHUB_ACTIVITY_DAYS;
-const CONTRIBUTION_WINDOW_DAYS = 365;
 
 type GitHubEvent = {
   type: string;
@@ -70,7 +68,7 @@ function describeEvent(event: GitHubEvent) {
 async function fetchContributionActivity(token: string): Promise<ContributionSnapshot | null> {
   const to = new Date();
   const from = new Date(to);
-  from.setUTCDate(to.getUTCDate() - (CONTRIBUTION_WINDOW_DAYS - 1));
+  from.setUTCDate(to.getUTCDate() - (GITHUB_ACTIVITY_DAYS - 1));
 
   const response = await fetch("https://api.github.com/graphql", {
     method: "POST",
@@ -112,7 +110,7 @@ async function fetchContributionActivity(token: string): Promise<ContributionSna
   if (!calendar || !days?.length || typeof calendar.totalContributions !== "number") return null;
 
   return {
-    activity: mapContributionDays(days, ACTIVITY_DAYS),
+    activity: mapContributionDays(days, GITHUB_ACTIVITY_DAYS),
     totalContributions: calendar.totalContributions,
     privateContributions:
       typeof collection?.restrictedContributionsCount === "number"
@@ -167,7 +165,7 @@ export async function getGitHubSignal(): Promise<GitHubSignal> {
   }
 
   if (latest) {
-    const activity = mapPublicActivity(events);
+    const activity = mapPublicActivity(events, GITHUB_ACTIVITY_DAYS);
     return {
       state: "live",
       statusLabel: token ? "Live · public only" : "Live · public",
@@ -187,7 +185,7 @@ export async function getGitHubSignal(): Promise<GitHubSignal> {
       statusLabel: token ? "Live · public only" : "Live · public",
       headline: "A quiet stretch on public GitHub.",
       description: "",
-      activity: mapPublicActivity(events),
+      activity: mapPublicActivity(events, GITHUB_ACTIVITY_DAYS),
       activityLabel: "Public GitHub activity over the last year",
       updatedAt: new Date().toISOString(),
     };

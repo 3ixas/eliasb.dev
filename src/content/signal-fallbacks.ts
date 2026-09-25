@@ -30,7 +30,7 @@ export const signalFallbacks: HomepageSignals = {
     statusLabel: "No live update",
     headline: "I couldn’t load GitHub just now.",
     description: "",
-    activity: recentDates(371),
+    activity: recentDates(365),
     activityLabel: "GitHub contributions over the last year are unavailable right now",
     updatedAt: null,
     href: "https://github.com/3ixas",

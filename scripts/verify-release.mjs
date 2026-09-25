@@ -285,11 +285,22 @@ function verifyHomepage(markup) {
   }
   const githubCalendar = [...markup.matchAll(/<[a-z][^>]*>/gi)]
     .map(([tag]) => tag)
-    .find((tag) => attribute(tag, "role") === "img" && /GitHub/i.test(attribute(tag, "aria-label") ?? ""));
-  check(githubCalendar, "GitHub contribution view should have a named image description");
-  const githubCalendarLabel = attribute(githubCalendar ?? "", "aria-label") ?? "";
-  check(/GitHub (contributions|activity).*last year/i.test(githubCalendarLabel), "GitHub contribution view should describe the yearly aggregate");
-  check(!/\b[\w.-]+\/[\w.-]+\b/.test(githubCalendarLabel), "GitHub contribution description should not expose repository details");
+    .find((tag) => attribute(tag, "role") === "grid" && /GitHub/i.test(attribute(tag, "aria-label") ?? ""));
+  const calendarUnavailableNotice = [...markup.matchAll(/<[a-z][^>]*>/gi)]
+    .map(([tag]) => tag)
+    .find((tag) => tag.includes("contribution-calendar-empty"));
+  if (githubCalendar) {
+    const githubCalendarLabel = attribute(githubCalendar, "aria-label") ?? "";
+    check(/GitHub contributions.*by day/i.test(githubCalendarLabel), "GitHub contribution grid should name its day-level data");
+    check(!/\b[\w.-]+\/[\w.-]+\b/.test(githubCalendarLabel), "GitHub contribution description should not expose repository details");
+    check((markup.match(/class="contribution-day"/g) ?? []).length === 365, "GitHub contribution grid should expose exactly 365 days");
+    check(markup.includes("Past 365 days"), "GitHub contribution grid should identify its time window");
+    check(/\b[A-Z][a-z]{2} 20\d{2} – [A-Z][a-z]{2} 20\d{2}\b/.test(plainText(markup)), "GitHub contribution grid should show month and year context");
+    check(markup.includes("contribution-calendar-instructions"), "GitHub contribution grid should explain its scroll and keyboard controls");
+  } else {
+    check(calendarUnavailableNotice || /I couldn’t load GitHub just now/.test(plainText(markup)), "Without the private aggregate snapshot, GitHub should explain why the full-year calendar is unavailable");
+    check(!/class="contribution-day"/.test(markup), "A partial public-event feed should not be shown as a complete year");
+  }
 
   const text = plainText(markup);
   check(/Goodreads/i.test(text) && /(Currently reading|Last on Goodreads)/i.test(text), "Reading signal should identify Goodreads and the current or last logged book");

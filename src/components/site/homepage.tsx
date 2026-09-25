@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { LocalTime } from "@/components/local-time";
 import { ClosableDetails } from "@/components/site/closable-details";
+import { ContributionCalendar } from "@/components/site/contribution-calendar";
 import { FeaturedWork } from "@/components/site/featured-work";
 import { FantasyMatchup } from "@/components/site/fantasy-matchup";
 import { InViewMotion } from "@/components/site/in-view-motion";
@@ -18,14 +19,6 @@ import { integrationConfig } from "@/content/integration-config";
 import { profile } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
 import { getHistorySignal } from "@/integrations/history";
-
-function activityLevel(count: number) {
-  if (count >= 4) return "4";
-  if (count >= 3) return "3";
-  if (count >= 2) return "2";
-  if (count >= 1) return "1";
-  return "0";
-}
 
 export async function Homepage() {
   const [signals, history] = await Promise.all([getHomepageSignals(), getHistorySignal()]);
@@ -83,11 +76,13 @@ export async function Homepage() {
                       <span>private</span>
                     </div>
                   )}
-                  <div className="activity-trace" role="img" aria-label={signals.github.activityLabel}>
-                    {signals.github.activity.map((day) => (
-                      <i key={day.date} data-level={activityLevel(day.count)} aria-hidden="true" />
-                    ))}
-                  </div>
+                  {signals.github.totalContributions !== undefined ? (
+                    <ContributionCalendar activity={signals.github.activity} label={signals.github.activityLabel} />
+                  ) : signals.github.state !== "unavailable" ? (
+                    <p className="contribution-calendar-empty">
+                      The full-year calendar isn’t available from the public snapshot.
+                    </p>
+                  ) : null}
                 </SignalPresentation>
               </article>
               <article className="signal signal-presence">
