@@ -177,9 +177,9 @@ button { color: inherit; font: inherit; }
 .project-stack dd { margin: 0; color: var(--muted); font: 11px/1.65 var(--mono); }
 .project-links { display: flex; flex-wrap: wrap; gap: 20px; }
 .project-links a { display: inline-block; padding-bottom: 4px; border-bottom: 1px solid currentColor; font-size: 13px; }
-.project-feature--threshold { --project-accent: #1e6b58; }
-.project-feature--argus-risk { --project-accent: #496b91; }
-.project-feature--flowtime { --project-accent: #6a599f; }
+.project-feature--threshold { --project-accent: #185c4a; }
+.project-feature--argus-risk { --project-accent: #3b5878; }
+.project-feature--flowtime { --project-accent: #584586; }
 :root[data-theme="dark"] .project-feature--threshold { --project-accent: #67c5a7; }
 :root[data-theme="dark"] .project-feature--argus-risk { --project-accent: #8eb6e0; }
 :root[data-theme="dark"] .project-feature--flowtime { --project-accent: #b8a8ef; }
@@ -368,7 +368,7 @@ button { color: inherit; font: inherit; }
 .prototype main, .collection-page main, .work-index-page main, .case-study main { animation: page-enter var(--motion-arrival) var(--motion-ease) both; }
 
 /* Direction 01: Living Editorial */
-.prototype-living-editorial { --paper: #f3f0e8; --ink: #141512; --muted: #706e66; --accent: #eb5b32; }
+.prototype-living-editorial { --paper: #f3f0e8; --ink: #141512; --muted: #625f57; --accent: #a83b21; }
 :root[data-theme="dark"] .prototype-living-editorial { --paper: #151613; --ink: #f2efe6; --muted: #aaa79e; --accent: #ff724c; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .prototype-living-editorial { --paper: #151613; --ink: #f2efe6; --muted: #aaa79e; --accent: #ff724c; } }
 .prototype-living-editorial .signature::first-letter { font-style: italic; }
@@ -407,8 +407,8 @@ button { color: inherit; font: inherit; }
 .prototype-cabinet-of-curiosities .signal:nth-child(2) { --ink: #17100a; --muted: #1c1406; color: var(--ink); background: #e6b94d; transform: rotate(1deg); }
 .prototype-cabinet-of-curiosities .signal:nth-child(3) { --ink: #000; --muted: #000; color: var(--ink); background: #df8b73; transform: rotate(-1deg); }
 .prototype-cabinet-of-curiosities .signal:nth-child(4) { --ink: #11100e; --accent: #002515; background: color-mix(in srgb, var(--accent) 20%, var(--paper)); }
-:root[data-theme="dark"] .prototype-cabinet-of-curiosities .signal:nth-child(4) { --ink: #f0e8d8; --muted: #cfc4b2; --accent: #67c5a7; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .prototype-cabinet-of-curiosities .signal:nth-child(4) { --ink: #f0e8d8; --muted: #cfc4b2; --accent: #67c5a7; } }
+:root[data-theme="dark"] .prototype-cabinet-of-curiosities .currently-section .signal-fantasy { --ink: #f0e8d8; --muted: #cfc4b2; --accent: #67c5a7; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .prototype-cabinet-of-curiosities .currently-section .signal-fantasy { --ink: #f0e8d8; --muted: #cfc4b2; --accent: #67c5a7; } }
 
 /* Keep the Personal signals cards balanced and readable in the selected home design. */
 .prototype-cabinet-of-curiosities .currently-section .signal-building { grid-column: span 8; min-height: 370px; }
@@ -445,7 +445,7 @@ button { color: inherit; font: inherit; }
 .prototype-cabinet-of-curiosities .shelf-note { color: #fff7ea; }
 .prototype-cabinet-of-curiosities .shelf-note p:first-child,
 .prototype-cabinet-of-curiosities .shelf-note p:last-child { color: #fff7ea; }
-.library-page, .prototype-cabinet-of-curiosities .outside-work-culture { --library-bg: #4d3925; --library-room: #856b4c; --library-paper: #e8e1d4; --library-ink: #000; --library-muted: #655e52; --library-light: #fff7ea; --library-summary-ink: #000; --library-playlist-ink: #fff7ea; --library-page: #f5f0df; --library-accent: #1e6b58; --library-object: #c95332; --library-object-alt: #283b50; }
+.library-page, .prototype-cabinet-of-curiosities .outside-work-culture { --library-bg: #4d3925; --library-room: #856b4c; --library-paper: #e8e1d4; --library-ink: #000; --library-muted: #5d574b; --library-light: #fff7ea; --library-summary-ink: #000; --library-playlist-ink: #fff7ea; --library-page: #f5f0df; --library-accent: #185c4a; --library-object: #c95332; --library-object-alt: #283b50; }
 :root[data-theme="dark"] .library-page, :root[data-theme="dark"] .prototype-cabinet-of-curiosities .outside-work-culture { --library-bg: #171411; --library-room: #4a3a2d; --library-paper: #28231e; --library-ink: #f0e8d8; --library-muted: #b0a494; --library-light: #f4eee4; --library-summary-ink: #fff; --library-playlist-ink: #10251f; --library-page: #25211d; --library-accent: #67c5a7; --library-object: #a94e39; --library-object-alt: #243247; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .library-page, :root:not([data-theme="light"]) .prototype-cabinet-of-curiosities .outside-work-culture { --library-bg: #171411; --library-room: #4a3a2d; --library-paper: #28231e; --library-ink: #f0e8d8; --library-muted: #b0a494; --library-light: #f4eee4; --library-summary-ink: #fff; --library-playlist-ink: #10251f; --library-page: #25211d; --library-accent: #67c5a7; --library-object: #a94e39; --library-object-alt: #243247; } }
 .prototype-cabinet-of-curiosities .outside-work-culture .signal-status { width: fit-content; margin-top: 8px; padding: 5px 7px; border: 1px solid currentColor; border-radius: 99px; font: 8px/1 var(--mono); letter-spacing: .07em; text-transform: uppercase; }

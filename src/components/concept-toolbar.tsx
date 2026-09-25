@@ -11,7 +11,7 @@ export function ConceptToolbar({ direction }: { direction: ConceptDirection }) {
 
   return (
     <aside className="concept-toolbar" aria-label="Concept controls">
-      <Link href="/" className="toolbar-back">All directions</Link>
+      <Link href="/concepts" className="toolbar-back">All directions</Link>
       <div className="toolbar-directions" aria-label="Visual directions">
         {Object.entries(conceptDirections).map(([slug, concept]) => (
           <Link

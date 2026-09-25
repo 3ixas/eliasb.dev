@@ -22,6 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Elias B.",
+    url: "/",
     title: "Elias B. — Software that makes complex things easier to understand",
     description:
       "Projects, ideas, and interests from Elias Bennett, a software engineer in London.",
