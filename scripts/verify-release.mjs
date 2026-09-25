@@ -16,10 +16,10 @@ const canonicalPages = [
   "/work/argus-risk",
   "/work/flowtime",
 ];
-const expectedSitemapUrls = new Set(canonicalPages.map((route) => route === "/" ? "https://eliasb.dev" : `https://eliasb.dev${route}`));
+const expectedSitemapUrls = new Set(canonicalPages.map((route) => route === "/" ? "https://www.eliasb.dev" : `https://www.eliasb.dev${route}`));
 const expectedIndexableRobots = [
   ["user-agent: *", "allow: /", "disallow: /concepts/"],
-  ["host: https://eliasb.dev", "sitemap: https://eliasb.dev/sitemap.xml"],
+  ["host: https://www.eliasb.dev", "sitemap: https://www.eliasb.dev/sitemap.xml"],
 ];
 
 const requiredHomepageSections = ["work", "outside-work", "experiments", "about", "contact"];

@@ -10,11 +10,11 @@ const redirectContracts = [
   ["/lab", "/#experiments"],
 ];
 const expectedSitemapUrls = new Set([
-  "https://eliasb.dev",
-  "https://eliasb.dev/work",
-  "https://eliasb.dev/work/threshold",
-  "https://eliasb.dev/work/argus-risk",
-  "https://eliasb.dev/work/flowtime",
+  "https://www.eliasb.dev",
+  "https://www.eliasb.dev/work",
+  "https://www.eliasb.dev/work/threshold",
+  "https://www.eliasb.dev/work/argus-risk",
+  "https://www.eliasb.dev/work/flowtime",
 ]);
 
 function configuredBaseUrl() {
@@ -72,7 +72,7 @@ async function verifyRoutes(baseUrl) {
     assert.equal(response.headers.get("location"), expectedLocation, `${route} has the wrong Location`);
   }
 
-  for (const [route, expectedCanonical] of [["/work", "https://eliasb.dev/work"], ["/work/threshold", "https://eliasb.dev/work/threshold"]]) {
+  for (const [route, expectedCanonical] of [["/work", "https://www.eliasb.dev/work"], ["/work/threshold", "https://www.eliasb.dev/work/threshold"]]) {
     const response = await fetch(new URL(route, baseUrl), { redirect: "manual" });
     assert.equal(response.status, 200, `${route} should render successfully`);
     const document = await response.text();

@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const siteUrl = "https://eliasb.dev";
+const siteUrl = "https://www.eliasb.dev";
 const routes = [
   "",
   "/work",

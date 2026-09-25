@@ -4,7 +4,7 @@ import "./globals.css";
 const isIndexable = process.env.SITE_INDEXABLE === "true";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://eliasb.dev"),
+  metadataBase: new URL("https://www.eliasb.dev"),
   title: {
     default: "Elias B. — Software that makes complex things easier to understand",
     template: "%s · Elias B.",
