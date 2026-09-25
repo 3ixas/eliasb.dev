@@ -183,8 +183,15 @@ function verifyHomepage(markup) {
   check(Boolean(aboutSection), "Homepage should render its About section before Contact");
   check(aboutSection.includes("Career path"), "About should identify the career overview");
   check(aboutSection.includes("My career so far."), "About should introduce the career progression plainly");
-  const careerStages = [...aboutSection.matchAll(/<h4\b[^>]*>([\s\S]*?)<\/h4>/gi)].map(([, title]) => plainText(title));
-  equal(careerStages.join("|"), "Data and marketing|AI model training|Software engineering", "About career stages should remain in sequence");
+  const careerRoles = [...aboutSection.matchAll(/<h4\b[^>]*>([\s\S]*?)<\/h4>/gi)].map(([, title]) => plainText(title));
+  equal(careerRoles.join("|"), "Marketing Executive|Full Stack Software Engineer|Software Engineer", "About career roles should follow the verified chronology");
+  const careerEmployers = [...aboutSection.matchAll(/class="career-employer"[^>]*>([\s\S]*?)<\/p>/gi)].map(([, employer]) => plainText(employer));
+  equal(careerEmployers.join("|"), "Optegra Eye Healthcare & Kensington Medical|Joveen|BNP Paribas CIB", "About should show the verified employers in order");
+  const careerDates = [...aboutSection.matchAll(/<time\b[^>]*>([\s\S]*?)<\/time>/gi)].map(([, date]) => plainText(date));
+  equal(careerDates.join("|"), "Sept 2021|Aug 2024|Aug 2024|June 2025|July 2025", "About should expose the verified role dates");
+  check(aboutSection.includes("Present"), "About should show the current role as ongoing");
+  check(aboutSection.includes("High-Performance Computing, Pricing and Risk Systems"), "About should retain the verified current team context");
+  check(!aboutSection.includes("AI model training"), "About should not claim unverified career experience");
   equal((aboutSection.match(/\bawkward\b/gi) ?? []).length, 1, "About should avoid repeating the word awkward");
   check(!aboutSection.includes("Outside the editor"), "About should not repeat the interests gathered in Library");
   check(!aboutSection.includes("A few other ways I measure a week."), "About should not render the duplicate interests grid");

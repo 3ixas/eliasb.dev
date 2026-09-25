@@ -333,12 +333,17 @@ button { color: inherit; font: inherit; }
 .about-career-heading > div { display: flex; flex-direction: column; gap: 24px; }
 .about-career-heading h3 { max-width: 900px; margin: 0; font: 400 clamp(42px, 6vw, 82px)/.9 var(--display); letter-spacing: -.05em; }
 .about-career-heading > div > span { max-width: 700px; color: var(--muted); font-size: clamp(16px, 1.8vw, 22px); line-height: 1.45; }
-.about-career-path ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: clamp(48px, 7vw, 90px) 0 0; padding: 0; list-style: none; }
-.about-career-path li { display: grid; grid-template-columns: 38px 1fr; grid-template-areas: "number era" "title title" "description description"; align-content: start; gap: 22px 14px; padding: 22px; background: var(--soft); border: 1px solid var(--line); border-top: 3px solid var(--accent); box-shadow: 5px 6px 0 color-mix(in srgb, var(--accent) 24%, transparent); }
-.about-career-path li > span { display: grid; grid-area: number; width: 34px; height: 34px; place-items: center; color: var(--paper); background: var(--accent); border-radius: 50%; font: 10px/1 var(--mono); }
-.about-career-path li > p { grid-area: era; align-self: center; margin: 0; color: var(--muted); font: 10px/1.35 var(--mono); text-transform: uppercase; }
-.about-career-path li h4 { grid-area: title; margin: 0; font: 400 clamp(30px, 3.2vw, 43px)/1 var(--display); }
-.about-career-path li > div { grid-area: description; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.career-timeline { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: clamp(48px, 7vw, 90px) 0 0; padding: 0; list-style: none; }
+.career-entry { min-width: 0; padding: 22px; background: var(--soft); border: 1px solid var(--line); border-top: 3px solid var(--accent); box-shadow: 5px 6px 0 color-mix(in srgb, var(--accent) 24%, transparent); }
+.career-entry-topline { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.career-entry-index { color: var(--accent); font: 10px/1 var(--mono); }
+.career-period { display: flex; flex-wrap: wrap; gap: 5px; margin: 0; color: var(--muted); font: 10px/1.4 var(--mono); text-transform: uppercase; }
+.career-entry h4 { margin: 30px 0 18px; font: 400 clamp(27px, 2.8vw, 38px)/1 var(--display); }
+.career-employer { width: fit-content; max-width: 100%; margin: 0; padding: 9px 11px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); font: 11px/1.45 var(--mono); overflow-wrap: anywhere; transform-origin: left center; transition: color 160ms ease, background-color 160ms ease, transform 180ms ease; }
+.career-entry-context { margin: 18px 0 0; color: var(--muted); font: 11px/1.55 var(--mono); }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .career-entry:hover .career-employer { color: var(--paper); background: var(--accent); transform: translateX(7px) rotate(-1deg); }
+}
 .site-footer { display: flex; justify-content: space-between; padding: 30px clamp(22px, 4vw, 64px); color: var(--muted); border-top: 1px solid var(--line); font: 9px/1.4 var(--mono); text-transform: uppercase; }
 .site-footer div { display: flex; gap: 25px; }
 
@@ -795,7 +800,7 @@ button { color: inherit; font: inherit; }
   .book-object[open] summary { transform: rotateY(-145deg); }
   .about-copy { gap: 38px; margin: 55px 0; }
   .about-career-heading { grid-template-columns: 1fr; gap: 22px; }
-  .about-career-path ol { grid-template-columns: 1fr; margin-top: 48px; }
+  .career-timeline { grid-template-columns: 1fr; margin-top: 48px; }
   .site-footer { margin-bottom: 74px; }
   .prototype-cabinet-of-curiosities .site-header { margin: 10px; }
   .prototype-cabinet-of-curiosities .work-section, .prototype-cabinet-of-curiosities .currently-section, .prototype-cabinet-of-curiosities .lab-section, .prototype-cabinet-of-curiosities .library-section, .prototype-cabinet-of-curiosities .about-section, .prototype-cabinet-of-curiosities .contact-section { margin: 10px; padding-right: 18px; padding-left: 18px; }

@@ -12,7 +12,7 @@ import {
 } from "@/components/site/signal-presentation";
 import { SignatureLine } from "@/components/signature-line";
 import { SiteHeader } from "@/components/site/site-header";
-import { journey, labItems } from "@/content/collections";
+import { careerTimeline, labItems } from "@/content/collections";
 import { integrationConfig } from "@/content/integration-config";
 import { profile } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
@@ -386,16 +386,27 @@ export async function Homepage() {
               <p>Career path</p>
               <div>
                 <h3 id="about-career-title">My career so far.</h3>
-                <span>I started in marketing and data, moved into AI model training, and now work in software engineering.</span>
+                <span>From healthcare marketing to full-stack software and high-performance pricing and risk systems.</span>
               </div>
             </div>
-            <ol aria-labelledby="about-career-title">
-              {journey.map((step, index) => (
-                <li key={step.label}>
-                  <span>0{index + 1}</span>
-                  <p>{step.label}</p>
-                  <h4>{step.title}</h4>
-                  <div>{step.description}</div>
+            <ol className="career-timeline" role="list" aria-labelledby="about-career-title">
+              {careerTimeline.map((entry, index) => (
+                <li className="career-entry" key={entry.employer}>
+                  <div className="career-entry-topline">
+                    <span className="career-entry-index">0{index + 1}</span>
+                    <p className="career-period">
+                      <time dateTime={entry.dates.start.dateTime}>{entry.dates.start.label}</time>
+                      <span aria-hidden="true">—</span>
+                      {entry.dates.end.dateTime ? (
+                        <time dateTime={entry.dates.end.dateTime}>{entry.dates.end.label}</time>
+                      ) : (
+                        <span>{entry.dates.end.label}</span>
+                      )}
+                    </p>
+                  </div>
+                  <h4>{entry.role}</h4>
+                  <p className="career-employer">{entry.employer}</p>
+                  {entry.context && <p className="career-entry-context">{entry.context}</p>}
                 </li>
               ))}
             </ol>
