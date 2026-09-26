@@ -35,7 +35,7 @@ function FeaturedProject({ project, priority }: { project: HomepageProject; prio
   const study = caseStudies[project.slug];
 
   return (
-    <article className={`project-feature project-feature--${project.slug}`}>
+    <article className={`project-feature project-feature--${project.slug}`} data-motion-reveal>
       <Link
         className="project-visual"
         href={caseStudyHref(project)}

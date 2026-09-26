@@ -5,7 +5,7 @@ import { ClosableDetails } from "@/components/site/closable-details";
 import { ContributionCalendar } from "@/components/site/contribution-calendar";
 import { FeaturedWork } from "@/components/site/featured-work";
 import { FantasyMatchup } from "@/components/site/fantasy-matchup";
-import { InViewMotion } from "@/components/site/in-view-motion";
+import { InViewMotion, SiteMotionObserver } from "@/components/site/in-view-motion";
 import { ScrollProgress } from "@/components/site/scroll-progress";
 import {
   SignalFreshness,
@@ -26,6 +26,7 @@ export async function Homepage() {
   return (
     <div className="prototype prototype-cabinet-of-curiosities selected-experience" id="top" tabIndex={-1}>
       <ScrollProgress />
+      <SiteMotionObserver />
       <SiteHeader />
       <main id="main-content" tabIndex={-1}>
         <section className="hero" aria-labelledby="hero-kicker">
@@ -70,7 +71,7 @@ export async function Homepage() {
               </h2>
             </div>
             <div className="signal-grid">
-              <article className="signal signal-building">
+              <article className="signal signal-building" data-motion-reveal>
                 <p>Recent building</p>
                 <SignalPresentation
                   signal={signals.github}
@@ -96,7 +97,7 @@ export async function Homepage() {
                   ) : null}
                 </SignalPresentation>
               </article>
-              <article className="signal signal-presence">
+              <article className="signal signal-presence" data-motion-reveal>
                 <p>Around here</p>
                 <figure className="london-signal-visual">
                   <Image
@@ -111,7 +112,7 @@ export async function Homepage() {
                   <LocalTime />
                 </strong>
               </article>
-              <article className="signal signal-training">
+              <article className="signal signal-training" data-motion-reveal>
                 <p>Training</p>
                 <SignalPresentation
                   signal={signals.training}
@@ -133,7 +134,7 @@ export async function Homepage() {
                       </div>
                     </InViewMotion>
                   ) : (
-                    <div className="training-rhythm" aria-label={`${signals.training.windowLabel} training by type`}>
+                    <div className="training-rhythm" aria-label={`${signals.training.windowLabel} training by type`} data-motion-reveal>
                       {signals.training.weekly.map((category) => (
                         <div className="training-metric" key={category.label}>
                           <i style={{ height: `${Math.max(8, Math.min(100, category.count * 24 + 8))}%` }} aria-hidden="true" />
@@ -146,7 +147,7 @@ export async function Homepage() {
                   {signals.training.description && <span>{signals.training.description}</span>}
                 </SignalPresentation>
               </article>
-              <article className="signal signal-fantasy">
+              <article className="signal signal-fantasy" data-motion-reveal>
                 <p>Fantasy football</p>
                 <SignalPresentation
                   signal={signals.fantasy}
@@ -176,7 +177,7 @@ export async function Homepage() {
                 A few things I enjoy <em>outside work.</em>
               </h2>
             </div>
-            <div className="library-objects">
+            <div className="library-objects" data-motion-reveal>
               <ClosableDetails
                 className="library-object library-object-book"
                 contentClassName="library-object-pages"
@@ -228,7 +229,7 @@ export async function Homepage() {
               </ClosableDetails>
             </div>
 
-            <div className="playlist-room outside-work-playlist">
+            <div className="playlist-room outside-work-playlist" data-motion-reveal>
               <div>
                 <p>Music · Spotify</p>
                 <SignalStatus signal={{ state: "curated", statusLabel: "My playlist" }} />
@@ -252,7 +253,7 @@ export async function Homepage() {
               <p>History</p>
               <h2 id="history-title">{history.headline}</h2>
               <div>
-                <article className="history-card">
+                <article className="history-card" data-motion-reveal>
                   {history.dateLabel && <span>{history.dateLabel}</span>}
                   <ol className="history-events" aria-label="Historical moments">
                     {history.events.map((event) => (
@@ -331,7 +332,7 @@ export async function Homepage() {
 
               if (!externalHref) {
                 return (
-                  <details key={note.index} className="lab-card lab-card-disclosure">
+                  <details key={note.index} className="lab-card lab-card-disclosure" data-motion-reveal>
                     <summary>
                       <span className="lab-index">{note.index}</span>
                       <span className={`lab-card-visual lab-card-visual-${note.treatment}`}>
@@ -358,6 +359,7 @@ export async function Homepage() {
                 <a
                   key={note.index}
                   className="lab-card"
+                  data-motion-reveal
                   href={externalHref}
                   target="_blank"
                   rel="noreferrer"
@@ -372,7 +374,7 @@ export async function Homepage() {
         <section className="about-section" id="about" tabIndex={-1} aria-labelledby="about-title">
           <p>04 / About</p>
           <h2 id="about-title">A bit about me.</h2>
-          <div className="about-copy">
+          <div className="about-copy" data-motion-reveal>
             <div className="about-prose">
               <p>{profile.about}</p>
               <p className="about-supporting-copy">
@@ -403,7 +405,7 @@ export async function Homepage() {
             </div>
             <ol className="career-timeline" role="list" aria-labelledby="about-career-title">
               {careerTimeline.map((entry, index) => (
-                <li className="career-entry" key={entry.employer}>
+                <li className="career-entry" key={entry.employer} data-motion-reveal>
                   <div className="career-entry-topline">
                     <span className="career-entry-index">0{index + 1}</span>
                     <p className="career-period">
@@ -429,7 +431,7 @@ export async function Homepage() {
         <section id="contact" tabIndex={-1} className="contact-block contact-section" aria-labelledby="contact-title">
           <p>05 / Contact</p>
           <h2 id="contact-title">Let’s talk.</h2>
-          <div className="contact-actions">
+          <div className="contact-actions" data-motion-reveal>
             <div className="contact-primary-action">
               <a className="contact-link" href={profile.links.email}>
                 Email me <span className="arrow-mark" aria-hidden="true">↗︎</span>
