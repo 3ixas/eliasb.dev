@@ -320,8 +320,8 @@ function verifyHomepage(markup) {
     check((trainingCard.match(/class="training-day"/g) ?? []).length === 7, "Authored training schedule should retain all seven days");
   }
   check(text.includes("Wikimedia") || text.includes("fallback"), "History output should identify its live or fallback source");
-  const historyCard = markup.match(/<article class="history-card">([\s\S]*?)<\/article>/i)?.[1] ?? "";
-  const historyEvents = [...historyCard.matchAll(/<li class="history-event(?: [^"]*)?">([\s\S]*?)<\/li>/gi)].map(([, event]) => event);
+  const historyList = markup.match(/<ol\b(?=[^>]*\baria-label="Historical moments")[^>]*>([\s\S]*?)<\/ol>/i)?.[1] ?? "";
+  const historyEvents = [...historyList.matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/gi)].map(([, event]) => event);
   equal(historyEvents.length, 3, "History should show three historical moments");
   const historyYears = historyEvents.map((event) => Number(event.match(/<strong\b[^>]*>(\d{1,4})<\/strong>/i)?.[1] ?? 0));
   check(historyYears.every((year) => year > 0), "Each history moment should show its year");
@@ -349,8 +349,12 @@ function verifyHomepage(markup) {
   check(descriptions.length >= 3 && descriptions.every((description) => description.length >= 60), "Long experiment descriptions should remain present in the rendered output");
   check(text.includes("first public version of Professor Past"), "Professor Past should be identified as its first public version");
 
-  const fantasyCard = markup.match(/<article class="signal signal-fantasy">([\s\S]*?)<\/article>/i)?.[1] ?? "";
-  const fantasyStatus = fantasyCard.match(/<span class="signal-status" data-state="([^"]+)">([^<]*)<\/span>/i);
+  const fantasyCard = [...markup.matchAll(/<article\b[^>]*>([\s\S]*?)<\/article>/gi)]
+    .map(([, card]) => card)
+    .find((card) => plainText(card).includes("Fantasy football")
+      && [...card.matchAll(/<[a-z][^>]*>/gi)].some(([tag]) => attribute(tag, "role") === "group"
+        && /fantasy football matchup$/i.test(attribute(tag, "aria-label")?.trim() ?? ""))) ?? "";
+  const fantasyStatus = fantasyCard.match(/<span\b(?=[^>]*\bdata-state="([^"]+)")[^>]*>([^<]*)<\/span>/i);
   check(fantasyStatus, "Fantasy football card should expose a signal state");
   const fantasyText = plainText(fantasyCard);
   check(fantasyText.includes("Weekly matchup"), "Fantasy football card should label the matchup");
