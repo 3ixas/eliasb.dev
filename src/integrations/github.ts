@@ -5,8 +5,6 @@ import type { ActivityDay, GitHubSignal } from "@/integrations/types";
 const GITHUB_LOGIN = "3ixas";
 const GITHUB_PROFILE = `https://github.com/${GITHUB_LOGIN}`;
 const API_VERSION = "2026-03-10";
-const ACTIVITY_DAYS = GITHUB_ACTIVITY_DAYS;
-const CONTRIBUTION_WINDOW_DAYS = 365;
 
 type GitHubEvent = {
   type: string;
@@ -70,7 +68,7 @@ function describeEvent(event: GitHubEvent) {
 async function fetchContributionActivity(token: string): Promise<ContributionSnapshot | null> {
   const to = new Date();
   const from = new Date(to);
-  from.setUTCDate(to.getUTCDate() - (CONTRIBUTION_WINDOW_DAYS - 1));
+  from.setUTCDate(to.getUTCDate() - (GITHUB_ACTIVITY_DAYS - 1));
 
   const response = await fetch("https://api.github.com/graphql", {
     method: "POST",
@@ -112,7 +110,7 @@ async function fetchContributionActivity(token: string): Promise<ContributionSna
   if (!calendar || !days?.length || typeof calendar.totalContributions !== "number") return null;
 
   return {
-    activity: mapContributionDays(days, ACTIVITY_DAYS),
+    activity: mapContributionDays(days, GITHUB_ACTIVITY_DAYS),
     totalContributions: calendar.totalContributions,
     privateContributions:
       typeof collection?.restrictedContributionsCount === "number"
@@ -154,11 +152,11 @@ export async function getGitHubSignal(): Promise<GitHubSignal> {
   if (contributions) {
     return {
       state: "live",
-      statusLabel: "Live · all contributions",
-      headline: `${contributions.totalContributions} contributions over the past year`,
-      description: "Private contributions are part of the total; I keep their repositories private.",
+      statusLabel: "Live · past year",
+      headline: `I’ve made ${contributions.totalContributions} contributions in the past year.`,
+      description: "",
       activity: contributions.activity,
-      activityLabel: "GitHub contributions over the last year, including private totals",
+      activityLabel: "GitHub contributions over the past year",
       totalContributions: contributions.totalContributions,
       privateContributions: contributions.privateContributions,
       updatedAt: new Date().toISOString(),
@@ -167,12 +165,12 @@ export async function getGitHubSignal(): Promise<GitHubSignal> {
   }
 
   if (latest) {
-    const activity = mapPublicActivity(events);
+    const activity = mapPublicActivity(events, GITHUB_ACTIVITY_DAYS);
     return {
       state: "live",
       statusLabel: token ? "Live · public only" : "Live · public",
       headline: describeEvent(latest),
-      description: "Only my public GitHub activity appears here.",
+      description: "",
       activity,
       activityLabel: "Public GitHub activity over the last year",
       updatedAt: new Date().toISOString(),
@@ -185,11 +183,9 @@ export async function getGitHubSignal(): Promise<GitHubSignal> {
       ...signalFallbacks.github,
       state: "live",
       statusLabel: token ? "Live · public only" : "Live · public",
-      headline: "No recent public GitHub activity",
-      description: token
-        ? "No recent public updates, and I couldn’t load the private total this time."
-        : "This chart shows public contributions only.",
-      activity: mapPublicActivity(events),
+      headline: "A quiet stretch on public GitHub.",
+      description: "",
+      activity: mapPublicActivity(events, GITHUB_ACTIVITY_DAYS),
       activityLabel: "Public GitHub activity over the last year",
       updatedAt: new Date().toISOString(),
     };

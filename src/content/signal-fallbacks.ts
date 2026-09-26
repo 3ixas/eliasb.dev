@@ -27,27 +27,21 @@ const TYPICAL_TRAINING_WEEK = [
 export const signalFallbacks: HomepageSignals = {
   github: {
     state: "unavailable",
-    statusLabel: "Public only",
-    headline: "Recent GitHub activity",
-    description: "The chart shows public contributions only.",
-    activity: recentDates(371),
-    activityLabel: "GitHub contributions over the last year are currently unavailable",
+    statusLabel: "No live update",
+    headline: "I couldn’t load GitHub just now.",
+    description: "",
+    activity: recentDates(365),
+    activityLabel: "GitHub contributions over the last year are unavailable right now",
     updatedAt: null,
     href: "https://github.com/3ixas",
   },
-  status: {
-    state: "curated",
-    statusLabel: "A note from me",
-    headline: "Probably thinking through an interface.",
-    description: "A note from London, which I update from time to time.",
-  },
   reading: {
     state: "curated",
-    statusLabel: "Last known book",
+    statusLabel: "Last on Goodreads",
     headline: "Dark Age",
-    description: "By Pierce Brown. This was the last book I had marked as reading on Goodreads.",
+    description: "",
     author: "Pierce Brown",
-    bookDescription: "By Pierce Brown. This was the last book I had marked as reading on Goodreads.",
+    bookDescription: "",
     coverUrl: "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1525464420l/29226553._SY475_.jpg",
     href: "https://www.goodreads.com/book/show/29226553-dark-age",
     updatedAt: null,
@@ -56,7 +50,7 @@ export const signalFallbacks: HomepageSignals = {
     state: "curated",
     statusLabel: "Typical week",
     headline: "My weekly training plan",
-    description: "I update this plan by hand.",
+    description: "",
     weekly: [
       { label: "Lift", count: 0 },
       { label: "Run", count: 0 },
@@ -70,22 +64,22 @@ export const signalFallbacks: HomepageSignals = {
   },
   fantasy: {
     state: "pending",
-    statusLabel: "My league isn’t connected yet",
+    statusLabel: "No matchup just yet",
     headline: "Main redraft league",
-    description: "I’ll show my score here when the league connects; other managers’ names stay private.",
+    description: "",
     matchupLabel: "Week unavailable",
     updatedAt: null,
   },
   culture: {
     state: "curated",
-    statusLabel: "Last known film",
+    statusLabel: "Last logged",
     headline: "Avengers: Infinity War",
-    description: "This was the most recent film in my Letterboxd diary when the feed last updated.",
+    description: "",
     href: "https://open.spotify.com/playlist/3t859SH3i1qKfvsDlGWm9F",
     filmTitle: "Avengers: Infinity War",
     filmYear: "2018",
     filmRating: "4.5",
-    filmDescription: "A superhero ensemble film about the Avengers making a last stand against Thanos.",
+    filmDescription: "",
     filmPosterUrl: "https://a.ltrbxd.com/resized/film-poster/2/2/6/6/6/1/226661-avengers-infinity-war-0-600-0-900-crop.jpg?v=8b35f60c0c",
     filmHref: "https://letterboxd.com/3lxas/film/avengers-infinity-war/",
     playlistHref: "https://open.spotify.com/playlist/3t859SH3i1qKfvsDlGWm9F",
@@ -117,8 +111,8 @@ function unavailableFantasySignal({
 export function fantasyWeekUnavailable(href: string): FantasySignal {
   return unavailableFantasySignal({
     href,
-    statusLabel: "Week data unavailable",
-    description: "Sleeper hasn’t returned the current week yet; I keep the other managers’ names private.",
+    statusLabel: "No current week yet",
+    description: "",
     matchupLabel: "Week unavailable",
   });
 }
@@ -126,8 +120,8 @@ export function fantasyWeekUnavailable(href: string): FantasySignal {
 export function fantasySourceUnavailable(href: string, week?: number): FantasySignal {
   return unavailableFantasySignal({
     href,
-    statusLabel: "Sleeper unavailable",
-    description: "Sleeper hasn’t returned the current matchup; the other managers’ names stay private.",
+    statusLabel: "No live update from Sleeper",
+    description: "",
     matchupLabel: week ? `Week ${week}` : "Week unavailable",
   });
 }

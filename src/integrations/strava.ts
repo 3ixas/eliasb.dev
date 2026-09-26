@@ -96,10 +96,8 @@ export async function getTrainingSignal(): Promise<TrainingSignal> {
     statusLabel: "Live · this week",
     headline: totalActivities
       ? `${totalActivities} session${totalActivities === 1 ? "" : "s"} this week`
-      : "No sessions logged this week",
-    description: totalActivities
-      ? "Strava activity is grouped by type. I don’t show routes or exact locations."
-      : "I haven’t logged any Strava activities this week.",
+      : "Nothing logged on Strava this week.",
+    description: "",
     href: integrationConfig.strava.profileUrl,
     weekly,
     totalActivities,

@@ -18,7 +18,7 @@ export type TrainingCategoryShape = {
   count: number;
 };
 
-export const GITHUB_ACTIVITY_DAYS = 371;
+export const GITHUB_ACTIVITY_DAYS = 365;
 
 export const TRAINING_CATEGORIES: TrainingCategoryShape[] = [
   { label: "Lift", count: 0 },

@@ -3,11 +3,11 @@ export const profile = {
   shortName: "Elias",
   role: "Software engineer",
   location: "London",
-  statement: "I build software that makes complex things easier to understand.",
+  statement: "I build software that untangles complex systems, so they’re easier to understand.",
   introduction:
-    "I work across systems, data, and interfaces. I like understanding how a product works underneath as well as how it feels to use.",
+    "I like getting under the skin of a product: how it works, what the data says, and how it feels to use.",
   about:
-    "I’m based in London, where I work on high-performance pricing and risk systems. Outside work, I build my own products end to end: I find the problem, shape the experience, write the code, and work through the awkward parts until they make sense.",
+    "I’m in London, building high-performance pricing and risk systems. Away from work, I make my own products end to end: I start with the problem, shape the experience, write the code, and stay with the hard bits until they make sense.",
   links: {
     email: "mailto:eliasthebennett@gmail.com",
     github: "https://github.com/3ixas",
@@ -43,7 +43,7 @@ export const projects = [
     eyebrow: "Product engineering · Data visualisation · 2026",
     thesis: "Making the cost of a decision visible.",
     description:
-      "A rental affordability calculator for London, Basel, and Zurich. It brings salary, moving costs, and local assumptions together to show what it might take to move.",
+      "A rental calculator for London, Basel, and Zurich. It puts salary, moving costs, and local assumptions together so you can see what a move might take.",
     qualities: [
       "Shareable URL state",
       "Typed city configuration",
@@ -63,7 +63,7 @@ export const projects = [
     name: "Argus Risk",
     eyebrow: "Event-driven systems",
     description:
-      "A local educational simulator for a multi-currency risk platform. It follows simulated market data and trades through the system and shows their effect on a portfolio dashboard.",
+      "A local simulator for a multi-currency risk platform. Follow simulated prices and trades through the system and see what they do to a portfolio.",
     image: "/work/argus/overview.webp",
     imageAlt: "Argus Risk interface showing event-driven risk positions",
     codeUrl: "https://github.com/3ixas/argus-risk",
@@ -76,7 +76,7 @@ export const projects = [
     name: "Flowtime",
     eyebrow: "Offline-first interaction",
     description:
-      "A focus timer that keeps session history on your device and adapts breaks to the time you worked. It stays accurate through sleeping tabs, closed browsers, and interruptions.",
+      "A focus timer that keeps time when your browser dozes off. It saves your history on your device and lets you choose what happens if you close the tab mid-session.",
     image: "/work/flowtime/timer.jpg",
     imageAlt: "Flowtime focus timer interface",
     liveUrl: "https://flowtime-focus-timer.vercel.app",

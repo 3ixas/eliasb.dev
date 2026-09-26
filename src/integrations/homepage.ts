@@ -1,5 +1,4 @@
 import { signalFallbacks } from "@/content/signal-fallbacks";
-import { integrationConfig } from "@/content/integration-config";
 import { getGitHubSignal } from "@/integrations/github";
 import { getReadingSignal } from "@/integrations/goodreads";
 import { getCultureSignal } from "@/integrations/letterboxd";
@@ -15,11 +14,6 @@ export async function getHomepageSignals(): Promise<HomepageSignals> {
     getCultureSignal(),
     getTrainingSignal(),
   ]);
-  const statusText = integrationConfig.status.message;
-  const statusExpiresAt = integrationConfig.status.expiresAt;
-  const statusIsCurrent = statusText && (
-    !statusExpiresAt || Number.isNaN(Date.parse(statusExpiresAt)) || Date.parse(statusExpiresAt) > Date.now()
-  );
   return {
     ...signalFallbacks,
     github,
@@ -27,13 +21,5 @@ export async function getHomepageSignals(): Promise<HomepageSignals> {
     reading,
     culture,
     training,
-    status: statusIsCurrent
-      ? {
-          state: "curated",
-          statusLabel: "Current note",
-          headline: statusText,
-          description: "I’m in London. I update this note from time to time.",
-        }
-      : signalFallbacks.status,
   };
 }

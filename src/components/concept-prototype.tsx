@@ -19,7 +19,11 @@ export function ConceptPrototype({
     <div className={`prototype prototype-${direction} ${reviewMode ? "review-experience" : "selected-experience"}`}>
       {reviewMode && <ConceptToolbar direction={direction} />}
       <header className="site-header">
-        <a href="#top" className="site-mark" aria-label="Elias B. home">E/B</a>
+        <a href="#top" className="site-mark" aria-label="Elias B. home">
+          <span aria-hidden="true">E</span>
+          <span className="brand-slash" aria-hidden="true">/</span>
+          <span aria-hidden="true">B</span>
+        </a>
         <nav aria-label="Primary navigation">
           <a href="#work">Work</a>
           <a href="#lab">Lab</a>

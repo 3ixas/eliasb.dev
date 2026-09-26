@@ -19,7 +19,8 @@ The homepage and Library render small server-owned snapshots. External services 
 ## History
 
 - The Library requests Wikimedia/English Wikipedia `onthisday` `events`, `selected`, and `births` feeds for the Monday of the current week.
-- The selection uses three source-linked historical moments from three centuries, including one before 1900. Each feed is cached for seven days and has a 3.5-second request timeout.
+- The selection favours specific curiosities over routine album-release milestones and ordinary birthday entries. It uses three source-linked historical moments from three centuries, including one before 1900 and at least two on-this-day events. Each feed is cached for seven days and has a 3.5-second request timeout.
+- When a selected record has a Commons lead image with creator and license metadata, the Library shows a thumbnail with links to its Commons file and license. Image lookups use the same seven-day cache and timeout; missing or incomplete reuse metadata leaves that story text-only.
 - If the feed cannot provide a varied selection, the card shows three source-checked examples spanning three centuries. It labels them “Saved examples” and does not present them as this Monday’s events or a live lookup.
 - The live card calls itself a weekly note; it does not promise daily maintenance.
 

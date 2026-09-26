@@ -1,38 +1,47 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 export function InViewMotion({ children }: { children: ReactNode }) {
-  const elementRef = useRef<HTMLDivElement>(null);
-  const [hasEntered, setHasEntered] = useState(false);
+  return <div className="signal-motion" data-motion-reveal>{children}</div>;
+}
 
+export function SiteMotionObserver() {
   useEffect(() => {
-    const element = elementRef.current;
-    if (!element) return;
+    const targets = document.querySelectorAll<HTMLElement>("[data-motion-reveal]");
+    if (!targets.length || !("IntersectionObserver" in window)) return;
 
-    if (
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-      !("IntersectionObserver" in window)
-    ) {
-      return;
-    }
-
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        setHasEntered(true);
-        observer.disconnect();
+      (entries, currentObserver) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.setAttribute("data-motion-entered", "true");
+          currentObserver.unobserve(entry.target);
+        });
       },
-      { threshold: 0.15 },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.12 },
     );
 
-    observer.observe(element);
-    return () => observer.disconnect();
+    const syncMotionPreference = () => {
+      if (motionPreference.matches) {
+        observer.disconnect();
+        return;
+      }
+
+      targets.forEach((target) => {
+        if (target.dataset.motionEntered !== "true") observer.observe(target);
+      });
+    };
+
+    syncMotionPreference();
+    motionPreference.addEventListener("change", syncMotionPreference);
+
+    return () => {
+      motionPreference.removeEventListener("change", syncMotionPreference);
+      observer.disconnect();
+    };
   }, []);
 
-  return (
-    <div ref={elementRef} className="signal-motion" data-entered={hasEntered}>
-      {children}
-    </div>
-  );
+  return null;
 }

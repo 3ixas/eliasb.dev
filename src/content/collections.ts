@@ -5,8 +5,8 @@ export const labItems = [
     title: "Ask Professor Past",
     kind: "History experiment",
     description:
-      "This is V1 of Professor Past: a history chatbot where you can ask an eccentric professor about the past.",
-    note: "This is the first version of the Professor Past project: the original history chatbot, built around an eccentric professor.",
+      "Ask an eccentric professor about history; this is the first public version of Professor Past.",
+    note: "Version one, with the professor at the centre of every answer.",
     liveUrl: undefined,
     codeUrl: "https://github.com/3ixas/ask-professor-past",
     treatment: "professor",
@@ -19,8 +19,8 @@ export const labItems = [
     title: "Fantasy football models",
     kind: "Football · Data · Prediction",
     description:
-      "I’m exploring matchup views, rankings, and draft tools for my Sleeper redraft league, with a small prediction model as a possible next step.",
-    note: "The homepage shows the live matchup when Sleeper is connected. I keep the other managers anonymous, and I’m still experimenting with rankings and predictions.",
+      "I’m tinkering with matchup views, rankings, and draft tools for my Sleeper league. A prediction model might be next.",
+    note: "The live matchup is on the homepage; this is where I try the ideas around it.",
     liveUrl: undefined,
     codeUrl: undefined,
     treatment: "fantasy",
@@ -33,8 +33,8 @@ export const labItems = [
     title: "Interface studies",
     kind: "Interaction · Craft · Notes",
     description:
-      "Small interface studies about states, controls, motion, and the details that make a product easier to use.",
-    note: "I’ll add a study when there’s a decision or lesson worth sharing, including ideas that didn’t work.",
+      "Small studies of controls, motion, and the details that make a product easier to use.",
+    note: "I keep the studies that teach me something, even when the idea doesn’t work.",
     liveUrl: undefined,
     codeUrl: undefined,
     treatment: "interface",
@@ -52,6 +52,7 @@ export const careerTimeline = [
       end: { dateTime: "2024-08", label: "Aug 2024" },
     },
     context: undefined,
+    story: "I worked with engineers on website performance, using Core Web Vitals and split tests to help choose what to fix.",
   },
   {
     role: "Full Stack Software Engineer",
@@ -61,6 +62,7 @@ export const careerTimeline = [
       end: { dateTime: "2025-06", label: "June 2025" },
     },
     context: undefined,
+    story: "I moved into the code, improving an ecommerce site across React, MySQL and a Java/Spring Boot backend.",
   },
   {
     role: "Software Engineer",
@@ -70,5 +72,6 @@ export const careerTimeline = [
       end: { dateTime: null, label: "Present" },
     },
     context: "High-Performance Computing, Pricing and Risk Systems · through _nology",
+    story: "These days I work on software that brings market data into pricing and risk calculations.",
   },
 ] as const;

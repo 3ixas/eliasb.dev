@@ -2,20 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-const defaultStatement = "I build software that makes complex things easier to understand.";
+const defaultStatement = "I build software that untangles complex systems, so they’re easier to understand.";
 type EntrancePhase = "ready" | "typing" | "settling" | "complete";
-
-export function SignatureReplayButton() {
-  return (
-    <button
-      className="signature-replay"
-      type="button"
-      onClick={() => window.dispatchEvent(new Event("replay-concept-entrance"))}
-    >
-      Replay the opening <span className="arrow-mark" aria-hidden="true">↻</span>
-    </button>
-  );
-}
 
 export function SignatureLine({
   direction,
