@@ -358,6 +358,20 @@ assert.equal(contributionCalendar.days[0].date, "2025-09-17");
 assert.equal(contributionCalendar.days.at(-1)?.date, "2026-09-16");
 assert.equal(contributionCalendar.rows.flat().find((day) => day?.count === 4)?.date, contributionDays[100].date);
 assert.ok(contributionCalendar.monthLabels.length >= 12);
+const labelEndByRow = new Map();
+for (const { column, row, span } of contributionCalendar.monthLabels) {
+  assert.ok(column >= (labelEndByRow.get(row) ?? 0), "Month labels on each row should not overlap");
+  assert.ok(column + span <= contributionCalendar.weekCount, "Month labels should fit within the year grid");
+  labelEndByRow.set(row, column + span);
+}
+const monthBoundaryCalendar = createContributionCalendar(
+  datesForWindow(GITHUB_ACTIVITY_DAYS, new Date("2026-09-26T12:00:00.000Z")),
+);
+assert.ok(monthBoundaryCalendar);
+const openingSeptember = monthBoundaryCalendar.monthLabels.find(({ column }) => column === 0);
+const openingOctober = monthBoundaryCalendar.monthLabels.find(({ label }) => label === "Oct");
+assert.ok(openingSeptember && openingOctober, "The calendar should label both opening months");
+assert.notEqual(openingSeptember.row, openingOctober.row, "Closely spaced opening month labels should use separate rows");
 assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "ArrowLeft"), 93);
 assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "ArrowRight"), 107);
 assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "ArrowDown"), 101);
@@ -366,6 +380,8 @@ assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "Home"), 9
 assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "End"), 101);
 assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "Escape"), null);
 assert.equal(createContributionCalendar([]), null);
+assert.equal(signalFallbacks.github.totalContributions, undefined, "Unavailable GitHub data should not imply a live aggregate");
+assert.match(signalFallbacks.github.headline, /couldn’t load GitHub/i);
 assert.deepEqual(signalFallbacks.training.schedule?.map(({ day, activity }) => ({ day, activity })), [
   { day: "Mon", activity: "Full body" },
   { day: "Tue", activity: "Zone 2 run" },

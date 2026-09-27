@@ -8,7 +8,7 @@ export type ContributionCalendarModel = {
   rows: (ActivityDay | null)[][];
   startWeekday: number;
   weekCount: number;
-  monthLabels: { column: number; label: string }[];
+  monthLabels: { column: number; label: string; row: number; span: number }[];
 };
 
 function dateFromIsoDay(value: string) {
@@ -42,12 +42,25 @@ export function createContributionCalendar(activity: ActivityDay[]): Contributio
     monthsByColumn.set(column, labels);
   });
 
+  const occupiedUntilByRow: number[] = [];
+  const monthLabels = [...monthsByColumn].map(([column, labels]) => {
+    const label = labels.join(" · ");
+    const span = Math.min(weekCount, Math.max(2, Math.ceil((label.length * 6) / 16)));
+    const visibleColumn = Math.min(column, weekCount - span);
+    let row = occupiedUntilByRow.findIndex((occupiedUntil) => visibleColumn >= occupiedUntil);
+
+    if (row === -1) row = occupiedUntilByRow.length;
+    occupiedUntilByRow[row] = visibleColumn + span;
+
+    return { column: visibleColumn, label, row, span };
+  });
+
   return {
     days,
     rows,
     startWeekday,
     weekCount,
-    monthLabels: [...monthsByColumn].map(([column, labels]) => ({ column, label: labels.join(" · ") })),
+    monthLabels,
   };
 }
 

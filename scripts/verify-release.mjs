@@ -217,8 +217,8 @@ function verifyHomepage(markup) {
   const aboutSection = aboutStart >= 0 && contactStart > aboutStart ? markup.slice(aboutStart, contactStart) : "";
   check(Boolean(aboutSection), "Homepage should render its About section before Contact");
   check(aboutSection.includes("Career path"), "About should identify the career overview");
-  check(aboutSection.includes("My career so far."), "About should introduce the career progression plainly");
   const careerCopy = plainText(aboutSection);
+  check(careerCopy.includes("My career so far."), "About should introduce the career progression plainly");
   check(careerCopy.includes("I like getting under the surface of a product"), "About should explain the personal thread behind the career path");
   check(careerCopy.includes("Core Web Vitals and split tests"), "About should ground the marketing stage in approved career evidence");
   check(careerCopy.includes("React, MySQL and a Java/Spring Boot backend"), "About should explain the move into full-stack work with approved evidence");
@@ -308,6 +308,8 @@ function verifyHomepage(markup) {
   }
 
   const text = plainText(markup);
+  const githubSignal = markup.match(/<article class="signal signal-building"[^>]*>([\s\S]*?)<\/article>/i)?.[1] ?? "";
+  check(!/Private contribution count|class="signal-metrics"/.test(githubSignal), "GitHub output should not show a separate private contribution statistic");
   check(/Goodreads/i.test(text) && /(Currently reading|Last on Goodreads)/i.test(text), "Reading signal should identify Goodreads and the current or last logged book");
   check(/Letterboxd/i.test(text) && /(Most recently watched|Last logged)/i.test(text), "Cinema signal should identify Letterboxd and the most recent or last logged film");
   check(!/other managers.{0,40}(names|private|anonymous)|names.{0,24}stay private/i.test(text), "Fantasy football output should omit the redundant privacy explanation");

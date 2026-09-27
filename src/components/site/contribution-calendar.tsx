@@ -64,11 +64,19 @@ export function ContributionCalendar({ activity, label }: { activity: ActivityDa
         aria-label={`${label}, from ${formatContributionDate(calendar.days[0].date)} to ${formatContributionDate(lastDay.date)}. Scroll sideways to explore the year.`}
         tabIndex={0}
       >
-        <div className="contribution-calendar-grid" style={{ "--week-count": calendar.weekCount } as CSSProperties}>
+        <div
+          className="contribution-calendar-grid"
+          style={{ "--week-count": calendar.weekCount } as CSSProperties}
+        >
           <div className="contribution-months" aria-hidden="true">
             <span />
-            {calendar.monthLabels.map(({ column, label: month }) => (
-              <span key={`${column}-${month}`} style={{ gridColumn: column + 2 }}>{month}</span>
+            {calendar.monthLabels.map(({ column, label: month, row, span }) => (
+              <span
+                key={`${column}-${month}`}
+                style={{ gridColumn: `${column + 2} / span ${span}`, gridRow: row + 1 }}
+              >
+                {month}
+              </span>
             ))}
           </div>
           <div

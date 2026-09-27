@@ -89,12 +89,6 @@ export async function Homepage() {
                 >
                   <strong>{signals.github.headline}</strong>
                   {signals.github.description && <span>{signals.github.description}</span>}
-                  {signals.github.privateContributions !== undefined && (
-                    <div className="signal-metrics" role="group" aria-label="Private contribution count">
-                      <b>{signals.github.privateContributions}</b>
-                      <span>private</span>
-                    </div>
-                  )}
                   {signals.github.totalContributions !== undefined ? (
                     <ContributionCalendar activity={signals.github.activity} label={signals.github.activityLabel} />
                   ) : signals.github.state !== "unavailable" ? (

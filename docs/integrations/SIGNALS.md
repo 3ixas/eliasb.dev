@@ -4,8 +4,8 @@ The homepage and Library render small server-owned snapshots. External services 
 
 ## GitHub contributions
 
-- `GITHUB_SIGNAL_TOKEN` is optional and server-only.
-- With the token, the GraphQL `ContributionsCollection` supplies the last 28 days of calendar counts, the aggregate total, and the restricted/private aggregate count. The page may show those numbers, but never a private repository name, branch, event, or message.
+- `GITHUB_SIGNAL_TOKEN` is optional and server-only. It needs the `read:user` scope so GitHub can include private and internal contributions Elias has chosen to show on his profile.
+- With the token, the GraphQL `ContributionsCollection` supplies the trailing year’s contribution calendar. The page uses its total and daily counts as one aggregate and never adds a separate restricted count or shows a private repository name, branch, event, or message.
 - Without the token, the REST public-events endpoint supplies a clearly labelled public-only trace. If either endpoint is unavailable, the authored fallback stays visible.
 - Responses are cached for six hours and requests time out after 3.5 seconds.
 
