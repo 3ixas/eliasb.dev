@@ -71,7 +71,7 @@ export async function Homepage() {
 
         <section className="outside-work-section" id="outside-work" tabIndex={-1} aria-labelledby="outside-work-title">
           <div className="currently-section">
-            <div className="section-heading compact">
+            <div className="section-heading compact" data-motion-reveal>
               <p>02 / Outside work</p>
               <h2 id="outside-work-title">
                 Some of what I’m into <em>lately.</em>
@@ -172,7 +172,7 @@ export async function Homepage() {
 
 
           <section className="library-section outside-work-culture" aria-labelledby="culture-title">
-            <div className="section-heading compact">
+            <div className="section-heading compact" data-motion-reveal>
               <p>Books, films, music and history</p>
               <h2 id="culture-title">
                 A few things I enjoy <em>outside work.</em>
@@ -252,7 +252,7 @@ export async function Homepage() {
 
             <div className="library-index outside-work-history" aria-labelledby="history-title">
               <p>History</p>
-              <h2 id="history-title">{emphasizeFinalWord(history.headline)}</h2>
+              <h2 id="history-title" data-motion-reveal>{emphasizeFinalWord(history.headline)}</h2>
               <div>
                 <article className="history-card" data-motion-reveal>
                   {history.dateLabel && <span>{history.dateLabel}</span>}
@@ -298,7 +298,7 @@ export async function Homepage() {
         </section>
 
         <section className="lab-section experiments-section" id="experiments" tabIndex={-1} aria-labelledby="experiments-title">
-          <div className="section-heading compact">
+          <div className="section-heading compact" data-motion-reveal>
             <p>03 / Experiments</p>
             <div>
               <h2 id="experiments-title">
@@ -374,7 +374,7 @@ export async function Homepage() {
 
         <section className="about-section" id="about" tabIndex={-1} aria-labelledby="about-title">
           <p>04 / About</p>
-          <h2 id="about-title">A bit about <em>me.</em></h2>
+          <h2 id="about-title" data-motion-reveal>A bit about <em>me.</em></h2>
           <div className="about-copy" data-motion-reveal>
             <div className="about-prose">
               <p>{profile.about}</p>
@@ -397,7 +397,7 @@ export async function Homepage() {
             </figure>
           </div>
           <div className="about-career-path">
-            <div className="about-career-heading">
+            <div className="about-career-heading" data-motion-reveal>
               <p>Career path</p>
               <div>
                 <h3 id="about-career-title">My career <em>so far.</em></h3>
@@ -436,7 +436,7 @@ export async function Homepage() {
 
         <section id="contact" tabIndex={-1} className="contact-block contact-section" aria-labelledby="contact-title">
           <p>05 / Contact</p>
-          <h2 id="contact-title">Let’s <em>talk.</em></h2>
+          <h2 id="contact-title" data-motion-reveal>Let’s <em>talk.</em></h2>
           <div className="contact-actions" data-motion-reveal>
             <div className="contact-primary-action">
               <a className="contact-link" href={profile.links.email}>

@@ -352,8 +352,8 @@ html[data-home-opening="revealing"] #top > main > .hero > .scroll-cue { animatio
 .london-signal-visual figcaption { position: absolute; right: 10px; bottom: 8px; z-index: 1; color: #f3eee5; font: 8px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
 [data-motion-reveal][data-motion-entered="true"] { animation: site-object-enter var(--motion-arrival) var(--motion-ease) both; }
 @keyframes site-object-enter {
-  from { translate: 0 12px; }
-  to { translate: 0 0; }
+  from { opacity: 0; translate: 0 22px; }
+  to { opacity: 1; translate: 0 0; }
 }
 .fantasy-scoreboard { margin: 22px 0 0; padding: 14px; color: #fff7ea; background: #12372d; border: 1px solid #282116; border-radius: 6px; box-shadow: 4px 5px 0 color-mix(in srgb, var(--ink) 28%, transparent); }
 .fantasy-matchup-heading { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 10px; color: #b6f0d7; border-bottom: 1px solid #ffffff40; font: 9px/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
