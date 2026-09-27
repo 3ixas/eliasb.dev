@@ -1,6 +1,10 @@
 import type { ActivityDay } from "@/integrations/types";
 
 export const CONTRIBUTION_WINDOW_DAYS = 365;
+// Explicit English names keep server and browser output identical during hydration.
+// Their Intl locale data can disagree, for example "Sept" versus "Sep".
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] as const;
+const SHORT_MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"] as const;
 export const CONTRIBUTION_WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] as const;
 
 export type ContributionCalendarModel = {
@@ -38,7 +42,7 @@ export function createContributionCalendar(activity: ActivityDay[]): Contributio
 
     const column = Math.floor((startWeekday + index) / 7);
     const labels = monthsByColumn.get(column) ?? [];
-    labels.push(new Intl.DateTimeFormat("en-GB", { month: "short", timeZone: "UTC" }).format(date));
+    labels.push(SHORT_MONTH_NAMES[date.getUTCMonth()]);
     monthsByColumn.set(column, labels);
   });
 
@@ -84,12 +88,18 @@ export function moveContributionCalendarIndex(
   return Math.max(0, Math.min(calendar.days.length - 1, moves[key]));
 }
 
-export function formatContributionDate(value: string, options: Intl.DateTimeFormatOptions = {}) {
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-    ...options,
-  }).format(dateFromIsoDay(value));
+type ContributionDateOptions = {
+  day?: "numeric";
+  month?: "short" | "long";
+  year?: "numeric";
+  weekday?: "short" | "long";
+};
+
+export function formatContributionDate(value: string, options: ContributionDateOptions = {}) {
+  const date = dateFromIsoDay(value);
+  const month = (options.month === "short" ? SHORT_MONTH_NAMES : MONTH_NAMES)[date.getUTCMonth()];
+  const day = `${date.getUTCDate()} ${month} ${date.getUTCFullYear()}`;
+  if (!options.weekday) return day;
+  const weekday = CONTRIBUTION_WEEKDAYS[date.getUTCDay()];
+  return `${options.weekday === "short" ? weekday.slice(0, 3) : weekday}, ${day}`;
 }
