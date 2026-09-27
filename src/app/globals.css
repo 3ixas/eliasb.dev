@@ -204,6 +204,14 @@ html[data-home-opening="running"] #top > main > :not(.hero),
 html[data-home-opening="highlight"] #top > main > :not(.hero),
 html[data-home-opening="running"] #top > footer,
 html[data-home-opening="highlight"] #top > footer { opacity: 0; pointer-events: none; }
+html[data-home-opening="running"] #top > .site-header:focus-within,
+html[data-home-opening="highlight"] #top > .site-header:focus-within,
+html[data-home-opening="running"] #top > main > .hero:focus-within > :not(.homepage-signature),
+html[data-home-opening="highlight"] #top > main > .hero:focus-within > :not(.homepage-signature),
+html[data-home-opening="running"] #top > main > :not(.hero):focus-within,
+html[data-home-opening="highlight"] #top > main > :not(.hero):focus-within,
+html[data-home-opening="running"] #top > footer:focus-within,
+html[data-home-opening="highlight"] #top > footer:focus-within { opacity: 1; pointer-events: auto; }
 html[data-home-opening="revealing"] #top > .site-header,
 html[data-home-opening="revealing"] #top > main > .hero > :not(.homepage-signature),
 html[data-home-opening="revealing"] #top > main > :not(.hero),
@@ -350,6 +358,7 @@ html[data-home-opening="revealing"] #top > main > .hero > .scroll-cue { animatio
 .london-signal-visual img { object-fit: cover; object-position: center 55%; filter: saturate(.72) sepia(.14) contrast(1.04); }
 .london-signal-visual::after { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 28%, color-mix(in srgb, #171816 68%, transparent)); content: ""; pointer-events: none; }
 .london-signal-visual figcaption { position: absolute; right: 10px; bottom: 8px; z-index: 1; color: #f3eee5; font: 8px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+html[data-motion-reveals] [data-motion-reveal]:not([data-motion-entered]) { opacity: 0; translate: 0 22px; }
 [data-motion-reveal][data-motion-entered="true"] { animation: site-object-enter var(--motion-arrival) var(--motion-ease) both; }
 @keyframes site-object-enter {
   from { opacity: 0; translate: 0 22px; }

@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Elias B. — software that makes complex things easier to understand";
+export const alt = "Elias Bennett — software engineer and product builder in London";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -79,7 +79,7 @@ export default function OpenGraphImage() {
             transform: "rotate(2deg)",
           }}
         >
-          Work, side projects, and a little life outside work.
+          Projects I’m working on, and a few things I enjoy.
         </div>
       </div>
     </div>,

@@ -31,10 +31,10 @@ export const caseStudies = {
     name: "Threshold",
     kind: "Product engineering · Data visualisation",
     year: "2026",
-    headline: "Affordability starts before the first month’s rent.",
+    headline: "Working out what a move might cost.",
     summary:
-      "A move costs more than the rent. Threshold puts upfront costs, monthly spending, and the savings gap in one place so you can see what it might take.",
-    role: "I shaped the product, data model, and interface.",
+      "Rent is only part of moving. Threshold puts upfront costs, monthly spending, and the savings gap in one place, so you can work out what a move might take.",
+    role: "I worked on the product direction, data model, and interface.",
     stack: [
       "React 19",
       "TypeScript",
@@ -76,34 +76,34 @@ export const caseStudies = {
     chapters: [
       {
         eyebrow: "01 / Frame the decision",
-        title: "Monthly affordability can hide the cost that stops a move.",
+        title: "Rent isn’t the only cost of moving.",
         body: [
-          "Rent is only part of the cost. There’s also the deposit, first month’s rent, moving costs, and furniture.",
-          "I split upfront and monthly costs so you can see how much more you need to save, and how long it could take.",
+          "Before you move, you may also need to cover a deposit, the first month’s rent, moving costs, and furniture.",
+          "Threshold separates what you’ll need upfront from what you’ll pay each month. It also shows the savings gap and an estimate of how long it could take to cover it.",
         ],
         notes: ["Upfront total", "Monthly total", "Savings gap", "Time to move"],
       },
       {
         eyebrow: "02 / Make assumptions visible",
-        title: "What goes into the estimate?",
+        title: "The estimate depends on where you’re moving.",
         body: [
-          "Each city has its own districts, rent bands, transport rules, deposits, and local charges. I let London, Basel, and Zurich share a calculator without pretending they cost the same.",
-          "Change anything from food and transport to income and savings, then see how the estimate shifts. I show when the figures were last refreshed, too.",
+          "London, Basel, and Zurich each have their own districts, rent bands, transport rules, deposits, and local charges. Threshold keeps those differences in view instead of using the same assumptions for all three.",
+          "You can change costs, income, and savings to see how the estimate changes. Each city’s figures also show when they were last refreshed.",
         ],
         notes: ["London", "Basel", "Zurich", "Editable defaults"],
       },
       {
         eyebrow: "03 / Share a scenario",
-        title: "Share your scenario with a link.",
+        title: "Open the same scenario later or share it.",
         body: [
-          "The link remembers the choices you made: district, home, household, lifestyle, and budget. Open it again and you’ll see the same scenario.",
-          "No account to set up. Copy the link to share your scenario, then change a few costs to compare another move.",
+          "The link stores your choices: district, home, household, lifestyle, and budget. Open it again and the same scenario is there.",
+          "There’s no account to set up. Copy the link to share it, then change a few costs to compare another move.",
         ],
         notes: ["No account", "No backend", "Reproducible scenarios", "Pure calculations"],
       },
     ],
     takeaway:
-      "With Threshold, I wanted people to check the numbers for themselves and change any estimate that didn’t fit.",
+      "I wanted each estimate to be easy to check and change. In Threshold, you can adjust one and see how the numbers move.",
   },
   "argus-risk": {
     slug: "argus-risk",
@@ -111,10 +111,10 @@ export const caseStudies = {
     name: "Argus Risk",
     kind: "Distributed systems · Financial simulation",
     year: "2026",
-    headline: "How simulated market data reaches the dashboard.",
+    headline: "How a simulated trade reaches the dashboard.",
     summary:
-      "Argus is a local simulator for a multi-currency risk platform. I built it to follow simulated prices and trades through the event stream, into risk calculations and onto a dashboard.",
-    role: "I designed and built the simulator, backend services, and dashboard.",
+      "I built Argus as a local simulator for a multi-currency risk platform. It follows simulated prices and trades through an event stream, into risk calculations, and onto a dashboard.",
+    role: "I built the simulator, backend services, and dashboard.",
     stack: [".NET 8", "Kafka / Redpanda", "PostgreSQL / Marten", "SignalR", "Next.js"],
     codeUrl: "https://github.com/3ixas/argus-risk",
     hero: {
@@ -167,7 +167,7 @@ export const caseStudies = {
       },
     ],
     takeaway:
-      "A risk number needs context. Argus shows how recent each value is and whether the system is keeping up.",
+      "In Argus, each risk value comes with its age and a view of whether the system is keeping up. That makes it easier to read the number in context.",
   },
   flowtime: {
     slug: "flowtime",
@@ -175,10 +175,10 @@ export const caseStudies = {
     name: "Flowtime",
     kind: "State design · Offline-first interaction",
     year: "2026",
-    headline: "A timer that stays accurate when the tab goes to sleep.",
+    headline: "A timer that keeps accurate time in the background.",
     summary:
-      "Flowtime keeps sessions on your device and gives you a break in proportion to the time you worked. It keeps time when the tab sleeps; if you close the browser, it asks what to do when you come back.",
-    role: "I shaped the product and interaction, then built the frontend with accessibility in mind.",
+      "Flowtime saves sessions on your device and sets breaks in proportion to your focus time. The timer keeps up when its tab is in the background. If you close the browser, it asks what you’d like to do when you return.",
+    role: "I worked on the product and its interactions, then built the frontend with accessibility in mind.",
     stack: ["Next.js", "TypeScript", "localStorage", "Service Worker", "Vitest"],
     liveUrl: "https://flowtime-focus-timer.vercel.app",
     codeUrl: "https://github.com/3ixas/flowtime-focus-timer",
@@ -207,7 +207,7 @@ export const caseStudies = {
       },
       {
         eyebrow: "02 / Recover interrupted sessions",
-        title: "If a session is interrupted, you choose what happens next.",
+        title: "Choose what to do when you return.",
         body: [
           "If you leave mid-session, Flowtime keeps your task and tags on your device. When you come back, you choose whether to pick up where you left off or call it a day.",
           "Resume, finish the session, skip the break, or start again: Flowtime makes the next step clear.",
@@ -216,7 +216,7 @@ export const caseStudies = {
       },
       {
         eyebrow: "03 / Keep data on your device",
-        title: "Your work history stays on your device.",
+        title: "Your history stays in your browser.",
         body: [
           "Sessions, tags, notes, and settings live in your browser. Flowtime works offline, and a CSV export lets you take your data with you.",
           "The timer works without a mouse, too: keyboard controls, clear screen-reader updates, and focus you can see.",
@@ -225,7 +225,7 @@ export const caseStudies = {
       },
     ],
     takeaway:
-      "If you leave mid-session, Flowtime keeps it on your device and asks what you want to do when you return.",
+      "If you leave mid-session, Flowtime saves your work on your device and asks what you’d like to do when you return.",
   },
 } as const satisfies Record<CaseStudySlug, CaseStudy>;
 

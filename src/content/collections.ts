@@ -5,8 +5,8 @@ export const labItems = [
     title: "Ask Professor Past",
     kind: "History experiment",
     description:
-      "Ask an eccentric professor about history; this is the first public version of Professor Past.",
-    note: "Version one, with the professor at the centre of every answer.",
+      "A first public version of Professor Past, an eccentric character for exploring questions about history.",
+    note: "This version puts the professor at the centre of each answer.",
     liveUrl: undefined,
     codeUrl: "https://github.com/3ixas/ask-professor-past",
     treatment: "professor",
@@ -19,8 +19,8 @@ export const labItems = [
     title: "Fantasy football models",
     kind: "Football · Data · Prediction",
     description:
-      "I’m tinkering with matchup views, rankings, and draft tools for my Sleeper league. A prediction model might be next.",
-    note: "The live matchup is on the homepage; this is where I try the ideas around it.",
+      "I’m working on matchup views, rankings, and draft tools for my Sleeper league. I’m still deciding whether a prediction model belongs here.",
+    note: "The live matchup is on the homepage. Here, I try out ideas for the tools around it.",
     liveUrl: undefined,
     codeUrl: undefined,
     treatment: "fantasy",
@@ -33,8 +33,8 @@ export const labItems = [
     title: "Interface studies",
     kind: "Interaction · Craft · Notes",
     description:
-      "Small studies of controls, motion, and the details that make a product easier to use.",
-    note: "I keep the studies that teach me something, even when the idea doesn’t work.",
+      "Small tests of controls, motion, and the details that make a product easier to use.",
+    note: "Some ideas work better than others; I keep the notes either way.",
     liveUrl: undefined,
     codeUrl: undefined,
     treatment: "interface",
@@ -52,7 +52,7 @@ export const careerTimeline = [
       end: { dateTime: "2024-08", label: "Aug 2024" },
     },
     context: undefined,
-    story: "I worked with engineers on website performance, using Core Web Vitals and split tests to help choose what to fix.",
+    story: "I worked with engineers to improve website performance. Core Web Vitals and split tests helped us decide what to fix first.",
   },
   {
     role: "Full Stack Software Engineer",
@@ -62,7 +62,7 @@ export const careerTimeline = [
       end: { dateTime: "2025-06", label: "June 2025" },
     },
     context: undefined,
-    story: "I moved into the code, improving an ecommerce site across React, MySQL and a Java/Spring Boot backend.",
+    story: "I moved from tracking site performance to changing the code, improving an ecommerce product built with React, MySQL, and Java/Spring Boot.",
   },
   {
     role: "Software Engineer",
@@ -73,6 +73,6 @@ export const careerTimeline = [
       end: { dateTime: null, label: "Present" },
     },
     context: "High-Performance Computing",
-    story: "These days I work on software that brings market data into pricing and risk calculations.",
+    story: "I work on software that brings market data into pricing and risk calculations.",
   },
 ] as const;

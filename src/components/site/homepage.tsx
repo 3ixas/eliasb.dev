@@ -5,7 +5,7 @@ import { ClosableDetails } from "@/components/site/closable-details";
 import { ContributionCalendar } from "@/components/site/contribution-calendar";
 import { FeaturedWork } from "@/components/site/featured-work";
 import { FantasyMatchup } from "@/components/site/fantasy-matchup";
-import { InViewMotion, SiteMotionObserver } from "@/components/site/in-view-motion";
+import { InViewMotion } from "@/components/site/in-view-motion";
 import { ScrollProgress } from "@/components/site/scroll-progress";
 import {
   SignalFreshness,
@@ -33,7 +33,6 @@ export async function Homepage() {
   return (
     <div className="prototype prototype-cabinet-of-curiosities selected-experience" id="top" tabIndex={-1}>
       <ScrollProgress />
-      <SiteMotionObserver />
       <SiteHeader />
       <main id="main-content" tabIndex={-1}>
         <section className="hero" aria-labelledby="hero-kicker">
@@ -57,8 +56,8 @@ export async function Homepage() {
                 <figcaption>Out on the water</figcaption>
               </figure>
               <p>
-                <span>Here</span>{" "}
-                Things I’ve built, things I’m trying, and a few things I enjoy.
+                <span>Here’s what I’ve been up to:</span>{" "}
+                a few things I’ve built, some I’m working on, and a few I enjoy.
               </p>
             </div>
           </div>
@@ -93,7 +92,7 @@ export async function Homepage() {
                     <ContributionCalendar activity={signals.github.activity} label={signals.github.activityLabel} />
                   ) : signals.github.state !== "unavailable" ? (
                     <p className="contribution-calendar-empty">
-                      The full-year calendar isn’t available from the public snapshot.
+                      I can’t show the full-year calendar just now.
                     </p>
                   ) : null}
                 </SignalPresentation>
@@ -175,7 +174,7 @@ export async function Homepage() {
             <div className="section-heading compact" data-motion-reveal>
               <p>Books, films, music and history</p>
               <h2 id="culture-title">
-                A few things I enjoy <em>outside work.</em>
+                A few things I’m into <em>outside work.</em>
               </h2>
             </div>
             <div className="library-objects" data-motion-reveal>
@@ -305,7 +304,7 @@ export async function Homepage() {
                 Things I’m trying <em>out.</em>
               </h2>
               <p className="section-supporting-copy">
-                Side projects, interface studies, and notes from things I’m making.
+                A few side projects and small experiments with how software feels to use.
               </p>
             </div>
           </div>
@@ -379,7 +378,7 @@ export async function Homepage() {
             <div className="about-prose">
               <p>{profile.about}</p>
               <p className="about-supporting-copy">
-                I want to make software that solves problems people keep running into and earns a place in their everyday lives by being clear, beautiful, and a pleasure to use.
+                I want to make software for real, recurring needs: easy to understand, good to look at, and enjoyable to use. Ideally, it becomes part of someone’s everyday routine.
               </p>
               <a className="about-contact-cta" href="#contact">
                 Start a conversation <span className="arrow-mark" aria-hidden="true">↓</span>
@@ -401,7 +400,7 @@ export async function Homepage() {
               <p>Career path</p>
               <div>
                 <h3 id="about-career-title">My career <em>so far.</em></h3>
-                <span>I like getting under the surface of a product. I started by using data to improve websites, then moved into building software.</span>
+                <span>I started in marketing and data, then moved into software. I still like figuring out what a product needs and helping to build it.</span>
               </div>
             </div>
             <ol className="career-timeline" role="list" aria-labelledby="about-career-title">
