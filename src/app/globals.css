@@ -172,16 +172,18 @@ button { color: inherit; font: inherit; }
 .signature.settling .signature-visible { transform: translateY(-.025em) scale(.998); }
 .signature.typing .signature-visible::after { display: inline-block; width: .04em; height: .75em; margin-left: .05em; background: var(--accent); content: ""; animation: cursor-blink .6s steps(1) infinite; }
 .signature-space { display: block; visibility: hidden; }
-.homepage-signature { max-width: 1100px; letter-spacing: -.055em; transform: rotate(-1deg); }
-.homepage-signature-static { display: block; text-decoration-line: underline; text-decoration-color: color-mix(in srgb, var(--accent) 42%, transparent); text-decoration-thickness: .075em; text-underline-offset: .095em; text-decoration-skip-ink: auto; }
-.homepage-signature-stage { display: none; }
+.homepage-signature { max-width: 1100px; letter-spacing: -.055em; transform: rotate(-1deg); isolation: isolate; }
+.homepage-signature-static { position: relative; z-index: 1; display: block; }
+.homepage-signature-stage { position: relative; z-index: 1; display: none; }
+.homepage-signature-marker { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.homepage-signature-marker path { fill: none; stroke: color-mix(in srgb, var(--accent) 46%, transparent); stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 660ms var(--motion-ease); }
+html[data-home-opening="running"] .homepage-signature-marker { opacity: 0; }
+html[data-home-opening="highlight"] .homepage-signature-marker path,
+html[data-home-opening="revealing"] .homepage-signature-marker path,
+html[data-home-opening="complete"] .homepage-signature-marker path,
+html:not([data-home-opening]) .homepage-signature-marker path { stroke-dashoffset: 0; }
+.homepage-signature-caret { color: var(--accent); font: 400 .78em/1 var(--sans); margin-left: .045em; vertical-align: baseline; animation: cursor-pulse 900ms var(--motion-ease) infinite alternate; }
 .homepage-signature-word { display: inline-block; opacity: 1; transform: translateY(0); transition: opacity 420ms var(--motion-ease), transform 420ms var(--motion-ease); }
-.homepage-signature.is-highlight .homepage-signature-stage,
-.homepage-signature.is-revealing .homepage-signature-stage,
-.homepage-signature.is-complete .homepage-signature-stage { text-decoration-line: underline; text-decoration-color: color-mix(in srgb, var(--accent) 42%, transparent); text-decoration-thickness: .075em; text-underline-offset: .095em; text-decoration-skip-ink: auto; transition: text-decoration-thickness 660ms var(--motion-ease), text-decoration-color 660ms var(--motion-ease); }
-.homepage-signature.is-ready .homepage-signature-stage,
-.homepage-signature.is-typing .homepage-signature-stage,
-.homepage-signature.is-landing .homepage-signature-stage { text-decoration-thickness: 0; text-decoration-color: transparent; }
 html[data-home-opening] .homepage-signature-static { visibility: hidden; }
 html[data-home-opening] .homepage-signature-stage { position: absolute; inset: 0; display: block; text-wrap: balance; }
 html[data-home-opening="running"] .homepage-signature-word:not(.is-landed) { opacity: 0; transform: translateY(.13em); }
@@ -204,6 +206,7 @@ html[data-home-opening="revealing"] #top > main > .hero > .hero-lower { animatio
 html[data-home-opening="revealing"] #top > main > .hero > .scroll-cue { animation-delay: 140ms; }
 @keyframes home-opening-reveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes cursor-blink { 50% { opacity: 0; } }
+@keyframes cursor-pulse { from { opacity: .65; } to { opacity: 1; } }
 .hero-lower { display: grid; grid-template-columns: 1fr .55fr; gap: 40px; align-items: end; margin-top: auto; padding-top: 65px; }
 .hero-introduction { display: grid; grid-template-columns: minmax(74px, .22fr) minmax(0, 1fr); gap: clamp(14px, 2vw, 28px); align-items: start; max-width: 760px; padding-top: 18px; border-top: 1px solid var(--line); }
 .hero-introduction-label { margin: 4px 0 0; color: var(--accent); font: 10px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; }

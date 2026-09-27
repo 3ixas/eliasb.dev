@@ -47,7 +47,7 @@ const themeScript = `
     (() => {
       const root = document.documentElement;
       const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-      if (location.pathname !== '/' || location.hash || motion.matches) return;
+      if (location.pathname !== '/' || (location.hash && location.hash !== '#top') || motion.matches) return;
       root.dataset.homeOpening = 'running';
       let fallbackTimer;
       const cleanup = () => {
