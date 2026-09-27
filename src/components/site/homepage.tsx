@@ -20,6 +20,13 @@ import { profile } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
 import { getHistorySignal } from "@/integrations/history";
 
+function emphasizeFinalWord(text: string) {
+  const finalSpace = text.lastIndexOf(" ");
+  if (finalSpace < 0) return text;
+
+  return <>{text.slice(0, finalSpace + 1)}<em>{text.slice(finalSpace + 1)}</em></>;
+}
+
 export async function Homepage() {
   const [signals, history] = await Promise.all([getHomepageSignals(), getHistorySignal()]);
 
@@ -251,7 +258,7 @@ export async function Homepage() {
 
             <div className="library-index outside-work-history" aria-labelledby="history-title">
               <p>History</p>
-              <h2 id="history-title">{history.headline}</h2>
+              <h2 id="history-title">{emphasizeFinalWord(history.headline)}</h2>
               <div>
                 <article className="history-card" data-motion-reveal>
                   {history.dateLabel && <span>{history.dateLabel}</span>}
@@ -373,7 +380,7 @@ export async function Homepage() {
 
         <section className="about-section" id="about" tabIndex={-1} aria-labelledby="about-title">
           <p>04 / About</p>
-          <h2 id="about-title">A bit about me.</h2>
+          <h2 id="about-title">A bit about <em>me.</em></h2>
           <div className="about-copy" data-motion-reveal>
             <div className="about-prose">
               <p>{profile.about}</p>
@@ -399,7 +406,7 @@ export async function Homepage() {
             <div className="about-career-heading">
               <p>Career path</p>
               <div>
-                <h3 id="about-career-title">My career so far.</h3>
+                <h3 id="about-career-title">My career <em>so far.</em></h3>
                 <span>I like getting under the surface of a product. I started by using data to improve websites, then moved into building software.</span>
               </div>
             </div>
@@ -435,7 +442,7 @@ export async function Homepage() {
 
         <section id="contact" tabIndex={-1} className="contact-block contact-section" aria-labelledby="contact-title">
           <p>05 / Contact</p>
-          <h2 id="contact-title">Let’s talk.</h2>
+          <h2 id="contact-title">Let’s <em>talk.</em></h2>
           <div className="contact-actions" data-motion-reveal>
             <div className="contact-primary-action">
               <a className="contact-link" href={profile.links.email}>

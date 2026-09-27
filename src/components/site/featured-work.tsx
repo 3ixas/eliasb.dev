@@ -101,7 +101,7 @@ export function FeaturedWork() {
       <div className="section-heading">
         <p>01 / Featured work</p>
         <h2 id="work-title">
-          A few things I’ve been building.
+          A few things I’ve been <em>building.</em>
         </h2>
       </div>
       <div className="featured-work-list">
