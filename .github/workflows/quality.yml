@@ -43,6 +43,9 @@ jobs:
       - name: Verify signal contracts
         run: pnpm verify:signals
 
+      - name: Verify opening lifecycle
+        run: pnpm verify:opening
+
       - name: Build with webpack
         run: SITE_INDEXABLE=true pnpm build --webpack
 

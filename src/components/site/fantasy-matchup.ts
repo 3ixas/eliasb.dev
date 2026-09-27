@@ -16,7 +16,7 @@ function scoreWidths(teamScore: number, opponentScore: number) {
 }
 
 function formatScore(value: number | undefined) {
-  return isScore(value) ? value.toFixed(1) : "—";
+  return isScore(value) ? value.toFixed(1) : "–";
 }
 
 export function FantasyMatchup({ signal }: { signal: MatchupScores }) {

@@ -3,6 +3,14 @@ import type { HistoryEvent, HistoryImage, HistorySignal } from "@/integrations/t
 const HISTORY_CACHE_SECONDS = 604800;
 const HISTORY_TIMEOUT_MS = 3500;
 const HISTORY_FEEDS = ["events", "selected", "births"] as const;
+const WIKIMEDIA_HEADERS = {
+  Accept: "application/json",
+  "User-Agent": "EliasBHistory/1.0 (https://www.eliasb.dev/)",
+};
+
+function historyWarning(source: string, reason: string | number) {
+  console.warn("[history] Wikimedia request unavailable", { source, reason });
+}
 
 type WikimediaFeedName = typeof HISTORY_FEEDS[number];
 
@@ -89,7 +97,7 @@ export const HISTORY_FALLBACK_EVENTS: HistoryEvent[] = [
   },
 ];
 
-function weekStart(now = new Date()) {
+export function historyWeekStart(now = new Date()) {
   const date = new Date(now);
   date.setUTCHours(0, 0, 0, 0);
   const day = date.getUTCDay();
@@ -197,9 +205,12 @@ async function fetchHistoryFeed(feedName: WikimediaFeedName, month: string, day:
     const response = await fetch(sourceUrl, {
       next: { revalidate: HISTORY_CACHE_SECONDS, tags: ["history-signal"] },
       signal: AbortSignal.timeout(HISTORY_TIMEOUT_MS),
-      headers: { Accept: "application/json" },
+      headers: WIKIMEDIA_HEADERS,
     });
-    if (!response.ok) return null;
+    if (!response.ok) {
+      historyWarning(feedName, response.status);
+      return null;
+    }
 
     const payload: unknown = await response.json();
     if (!payload || typeof payload !== "object") return null;
@@ -208,7 +219,8 @@ async function fetchHistoryFeed(feedName: WikimediaFeedName, month: string, day:
 
     const kind: HistoryEvent["kind"] = feedName === "births" ? "birth" : "event";
     return items.some((item) => eventFrom(item, kind)) ? { feedName, items } : null;
-  } catch {
+  } catch (error) {
+    historyWarning(feedName, error instanceof Error ? error.name : "request failed");
     return null;
   }
 }
@@ -346,9 +358,12 @@ async function fetchCommonsImage(fileTitle: string): Promise<HistoryImage | unde
     const response = await fetch(requestUrl, {
       next: { revalidate: HISTORY_CACHE_SECONDS, tags: ["history-signal"] },
       signal: AbortSignal.timeout(HISTORY_TIMEOUT_MS),
-      headers: { Accept: "application/json" },
+      headers: WIKIMEDIA_HEADERS,
     });
-    if (!response.ok) return undefined;
+    if (!response.ok) {
+      historyWarning("Commons image", response.status);
+      return undefined;
+    }
 
     const payload: unknown = await response.json();
     if (!isRecord(payload) || !isRecord(payload.query)) return undefined;
@@ -384,12 +399,13 @@ async function fetchCommonsImage(fileTitle: string): Promise<HistoryImage | unde
 
     const alt = historyImageAlt(objectName, fileTitle);
     return { src, alt, creator, sourceUrl, licenseName, licenseUrl };
-  } catch {
+  } catch (error) {
+    historyWarning("Commons image", error instanceof Error ? error.name : "request failed");
     return undefined;
   }
 }
 
-function fallbackSignal(): HistorySignal {
+export function savedHistorySignal(): HistorySignal {
   return {
     state: "curated",
     statusLabel: "Saved examples",
@@ -403,7 +419,7 @@ function fallbackSignal(): HistorySignal {
 }
 
 export async function getHistorySignal(now = new Date()): Promise<HistorySignal> {
-  const start = weekStart(now);
+  const start = historyWeekStart(now);
   const month = String(start.getUTCMonth() + 1).padStart(2, "0");
   const day = String(start.getUTCDate()).padStart(2, "0");
   const sourceUrl = `https://en.wikipedia.org/api/rest_v1/feed/onthisday/all/${month}/${day}`;
@@ -411,11 +427,12 @@ export async function getHistorySignal(now = new Date()): Promise<HistorySignal>
   try {
     const feeds = await Promise.all(HISTORY_FEEDS.map((feedName) => fetchHistoryFeed(feedName, month, day)));
     const successfulFeeds = feeds.filter((feed): feed is WikimediaFeedResult => feed !== null);
-    if (successfulFeeds.length !== HISTORY_FEEDS.length) return fallbackSignal();
-
     const payload = Object.fromEntries(successfulFeeds.map(({ feedName, items }) => [feedName, items]));
     const candidates = selectHistoryCandidates(payload, now);
-    if (candidates.length !== 3) return fallbackSignal();
+    if (candidates.length !== 3) {
+      historyWarning("selection", `insufficient stories from ${successfulFeeds.length} available feeds`);
+      return savedHistorySignal();
+    }
     const events = await Promise.all(candidates.map(async ({ event, commonsFileTitle }) => {
       if (!commonsFileTitle) return event;
       const image = await fetchCommonsImage(commonsFileTitle);
@@ -432,7 +449,8 @@ export async function getHistorySignal(now = new Date()): Promise<HistorySignal>
       sourceUrl,
       updatedAt: new Date().toISOString(),
     };
-  } catch {
-    return fallbackSignal();
+  } catch (error) {
+    historyWarning("selection", error instanceof Error ? error.name : "selection failed");
+    return savedHistorySignal();
   }
 }

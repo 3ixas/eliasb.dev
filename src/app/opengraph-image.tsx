@@ -1,6 +1,7 @@
+import { profile } from "@/content/site";
 import { ImageResponse } from "next/og";
 
-export const alt = "Elias Bennett — software engineer and product builder in London";
+export const alt = "Elias Bennett, software engineer and product builder in London";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -60,7 +61,7 @@ export default function OpenGraphImage() {
             letterSpacing: -5,
           }}
         >
-          I build software that makes complex things easier to understand.
+          {profile.statement}
         </div>
         <div
           style={{

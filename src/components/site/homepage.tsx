@@ -16,9 +16,9 @@ import { HomepageSignature } from "@/components/homepage-opening";
 import { SiteHeader } from "@/components/site/site-header";
 import { careerTimeline, labItems } from "@/content/collections";
 import { integrationConfig } from "@/content/integration-config";
-import { profile } from "@/content/site";
+import { homepageHeadline, profile } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
-import { getHistorySignal } from "@/integrations/history";
+import { getCachedHistorySignal } from "@/integrations/history-cache";
 
 function emphasizeFinalWord(text: string) {
   const finalSpace = text.lastIndexOf(" ");
@@ -28,7 +28,7 @@ function emphasizeFinalWord(text: string) {
 }
 
 export async function Homepage() {
-  const [signals, history] = await Promise.all([getHomepageSignals(), getHistorySignal()]);
+  const [signals, history] = await Promise.all([getHomepageSignals(), getCachedHistorySignal()]);
 
   return (
     <div className="prototype prototype-cabinet-of-curiosities selected-experience" id="top" tabIndex={-1}>
@@ -39,7 +39,7 @@ export async function Homepage() {
           <p className="hero-kicker" id="hero-kicker">
             {profile.shortName} · {profile.role} · {profile.location}
           </p>
-          <HomepageSignature statement={profile.statement} />
+          <HomepageSignature {...homepageHeadline} />
           <div className="hero-lower">
             <div className="hero-introduction">
               <p className="hero-introduction-label">How I work</p>
@@ -378,7 +378,7 @@ export async function Homepage() {
             <div className="about-prose">
               <p>{profile.about}</p>
               <p className="about-supporting-copy">
-                I want to make software for real, recurring needs: easy to understand, good to look at, and enjoyable to use. Ideally, it becomes part of someone’s everyday routine.
+                I want to make products that solve a recurring problem well enough to become part of someone’s day. I care about making them beautiful, easy to understand, and a pleasure to use.
               </p>
               <a className="about-contact-cta" href="#contact">
                 Start a conversation <span className="arrow-mark" aria-hidden="true">↓</span>
@@ -410,7 +410,7 @@ export async function Homepage() {
                     <span className="career-entry-index">0{index + 1}</span>
                     <p className="career-period">
                       <time dateTime={entry.dates.start.dateTime}>{entry.dates.start.label}</time>
-                      <span aria-hidden="true">—</span>
+                      <span aria-hidden="true">–</span>
                       {entry.dates.end.dateTime ? (
                         <time dateTime={entry.dates.end.dateTime}>{entry.dates.end.label}</time>
                       ) : (

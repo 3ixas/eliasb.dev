@@ -178,13 +178,13 @@ function verifyPageShell(markup, route) {
 function verifyHomepage(markup) {
   verifyPageShell(markup, "/");
   const headline = tags(markup, "h1")[0];
-  const fullOpening = "I build software that untangles complex systems, so they’re easier to understand.";
+  const fullOpening = "I build software to make everyday things easier, and more enjoyable.";
   equal(attribute(headline ?? "", "aria-label"), fullOpening, "Homepage opening should retain its complete semantic sentence");
   const headlineContent = markup.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? "";
   check(plainText(headlineContent).includes(fullOpening), "Homepage opening should keep a complete static text fallback");
   const animatedHeadline = markup.match(/<span class="homepage-signature-stage"[^>]*>([\s\S]*?)<\/span><\/h1>/i)?.[1] ?? "";
   const animatedText = animatedHeadline.replace(/<[^>]+>/g, "").replace(/<!--.*?-->/gs, "");
-  check(animatedText.startsWith(" so they’re"), "Animated homepage opening should place its second thought after a visible pause");
+  check(animatedText.startsWith(" and more enjoyable."), "Animated homepage opening should place its second thought after a visible pause");
   check(!/Replay the opening/i.test(markup), "Homepage should not expose an opening replay control");
 
   const top = tags(markup, "div").find((tag) => attribute(tag, "id") === "top");

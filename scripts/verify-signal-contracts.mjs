@@ -10,7 +10,7 @@ import {
   startOfUtcWeek,
 } from "../src/integrations/signal-mappers.ts";
 import { integrationConfig } from "../src/content/integration-config.ts";
-import { getHistorySignal, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "../src/integrations/history.ts";
+import { getHistorySignal, historyWeekStart, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "../src/integrations/history.ts";
 import { fantasySourceUnavailable, fantasyWeekUnavailable, signalFallbacks } from "../src/content/signal-fallbacks.ts";
 import { FantasyMatchup } from "../src/components/site/fantasy-matchup.ts";
 import { SignalPresentation } from "../src/components/site/signal-presentation.ts";
@@ -82,6 +82,9 @@ const historyFixture = {
   holidays: [{ year: null, text: "A seasonal observance", pages: [{ titles: { canonical: "Holiday" } }] }],
 };
 
+assert.equal(historyWeekStart(new Date("2026-09-27T23:59:59Z")).toISOString(), "2026-09-21T00:00:00.000Z");
+assert.equal(historyWeekStart(new Date("2026-09-28T00:00:00Z")).toISOString(), "2026-09-28T00:00:00.000Z");
+
 const selectedHistory = selectHistoryEvents(historyFixture, historyNow);
 assert.deepEqual(selectedHistory.map(({ year }) => year), [1783, 1933, 2003]);
 assert.deepEqual(selectedHistory.map(({ kind }) => kind), ["event", "event", "event"]);
@@ -100,6 +103,7 @@ assert.deepEqual(HISTORY_FALLBACK_EVENTS.map(({ sourceUrl }) => new URL(sourceUr
 const originalFetch = globalThis.fetch;
 const historyRequestUrls = [];
 const historyRequestCacheDurations = [];
+const historyRequestAgents = [];
 const commonsRequestTitles = [];
 const commonsImageResponse = (title, { withoutLicense = false, licenseUrl = "https://creativecommons.org/licenses/by-sa/4.0/" } = {}) => new Response(JSON.stringify({
   query: {
@@ -128,6 +132,7 @@ try {
     const url = new URL(String(input));
     historyRequestUrls.push(url.href);
     historyRequestCacheDurations.push(options.next.revalidate);
+    historyRequestAgents.push(options.headers["User-Agent"]);
     if (url.hostname === "commons.wikimedia.org") {
       const title = url.searchParams.get("titles").replace(/^File:/, "");
       commonsRequestTitles.push(title);
@@ -143,6 +148,7 @@ try {
   assert.equal(imageRequests.length, 3);
   assert.equal(imageRequests.every((requestUrl) => new URL(requestUrl).searchParams.get("iiextmetadatafilter") === "ObjectName|Artist|LicenseShortName|LicenseUrl"), true);
   assert.equal(historyRequestCacheDurations.every((seconds) => seconds === 604800), true);
+  assert.ok(historyRequestAgents.every((agent) => agent === "EliasBHistory/1.0 (https://www.eliasb.dev/)"), "Feed and Commons requests must identify the site to Wikimedia");
   assert.deepEqual(commonsRequestTitles.sort(), ["Galileo_spacecraft.jpg", "Montgolfier_balloon.jpg", "Salvador_Lutteroth.jpg"]);
   assert.match(liveHistory.sourceUrl, /\/feed\/onthisday\/all\/09\/21$/);
   assert.deepEqual(liveHistory.events.map(({ year }) => year), [1783, 1933, 2003]);
@@ -152,6 +158,20 @@ try {
   assert.equal(liveHistory.events.every(({ image }) => image?.src.startsWith("https://upload.wikimedia.org/wikipedia/commons/")), true);
   assert.equal(liveHistory.events.every(({ image }) => image?.licenseUrl === "https://creativecommons.org/licenses/by-sa/4.0/"), true);
   assert.equal(liveHistory.events.every(({ image }) => image?.alt.length > 0 && !image.alt.includes("<")), true);
+
+  for (const failedFeed of ["births", "selected"]) {
+    globalThis.fetch = async (input) => {
+      const url = new URL(String(input));
+      if (url.hostname === "commons.wikimedia.org") return commonsImageResponse(url.searchParams.get("titles").replace(/^File:/, ""));
+      const feedName = url.pathname.split("/").at(-3);
+      if (feedName === failedFeed) return new Response(null, { status: 503 });
+      return new Response(JSON.stringify({ [feedName]: historyFixture[feedName] }), { status: 200 });
+    };
+    const availableHistory = await getHistorySignal(historyNow);
+    assert.equal(availableHistory.state, "live", `A failed ${failedFeed} feed must not discard three valid stories`);
+    assert.equal(availableHistory.events.length, 3);
+    assert.ok(availableHistory.events.every(({ image }) => image), "Available stories must retain their licensed images");
+  }
 
   globalThis.fetch = async (input) => {
     const url = new URL(String(input));
@@ -188,7 +208,7 @@ try {
     return new Response(JSON.stringify({ [feedName]: historyFixture[feedName] }), { status: 200 });
   };
   const partialHistory = await getHistorySignal(historyNow);
-  assert.equal(partialHistory.state, "curated", "A failed required category should not be labelled as a live result");
+  assert.equal(partialHistory.state, "curated", "Insufficient stories after a feed failure should not be labelled live");
   assert.equal(partialHistory.dateLabel, "Saved examples");
 
   globalThis.fetch = async (input) => {
@@ -197,7 +217,7 @@ try {
     return new Response(JSON.stringify({ [feedName]: items }), { status: 200 });
   };
   const emptyHistory = await getHistorySignal(historyNow);
-  assert.equal(emptyHistory.state, "curated", "An empty required category should not be labelled as a live result");
+  assert.equal(emptyHistory.state, "curated", "Insufficient stories after an empty feed should not be labelled live");
 
   globalThis.fetch = async (input) => {
     const feedName = new URL(String(input)).pathname.split("/").at(-3);
@@ -205,7 +225,7 @@ try {
     return new Response(JSON.stringify({ [feedName]: items }), { status: 200 });
   };
   const malformedHistory = await getHistorySignal(historyNow);
-  assert.equal(malformedHistory.state, "curated", "A category without a source-linked item should not be labelled as live");
+  assert.equal(malformedHistory.state, "curated", "Insufficient source-linked stories should not be labelled live");
 
   globalThis.fetch = async (input) => {
     const feedName = new URL(String(input)).pathname.split("/").at(-3);
@@ -340,7 +360,7 @@ assert.match(liveMatchupMarkup, /My team[\s\S]*112\.4[\s\S]*Opponent[\s\S]*98\.7
 assert.match(liveMatchupMarkup, /class="matchup-bars"/, "Known scores should have a visual score comparison");
 
 const pendingMatchupMarkup = renderToStaticMarkup(createElement(FantasyMatchup, { signal: fantasyPendingSignal }));
-assert.match(pendingMatchupMarkup, /My team[\s\S]*—[\s\S]*Opponent[\s\S]*—/);
+assert.match(pendingMatchupMarkup, /My team[\s\S]*–[\s\S]*Opponent[\s\S]*–/);
 assert.equal(pendingMatchupMarkup.includes('class="matchup-bars"'), false, "Unknown scores should not imply an equal matchup");
 
 assert.equal(GITHUB_ACTIVITY_DAYS, 365);

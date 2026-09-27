@@ -39,7 +39,7 @@ function FeaturedProject({ project, priority }: { project: HomepageProject; prio
       <Link
         className="project-visual"
         href={caseStudyHref(project)}
-        aria-label={`${project.index} — Read the ${project.name} case study`}
+        aria-label={`${project.index}, Read the ${project.name} case study`}
       >
         <Image
           src={project.image}

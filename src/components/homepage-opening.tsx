@@ -9,6 +9,8 @@ const CHARACTER_DELAY_MS = 46;
 const COMMA_PAUSE_MS = 280;
 const WORD_LANDING_STAGGER_MS = 48;
 const WORD_LANDING_SETTLE_MS = 440;
+const HIGHLIGHT_MS = 660;
+const PAGE_REVEAL_MS = 620;
 
 type MarkerPath = { d: string; strokeWidth: number };
 type MarkerMeasure = { viewBox: string; paths: MarkerPath[] };
@@ -55,18 +57,8 @@ function measureMarker(headline: HTMLHeadingElement, text: HTMLSpanElement): Mar
   }
 }
 
-function splitAtComma(statement: string) {
-  const comma = statement.indexOf(",");
-  if (comma < 0) return { first: statement, second: "" };
-
-  return {
-    first: statement.slice(0, comma + 1),
-    second: statement.slice(comma + 1).trim(),
-  };
-}
-
-export function HomepageSignature({ statement }: { statement: string }) {
-  const { first, second } = splitAtComma(statement);
+export function HomepageSignature({ first, second }: { first: string; second: string }) {
+  const statement = `${first} ${second}`;
   const secondWords = useMemo(() => second.split(/\s+/).filter(Boolean), [second]);
   const [visibleFirst, setVisibleFirst] = useState("");
   const [landedWords, setLandedWords] = useState(0);
@@ -136,6 +128,14 @@ export function HomepageSignature({ statement }: { statement: string }) {
       };
     }
 
+    const landingDuration = secondWords.length
+      ? (secondWords.length - 1) * WORD_LANDING_STAGGER_MS + WORD_LANDING_SETTLE_MS
+      : 0;
+    const durationMs = BACKGROUND_PAUSE_MS
+      + Math.max(0, characters.length - 1) * CHARACTER_DELAY_MS
+      + COMMA_PAUSE_MS + landingDuration + HIGHLIGHT_MS + PAGE_REVEAL_MS;
+    window.dispatchEvent(new CustomEvent("home-opening-started", { detail: { durationMs } }));
+
     const type = (index: number) => {
       setVisibleFirst(characters.slice(0, index + 1).join(""));
       if (index + 1 < characters.length) {
@@ -151,9 +151,6 @@ export function HomepageSignature({ statement }: { statement: string }) {
       secondWords.forEach((_, index) => {
         schedule(() => setLandedWords(index + 1), index * WORD_LANDING_STAGGER_MS);
       });
-      const landingDuration = secondWords.length
-        ? (secondWords.length - 1) * WORD_LANDING_STAGGER_MS + WORD_LANDING_SETTLE_MS
-        : 0;
       schedule(() => {
         setPhase("highlight");
         root.dataset.homeOpening = "highlight";
@@ -164,8 +161,8 @@ export function HomepageSignature({ statement }: { statement: string }) {
             setPhase("complete");
             root.dataset.homeOpening = "complete";
             window.dispatchEvent(new Event("home-opening-completed"));
-          }, 620);
-        }, 660);
+          }, PAGE_REVEAL_MS);
+        }, HIGHLIGHT_MS);
       }, landingDuration);
     };
 
