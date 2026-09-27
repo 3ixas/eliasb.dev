@@ -141,9 +141,15 @@ button { color: inherit; font: inherit; }
 .site-header nav a[aria-current="page"]::after, .site-header nav a[aria-current="location"]::after { transform: scaleX(1); transform-origin: left; }
 .say-hello { justify-self: end; font-size: 13px; }
 .site-header-actions { justify-self: end; display: flex; gap: 16px; align-items: center; }
+.site-theme-control { display: inline-flex; align-items: center; gap: 6px; }
 .site-theme-toggle { display: grid; width: 30px; height: 30px; padding: 0; cursor: pointer; place-items: center; background: transparent; border: 1px solid var(--line); border-radius: 50%; transition: border-color var(--motion-quick) var(--motion-ease), color var(--motion-quick) var(--motion-ease); }
 .site-theme-toggle:hover { border-color: var(--accent); }
 .site-theme-toggle--labelled { display: inline-flex; width: auto; height: auto; min-height: 30px; gap: 7px; padding: 7px 10px; border-radius: 20px; font: 9px/1 var(--mono); letter-spacing: .06em; }
+.site-theme-system { display: inline-flex; min-height: 30px; align-items: center; justify-content: center; padding: 0 7px; color: var(--muted); cursor: pointer; background: transparent; border: 1px solid transparent; border-radius: 20px; font: 9px/1 var(--mono); letter-spacing: .04em; transition: color var(--motion-quick) var(--motion-ease), border-color var(--motion-quick) var(--motion-ease); }
+.site-theme-system:hover { color: var(--accent); border-color: var(--line); }
+.toolbar-actions .site-theme-toggle { padding: 0; background: transparent; border-color: var(--line); text-transform: none; }
+.toolbar-actions .site-theme-toggle--labelled { padding: 7px 10px; border-radius: 20px; }
+.toolbar-actions .site-theme-system { padding: 0 7px; background: transparent; border-color: transparent; border-radius: 20px; text-transform: none; }
 .theme-toggle-icon { display: block; width: 16px; height: 16px; overflow: visible; transition: transform var(--motion-standard) var(--motion-ease); }
 .theme-toggle-rays, .theme-toggle-sun-disc, .theme-toggle-moon { transform-box: fill-box; transform-origin: center; transition: opacity var(--motion-standard) var(--motion-ease), transform var(--motion-object) var(--motion-object-ease); }
 .theme-toggle-rays { opacity: 1; }
@@ -900,7 +906,7 @@ html[data-home-opening="revealing"] #top > main > .hero > .scroll-cue { animatio
   .concept-card strong { font-size: 40px; }
   .concept-toolbar { grid-template-columns: 1fr auto; }
   .toolbar-directions { display: none; }
-  .toolbar-actions button:first-child { display: none; }
+  .toolbar-actions > button:first-child { display: none; }
   .site-header { grid-template-columns: 1fr 1fr; min-height: 70px; }
   .site-header nav { position: fixed; right: 12px; bottom: 12px; left: 12px; z-index: 80; justify-content: space-around; padding: 15px 10px; color: #f0eee8; background: #171816; border: 1px solid #454641; border-radius: 40px; box-shadow: 0 8px 30px #0005; }
   .site-header nav a, .page-header nav a { padding: 8px 6px; }
