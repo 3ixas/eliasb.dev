@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Homepage } from "@/components/site/homepage";
 
 export const metadata: Metadata = {
-  title: "Elias B. — Software that untangles complex systems",
-  description: "I’m Elias, a software engineer in London. Here’s what I build and what I get up to outside work.",
+  title: "Elias Bennett — Software engineer and product builder",
+  description: "I’m Elias, a software engineer in London. I help shape product ideas, build across the stack with others, and stay involved through launch and the changes that follow.",
 };
 
 export default function Home() {

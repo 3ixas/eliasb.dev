@@ -33,9 +33,9 @@ function measureMarker(headline: HTMLHeadingElement, text: HTMLSpanElement): Mar
       else lines.push({ top: rect.top, rects: [rect] });
     }
 
-    const strokeWidth = fontSize * 0.075;
+    const strokeWidth = fontSize * 0.14;
     const amplitude = Math.max(1.2, fontSize * 0.012);
-    const offset = fontSize * 0.045;
+    const offset = fontSize * -0.34;
     const paths = lines.map((line) => {
       const left = Math.min(...line.rects.map((rect) => rect.left)) - headingRect.left;
       const right = Math.max(...line.rects.map((rect) => rect.right)) - headingRect.left;

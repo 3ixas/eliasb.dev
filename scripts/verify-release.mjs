@@ -219,10 +219,10 @@ function verifyHomepage(markup) {
   check(aboutSection.includes("Career path"), "About should identify the career overview");
   const careerCopy = plainText(aboutSection);
   check(careerCopy.includes("My career so far."), "About should introduce the career progression plainly");
-  check(careerCopy.includes("I like getting under the surface of a product"), "About should explain the personal thread behind the career path");
+  check(careerCopy.includes("I started in marketing and data, then moved into software"), "About should explain the verified career progression in plain language");
   check(careerCopy.includes("Core Web Vitals and split tests"), "About should ground the marketing stage in approved career evidence");
-  check(careerCopy.includes("React, MySQL and a Java/Spring Boot backend"), "About should explain the move into full-stack work with approved evidence");
-  check(careerCopy.includes("These days I work on software that brings market data into pricing and risk calculations"), "About should describe the current role with its verified pricing/risk systems context");
+  check(careerCopy.includes("React, MySQL, and Java/Spring Boot"), "About should explain the move into full-stack work with approved evidence");
+  check(careerCopy.includes("I work on software that brings market data into pricing and risk calculations"), "About should describe the current role with its verified pricing/risk systems context");
   const careerRoles = [...aboutSection.matchAll(/<h4\b[^>]*>([\s\S]*?)<\/h4>/gi)].map(([, title]) => plainText(title));
   equal(careerRoles.join("|"), "Marketing Executive|Full Stack Software Engineer|Software Engineer working on pricing and risk systems", "About career roles should describe the verified current work without inventing an official title");
   const careerEmployers = [...aboutSection.matchAll(/class="career-employer"[^>]*>([\s\S]*?)<\/p>/gi)].map(([, employer]) => plainText(employer));

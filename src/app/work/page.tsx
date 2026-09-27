@@ -5,14 +5,14 @@ import { caseStudies } from "@/content/case-studies";
 
 export const metadata: Metadata = {
   title: "Work",
-  description: "A closer look at the software and systems I’ve built.",
+  description: "A closer look at the projects I’ve built and how I approached them.",
   alternates: { canonical: "/work" },
   openGraph: {
     type: "website",
     siteName: "Elias B.",
     url: "/work",
     title: "Work · Elias B.",
-    description: "A closer look at the software and systems I’ve built.",
+    description: "A closer look at the projects I’ve built and how I approached them.",
     images: [{
       url: "/work/threshold/landing.webp",
       width: 2294,
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Work · Elias B.",
-    description: "A closer look at the software and systems I’ve built.",
+    description: "A closer look at the projects I’ve built and how I approached them.",
     images: [{
       url: "/work/threshold/landing.webp",
       alt: "Threshold landing page introducing the real cost of moving out",
@@ -40,8 +40,8 @@ export default function WorkPage() {
       <main id="main-content" tabIndex={-1}>
         <header className="work-index-hero">
           <p>{studies.length} case studies</p>
-          <h1>How each project came together.</h1>
-          <span>The problem, the calls I made, and the bits I had to figure out.</span>
+          <h1>What I built, and how I approached it.</h1>
+          <span>What I was trying to solve, how I went about it, and what I learned along the way.</span>
         </header>
         <ol className="work-index-list">
           {studies.map((study) => <WorkArchiveCard key={study.slug} study={study} />)}

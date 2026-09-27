@@ -5,9 +5,9 @@ export const profile = {
   location: "London",
   statement: "I build software that untangles complex systems, so they’re easier to understand.",
   introduction:
-    "I like getting involved early, while there’s still room to ask what’s worth making. I help shape how a product works and feels, build across the stack, and work with others where the project calls for it. I stay close through shipping and the next round of changes.",
+    "I like getting involved early, while an idea is still taking shape. I help decide what to make, shape how it works and feels, and build it with others. I stay involved through launch and the next round of changes.",
   about:
-    "I’m in London, working on high-performance pricing and risk systems. Away from work, I take my own product ideas from the first sketch through design and code, then keep iterating after they ship.",
+    "I’m in London, where I work on high-performance pricing and risk systems. Outside work, I take my own product ideas from the first sketch through design and code, then keep improving them after they ship.",
   links: {
     email: "mailto:eliasthebennett@gmail.com",
     github: "https://github.com/3ixas",
@@ -41,9 +41,9 @@ export const projects = [
     index: "01",
     name: "Threshold",
     eyebrow: "Product engineering · Data visualisation · 2026",
-    thesis: "Making the cost of a decision visible.",
+    thesis: "A clearer view of what moving could cost.",
     description:
-      "A rental calculator for London, Basel, and Zurich. It puts salary, moving costs, and local assumptions together so you can see what a move might take.",
+      "A rental calculator for London, Basel, and Zurich. It brings salary, moving costs, and local assumptions together so you can work out what a move might take.",
     qualities: [
       "Shareable URL state",
       "Typed city configuration",
@@ -63,7 +63,7 @@ export const projects = [
     name: "Argus Risk",
     eyebrow: "Event-driven systems",
     description:
-      "A local simulator for a multi-currency risk platform. Follow simulated prices and trades through the system and see what they do to a portfolio.",
+      "A local simulator for a multi-currency risk platform. Follow simulated prices and trades through the system and into portfolio calculations.",
     image: "/work/argus/overview.webp",
     imageAlt: "Argus Risk interface showing event-driven risk positions",
     codeUrl: "https://github.com/3ixas/argus-risk",
@@ -76,7 +76,7 @@ export const projects = [
     name: "Flowtime",
     eyebrow: "Offline-first interaction",
     description:
-      "A focus timer that keeps time when your browser dozes off. It saves your history on your device and lets you choose what happens if you close the tab mid-session.",
+      "A focus timer that keeps accurate time when its browser tab is in the background. It saves your history on your device and asks what you want to do if you close the tab mid-session.",
     image: "/work/flowtime/timer.jpg",
     imageAlt: "Flowtime focus timer interface",
     liveUrl: "https://flowtime-focus-timer.vercel.app",
@@ -101,7 +101,7 @@ export const labNotes = [
     title: "Ask Professor Past",
     kind: "History experiment",
     description:
-      "A character-led way to ask questions of history, built around a witty and eccentric professor.",
+      "A small experiment in asking questions about history through an eccentric fictional professor.",
     href: "/lab#lab-01",
     treatment: "professor",
     image: "/lab/professor-past.webp",
@@ -112,7 +112,7 @@ export const labNotes = [
     title: "Fantasy models",
     kind: "Football · Data",
     description:
-      "Small experiments with rankings, matchups, predictions, and the weekly chaos of a redraft league.",
+      "Matchup views, rankings, and draft tools for a redraft league. I’m still working out where predictions fit.",
     href: "/lab#lab-02",
     treatment: "fantasy",
     image: "/signals/football-stadium.jpg",
@@ -123,7 +123,7 @@ export const labNotes = [
     title: "Interface studies",
     kind: "Work in progress",
     description:
-      "Components, interaction ideas, failed directions, and notes from learning how products should feel.",
+      "Small tests of controls and motion, with notes on what feels useful and what doesn’t.",
     href: "/lab#lab-03",
     treatment: "interface",
     image: "/lab/flowtime-interface.jpg",
