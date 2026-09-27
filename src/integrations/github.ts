@@ -15,14 +15,12 @@ type GitHubEvent = {
 type ContributionSnapshot = {
   activity: ActivityDay[];
   totalContributions: number;
-  privateContributions: number;
 };
 
 type ContributionResponse = {
   data?: {
     user?: {
       contributionsCollection?: {
-        restrictedContributionsCount?: number;
         contributionCalendar?: {
           totalContributions?: number;
           weeks?: Array<{
@@ -86,7 +84,6 @@ async function fetchContributionActivity(token: string): Promise<ContributionSna
               weeks { contributionDays { date contributionCount } }
               totalContributions
             }
-            restrictedContributionsCount
           }
         }
       }`,
@@ -112,10 +109,6 @@ async function fetchContributionActivity(token: string): Promise<ContributionSna
   return {
     activity: mapContributionDays(days, GITHUB_ACTIVITY_DAYS),
     totalContributions: calendar.totalContributions,
-    privateContributions:
-      typeof collection?.restrictedContributionsCount === "number"
-        ? collection.restrictedContributionsCount
-        : 0,
   };
 }
 
@@ -158,7 +151,6 @@ export async function getGitHubSignal(): Promise<GitHubSignal> {
       activity: contributions.activity,
       activityLabel: "GitHub contributions over the past year",
       totalContributions: contributions.totalContributions,
-      privateContributions: contributions.privateContributions,
       updatedAt: new Date().toISOString(),
       href: GITHUB_PROFILE,
     };

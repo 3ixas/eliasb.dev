@@ -98,10 +98,10 @@ export function WorkArchiveCard({ study }: { study: WorkArchiveCardProps }) {
 export function FeaturedWork() {
   return (
     <section className="work-section" id="work" tabIndex={-1} aria-labelledby="work-title">
-      <div className="section-heading">
+      <div className="section-heading" data-motion-reveal>
         <p>01 / Featured work</p>
         <h2 id="work-title">
-          A few things I’ve been building.
+          A few things I’ve been <em>building.</em>
         </h2>
       </div>
       <div className="featured-work-list">

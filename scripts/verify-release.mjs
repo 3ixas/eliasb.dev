@@ -217,20 +217,20 @@ function verifyHomepage(markup) {
   const aboutSection = aboutStart >= 0 && contactStart > aboutStart ? markup.slice(aboutStart, contactStart) : "";
   check(Boolean(aboutSection), "Homepage should render its About section before Contact");
   check(aboutSection.includes("Career path"), "About should identify the career overview");
-  check(aboutSection.includes("My career so far."), "About should introduce the career progression plainly");
   const careerCopy = plainText(aboutSection);
+  check(careerCopy.includes("My career so far."), "About should introduce the career progression plainly");
   check(careerCopy.includes("I like getting under the surface of a product"), "About should explain the personal thread behind the career path");
   check(careerCopy.includes("Core Web Vitals and split tests"), "About should ground the marketing stage in approved career evidence");
   check(careerCopy.includes("React, MySQL and a Java/Spring Boot backend"), "About should explain the move into full-stack work with approved evidence");
   check(careerCopy.includes("These days I work on software that brings market data into pricing and risk calculations"), "About should describe the current role with its verified pricing/risk systems context");
   const careerRoles = [...aboutSection.matchAll(/<h4\b[^>]*>([\s\S]*?)<\/h4>/gi)].map(([, title]) => plainText(title));
-  equal(careerRoles.join("|"), "Marketing Executive|Full Stack Software Engineer|Software Engineer", "About career roles should follow the verified chronology");
+  equal(careerRoles.join("|"), "Marketing Executive|Full Stack Software Engineer|Software Engineer working on pricing and risk systems", "About career roles should describe the verified current work without inventing an official title");
   const careerEmployers = [...aboutSection.matchAll(/class="career-employer"[^>]*>([\s\S]*?)<\/p>/gi)].map(([, employer]) => plainText(employer));
   equal(careerEmployers.join("|"), "Optegra Eye Healthcare & Kensington Medical|Joveen|BNP Paribas CIB", "About should show the verified employers in order");
   const careerDates = [...aboutSection.matchAll(/<time\b[^>]*>([\s\S]*?)<\/time>/gi)].map(([, date]) => plainText(date));
   equal(careerDates.join("|"), "Sept 2021|Aug 2024|Aug 2024|June 2025|July 2025", "About should expose the verified role dates");
   check(aboutSection.includes("Present"), "About should show the current role as ongoing");
-  check(aboutSection.includes("High-Performance Computing, Pricing and Risk Systems"), "About should retain the verified current team context");
+  check(aboutSection.includes("High-Performance Computing"), "About should retain the verified current team context");
   check(!aboutSection.includes("AI model training"), "About should not claim unverified career experience");
   equal((aboutSection.match(/\bawkward\b/gi) ?? []).length, 0, "About should not use vague filler language");
   check(!aboutSection.includes("Outside the editor"), "About should not repeat the interests gathered in Library");
@@ -244,6 +244,7 @@ function verifyHomepage(markup) {
   const contactEnd = markup.indexOf("<footer", contactStart);
   const contactSection = contactStart >= 0 && contactEnd > contactStart ? markup.slice(contactStart, contactEnd) : "";
   check(Boolean(contactSection), "Homepage should render its Contact section before the footer");
+  check(!/<img\b/i.test(contactSection), "Contact should keep its visual focus on ways to connect");
   const contactActions = contactSection.match(/<nav class="contact-profile-links"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] ?? "";
   const contactProfiles = [...contactActions.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)];
   equal(contactProfiles.length, 3, "Contact should present GitHub, LinkedIn, and résumé actions");
@@ -308,6 +309,8 @@ function verifyHomepage(markup) {
   }
 
   const text = plainText(markup);
+  const githubSignal = markup.match(/<article class="signal signal-building"[^>]*>([\s\S]*?)<\/article>/i)?.[1] ?? "";
+  check(!/Private contribution count|class="signal-metrics"/.test(githubSignal), "GitHub output should not show a separate private contribution statistic");
   check(/Goodreads/i.test(text) && /(Currently reading|Last on Goodreads)/i.test(text), "Reading signal should identify Goodreads and the current or last logged book");
   check(/Letterboxd/i.test(text) && /(Most recently watched|Last logged)/i.test(text), "Cinema signal should identify Letterboxd and the most recent or last logged film");
   check(!/other managers.{0,40}(names|private|anonymous)|names.{0,24}stay private/i.test(text), "Fantasy football output should omit the redundant privacy explanation");

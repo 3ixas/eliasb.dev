@@ -5,9 +5,9 @@ export const profile = {
   location: "London",
   statement: "I build software that untangles complex systems, so they’re easier to understand.",
   introduction:
-    "I like getting under the skin of a product: how it works, what the data says, and how it feels to use.",
+    "I like getting involved early, while there’s still room to ask what’s worth making. I help shape how a product works and feels, build across the stack, and work with others where the project calls for it. I stay close through shipping and the next round of changes.",
   about:
-    "I’m in London, building high-performance pricing and risk systems. Away from work, I make my own products end to end: I start with the problem, shape the experience, write the code, and stay with the hard bits until they make sense.",
+    "I’m in London, working on high-performance pricing and risk systems. Away from work, I take my own product ideas from the first sketch through design and code, then keep iterating after they ship.",
   links: {
     email: "mailto:eliasthebennett@gmail.com",
     github: "https://github.com/3ixas",

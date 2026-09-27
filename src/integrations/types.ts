@@ -13,7 +13,6 @@ export type GitHubSignal = {
   activity: ActivityDay[];
   activityLabel: string;
   totalContributions?: number;
-  privateContributions?: number;
   updatedAt: string | null;
   href: string;
 };

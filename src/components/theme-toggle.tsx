@@ -56,8 +56,30 @@ function getServerHydrationStatus() {
 }
 
 function nextThemePreference(current: ThemePreference, systemTheme: Theme): ThemePreference {
-  if (current === "system") return systemTheme === "dark" ? "light" : "dark";
-  return current === systemTheme ? "system" : systemTheme;
+  const activeTheme = current === "system" ? systemTheme : current;
+  return activeTheme === "dark" ? "light" : "dark";
+}
+
+function applyThemePreference(preference: ThemePreference) {
+  const root = document.documentElement;
+
+  if (preference === "system") {
+    delete root.dataset.theme;
+    try {
+      window.localStorage.removeItem(THEME_STORAGE_KEY);
+    } catch {
+      // The page still follows the device setting for this visit.
+    }
+  } else {
+    root.dataset.theme = preference;
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, preference);
+    } catch {
+      // The chosen appearance still applies for this visit.
+    }
+  }
+
+  window.dispatchEvent(new Event(THEME_PREFERENCE_EVENT));
 }
 
 function themeName(theme: ThemePreference) {
@@ -89,52 +111,47 @@ export function ThemeToggle({ compact = false }: { compact?: boolean }) {
 
   function toggleTheme() {
     const systemThemeNow = getSystemTheme();
-    const next = nextThemePreference(preference, systemThemeNow);
-    const root = document.documentElement;
+    const currentPreference = getThemePreference();
+    applyThemePreference(nextThemePreference(currentPreference, systemThemeNow));
+  }
 
-    if (next === "system") {
-      delete root.dataset.theme;
-      try {
-        window.localStorage.removeItem(THEME_STORAGE_KEY);
-      } catch {
-        // The page still follows the device setting for this visit.
-      }
-    } else {
-      root.dataset.theme = next;
-      try {
-        window.localStorage.setItem(THEME_STORAGE_KEY, next);
-      } catch {
-        // The chosen appearance still applies for this visit.
-      }
-    }
-
-    window.dispatchEvent(new Event(THEME_PREFERENCE_EVENT));
+  function useSystemAppearance() {
+    applyThemePreference("system");
   }
 
   return (
-    <button
-      type="button"
-      className={`site-theme-toggle${compact ? "" : " site-theme-toggle--labelled"}`}
-      onClick={toggleTheme}
-      aria-label={accessibleName}
-      title={accessibleName}
-    >
-      <svg className="theme-toggle-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <g className="theme-toggle-rays" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.6">
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42" />
-        </g>
-        <circle className="theme-toggle-sun-disc" cx="12" cy="12" r="4.15" fill="currentColor" />
-        <path
-          className="theme-toggle-moon"
-          d="M19.2 15.45A7.4 7.4 0 0 1 8.55 4.8 7.5 7.5 0 1 0 19.2 15.45Z"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1.6"
-        />
-      </svg>
-      {!compact && <span className="theme-toggle-label">{preference === "system" ? "System" : preference}</span>}
-    </button>
+    <div className="site-theme-control">
+      <button
+        type="button"
+        className={`site-theme-toggle${compact ? "" : " site-theme-toggle--labelled"}`}
+        onClick={toggleTheme}
+        aria-label={accessibleName}
+        title={accessibleName}
+      >
+        <svg className="theme-toggle-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <g className="theme-toggle-rays" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.6">
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42" />
+          </g>
+          <circle className="theme-toggle-sun-disc" cx="12" cy="12" r="4.15" fill="currentColor" />
+          <path
+            className="theme-toggle-moon"
+            d="M21 14.5A8.5 8.5 0 0 1 9.5 3 8.5 8.5 0 1 0 21 14.5Z"
+            fill="currentColor"
+          />
+        </svg>
+        {!compact && <span className="theme-toggle-label">{preference === "system" ? "System" : preference}</span>}
+      </button>
+      {preference !== "system" && (
+        <button
+          type="button"
+          className="site-theme-system"
+          onClick={useSystemAppearance}
+          aria-label="Use system appearance"
+          title="Use your device’s appearance"
+        >
+          {compact ? "System" : "Use system"}
+        </button>
+      )}
+    </div>
   );
 }

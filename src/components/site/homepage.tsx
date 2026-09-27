@@ -20,6 +20,13 @@ import { profile } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
 import { getHistorySignal } from "@/integrations/history";
 
+function emphasizeFinalWord(text: string) {
+  const finalSpace = text.lastIndexOf(" ");
+  if (finalSpace < 0) return text;
+
+  return <>{text.slice(0, finalSpace + 1)}<em>{text.slice(finalSpace + 1)}</em></>;
+}
+
 export async function Homepage() {
   const [signals, history] = await Promise.all([getHomepageSignals(), getHistorySignal()]);
 
@@ -64,7 +71,7 @@ export async function Homepage() {
 
         <section className="outside-work-section" id="outside-work" tabIndex={-1} aria-labelledby="outside-work-title">
           <div className="currently-section">
-            <div className="section-heading compact">
+            <div className="section-heading compact" data-motion-reveal>
               <p>02 / Outside work</p>
               <h2 id="outside-work-title">
                 Some of what I’m into <em>lately.</em>
@@ -82,12 +89,6 @@ export async function Homepage() {
                 >
                   <strong>{signals.github.headline}</strong>
                   {signals.github.description && <span>{signals.github.description}</span>}
-                  {signals.github.privateContributions !== undefined && (
-                    <div className="signal-metrics" role="group" aria-label="Private contribution count">
-                      <b>{signals.github.privateContributions}</b>
-                      <span>private</span>
-                    </div>
-                  )}
                   {signals.github.totalContributions !== undefined ? (
                     <ContributionCalendar activity={signals.github.activity} label={signals.github.activityLabel} />
                   ) : signals.github.state !== "unavailable" ? (
@@ -171,7 +172,7 @@ export async function Homepage() {
 
 
           <section className="library-section outside-work-culture" aria-labelledby="culture-title">
-            <div className="section-heading compact">
+            <div className="section-heading compact" data-motion-reveal>
               <p>Books, films, music and history</p>
               <h2 id="culture-title">
                 A few things I enjoy <em>outside work.</em>
@@ -251,7 +252,7 @@ export async function Homepage() {
 
             <div className="library-index outside-work-history" aria-labelledby="history-title">
               <p>History</p>
-              <h2 id="history-title">{history.headline}</h2>
+              <h2 id="history-title" data-motion-reveal>{emphasizeFinalWord(history.headline)}</h2>
               <div>
                 <article className="history-card" data-motion-reveal>
                   {history.dateLabel && <span>{history.dateLabel}</span>}
@@ -297,7 +298,7 @@ export async function Homepage() {
         </section>
 
         <section className="lab-section experiments-section" id="experiments" tabIndex={-1} aria-labelledby="experiments-title">
-          <div className="section-heading compact">
+          <div className="section-heading compact" data-motion-reveal>
             <p>03 / Experiments</p>
             <div>
               <h2 id="experiments-title">
@@ -373,12 +374,12 @@ export async function Homepage() {
 
         <section className="about-section" id="about" tabIndex={-1} aria-labelledby="about-title">
           <p>04 / About</p>
-          <h2 id="about-title">A bit about me.</h2>
+          <h2 id="about-title" data-motion-reveal>A bit about <em>me.</em></h2>
           <div className="about-copy" data-motion-reveal>
             <div className="about-prose">
               <p>{profile.about}</p>
               <p className="about-supporting-copy">
-                I like software that tells you what it’s doing, holds up when things go wrong, and gets the small details right.
+                I want to make software that solves problems people keep running into and earns a place in their everyday lives by being clear, beautiful, and a pleasure to use.
               </p>
               <a className="about-contact-cta" href="#contact">
                 Start a conversation <span className="arrow-mark" aria-hidden="true">↓</span>
@@ -396,10 +397,10 @@ export async function Homepage() {
             </figure>
           </div>
           <div className="about-career-path">
-            <div className="about-career-heading">
+            <div className="about-career-heading" data-motion-reveal>
               <p>Career path</p>
               <div>
-                <h3 id="about-career-title">My career so far.</h3>
+                <h3 id="about-career-title">My career <em>so far.</em></h3>
                 <span>I like getting under the surface of a product. I started by using data to improve websites, then moved into building software.</span>
               </div>
             </div>
@@ -418,7 +419,12 @@ export async function Homepage() {
                       )}
                     </p>
                   </div>
-                  <h4>{entry.role}</h4>
+                  <h4>
+                    {entry.role}
+                    {"roleFocus" in entry && entry.roleFocus && (
+                      <span className="career-role-focus"> working on {entry.roleFocus}</span>
+                    )}
+                  </h4>
                   <p className="career-employer">{entry.employer}</p>
                   {entry.context && <p className="career-entry-context">{entry.context}</p>}
                   {entry.story && <p className="career-entry-story">{entry.story}</p>}
@@ -430,7 +436,7 @@ export async function Homepage() {
 
         <section id="contact" tabIndex={-1} className="contact-block contact-section" aria-labelledby="contact-title">
           <p>05 / Contact</p>
-          <h2 id="contact-title">Let’s talk.</h2>
+          <h2 id="contact-title" data-motion-reveal>Let’s <em>talk.</em></h2>
           <div className="contact-actions" data-motion-reveal>
             <div className="contact-primary-action">
               <a className="contact-link" href={profile.links.email}>
@@ -439,23 +445,30 @@ export async function Homepage() {
               <span className="contact-email">eliasthebennett@gmail.com</span>
             </div>
             <div className="contact-aside">
-              <figure className="contact-photo">
-                <Image
-                  src="/profile/elias.webp"
-                  alt="Elias smiling outside in a grey jumper"
-                  fill
-                  sizes="(max-width: 420px) 130px, (max-width: 560px) 160px, (max-width: 800px) 250px, (max-width: 1100px) 110px, 180px"
-                />
-              </figure>
               <nav className="contact-profile-links" aria-label="Other ways to connect">
-                <a href={profile.links.github} target="_blank" rel="noreferrer">
+                <a
+                  className="contact-profile-link contact-profile-link--github"
+                  href={profile.links.github}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   GitHub <span className="arrow-mark" aria-hidden="true">↗︎</span>
                 </a>
-                <a href={profile.links.linkedin} target="_blank" rel="noreferrer">
+                <a
+                  className="contact-profile-link contact-profile-link--linkedin"
+                  href={profile.links.linkedin}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   LinkedIn <span className="arrow-mark" aria-hidden="true">↗︎</span>
                 </a>
                 {profile.links.resume && (
-                  <a href={profile.links.resume} target="_blank" rel="noreferrer">
+                  <a
+                    className="contact-profile-link contact-profile-link--resume"
+                    href={profile.links.resume}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     Résumé <span className="arrow-mark" aria-hidden="true">↗︎</span>
                   </a>
                 )}
@@ -466,7 +479,7 @@ export async function Homepage() {
       </main>
 
       <footer className="site-footer">
-        <p>Made by {profile.shortName}, in London.</p>
+        <p>Made by {profile.shortName}.</p>
         <div>
           <Link href="/concepts">Design study <span className="arrow-mark" aria-hidden="true">↗︎</span></Link>
           <a href={profile.links.github} target="_blank" rel="noreferrer">
