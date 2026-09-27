@@ -18,7 +18,7 @@ import { careerTimeline, labItems } from "@/content/collections";
 import { integrationConfig } from "@/content/integration-config";
 import { homepageHeadline, profile } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
-import { getHistorySignal } from "@/integrations/history";
+import { getCachedHistorySignal } from "@/integrations/history-cache";
 
 function emphasizeFinalWord(text: string) {
   const finalSpace = text.lastIndexOf(" ");
@@ -28,7 +28,7 @@ function emphasizeFinalWord(text: string) {
 }
 
 export async function Homepage() {
-  const [signals, history] = await Promise.all([getHomepageSignals(), getHistorySignal()]);
+  const [signals, history] = await Promise.all([getHomepageSignals(), getCachedHistorySignal()]);
 
   return (
     <div className="prototype prototype-cabinet-of-curiosities selected-experience" id="top" tabIndex={-1}>
