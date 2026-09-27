@@ -16,6 +16,7 @@ import { FantasyMatchup } from "../src/components/site/fantasy-matchup.ts";
 import { SignalPresentation } from "../src/components/site/signal-presentation.ts";
 import {
   createContributionCalendar,
+  formatContributionDate,
   moveContributionCalendarIndex,
 } from "../src/components/site/contribution-calendar-model.ts";
 
@@ -362,6 +363,19 @@ assert.match(liveMatchupMarkup, /class="matchup-bars"/, "Known scores should hav
 const pendingMatchupMarkup = renderToStaticMarkup(createElement(FantasyMatchup, { signal: fantasyPendingSignal }));
 assert.match(pendingMatchupMarkup, /My team[\s\S]*–[\s\S]*Opponent[\s\S]*–/);
 assert.equal(pendingMatchupMarkup.includes('class="matchup-bars"'), false, "Unknown scores should not imply an equal matchup");
+
+// Simulate a browser with different locale data. Calendar HTML must not depend
+// on Intl at either render, otherwise React can replace the page during hydration.
+const originalDateTimeFormat = Intl.DateTimeFormat;
+try {
+  Intl.DateTimeFormat = function () { throw new Error("Runtime locale formatting must not enter the calendar render"); };
+  assert.equal(formatContributionDate("2025-09-28", { month: "short" }), "28 Sept 2025");
+  assert.equal(formatContributionDate("2025-09-28", { month: "short", weekday: "short" }), "Sun, 28 Sept 2025");
+  assert.equal(formatContributionDate("2025-09-28", { weekday: "long" }), "Sunday, 28 September 2025");
+  assert.equal(createContributionCalendar([{ date: "2025-09-28", count: 0 }]).monthLabels[0].label, "Sept");
+} finally {
+  Intl.DateTimeFormat = originalDateTimeFormat;
+}
 
 assert.equal(GITHUB_ACTIVITY_DAYS, 365);
 assert.equal(signalFallbacks.github.activity.length, GITHUB_ACTIVITY_DAYS);
