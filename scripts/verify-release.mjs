@@ -244,6 +244,7 @@ function verifyHomepage(markup) {
   const contactEnd = markup.indexOf("<footer", contactStart);
   const contactSection = contactStart >= 0 && contactEnd > contactStart ? markup.slice(contactStart, contactEnd) : "";
   check(Boolean(contactSection), "Homepage should render its Contact section before the footer");
+  check(!/<img\b/i.test(contactSection), "Contact should keep its visual focus on ways to connect");
   const contactActions = contactSection.match(/<nav class="contact-profile-links"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] ?? "";
   const contactProfiles = [...contactActions.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)];
   equal(contactProfiles.length, 3, "Contact should present GitHub, LinkedIn, and résumé actions");

@@ -445,23 +445,30 @@ export async function Homepage() {
               <span className="contact-email">eliasthebennett@gmail.com</span>
             </div>
             <div className="contact-aside">
-              <figure className="contact-photo">
-                <Image
-                  src="/profile/elias.webp"
-                  alt="Elias smiling outside in a grey jumper"
-                  fill
-                  sizes="(max-width: 420px) 130px, (max-width: 560px) 160px, (max-width: 800px) 250px, (max-width: 1100px) 110px, 180px"
-                />
-              </figure>
               <nav className="contact-profile-links" aria-label="Other ways to connect">
-                <a href={profile.links.github} target="_blank" rel="noreferrer">
+                <a
+                  className="contact-profile-link contact-profile-link--github"
+                  href={profile.links.github}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   GitHub <span className="arrow-mark" aria-hidden="true">↗︎</span>
                 </a>
-                <a href={profile.links.linkedin} target="_blank" rel="noreferrer">
+                <a
+                  className="contact-profile-link contact-profile-link--linkedin"
+                  href={profile.links.linkedin}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   LinkedIn <span className="arrow-mark" aria-hidden="true">↗︎</span>
                 </a>
                 {profile.links.resume && (
-                  <a href={profile.links.resume} target="_blank" rel="noreferrer">
+                  <a
+                    className="contact-profile-link contact-profile-link--resume"
+                    href={profile.links.resume}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     Résumé <span className="arrow-mark" aria-hidden="true">↗︎</span>
                   </a>
                 )}
