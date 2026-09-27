@@ -66,12 +66,13 @@ export const careerTimeline = [
   },
   {
     role: "Software Engineer",
+    roleFocus: "pricing and risk systems",
     employer: "BNP Paribas CIB",
     dates: {
       start: { dateTime: "2025-07", label: "July 2025" },
       end: { dateTime: null, label: "Present" },
     },
-    context: "High-Performance Computing, Pricing and Risk Systems · through _nology",
+    context: "High-Performance Computing",
     story: "These days I work on software that brings market data into pricing and risk calculations.",
   },
 ] as const;

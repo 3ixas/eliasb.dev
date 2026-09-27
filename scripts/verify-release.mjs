@@ -224,13 +224,13 @@ function verifyHomepage(markup) {
   check(careerCopy.includes("React, MySQL and a Java/Spring Boot backend"), "About should explain the move into full-stack work with approved evidence");
   check(careerCopy.includes("These days I work on software that brings market data into pricing and risk calculations"), "About should describe the current role with its verified pricing/risk systems context");
   const careerRoles = [...aboutSection.matchAll(/<h4\b[^>]*>([\s\S]*?)<\/h4>/gi)].map(([, title]) => plainText(title));
-  equal(careerRoles.join("|"), "Marketing Executive|Full Stack Software Engineer|Software Engineer", "About career roles should follow the verified chronology");
+  equal(careerRoles.join("|"), "Marketing Executive|Full Stack Software Engineer|Software Engineer working on pricing and risk systems", "About career roles should describe the verified current work without inventing an official title");
   const careerEmployers = [...aboutSection.matchAll(/class="career-employer"[^>]*>([\s\S]*?)<\/p>/gi)].map(([, employer]) => plainText(employer));
   equal(careerEmployers.join("|"), "Optegra Eye Healthcare & Kensington Medical|Joveen|BNP Paribas CIB", "About should show the verified employers in order");
   const careerDates = [...aboutSection.matchAll(/<time\b[^>]*>([\s\S]*?)<\/time>/gi)].map(([, date]) => plainText(date));
   equal(careerDates.join("|"), "Sept 2021|Aug 2024|Aug 2024|June 2025|July 2025", "About should expose the verified role dates");
   check(aboutSection.includes("Present"), "About should show the current role as ongoing");
-  check(aboutSection.includes("High-Performance Computing, Pricing and Risk Systems"), "About should retain the verified current team context");
+  check(aboutSection.includes("High-Performance Computing"), "About should retain the verified current team context");
   check(!aboutSection.includes("AI model training"), "About should not claim unverified career experience");
   equal((aboutSection.match(/\bawkward\b/gi) ?? []).length, 0, "About should not use vague filler language");
   check(!aboutSection.includes("Outside the editor"), "About should not repeat the interests gathered in Library");

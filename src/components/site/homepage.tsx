@@ -378,7 +378,7 @@ export async function Homepage() {
             <div className="about-prose">
               <p>{profile.about}</p>
               <p className="about-supporting-copy">
-                I like software that tells you what it’s doing, holds up when things go wrong, and gets the small details right.
+                I want to make software that solves problems people keep running into and earns a place in their everyday lives by being clear, beautiful, and a pleasure to use.
               </p>
               <a className="about-contact-cta" href="#contact">
                 Start a conversation <span className="arrow-mark" aria-hidden="true">↓</span>
@@ -418,7 +418,12 @@ export async function Homepage() {
                       )}
                     </p>
                   </div>
-                  <h4>{entry.role}</h4>
+                  <h4>
+                    {entry.role}
+                    {"roleFocus" in entry && entry.roleFocus && (
+                      <span className="career-role-focus"> working on {entry.roleFocus}</span>
+                    )}
+                  </h4>
                   <p className="career-employer">{entry.employer}</p>
                   {entry.context && <p className="career-entry-context">{entry.context}</p>}
                   {entry.story && <p className="career-entry-story">{entry.story}</p>}
@@ -466,7 +471,7 @@ export async function Homepage() {
       </main>
 
       <footer className="site-footer">
-        <p>Made by {profile.shortName}, in London.</p>
+        <p>Made by {profile.shortName}.</p>
         <div>
           <Link href="/concepts">Design study <span className="arrow-mark" aria-hidden="true">↗︎</span></Link>
           <a href={profile.links.github} target="_blank" rel="noreferrer">

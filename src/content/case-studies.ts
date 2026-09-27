@@ -34,7 +34,7 @@ export const caseStudies = {
     headline: "Affordability starts before the first month’s rent.",
     summary:
       "A move costs more than the rent. Threshold puts upfront costs, monthly spending, and the savings gap in one place so you can see what it might take.",
-    role: "I shaped the product, data model, and interface from end to end.",
+    role: "I shaped the product, data model, and interface.",
     stack: [
       "React 19",
       "TypeScript",
