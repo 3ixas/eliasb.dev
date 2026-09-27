@@ -467,6 +467,17 @@ html[data-home-opening="revealing"] #top > main > .hero > .scroll-cue { animatio
 @keyframes page-enter { from { opacity: .001; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .prototype main, .collection-page main, .work-index-page main, .case-study main { animation: page-enter var(--motion-arrival) var(--motion-ease) both; }
 
+@media (max-width: 360px) {
+  .prototype-cabinet-of-curiosities .currently-section .signal-training > .signal-status,
+  .prototype-cabinet-of-curiosities .currently-section .signal-fantasy > .signal-status {
+    position: static;
+    align-self: flex-end;
+    margin: 0 0 10px;
+  }
+  .prototype-cabinet-of-curiosities .currently-section .signal-training > p,
+  .prototype-cabinet-of-curiosities .currently-section .signal-fantasy > p { padding-right: 0; }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .signal:focus-within { z-index: 2; box-shadow: 5px 6px 0 color-mix(in srgb, var(--accent) 24%, transparent); transform: translateY(-3px); }
   .signal:active { transform: translateY(1px); }
@@ -545,7 +556,7 @@ html[data-home-opening="revealing"] #top > main > .hero > .scroll-cue { animatio
 .prototype-cabinet-of-curiosities .currently-section .signal-building { grid-column: span 12; min-height: 370px; }
 .prototype-cabinet-of-curiosities .currently-section .signal-presence { grid-column: span 4; }
 .prototype-cabinet-of-curiosities .currently-section .signal-training,
-.prototype-cabinet-of-curiosities .currently-section .signal-fantasy { grid-column: span 6; }
+.prototype-cabinet-of-curiosities .currently-section .signal-fantasy { grid-column: span 4; }
 .prototype-cabinet-of-curiosities .currently-section .signal-training {
   --ink: #17100a;
   --muted: #17100a;
