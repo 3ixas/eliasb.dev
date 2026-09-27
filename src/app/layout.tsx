@@ -1,3 +1,4 @@
+import { siteDescription } from "@/content/site";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -6,11 +7,11 @@ const isIndexable = process.env.SITE_INDEXABLE === "true";
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.eliasb.dev"),
   title: {
-    default: "Elias Bennett — Software engineer and product builder",
+    default: "Elias Bennett | Software engineer and product builder",
     template: "%s · Elias B.",
   },
   description:
-    "I’m Elias, a software engineer in London. I help shape product ideas, build across the stack with others, and stay involved through launch and the changes that follow.",
+    siteDescription,
   alternates: {
     canonical: "/",
   },
@@ -23,15 +24,15 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Elias B.",
     url: "/",
-    title: "Elias Bennett — Software engineer and product builder",
+    title: "Elias Bennett | Software engineer and product builder",
     description:
-      "I help shape product ideas, build across the stack with others, and stay involved through launch and the changes that follow.",
+      siteDescription,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Elias Bennett — Software engineer and product builder",
+    title: "Elias Bennett | Software engineer and product builder",
     description:
-      "I help shape product ideas, build across the stack with others, and stay involved through launch and the changes that follow.",
+      siteDescription,
     images: ["/opengraph-image"],
   },
   robots: { index: isIndexable, follow: isIndexable },
@@ -53,6 +54,7 @@ const siteBootScript = `
       const cleanup = () => {
         window.clearTimeout(fallbackTimer);
         motion.removeEventListener('change', onMotionChange);
+        window.removeEventListener('home-opening-started', onStarted);
         window.removeEventListener('home-opening-completed', cleanup);
       };
       const finish = () => {
@@ -64,11 +66,22 @@ const siteBootScript = `
       const onMotionChange = (event) => {
         if (event.matches) finish();
       };
+      const onStarted = (event) => {
+        // Hydration and playback have separate budgets. A slow bundle download
+        // must not use up the time reserved for the actual entrance.
+        window.clearTimeout(fallbackTimer);
+        fallbackTimer = window.setTimeout(finish, event.detail.durationMs + 2000);
+      };
       motion.addEventListener('change', onMotionChange);
+      window.addEventListener('home-opening-started', onStarted);
       window.addEventListener('home-opening-completed', cleanup);
-      fallbackTimer = window.setTimeout(finish, 7000);
+      // Fail open if the component never mounts. Late hydration must not hide
+      // the page again once this startup deadline has exposed it.
+      fallbackTimer = window.setTimeout(finish, 12000);
     })();
-  } catch (_) {}
+  } catch (_) {
+    document.documentElement.removeAttribute('data-home-opening');
+  }
   try {
     (() => {
       const root = document.documentElement;

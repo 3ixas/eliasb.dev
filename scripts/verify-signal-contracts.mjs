@@ -340,7 +340,7 @@ assert.match(liveMatchupMarkup, /My team[\s\S]*112\.4[\s\S]*Opponent[\s\S]*98\.7
 assert.match(liveMatchupMarkup, /class="matchup-bars"/, "Known scores should have a visual score comparison");
 
 const pendingMatchupMarkup = renderToStaticMarkup(createElement(FantasyMatchup, { signal: fantasyPendingSignal }));
-assert.match(pendingMatchupMarkup, /My team[\s\S]*—[\s\S]*Opponent[\s\S]*—/);
+assert.match(pendingMatchupMarkup, /My team[\s\S]*–[\s\S]*Opponent[\s\S]*–/);
 assert.equal(pendingMatchupMarkup.includes('class="matchup-bars"'), false, "Unknown scores should not imply an equal matchup");
 
 assert.equal(GITHUB_ACTIVITY_DAYS, 365);

@@ -5,7 +5,7 @@ export function PageHeader() {
   return (
     <header className="page-header">
       <a className="skip-link" href="#main-content">Skip to content</a>
-      <Link href="/" className="site-mark" aria-label="E/B — Elias B. homepage">
+      <Link href="/" className="site-mark" aria-label="E/B, Elias B. homepage">
         <span aria-hidden="true">E</span>
         <span className="brand-slash" aria-hidden="true">/</span>
         <span aria-hidden="true">B</span>

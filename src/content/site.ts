@@ -1,11 +1,19 @@
+export const homepageHeadline = {
+  first: "I build software to make everyday things easier,",
+  second: "and more enjoyable.",
+} as const;
+
+export const siteDescription =
+  "I’m Elias, a software engineer in London. I take ideas through design, full-stack development, and iteration, aiming to make useful, enjoyable products.";
+
 export const profile = {
   name: "Elias Bennett",
   shortName: "Elias",
   role: "Software engineer",
   location: "London",
-  statement: "I build software that untangles complex systems, so they’re easier to understand.",
+  statement: `${homepageHeadline.first} ${homepageHeadline.second}`,
   introduction:
-    "I like getting involved early, while an idea is still taking shape. I help decide what to make, shape how it works and feels, and build it with others. I stay involved through launch and the next round of changes.",
+    "I like taking an idea all the way through: deciding what’s worth making, shaping the design, building across the stack, and continuing to improve it after it ships. I work with others along the way.",
   about:
     "I’m in London, where I work on high-performance pricing and risk systems. Outside work, I take my own product ideas from the first sketch through design and code, then keep improving them after they ship.",
   links: {
