@@ -8,6 +8,14 @@ Language for Elias's public presence at eliasb.dev.
 Elias's public corner of the internet, containing professional work, interests, and ideas in a thoughtful, beautiful, personal experience.
 _Avoid_: Online CV, LinkedIn replacement
 
+**Board**:
+The site's organising metaphor: a well-kept studio wall where Elias pins things he is making, reading, watching, and thinking about. Pins sit at slight angles, can overlap a little, and are swapped as life changes. Replaces Cabinet of Curiosities as the name of the visual direction.
+_Avoid_: Cabinet, dashboard, widget grid
+
+**Pin**:
+One item placed on the Board, such as a project, a book, a film, a playlist, or this week's history clipping. A pin earns its place only while it has something current or meaningful to show; a stale or empty pin is removed rather than displayed.
+_Avoid_: Widget, card (when meaning the Board item)
+
 **One-page home**:
 The canonical scrollable homepage where the primary navigation moves between authored sections of one narrative: introduction, featured work, personal signals, experiments, about, and contact.
 _Avoid_: Making Library, Lab, or About separate primary destinations.
@@ -35,9 +43,20 @@ _Avoid_: Blog, feed
 The legacy name for experiments, works in progress, making notes, and playful technical experiences. The current visible term is **Experiments**, a compact homepage section.
 _Avoid_: Treating Lab as a separate publishing destination or confusing it with the main Work archive.
 
-**Experiments section**:
-A compact, occasional homepage section for Lab material such as Ask Professor Past, fantasy models, and interface studies. It does not require a separate navigation tab or a regular publishing schedule.
-_Avoid_: A second full publishing destination that Elias must maintain.
+**Making pin**:
+The Pin showing what Elias is building right now, in one line with one image. It replaces the Experiments section. When nothing is current, it shows his latest public repository instead.
+_Avoid_: Experiments section, Lab
+
+**Weekly clipping**:
+This week's history Pin: one surprising, source-linked fact shown like a newspaper cutting, which opens to reveal the week's other two.
+_Avoid_: History widget, history panel
+
+**Maker of clarity**:
+Elias's positioning. He builds everyday software, end to end, that makes complicated things simple, useful, and beautiful. It is an aspiration, never a claim of adoption or impact.
+_Avoid_: Claims of users, traction, or "can't live without" as a fact
+
+**Experiments section** (retired):
+A former compact homepage section for Lab material. It is replaced by the Making pin.
 
 **Library**:
 The public primary-navigation label for the unified Personal signals section. It takes visitors to the existing one-page collection and does not create a separate Library page.
