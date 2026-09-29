@@ -1,5 +1,7 @@
 # Selected visual direction
 
+> **Superseded** on 29 September 2026 by the Board direction in `docs/design/DESIGN.md`. Kept as history.
+
 ## Decision
 
 Use **Cabinet of Curiosities** as the primary visual direction, grounded by the hierarchy, whitespace, and restraint of **Living Editorial**.

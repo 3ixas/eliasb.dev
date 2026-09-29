@@ -1,69 +1,154 @@
-# DESIGN.md
+# DESIGN.md: The Board
+
+Supersedes the 21 September 2026 refinement brief and `SELECTED-DIRECTION.md` (Cabinet of Curiosities). The product scope is in `docs/specs/REFOUNDATION-SCOPE.md`; ADR 0004 covers the motion and styling architecture.
 
 ## Product and decision
 
-- **Product:** eliasb.dev, Elias Bennett's personal portfolio and cultural notebook.
-- **Design decision:** preserve and sharpen the selected Cabinet of Curiosities direction, using Living Editorial for hierarchy and Signals and Systems only inside relevant data views.
-- **Problem and user:** prospective collaborators, employers, and fellow builders should understand Elias's work and judgment quickly, then have room to explore the person and the artefacts around the work.
-- **Primary journey:** arrive at the homepage → understand the promise and point of view → inspect featured work → browse Outside work → explore occasional Experiments → reach About and contact.
-- **Success:** the visitor can find the next meaningful thing without explanation, while the site feels personal, tactile, calm, and technically trustworthy.
+- **Product:** eliasb.dev, Elias Bennett's personal site.
+- **Problem and user:** the current site looks good but is "not fully there". Hiring founders, product teams, and fellow builders should feel within seconds that this person has taste and care, then want to explore the person behind the work.
+- **Design decision this work must settle:** a complete visual and motion system for the **Board**, a well-kept studio wall Elias pins things to, strong enough to meet his subjective bar: a site he is proud to share with anyone, and one that would genuinely impress them.
+- **Primary job:** show that Elias is a **maker of clarity**. The work is pinned carefully and clearly; the life around it is pinned more loosely.
+- **Primary journey:** the opening headline is typed and then pinned → a supporting line → Work (pinned carefully, over a faint grid) → a case study or back → the personal Board (the making pin, books, film, music, weekly clipping, training, fantasy, London, GitHub) → About (the story, opening with history) → contact.
+- **Success looks like:** the polish criteria in the scope (no blank content, no layout shift, one type and spacing scale, shared motion, every state designed, 320–1440 px in both themes, strong Lighthouse scores), plus Elias's side-by-side judgement against the references.
 
 ## Scope
 
-- **Surfaces:** `/`, `/work`, `/work/[slug]`, compatibility redirects for `/lab`, `/library`, and `/about`, and the mobile navigation shell.
-- **Target devices:** narrow touch layouts from 320px through desktop widths; pointer, keyboard, light theme, dark theme, and reduced-motion preferences.
-- **Included states:** first entrance, returning visitor, live signal, cached signal, authored fallback, missing imagery, open Outside work object, external-link handoff, focus-visible, loading imagery, and long content.
-- **Explicitly excluded:** a second personal destination taxonomy, new personal claims, new third-party credentials, new paid services, a new visual world, and replacing the Spotify player.
-- **Constraints:** Next.js App Router, server-owned integrations with truthful fallback labels, project-owned CSS/components, semantic HTML, WCAG-conscious keyboard and focus behavior, responsive images, and no animation that delays access to content.
+- **Surfaces:** `/` (the One-page home), `/work`, `/work/[slug]` (three case studies), the navigation shell, the theme control, the social share image, and the `/about`, `/library`, and `/lab` redirects (no UI).
+- **Target devices:** 320, 390, 820, and 1440 px, plus wide screens. Pointer, touch, and keyboard. Light and dark themes. Reduced motion.
+- **Included states:** the first-load opening, a reload, back-navigation without the opening, live, cached, and fallback pins, a pin removed when it has nothing current, fantasy between game windows, fantasy off-season, the Making pin fallback, weekly clipping closed and open, a clipping without an image, slow images, JavaScript blocked, and long content.
+- **Explicitly excluded:** visitor-draggable pins, 3D scenes or WebGL, gated intros ("click to enter"), sound, new integrations, a CMS.
+- **Constraints:** Next.js App Router. Tokens plus Tailwind v4 and Motion (ADR 0004). All content in the HTML and visible from first paint. Self-hosted fonts through `next/font`. WCAG 2.2 AA.
+- **Real content and assets:** real project screenshots (`public/work/*`), portraits (`public/profile/*`), the running photo (source `~/Downloads/IMG_1421.HEIC`, metadata stripped), the London photograph, live book and film artwork, Wikimedia images for the clipping, and the E/B mark with its orange slash.
 
 ## References
 
-| Reference | Useful for | Carry over | Do not carry over |
-| --- | --- | --- | --- |
-| `docs/discovery/DESIGN-BRIEF.md` | Product intent, voice, journey, content and privacy boundaries | Thoughtful personal corner of the internet; clear work-first journey; authored fallbacks | Invented claims, corporate/CV framing, exposed private activity |
-| `docs/design/SELECTED-DIRECTION.md` | Accepted visual direction | Tactile objects, selective colour, editorial restraint, small irregularity | Turning every section into a novelty object |
-| `docs/content/IMAGE-CREDITS.md` | Real imagery and rights record | Bundled project, London, football, Lab, and profile imagery | Uncredited or decorative stock imagery |
-| Current running site at `http://localhost:3012` | Existing implementation and rendered truth | Existing tokens, component anatomy, responsive rules, current copy and signal states | Blindly changing the established direction |
+| Reference | Role | Carry over | Do not carry over |
+|---|---|---|---|
+| [Commissioner](https://commissioner.design) | Opening and hero typography | Two-part typed headline; objects held by paperclips; generous whitespace; calm confidence | The cloud character and illustrations; content blank until lazy-loaded |
+| [Matthew Yu](https://matthewyu.dev) | One signature tactile object | A single memorable interaction built from a personal artefact; restraint around it | The sketchbook itself; the minimal grey world |
+| [Sparsh Paliwal](https://www.sparshpaliwal.com) | Clarity and hierarchy | A one-line identity statement; a plain project list whose images carry colour; clear Email and Résumé actions; a restrained palette in both themes | The generic dark grey surface and system-sans feel |
+| [Josh W. Comeau](https://www.joshwcomeau.com) | Theme woven into the scene; delight | The theme changes a scene rather than swapping colours; small, rewarding interactions | Cartoon illustration style; sound |
+| [Yalamps](https://www.awwwards.com/sites/yalamps) (Awwwards captures; the live site was redesigned) | Light and dark as a lighting change | Day and night as a narrative change, with a toggle that feels like light | Storybook landscape illustration |
+| [Mohit Virli](https://www.awwwards.com/sites/mohit-virlis-portfolio) | Light and dark as a lighting change | Daylight to starry night as the theme transition | 3D, heavy loading, blank first paint |
+| [Emil Kowalski](https://emilkowal.ski) | Motion craft | Interruptible spring motion, tiny durations, nothing gratuitous | The minimal text-only layout |
+| [Rauno Freiberg](https://rauno.me) | Interaction detail | Small, surprising details that reward attention | The experimental layout |
+| The lamp furniture site Elias remembers (link to come) | The bar for a woven theme | Lamps visibly switching on in the scene; daylight versus warm lamplight | Everything product-specific |
 
-No external visual reference or Stitch exploration is needed for this pass: the visual direction is already selected and the work is a bounded refinement of the existing product.
+Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the site is gated behind a start screen), Craig Mod and Frank Chimero (too plain for this direction).
 
 ## Design DNA
 
-- **Content priority and reading path:** premise first, featured Work second, Outside work third, occasional Experiments fourth, contact always reachable.
-- **Layout, grid, rhythm, and density:** generous section openings; asymmetrical editorial grids; tactile cards and framed images; dense mono labels only where they add orientation; mobile becomes a single readable column with a persistent bottom navigation.
-- **Typography roles:** serif display for statements and artefact titles; sans for explanatory copy and controls; mono for labels, status, dates, metrics, and source links.
-- **Colour roles:** warm paper/canvas and ink as the base; burnt orange for emphasis and action; green, ochre, blue, and terracotta reserved for object identity or meaningful status; focus remains visibly distinct from decoration.
-- **Surfaces, borders, shadows, and radii:** paper cards, thin ink rules, small rounded frames, offset shadows, and restrained rotations that make objects feel handled without harming reading order.
-- **Components and interaction feedback:** shared headers, source links, signal status pills, framed imagery, Outside work disclosures, theme toggle, and explicit external-link affordances; hover is enhancement, not the only path.
-- **Motion purpose and pacing:** the hero entrance reveals hierarchy; object opening and route entry preserve continuity; hover lift/rotation confirms affordance; all motion is interruptible and collapses to immediate state changes for reduced-motion users.
-- **Platform and accessibility assumptions:** semantic headings and links remain primary; keyboard focus is visible; content does not depend on hover, animation, or the third-party Spotify iframe; reduced motion, narrow screens, zoom, slow images, and fallback data are first-class states.
+- **Content priority:** identity statement → Work → the personal Board → the story → contact. Work is always the first thing reached from navigation.
+- **Layout and density:** a 12-column desktop grid. The hero and Work are pinned carefully: large, rotated at most ±0.5°, generously spaced, and aligned to a faint pinned grid visible only behind Work. Personal pins are looser: ±1–3°, different sizes, occasional overlap of up to 8%, never covering text. On mobile, the Board becomes one column of pins with tilt capped at ±1.5° and no overlap.
+- **Type roles:**
+  - A self-hosted characterful serif for statements, pin titles, and split-colour headings. The last word is italic and in the accent colour; Elias loves this and it stays.
+  - A clean sans for reading and controls.
+  - A mono for small labels, dates, and metrics.
+  - One modular scale with a fluid display size. No sizes outside the scale.
+  - Candidate pairings are compared on the canvas:
+    - A: Newsreader with Hanken Grotesk and JetBrains Mono.
+    - B: Besley with Figtree and Spline Sans Mono.
+    - C: Brygada 1918 with Schibsted Grotesk and IBM Plex Mono.
+  - Fraunces and Young Serif were dropped: Fraunces is an overused default, and Young Serif has no italic for the split-colour headings.
+- **Colour roles:**
+  - Wall: warm plaster by day, deep warm umber at night.
+  - Paper: pin stock, a little lighter than the wall.
+  - Ink and muted ink.
+  - One accent: the E/B slash orange, used for emphasis, action, and the highlight.
+  - Paper stocks for pins: sage, ochre, blueprint blue, terracotta. These are object identity only, never UI state.
+  - Focus: its own high-contrast ring.
+- **Surfaces:**
+  - Pins are paper, photographs, clippings, or cards, each held by a physical fixing chosen by type: a pushpin for notes and headline, tape for photographs, a clip for documents and case studies.
+  - **One light source.** Every shadow is cast from the same light, so each shadow's direction is a theme token rather than a per-component choice.
+  - Radii are small, like real paper corners.
+- **Components and feedback:**
+  - On hover or focus, a pin lifts and straightens slightly, and its shadow lengthens away from the light.
+  - On touch, a pin shows a pressed state.
+  - Hover is never the only route to information.
+  - Links read as links.
+- **Motion:**
+  - Motion follows physics: pins settle with springs, and nothing slides in from off-screen.
+  - Durations are 120, 200, and 320 ms for UI changes; springs are used for pin movement.
+  - All motion is interruptible, and reduced motion swaps it for instant state changes.
+  - Content never waits for motion.
+
+## Direction
+
+- **Chosen direction: A, "Studio wall"**, with two borrowed elements.
+  - From B (the crit wall): a faint pinned grid, only behind Work.
+  - From C (the night desk): the dark theme.
+- **Theme as lighting, not colour swap** (Elias's requirement, 29 September 2026):
+  - **Day:** soft daylight from a window at the upper left. A very faint window-frame shadow lies across the wall, and pin shadows fall down and to the right.
+  - **Night:** the window goes dark and a desk lamp clamped to the wall's upper right switches on, casting a warm pool of light. Pins inside the pool are warmly lit; pins outside it are dimmer but always meet AA contrast. Pin shadows swing to fall down and to the left, away from the lamp.
+  - **The theme control is the lamp itself** (a pull cord or switch in the header). Using it visibly switches the lamp on or off, and every shadow on the page swings with the light.
+  - The site starts in the visitor's system theme and follows live changes; a manual choice overrides this, with a clear route back to automatic.
+  - With reduced motion, the theme change is a crossfade with no swinging and no flicker.
+- **Signature: the headline gets pinned.** The sentence types in two parts, the hand-drawn highlight is drawn beneath it, then the headline card settles onto the wall and a pushpin presses in. The Board is visible behind it from the first frame. It replays on every load or reload, never on back-navigation, and reduced motion shows the finished state at once.
+- **Anti-goals:**
+  - Generic AI portfolio defaults: centred hero with a gradient, Inter or Geist on grey, bento grids, glassmorphism, emoji.
+  - Kitsch corkboard texture or clip-art pins.
+  - Novelty that hides content.
+  - Motion that is decoration rather than physics.
+  - Many shadow styles, accents, or font sizes.
+  - Blank panels while scrolling.
+  - Text over photographs without a scrim.
+- **Why it fits:** it is Elias's own description of what he loves, a board he has stuck things onto. Clarity sits in the careful pins and warmth in the loose ones. One light source gives the system a physical rule that enforces consistency, which is the polish the first build lacked.
+- **Alternatives considered:**
+  - B, "Crit wall" (cool, gridded): clearest, but too cold on its own.
+  - C, "Desk at night" (cursor-moved lamp across the whole site): most dramatic, but it risks legibility and does not work on mobile. It survives as the dark theme.
 
 ## Screens and states
 
 | Screen | User decision | Empty | Loading | Error | Success | Other states |
-| --- | --- | --- | --- | --- | --- | --- |
-| Homepage | What should I explore next? | Authored signal cards | Image/iframe loading | Signal fallback | Work and contact visible | First entrance, returning visitor, reduced motion, light/dark |
-| Work archive | Which case study is relevant? | Not applicable | Image loading | Missing image fallback | All linked case studies | Hover/focus, narrow card stack |
-| Case study | Do I want the reasoning and source? | Missing optional live link | Hero/gallery image loading | External project unavailable | Layered narrative and source links | Back to work, reduced motion |
-| Outside work | What should I pick up, follow, or revisit? | Authored signal and culture fallback | Feed/image/Spotify loading | Cached or authored state | Flexible signal collection with clear sources | Cards may regroup; open/close by keyboard and pointer |
-| Experiments | Which occasional idea is worth opening? | A rough or unfinished item remains legible | Image loading | Missing optional live/code link | Image, description, and clear open action | Touch/pointer, focus, long descriptions |
-| About | Does the person and contact context fit? | No empty state | Portrait loading | Contact link failure is external | Story, journey, life texture, contact | Local time, theme, reduced motion |
+|---|---|---|---|---|---|---|
+| Home: hero | Is this person worth my time? | n/a | Fonts load without text jumping (metric-matched fallbacks) | JavaScript blocked: finished headline shown | Headline pinned, Board visible | First load, reload, back-navigation, reduced motion, day and night |
+| Home: Work | Which project should I open? | n/a | Screenshots have reserved sizes with a paper placeholder | Missing image shows a titled paper pin | Three projects pinned carefully, "View all work" | Hover lift, focus, 320 px stack |
+| Home: personal Board | What's he like? | A pin with nothing current is removed | Artwork placeholders reserve their space | Cached pin with a subtle "as of" date; authored fallback | A composed Board | Fantasy: live, last week, off-season. Clipping: closed, open, no image. Making fallback. Training with or without Strava |
+| Home: About | Do I connect with his story? | n/a | Portrait placeholder reserves space | n/a | Story opening with history, portrait | Long text, day and night |
+| Home: contact | How do I reach him? | n/a | n/a | n/a | Email as the main action; résumé, GitHub, LinkedIn | Contact cursors on fine pointers only |
+| `/work` archive | Which case study? | n/a | Image placeholders | n/a | All case studies | 320 px |
+| `/work/[slug]` | Is the reasoning good? | n/a | Hero image placeholder | External link unavailable | Clean reading page with a hint of the Board | Back to Work without replaying the opening |
 
-## Stitch exploration record
+## Exploration record
 
-- **Stitch project:** not used; the direction and representative implementation already exist.
-- **Design system:** project-owned CSS variables and component classes in `src/app/globals.css`.
-- **Generated screens or variants:** none for this refinement pass.
-- **Chosen direction:** existing Cabinet of Curiosities, grounded by Living Editorial.
-- **Rejected directions:** Signals and Systems remains a supporting language for data cards, not the site-wide environment.
-- **Remaining open decisions:** whether a future performance decision should change live-feed regeneration semantics; whether structured integration telemetry is justified by an operational need.
-- **Last reviewed:** 21 September 2026, local rendered surface at `http://localhost:3012`; the production webpack build was checked separately.
+- **Service:** Claude Design (the core Design canvas type).
+- **Canvas:** [eliasb.dev: The Board](https://claude.ai/artifact/4zfQfGQme3zy2kUgvh4V8H), created on 29 September 2026. It is private to Elias.
+- **Design system:** built from this file; no stock design system.
+- **First artboard group (round 1, 29 September 2026):**
+  - `Main`: the day hero, with the lamp off.
+  - `Night`: the same hero with the lamp on.
+  - `Type`: pairings A, B, and C.
+  - `Work`: three projects pinned with binder clips over the grid.
+  - `Board`: the weekly clipping, running photo, Making, fantasy (real week 3 result), book, film, London, GitHub year (real data), and music.
+  - `Mobile`: 390 px.
+  - Every artboard except `Type` has a Type tweak for switching pairings A, B, and C.
+  - Strava counts are shown as `[n]` placeholders because the production credentials are unconfirmed.
+  - The draft headline is "I build everyday software, and make complicated things feel simple." It still needs approval in the copy document.
+- **Motion prototype:** after the static screens are approved. It covers the pinned headline, pin lift, the theme lamp with shadow swing, clipping open, and reduced-motion equivalents.
+- **Chosen direction:** A, "Studio wall", with lighting-based themes.
+- **Rejected directions:** B and C as whole-site environments (see above); Cabinet of Curiosities as the direction's name.
+- **Open decisions:**
+  - The type pairing.
+  - The exact paper stocks.
+  - The lamp and window rendering style (photographic, illustrated, or pure light and shadow).
+  - Whether pin labels use Elias's own handwriting.
+  - The link to the lamp furniture reference.
+- **Last reviewed:** 29 September 2026.
+
+## Acceptance and sign-off
+
+- **Acceptance criteria:** the polish criteria in `REFOUNDATION-SCOPE.md`, plus:
+  - One light source per theme: all shadows are consistent.
+  - At most four font families and weights in total across the display, sans, and mono families.
+  - Every token comes from this file.
+  - The theme control changes the lighting visibly within 600 ms.
+  - The signature is visible on the home page in both themes.
+- **Evidence reviewed:** the live site (29 September 2026), the reference sites above, and a `globals.css` audit: 30 font sizes, 33 box-shadows, 10 accent and 10 ink values, and a system-only font stack that renders Baskerville or Times New Roman outside Apple devices.
+- **User feedback:**
+  - Elias approved direction A with the borrowed elements, the pinned-headline signature, web fonts, and creating the canvas (29 September 2026).
+  - He requested that light and dark be woven into the design, like lamps switching on.
+- **User sign-off:** pending the canvas review.
 
 ## Implementation handoff
 
-- **Approved tokens and component rules:** preserve `--paper`, `--ink`, `--muted`, `--line`, `--soft`, `--accent`, serif/sans/mono roles, shared headers, signal cards, framed images, and explicit source links.
-- **Responsive changes:** retain the 12-column desktop composition, collapse to readable single-column content below the existing breakpoint, and keep the fixed mobile navigation clear of focus targets.
-- **Accessibility requirements:** one meaningful `h1` per route; semantic links and disclosures; visible `:focus-visible`; no essential information behind hover or motion; labelled Spotify iframe plus direct Spotify fallback; reduced-motion CSS for every animation and transition.
-- **Motion requirements:** use short transform/opacity transitions for affordance and route continuity; avoid layout animation; do not delay content; honor `prefers-reduced-motion: reduce` globally.
-- **Acceptance evidence:** screenshots and accessibility trees from local routes; existing cross-browser evidence in `docs/launch/VALIDATION.md`; lint, typecheck, signal checks, production build, and diff checks.
-- **Approved reference links:** `docs/discovery/DESIGN-BRIEF.md`, `docs/design/SELECTED-DIRECTION.md`, and `docs/content/IMAGE-CREDITS.md`.
+Filled in after sign-off: approved tokens and component rules, responsive changes, accessibility and motion requirements, acceptance evidence, and links to the approved artboards.
