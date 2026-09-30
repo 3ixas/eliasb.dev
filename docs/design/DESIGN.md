@@ -32,7 +32,7 @@ Supersedes the 21 September 2026 refinement brief and `SELECTED-DIRECTION.md` (C
 | [Mohit Virli](https://www.awwwards.com/sites/mohit-virlis-portfolio) | Light and dark as a lighting change | Daylight to starry night as the theme transition | 3D, heavy loading, blank first paint |
 | [Emil Kowalski](https://emilkowal.ski) | Motion craft | Interruptible spring motion, tiny durations, nothing gratuitous | The minimal text-only layout |
 | [Rauno Freiberg](https://rauno.me) | Interaction detail | Small, surprising details that reward attention | The experimental layout |
-| The lamp furniture site Elias remembers (link to come) | The bar for a woven theme | Lamps visibly switching on in the scene; daylight versus warm lamplight | Everything product-specific |
+| [In Common With](https://www.incommonwith.com/collections/all-products) | The bar for a woven theme and its timing | Its "Light" switch crossfades every product photo to a version shot with the lamp on. The page background eases over 1.2 s with `cubic-bezier(0.42, 0, 0.58, 1)`, a slow, symmetrical ease-in-out that feels calm rather than abrupt. | Product photography, the shop layout |
 
 Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the site is gated behind a start screen), Craig Mod and Frank Chimero (too plain for this direction).
 
@@ -45,7 +45,8 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
   - A clean sans for reading and controls.
   - A mono for small labels, dates, and metrics.
   - One modular scale with a fluid display size. No sizes outside the scale.
-  - Candidate pairings are compared on the canvas:
+  - **Chosen (30 September 2026): A, Newsreader with Hanken Grotesk and JetBrains Mono.**
+  - Candidate pairings compared on the canvas:
     - A: Newsreader with Hanken Grotesk and JetBrains Mono.
     - B: Besley with Figtree and Spline Sans Mono.
     - C: Brygada 1918 with Schibsted Grotesk and IBM Plex Mono.
@@ -58,6 +59,8 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
   - Paper stocks for pins: sage, ochre, blueprint blue, terracotta. These are object identity only, never UI state.
   - Focus: its own high-contrast ring.
 - **Surfaces:**
+  - The personal Board is a **framed pinboard** mounted on the wall: a thin oak frame and a warm linen surface with a few old pin holes, lit by the same light. It makes the Board read as a board without cork kitsch (Elias, 30 September 2026).
+  - **Work text sits on sticky notes** in pin stocks (ochre, blueprint blue, sage), overlapping the screenshot's edge slightly, so descriptions stand out from the wall (Elias, 30 September 2026).
   - Pins are paper, photographs, clippings, or cards, each held by a physical fixing chosen by type: a pushpin for notes and headline, tape for photographs, a clip for documents and case studies.
   - **One light source.** Every shadow is cast from the same light, so each shadow's direction is a theme token rather than a per-component choice.
   - Radii are small, like real paper corners.
@@ -82,7 +85,8 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
   - **Night:** the window goes dark and a desk lamp clamped to the wall's upper right switches on, casting a warm pool of light. Pins inside the pool are warmly lit; pins outside it are dimmer but always meet AA contrast. Pin shadows swing to fall down and to the left, away from the lamp.
   - **The theme control is the lamp itself** (a pull cord or switch in the header). Using it visibly switches the lamp on or off, and every shadow on the page swings with the light.
   - The site starts in the visitor's system theme and follows live changes; a manual choice overrides this, with a clear route back to automatic.
-  - With reduced motion, the theme change is a crossfade with no swinging and no flicker.
+  - **Timing (from In Common With):** the switch is a 1.2 s ease-in-out (`cubic-bezier(0.42, 0, 0.58, 1)`) crossfade of the wall, the lamp's glow, and pin lighting. Shadows swing over the same 1.2 s. The cord itself responds at once with a short spring tug, so the control feels immediate while the room changes slowly.
+  - With reduced motion, the theme change is a 200 ms crossfade with no swinging and no flicker.
 - **Signature: the headline gets pinned.** The sentence types in two parts, the hand-drawn highlight is drawn beneath it, then the headline card settles onto the wall and a pushpin presses in. The Board is visible behind it from the first frame. It replays on every load or reload, never on back-navigation, and reduced motion shows the finished state at once.
 - **Anti-goals:**
   - Generic AI portfolio defaults: centred hero with a gradient, Inter or Geist on grey, bento grids, glassmorphism, emoji.
@@ -128,12 +132,15 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
 - **Chosen direction:** A, "Studio wall", with lighting-based themes.
 - **Rejected directions:** B and C as whole-site environments (see above); Cabinet of Curiosities as the direction's name.
 - **Open decisions:**
-  - The type pairing.
   - The exact paper stocks.
   - The lamp and window rendering style (photographic, illustrated, or pure light and shadow).
   - Whether pin labels use Elias's own handwriting.
-  - The link to the lamp furniture reference.
-- **Last reviewed:** 29 September 2026.
+- **Round 2 (30 September 2026):**
+  - Elias loves the headline and the lamp idea, and chose Newsreader.
+  - He asked for Work descriptions on coloured sticky notes, now done, and for the Board to read more clearly as a board, now done with a framed pinboard.
+  - He confirmed that the cord switches the theme.
+  - The mobile artboard does not yet carry the round 2 changes.
+- **Last reviewed:** 30 September 2026.
 
 ## Acceptance and sign-off
 
