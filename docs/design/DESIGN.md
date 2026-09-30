@@ -142,6 +142,48 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
   - **Lamp A:** one calm 1.2 s room crossfade using `cubic-bezier(0.42, 0, 0.58, 1)`, with the cord's instant tug.
   - **Clipping A:** the week's other two cuttings fan out from behind the main one on a spring (bounce 0.2, 0.5 s). On narrow screens they stack below it.
   - **Scroll sway:** pins drift and rotate very slightly with scroll depth (at most about 14 px and 0.9°). "It makes the site feel alive." It is off under reduced motion. The production build should drive it with Motion's hardware-accelerated scroll timeline, not a per-frame callback.
+- **Round 4 (30 September 2026): every section lit its own way, every object earned.** Elias approved the full section scan.
+  - **Lights, one per section.** By day, window light falls across everything and each light is an object, switched off. Pulling the cord turns them all on together, and each section's shadows fall away from its own light.
+
+    | Section | Light |
+    |---|---|
+    | Hero | Clamp desk lamp |
+    | Work | A brass picture light above each project |
+    | Board | A festoon string across the top of the frame |
+    | About | A candle: gentle flicker at night, steady with reduced motion |
+    | Contact | A neon "hello", unlit by day |
+
+  - **Objects:**
+
+    | Section | Object |
+    |---|---|
+    | Nav | A small pushpin marks the current section and springs between links |
+    | Work tech stacks | Embossed label tape on the sticky notes |
+    | "View all work" | An archive drawer of manila folders |
+    | Case-study pages | An opened folder |
+    | Making | A blueprint sheet with a title block |
+    | GitHub | Graph paper with ink-stamp days and a pencil note on hover |
+    | London | Photo plus an analogue clock showing real London time |
+    | Fantasy | A matchday ticket stub |
+    | Book | Cover plus a stamped library card |
+    | Film | Poster plus a cinema ticket stub |
+    | Music | A mixtape J-card with cassette; "Play" reveals the Spotify player |
+    | Training | Polaroid plus tally marks, with the number beside them |
+    | About | Prose with margin objects: history essay, plain bakery bag (no brand logo), a code sticky note, lanyard |
+    | Contact | A postcard with an E/B stamp, plus pinned link cards |
+    | Footer | The frame's bottom edge, a light-switch plate (second theme control), "Made by Elias" |
+    | Stale pins | Sun-faded with a pencilled "as of" date |
+    | Missing photos | A blank polaroid saying "photo coming" |
+    | 404 | "Something was pinned here." |
+    | Favicon | A pushpin |
+    | Social image | The pinned headline card |
+
+  - **Removed:** the scroll progress bar (the nav pin replaces it) and the per-link contact cursors (the postcard replaces them).
+  - **Kept plain:** focus states stay a solid, high-contrast accent outline.
+  - **Scroll sway:** kept, implemented with CSS scroll-driven animations (`animation-timeline: view()`) on transforms only. Browsers without support show still pins. Confirm support in Safari and Firefox during implementation.
+  - **Canvas:** artboards `R4Work`, `R4Board`, and `R4Story` each have a Lighting tweak, and the `…Night` artboards show them with the lights on. `R4Extras` covers the case-study folder, 404, states, favicon, and social image.
+  - **Copy status:** the About prose on the canvas is a draft from Elias's spoken story and is not approved. The copy document governs.
+  - **Mobile:** the mobile artboard does not yet show round 4. Mobile follows the single-column rules during implementation.
 - **Motion prototype scope:** It covers the pinned headline, pin lift, the theme lamp with shadow swing, clipping open, and reduced-motion equivalents.
 - **Chosen direction:** A, "Studio wall", with lighting-based themes.
 - **Rejected directions:** B and C as whole-site environments (see above); Cabinet of Curiosities as the direction's name.
