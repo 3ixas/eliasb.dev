@@ -128,7 +128,16 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
   - Every artboard except `Type` has a Type tweak for switching pairings A, B, and C.
   - Strava counts are shown as `[n]` placeholders because the production credentials are unconfirmed.
   - The draft headline is "I build everyday software, and make complicated things feel simple." It still needs approval in the copy document.
-- **Motion prototype:** after the static screens are approved. It covers the pinned headline, pin lift, the theme lamp with shadow swing, clipping open, and reduced-motion equivalents.
+- **Round 3 (30 September 2026):**
+  - Added the night Board, with the framed pinboard under the lamp.
+  - Mobile now carries the sticky notes and the framed board.
+- **Motion prototype:** a throwaway page on the `prototype/board-motion` branch (`prototypes/board-motion/index.html`, Motion 13.4.6). Its bottom bar compares:
+  - **Opening:** A types the first clause and the rest lands; B types everything and "feel simple." lands.
+  - **Lamp:** A is one 1.2 s room crossfade; B has the bulb bloom first and the room follow.
+  - **Clipping:** A fans out from behind; B unfolds in place.
+  - **Scroll:** still or sway.
+  - **Reduced motion:** a simulated setting.
+- **Motion prototype scope:** It covers the pinned headline, pin lift, the theme lamp with shadow swing, clipping open, and reduced-motion equivalents.
 - **Chosen direction:** A, "Studio wall", with lighting-based themes.
 - **Rejected directions:** B and C as whole-site environments (see above); Cabinet of Curiosities as the direction's name.
 - **Open decisions:**
