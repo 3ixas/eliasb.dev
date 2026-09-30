@@ -137,6 +137,11 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
   - **Clipping:** A fans out from behind; B unfolds in place.
   - **Scroll:** still or sway.
   - **Reduced motion:** a simulated setting.
+- **Motion verdict (Elias, 30 September 2026, after running the prototype himself):**
+  - **Opening B:** type the sentence through "complicated things", then "*feel simple.*" drops in with a small spring (bounce 0.3, 0.45 s), the highlight draws beneath it (0.52 s strong ease-out), and the card settles as the pin presses in. Elias: A felt "a little more rushed"; B "grips me in a bit more".
+  - **Lamp A:** one calm 1.2 s room crossfade using `cubic-bezier(0.42, 0, 0.58, 1)`, with the cord's instant tug.
+  - **Clipping A:** the week's other two cuttings fan out from behind the main one on a spring (bounce 0.2, 0.5 s). On narrow screens they stack below it.
+  - **Scroll sway:** pins drift and rotate very slightly with scroll depth (at most about 14 px and 0.9°). "It makes the site feel alive." It is off under reduced motion. The production build should drive it with Motion's hardware-accelerated scroll timeline, not a per-frame callback.
 - **Motion prototype scope:** It covers the pinned headline, pin lift, the theme lamp with shadow swing, clipping open, and reduced-motion equivalents.
 - **Chosen direction:** A, "Studio wall", with lighting-based themes.
 - **Rejected directions:** B and C as whole-site environments (see above); Cabinet of Curiosities as the direction's name.
