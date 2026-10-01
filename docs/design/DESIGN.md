@@ -184,7 +184,9 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     - Tape joins paper to a visible surface.
     - Nothing pinned, clipped, or taped floats.
   - **Theme controls are explicit (Elias, 1 October 2026).**
-    - There are two controls: the header pull cord, which is always visible and labelled "Lights on" or "Lights off", and the footer switch plate.
+    - There are two controls: the header pull cord, which is always visible, and the footer switch plate.
+    - The cord has no visible text label (Elias: a label "loses effect"). It explains itself as an object: a larger brass pull with a soft halo, which stretches slightly and brightens on hover. On first visit it sways once after the opening.
+    - The accessible name ("Turn the lights on" or "Turn the lights off") is kept.
     - The section lights are scenery and are not clickable.
     - Each picture light's glow covers the whole project row (screenshot and sticky note), plus a soft wash on the wall.
   - **Removed:** the scroll progress bar (the nav pin replaces it) and the per-link contact cursors (the postcard replaces them).
