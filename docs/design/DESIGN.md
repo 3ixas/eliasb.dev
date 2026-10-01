@@ -210,6 +210,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     - **Book:** cover plus a stamped library card.
     - **Film:** poster plus an "Admit one · Last watched" ticket.
     - **Music:** a retro portable cassette player ("E/B Sound") hanging by its strap from a pin. Its tape window is labelled with the playlist, and it has real Previous, Play, and Next controls. Below it is a track-list card. Play opens the official Spotify player, and the track list fills from Spotify.
+  - **Photos (Elias, 1 October 2026):** the white-tux portrait (`public/profile/elias-evening.webp`), Elias's favourite, is the hero polaroid. The grey-jumper photo (`public/profile/elias.webp`) goes in About.
   - **Removed:** the scroll progress bar (the nav pin replaces it) and the per-link contact cursors (the postcard replaces them).
   - **Kept plain:** focus states stay a solid, high-contrast accent outline.
   - **Scroll sway:** kept, implemented with CSS scroll-driven animations (`animation-timeline: view()`) on transforms only. Browsers without support show still pins. Confirm support in Safari and Firefox during implementation.
