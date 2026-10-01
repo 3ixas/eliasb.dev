@@ -221,16 +221,20 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
 - **Motion prototype scope:** It covers the pinned headline, pin lift, the theme lamp with shadow swing, clipping open, and reduced-motion equivalents.
 - **Chosen direction:** A, "Studio wall", with lighting-based themes.
 - **Rejected directions:** B and C as whole-site environments (see above); Cabinet of Curiosities as the direction's name.
-- **Open decisions:**
-  - The exact paper stocks.
-  - The lamp and window rendering style (photographic, illustrated, or pure light and shadow).
-  - Whether pin labels use Elias's own handwriting.
+- **Open decisions (settled at sign-off, 1 October 2026):**
+  - **Paper stocks:** the canvas colours (ochre, blueprint blue, sage, terracotta, kraft), fine-tuned for AA contrast in the build.
+  - **Light rendering:** line-drawn objects with CSS light and shadow (no photography or illustration), and a different light type per section.
+  - **Handwriting:** not in v1.
+  - **Case-study chapter pages:** designed in the build within these rules, extending the case-file folder.
+  - **Mobile:** follows the single-column rules (tilt capped at ±1.5°, no overlap) with the round 4 objects.
+  - **Cord discoverability:** superseded. The control is now the header rocker switch; it is still checked by Elias in the first slice that builds it.
 - **Round 2 (30 September 2026):**
   - Elias loves the headline and the lamp idea, and chose Newsreader.
   - He asked for Work descriptions on coloured sticky notes, now done, and for the Board to read more clearly as a board, now done with a framed pinboard.
   - He confirmed that the cord switches the theme.
   - The mobile artboard does not yet carry the round 2 changes.
-- **Last reviewed:** 30 September 2026.
+- **Round 4 iterations (1 October 2026):** 16 comment threads, all resolved and recorded above.
+- **Last reviewed:** 1 October 2026.
 
 ## Acceptance and sign-off
 
@@ -244,8 +248,45 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
 - **User feedback:**
   - Elias approved direction A with the borrowed elements, the pinned-headline signature, web fonts, and creating the canvas (29 September 2026).
   - He requested that light and dark be woven into the design, like lamps switching on.
-- **User sign-off:** pending the canvas review.
+- **User sign-off:** Elias signed off the full design direction on 1 October 2026 ("Happy with everything after these iterations, signed off").
+- **Signed off on:** 1 October 2026, against canvas version 32.
 
 ## Implementation handoff
 
-Filled in after sign-off: approved tokens and component rules, responsive changes, accessibility and motion requirements, acceptance evidence, and links to the approved artboards.
+- **Approved artboards:**
+  - [Canvas](https://claude.ai/artifact/4zfQfGQme3zy2kUgvh4V8H): `Main` and `Night` (hero), `Type`, `R4Work` and `R4WorkNight`, `R4Board` and `R4BoardNight`, `R4Story` and `R4StoryNight`, and `R4Extras`.
+  - Rounds 1–3 (`Work`, `Board`, `BoardNight`, `Mobile`) are superseded where round 4 differs.
+- **Tokens:**
+  - Wall, paper, ink, muted, rule, and accent `#C94A22` (night wall accent `#FF8A5C`).
+  - Pin stocks: ochre `#F2DFAA`, blueprint `#C9D8E6`, sage `#CCD8C1`, terracotta, kraft `#D7AE63`.
+  - GitHub greens (exception).
+  - Day shadow `1px 2px 2px rgba(70,45,20,.10), 8px 12px 22px -8px rgba(70,45,20,.28)`. Night shadows fall away from each section's light.
+  - Fonts: Newsreader, Hanken Grotesk, JetBrains Mono, all through `next/font`.
+  - Spacing scale 4–128; one type scale with a fluid display size.
+  - The canvas values are the starting point; they are normalised into the token file in the first slice.
+- **Component rules:**
+  - Every fixing has a visible surface.
+  - Every pin says what it is to a stranger.
+  - Lights are mounted objects and are not interactive.
+  - The single theme control is the header rocker switch.
+  - Hover: lift and straighten. Press: squeeze. Focus: a solid accent outline.
+- **Responsive:**
+  - 12-column desktop. Below 900 px, a single column with tilt capped at ±1.5° and no overlap.
+  - The sticky header keeps the switch visible.
+  - The culture corner stacks.
+  - The GitHub sheet scrolls horizontally on phones, with month labels.
+- **Accessibility:**
+  - WCAG 2.2 AA, measured in both themes, including the dimmed areas of the night Board.
+  - One `h1` per route; the full headline is in the HTML.
+  - Decorative objects are `aria-hidden`; meaningful images have alt text.
+  - The 44 px target minimum applies to the switch and pin actions.
+- **Motion:**
+  - Opening B: the card starts lifted, the headline types, "feel simple." lands on a spring (bounce 0.3, 0.45 s), the highlight draws (0.52 s), and the pin presses in. It replays on every load and reload, never on back-navigation.
+  - The theme change is a 1.2 s `cubic-bezier(0.42, 0, 0.58, 1)` room crossfade with shadow swing; the switch rocks instantly.
+  - The clipping fans out on a spring (bounce 0.2, 0.5 s).
+  - Scroll sway uses CSS scroll-driven animations, transform only.
+  - The About string draws on scroll.
+  - The neon flickers occasionally, and the candle flickers gently.
+  - Reduced motion removes movement and keeps 200 ms crossfades.
+  - Prototype: the `prototype/board-motion` branch.
+- **Acceptance evidence for the build:** rendered checks at 320, 390, 820, and 1440 px in both themes, Playwright, Lighthouse, contrast measurements, and Elias's review of each slice against the canvas.
