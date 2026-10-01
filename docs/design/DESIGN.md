@@ -85,7 +85,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
   - **Night:** the window goes dark and a desk lamp clamped to the wall's upper right switches on, casting a warm pool of light. Pins inside the pool are warmly lit; pins outside it are dimmer but always meet AA contrast. Pin shadows swing to fall down and to the left, away from the lamp.
   - **The theme control is a light switch in the header** (it superseded an earlier pull cord on 1 October 2026). Flipping it visibly switches the lights on or off, and every shadow on the page swings with the light.
   - The site starts in the visitor's system theme and follows live changes; a manual choice overrides this, with a clear route back to automatic.
-  - **Timing (from In Common With):** the switch is a 1.2 s ease-in-out (`cubic-bezier(0.42, 0, 0.58, 1)`) crossfade of the wall, the lamp's glow, and pin lighting. Shadows swing over the same 1.2 s. The switch toggle flips at once with a short spring, so the control feels immediate while the room changes slowly.
+  - **Timing (from In Common With):** the switch is a 1.2 s ease-in-out (`cubic-bezier(0.42, 0, 0.58, 1)`) crossfade of the wall, the lamp's glow, and pin lighting. Shadows swing over the same 1.2 s. The rocker moves at once with a short spring, so the control feels immediate while the room changes slowly.
   - With reduced motion, the theme change is a 200 ms crossfade with no swinging and no flicker.
 - **Signature: the headline gets pinned.** The sentence types in two parts, the hand-drawn highlight is drawn beneath it, then the headline card settles onto the wall and a pushpin presses in. The Board is visible behind it from the first frame. It replays on every load or reload, never on back-navigation, and reduced motion shows the finished state at once.
 - **Anti-goals:**
@@ -186,9 +186,9 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     - Nothing pinned, clipped, or taped floats.
   - **One theme control: a light switch in the header (Elias, 1 October 2026).**
     - The cord and the footer switch are retired.
-    - The control is a cream ceramic switch plate with two brass screws and a brass toggle: up when the lights are off, down when they are on. At night it has a faint warm glow.
+    - The control is a UK-style rocker switch: a square cream plate, two brass screws, and one flat brass rocker split across the middle. With the lights off the top half is pressed in; with them on, the bottom half is. At night it has a faint warm glow. (Elias rejected a flick toggle on 1 October 2026.)
     - It sits in the sticky header, so it is always visible on every screen size.
-    - Clicking flips the toggle instantly with a short spring, then the room changes over the 1.2 s fade.
+    - Clicking rocks the switch instantly with a short spring, then the room changes over the 1.2 s fade.
     - The section lights are scenery and are not clickable.
     - The accessible name is "Turn the lights on" or "Turn the lights off".
     - Each picture light's glow covers the whole project row (screenshot and sticky note), plus a soft wash on the wall.
