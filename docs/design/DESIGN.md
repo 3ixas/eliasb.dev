@@ -150,7 +150,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     | Hero | Clamp desk lamp |
     | Work | A brass picture light above each project |
     | Board | A festoon string across the top of the frame |
-    | About | A candle on a small wall shelf on iron brackets, beside a row of book spines, in the top half of About and well away from the neon: gentle flicker at night, steady with reduced motion |
+    | About | A candle on a small wall shelf on iron brackets, beside a row of book spines, beside the About heading, in the top half and well away from the neon: gentle flicker at night, steady with reduced motion |
     | Contact | A bold neon sign: a dark scanlined sign box bolted to the wall with its cable to a socket, a large hot-pink "hello" with a small cyan "SAY" and underline tube. Unlit glass by day; at night it glows strongly and washes the wall pink and cyan. An occasional single-letter flicker, off under reduced motion |
 
   - **Objects:**
@@ -169,7 +169,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     | Film | Poster plus a cinema ticket stub |
     | Music | A portable cassette player with a track list (see the culture corner below) |
     | Training | Polaroid plus tally marks, with the number beside them |
-    | About | Prose with margin objects: history essay, plain bakery bag (no brand logo), a code sticky note, lanyard |
+    | About | Prose beside a connected journey: a red string with arrowheads, pinned at five numbered stops and starting with a pencilled "start here". The stops are: (1) history essay, (2) plain bakery bag with doughnut (no brand logo), (3) speech bubble quoting "I need that feeling from what I do.", (4) code sticky note, (5) lanyard, "BNP Paribas, today". In the build, the string draws stop by stop on scroll, and is static under reduced motion |
     | Contact | A postcard with an E/B stamp, plus pinned link cards |
     | Footer | The frame's bottom edge and "Made by Elias" |
     | Stale pins | Sun-faded with a pencilled "as of" date |
