@@ -150,7 +150,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     | Hero | Clamp desk lamp |
     | Work | A brass picture light above each project |
     | Board | A festoon string across the top of the frame |
-    | About | A candle: gentle flicker at night, steady with reduced motion |
+    | About | A candle on a small wall shelf on iron brackets, beside a row of book spines: gentle flicker at night, steady with reduced motion |
     | Contact | A neon "hello", unlit by day |
 
   - **Objects:**
@@ -182,6 +182,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     - Clips belong to clipboards. Project screenshots sit on a hardboard clipboard with a metal clip.
     - Pins go into the plaster wall (faint plaster texture) or the framed linen board.
     - Tape joins paper to a visible surface.
+    - Lights are mounted too: clamped, hung, screwed to the wall, or standing on a shelf.
     - Nothing pinned, clipped, or taped floats.
   - **Theme controls are explicit (Elias, 1 October 2026).**
     - There are two controls: the header pull cord, which is always visible, and the footer switch plate.
