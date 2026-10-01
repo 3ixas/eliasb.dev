@@ -83,9 +83,9 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
 - **Theme as lighting, not colour swap** (Elias's requirement, 29 September 2026):
   - **Day:** soft daylight from a window at the upper left. A very faint window-frame shadow lies across the wall, and pin shadows fall down and to the right.
   - **Night:** the window goes dark and a desk lamp clamped to the wall's upper right switches on, casting a warm pool of light. Pins inside the pool are warmly lit; pins outside it are dimmer but always meet AA contrast. Pin shadows swing to fall down and to the left, away from the lamp.
-  - **The theme control is the lamp itself** (a pull cord or switch in the header). Using it visibly switches the lamp on or off, and every shadow on the page swings with the light.
+  - **The theme control is a light switch in the header** (it superseded an earlier pull cord on 1 October 2026). Flipping it visibly switches the lights on or off, and every shadow on the page swings with the light.
   - The site starts in the visitor's system theme and follows live changes; a manual choice overrides this, with a clear route back to automatic.
-  - **Timing (from In Common With):** the switch is a 1.2 s ease-in-out (`cubic-bezier(0.42, 0, 0.58, 1)`) crossfade of the wall, the lamp's glow, and pin lighting. Shadows swing over the same 1.2 s. The cord itself responds at once with a short spring tug, so the control feels immediate while the room changes slowly.
+  - **Timing (from In Common With):** the switch is a 1.2 s ease-in-out (`cubic-bezier(0.42, 0, 0.58, 1)`) crossfade of the wall, the lamp's glow, and pin lighting. Shadows swing over the same 1.2 s. The switch toggle flips at once with a short spring, so the control feels immediate while the room changes slowly.
   - With reduced motion, the theme change is a 200 ms crossfade with no swinging and no flicker.
 - **Signature: the headline gets pinned.** The sentence types in two parts, the hand-drawn highlight is drawn beneath it, then the headline card settles onto the wall and a pushpin presses in. The Board is visible behind it from the first frame. It replays on every load or reload, never on back-navigation, and reduced motion shows the finished state at once.
 - **Anti-goals:**
