@@ -200,6 +200,11 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
   - **The training pin is a photo plus a log card (Elias, 1 October 2026).**
     - The polaroid carries the mood ("Out on a run, central London.").
     - A lined "Training this week · via Strava" card pinned over its edge carries the data: one row per activity (Lifts, Runs, and Muay Thai once recorded), each with tally marks and a number.
+  - **The GitHub pin is a full-width feature (Elias, 1 October 2026).**
+    - A graph-paper sheet spanning the board, with a large ink total and month labels.
+    - Larger ink-stamp days and a Quiet-to-Busy legend.
+    - A pencil loop around the busiest stretch, computed from the data, with a handwritten note.
+    - A hover or tap invitation to see each day's count.
   - **Removed:** the scroll progress bar (the nav pin replaces it) and the per-link contact cursors (the postcard replaces them).
   - **Kept plain:** focus states stay a solid, high-contrast accent outline.
   - **Scroll sway:** kept, implemented with CSS scroll-driven animations (`animation-timeline: view()`) on transforms only. Browsers without support show still pins. Confirm support in Safari and Firefox during implementation.
