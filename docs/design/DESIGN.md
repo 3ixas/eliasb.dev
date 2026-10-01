@@ -187,6 +187,8 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     - There are two controls: the header pull cord, which is always visible, and the footer switch plate.
     - The cord has no visible text label (Elias: a label "loses effect"). It explains itself as an object: a larger brass pull with a soft halo, which stretches slightly and brightens on hover. On first visit it sways once after the opening.
     - The accessible name ("Turn the lights on" or "Turn the lights off") is kept.
+    - The header is sticky, so the cord stays visible while scrolling on every screen size.
+    - **Open, to settle in the build:** whether the cord is discoverable enough. The slice that builds it ends with Elias trying it. The ready fallback is a pencilled "pull me" note beside the cord on first visit only.
     - The section lights are scenery and are not clickable.
     - Each picture light's glow covers the whole project row (screenshot and sticky note), plus a soft wash on the wall.
   - **Removed:** the scroll progress bar (the nav pin replaces it) and the per-link contact cursors (the postcard replaces them).
