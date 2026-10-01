@@ -143,7 +143,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
   - **Clipping A:** the week's other two cuttings fan out from behind the main one on a spring (bounce 0.2, 0.5 s). On narrow screens they stack below it.
   - **Scroll sway:** pins drift and rotate very slightly with scroll depth (at most about 14 px and 0.9°). "It makes the site feel alive." It is off under reduced motion. The production build should drive it with Motion's hardware-accelerated scroll timeline, not a per-frame callback.
 - **Round 4 (30 September 2026): every section lit its own way, every object earned.** Elias approved the full section scan.
-  - **Lights, one per section.** By day, window light falls across everything and each light is an object, switched off. Pulling the cord turns them all on together, and each section's shadows fall away from its own light.
+  - **Lights, one per section.** By day, window light falls across everything and each light is an object, switched off. Flipping the switch turns them all on together, and each section's shadows fall away from its own light.
 
     | Section | Light |
     |---|---|
@@ -171,7 +171,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     | Training | Polaroid plus tally marks, with the number beside them |
     | About | Prose with margin objects: history essay, plain bakery bag (no brand logo), a code sticky note, lanyard |
     | Contact | A postcard with an E/B stamp, plus pinned link cards |
-    | Footer | The frame's bottom edge, a light-switch plate (second theme control), "Made by Elias" |
+    | Footer | The frame's bottom edge and "Made by Elias" |
     | Stale pins | Sun-faded with a pencilled "as of" date |
     | Missing photos | A blank polaroid saying "photo coming" |
     | 404 | "Something was pinned here." |
@@ -184,13 +184,13 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     - Tape joins paper to a visible surface.
     - Lights are mounted too: clamped, hung, screwed to the wall, or standing on a shelf.
     - Nothing pinned, clipped, or taped floats.
-  - **Theme controls are explicit (Elias, 1 October 2026).**
-    - There are two controls: the header pull cord, which is always visible, and the footer switch plate.
-    - The cord has no visible text label (Elias: a label "loses effect"). It explains itself as an object: a larger brass pull with a soft halo, which stretches slightly and brightens on hover. On first visit it sways once after the opening.
-    - The accessible name ("Turn the lights on" or "Turn the lights off") is kept.
-    - The header is sticky, so the cord stays visible while scrolling on every screen size.
-    - **Open, to settle in the build:** whether the cord is discoverable enough. The slice that builds it ends with Elias trying it. The ready fallback is a pencilled "pull me" note beside the cord on first visit only.
+  - **One theme control: a light switch in the header (Elias, 1 October 2026).**
+    - The cord and the footer switch are retired.
+    - The control is a cream ceramic switch plate with two brass screws and a brass toggle: up when the lights are off, down when they are on. At night it has a faint warm glow.
+    - It sits in the sticky header, so it is always visible on every screen size.
+    - Clicking flips the toggle instantly with a short spring, then the room changes over the 1.2 s fade.
     - The section lights are scenery and are not clickable.
+    - The accessible name is "Turn the lights on" or "Turn the lights off".
     - Each picture light's glow covers the whole project row (screenshot and sticky note), plus a soft wash on the wall.
   - **The weekly clipping is "The Weekly Curiosity" (Elias, 1 October 2026).**
     - A bold all-caps Newsreader masthead between double rules, with the strapline "Odd, true, and from this week in history".
