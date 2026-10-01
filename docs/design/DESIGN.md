@@ -160,7 +160,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     | Nav | A small pushpin marks the current section and springs between links |
     | Work tech stacks | Embossed label tape on the sticky notes |
     | "View all work" | An archive drawer of manila folders |
-    | Case-study pages | An opened folder |
+    | Case-study pages | An opened kraft case-file folder: tab labelled in label tape, a red "CASE FILE Nº" stamp, and coloured divider tabs on the right edge as the chapter navigation (Problem, Decisions, How it's built, What I'd change). Inside: a red margin rule, a large title, the thesis on a sticky note, a paperclipped screenshot with a pencil note, label-tape stack tags, and stamp-style Live and Code buttons |
     | Making | A blueprint sheet with a title block |
     | GitHub | Graph paper with ink-stamp days and a pencil note on hover |
     | London | Photo plus an analogue clock showing real London time |
@@ -174,7 +174,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     | Footer | The frame's bottom edge and "Made by Elias" |
     | Stale pins | Sun-faded with a pencilled "as of" date |
     | Missing photos | A blank polaroid saying "photo coming" |
-    | 404 | "Something was pinned here." |
+    | 404 | "Something was pinned here." on an empty patch of board, with a red "404" stamp |
     | Favicon | A pushpin |
     | Social image | The pinned headline card |
 
