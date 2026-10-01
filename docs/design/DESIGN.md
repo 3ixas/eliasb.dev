@@ -167,7 +167,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     | Fantasy | A matchday ticket stub |
     | Book | Cover plus a stamped library card |
     | Film | Poster plus a cinema ticket stub |
-    | Music | A mixtape J-card with cassette; "Play" reveals the Spotify player |
+    | Music | A portable cassette player with a track list (see the culture corner below) |
     | Training | Polaroid plus tally marks, with the number beside them |
     | About | Prose with margin objects: history essay, plain bakery bag (no brand logo), a code sticky note, lanyard |
     | Contact | A postcard with an E/B stamp, plus pinned link cards |
@@ -205,6 +205,11 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     - Larger ink-stamp days and a Quiet-to-Busy legend.
     - A pencil loop around the busiest stretch, computed from the data, with a handwritten note.
     - A hover or tap invitation to see each day's count.
+  - **Every pin says what it is to a stranger (Elias, 1 October 2026).** Each pin carries a clear tag or headline (for example "Now reading", "Last watched", "On repeat") as well as its image.
+  - **The culture corner (Elias, 1 October 2026):** a dedicated row of large objects, each with a kraft shipping tag.
+    - **Book:** cover plus a stamped library card.
+    - **Film:** poster plus an "Admit one · Last watched" ticket.
+    - **Music:** a retro portable cassette player ("E/B Sound") hanging by its strap from a pin. Its tape window is labelled with the playlist, and it has real Previous, Play, and Next controls. Below it is a track-list card. Play opens the official Spotify player, and the track list fills from Spotify.
   - **Removed:** the scroll progress bar (the nav pin replaces it) and the per-link contact cursors (the postcard replaces them).
   - **Kept plain:** focus states stay a solid, high-contrast accent outline.
   - **Scroll sway:** kept, implemented with CSS scroll-driven animations (`animation-timeline: view()`) on transforms only. Browsers without support show still pins. Confirm support in Safari and Firefox during implementation.
