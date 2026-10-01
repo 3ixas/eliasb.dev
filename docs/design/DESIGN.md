@@ -178,6 +178,15 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     | Favicon | A pushpin |
     | Social image | The pinned headline card |
 
+  - **Fixings always have a surface (Elias, 1 October 2026).**
+    - Clips belong to clipboards. Project screenshots sit on a hardboard clipboard with a metal clip.
+    - Pins go into the plaster wall (faint plaster texture) or the framed linen board.
+    - Tape joins paper to a visible surface.
+    - Nothing pinned, clipped, or taped floats.
+  - **Theme controls are explicit (Elias, 1 October 2026).**
+    - There are two controls: the header pull cord, which is always visible and labelled "Lights on" or "Lights off", and the footer switch plate.
+    - The section lights are scenery and are not clickable.
+    - Each picture light's glow covers the whole project row (screenshot and sticky note), plus a soft wash on the wall.
   - **Removed:** the scroll progress bar (the nav pin replaces it) and the per-link contact cursors (the postcard replaces them).
   - **Kept plain:** focus states stay a solid, high-contrast accent outline.
   - **Scroll sway:** kept, implemented with CSS scroll-driven animations (`animation-timeline: view()`) on transforms only. Browsers without support show still pins. Confirm support in Safari and Firefox during implementation.
