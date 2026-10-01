@@ -186,7 +186,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     - Nothing pinned, clipped, or taped floats.
   - **One theme control: a light switch in the header (Elias, 1 October 2026).**
     - The cord and the footer switch are retired.
-    - The control is a UK-style rocker switch: a square cream plate, two brass screws, and one flat brass rocker split across the middle. With the lights off the top half is pressed in; with them on, the bottom half is. At night it has a faint warm glow. (Elias rejected a flick toggle on 1 October 2026.)
+    - The control is a UK-style rocker switch: a tall rectangular cream plate with brass screws top and bottom, and one brass rocker drawn visibly tilted. The pressed half is dark and recessed; the raised half is bright, with a highlighted ridge and a visible edge thickness. With the lights off the top half is pressed in; with them on, the bottom half is. At night it has a faint warm glow. (Elias rejected a flick toggle on 1 October 2026.)
     - It sits in the sticky header, so it is always visible on every screen size.
     - Clicking rocks the switch instantly with a short spring, then the room changes over the 1.2 s fade.
     - The section lights are scenery and are not clickable.
