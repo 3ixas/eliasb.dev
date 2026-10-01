@@ -202,7 +202,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     - A lined "Training this week · via Strava" card pinned over its edge carries the data: one row per activity (Lifts, Runs, and Muay Thai once recorded), each with tally marks and a number.
   - **The GitHub pin is a full-width feature (Elias, 1 October 2026).**
     - A graph-paper sheet spanning the board, with a large ink total and month labels.
-    - Larger ink-stamp days and a Quiet-to-Busy legend.
+    - Days are small rounded squares in GitHub's five-step green scale (Elias: green is what people recognise). This is the one deliberate exception to the site palette. There is a Quiet-to-Busy legend.
     - A pencil loop around the busiest stretch, computed from the data, with a handwritten note.
     - A hover or tap invitation to see each day's count.
   - **Every pin says what it is to a stranger (Elias, 1 October 2026).** Each pin carries a clear tag or headline (for example "Now reading", "Last watched", "On repeat") as well as its image.
