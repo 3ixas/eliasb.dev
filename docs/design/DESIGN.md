@@ -191,6 +191,12 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     - **Open, to settle in the build:** whether the cord is discoverable enough. The slice that builds it ends with Elias trying it. The ready fallback is a pencilled "pull me" note beside the cord on first visit only.
     - The section lights are scenery and are not clickable.
     - Each picture light's glow covers the whole project row (screenshot and sticky note), plus a soft wash on the wall.
+  - **The weekly clipping is "The Weekly Curiosity" (Elias, 1 October 2026).**
+    - A bold all-caps Newsreader masthead between double rules, with the strapline "Odd, true, and from this week in history".
+    - A red "STRANGE BUT TRUE" rubber stamp on the photo.
+    - A playful issue line: "Vol. · No. · Week of · Price: one click".
+    - The fact is set as the bold headline, and the button reads "2 more oddities this week".
+    - Curation must favour surprising, quirky "I never knew that" facts over news-headline events.
   - **Removed:** the scroll progress bar (the nav pin replaces it) and the per-link contact cursors (the postcard replaces them).
   - **Kept plain:** focus states stay a solid, high-contrast accent outline.
   - **Scroll sway:** kept, implemented with CSS scroll-driven animations (`animation-timeline: view()`) on transforms only. Browsers without support show still pins. Confirm support in Safari and Firefox during implementation.
