@@ -84,7 +84,14 @@
   --drawer-handle: linear-gradient(180deg, #d8cdbb, #9c8f7e);
   --drawer-handle-shadow: 0 2px 2px rgb(0 0 0 / 0.3);
   --drawer-side: #6a5745;
-  --drawer-inside: color-mix(in srgb, var(--drawer-side) 22%, transparent);
+  --drawer-slot: #2a221b;
+  --drawer-back: #5a4838;
+  --drawer-wall: linear-gradient(to bottom, #5a4838, #7e6a55);
+  --drawer-floor-far: #4a3b2e;
+  --drawer-floor-near: #6f5c49;
+  --drawer-depth: inset 0 18px 18px -12px rgb(0 0 0 / 0.45);
+  --drawer-panel: inset 0 -3px 0 rgb(0 0 0 / 0.25), inset 0 0 0 10px rgb(255 255 255 / 0.05), inset 0 0 0 11px rgb(0 0 0 / 0.18);
+  --manila-crease: inset 0 1px 0 rgb(255 255 255 / 0.35);
 
   /* GitHub's five-step greens: the one deliberate palette exception */
   --github-0: #ebedf0;
@@ -669,31 +676,90 @@
   }
 
   /*
-   * The work drawer: a wooden drawer pulled open, with manila folders standing
-   * in it and the drawer's front, label holder, and handle below them.
+   * The work drawer, seen from the front and a little above: the cabinet's
+   * top rail and the dark slot the drawer came out of, then the open drawer
+   * (its back panel, walls narrowing towards the back, and a shadowed floor),
+   * with manila folders filed upright, and the drawer's front at the bottom.
    */
-  .board-drawer {
-    background: var(--drawer-inside);
-    border-inline: 12px solid var(--drawer-side);
+  .board-cabinet {
+    filter: drop-shadow(calc(var(--light-side) * 6px) 14px 14px rgb(var(--shadow-tint) / var(--shadow-far-alpha)));
   }
 
+  .board-cabinet-rail {
+    height: 28px;
+    margin-inline: -12px;
+    border-radius: 6px 6px 0 0;
+    background: linear-gradient(to bottom, var(--drawer-side) 0 16px, var(--drawer-slot) 16px);
+    box-shadow: var(--drawer-sheen);
+  }
+
+  .board-drawer {
+    position: relative;
+    padding: 0 28px 20px;
+    background:
+      linear-gradient(to bottom, var(--drawer-back) 0 20px, transparent 20px),
+      linear-gradient(to bottom, var(--drawer-floor-far), var(--drawer-floor-near));
+    box-shadow: var(--drawer-depth);
+  }
+
+  /* The drawer's side walls, wider at the front than the back. */
+  .board-drawer::before,
+  .board-drawer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 22px;
+    background: var(--drawer-wall);
+    pointer-events: none;
+  }
+
+  .board-drawer::before {
+    left: 0;
+    clip-path: polygon(0 0, 55% 0, 100% 100%, 0 100%);
+  }
+
+  .board-drawer::after {
+    right: 0;
+    clip-path: polygon(45% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  /* Each folder stands in front of the one behind it and shades it a little. */
   .board-manila {
-    box-shadow: 0 -2px 3px rgb(var(--shadow-tint) / var(--shadow-near-alpha));
+    box-shadow:
+      0 -3px 6px rgb(var(--shadow-tint) / calc(var(--shadow-near-alpha) * 2)),
+      var(--manila-crease);
   }
 
   .board-drawer-front {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    height: 104px;
     margin-inline: -12px;
+    border-radius: 0 0 var(--radius-board) var(--radius-board);
     background: var(--drawer-wood);
-    box-shadow: var(--drawer-sheen), var(--shadow-pin);
+    /* A raised panel: a light top edge, a dark bottom edge, and an inset border. */
+    box-shadow:
+      var(--drawer-sheen),
+      var(--drawer-panel);
   }
 
   .board-drawer-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 180px;
-    height: 44px;
     max-width: 45%;
+    height: 44px;
     border: 3px solid var(--drawer-label-edge);
     border-radius: 3px;
     background: var(--drawer-label);
+    color: var(--ink);
+    font-family: var(--font-newsreader), Georgia, serif;
+    font-size: var(--text-lead);
+    white-space: nowrap;
   }
 
   .board-drawer-handle {

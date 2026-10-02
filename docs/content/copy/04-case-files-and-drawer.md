@@ -21,6 +21,7 @@ Covers the Argus Risk and Flowtime case files (same folder template as Threshold
 | Intro | Each folder is a case study: what was confusing, what I made clear, and how I built it. |
 | Folder tab (label tape) | The project name |
 | On each folder | Nº 01 · the case file's kicker · the thesis |
+| Drawer front label card (decorative, from the signed-off R4Work canvas; added after Elias's review asked for the drawer to read more clearly) | All my work |
 | Folder link (accessible name) | Open the Threshold folder (and so on) |
 | Visible link text | Open the folder → |
 | Page title | Work |

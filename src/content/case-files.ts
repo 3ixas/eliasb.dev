@@ -340,6 +340,8 @@ export const drawer = {
   intro: "Each folder is a case study: what was confusing, what I made clear, and how I built it.",
   backToBoard: "Back to the Board",
   backToBoardHref: "/#work",
+  /** The card in the drawer front's label holder, from the signed-off canvas. */
+  label: "All my work",
   folderNumber: (number: string) => `Nº ${number}`,
   openFolder: "Open the folder",
   folderLabel: (name: string) => `Open the ${name} folder`,

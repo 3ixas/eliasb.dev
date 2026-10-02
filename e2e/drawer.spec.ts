@@ -24,6 +24,13 @@ test.describe("Work drawer", () => {
     }
   });
 
+  test("reads as a drawer: folders filed one in front of the other, above a labelled front", async ({ page }) => {
+    const boxes = await page.getByRole("main").getByRole("article").evaluateAll((articles) => articles.map((article) => article.getBoundingClientRect()).map(({ top, bottom }) => ({ top, bottom })));
+    for (let index = 1; index < boxes.length; index++) expect(boxes[index].top).toBeLessThan(boxes[index - 1].bottom);
+    await expect(page.locator(".board-drawer-front")).toHaveAttribute("aria-hidden", "true");
+    await expect(page.locator(".board-drawer-front")).toContainText("All my work");
+  });
+
   test("every folder tab shows and stays on the page", async ({ page }) => {
     const width = page.viewportSize()!.width;
     const tabs = await page.getByRole("heading", { level: 2 }).evaluateAll((headings) =>
@@ -41,8 +48,8 @@ test.describe("Work drawer", () => {
     const folder = page.getByRole("article", { name: "Argus Risk" });
     await folder.scrollIntoViewIfNeeded();
     const box = (await folder.boundingBox())!;
-    // Click the folder's paper, away from the link text.
-    await page.mouse.click(box.x + box.width - 16, box.y + box.height - 16);
+    // Click the folder's paper near its top, the part the folder in front leaves showing.
+    await page.mouse.click(box.x + box.width - 16, box.y + 24);
     await expect(page).toHaveURL(/\/work\/argus-risk$/);
   });
 
