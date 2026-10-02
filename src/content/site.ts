@@ -1,6 +1,21 @@
-export const homepageHeadline = {
-  first: "I build software to make everyday things easier,",
-  second: "and more enjoyable.",
+// Approved in docs/content/copy/01-board-foundation.md.
+export const hero = {
+  kicker: "Elias Bennett · Software engineer · London",
+  headline: {
+    lead: "I build everyday software, and make complicated things",
+    emphasis: "feel simple.",
+  },
+  supportingLine:
+    "I take ideas all the way through: deciding what’s worth making, designing it, building it across the stack, and improving it after it ships.",
+  portrait: {
+    alt: "Elias in a white tuxedo, smiling",
+    caption: "Elias · London",
+  },
+  links: {
+    work: "See my work ↓",
+    email: "Email me ↗",
+    emailHref: "mailto:eliasthebennett@gmail.com",
+  },
 } as const;
 
 export const siteDescription =
@@ -11,9 +26,7 @@ export const profile = {
   shortName: "Elias",
   role: "Software engineer",
   location: "London",
-  statement: `${homepageHeadline.first} ${homepageHeadline.second}`,
-  introduction:
-    "I like taking an idea all the way through: deciding what’s worth making, shaping the design, building across the stack, and continuing to improve it after it ships. I work with others along the way.",
+  statement: `${hero.headline.lead} ${hero.headline.emphasis}`,
   about:
     "I’m in London, where I work on high-performance pricing and risk systems. Outside work, I take my own product ideas from the first sketch through design and code, then keep improving them after they ship.",
   links: {

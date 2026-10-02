@@ -14,16 +14,6 @@ function recentDates(length: number) {
   });
 }
 
-const TYPICAL_TRAINING_WEEK = [
-  { day: "Mon", activity: "Full body" },
-  { day: "Tue", activity: "Zone 2 run" },
-  { day: "Wed", activity: "Full body" },
-  { day: "Thu", activity: "Interval run" },
-  { day: "Fri", activity: "Full body" },
-  { day: "Sat", activity: "Zone 2 rowing machine" },
-  { day: "Sun", activity: "Interval assault bike" },
-] as const;
-
 export const signalFallbacks: HomepageSignals = {
   github: {
     state: "unavailable",
@@ -60,7 +50,6 @@ export const signalFallbacks: HomepageSignals = {
     totalActivities: 0,
     windowLabel: "Typical week",
     updatedAt: null,
-    schedule: TYPICAL_TRAINING_WEEK,
   },
   fantasy: {
     state: "pending",

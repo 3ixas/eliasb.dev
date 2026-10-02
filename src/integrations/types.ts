@@ -22,14 +22,8 @@ export type TrainingCategory = {
   count: number;
 };
 
-export type TrainingDay = {
-  day: string;
-  activity: string;
-};
-
 export type TrainingSignal = PersonalSignal & {
   weekly: TrainingCategory[];
-  schedule?: readonly TrainingDay[];
   totalActivities: number;
   windowLabel: string;
   updatedAt: string | null;

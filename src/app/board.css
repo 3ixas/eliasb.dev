@@ -1,0 +1,276 @@
+/*
+ * The legacy stylesheet sits in its own layer, above Tailwind's base but
+ * below utilities, so new components win while old sections keep working.
+ * It is deleted once every section has moved to the Board (#91).
+ */
+@layer theme, base, legacy, components, utilities;
+@import "tailwindcss";
+@import "./globals.css" layer(legacy);
+
+/*
+ * Board design tokens, normalised from the signed-off canvas (version 32).
+ * Components read these through Tailwind utilities or var(); they never
+ * hard-code colours or shadows. Night values apply under the same rules as
+ * the theme boot script: an explicit data-theme wins, otherwise the device.
+ * CSS cannot share one block between a media query and an attribute
+ * selector, so the night block appears twice; keep the copies identical.
+ */
+:root {
+  --wall: #efe8dc;
+  --wall-gradient: linear-gradient(118deg, #f5efe5 0%, #efe8dc 48%, #e7decf 100%);
+  --wall-ink: #1d1a16;
+  --wall-muted: #5f574d;
+  --wall-accent: #c94a22;
+  --rule: #d6ccbc;
+  --paper: #fbf7f0;
+  --paper-photo: #fffdf8;
+  --ink: #1d1a16;
+  --muted: #5f574d;
+  --accent: #c94a22;
+  --pushpin: #d9542c;
+  --pushpin-needle: #8c8276;
+  --pushpin-shine: rgb(255 255 255 / 0.55);
+  --tape: rgb(252 246 230 / 0.66);
+  --focus: #c94a22;
+
+  /* Pin stocks: object identity only, never UI state */
+  --stock-ochre: #f2dfaa;
+  --stock-blueprint: #c9d8e6;
+  --stock-sage: #ccd8c1;
+  --stock-terracotta: #e08b6a;
+  --stock-kraft: #d7ae63;
+
+  /* Surfaces and fixings that look the same by day and night */
+  --linen: #e3d2b4;
+  --clipboard: #a27850;
+  --clipboard-grain:
+    linear-gradient(160deg, rgb(255 235 205 / 0.18), rgb(0 0 0 / 0.08)),
+    repeating-linear-gradient(90deg, rgb(60 35 15 / 0.05) 0 2px, transparent 2px 7px);
+  --clipboard-sheen: inset 0 1px 0 rgb(255 235 205 / 0.35);
+  --plaster-grain: radial-gradient(rgb(120 90 60 / 0.07) 1px, transparent 1.2px) 0 0 / 7px 7px;
+  --linen-weave:
+    repeating-linear-gradient(45deg, rgb(90 60 30 / 0.045) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(-45deg, rgb(90 60 30 / 0.04) 0 1px, transparent 1px 6px);
+  --metal: #b9bec4;
+  --metal-edge: #8d939a;
+  --metal-shine: rgb(255 255 255 / 0.55);
+  --shelf-wood: #8a6a48;
+  --iron: #3a3530;
+  --string: #b3261e;
+
+  /* GitHub's five-step greens: the one deliberate palette exception */
+  --github-0: #ebedf0;
+  --github-1: #9be9a8;
+  --github-2: #40c463;
+  --github-3: #30a14e;
+  --github-4: #216e39;
+
+  /*
+   * Light. --light-side says which way shadows fall (+1 right, -1 left);
+   * the theme sets the shadow's strength. The shadows themselves are built
+   * below wherever a light is declared, so a section can flip them.
+   */
+  --light-side: 1;
+  --shadow-tint: 70 45 20;
+  --shadow-near-alpha: 0.1;
+  --shadow-far-alpha: 0.28;
+  --shadow-far-x: 8px;
+  --shadow-far-y-blur: 12px 22px;
+  --shadow-lift-x: 16px;
+  --shadow-lift-y-blur: 24px 36px;
+
+  /* Motion */
+  --duration-quick: 120ms;
+  --duration-ui: 200ms;
+  --duration-settle: 320ms;
+  --duration-room: 1.2s;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --wall: #1d1915;
+    --wall-gradient:
+      radial-gradient(1100px 820px at 90% 10%, rgb(255 178 102 / 0.3) 0%, rgb(255 160 90 / 0.12) 38%, transparent 70%),
+      linear-gradient(118deg, #15120f 0%, #1d1915 55%, #221d18 100%);
+    --wall-ink: #efe4d2;
+    --wall-muted: #b8ab95;
+    --wall-accent: #ff8a5c;
+    --rule: #3a322b;
+    --paper: #f1e3c9;
+    --paper-photo: #f6ebd6;
+    --muted: #5a4f42;
+    --accent: #b8431d;
+    --pushpin: #e0602f;
+    --pushpin-needle: #6e6357;
+    --pushpin-shine: rgb(255 240 220 / 0.6);
+    --tape: rgb(240 226 196 / 0.5);
+    --focus: #ff8a5c;
+    /* The desk lamp is at the upper right, so shadows fall to the left. */
+    --light-side: -1;
+    --shadow-tint: 0 0 0;
+    --shadow-near-alpha: 0.35;
+    --shadow-far-alpha: 0.62;
+    --shadow-far-x: 16px;
+    --shadow-far-y-blur: 20px 30px;
+    --shadow-lift-x: 22px;
+    --shadow-lift-y-blur: 28px 40px;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --wall: #1d1915;
+  --wall-gradient:
+    radial-gradient(1100px 820px at 90% 10%, rgb(255 178 102 / 0.3) 0%, rgb(255 160 90 / 0.12) 38%, transparent 70%),
+    linear-gradient(118deg, #15120f 0%, #1d1915 55%, #221d18 100%);
+  --wall-ink: #efe4d2;
+  --wall-muted: #b8ab95;
+  --wall-accent: #ff8a5c;
+  --rule: #3a322b;
+  --paper: #f1e3c9;
+  --paper-photo: #f6ebd6;
+  --muted: #5a4f42;
+  --accent: #b8431d;
+  --pushpin: #e0602f;
+  --pushpin-needle: #6e6357;
+  --pushpin-shine: rgb(255 240 220 / 0.6);
+  --tape: rgb(240 226 196 / 0.5);
+  --focus: #ff8a5c;
+  /* The desk lamp is at the upper right, so shadows fall to the left. */
+  --light-side: -1;
+  --shadow-tint: 0 0 0;
+  --shadow-near-alpha: 0.35;
+  --shadow-far-alpha: 0.62;
+  --shadow-far-x: 16px;
+  --shadow-far-y-blur: 20px 30px;
+  --shadow-lift-x: 22px;
+  --shadow-lift-y-blur: 28px 40px;
+  color-scheme: dark;
+}
+
+/*
+ * Shadow-by-light. Custom properties resolve where they are declared, so the
+ * shadows are rebuilt on every element that names its own light: a section
+ * with data-light="left" or "right" casts its shadows away from that light.
+ */
+:root,
+[data-light] {
+  --shadow-pin:
+    calc(var(--light-side) * 1px) 2px 2px rgb(var(--shadow-tint) / var(--shadow-near-alpha)),
+    calc(var(--light-side) * var(--shadow-far-x)) var(--shadow-far-y-blur) -8px rgb(var(--shadow-tint) / var(--shadow-far-alpha));
+  --shadow-pin-lift:
+    calc(var(--light-side) * 2px) 4px 4px rgb(var(--shadow-tint) / var(--shadow-near-alpha)),
+    calc(var(--light-side) * var(--shadow-lift-x)) var(--shadow-lift-y-blur) -10px rgb(var(--shadow-tint) / var(--shadow-far-alpha));
+  /* Small contact shadows for tape, pushpins, and clips */
+  --shadow-contact: calc(var(--light-side) * 1px) 1px 1px rgb(var(--shadow-tint) / var(--shadow-near-alpha));
+  --shadow-pushpin: rgb(var(--shadow-tint) / calc(var(--shadow-near-alpha) * 2.2));
+  --shadow-clip: drop-shadow(calc(var(--light-side) * 1px) 2px 1px rgb(var(--shadow-tint) / calc(var(--shadow-near-alpha) * 3.5)));
+}
+
+[data-light="left"] {
+  --light-side: 1;
+}
+
+[data-light="right"] {
+  --light-side: -1;
+}
+
+/*
+ * Tailwind utilities read the runtime tokens, so the theme switches without
+ * regenerating classes. One spacing scale (4–128) and one type scale.
+ */
+@theme inline {
+  --color-wall: var(--wall);
+  --color-wall-ink: var(--wall-ink);
+  --color-wall-muted: var(--wall-muted);
+  --color-wall-accent: var(--wall-accent);
+  --color-rule: var(--rule);
+  --color-paper: var(--paper);
+  --color-paper-photo: var(--paper-photo);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-focus: var(--focus);
+  --color-stock-ochre: var(--stock-ochre);
+  --color-stock-blueprint: var(--stock-blueprint);
+  --color-stock-sage: var(--stock-sage);
+  --color-stock-terracotta: var(--stock-terracotta);
+  --color-stock-kraft: var(--stock-kraft);
+
+  --font-display: var(--font-newsreader), Georgia, serif;
+  --font-sans: var(--font-hanken-grotesk), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  --shadow-pin: var(--shadow-pin);
+  --shadow-pin-lift: var(--shadow-pin-lift);
+}
+
+@theme {
+  --spacing: 4px;
+
+  --text-label: 0.75rem;
+  --text-label--letter-spacing: 0.08em;
+  --text-small: 0.875rem;
+  --text-body: 1rem;
+  --text-lead: 1.25rem;
+  --text-lead--line-height: 1.55;
+  --text-title: 1.5rem;
+  --text-title--line-height: 1.15;
+  --text-heading: clamp(2rem, 1.4rem + 2.4vw, 3.5rem);
+  --text-heading--line-height: 1.05;
+  --text-display: clamp(2.5rem, 1.2rem + 5.2vw, 5.25rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.015em;
+
+  --radius-paper: 2px;
+  --radius-board: 10px;
+  --radius-pill: 999px;
+
+  --ease-room: cubic-bezier(0.42, 0, 0.58, 1);
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+
+  --breakpoint-board: 900px;
+}
+
+/*
+ * Component rules live in the components layer, so a utility on the element
+ * (for example a hover that straightens a pin) can still override them.
+ */
+@layer components {
+  /*
+   * Pin tilt: careful pins (hero, Work) stay within ±0.5°, loose pins within
+   * ±3°. Below 900 px every pin is capped at ±1.5° and sits in one column.
+   */
+  [data-pin],
+  [data-pin-mount] {
+    rotate: var(--pin-tilt, 0deg);
+  }
+
+  @media (max-width: 899.98px) {
+    [data-pin],
+    [data-pin-mount] {
+      rotate: clamp(-1.5deg, var(--pin-tilt, 0deg), 1.5deg);
+    }
+  }
+
+  /* Surfaces: faint plaster grain over the wall's light, or a linen weave. */
+  .board-surface-wall {
+    background: var(--plaster-grain), var(--wall-gradient);
+    background-color: var(--wall);
+  }
+
+  .board-surface-linen {
+    background-color: var(--linen);
+    background-image: var(--linen-weave);
+  }
+
+  .board-focus:focus-visible,
+  .board-surface :is(a, button):focus-visible,
+  [data-board-header] :is(a, button):focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+    border-radius: var(--radius-paper);
+  }
+}

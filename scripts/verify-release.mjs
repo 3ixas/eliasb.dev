@@ -40,7 +40,7 @@ const expectedWorkSocialCards = new Map([
   }],
 ]);
 const expectedIndexableRobots = [
-  ["user-agent: *", "allow: /", "disallow: /concepts/"],
+  ["user-agent: *", "allow: /"],
   ["host: https://www.eliasb.dev", "sitemap: https://www.eliasb.dev/sitemap.xml"],
 ];
 
@@ -171,20 +171,17 @@ function verifyPageShell(markup, route) {
   check(main, `${route} should have a main landmark`);
   equal(attribute(main ?? "", "id"), "main-content", `${route} main landmark id`);
   equal(attribute(main ?? "", "tabindex"), "-1", `${route} main landmark should accept skip-link focus`);
-  check(markup.includes('<a class="skip-link" href="#main-content">'), `${route} should expose a skip link`);
+  const skipLink = hrefs(markup).find(({ href }) => href === "#main-content");
+  check(skipLink && plainText(markup.slice(markup.indexOf(skipLink.tag))).startsWith("Skip to content"), `${route} should expose a skip link`);
   equal(tags(markup, "h1").length, 1, `${route} should have exactly one h1`);
 }
 
 function verifyHomepage(markup) {
   verifyPageShell(markup, "/");
-  const headline = tags(markup, "h1")[0];
-  const fullOpening = "I build software to make everyday things easier, and more enjoyable.";
-  equal(attribute(headline ?? "", "aria-label"), fullOpening, "Homepage opening should retain its complete semantic sentence");
+  const fullOpening = "I build everyday software, and make complicated things feel simple.";
   const headlineContent = markup.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? "";
-  check(plainText(headlineContent).includes(fullOpening), "Homepage opening should keep a complete static text fallback");
-  const animatedHeadline = markup.match(/<span class="homepage-signature-stage"[^>]*>([\s\S]*?)<\/span><\/h1>/i)?.[1] ?? "";
-  const animatedText = animatedHeadline.replace(/<[^>]+>/g, "").replace(/<!--.*?-->/gs, "");
-  check(animatedText.startsWith(" and more enjoyable."), "Animated homepage opening should place its second thought after a visible pause");
+  equal(plainText(headlineContent), fullOpening, "Homepage headline should be one complete, server-rendered sentence");
+  check(!/data-home-opening/.test(markup), "Homepage content should never wait for the opening");
   check(!/Replay the opening/i.test(markup), "Homepage should not expose an opening replay control");
 
   const top = tags(markup, "div").find((tag) => attribute(tag, "id") === "top");
@@ -193,9 +190,10 @@ function verifyHomepage(markup) {
 
   const nav = markup.match(/<nav aria-label="Primary navigation">([\s\S]*?)<\/nav>/i)?.[1] ?? "";
   const navHrefs = hrefs(nav).map(({ href }) => href);
-  equal(navHrefs.join("|"), "#top|#work|#outside-work|#about", "Homepage primary navigation targets");
+  equal(navHrefs.join("|"), "#work|#outside-work|#about", "Homepage primary navigation targets");
   const navLabels = [...nav.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/gi)].map(([, content]) => plainText(content));
-  equal(navLabels.join("|"), "Home|Work|Library|About", "Homepage primary navigation labels");
+  equal(navLabels.join("|"), "Work|Library|About", "Homepage primary navigation labels");
+  check(!/class="scroll-progress"/.test(markup), "Homepage should not render the retired scroll progress bar");
 
   const pageIds = ids(markup);
   for (const sectionId of requiredHomepageSections) {
@@ -320,7 +318,7 @@ function verifyHomepage(markup) {
   const trainingText = plainText(trainingCard);
   if (trainingText.includes("My weekly training plan")) {
     check(!/maintained by hand|not a live workout log|usual plan/i.test(trainingText), "Training should skip redundant schedule explanations");
-    check((trainingCard.match(/class="training-day"/g) ?? []).length === 7, "Authored training schedule should retain all seven days");
+    check(!/class="training-day"/.test(trainingCard), "The retired authored training schedule should not render");
   }
   check(text.includes("Wikimedia") || text.includes("fallback"), "History output should identify its live or fallback source");
   const historyList = markup.match(/<ol\b(?=[^>]*\baria-label="Historical moments")[^>]*>([\s\S]*?)<\/ol>/i)?.[1] ?? "";
@@ -392,32 +390,10 @@ async function verifyRoutes(baseUrl, pages) {
     if (route.startsWith("/work")) await verifyWorkSocialMetadata(baseUrl, page.document, route);
   }
 
-  const conceptIndex = await fetchPage(baseUrl, "/concepts");
-  pages.set("/concepts", conceptIndex);
-  equal(conceptIndex.response.status, 200, "Concept direction index should render successfully");
-  equal(tags(conceptIndex.markup, "h1").length, 1, "Concept direction index should have one h1");
-  const conceptLinks = hrefs(conceptIndex.markup)
-    .map(({ href }) => href)
-    .filter((href) => href?.startsWith("/concepts/"))
-    .sort();
-  equal(
-    conceptLinks.join("|"),
-    "/concepts/cabinet-of-curiosities|/concepts/living-editorial|/concepts/signals-and-systems",
-    "Concept index should link to each design direction",
-  );
-
-  const conceptPrototype = await fetchPage(baseUrl, "/concepts/cabinet-of-curiosities");
-  pages.set("/concepts/cabinet-of-curiosities", conceptPrototype);
-  equal(conceptPrototype.response.status, 200, "Selected concept direction should render successfully");
-  const toolbar = conceptPrototype.markup.match(/<aside\b[^>]*aria-label="Concept controls"[^>]*>[\s\S]*?<\/aside>/i)?.[0] ?? "";
-  check(Boolean(toolbar), "Selected concept direction should expose its controls");
-  const backLink = hrefs(toolbar).find(({ tag }) => attribute(tag, "class") === "toolbar-back");
-  const backLinkText = toolbar.match(/<a\b[^>]*class="toolbar-back"[^>]*>([\s\S]*?)<\/a>/i)?.[1] ?? "";
-  equal(plainText(backLinkText), "All directions", "Concept toolbar back-link label");
-  equal(backLink?.href, "/concepts", "Concept toolbar should return to the direction index");
-  const selectedDirection = tags(toolbar, "a")
-    .find((tag) => attribute(tag, "aria-current") === "page");
-  equal(attribute(selectedDirection ?? "", "href"), "/concepts/cabinet-of-curiosities", "Concept toolbar selected direction");
+  const retiredConcepts = await fetch(new URL("/concepts", baseUrl), { redirect: "manual" });
+  equal(retiredConcepts.status, 404, "The retired /concepts design study should no longer exist");
+  const fixtures = await fetch(new URL("/fixtures/pins", baseUrl), { redirect: "manual" });
+  equal(fixtures.status, 404, "Test fixtures should not exist in production");
 
   for (const [route, location] of compatibilityRedirects) {
     const response = await fetch(new URL(route, baseUrl), { redirect: "manual" });

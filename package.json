@@ -10,14 +10,18 @@
     "verify:signals": "node --no-warnings --experimental-strip-types scripts/verify-signal-contracts.mjs && node --no-warnings --experimental-strip-types scripts/verify-history-cache.mjs",
     "verify:routes": "node scripts/verify-canonical-routes.mjs",
     "verify:release": "node scripts/verify-release.mjs",
-    "verify:opening": "node scripts/verify-opening.mjs"
+    "verify:opening": "node scripts/verify-opening.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
+    "motion": "^13.5.0",
     "next": "16.3.5",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

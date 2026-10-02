@@ -1,12 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { PageHeader } from "@/components/site/page-header";
+import { BoardHeader } from "@/components/board/board-header";
 import type { CaseStudy } from "@/content/case-studies";
 
 export function CaseStudyPage({ study }: { study: CaseStudy }) {
   return (
     <div className={`case-study case-${study.slug}`}>
-      <PageHeader />
+      <BoardHeader page="work" />
       <main id="main-content" tabIndex={-1}>
         <header className="case-hero">
           <div className="case-crumbs">

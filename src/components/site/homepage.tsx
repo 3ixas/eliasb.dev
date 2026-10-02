@@ -1,22 +1,20 @@
 import Image from "next/image";
-import Link from "next/link";
 import { LocalTime } from "@/components/local-time";
 import { ClosableDetails } from "@/components/site/closable-details";
 import { ContributionCalendar } from "@/components/site/contribution-calendar";
 import { FeaturedWork } from "@/components/site/featured-work";
 import { FantasyMatchup } from "@/components/site/fantasy-matchup";
 import { InViewMotion } from "@/components/site/in-view-motion";
-import { ScrollProgress } from "@/components/site/scroll-progress";
 import {
   SignalFreshness,
   SignalPresentation,
   SignalStatus,
 } from "@/components/site/signal-presentation";
-import { HomepageSignature } from "@/components/homepage-opening";
-import { SiteHeader } from "@/components/site/site-header";
+import { BoardHeader } from "@/components/board/board-header";
+import { Hero } from "@/components/board/hero";
 import { careerTimeline, labItems } from "@/content/collections";
 import { integrationConfig } from "@/content/integration-config";
-import { homepageHeadline, profile } from "@/content/site";
+import { profile } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
 import { getCachedHistorySignal } from "@/integrations/history-cache";
 
@@ -32,39 +30,9 @@ export async function Homepage() {
 
   return (
     <div className="prototype prototype-cabinet-of-curiosities selected-experience" id="top" tabIndex={-1}>
-      <ScrollProgress />
-      <SiteHeader />
+      <BoardHeader />
       <main id="main-content" tabIndex={-1}>
-        <section className="hero" aria-labelledby="hero-kicker">
-          <p className="hero-kicker" id="hero-kicker">
-            {profile.shortName} · {profile.role} · {profile.location}
-          </p>
-          <HomepageSignature {...homepageHeadline} />
-          <div className="hero-lower">
-            <div className="hero-introduction">
-              <p className="hero-introduction-label">How I work</p>
-              <p className="hero-copy">{profile.introduction}</p>
-            </div>
-            <div className="concept-thesis">
-              <figure className="concept-thesis-photo">
-                <Image
-                  src="/profile/elias-coast.webp"
-                  alt="Elias standing aboard a boat, with water and a rocky coastline behind him"
-                  fill
-                  sizes="(max-width: 700px) 100px, 120px"
-                />
-                <figcaption>Out on the water</figcaption>
-              </figure>
-              <p>
-                <span>Here’s what I’ve been up to:</span>{" "}
-                a few things I’ve built, some I’m working on, and a few I enjoy.
-              </p>
-            </div>
-          </div>
-          <a className="scroll-cue" href="#work">
-            Selected work <span aria-hidden="true">↓</span>
-          </a>
-        </section>
+        <Hero />
 
         <FeaturedWork />
 
@@ -122,28 +90,15 @@ export async function Homepage() {
                   }}
                 >
                   <strong>{signals.training.headline}</strong>
-                  {signals.training.schedule ? (
-                    <InViewMotion>
-                      <div className="training-schedule" role="group" aria-label={`${signals.training.windowLabel} training schedule`}>
-                        {signals.training.schedule.map((day) => (
-                          <div className="training-day" key={day.day}>
-                            <b>{day.day}</b>
-                            <span>{day.activity}</span>
-                          </div>
-                        ))}
+                  <div className="training-rhythm" aria-label={`${signals.training.windowLabel} training by type`} data-motion-reveal>
+                    {signals.training.weekly.map((category) => (
+                      <div className="training-metric" key={category.label}>
+                        <i style={{ height: `${Math.max(8, Math.min(100, category.count * 24 + 8))}%` }} aria-hidden="true" />
+                        <b>{category.count}</b>
+                        <span>{category.label}</span>
                       </div>
-                    </InViewMotion>
-                  ) : (
-                    <div className="training-rhythm" aria-label={`${signals.training.windowLabel} training by type`} data-motion-reveal>
-                      {signals.training.weekly.map((category) => (
-                        <div className="training-metric" key={category.label}>
-                          <i style={{ height: `${Math.max(8, Math.min(100, category.count * 24 + 8))}%` }} aria-hidden="true" />
-                          <b>{category.count}</b>
-                          <span>{category.label}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                    ))}
+                  </div>
                   {signals.training.description && <span>{signals.training.description}</span>}
                 </SignalPresentation>
               </article>
@@ -480,7 +435,6 @@ export async function Homepage() {
       <footer className="site-footer">
         <p>Made by {profile.shortName}.</p>
         <div>
-          <Link href="/concepts">Design study <span className="arrow-mark" aria-hidden="true">↗︎</span></Link>
           <a href={profile.links.github} target="_blank" rel="noreferrer">
             GitHub <span className="arrow-mark" aria-hidden="true">↗︎</span>
           </a>

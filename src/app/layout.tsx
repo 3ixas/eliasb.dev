@@ -1,6 +1,24 @@
 import { siteDescription } from "@/content/site";
 import type { Metadata } from "next";
-import "./globals.css";
+import { Hanken_Grotesk, JetBrains_Mono, Newsreader } from "next/font/google";
+import "./board.css";
+
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  axes: ["opsz"],
+  variable: "--font-newsreader",
+});
+
+const hankenGrotesk = Hanken_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-hanken-grotesk",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+});
 
 const isIndexable = process.env.SITE_INDEXABLE === "true";
 
@@ -48,44 +66,6 @@ const siteBootScript = `
     (() => {
       const root = document.documentElement;
       const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-      if (location.pathname !== '/' || (location.hash && location.hash !== '#top') || motion.matches) return;
-      root.dataset.homeOpening = 'running';
-      let fallbackTimer;
-      const cleanup = () => {
-        window.clearTimeout(fallbackTimer);
-        motion.removeEventListener('change', onMotionChange);
-        window.removeEventListener('home-opening-started', onStarted);
-        window.removeEventListener('home-opening-completed', cleanup);
-      };
-      const finish = () => {
-        if (!root.hasAttribute('data-home-opening')) return;
-        root.removeAttribute('data-home-opening');
-        cleanup();
-        window.dispatchEvent(new Event('home-opening-finish'));
-      };
-      const onMotionChange = (event) => {
-        if (event.matches) finish();
-      };
-      const onStarted = (event) => {
-        // Hydration and playback have separate budgets. A slow bundle download
-        // must not use up the time reserved for the actual entrance.
-        window.clearTimeout(fallbackTimer);
-        fallbackTimer = window.setTimeout(finish, event.detail.durationMs + 2000);
-      };
-      motion.addEventListener('change', onMotionChange);
-      window.addEventListener('home-opening-started', onStarted);
-      window.addEventListener('home-opening-completed', cleanup);
-      // Fail open if the component never mounts. Late hydration must not hide
-      // the page again once this startup deadline has exposed it.
-      fallbackTimer = window.setTimeout(finish, 12000);
-    })();
-  } catch (_) {
-    document.documentElement.removeAttribute('data-home-opening');
-  }
-  try {
-    (() => {
-      const root = document.documentElement;
-      const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
       if (typeof IntersectionObserver === 'undefined') return;
 
       let observer;
@@ -116,7 +96,6 @@ const siteBootScript = `
 
       const startObserving = () => {
         if (started || motion.matches || !root.hasAttribute('data-motion-reveals')) return;
-        if (root.hasAttribute('data-home-opening') && root.dataset.homeOpening !== 'complete') return;
         if (!document.body) {
           window.addEventListener('DOMContentLoaded', startObserving, { once: true });
           return;
@@ -165,9 +144,6 @@ const siteBootScript = `
         }
       };
 
-      window.addEventListener('home-opening-completed', startObserving);
-      window.addEventListener('home-opening-finish', startObserving);
-
       const syncMotionPreference = (event) => {
         if (event.matches) {
           observer?.disconnect();
@@ -199,7 +175,12 @@ const siteBootScript = `
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
+    <html
+      lang="en-GB"
+      suppressHydrationWarning
+      data-scroll-behavior="smooth"
+      className={`${newsreader.variable} ${hankenGrotesk.variable} ${jetbrainsMono.variable}`}
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: siteBootScript }} />
       </head>

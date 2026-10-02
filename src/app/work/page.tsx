@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { WorkArchiveCard } from "@/components/site/featured-work";
-import { PageHeader } from "@/components/site/page-header";
+import { BoardHeader } from "@/components/board/board-header";
 import { caseStudies } from "@/content/case-studies";
 
 export const metadata: Metadata = {
@@ -36,7 +36,7 @@ export default function WorkPage() {
 
   return (
     <div className="work-index-page">
-      <PageHeader />
+      <BoardHeader page="work" />
       <main id="main-content" tabIndex={-1}>
         <header className="work-index-hero">
           <p>{studies.length} case studies</p>
