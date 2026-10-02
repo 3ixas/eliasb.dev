@@ -65,21 +65,43 @@ export type PersonalSignal = {
   href?: string;
 };
 
-export type ReadingSignal = PersonalSignal & {
-  author?: string;
-  coverUrl?: string;
-  bookDescription?: string;
+/** The book on my currently-reading shelf. */
+export type Book = {
+  title: string;
+  author: string;
+  /** When the book went onto the shelf, which is when I started it. */
+  startedAt: string | null;
+  coverUrl: string | null;
+};
+
+/**
+ * Goodreads, live only: book is null when the shelf is empty. "pending" means
+ * nothing has been fetched successfully yet, so there is nothing to show.
+ */
+export type ReadingSignal = {
+  state: SignalState;
+  book: Book | null;
+  href: string;
   updatedAt: string | null;
 };
 
-export type CultureSignal = PersonalSignal & {
-  filmTitle?: string;
-  filmYear?: string;
-  filmRating?: string;
-  filmDescription?: string;
-  filmPosterUrl?: string;
-  filmHref?: string;
-  playlistHref: string;
+/** The latest film in my Letterboxd diary. */
+export type Film = {
+  title: string;
+  year: string | null;
+  /** Out of 5, in half stars. */
+  rating: number | null;
+  /** The diary date, YYYY-MM-DD. */
+  watchedOn: string | null;
+  posterUrl: string | null;
+  href: string;
+};
+
+/** Letterboxd, live only: film is null when the diary is empty. */
+export type FilmSignal = {
+  state: SignalState;
+  film: Film | null;
+  href: string;
   updatedAt: string | null;
 };
 
@@ -92,8 +114,6 @@ export type FantasySignal = PersonalSignal & {
 
 export type HomepageSignals = {
   github: GitHubSignal;
-  reading: ReadingSignal;
   training: TrainingSignal;
   fantasy: FantasySignal;
-  culture: CultureSignal;
 };

@@ -270,19 +270,18 @@ function verifyHomepage(markup) {
   check(tags(markup, "img").some((tag) => (attribute(tag, "srcset") ?? "").includes("/_next/image")), "Homepage imagery should use responsive Next Image sources");
 
   const detailBlocks = [...markup.matchAll(/<details\b[\s\S]*?<\/details>/gi)].map(([block]) => block);
-  check(detailBlocks.length >= 4, "Homepage should retain native reading, cinema, and experiment disclosures");
+  check(detailBlocks.length >= 2, "Homepage should retain native experiment disclosures");
   check(detailBlocks.every((block) => /<summary\b/i.test(block)), "Every disclosure should use a native summary control");
-  check(markup.includes('data-close-object'), "Open culture objects should expose a keyboard-accessible close control");
 
-  const spotifyFrame = tags(markup, "iframe").find((tag) => (attribute(tag, "src") ?? "").includes("open.spotify.com/embed/playlist/"));
-  check(spotifyFrame, "Homepage should retain the official Spotify playlist embed");
-  equal(attribute(spotifyFrame ?? "", "title"), "Elias’s current Spotify playlist", "Spotify iframe title");
+  // The cassette player is a facade: Spotify's player loads only when Play is pressed.
+  check(!/open\.spotify\.com\/embed/.test(markup), "Spotify's player should load only when Play is pressed");
+  check(tags(markup, "button").some((tag) => attribute(tag, "aria-label") === "Play my playlist on Spotify"), "The cassette player should have a named Play button");
   const spotifyLink = hrefs(markup).find(({ href }) => href?.includes("open.spotify.com/playlist/"));
   check(spotifyLink, "Homepage should expose a direct Spotify fallback link");
-  check(markup.includes("Open playlist in Spotify"), "Spotify fallback link should be visibly labelled");
+  check(markup.includes("Open in Spotify"), "Spotify fallback link should be visibly labelled");
 
   const statuses = [...markup.matchAll(/<span class="signal-status" data-state="([^"]+)">([^<]*)<\/span>/gi)];
-  check(statuses.length >= 6, "Outside work should expose status labels for its signal cards");
+  check(statuses.length >= 3, "Outside work should expose status labels for its signal cards");
   for (const [, state, label] of statuses) {
     check(signalStates.has(state), `Signal state ${state} must use the shared signal contract`);
     check(Boolean(label.trim()), "Signal states must have a visible label");
@@ -309,8 +308,8 @@ function verifyHomepage(markup) {
   const text = plainText(markup);
   const githubSignal = markup.match(/<article class="signal signal-building"[^>]*>([\s\S]*?)<\/article>/i)?.[1] ?? "";
   check(!/Private contribution count|class="signal-metrics"/.test(githubSignal), "GitHub output should not show a separate private contribution statistic");
-  check(/Goodreads/i.test(text) && /(Currently reading|Last on Goodreads)/i.test(text), "Reading signal should identify Goodreads and the current or last logged book");
-  check(/Letterboxd/i.test(text) && /(Most recently watched|Last logged)/i.test(text), "Cinema signal should identify Letterboxd and the most recent or last logged film");
+  check(/Now reading/.test(text) && /(Goodreads|Between books)/.test(text), "The book pin should show the book from Goodreads, or say I'm between books");
+  check(/Admit one · Last watched/.test(text) && /(Letterboxd|Nothing logged yet)/.test(text), "The film ticket should show the film from Letterboxd, or say nothing is logged");
   check(!/other managers.{0,40}(names|private|anonymous)|names.{0,24}stay private/i.test(text), "Fantasy football output should omit the redundant privacy explanation");
   check(!/private contributions are part of the total|keep their repositories private/i.test(text), "GitHub output should omit the redundant private-repository explanation");
   check(text.includes("Strava") || (text.includes("Typical week") && text.includes("My weekly plan")), "Training output should distinguish live activity from an authored typical week");

@@ -167,7 +167,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     | Fantasy | A matchday ticket stub |
     | Book | Cover plus a stamped library card |
     | Film | Poster plus a cinema ticket stub |
-    | Music | A portable cassette player with a track list (see the culture corner below) |
+    | Music | A portable cassette player that opens to Spotify's own player (see the culture corner below) |
     | Training | Polaroid plus tally marks, with the number beside them |
     | About | Prose beside a connected journey: a red string with arrowheads, pinned at five numbered stops and starting with a pencilled "start here". The stops are: (1) history essay, (2) plain bakery bag with doughnut (no brand logo), (3) speech bubble quoting "I need that feeling from what I do.", (4) code sticky note, (5) lanyard, "BNP Paribas, today". In the build, the string draws stop by stop on scroll, and is static under reduced motion |
     | Contact | A postcard with an E/B stamp, plus pinned link cards |
@@ -209,9 +209,10 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     - A hover or tap invitation to see each day's count.
   - **Every pin says what it is to a stranger (Elias, 1 October 2026).** Each pin carries a clear tag or headline (for example "Now reading", "Last watched", "On repeat") as well as its image.
   - **The culture corner (Elias, 1 October 2026):** a dedicated row of large objects, each with a kraft shipping tag.
-    - **Book:** cover plus a stamped library card.
-    - **Film:** poster plus an "Admit one · Last watched" ticket.
-    - **Music:** a retro portable cassette player ("E/B Sound") hanging by its strap from a pin. Its tape window is labelled with the playlist, and it has real Previous, Play, and Next controls. Below it is a track-list card. Play opens the official Spotify player, and the track list fills from Spotify.
+    - **Book:** cover plus a library card stamped with the day the book went onto my currently-reading shelf (Elias, 2 October 2026).
+    - **Film:** poster plus an "Admit one · Last watched" ticket showing the day watched and the star rating (Elias, 2 October 2026).
+    - **Empty feeds (Elias, 2 October 2026):** the book and film come only from their live feeds. An empty shelf or diary keeps the pin up with a blank cover or poster and "Between books" or "Nothing logged yet"; an unreachable feed keeps the last version fetched.
+    - **Music (Elias, 2 October 2026):** a retro cassette player ("E/B Sound") built round Spotify's own player rather than beside it. Before Play: the tape in the deck's window, one Play button, and a handwritten J-card. Play opens the deck's window to Spotify's full player, 352 px tall, with its own controls and track list; nothing from Spotify loads before that. No Previous or Next buttons, since they couldn't control Spotify's player. An "Open in Spotify" link is always there.
   - **Photos (Elias, 1 October 2026):** the white-tux portrait (`public/profile/elias-evening.webp`), Elias's favourite, is the hero polaroid. The grey-jumper photo (`public/profile/elias.webp`) goes in About.
   - **Removed:** the scroll progress bar (the nav pin replaces it) and the per-link contact cursors (the postcard replaces them).
   - **Kept plain:** focus states stay a solid, high-contrast accent outline.
@@ -259,7 +260,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
   - Rounds 1–3 (`Work`, `Board`, `BoardNight`, `Mobile`) are superseded where round 4 differs.
 - **Tokens:**
   - Wall, paper, ink, muted, rule, and accent `#C94A22` (night wall accent `#FF8A5C`).
-  - Pin stocks: ochre `#F2DFAA`, blueprint `#C9D8E6`, sage `#CCD8C1`, terracotta, kraft `#D7AE63`.
+  - Pin stocks: ochre `#F2DFAA`, blueprint `#C9D8E6`, sage `#CCD8C1`, terracotta, kraft `#D7AE63`, ticket `#E9C37A`.
   - GitHub greens (exception).
   - Day shadow `1px 2px 2px rgba(70,45,20,.10), 8px 12px 22px -8px rgba(70,45,20,.28)`. Night shadows fall away from each section's light.
   - Fonts: Newsreader, Hanken Grotesk, JetBrains Mono, all through `next/font`.

@@ -3,7 +3,9 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   GITHUB_ACTIVITY_DAYS,
+  bookFromGoodreads,
   datesForWindow,
+  filmFromLetterboxd,
   groupTrainingActivities,
   mapContributionDays,
   mapPublicActivity,
@@ -11,6 +13,7 @@ import {
 } from "../src/integrations/signal-mappers.ts";
 import { integrationConfig } from "../src/content/integration-config.ts";
 import { asOfDate, pinStatus, staleAfterDays } from "../src/integrations/pin-rules.ts";
+import { filmLine, stars } from "../src/content/board.ts";
 import { getHistorySignal, historyWeekStart, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "../src/integrations/history.ts";
 import { fantasySourceUnavailable, fantasyWeekUnavailable, signalFallbacks } from "../src/content/signal-fallbacks.ts";
 import { FantasyMatchup } from "../src/components/site/fantasy-matchup.ts";
@@ -254,10 +257,50 @@ try {
 }
 
 assert.equal(signalFallbacks.fantasy.href ?? null, null);
-assert.equal(signalFallbacks.reading.statusLabel, "Last on Goodreads");
-assert.equal(signalFallbacks.reading.bookDescription, "");
-assert.equal(signalFallbacks.culture.statusLabel, "Last logged");
-assert.equal(signalFallbacks.culture.description, "");
+// The book and film are live only: there are no saved copies to fall back on.
+assert.equal("reading" in signalFallbacks, false);
+assert.equal("culture" in signalFallbacks, false);
+
+// Goodreads: the series suffix comes off, and the shelf date is the start date.
+assert.deepEqual(
+  bookFromGoodreads({
+    title: "Dark Age (Red Rising Saga, #5)",
+    author: "Pierce Brown",
+    dateAdded: "Mon, 14 Sep 2026 03:52:45 -0700",
+    coverUrl: "https://i.gr-assets.com/cover.jpg",
+  }),
+  { title: "Dark Age", author: "Pierce Brown", startedAt: "2026-09-14T10:52:45.000Z", coverUrl: "https://i.gr-assets.com/cover.jpg" },
+);
+assert.equal(bookFromGoodreads({ title: "Dark Age", author: "Pierce Brown", dateAdded: "not a date" }).startedAt, null);
+assert.equal(bookFromGoodreads({ title: "Dark Age", author: "Pierce Brown" }).coverUrl, null);
+assert.equal(bookFromGoodreads({ title: "Dark Age" }), null);
+assert.equal(bookFromGoodreads({ author: "Pierce Brown" }), null);
+
+// Letterboxd: half-star ratings and the diary date, or nothing where they're missing or malformed.
+const letterboxdProfile = "https://letterboxd.com/3lxas/";
+assert.deepEqual(
+  filmFromLetterboxd(
+    { title: "The Invite", year: "2026", rating: "4.0", watchedDate: "2026-09-14", posterUrl: "https://a.ltrbxd.com/p.jpg", href: "https://letterboxd.com/3lxas/film/the-invite/" },
+    letterboxdProfile,
+  ),
+  { title: "The Invite", year: "2026", rating: 4, watchedOn: "2026-09-14", posterUrl: "https://a.ltrbxd.com/p.jpg", href: "https://letterboxd.com/3lxas/film/the-invite/" },
+);
+const sparseFilm = filmFromLetterboxd({ title: "Unrated", rating: "", watchedDate: "14 Sept" }, letterboxdProfile);
+assert.deepEqual(sparseFilm, { title: "Unrated", year: null, rating: null, watchedOn: null, posterUrl: null, href: letterboxdProfile });
+assert.equal(filmFromLetterboxd({ title: "Odd", rating: "7" }, letterboxdProfile).rating, null);
+assert.equal(filmFromLetterboxd({ title: "Half", rating: "0.5" }, letterboxdProfile).rating, 0.5);
+assert.equal(filmFromLetterboxd({ title: " " }, letterboxdProfile), null);
+
+// The ticket's line, shown and spoken.
+assert.equal(stars(4), "★★★★");
+assert.equal(stars(4.5), "★★★★½");
+assert.equal(stars(0.5), "½");
+const watched = { short: "14 Sept", long: "14 September" };
+assert.deepEqual(filmLine(watched, 4), { shown: "Watched 14 Sept · ★★★★", spoken: "Watched 14 September, rated 4 out of 5" });
+assert.deepEqual(filmLine(watched, 4.5), { shown: "Watched 14 Sept · ★★★★½", spoken: "Watched 14 September, rated 4.5 out of 5" });
+assert.deepEqual(filmLine(watched, null), { shown: "Watched 14 Sept", spoken: "Watched 14 September" });
+assert.deepEqual(filmLine(null, 3), { shown: "★★★", spoken: "Rated 3 out of 5" });
+assert.equal(filmLine(null, null), null);
 
 /** @type {import("../src/integrations/types.ts").FantasySignal} */
 const fantasyLiveSignal = {

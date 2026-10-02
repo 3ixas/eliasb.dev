@@ -1,10 +1,13 @@
 import type { CSSProperties } from "react";
+import { CultureCorner } from "@/components/board/culture-corner";
 import { LondonClock } from "@/components/board/london-clock";
 import { Pin } from "@/components/board/pin";
 import { PinPhoto, PinSlot } from "@/components/board/pin-states";
 import { Pinboard } from "@/components/board/pinboard";
 import { BoardSurface } from "@/components/board/surface";
 import { board } from "@/content/board";
+import { getReadingSignal } from "@/integrations/goodreads";
+import { getFilmSignal } from "@/integrations/letterboxd";
 import type { PinStatus } from "@/integrations/pin-rules";
 
 // London is authored, a photo and the time, so it is always current (staleAfterDays.london is null).
@@ -12,9 +15,13 @@ const londonStatus: PinStatus = { kind: "current" };
 
 /**
  * The Board: the personal section, a framed linen pinboard on the wall.
- * London is pinned here; the other pins move onto the board in #83 to #87.
+ * London and the culture corner are pinned here; the other pins move onto the
+ * board in #84 to #87.
  */
-export function Board() {
+export async function Board() {
+  const [reading, film] = await Promise.all([getReadingSignal(), getFilmSignal()]);
+  const now = new Date();
+
   return (
     <BoardSurface
       kind="wall"
@@ -31,6 +38,7 @@ export function Board() {
         </h2>
         <Pinboard className="mt-12 board:mt-16">
           <LondonPin />
+          <CultureCorner reading={reading} film={film} now={now} />
         </Pinboard>
       </div>
     </BoardSurface>

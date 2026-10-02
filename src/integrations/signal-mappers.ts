@@ -1,3 +1,5 @@
+import type { Book, Film } from "./types";
+
 export type ActivityDay = { date: string; count: number };
 
 export type GitHubEventShape = {
@@ -89,4 +91,59 @@ export function groupTrainingActivities(activities: StravaActivityShape[]) {
     ...category,
     count: counts.get(category.label) ?? 0,
   }));
+}
+
+/** The fields read from a Goodreads currently-reading item, already decoded. */
+export type GoodreadsItemShape = {
+  title?: string;
+  author?: string;
+  dateAdded?: string;
+  coverUrl?: string;
+};
+
+/**
+ * A Goodreads item as the book I'm reading. The series suffix comes off the
+ * title, and the day it went onto the shelf stands in for the day I started.
+ * Without a title and author it isn't a book, so the result is null.
+ */
+export function bookFromGoodreads(item: GoodreadsItemShape): Book | null {
+  const title = item.title
+    ?.replace(/\s+by\s+.+$/i, "")
+    .replace(/\s+\([^)]*#\d+[^)]*\)\s*$/, "")
+    .trim();
+  const author = item.author?.trim();
+  if (!title || !author) return null;
+  return { title, author, startedAt: isoInstant(item.dateAdded), coverUrl: item.coverUrl ?? null };
+}
+
+/** The fields read from a Letterboxd diary item, already decoded. */
+export type LetterboxdItemShape = {
+  title?: string;
+  year?: string;
+  rating?: string;
+  watchedDate?: string;
+  posterUrl?: string;
+  href?: string;
+};
+
+/** A Letterboxd diary item as the film I last watched, or null if it names no film. */
+export function filmFromLetterboxd(item: LetterboxdItemShape, profileUrl: string): Film | null {
+  const title = item.title?.trim();
+  if (!title) return null;
+  const rating = Number(item.rating);
+  return {
+    title,
+    year: item.year?.trim() || null,
+    // Letterboxd rates in half stars, from half a star to five.
+    rating: Number.isFinite(rating) && rating >= 0.5 && rating <= 5 ? Math.round(rating * 2) / 2 : null,
+    watchedOn: /^\d{4}-\d{2}-\d{2}$/.test(item.watchedDate ?? "") ? item.watchedDate! : null,
+    posterUrl: item.posterUrl ?? null,
+    href: item.href ?? profileUrl,
+  };
+}
+
+function isoInstant(value: string | undefined) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }

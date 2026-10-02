@@ -1,35 +1,11 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { contrastOnPaper } from "./support/contrast";
 
 const lightsOn = async (page: Page) => {
   if ((await page.evaluate(() => document.documentElement.dataset.lights)) !== "on") await page.locator("[data-light-switch]").click();
   await expect.poll(() => page.evaluate(() => document.documentElement.dataset.lights === "on" && !("themeChanging" in document.documentElement.dataset))).toBe(true);
 };
-
-/** WCAG contrast between an element's text and the opaque paper it sits on. */
-const contrastOnPaper = (page: Page, selector: string) =>
-  page.locator(selector).evaluateAll((elements) => {
-    const parse = (colour: string) => colour.match(/[\d.]+/g)!.slice(0, 4).map(Number);
-    const luminance = ([r, g, b]: number[]) => {
-      const [lr, lg, lb] = [r, g, b].map((channel) => {
-        const c = channel / 255;
-        return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-      });
-      return 0.2126 * lr + 0.7152 * lg + 0.0722 * lb;
-    };
-    const paperBehind = (element: Element) => {
-      for (let node: Element | null = element; node; node = node.parentElement) {
-        const background = parse(getComputedStyle(node).backgroundColor);
-        if ((background[3] ?? 1) === 1 && background.length >= 3 && getComputedStyle(node).backgroundColor !== "rgba(0, 0, 0, 0)") return background;
-      }
-      return [255, 255, 255];
-    };
-    return elements.map((element) => {
-      const text = luminance(parse(getComputedStyle(element).color));
-      const paper = luminance(paperBehind(element));
-      return { text: element.textContent, ratio: (Math.max(text, paper) + 0.05) / (Math.min(text, paper) + 0.05) };
-    });
-  });
 
 test.describe("The Board", () => {
   test.beforeEach(async ({ page }) => {

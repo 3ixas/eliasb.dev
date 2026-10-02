@@ -40,6 +40,7 @@
   --stock-sage: #ccd8c1;
   --stock-terracotta: #e08b6a;
   --stock-kraft: #d7ae63;
+  --stock-ticket: #e9c37a;
 
   /* Surfaces and fixings that look the same by day and night */
   --linen: #e3d2b4;
@@ -116,6 +117,26 @@
   --photo-coming: repeating-linear-gradient(135deg, #ede6da 0 10px, #e6ded0 10px 20px);
   --photo-coming-ink: #5f574d;
   --stale-fade: sepia(0.35) saturate(0.6);
+
+  /* The culture corner: a library card, a cinema ticket, and a cassette player. */
+  --library-card: #efe3c8;
+  --library-card-rule: rgb(90 110 150 / 0.35);
+  --library-stamp: #6a2e7a;
+  --tag-ink: #5c3d10;
+  --ticket-perforation: rgb(92 61 16 / 0.45);
+  --deck: #a93f1c;
+  --deck-gradient: linear-gradient(180deg, #b5431e 0%, #9e3a1a 100%);
+  --deck-sheen: inset 0 2px 0 rgb(255 220 190 / 0.4), inset 0 -3px 0 rgb(0 0 0 / 0.18);
+  --deck-ink: #fff4ec;
+  --deck-window: #2a2420;
+  --deck-window-depth: inset 0 3px 8px rgb(0 0 0 / 0.6);
+  --tape-label: #efe6d2;
+  --tape-reel: radial-gradient(circle, #efe6d2 0 17%, #2a2420 18.5% 28%, #5a4e44 29.5% 50%, transparent 51%);
+  --deck-button: #1d1a16;
+  --deck-button-ink: #f3e6da;
+  --deck-button-edge: #000;
+  --j-card: #f5eedd;
+  --j-card-ink: #3a3129;
 
   /* GitHub's five-step greens: the one deliberate palette exception */
   --github-0: #ebedf0;
@@ -296,6 +317,7 @@
   --color-stock-sage: var(--stock-sage);
   --color-stock-terracotta: var(--stock-terracotta);
   --color-stock-kraft: var(--stock-kraft);
+  --color-stock-ticket: var(--stock-ticket);
 
   --font-display: var(--font-newsreader), Georgia, serif;
   --font-sans: var(--font-hanken-grotesk), system-ui, sans-serif;
@@ -863,6 +885,96 @@
     width: 100%;
     background: var(--photo-coming);
     color: var(--photo-coming-ink);
+  }
+
+  /* The culture corner. */
+  .board-library-card {
+    background-color: var(--library-card);
+    background-image: repeating-linear-gradient(to bottom, transparent 0 24px, var(--library-card-rule) 24px 25px);
+    box-shadow: var(--shadow-pin);
+  }
+
+  .board-library-stamp {
+    display: inline-block;
+    border: 2px solid var(--library-stamp);
+    padding: 2px 6px;
+    rotate: -8deg;
+    color: var(--library-stamp);
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-size: var(--text-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* A blank cover or poster where the feed has nothing to show. */
+  .board-blank-print {
+    background: var(--photo-coming);
+  }
+
+  [data-stock="kraft"] .board-tag-ink {
+    color: var(--tag-ink);
+  }
+
+  /* A cinema ticket, perforated down its left edge. */
+  .board-ticket::before {
+    content: "";
+    position: absolute;
+    inset-block: 8px;
+    left: 10px;
+    width: 4px;
+    background: radial-gradient(circle, var(--ticket-perforation) 0 1.5px, transparent 2px) 0 0 / 4px 8px repeat-y;
+  }
+
+  .board-deck {
+    border-radius: 18px;
+    background-color: var(--deck);
+    background-image: var(--deck-gradient);
+    color: var(--deck-ink);
+    box-shadow: var(--shadow-pin), var(--deck-sheen);
+  }
+
+  .board-deck-window {
+    border-radius: 10px;
+    background: var(--deck-window);
+    box-shadow: var(--deck-window-depth);
+  }
+
+  .board-tape-label {
+    border-radius: 6px;
+    background: var(--tape-label);
+    color: var(--ink);
+  }
+
+  .board-tape-reel {
+    flex: none;
+    border-radius: 50%;
+    background: var(--tape-reel);
+  }
+
+  .board-deck-button {
+    min-height: 48px;
+    border-radius: 8px;
+    background: var(--deck-button);
+    color: var(--deck-button-ink);
+    box-shadow: 0 3px 0 var(--deck-button-edge);
+    font-weight: 600;
+    transition: translate var(--duration-quick) var(--ease-out-strong), box-shadow var(--duration-quick) var(--ease-out-strong);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .board-deck-button:active {
+      translate: 0 2px;
+      box-shadow: 0 1px 0 var(--deck-button-edge);
+    }
+  }
+
+  /* The cassette's paper insert, tucked under the deck. */
+  .board-j-card {
+    background-color: var(--j-card);
+    background-image: repeating-linear-gradient(to bottom, transparent 0 27px, var(--margin-rule) 27px 28px);
+    background-position: 0 14px;
+    color: var(--j-card-ink);
+    box-shadow: var(--shadow-contact);
   }
 
   /*

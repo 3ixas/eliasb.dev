@@ -1,19 +1,13 @@
 import Image from "next/image";
-import { ClosableDetails } from "@/components/site/closable-details";
 import { ContributionCalendar } from "@/components/site/contribution-calendar";
 import { FantasyMatchup } from "@/components/site/fantasy-matchup";
 import { InViewMotion } from "@/components/site/in-view-motion";
-import {
-  SignalFreshness,
-  SignalPresentation,
-  SignalStatus,
-} from "@/components/site/signal-presentation";
+import { SignalPresentation } from "@/components/site/signal-presentation";
 import { Board } from "@/components/board/board";
 import { BoardHeader } from "@/components/board/board-header";
 import { Hero } from "@/components/board/hero";
 import { Work } from "@/components/board/work";
 import { careerTimeline, labItems } from "@/content/collections";
-import { integrationConfig } from "@/content/integration-config";
 import { profile } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
 import { getCachedHistorySignal } from "@/integrations/history-cache";
@@ -38,7 +32,7 @@ export async function Homepage() {
 
         <Board />
 
-        {/* Pins not yet on the Board; each moves onto it in #83 to #87. */}
+        {/* Pins not yet on the Board; each moves onto it in #84 to #87. */}
         <div className="outside-work-section">
           <div className="currently-section">
             <div className="signal-grid">
@@ -107,85 +101,7 @@ export async function Homepage() {
 
 
 
-          <section className="library-section outside-work-culture" aria-labelledby="culture-title">
-            <div className="section-heading compact" data-motion-reveal>
-              <p>Books, films, music and history</p>
-              <h2 id="culture-title">
-                A few things I’m into <em>outside work.</em>
-              </h2>
-            </div>
-            <div className="library-objects" data-motion-reveal>
-              <ClosableDetails
-                className="library-object library-object-book"
-                contentClassName="library-object-pages"
-                summary={(
-                  <>
-                    <span>Goodreads</span>
-                    <SignalStatus signal={signals.reading} />
-                    {signals.reading.coverUrl && (
-                      <span className="library-book-cover" aria-hidden="true">
-                        <Image src={signals.reading.coverUrl} alt="" fill sizes="180px" />
-                      </span>
-                    )}
-                    <strong>{signals.reading.headline}</strong>
-                    <i>001</i>
-                  </>
-                )}
-              >
-                <h3>{signals.reading.headline}</h3>
-                {signals.reading.bookDescription ? (
-                  <span>{signals.reading.bookDescription}</span>
-                ) : signals.reading.author ? (
-                  <span>By {signals.reading.author}</span>
-                ) : null}
-                <SignalFreshness signal={signals.reading} className="library-freshness" />
-                {signals.reading.href && <a href={signals.reading.href} target="_blank" rel="noreferrer">View on Goodreads <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
-              </ClosableDetails>
-              <ClosableDetails
-                className="library-object library-object-poster"
-                contentClassName="library-object-pages"
-                summary={(
-                  <>
-                    <span>Letterboxd</span>
-                    <SignalStatus signal={signals.culture} />
-                    {signals.culture.filmPosterUrl && (
-                      <Image src={signals.culture.filmPosterUrl} alt="" fill sizes="(max-width: 800px) 88vw, 30vw" />
-                    )}
-                    <strong>{signals.culture.filmTitle ?? signals.culture.headline}</strong>
-                    <i>002</i>
-                  </>
-                )}
-              >
-                <h3>{signals.culture.filmTitle ?? signals.culture.headline}</h3>
-                {signals.culture.filmDescription && <span>{signals.culture.filmDescription}</span>}
-                {signals.culture.filmYear && (
-                  <span>{signals.culture.filmYear}{signals.culture.filmRating ? ` · ${signals.culture.filmRating} out of 5` : ""}</span>
-                )}
-                <SignalFreshness signal={signals.culture} className="library-freshness" />
-                {signals.culture.filmHref && <a href={signals.culture.filmHref} target="_blank" rel="noreferrer">View on Letterboxd <span className="arrow-mark" aria-hidden="true">↗︎</span></a>}
-              </ClosableDetails>
-            </div>
-
-            <div className="playlist-room outside-work-playlist" data-motion-reveal>
-              <div>
-                <p>Music · Spotify</p>
-                <SignalStatus signal={{ state: "curated", statusLabel: "My playlist" }} />
-                <h3>What I’m listening to</h3>
-                <span>I add songs as I find them.</span>
-                <a className="playlist-open-link" href={integrationConfig.spotify.playlistUrl} target="_blank" rel="noreferrer">
-                  Open playlist in Spotify <span className="arrow-mark" aria-hidden="true">↗︎</span>
-                </a>
-              </div>
-              <iframe
-                title="Elias’s current Spotify playlist"
-                src={`https://open.spotify.com/embed/playlist/${integrationConfig.spotify.playlistId}?utm_source=generator&theme=0`}
-                width="100%"
-                height="480"
-                loading="lazy"
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-              />
-            </div>
-
+          <section className="library-section outside-work-culture" aria-labelledby="history-title">
             <div className="library-index outside-work-history" aria-labelledby="history-title">
               <p>History</p>
               <h2 id="history-title" data-motion-reveal>{emphasizeFinalWord(history.headline)}</h2>
