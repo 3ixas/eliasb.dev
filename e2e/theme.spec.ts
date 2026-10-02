@@ -57,9 +57,20 @@ test.describe("Light switch and theme", () => {
   test("a change of device setting crossfades the room too", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "no-preference" });
     await page.goto("/");
+    // The crossfade lasts 1.3 s, and under load a round trip to the page can
+    // take as long, so read the room in the task that turns the lights on.
+    await page.evaluate(() => {
+      const root = document.documentElement;
+      (window as unknown as { fading: Promise<number> }).fading = new Promise((resolve) => {
+        new MutationObserver((_, observer) => {
+          if (root.dataset.lights !== "on") return;
+          observer.disconnect();
+          resolve(document.querySelector("[data-board-header]")!.getAnimations().length);
+        }).observe(root, { attributes: true, attributeFilter: ["data-lights"] });
+      });
+    });
     await page.emulateMedia({ colorScheme: "dark" });
-    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.lights)).toBe("on");
-    const fading = await page.evaluate(() => document.querySelector("[data-board-header]")!.getAnimations().length);
+    const fading = await page.evaluate(() => (window as unknown as { fading: Promise<number> }).fading);
     expect(fading).toBeGreaterThan(0);
   });
 
