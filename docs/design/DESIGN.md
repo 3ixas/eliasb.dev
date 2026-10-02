@@ -286,6 +286,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
   - The theme change is a 1.2 s `cubic-bezier(0.42, 0, 0.58, 1)` room crossfade with shadow swing; the switch rocks instantly.
   - The clipping fans out on a spring (bounce 0.2, 0.5 s).
   - Scroll sway uses CSS scroll-driven animations, transform only.
+  - Support, checked 2 October 2026 (#82): Chromium 153 and WebKit 26.6 support `animation-timeline: view()` (verified in Playwright). Firefox does not ship it: MDN's compatibility data (8.1.4, 1 October 2026) lists it as preview-only on desktop and unsupported on Android. Firefox visitors get the still pins, which is the accepted fallback.
   - The About string draws on scroll.
   - The neon flickers occasionally, and the candle flickers gently.
   - Reduced motion removes movement and keeps 200 ms crossfades.

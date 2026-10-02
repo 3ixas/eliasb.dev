@@ -6,7 +6,7 @@
  *
  * Each section adds its own kind of light when it moves to the Board.
  */
-export type LightKind = "desk-lamp" | "picture-light";
+export type LightKind = "desk-lamp" | "picture-light" | "festoon" | "clamp-spotlight" | "fairy-lights";
 
 export function Light({ kind }: { kind: LightKind }) {
   switch (kind) {
@@ -14,6 +14,12 @@ export function Light({ kind }: { kind: LightKind }) {
       return <DeskLamp />;
     case "picture-light":
       return <PictureLight />;
+    case "festoon":
+      return <Festoon />;
+    case "clamp-spotlight":
+      return <ClampSpotlight />;
+    case "fairy-lights":
+      return <FairyLights />;
   }
 }
 
@@ -65,6 +71,68 @@ function PictureLight() {
         <circle cx="210" cy="4" r="7" fill="var(--brass)" stroke="var(--brass-edge)" />
         <rect x="20" y="30" width="380" height="18" rx="9" fill="var(--brass)" stroke="var(--brass-edge)" strokeWidth="1.5" />
         <rect x="36" y="44" width="348" height="5" rx="2.5" fill="var(--brass-lip)" />
+      </svg>
+    </div>
+  );
+}
+
+// Festoon bulbs hang along a sagging wire, so each sits a little lower towards the middle.
+const festoonBulbs = Array.from({ length: 9 }, (_, index) => {
+  const along = (index + 0.5) / 9;
+  return { left: `${along * 100}%`, top: 6 + Math.round(18 * Math.sin(Math.PI * along)) };
+});
+
+/**
+ * The Board's three lights hang on its frame. A festoon string runs across the
+ * top and pools light at the top right; at night the bulbs glow.
+ */
+function Festoon() {
+  return (
+    <div aria-hidden="true" inert data-light-fixture="festoon" className="pointer-events-none absolute inset-0">
+      <div className="absolute inset-0 bg-(image:--festoon-pool) opacity-(--is-night)" />
+      <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="absolute inset-x-0 -top-2 h-10 w-full overflow-visible">
+        <path d="M0 2 Q50 46 100 2" fill="none" stroke="var(--light-wire)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+      </svg>
+      {festoonBulbs.map(({ left, top }) => (
+        <span key={left} className="board-festoon-bulb absolute -translate-x-1/2" style={{ left, top }} />
+      ))}
+    </div>
+  );
+}
+
+/** A black clamp spotlight on the frame's left edge, throwing a beam across the middle of the Board. */
+function ClampSpotlight() {
+  return (
+    <div aria-hidden="true" inert data-light-fixture="clamp-spotlight" className="pointer-events-none absolute inset-0">
+      <div className="absolute inset-x-0 top-[38%] h-[30%] bg-(image:--spotlight-beam) opacity-(--is-night) [clip-path:polygon(0_42%,100%_0,100%_100%,0_58%)]" />
+      <svg width="64" height="56" viewBox="0 0 64 56" className="absolute top-[calc(38%+0.75rem)] -left-8">
+        <rect x="0" y="20" width="18" height="16" rx="2" fill="var(--iron)" />
+        <rect x="14" y="25" width="12" height="6" fill="var(--iron)" />
+        <g transform="rotate(-4 40 28)">
+          <path d="M24 16 L50 12 L50 44 L24 40 Z" fill="var(--iron)" />
+          <ellipse cx="50" cy="28" rx="5" ry="16" fill="var(--spotlight-face)" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+// A loose wire wound down the corner, and the bulbs along it.
+const fairyWire = "M97 2 C78 12 100 28 86 38 S94 62 78 70 S88 90 66 93 S36 88 22 95 S6 94 2 98";
+const fairyBulbs = [
+  [97, 2], [88, 18], [90, 36], [86, 52], [80, 68], [84, 82], [70, 92], [52, 91], [36, 90], [20, 95], [6, 96],
+] as const;
+
+/** Fairy lights wound down the Board's bottom-right corner. */
+function FairyLights() {
+  return (
+    <div aria-hidden="true" inert data-light-fixture="fairy-lights" className="pointer-events-none absolute inset-0">
+      <div className="absolute inset-0 bg-(image:--fairy-pool) opacity-(--is-night)" />
+      <svg viewBox="0 0 100 100" className="board-fairy-lights absolute -right-2 -bottom-2 size-[min(280px,45%)] overflow-visible">
+        <path d={fairyWire} fill="none" stroke="var(--light-wire)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+        {fairyBulbs.map(([x, y]) => (
+          <circle key={`${x}-${y}`} cx={x} cy={y} r="2.4" />
+        ))}
       </svg>
     </div>
   );

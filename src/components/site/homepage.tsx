@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { LocalTime } from "@/components/local-time";
 import { ClosableDetails } from "@/components/site/closable-details";
 import { ContributionCalendar } from "@/components/site/contribution-calendar";
 import { FantasyMatchup } from "@/components/site/fantasy-matchup";
@@ -9,6 +8,7 @@ import {
   SignalPresentation,
   SignalStatus,
 } from "@/components/site/signal-presentation";
+import { Board } from "@/components/board/board";
 import { BoardHeader } from "@/components/board/board-header";
 import { Hero } from "@/components/board/hero";
 import { Work } from "@/components/board/work";
@@ -36,14 +36,11 @@ export async function Homepage() {
 
         <Work />
 
-        <section className="outside-work-section" id="outside-work" tabIndex={-1} aria-labelledby="outside-work-title">
+        <Board />
+
+        {/* Pins not yet on the Board; each moves onto it in #83 to #87. */}
+        <div className="outside-work-section">
           <div className="currently-section">
-            <div className="section-heading compact" data-motion-reveal>
-              <p>02 / Outside work</p>
-              <h2 id="outside-work-title">
-                Some of what I’m into <em>lately.</em>
-              </h2>
-            </div>
             <div className="signal-grid">
               <article className="signal signal-building" data-motion-reveal>
                 <p>Recent building</p>
@@ -64,21 +61,6 @@ export async function Homepage() {
                     </p>
                   ) : null}
                 </SignalPresentation>
-              </article>
-              <article className="signal signal-presence" data-motion-reveal>
-                <p>Around here</p>
-                <figure className="london-signal-visual">
-                  <Image
-                    src="/signals/london-st-pauls.jpg"
-                    alt="London skyline from the Thames, with St Paul’s Cathedral and the City beyond"
-                    fill
-                    sizes="(max-width: 800px) calc(100vw - 100px), 22vw"
-                  />
-                  <figcaption>London · home base</figcaption>
-                </figure>
-                <strong>
-                  <LocalTime />
-                </strong>
               </article>
               <article className="signal signal-training" data-motion-reveal>
                 <p>Training</p>
@@ -249,7 +231,7 @@ export async function Homepage() {
               </div>
             </div>
           </section>
-        </section>
+        </div>
 
         <section className="lab-section experiments-section" id="experiments" tabIndex={-1} aria-labelledby="experiments-title">
           <div className="section-heading compact" data-motion-reveal>

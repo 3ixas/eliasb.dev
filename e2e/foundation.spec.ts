@@ -50,7 +50,7 @@ test.describe("Board foundation", () => {
     expect(outline).toBe("solid");
   });
 
-  for (const route of ["/", "/work/threshold", "/work/argus-risk", "/work/flowtime", "/fixtures/pins"]) {
+  for (const route of ["/", "/work/threshold", "/work/argus-risk", "/work/flowtime", "/fixtures/pins", "/fixtures/board"]) {
     test(`every fixing is attached to a visible surface on ${route}`, async ({ page }) => {
       await page.goto(route);
       const fixings = await page.locator("[data-fixing]").evaluateAll((pins) =>

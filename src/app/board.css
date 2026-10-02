@@ -93,6 +93,32 @@
   --drawer-panel: inset 0 -3px 0 rgb(0 0 0 / 0.25), inset 0 0 0 10px rgb(255 255 255 / 0.05), inset 0 0 0 11px rgb(0 0 0 / 0.18);
   --manila-crease: inset 0 1px 0 rgb(255 255 255 / 0.35);
 
+  /*
+   * The Board: a wooden frame round a linen pinboard, and its three lights.
+   * Day and night blend on --is-night, so they need no copy in the night blocks.
+   */
+  --frame-wood: linear-gradient(135deg, #c69c6d 0%, #b08457 45%, #9c7349 100%);
+  --frame-night: linear-gradient(rgb(20 12 6 / calc(var(--is-night) * 0.3)), rgb(20 12 6 / calc(var(--is-night) * 0.3)));
+  --frame-sheen: inset 0 1px 0 rgb(255 240 215 / 0.45);
+  --linen-inset: inset 3px 4px 10px rgb(60 35 15 / 0.3);
+  --night-dim: rgb(38 24 12 / 0.38);
+  --festoon-pool: radial-gradient(ellipse 55% 40% at 82% 0%, rgb(255 190 110 / 0.55), rgb(255 170 90 / 0.12) 45%, transparent 72%);
+  --spotlight-beam: linear-gradient(to right, rgb(255 226 170 / 0.45), rgb(255 210 150 / 0.14) 60%, transparent);
+  --fairy-pool: radial-gradient(ellipse 40% 30% at 90% 92%, rgb(255 160 110 / 0.4), rgb(255 140 90 / 0.1) 50%, transparent 74%);
+  --light-wire: color-mix(in srgb, #2a2420 calc(var(--is-night) * 100%), #5b524a);
+  --festoon-bulb: color-mix(in srgb, #ffe3ae calc(var(--is-night) * 100%), rgb(250 246 238 / 0.6));
+  --festoon-bulb-edge: color-mix(in srgb, #e8b878 calc(var(--is-night) * 100%), #9c8f80);
+  --festoon-glow: 0 0 10px 3px rgb(255 190 110 / calc(var(--is-night) * 0.7));
+  --fairy-bulb: color-mix(in srgb, #ffd9a0 calc(var(--is-night) * 100%), #d9cdb8);
+  --fairy-glow: drop-shadow(0 0 3px rgb(255 184 107 / calc(var(--is-night) * 1)));
+  --spotlight-face: color-mix(in srgb, #fff1cf calc(var(--is-night) * 100%), #d8cfc0);
+  --clock-rim: #3a332d;
+  --clock-face: #f6f0e2;
+  --clock-hands: #1d1a16;
+  --photo-coming: repeating-linear-gradient(135deg, #ede6da 0 10px, #e6ded0 10px 20px);
+  --photo-coming-ink: #5f574d;
+  --stale-fade: sepia(0.35) saturate(0.6);
+
   /* GitHub's five-step greens: the one deliberate palette exception */
   --github-0: #ebedf0;
   --github-1: #9be9a8;
@@ -768,5 +794,103 @@
     border-radius: 7px;
     background: var(--drawer-handle);
     box-shadow: var(--drawer-handle-shadow);
+  }
+
+  /*
+   * The Board's frame and linen. At night the linen dims under the pins and
+   * each light leaves a pool on it; the pins sit above both.
+   */
+  .board-frame {
+    background: var(--frame-night), var(--frame-wood);
+    box-shadow: var(--frame-sheen), var(--shadow-pin);
+  }
+
+  .board-linen {
+    box-shadow: var(--linen-inset);
+  }
+
+  .board-night-dim {
+    background: var(--night-dim);
+    mix-blend-mode: multiply;
+    opacity: var(--is-night);
+  }
+
+  [data-light-fixture="festoon"] > div,
+  [data-light-fixture="clamp-spotlight"] > div,
+  [data-light-fixture="fairy-lights"] > div {
+    mix-blend-mode: screen;
+  }
+
+  .board-festoon-bulb {
+    width: 12px;
+    height: 16px;
+    border: 1px solid var(--festoon-bulb-edge);
+    border-radius: 50% 50% 45% 45%;
+    background: var(--festoon-bulb);
+    box-shadow: var(--festoon-glow);
+  }
+
+  .board-fairy-lights circle {
+    fill: var(--fairy-bulb);
+    stroke: var(--festoon-bulb-edge);
+    stroke-width: 0.6;
+    filter: var(--fairy-glow);
+  }
+
+  .board-clock {
+    filter: drop-shadow(calc(var(--light-side) * 4px) 8px 8px rgb(var(--shadow-tint) / var(--shadow-far-alpha)));
+  }
+
+  /* A pin that has gone stale is sun-faded, with its date on a scrap of paper. */
+  .board-stale > :first-child {
+    filter: var(--stale-fade);
+  }
+
+  .board-as-of {
+    width: fit-content;
+    margin: 12px 0 0 auto;
+    padding: 2px 8px;
+    rotate: -2deg;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-newsreader), Georgia, serif;
+    font-size: var(--text-small);
+    font-style: italic;
+    box-shadow: var(--shadow-contact);
+  }
+
+  .board-photo-coming {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background: var(--photo-coming);
+    color: var(--photo-coming-ink);
+  }
+
+  /*
+   * Scroll sway: pins drift and turn very slightly as they cross the screen,
+   * at most 14 px and 0.9 degrees, scaled by each pin's depth. Transform only,
+   * so a pin is never hidden. Browsers without scroll-driven animations, and
+   * anyone who prefers reduced motion, see still pins.
+   */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .board-sway {
+        animation: board-sway linear both;
+        animation-timeline: view();
+        animation-range: cover;
+      }
+    }
+  }
+
+  @keyframes board-sway {
+    from {
+      transform: translateY(calc(var(--sway-depth, 1) * 7px)) rotate(calc(var(--sway-depth, 1) * -0.45deg));
+    }
+
+    to {
+      transform: translateY(calc(var(--sway-depth, 1) * -7px)) rotate(calc(var(--sway-depth, 1) * 0.45deg));
+    }
   }
 }

@@ -10,6 +10,7 @@ import {
   startOfUtcWeek,
 } from "../src/integrations/signal-mappers.ts";
 import { integrationConfig } from "../src/content/integration-config.ts";
+import { asOfDate, pinStatus, staleAfterDays } from "../src/integrations/pin-rules.ts";
 import { getHistorySignal, historyWeekStart, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "../src/integrations/history.ts";
 import { fantasySourceUnavailable, fantasyWeekUnavailable, signalFallbacks } from "../src/content/signal-fallbacks.ts";
 import { FantasyMatchup } from "../src/components/site/fantasy-matchup.ts";
@@ -460,5 +461,32 @@ assert.deepEqual(training.map(({ label, count }) => ({ label, count })), [
 ]);
 assert.equal(JSON.stringify(training).includes("private"), false);
 assert.deepEqual(groupTrainingActivities([]).map((category) => category.count), [0, 0, 0, 0]);
+
+// Pin rules: nothing current is removed; saved data past its pin's limit is stale.
+const pinNow = new Date("2026-10-02T12:00:00.000Z");
+const daysAgo = (days) => new Date(pinNow.getTime() - days * 86_400_000).toISOString();
+assert.deepEqual(pinStatus("reading", { state: "unavailable", updatedAt: null }, pinNow), { kind: "removed" });
+assert.deepEqual(pinStatus("london", { state: "unavailable", updatedAt: null }, pinNow), { kind: "removed" });
+assert.deepEqual(pinStatus("training", { state: "live", updatedAt: daysAgo(8) }, pinNow), { kind: "current" });
+assert.deepEqual(pinStatus("training", { state: "live", updatedAt: daysAgo(10) }, pinNow), {
+  kind: "stale",
+  asOf: { iso: daysAgo(10), short: "22 Sept", long: "22 September" },
+});
+assert.equal(pinStatus("github", { state: "live", updatedAt: daysAgo(4) }, pinNow).kind, "stale");
+assert.equal(pinStatus("github", { state: "live", updatedAt: daysAgo(2) }, pinNow).kind, "current");
+assert.equal(pinStatus("reading", { state: "live", updatedAt: daysAgo(61) }, pinNow).kind, "stale");
+assert.equal(pinStatus("film", { state: "live", updatedAt: daysAgo(59) }, pinNow).kind, "current");
+// Authored, curated, and never-stale pins stay current however old they are.
+for (const key of ["playlist", "making", "london", "fantasy", "clipping"]) {
+  assert.equal(staleAfterDays[key], null);
+  assert.equal(pinStatus(key, { state: "live", updatedAt: daysAgo(400) }, pinNow).kind, "current");
+}
+assert.equal(pinStatus("training", { state: "curated", updatedAt: daysAgo(400) }, pinNow).kind, "current");
+assert.equal(pinStatus("training", { state: "live", updatedAt: null }, pinNow).kind, "current");
+assert.equal(pinStatus("training", { state: "live", updatedAt: "not a date" }, pinNow).kind, "current");
+// "As of" dates are London days, the same in every locale.
+assert.deepEqual(asOfDate(new Date("2026-03-01T00:30:00.000Z")), { iso: "2026-03-01T00:30:00.000Z", short: "1 Mar", long: "1 March" });
+assert.equal(asOfDate(new Date("2026-06-30T23:30:00.000Z")).short, "1 July");
+assert.equal(asOfDate(new Date("2026-09-12T09:00:00.000Z")).short, "12 Sept");
 
 console.log("Signal contract checks passed.");
