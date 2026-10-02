@@ -191,6 +191,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     - Clicking rocks the switch instantly with a short spring, then the room changes over the 1.2 s fade.
     - The section lights are scenery and are not clickable.
     - The accessible name is "Turn the lights on" or "Turn the lights off".
+    - **Back to automatic (build, #77):** flipping the switch so the lights match the device's own setting returns the site to following the device; any other flip is an explicit choice that persists. The single rocker needs no separate "System" control.
     - Each picture light's glow covers the whole project row (screenshot and sticky note), plus a soft wash on the wall.
   - **The weekly clipping is "The Weekly Curiosity" (Elias, 1 October 2026).**
     - A bold all-caps Newsreader masthead between double rules, with the strapline "Odd, true, and from this week in history".

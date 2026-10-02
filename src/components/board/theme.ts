@@ -1,0 +1,94 @@
+/**
+ * The theme controller. There are three preferences: "system" follows the
+ * device live, and "light" or "dark" is an explicit choice that persists.
+ * The pre-paint boot script in the root layout reads the same storage key
+ * and sets data-lights, so the page never paints in the wrong theme.
+ *
+ * The Board's styles follow data-lights rather than the device media query,
+ * so this controller always marks the room as changing before the lights
+ * change, and the change crossfades even when the device setting causes it.
+ */
+export type Theme = "light" | "dark";
+export type ThemePreference = Theme | "system";
+
+export const THEME_STORAGE_KEY = "elias-theme";
+
+const ROOM_CHANGE_MS = 1200;
+const REDUCED_ROOM_CHANGE_MS = 200;
+const darkQuery = "(prefers-color-scheme: dark)";
+
+/**
+ * What flipping the switch chooses. It always changes the lights; when the
+ * result matches the device, the visitor is back on their device setting
+ * rather than pinned to a theme that happens to agree with it.
+ */
+export function nextPreference(current: ThemePreference, system: Theme): ThemePreference {
+  const active = current === "system" ? system : current;
+  const next: Theme = active === "dark" ? "light" : "dark";
+  return next === system ? "system" : next;
+}
+
+export function readPreference(): ThemePreference {
+  try {
+    const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
+    if (saved === "light" || saved === "dark") return saved;
+  } catch {
+    // Storage can be blocked; the document still knows what was applied.
+  }
+  const applied = document.documentElement.dataset.theme;
+  return applied === "light" || applied === "dark" ? applied : "system";
+}
+
+export function systemTheme(): Theme {
+  return window.matchMedia(darkQuery).matches ? "dark" : "light";
+}
+
+let changeTimer: number | undefined;
+
+/** Marks the room as changing, so the stylesheet crossfades it. */
+function markRoomChanging() {
+  const root = document.documentElement;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.clearTimeout(changeTimer);
+  root.dataset.themeChanging = "";
+  changeTimer = window.setTimeout(
+    () => delete root.dataset.themeChanging,
+    (reduced ? REDUCED_ROOM_CHANGE_MS : ROOM_CHANGE_MS) + 100,
+  );
+}
+
+function setLights(theme: Theme) {
+  markRoomChanging();
+  document.documentElement.dataset.lights = theme === "dark" ? "on" : "off";
+}
+
+export function applyPreference(preference: ThemePreference) {
+  const root = document.documentElement;
+  setLights(preference === "system" ? systemTheme() : preference);
+  if (preference === "system") delete root.dataset.theme;
+  else root.dataset.theme = preference;
+  try {
+    if (preference === "system") window.localStorage.removeItem(THEME_STORAGE_KEY);
+    else window.localStorage.setItem(THEME_STORAGE_KEY, preference);
+  } catch {
+    // The choice still applies for this visit.
+  }
+}
+
+export function flipLights() {
+  applyPreference(nextPreference(readPreference(), systemTheme()));
+}
+
+/** Follows the device appearance while the visitor has made no choice. */
+export function watchSystemTheme() {
+  const media = window.matchMedia(darkQuery);
+  const onChange = () => {
+    if (readPreference() !== "system") return;
+    const lights = systemTheme() === "dark" ? "on" : "off";
+    if (document.documentElement.dataset.lights !== lights) setLights(systemTheme());
+  };
+  media.addEventListener("change", onChange);
+  // The device may have changed between the boot script and this listener.
+  onChange();
+  return () => media.removeEventListener("change", onChange);
+}

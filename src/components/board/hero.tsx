@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Light } from "@/components/board/light";
 import { Pin } from "@/components/board/pin";
 import { BoardSurface } from "@/components/board/surface";
 import { hero } from "@/content/site";
@@ -14,9 +15,11 @@ export function Hero() {
       kind="wall"
       as="section"
       aria-labelledby="hero-title"
+      data-light="right"
       className="relative overflow-hidden px-4 pt-10 pb-16 sm:px-8 lg:px-16 lg:pt-14 lg:pb-24"
     >
-      <div className="mx-auto grid max-w-[1312px] grid-cols-1 gap-x-8 gap-y-10 board:grid-cols-12">
+      <Light kind="desk-lamp" />
+      <div className="relative z-10 mx-auto grid max-w-[1312px] grid-cols-1 gap-x-8 gap-y-10 board:grid-cols-12">
         <p className="font-mono text-label uppercase text-wall-muted board:col-span-12 board:px-4">{hero.kicker}</p>
 
         <div className="board:col-span-8">

@@ -10,8 +10,9 @@
 /*
  * Board design tokens, normalised from the signed-off canvas (version 32).
  * Components read these through Tailwind utilities or var(); they never
- * hard-code colours or shadows. Night values apply under the same rules as
- * the theme boot script: an explicit data-theme wins, otherwise the device.
+ * hard-code colours or shadows. Night values follow data-lights, which the
+ * boot script sets before first paint and the theme controller changes; the
+ * device setting is the fallback when script is blocked.
  * CSS cannot share one block between a media query and an attribute
  * selector, so the night block appears twice; keep the copies identical.
  */
@@ -66,11 +67,14 @@
   --github-4: #216e39;
 
   /*
-   * Light. --light-side says which way shadows fall (+1 right, -1 left);
-   * the theme sets the shadow's strength. The shadows themselves are built
-   * below wherever a light is declared, so a section can flip them.
+   * Light. By day the window at the upper left lights everything, so shadows
+   * fall right. At night each section's own light takes over: --night-light-side
+   * says which way its shadows fall (+1 right, -1 left). The theme only sets
+   * --is-night and the shadows' strength; the shadows are built below.
    */
-  --light-side: 1;
+  --is-night: 0;
+  --night-light-side: -1;
+  --wall-night-gradient: linear-gradient(118deg, #15120f 0%, #1d1915 55%, #221d18 100%);
   --shadow-tint: 70 45 20;
   --shadow-near-alpha: 0.1;
   --shadow-far-alpha: 0.28;
@@ -79,21 +83,53 @@
   --shadow-lift-x: 16px;
   --shadow-lift-y-blur: 24px 36px;
 
+  /*
+   * Mounted lights and the switch. Colours blend from day (off) to night
+   * (on) on --is-night, so they need no copy in the night blocks.
+   */
+  --lamp-arm: color-mix(in srgb, #5e544a calc(var(--is-night) * 100%), #8c8276);
+  --lamp-joint: color-mix(in srgb, #6e6357 calc(var(--is-night) * 100%), #9a9084);
+  --lamp-shade: color-mix(in srgb, #2e2823 calc(var(--is-night) * 100%), #cfc5b6);
+  --lamp-shade-edge: color-mix(in srgb, #4e443b calc(var(--is-night) * 100%), #a89d8f);
+  --lamp-bulb: color-mix(in srgb, #ffe2b0 calc(var(--is-night) * 100%), #e4dccf);
+  --lamp-glow: rgb(255 214 150 / 0.35);
+  --lamp-pool:
+    radial-gradient(closest-side, rgb(255 196 128 / 0.22), rgb(255 170 100 / 0)),
+    radial-gradient(farthest-side, rgb(255 178 102 / 0.14), rgb(255 160 90 / 0));
+  --switch-plate-top: #f7f1e6;
+  --switch-plate-bottom: #e5dbc9;
+  --switch-edge: #cbbea7;
+  --switch-bevel: rgb(255 255 255 / 0.8);
+  --switch-screw: #e9e1d2;
+  --switch-screw-edge: #b9ac96;
+  --switch-slot: #9c8f7a;
+  --switch-gap: #b3a68f;
+  --switch-rocker-pressed: #d9cfbc;
+  --switch-rocker-mid: #e6ddcc;
+  --switch-rocker-face: #fbf8f1;
+  --switch-rocker-proud: #fffefa;
+  --switch-rocker-shadow: rgb(60 45 25 / 0.32);
+  --switch-rocker-shade: rgb(60 45 25 / 0.1);
+  --switch-glow: 0 0 18px 4px rgb(255 190 120 / calc(var(--is-night) * 0.35));
+  /* +1 shows the top of the rocker pressed (lights off); -1 the bottom (on). */
+  --rocker-flip: calc(1 - 2 * var(--is-night));
+
   /* Motion */
   --duration-quick: 120ms;
   --duration-ui: 200ms;
   --duration-settle: 320ms;
+  --duration-hover: 220ms;
   --duration-room: 1.2s;
+  /* A short spring (damping 0.7) sampled for CSS, so the switch rocks before any script loads. */
+  --spring-rocker: linear(0, 0.095, 0.298, 0.519, 0.713, 0.86, 0.957, 1.014, 1.04, 1.046, 1.041, 1.032, 1.022, 1.013, 1.006, 1.002, 0.999, 0.998, 0.998, 0.998, 0.999, 1);
+  --duration-rocker: 300ms;
 
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
+  :root:not([data-lights]) {
     --wall: #1d1915;
-    --wall-gradient:
-      radial-gradient(1100px 820px at 90% 10%, rgb(255 178 102 / 0.3) 0%, rgb(255 160 90 / 0.12) 38%, transparent 70%),
-      linear-gradient(118deg, #15120f 0%, #1d1915 55%, #221d18 100%);
     --wall-ink: #efe4d2;
     --wall-muted: #b8ab95;
     --wall-accent: #ff8a5c;
@@ -107,8 +143,7 @@
     --pushpin-shine: rgb(255 240 220 / 0.6);
     --tape: rgb(240 226 196 / 0.5);
     --focus: #ff8a5c;
-    /* The desk lamp is at the upper right, so shadows fall to the left. */
-    --light-side: -1;
+    --is-night: 1;
     --shadow-tint: 0 0 0;
     --shadow-near-alpha: 0.35;
     --shadow-far-alpha: 0.62;
@@ -120,11 +155,8 @@
   }
 }
 
-:root[data-theme="dark"] {
+:root[data-lights="on"] {
   --wall: #1d1915;
-  --wall-gradient:
-    radial-gradient(1100px 820px at 90% 10%, rgb(255 178 102 / 0.3) 0%, rgb(255 160 90 / 0.12) 38%, transparent 70%),
-    linear-gradient(118deg, #15120f 0%, #1d1915 55%, #221d18 100%);
   --wall-ink: #efe4d2;
   --wall-muted: #b8ab95;
   --wall-accent: #ff8a5c;
@@ -138,8 +170,7 @@
   --pushpin-shine: rgb(255 240 220 / 0.6);
   --tape: rgb(240 226 196 / 0.5);
   --focus: #ff8a5c;
-  /* The desk lamp is at the upper right, so shadows fall to the left. */
-  --light-side: -1;
+  --is-night: 1;
   --shadow-tint: 0 0 0;
   --shadow-near-alpha: 0.35;
   --shadow-far-alpha: 0.62;
@@ -152,11 +183,13 @@
 
 /*
  * Shadow-by-light. Custom properties resolve where they are declared, so the
- * shadows are rebuilt on every element that names its own light: a section
- * with data-light="left" or "right" casts its shadows away from that light.
+ * shadows are rebuilt on every element that names its own light: at night, a
+ * section with data-light="left" or "right" casts its shadows away from it.
+ * --light-side is the window's +1 by day and the section's light at night.
  */
 :root,
 [data-light] {
+  --light-side: calc(1 - var(--is-night) * (1 - var(--night-light-side)));
   --shadow-pin:
     calc(var(--light-side) * 1px) 2px 2px rgb(var(--shadow-tint) / var(--shadow-near-alpha)),
     calc(var(--light-side) * var(--shadow-far-x)) var(--shadow-far-y-blur) -8px rgb(var(--shadow-tint) / var(--shadow-far-alpha));
@@ -166,15 +199,16 @@
   /* Small contact shadows for tape, pushpins, and clips */
   --shadow-contact: calc(var(--light-side) * 1px) 1px 1px rgb(var(--shadow-tint) / var(--shadow-near-alpha));
   --shadow-pushpin: rgb(var(--shadow-tint) / calc(var(--shadow-near-alpha) * 2.2));
+  --shadow-switch: drop-shadow(calc(var(--light-side) * 1px) 2px 2px rgb(var(--shadow-tint) / calc(var(--shadow-near-alpha) * 2.8)));
   --shadow-clip: drop-shadow(calc(var(--light-side) * 1px) 2px 1px rgb(var(--shadow-tint) / calc(var(--shadow-near-alpha) * 3.5)));
 }
 
 [data-light="left"] {
-  --light-side: 1;
+  --night-light-side: 1;
 }
 
 [data-light="right"] {
-  --light-side: -1;
+  --night-light-side: -1;
 }
 
 /*
@@ -246,6 +280,7 @@
   [data-pin],
   [data-pin-mount] {
     rotate: var(--pin-tilt, 0deg);
+    transition: box-shadow var(--duration-hover) var(--ease-out-strong);
   }
 
   @media (max-width: 899.98px) {
@@ -256,9 +291,22 @@
   }
 
   /* Surfaces: faint plaster grain over the wall's light, or a linen weave. */
+  /* By night a darker wall fades in over the day wall, so the change is a crossfade. */
   .board-surface-wall {
+    position: relative;
+    isolation: isolate;
     background: var(--plaster-grain), var(--wall-gradient);
     background-color: var(--wall);
+  }
+
+  .board-surface-wall::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--plaster-grain), var(--wall-night-gradient);
+    opacity: var(--is-night);
   }
 
   .board-surface-linen {
@@ -272,5 +320,67 @@
     outline: 3px solid var(--focus);
     outline-offset: 3px;
     border-radius: var(--radius-paper);
+  }
+
+  /*
+   * The room changes. While the theme switches, everything crossfades over
+   * 1.2 s and shadows swing with the light; with reduced motion it is a
+   * 200 ms crossfade and shadows change without swinging. The switch keeps
+   * its own quick rock.
+   */
+  :root[data-theme-changing],
+  :root[data-theme-changing] *:not([data-light-switch], [data-light-switch] *),
+  :root[data-theme-changing] *:not([data-light-switch], [data-light-switch] *)::before,
+  :root[data-theme-changing] *:not([data-light-switch], [data-light-switch] *)::after {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, box-shadow, fill, stroke, opacity, filter !important;
+    transition-duration: var(--duration-room) !important;
+    transition-timing-function: var(--ease-room) !important;
+    transition-delay: 0s !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root[data-theme-changing],
+    :root[data-theme-changing] *:not([data-light-switch], [data-light-switch] *),
+    :root[data-theme-changing] *:not([data-light-switch], [data-light-switch] *)::before,
+    :root[data-theme-changing] *:not([data-light-switch], [data-light-switch] *)::after {
+      transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, opacity !important;
+      transition-duration: var(--duration-ui) !important;
+    }
+  }
+
+  /* The switch: the rocker rocks on a quick spring, and its label names the action. */
+  .board-rocker {
+    transform-box: view-box;
+    transform-origin: 16px 26px;
+    scale: 1 var(--rocker-flip);
+    transition: scale var(--duration-rocker) var(--spring-rocker);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .board-rocker {
+      transition: none;
+    }
+  }
+
+  .board-label-night {
+    display: none;
+  }
+
+  :root[data-lights="on"] .board-label-day {
+    display: none;
+  }
+
+  :root[data-lights="on"] .board-label-night {
+    display: inline;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-lights]) .board-label-day {
+      display: none;
+    }
+
+    :root:not([data-lights]) .board-label-night {
+      display: inline;
+    }
   }
 }

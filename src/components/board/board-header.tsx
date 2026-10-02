@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { LayoutGroup, MotionConfig, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { LightSwitch } from "@/components/board/light-switch";
 import { springs } from "@/components/board/motion";
 import { Pushpin } from "@/components/board/pin";
 
@@ -131,14 +131,7 @@ export function BoardHeader({ page }: { page?: Section }) {
           </nav>
 
           <div className="flex items-center gap-3 sm:gap-5">
-            {/*
-              The legacy toggle stays until the light switch replaces it (#77).
-              Its "System" reset is put on the Board's type scale, and left out
-              on phones, where the header has no room for it until then.
-            */}
-            <div className="[&_.site-theme-toggle]:size-11 [&_.site-theme-system]:min-h-11 [&_.site-theme-system]:font-mono [&_.site-theme-system]:text-label [&_.site-theme-system]:text-wall-muted max-sm:[&_.site-theme-system]:hidden">
-              <ThemeToggle compact />
-            </div>
+            <LightSwitch />
             <Link
               href={sectionHref("contact", isHome)}
               className="board-focus hidden min-h-11 items-center rounded-pill border-[1.5px] border-wall-ink px-5 text-body font-medium no-underline sm:inline-flex"

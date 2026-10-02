@@ -16,7 +16,7 @@ export function BoardSurface({
   as?: ElementType;
   className?: string;
   children: ReactNode;
-} & Partial<Record<`aria-${string}` | "id" | "tabIndex", string | number>>) {
+} & Partial<Record<`aria-${string}` | `data-${string}` | "id" | "tabIndex", string | number>>) {
   return (
     <Element
       data-board-surface={kind}

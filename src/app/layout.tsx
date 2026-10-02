@@ -58,9 +58,15 @@ export const metadata: Metadata = {
 
 const siteBootScript = `
   try {
-    const saved = localStorage.getItem('elias-theme');
-    if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
-    else delete document.documentElement.dataset.theme;
+    const root = document.documentElement;
+    let saved = null;
+    try { saved = localStorage.getItem('elias-theme'); } catch (_) {}
+    if (saved === 'light' || saved === 'dark') root.dataset.theme = saved;
+    else delete root.dataset.theme;
+    // The Board follows data-lights once script runs, so the theme controller
+    // decides when the room changes, including when the device setting does.
+    const dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.lights = dark ? 'on' : 'off';
   } catch (_) {}
   try {
     (() => {
