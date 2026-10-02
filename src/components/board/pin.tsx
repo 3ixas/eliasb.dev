@@ -12,6 +12,8 @@ export type FixingSurfaces = {
   clipboard: "wall";
   string: "wall" | "linen";
   shelf: "wall";
+  /** A sticky note's own adhesive strip. */
+  adhesive: "wall";
 };
 
 export type Fixing = keyof FixingSurfaces;
@@ -26,13 +28,13 @@ export type Looseness = "careful" | "loose";
 const tiltLimits: Record<Looseness, number> = { careful: 0.5, loose: 3 };
 
 const stockClasses: Record<PinStock, string> = {
-  paper: "bg-paper text-ink shadow-pin",
-  photo: "bg-paper-photo text-ink shadow-pin",
-  ochre: "bg-stock-ochre text-ink shadow-pin",
-  blueprint: "bg-stock-blueprint text-ink shadow-pin",
-  sage: "bg-stock-sage text-ink shadow-pin",
-  terracotta: "bg-stock-terracotta text-ink shadow-pin",
-  kraft: "bg-stock-kraft text-ink shadow-pin",
+  paper: "bg-paper text-ink",
+  photo: "bg-paper-photo text-ink",
+  ochre: "bg-stock-ochre text-ink",
+  blueprint: "bg-stock-blueprint text-ink",
+  sage: "bg-stock-sage text-ink",
+  terracotta: "bg-stock-terracotta text-ink",
+  kraft: "bg-stock-kraft text-ink",
   // An object with no paper of its own sits straight on the wall.
   none: "text-wall-ink",
 };
@@ -45,6 +47,8 @@ type PinBaseProps = {
   stock?: PinStock;
   /** Horizontal position of the fixing along the top edge, as a percentage. */
   fixingAt?: number;
+  /** Lifts and straightens on hover or focus, and squeezes on press. */
+  interactive?: boolean;
   className?: string;
   children: ReactNode;
 };
@@ -66,9 +70,11 @@ export function Pin({
   looseness,
   stock = "paper",
   fixingAt = 50,
+  interactive = false,
   className,
   children,
 }: PinProps) {
+  const lifts = interactive ? "board-lifts" : "";
   const tiltDeg = `${clampTilt(tilt, looseness)}deg`;
   // On a clipboard, the board takes the tilt and the sheet sits square on it.
   const mounted = fixing === "clipboard";
@@ -80,7 +86,8 @@ export function Pin({
       data-fixing={fixing}
       data-surface={surface}
       data-looseness={looseness}
-      className={`relative rounded-paper ${stockClasses[stock]} ${className ?? ""}`}
+      data-stock={stock}
+      className={`relative rounded-paper ${stockClasses[stock]} ${mounted ? "" : lifts} ${className ?? ""}`}
       style={style}
     >
       <FixingMark fixing={fixing} at={fixingAt} />
@@ -90,7 +97,7 @@ export function Pin({
 
   // A clipboard and a shelf are surfaces in their own right: they are drawn
   // around the object rather than on top of it.
-  if (mounted) return <Clipboard tilt={tiltDeg}>{pin}</Clipboard>;
+  if (mounted) return <Clipboard tilt={tiltDeg} className={lifts}>{pin}</Clipboard>;
   if (fixing === "shelf") return <Shelf>{pin}</Shelf>;
   return pin;
 }
@@ -106,23 +113,24 @@ function FixingMark({ fixing, at }: { fixing: Fixing; at: number }) {
       return <Tape className="absolute -top-3 z-10 w-28 -translate-x-1/2 -rotate-3" style={left} />;
     case "clip":
       return <Paperclip className="absolute -top-7 z-10" style={left} />;
+    case "adhesive":
+      return <span aria-hidden="true" data-fixing-mark="adhesive" className="absolute inset-x-0 top-0 h-6 rounded-t-paper bg-(--sticky-adhesive)" />;
     case "clipboard":
     case "shelf":
       return null;
   }
 }
 
-function Clipboard({ children, tilt }: { children: ReactNode; tilt: string }) {
+function Clipboard({ children, tilt, className }: { children: ReactNode; tilt: string; className: string }) {
   return (
     <div
       data-board-surface="clipboard"
       data-pin-mount
-      className="relative rounded-board px-4 pt-12 pb-4"
+      className={`relative rounded-board px-4 pt-12 pb-4 ${className}`}
       style={{
         "--pin-tilt": tilt,
         backgroundColor: "var(--clipboard)",
         backgroundImage: "var(--clipboard-grain)",
-        boxShadow: "var(--shadow-pin), var(--clipboard-sheen)",
       } as CSSProperties}
     >
       <svg aria-hidden="true" data-fixing-mark="clipboard" width="120" height="44" viewBox="0 0 120 44" className="absolute -top-3 left-1/2 -translate-x-1/2">

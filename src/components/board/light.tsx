@@ -6,12 +6,14 @@
  *
  * Each section adds its own kind of light when it moves to the Board.
  */
-export type LightKind = "desk-lamp";
+export type LightKind = "desk-lamp" | "picture-light";
 
 export function Light({ kind }: { kind: LightKind }) {
   switch (kind) {
     case "desk-lamp":
       return <DeskLamp />;
+    case "picture-light":
+      return <PictureLight />;
   }
 }
 
@@ -42,6 +44,27 @@ function DeskLamp() {
             className="fill-(--lamp-glow) opacity-(--is-night) blur-sm"
           />
         </g>
+      </svg>
+    </div>
+  );
+}
+
+/**
+ * A brass picture light screwed to the wall above a project. At night its
+ * beam falls across the screenshot and a soft wash lights the wall; the note
+ * in front catches the same light on its paper (the board-lit class).
+ * Its section sets data-light="above", so shadows fall straight down.
+ */
+function PictureLight() {
+  return (
+    <div aria-hidden="true" inert data-light-fixture="picture-light" className="pointer-events-none absolute inset-0">
+      <div className="absolute -inset-x-[12%] top-8 -bottom-24 bg-(image:--picture-wash) opacity-(--is-night)" />
+      <div className="absolute -inset-x-[5%] top-12 -bottom-16 z-20 bg-(image:--picture-beam) opacity-(--is-night) mix-blend-screen [clip-path:polygon(32%_0,68%_0,100%_100%,0_100%)]" />
+      <svg width="420" height="70" viewBox="0 0 420 70" className="absolute top-0 left-1/2 z-30 w-[min(420px,80%)] -translate-x-1/2 overflow-visible">
+        <line x1="210" y1="0" x2="210" y2="30" stroke="var(--brass-edge)" strokeWidth="4" />
+        <circle cx="210" cy="4" r="7" fill="var(--brass)" stroke="var(--brass-edge)" />
+        <rect x="20" y="30" width="380" height="18" rx="9" fill="var(--brass)" stroke="var(--brass-edge)" strokeWidth="1.5" />
+        <rect x="36" y="44" width="348" height="5" rx="2.5" fill="var(--brass-lip)" />
       </svg>
     </div>
   );

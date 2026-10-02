@@ -23,6 +23,7 @@ export default async function PinFixtures() {
         <Pin object="sheet" fixing="clipboard" surface="wall" looseness="careful" tilt={0.5} className="p-8">On a clipboard</Pin>
         <Pin object="object" fixing="shelf" surface="wall" looseness="loose" stock="none" className="p-8">On a shelf</Pin>
         <Pin object="note" fixing="string" surface="wall" looseness="loose" tilt={-2} stock="ochre" className="p-8">On the string</Pin>
+        <Pin object="note" fixing="adhesive" surface="wall" looseness="loose" tilt={1} stock="sage" className="p-8 pt-10">A sticky note</Pin>
         <Pin object="sheet" fixing="pushpin" surface="wall" looseness="loose" tilt={1} className="p-8">
           A sheet with a clipped photo
           <Pin object="photo" fixing="clip" surface="paper" looseness="loose" tilt={2} stock="photo" fixingAt={20} className="mt-8 p-6">

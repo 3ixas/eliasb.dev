@@ -79,15 +79,15 @@ export function Hero() {
           <div className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-2">
             <a
               href="#work"
-              className="board-focus inline-flex min-h-11 items-center font-semibold text-wall-ink underline decoration-wall-accent decoration-2 underline-offset-4"
+              className="board-focus inline-flex min-h-11 items-center gap-1 font-semibold text-wall-ink underline decoration-wall-accent decoration-2 underline-offset-4"
             >
-              {hero.links.work}
+              {hero.links.work} <span aria-hidden="true">{hero.links.workArrow}</span>
             </a>
             <a
               href={hero.links.emailHref}
-              className="board-focus inline-flex min-h-11 items-center font-medium text-wall-muted underline underline-offset-4"
+              className="board-focus inline-flex min-h-11 items-center gap-1 font-medium text-wall-muted underline underline-offset-4"
             >
-              {hero.links.email}
+              {hero.links.email} <span aria-hidden="true">{hero.links.emailArrow}</span>
             </a>
           </div>
         </div>

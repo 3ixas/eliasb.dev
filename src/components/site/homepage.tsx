@@ -2,7 +2,6 @@ import Image from "next/image";
 import { LocalTime } from "@/components/local-time";
 import { ClosableDetails } from "@/components/site/closable-details";
 import { ContributionCalendar } from "@/components/site/contribution-calendar";
-import { FeaturedWork } from "@/components/site/featured-work";
 import { FantasyMatchup } from "@/components/site/fantasy-matchup";
 import { InViewMotion } from "@/components/site/in-view-motion";
 import {
@@ -12,6 +11,7 @@ import {
 } from "@/components/site/signal-presentation";
 import { BoardHeader } from "@/components/board/board-header";
 import { Hero } from "@/components/board/hero";
+import { Work } from "@/components/board/work";
 import { careerTimeline, labItems } from "@/content/collections";
 import { integrationConfig } from "@/content/integration-config";
 import { profile } from "@/content/site";
@@ -34,7 +34,7 @@ export async function Homepage() {
       <main id="main-content" tabIndex={-1}>
         <Hero />
 
-        <FeaturedWork />
+        <Work />
 
         <section className="outside-work-section" id="outside-work" tabIndex={-1} aria-labelledby="outside-work-title">
           <div className="currently-section">

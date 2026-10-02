@@ -69,10 +69,10 @@ test.describe("Board foundation", () => {
     });
   }
 
-  test("the fixtures render all six fixings", async ({ page }) => {
+  test("the fixtures render every fixing", async ({ page }) => {
     await page.goto("/fixtures/pins");
     const kinds = await page.locator("[data-fixing]").evaluateAll((pins) => [...new Set(pins.map((pin) => pin.getAttribute("data-fixing")))].sort());
-    expect(kinds).toEqual(["clip", "clipboard", "pushpin", "shelf", "string", "tape"]);
+    expect(kinds).toEqual(["adhesive", "clip", "clipboard", "pushpin", "shelf", "string", "tape"]);
     for (const kind of kinds) await expect(page.locator(`[data-fixing-mark="${kind}"]`).first()).toBeVisible();
   });
 

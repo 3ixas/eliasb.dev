@@ -1,3 +1,4 @@
+import type { PinStock } from "@/components/board/pin";
 // Approved in docs/content/copy/01-board-foundation.md.
 export const hero = {
   kicker: "Elias Bennett · Software engineer · London",
@@ -12,10 +13,25 @@ export const hero = {
     caption: "Elias · London",
   },
   links: {
-    work: "See my work ↓",
-    email: "Email me ↗",
+    work: "See my work",
+    workArrow: "↓",
+    email: "Email me",
+    emailArrow: "↗",
     emailHref: "mailto:eliasthebennett@gmail.com",
   },
+} as const;
+
+// Approved in docs/content/copy/02-work.md.
+export const work = {
+  kicker: "01 / Work",
+  heading: { lead: "Things I’ve been", emphasis: "building." },
+  openFolder: "Open the folder",
+  /** The screenshot link's accessible name. */
+  folderLabel: (name: string) => `Open the ${name} folder`,
+  live: "Live",
+  code: "Code",
+  builtWith: "Built with",
+  viewAll: "View all work",
 } as const;
 
 export const siteDescription =
@@ -52,6 +68,10 @@ export type HomepageProject = {
   codeUrl: string;
   liveUrl?: string;
   qualities?: readonly string[];
+  /** Headline technologies on the Work note's label tape (approved in docs/content/copy/02-work.md). */
+  labelTape: readonly string[];
+  /** The colour of the project's sticky note. */
+  noteStock: Extract<PinStock, "ochre" | "blueprint" | "sage">;
   imageWidth: number;
   imageHeight: number;
 };
@@ -75,6 +95,8 @@ export const projects = [
       "Threshold landing page showing rental affordability choices for London, Basel, and Zurich",
     liveUrl: "https://threshold-beta.vercel.app",
     codeUrl: "https://github.com/3ixas/threshold",
+    labelTape: ["React 19", "TypeScript", "MapLibre"],
+    noteStock: "ochre",
     imageWidth: 1804,
     imageHeight: 1376,
   },
@@ -88,6 +110,8 @@ export const projects = [
     image: "/work/argus/overview.webp",
     imageAlt: "Argus Risk interface showing event-driven risk positions",
     codeUrl: "https://github.com/3ixas/argus-risk",
+    labelTape: [".NET 8", "Kafka", "PostgreSQL", "SignalR"],
+    noteStock: "blueprint",
     imageWidth: 1280,
     imageHeight: 770,
   },
@@ -102,6 +126,8 @@ export const projects = [
     imageAlt: "Flowtime focus timer interface",
     liveUrl: "https://flowtime-focus-timer.vercel.app",
     codeUrl: "https://github.com/3ixas/flowtime-focus-timer",
+    labelTape: ["Next.js", "TypeScript", "Service Worker"],
+    noteStock: "sage",
     imageWidth: 1280,
     imageHeight: 640,
   },
