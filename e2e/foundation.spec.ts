@@ -9,7 +9,7 @@ test.describe("Board foundation", () => {
     await page.goto("/");
     const heading = page.getByRole("heading", { level: 1 });
     await expect(heading).toHaveCount(1);
-    await expect(heading).toHaveText(headline);
+    await expect(heading).toHaveAccessibleName(headline);
     await expect(heading).toBeVisible();
   });
 

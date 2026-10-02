@@ -186,8 +186,8 @@ Keep the existing integrations, snapshots, content data, and routes. Rewrite eve
   3. "feel simple." lands on a spring (bounce 0.3, visual duration 0.45 s).
   4. The highlight draws (0.52 s, strong ease-out).
   5. The card settles and the pin presses in (springs 0.25 and 0.35).
-- **When it runs:** on every fresh load and reload, never on client-side back-navigation.
-- **Fail-safe:** any failure, slow script, or reduced-motion preference shows the finished state. Content is never hidden waiting for script.
+- **When it runs:** on every fresh load and reload, never on client-side back-navigation. It also stays still when the visitor arrives at a section (a URL hash other than `#top`) or in a background tab, where nobody would see it.
+- **Fail-safe:** any failure, slow script, or reduced-motion preference shows the finished state. Content is never hidden waiting for script. If the page stalls for more than a second mid-opening, it finishes at once.
 
 ### Motion
 

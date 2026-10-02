@@ -383,4 +383,47 @@
       display: inline;
     }
   }
+
+  /*
+   * The opening. While it plays, the server-rendered heading stays in place
+   * (and in the accessibility tree) but is drawn by the decorative copy.
+   */
+  /* Only while the copy is actually there, so a fresh hero is never left blank. */
+  :root[data-opening] h1:has(> [data-opening-layer]:not(:empty)) [data-opening-source] {
+    opacity: 0;
+  }
+
+  .board-untyped {
+    color: transparent;
+  }
+
+  .board-untyped [data-highlight],
+  .board-untyped svg {
+    visibility: hidden;
+  }
+
+  /* A zero-width caret, so it never moves a line break. */
+  .board-caret {
+    position: relative;
+  }
+
+  .board-caret > span {
+    position: absolute;
+    bottom: -0.12em;
+    left: 0.02em;
+    width: 0.06em;
+    height: 0.82em;
+    border-radius: 1px;
+    background: var(--accent);
+  }
+
+  .board-caret-blink > span {
+    animation: board-caret-blink 1s steps(1) infinite;
+  }
+
+  @keyframes board-caret-blink {
+    50% {
+      opacity: 0;
+    }
+  }
 }

@@ -1,13 +1,14 @@
 import Image from "next/image";
 import { Light } from "@/components/board/light";
+import { openingScript } from "@/components/board/opening";
 import { Pin } from "@/components/board/pin";
 import { BoardSurface } from "@/components/board/surface";
 import { hero } from "@/content/site";
 
 /**
  * The hero: the headline card pinned to the wall beside the portrait.
- * Static in this slice; the opening (#78) animates a decorative layer over it
- * without ever hiding the server-rendered headline.
+ * The opening types a decorative copy over the heading; the heading itself
+ * is always the server-rendered sentence (see opening.ts).
  */
 export function Hero() {
   return (
@@ -22,11 +23,13 @@ export function Hero() {
       <div className="relative z-10 mx-auto grid max-w-[1312px] grid-cols-1 gap-x-8 gap-y-10 board:grid-cols-12">
         <p className="font-mono text-label uppercase text-wall-muted board:col-span-12 board:px-4">{hero.kicker}</p>
 
-        <div className="board:col-span-8">
+        <div className="board:col-span-8" data-opening-card>
           <Pin object="card" fixing="pushpin" surface="wall" looseness="careful" tilt={-0.4} className="px-6 py-10 sm:px-12 sm:py-14 lg:px-16">
-            <h1 id="hero-title" className="m-0 font-display text-display font-normal text-balance">
-              {hero.headline.lead}{" "}
-              <span className="relative inline-block isolate">
+            <h1 id="hero-title" className="relative m-0 font-display text-display font-normal text-balance">
+              <span data-opening-source data-opening-lead>
+                {hero.headline.lead}
+              </span>{" "}
+              <span data-opening-source data-opening-emphasis className="relative inline-block isolate">
                 <em className="text-accent">{hero.headline.emphasis}</em>
                 <svg
                   aria-hidden="true"
@@ -45,6 +48,14 @@ export function Hero() {
                   />
                 </svg>
               </span>
+              {/* Filled by the opening script before hydration; React leaves its contents alone. */}
+              <span
+                aria-hidden="true"
+                data-opening-layer
+                className="pointer-events-none absolute inset-0"
+                dangerouslySetInnerHTML={{ __html: "" }}
+                suppressHydrationWarning
+              />
             </h1>
           </Pin>
         </div>
@@ -81,6 +92,7 @@ export function Hero() {
           </div>
         </div>
       </div>
+      <script dangerouslySetInnerHTML={{ __html: openingScript }} />
     </BoardSurface>
   );
 }
