@@ -28,6 +28,10 @@ test.describe("Case-file folder", () => {
   test("each divider tab jumps to its section", async ({ page }) => {
     const nav = page.getByRole("navigation", { name: "Sections" });
     await expect(nav.getByRole("link")).toHaveText(tabs.map(({ name }) => name));
+    // On the folder's edge the labels run sideways, apostrophes and all.
+    if ((page.viewportSize()?.width ?? 1440) >= 900) {
+      for (const tab of await nav.getByRole("link").all()) await expect(tab).toHaveCSS("text-orientation", "sideways");
+    }
     for (const { name, id } of tabs) {
       const tab = nav.getByRole("link", { name });
       const box = (await tab.boundingBox())!;

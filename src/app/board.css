@@ -651,6 +651,8 @@
       white-space: nowrap;
       border-radius: 0 8px 8px 0;
       writing-mode: vertical-rl;
+      /* Lay every glyph on its side, punctuation included, so apostrophes read as in a line of text. */
+      text-orientation: sideways;
       box-shadow: calc(var(--light-side) * 3px) 3px 6px rgb(var(--shadow-tint) / var(--shadow-near-alpha));
     }
   }
