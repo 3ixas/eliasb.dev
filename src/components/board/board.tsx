@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { ClippingPin } from "@/components/board/clipping";
 import { CultureCorner } from "@/components/board/culture-corner";
 import { LondonClock } from "@/components/board/london-clock";
 import { Pin } from "@/components/board/pin";
@@ -7,6 +8,7 @@ import { Pinboard } from "@/components/board/pinboard";
 import { BoardSurface } from "@/components/board/surface";
 import { board } from "@/content/board";
 import { getReadingSignal } from "@/integrations/goodreads";
+import { getCachedHistorySignal } from "@/integrations/history-cache";
 import { getFilmSignal } from "@/integrations/letterboxd";
 import type { PinStatus } from "@/integrations/pin-rules";
 
@@ -15,11 +17,11 @@ const londonStatus: PinStatus = { kind: "current" };
 
 /**
  * The Board: the personal section, a framed linen pinboard on the wall.
- * London and the culture corner are pinned here; the other pins move onto the
- * board in #84 to #87.
+ * The Weekly Curiosity, London and the culture corner are pinned here; the
+ * other pins move onto the board in #85 to #87.
  */
 export async function Board() {
-  const [reading, film] = await Promise.all([getReadingSignal(), getFilmSignal()]);
+  const [history, reading, film] = await Promise.all([getCachedHistorySignal(), getReadingSignal(), getFilmSignal()]);
   const now = new Date();
 
   return (
@@ -37,6 +39,7 @@ export async function Board() {
           {board.heading.lead} <em className="text-wall-accent">{board.heading.emphasis}</em>
         </h2>
         <Pinboard className="mt-12 board:mt-16">
+          <ClippingPin history={history} now={now} />
           <LondonPin />
           <CultureCorner reading={reading} film={film} now={now} />
         </Pinboard>

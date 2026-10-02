@@ -7,9 +7,12 @@ export function ExternalLink({ href, className, children }: { href: string; clas
       href={href}
       target="_blank"
       rel="noreferrer"
-      className={`board-focus inline-flex min-h-11 items-center gap-1 font-mono text-label uppercase underline underline-offset-4 ${className ?? ""}`}
+      className={`board-focus inline-flex min-h-11 items-center font-mono text-label uppercase underline underline-offset-4 ${className ?? ""}`}
     >
-      {children} <span aria-hidden="true">↗</span>
+      {/* One span, so a wrapped label keeps its arrow beside the last word. */}
+      <span>
+        {children} <span aria-hidden="true">↗</span>
+      </span>
     </a>
   );
 }

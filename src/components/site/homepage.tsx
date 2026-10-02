@@ -10,17 +10,9 @@ import { Work } from "@/components/board/work";
 import { careerTimeline, labItems } from "@/content/collections";
 import { profile } from "@/content/site";
 import { getHomepageSignals } from "@/integrations/homepage";
-import { getCachedHistorySignal } from "@/integrations/history-cache";
-
-function emphasizeFinalWord(text: string) {
-  const finalSpace = text.lastIndexOf(" ");
-  if (finalSpace < 0) return text;
-
-  return <>{text.slice(0, finalSpace + 1)}<em>{text.slice(finalSpace + 1)}</em></>;
-}
 
 export async function Homepage() {
-  const [signals, history] = await Promise.all([getHomepageSignals(), getCachedHistorySignal()]);
+  const signals = await getHomepageSignals();
 
   return (
     <div className="prototype prototype-cabinet-of-curiosities selected-experience" id="top" tabIndex={-1}>
@@ -32,7 +24,7 @@ export async function Homepage() {
 
         <Board />
 
-        {/* Pins not yet on the Board; each moves onto it in #84 to #87. */}
+        {/* Pins not yet on the Board; each moves onto it in #85 to #87. */}
         <div className="outside-work-section">
           <div className="currently-section">
             <div className="signal-grid">
@@ -98,55 +90,6 @@ export async function Homepage() {
               </article>
             </div>
           </div>
-
-
-
-          <section className="library-section outside-work-culture" aria-labelledby="history-title">
-            <div className="library-index outside-work-history" aria-labelledby="history-title">
-              <p>History</p>
-              <h2 id="history-title" data-motion-reveal>{emphasizeFinalWord(history.headline)}</h2>
-              <div>
-                <article className="history-card" data-motion-reveal>
-                  {history.dateLabel && <span>{history.dateLabel}</span>}
-                  <ol className="history-events" aria-label="Historical moments">
-                    {history.events.map((event) => (
-                      <li className={`history-event${event.image ? " history-event--illustrated" : ""}`} key={`${event.year}-${event.kind}-${event.text}`}>
-                        <div className="history-event-meta">
-                          <span className="history-event-kind">{event.kind === "birth" ? "Born" : "On this day"}</span>
-                          <strong>{event.year}</strong>
-                        </div>
-                        {event.image && (
-                          <figure className="history-event-visual">
-                            <div className="history-event-image-frame">
-                              <Image
-                                src={event.image.src}
-                                alt={event.image.alt}
-                                fill
-                                sizes="(max-width: 700px) calc(100vw - 100px), 22vw"
-                              />
-                            </div>
-                            <figcaption>
-                              <span>Image: {event.image.creator}</span>
-                              <span className="history-event-credit-links">
-                                <a href={event.image.sourceUrl} target="_blank" rel="noreferrer">Commons</a>
-                                <a href={event.image.licenseUrl ?? event.image.sourceUrl} target="_blank" rel="noreferrer">{event.image.licenseName}</a>
-                              </span>
-                            </figcaption>
-                          </figure>
-                        )}
-                        <p>{event.text}</p>
-                        <a href={event.sourceUrl} target="_blank" rel="noreferrer">Read the record <span className="arrow-mark" aria-hidden="true">↗︎</span></a>
-                      </li>
-                    ))}
-                  </ol>
-                  {history.description && <small>{history.description}</small>}
-                  <a className="history-source" href={history.sourceUrl} target="_blank" rel="noreferrer">
-                    {history.state === "live" ? "View this week’s Wikimedia events" : "Browse Wikipedia history"} <span className="arrow-mark" aria-hidden="true">↗︎</span>
-                  </a>
-                </article>
-              </div>
-            </div>
-          </section>
         </div>
 
         <section className="lab-section experiments-section" id="experiments" tabIndex={-1} aria-labelledby="experiments-title">

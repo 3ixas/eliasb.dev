@@ -319,27 +319,30 @@ function verifyHomepage(markup) {
     check(!/maintained by hand|not a live workout log|usual plan/i.test(trainingText), "Training should skip redundant schedule explanations");
     check(!/class="training-day"/.test(trainingCard), "The retired authored training schedule should not render");
   }
-  check(text.includes("Wikimedia") || text.includes("fallback"), "History output should identify its live or fallback source");
-  const historyList = markup.match(/<ol\b(?=[^>]*\baria-label="Historical moments")[^>]*>([\s\S]*?)<\/ol>/i)?.[1] ?? "";
-  const historyEvents = [...historyList.matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/gi)].map(([, event]) => event);
-  equal(historyEvents.length, 3, "History should show three historical moments");
-  const historyYears = historyEvents.map((event) => Number(event.match(/<strong\b[^>]*>(\d{1,4})<\/strong>/i)?.[1] ?? 0));
-  check(historyYears.every((year) => year > 0), "Each history moment should show its year");
-  check(new Set(historyYears.map((year) => Math.floor((year - 1) / 100))).size >= 3, "History should span at least three centuries");
-  check(historyYears.some((year) => year < 1900), "History should include a moment before 1900");
-  for (const event of historyEvents) {
-    const record = hrefs(event).find(({ href }) => href?.startsWith("https://"));
-    check(record, "Each history moment should link directly to its source");
-    check(plainText(event).includes("Read the record"), "Each history source link should have a clear label");
-    if (event.includes("history-event-visual")) {
-      const credits = hrefs(event);
-      check(/<img\b[^>]*alt="[^"]+"/i.test(event), "Each history image should have useful alternative text");
-      check(plainText(event).includes("Image:"), "Each history image should name its creator");
-      check(credits.some(({ href }) => href?.startsWith("https://commons.wikimedia.org/wiki/File:")), "Each history image should link to its Commons file record");
-      check(/(?:CC BY|CC0|Public domain|GFDL|Free Art License)/i.test(plainText(event)), "Each history image should display its reuse license");
-      check(credits.some(({ href }) => href?.startsWith("https://creativecommons.org/") || href?.startsWith("https://commons.wikimedia.org/wiki/File:")), "Each history image should link to its license or Commons reuse record");
+  // The Weekly Curiosity: three oddities as a clipping, sourced to readable pages.
+  // From the clipping's pin up to the next pin on the Board.
+  const clipping = markup.match(/data-board-pin="clipping"([\s\S]*?)data-board-pin=/i)?.[1] ?? "";
+  check(plainText(clipping).includes("The Weekly Curiosity"), "The clipping should carry its masthead");
+  const stories = [...clipping.matchAll(/<article\b[^>]*>([\s\S]*?)<\/article>/gi)].map(([, story]) => story);
+  equal(stories.length, 3, "The clipping should hold three oddities");
+  const storyYears = stories.map((story) => Number(plainText(story).match(/(\d{1,4})\s+Read (?:on Wikipedia|more)/)?.[1] ?? 0));
+  check(storyYears.every((year) => year > 0), "Each oddity should show its year");
+  check(new Set(storyYears.map((year) => Math.floor((year - 1) / 100))).size >= 3, "The oddities should span at least three centuries");
+  check(storyYears.some((year) => year < 1900), "The oddities should include one before 1900");
+  for (const story of stories) {
+    check(hrefs(story).some(({ href }) => href?.startsWith("https://")), "Each oddity should link directly to its source");
+    check(/Read (?:on Wikipedia|more)/.test(plainText(story)), "Each oddity's source link should have a clear label");
+    if (/<img\b/i.test(story)) {
+      const credits = hrefs(story);
+      check(/<img\b[^>]*alt="[^"]+"/i.test(story), "Each oddity's picture should have useful alternative text");
+      check(plainText(story).includes("Image:"), "Each oddity's picture should name its creator");
+      check(credits.some(({ href }) => href?.startsWith("https://commons.wikimedia.org/wiki/File:")), "Each oddity's picture should link to its Commons file record");
+      check(/(?:CC BY|CC0|Public domain|GFDL|Free Art License)/i.test(plainText(story)), "Each oddity's picture should display its reuse licence");
     }
   }
+  const daySource = hrefs(clipping).find(({ href }) => /^https:\/\/en\.wikipedia\.org\/wiki\/([A-Z][a-z]+_\d{1,2}|Portal:History)$/.test(href ?? ""));
+  check(daySource, "The clipping's source should be the readable Wikipedia page for the day");
+  check(!/api\/rest_v1/.test(clipping), "The clipping should never link to the feed's raw JSON");
   check(/Updated \d{1,2} [A-Z][a-z]{2,4}|Wikimedia · cached/i.test(text), "Signal cards should expose a useful update date or cache label");
   check(["GitHub", "Goodreads", "Letterboxd", "Sleeper", "Wikimedia"].some((source) => text.includes(source)), "Signal cards should expose visible source wording");
   check(!/(ghp_|github_pat_|sk-[A-Za-z0-9]|STRAVA_CLIENT_SECRET)/i.test(text), "Rendered output must not contain credential-like values");

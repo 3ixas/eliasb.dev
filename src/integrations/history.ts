@@ -70,7 +70,13 @@ const INTEREST_GROUPS = [
   /\b(?:first|founded|established|establishes|discovered|opened|inaugurated|premiered|launched|presented|debut)\b/i,
 ];
 const DISTINCTIVE_FACT_TERMS = /\b(?:accidentally|by accident|deliberately|unexpected(?:ly)?|mistakenly|secret(?:ly)?|never before|first[- ]ever|only known|last known|lost at sea)\b/i;
+// The clipping is for oddities: animals, food, records, and happy accidents beat news-headline politics.
+const QUIRKY_TERMS = /\b(?:sheep|ducks?|rooster|dogs?|cats?|horses?|elephants?|monkeys?|chimpanzees?|pigs?|cows?|goats?|bears?|whales?|parrots?|balloons?|cheese|chocolate|pizza|beer|coffee|bicycles?|toys?|hoax|prank|world record|longest|largest|smallest|tallest|oldest|survived|eccentric|bizarre|unusual)\b/i;
+const NEWS_HEADLINE_TERMS = /\b(?:elections?|elected|president|prime minister|parliament|government|treaty|independence|referendum|constitution|declares?|declared|minister|congress|senate|supreme court|sanctions?|summit|protests?|coalition|annex(?:es|ed)?|occupation|ceasefire|republic)\b/i;
 const ROUTINE_ALBUM_RELEASE = /\b(?:band|musician|artist|singer)\b[^.!?]{0,120}\b(?:released|issued)\b[^.!?]{0,80}\b(?:studio )?album\b/i;
+
+// Flags, maps, logos and the like illustrate a place or a body, not the fact.
+const UNSUITABLE_IMAGE = /(?:\bflag\b|coat[_ ]of[_ ]arms|\bmap\b|locator|\blogo\b|\bseal\b|emblem|signature|\.svg$)/i;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === "object");
@@ -103,14 +109,6 @@ export function historyWeekStart(now = new Date()) {
   const day = date.getUTCDay();
   date.setUTCDate(date.getUTCDate() - (day === 0 ? 6 : day - 1));
   return date;
-}
-
-function dateLabel(date: Date) {
-  return `Week of ${new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(date)}`;
 }
 
 function pageUrl(page: unknown): string | undefined {
@@ -175,7 +173,9 @@ function eventFrom(value: unknown, kind: HistoryEvent["kind"]): MappedHistoryEve
       return sourceUrl ? { sourceUrl, commonsFileTitle: commonsFileTitle(page) } : undefined;
     })
     .filter((page): page is { sourceUrl: string; commonsFileTitle: string | undefined } => Boolean(page));
-  const sourcePage = pageRecords.find((page) => page.commonsFileTitle) ?? pageRecords[0];
+  // The first page is the fact's subject. Its own picture or none: a picture
+  // from a page further down the list (a country, a flag) would be unrelated.
+  const sourcePage = pageRecords[0];
   const sourceUrl = sourcePage?.sourceUrl;
   if (!sourceUrl) return undefined;
   const normalizedText = value.text.replace(/\s+/g, " ").trim();
@@ -190,7 +190,7 @@ function eventFrom(value: unknown, kind: HistoryEvent["kind"]): MappedHistoryEve
       text,
       sourceUrl,
     },
-    commonsFileTitle: sourcePage.commonsFileTitle,
+    commonsFileTitle: sourcePage.commonsFileTitle && !UNSUITABLE_IMAGE.test(sourcePage.commonsFileTitle) ? sourcePage.commonsFileTitle : undefined,
   };
 }
 
@@ -233,7 +233,9 @@ function candidateScore(event: HistoryEvent, currentYear: number): number {
   const interest = INTEREST_GROUPS.reduce((score, group) => score + Number(group.test(searchText)), 0);
   const distinctiveDetail = DISTINCTIVE_FACT_TERMS.test(event.text) ? 1.5 : 0;
   const routineMilestone = ROUTINE_ALBUM_RELEASE.test(event.text) ? 1.25 : 0;
-  return Math.max(0, interest + distinctiveDetail - routineMilestone - (event.year >= currentYear - 40 ? 0.25 : 0));
+  const quirk = QUIRKY_TERMS.test(event.text) ? 2 : 0;
+  const headline = NEWS_HEADLINE_TERMS.test(searchText) ? 2 : 0;
+  return Math.max(0, interest + distinctiveDetail + quirk - routineMilestone - headline - (event.year >= currentYear - 40 ? 0.25 : 0));
 }
 
 function selectHistoryCandidates(payload: unknown, now = new Date()): HistoryCandidate[] {
@@ -275,7 +277,9 @@ function selectHistoryCandidates(payload: unknown, now = new Date()): HistoryCan
     || selected.filter(({ event }) => event.kind === "event").length < 2
   ) return [];
 
-  return selected.sort((left, right) => left.event.year - right.event.year);
+  // The most surprising leads the clipping; the other two follow in date order.
+  const [lead, ...rest] = selected;
+  return [lead, ...rest.sort((left, right) => left.event.year - right.event.year)];
 }
 
 export function selectHistoryEvents(payload: unknown, now = new Date()): HistoryEvent[] {
@@ -398,20 +402,29 @@ async function fetchCommonsImage(fileTitle: string): Promise<HistoryImage | unde
     ) return undefined;
 
     const alt = historyImageAlt(objectName, fileTitle);
-    return { src, alt, creator, sourceUrl, licenseName, licenseUrl };
+    return { src, alt, creator, sourceUrl, licenseName, licenseUrl, width, height };
   } catch (error) {
     historyWarning("Commons image", error instanceof Error ? error.name : "request failed");
     return undefined;
   }
 }
 
+/**
+ * The clipping leads with a picture where it can: the most surprising fact
+ * that has one leads, and the rest follow in date order.
+ */
+function withPicturedLead(events: HistoryEvent[]): HistoryEvent[] {
+  const [lead, ...rest] = events;
+  if (!lead || lead.image) return events;
+  const pictured = rest.find((event) => event.image);
+  if (!pictured) return events;
+  return [pictured, ...[lead, ...rest.filter((event) => event !== pictured)].sort((left, right) => left.year - right.year)];
+}
+
 export function savedHistorySignal(): HistorySignal {
   return {
     state: "curated",
-    statusLabel: "Saved examples",
-    headline: "A few curious turns",
-    description: "",
-    dateLabel: "Saved examples",
+    weekOf: null,
     events: HISTORY_FALLBACK_EVENTS,
     sourceUrl: "https://en.wikipedia.org/wiki/Portal:History",
     updatedAt: null,
@@ -422,7 +435,8 @@ export async function getHistorySignal(now = new Date()): Promise<HistorySignal>
   const start = historyWeekStart(now);
   const month = String(start.getUTCMonth() + 1).padStart(2, "0");
   const day = String(start.getUTCDate()).padStart(2, "0");
-  const sourceUrl = `https://en.wikipedia.org/api/rest_v1/feed/onthisday/all/${month}/${day}`;
+  // The readable page for the day, never the feed's raw JSON.
+  const sourceUrl = `https://en.wikipedia.org/wiki/${start.toLocaleString("en-GB", { month: "long", timeZone: "UTC" })}_${start.getUTCDate()}`;
 
   try {
     const feeds = await Promise.all(HISTORY_FEEDS.map((feedName) => fetchHistoryFeed(feedName, month, day)));
@@ -433,18 +447,16 @@ export async function getHistorySignal(now = new Date()): Promise<HistorySignal>
       historyWarning("selection", `insufficient stories from ${successfulFeeds.length} available feeds`);
       return savedHistorySignal();
     }
-    const events = await Promise.all(candidates.map(async ({ event, commonsFileTitle }) => {
+    const illustrated = await Promise.all(candidates.map(async ({ event, commonsFileTitle }) => {
       if (!commonsFileTitle) return event;
       const image = await fetchCommonsImage(commonsFileTitle);
       return image ? { ...event, image } : event;
     }));
+    const events = withPicturedLead(illustrated);
 
     return {
       state: "live",
-      statusLabel: "Wikimedia · cached",
-      headline: "This week in history",
-      description: "",
-      dateLabel: dateLabel(start),
+      weekOf: start.toISOString().slice(0, 10),
       events,
       sourceUrl,
       updatedAt: new Date().toISOString(),

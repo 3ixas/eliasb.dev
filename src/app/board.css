@@ -41,6 +41,7 @@
   --stock-terracotta: #e08b6a;
   --stock-kraft: #d7ae63;
   --stock-ticket: #e9c37a;
+  --stock-newsprint: #f4efe3;
 
   /* Surfaces and fixings that look the same by day and night */
   --linen: #e3d2b4;
@@ -318,6 +319,7 @@
   --color-stock-terracotta: var(--stock-terracotta);
   --color-stock-kraft: var(--stock-kraft);
   --color-stock-ticket: var(--stock-ticket);
+  --color-stock-newsprint: var(--stock-newsprint);
 
   --font-display: var(--font-newsreader), Georgia, serif;
   --font-sans: var(--font-hanken-grotesk), system-ui, sans-serif;
@@ -885,6 +887,28 @@
     width: 100%;
     background: var(--photo-coming);
     color: var(--photo-coming-ink);
+  }
+
+  /* The Weekly Curiosity: a newspaper cutting with a rubber-stamped picture. */
+  .board-masthead {
+    font-family: var(--font-newsreader), Georgia, serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+
+  .board-news-stamp {
+    border: 3px solid var(--stamp);
+    padding: 4px 10px;
+    rotate: 8deg;
+    background: var(--stock-newsprint);
+    color: var(--stamp);
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-size: var(--text-small);
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   /* The culture corner. */

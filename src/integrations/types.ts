@@ -44,15 +44,20 @@ export type HistoryImage = {
   sourceUrl: string;
   licenseName: string;
   licenseUrl: string | null;
+  width: number;
+  height: number;
 };
 
+/**
+ * The Weekly Curiosity: three oddities from this week in history, the most
+ * surprising first. Saved examples have no week (weekOf is null).
+ */
 export type HistorySignal = {
   state: SignalState;
-  statusLabel: string;
-  headline: string;
-  description: string;
-  dateLabel: string;
+  /** The Monday the week starts, YYYY-MM-DD; the facts happened on this day. */
+  weekOf: string | null;
   events: HistoryEvent[];
+  /** The readable Wikipedia page for the day, or the history portal for saved examples. */
   sourceUrl: string;
   updatedAt: string | null;
 };

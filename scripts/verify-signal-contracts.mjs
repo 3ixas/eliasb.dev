@@ -13,7 +13,7 @@ import {
 } from "../src/integrations/signal-mappers.ts";
 import { integrationConfig } from "../src/content/integration-config.ts";
 import { asOfDate, pinStatus, staleAfterDays } from "../src/integrations/pin-rules.ts";
-import { filmLine, stars } from "../src/content/board.ts";
+import { filmLine, isoWeek, stars } from "../src/content/board.ts";
 import { getHistorySignal, historyWeekStart, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "../src/integrations/history.ts";
 import { fantasySourceUnavailable, fantasyWeekUnavailable, signalFallbacks } from "../src/content/signal-fallbacks.ts";
 import { FantasyMatchup } from "../src/components/site/fantasy-matchup.ts";
@@ -101,6 +101,31 @@ assert.equal(selectedHistory.some(({ year, text }) => year === 2013 || /attack|k
 assert.equal(selectedHistory.some(({ year }) => year === 2024), false, "Recent entries should not crowd out older events");
 assert.equal(selectedHistory.some(({ text }) => /Green Day|studio album/i.test(text)), false, "Routine album-release anniversaries should lose out to more distinctive stories");
 assert.equal(selectHistoryEvents({ events: historyFixture.events.slice(1, 2) }, historyNow).length, 0, "A narrow feed should fall back rather than present three items from one century");
+// Curation: an oddity beats a news headline from the same century, and the
+// most surprising fact leads the clipping, with the others in date order.
+const oddities = selectHistoryEvents({
+  events: [
+    { year: 1849, text: "The president signs a treaty with a neighbouring government.", pages: [historyPage("Treaty", "Treaty.jpg")] },
+    { year: 1858, text: "A sheep becomes the first animal to cross the Channel by balloon.", pages: [historyPage("Balloon_sheep", "Balloon_sheep.jpg")] },
+    { year: 1937, text: "J.R.R. Tolkien’s The Hobbit is published for the first time.", pages: [historyPage("The_Hobbit", "The_Hobbit.jpg")] },
+    { year: 2003, text: "The Galileo spacecraft was deliberately sent into Jupiter’s atmosphere.", pages: [historyPage("Galileo_(spacecraft)", "Galileo.jpg")] },
+  ],
+}, historyNow);
+assert.deepEqual(oddities.map(({ year }) => year), [1858, 1937, 2003], "The sheep beats the treaty, and leads");
+assert.equal(selectHistoryEvents({
+  events: [
+    { year: 1810, text: "Parliament votes to declare independence and elect a president.", pages: [historyPage("Independence", "Independence.jpg")] },
+    { year: 1937, text: "J.R.R. Tolkien’s The Hobbit is published for the first time.", pages: [historyPage("The_Hobbit", "The_Hobbit.jpg")] },
+    { year: 2003, text: "The Galileo spacecraft was deliberately sent into Jupiter’s atmosphere.", pages: [historyPage("Galileo_(spacecraft)", "Galileo.jpg")] },
+  ],
+}, historyNow).length, 0, "A news headline doesn't make the cut, even to fill the clipping");
+
+// The dateline's volume and number are the ISO week-year and week.
+assert.deepEqual(isoWeek(new Date("2026-09-28T12:00:00Z")), { year: 2026, week: 40 });
+assert.deepEqual(isoWeek(new Date("2026-01-01T12:00:00Z")), { year: 2026, week: 1 });
+assert.deepEqual(isoWeek(new Date("2027-01-01T12:00:00Z")), { year: 2026, week: 53 });
+assert.deepEqual(isoWeek(new Date("2024-12-30T12:00:00Z")), { year: 2025, week: 1 });
+
 assert.deepEqual(HISTORY_FALLBACK_EVENTS.map(({ year }) => year), [1783, 1933, 2003]);
 assert.equal(new Set(HISTORY_FALLBACK_EVENTS.map(({ year }) => Math.floor((year - 1) / 100))).size, 3);
 assert.deepEqual(HISTORY_FALLBACK_EVENTS.map(({ sourceUrl }) => new URL(sourceUrl).hostname), ["airandspace.si.edu", "cmll.com", "www.jpl.nasa.gov"]);
@@ -155,7 +180,10 @@ try {
   assert.equal(historyRequestCacheDurations.every((seconds) => seconds === 604800), true);
   assert.ok(historyRequestAgents.every((agent) => agent === "EliasBHistory/1.0 (https://www.eliasb.dev/)"), "Feed and Commons requests must identify the site to Wikimedia");
   assert.deepEqual(commonsRequestTitles.sort(), ["Galileo_spacecraft.jpg", "Montgolfier_balloon.jpg", "Salvador_Lutteroth.jpg"]);
-  assert.match(liveHistory.sourceUrl, /\/feed\/onthisday\/all\/09\/21$/);
+  // The source is the readable page for the day, never the feed's raw JSON.
+  assert.equal(liveHistory.sourceUrl, "https://en.wikipedia.org/wiki/September_21");
+  assert.equal(liveHistory.weekOf, "2026-09-21");
+  assert.equal(liveHistory.events.every(({ image }) => image?.width === 640 && image?.height === 426), true);
   assert.deepEqual(liveHistory.events.map(({ year }) => year), [1783, 1933, 2003]);
   assert.equal(liveHistory.events.every(({ image }) => image?.creator === "Ada Example"), true);
   assert.equal(liveHistory.events.every(({ image }) => image?.licenseName === "CC BY-SA 4.0"), true);
@@ -194,6 +222,30 @@ try {
   assert.equal(textOnlyHistory.events.find(({ year }) => year === 2003).image, undefined, "A missing Commons file should leave its story text-only");
   assert.equal(textOnlyHistory.events.find(({ year }) => year === 1783).image, undefined, "Missing license metadata should leave its story text-only");
   assert.equal(textOnlyHistory.events.filter(({ image }) => image).length, 1);
+  assert.equal(textOnlyHistory.events[0].year, 1933, "The fact with a picture leads when the most surprising has none");
+  assert.deepEqual(textOnlyHistory.events.slice(1).map(({ year }) => year), [1783, 2003], "The rest follow in date order");
+
+  // A fact's picture comes from its own subject's page or not at all: never a
+  // flag, map or logo, and never a picture from a page further down the list.
+  const unrelatedPictures = structuredClone(historyFixture);
+  unrelatedPictures.events[0].pages = [{ titles: { canonical: "Montgolfier_brothers" } }, historyPage("France", "Flag_of_France.svg")];
+  unrelatedPictures.events[1].pages = [historyPage("Salvador_Lutteroth", "Locator_map_of_Mexico.png")];
+  const unrelatedRequests = [];
+  globalThis.fetch = async (input) => {
+    const url = new URL(String(input));
+    if (url.hostname === "commons.wikimedia.org") {
+      const title = url.searchParams.get("titles").replace(/^File:/, "");
+      unrelatedRequests.push(title);
+      return commonsImageResponse(title);
+    }
+    const feedName = url.pathname.split("/").at(-3);
+    return new Response(JSON.stringify({ [feedName]: unrelatedPictures[feedName] }), { status: 200 });
+  };
+  const unrelatedHistory = await getHistorySignal(historyNow);
+  assert.deepEqual(unrelatedRequests, ["Galileo_spacecraft.jpg"], "Only the subject's own picture is fetched");
+  assert.equal(unrelatedHistory.events.find(({ year }) => year === 1783).image, undefined, "A picture from another page leaves the fact text-only");
+  assert.equal(unrelatedHistory.events.find(({ year }) => year === 1783).sourceUrl, "https://en.wikipedia.org/wiki/Montgolfier_brothers");
+  assert.equal(unrelatedHistory.events.find(({ year }) => year === 1933).image, undefined, "A locator map leaves the fact text-only");
 
   globalThis.fetch = async (input) => {
     const url = new URL(String(input));
@@ -214,7 +266,7 @@ try {
   };
   const partialHistory = await getHistorySignal(historyNow);
   assert.equal(partialHistory.state, "curated", "Insufficient stories after a feed failure should not be labelled live");
-  assert.equal(partialHistory.dateLabel, "Saved examples");
+  assert.equal(partialHistory.weekOf, null, "Saved examples belong to no week");
 
   globalThis.fetch = async (input) => {
     const feedName = new URL(String(input)).pathname.split("/").at(-3);
@@ -243,15 +295,13 @@ try {
   };
   const insufficientHistory = await getHistorySignal(historyNow);
   assert.equal(insufficientHistory.state, "curated");
-  assert.equal(insufficientHistory.description, "");
 
   globalThis.fetch = async () => { throw new Error("simulated Wikimedia outage"); };
   const savedHistory = await getHistorySignal(historyNow);
   assert.equal(savedHistory.state, "curated");
-  assert.equal(savedHistory.headline, "A few curious turns");
-  assert.equal(savedHistory.dateLabel, "Saved examples");
+  assert.equal(savedHistory.weekOf, null);
+  assert.equal(savedHistory.sourceUrl, "https://en.wikipedia.org/wiki/Portal:History");
   assert.deepEqual(savedHistory.events.map(({ year }) => year), [1783, 1933, 2003]);
-  assert.equal(savedHistory.description, "");
 } finally {
   globalThis.fetch = originalFetch;
 }

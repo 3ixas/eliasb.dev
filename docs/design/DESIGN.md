@@ -194,11 +194,12 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     - **Back to automatic (build, #77):** flipping the switch so the lights match the device's own setting returns the site to following the device; any other flip is an explicit choice that persists. The single rocker needs no separate "System" control.
     - Each picture light's glow covers the whole project row (screenshot and sticky note), plus a soft wash on the wall.
   - **The weekly clipping is "The Weekly Curiosity" (Elias, 1 October 2026).**
-    - A bold all-caps Newsreader masthead between double rules, with the strapline "Odd, true, and from this week in history".
+    - A bold all-caps Newsreader masthead, with the strapline "Odd but true, from this week in history" (Elias, 2 October 2026).
     - A red "STRANGE BUT TRUE" rubber stamp on the photo.
     - A playful issue line: "Vol. · No. · Week of · Price: one click".
     - The fact is set as the bold headline, and the button reads "2 more oddities this week".
     - Curation must favour surprising, quirky "I never knew that" facts over news-headline events.
+    - **Built (Elias, 2 October 2026):** the most surprising fact with a picture leads; the other two follow in date order. A fact's picture comes only from its own subject's page, never a flag, map or logo, so some facts are text-only. On wide screens the other two fan out beside the clipping, each below the one before by its measured height; on narrow screens they open below it. The source link is the readable Wikipedia page for the day.
   - **The training pin is a photo plus a log card (Elias, 1 October 2026).**
     - The polaroid carries the mood ("Out on a run, central London.").
     - A lined "Training this week · via Strava" card pinned over its edge carries the data: one row per activity (Lifts, Runs, and Muay Thai once recorded), each with tally marks and a number.
