@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { CaseFilePage } from "@/components/board/case-file";
 import { CaseStudyPage } from "@/components/site/case-study-page";
+import { caseFiles } from "@/content/case-files";
 import { caseStudies, isCaseStudySlug } from "@/content/case-studies";
 
 export function generateStaticParams() {
@@ -15,28 +17,31 @@ export async function generateMetadata({
   const { slug } = await params;
   if (!isCaseStudySlug(slug)) return {};
   const study = caseStudies[slug];
+  const file = caseFiles[slug];
+  const description = file?.description ?? study.summary;
+  const image = file?.screenshot ?? study.hero;
   return {
     title: study.name,
-    description: study.summary,
+    description,
     alternates: { canonical: `/work/${slug}` },
     openGraph: {
       type: "website",
       siteName: "Elias B.",
       url: `/work/${slug}`,
       title: `${study.name} · Elias B.`,
-      description: study.summary,
+      description,
       images: [{
-        url: study.hero.src,
-        width: study.hero.width,
-        height: study.hero.height,
-        alt: study.hero.alt,
+        url: image.src,
+        width: image.width,
+        height: image.height,
+        alt: image.alt,
       }],
     },
     twitter: {
       card: "summary_large_image",
       title: `${study.name} · Elias B.`,
-      description: study.summary,
-      images: [{ url: study.hero.src, alt: study.hero.alt }],
+      description,
+      images: [{ url: image.src, alt: image.alt }],
     },
   };
 }
@@ -48,5 +53,6 @@ export default async function WorkDetailPage({
 }) {
   const { slug } = await params;
   if (!isCaseStudySlug(slug)) notFound();
-  return <CaseStudyPage study={caseStudies[slug]} />;
+  const file = caseFiles[slug];
+  return file ? <CaseFilePage file={file} /> : <CaseStudyPage study={caseStudies[slug]} />;
 }

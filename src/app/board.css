@@ -69,6 +69,11 @@
   --picture-wash: radial-gradient(ellipse 60% 70% at 50% 8%, rgb(255 182 110 / 0.26), rgb(255 170 100 / 0.08) 55%, transparent 80%);
   --picture-beam: linear-gradient(to bottom, rgb(255 206 140 / 0.36), rgb(255 192 122 / 0.14) 55%, rgb(255 190 120 / 0));
   --pinned-grid: color-mix(in srgb, var(--wall-ink) 5.5%, transparent);
+  --folder-grain:
+    repeating-linear-gradient(100deg, rgb(120 80 30 / 0.05) 0 2px, transparent 2px 9px),
+    radial-gradient(800px 400px at 20% 0%, rgb(255 240 200 / 0.35), transparent 70%);
+  --margin-rule: rgb(201 74 34 / 0.25);
+  --stamp: #b3261e;
 
   /* GitHub's five-step greens: the one deliberate palette exception */
   --github-0: #ebedf0;
@@ -354,7 +359,8 @@
   }
 
   /* On paper the wall's night accent is too pale, so focus uses the paper accent. */
-  [data-pin]:not([data-stock="none"]) :is(a, button):focus-visible {
+  [data-pin]:not([data-stock="none"]) :is(a, button):focus-visible,
+  [data-board-surface="paper"] :is(a, button):focus-visible {
     outline-color: var(--accent);
   }
 
@@ -559,5 +565,93 @@
       linear-gradient(var(--pinned-grid) 1px, transparent 1px),
       linear-gradient(90deg, var(--pinned-grid) 1px, transparent 1px);
     background-size: 48px 48px;
+  }
+
+  /*
+   * The case-file folder: kraft card with a grain, and inside it a sheet of
+   * paper with a red margin rule. The rule moves in with the padding on phones.
+   */
+  .board-folder {
+    background-color: var(--stock-kraft);
+    background-image: var(--folder-grain);
+  }
+
+  .board-folder-sheet {
+    box-shadow: var(--shadow-contact);
+    background-image: linear-gradient(90deg, transparent 23px, var(--margin-rule) 23px 24px, transparent 24px);
+  }
+
+  @media (min-width: 640px) {
+    .board-folder-sheet {
+      background-image: linear-gradient(90deg, transparent 39px, var(--margin-rule) 39px 40px, transparent 40px);
+    }
+  }
+
+  /* A rubber stamp, inked straight onto the sheet. */
+  .board-stamp {
+    display: inline-block;
+    border: 3px solid var(--stamp);
+    padding: 6px 12px;
+    color: var(--stamp);
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-size: var(--text-small);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* Live and Code: stamp-style buttons, one inked solid and one outlined. */
+  .board-stamp-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: 3px;
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-size: var(--text-small);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: translate var(--duration-quick) var(--ease-out-strong), box-shadow var(--duration-quick) var(--ease-out-strong);
+  }
+
+  .board-stamp-button-solid {
+    background: var(--accent);
+    color: var(--paper);
+    box-shadow: 0 3px 0 color-mix(in srgb, var(--accent) 62%, black);
+  }
+
+  .board-stamp-button-outline {
+    border: 2px solid var(--ink);
+    color: var(--ink);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .board-stamp-button:active {
+      translate: 0 2px;
+    }
+
+    .board-stamp-button-solid:active {
+      box-shadow: 0 1px 0 color-mix(in srgb, var(--accent) 62%, black);
+    }
+  }
+
+  /* Divider tabs stick out of the folder's right edge on wide screens. */
+  .board-divider-tab {
+    border-radius: var(--radius-paper);
+    box-shadow: var(--shadow-contact);
+  }
+
+  @media (min-width: 900px) {
+    .board-divider-tab {
+      justify-content: center;
+      width: 56px;
+      min-height: 80px;
+      padding-block: 14px;
+      white-space: nowrap;
+      border-radius: 0 8px 8px 0;
+      writing-mode: vertical-rl;
+      box-shadow: calc(var(--light-side) * 3px) 3px 6px rgb(var(--shadow-tint) / var(--shadow-near-alpha));
+    }
   }
 }

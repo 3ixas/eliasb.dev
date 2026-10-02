@@ -29,6 +29,9 @@ export default async function PinFixtures() {
           <Pin object="photo" fixing="clip" surface="paper" looseness="loose" tilt={2} stock="photo" fixingAt={20} className="mt-8 p-6">
             Clipped to paper
           </Pin>
+          <Pin object="note" fixing="adhesive" surface="paper" looseness="loose" tilt={-1.5} stock="ochre" className="mt-8 p-6 pt-9">
+            Stuck to paper
+          </Pin>
         </Pin>
       </BoardSurface>
       <BoardSurface kind="linen" className="grid gap-16 p-16 board:grid-cols-3">

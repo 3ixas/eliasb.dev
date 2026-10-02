@@ -13,7 +13,7 @@ export type FixingSurfaces = {
   string: "wall" | "linen";
   shelf: "wall";
   /** A sticky note's own adhesive strip. */
-  adhesive: "wall";
+  adhesive: "wall" | "paper";
 };
 
 export type Fixing = keyof FixingSurfaces;

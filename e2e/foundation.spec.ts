@@ -50,7 +50,7 @@ test.describe("Board foundation", () => {
     expect(outline).toBe("solid");
   });
 
-  for (const route of ["/", "/fixtures/pins"]) {
+  for (const route of ["/", "/work/threshold", "/fixtures/pins"]) {
     test(`every fixing is attached to a visible surface on ${route}`, async ({ page }) => {
       await page.goto(route);
       const fixings = await page.locator("[data-fixing]").evaluateAll((pins) =>
@@ -58,7 +58,7 @@ test.describe("Board foundation", () => {
           const surface = pin.getAttribute("data-surface");
           const holder =
             surface === "paper"
-              ? pin.parentElement?.closest("[data-pin]")
+              ? pin.parentElement?.closest('[data-pin], [data-board-surface="paper"]')
               : pin.closest(`[data-board-surface="${surface}"]`);
           const box = holder?.getBoundingClientRect();
           return { surface, attached: Boolean(holder && box && box.width > 0 && box.height > 0) };
