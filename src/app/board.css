@@ -74,6 +74,17 @@
     radial-gradient(800px 400px at 20% 0%, rgb(255 240 200 / 0.35), transparent 70%);
   --margin-rule: rgb(201 74 34 / 0.25);
   --stamp: #b3261e;
+  --manila-1: #e8ce93;
+  --manila-2: #e3c684;
+  --manila-3: #ddbf7b;
+  --drawer-wood: linear-gradient(180deg, #7e6a55 0%, #6a5745 100%);
+  --drawer-sheen: inset 0 1px 0 rgb(255 255 255 / 0.18);
+  --drawer-label: #f4eedf;
+  --drawer-label-edge: #b9a58a;
+  --drawer-handle: linear-gradient(180deg, #d8cdbb, #9c8f7e);
+  --drawer-handle-shadow: 0 2px 2px rgb(0 0 0 / 0.3);
+  --drawer-side: #6a5745;
+  --drawer-inside: color-mix(in srgb, var(--drawer-side) 22%, transparent);
 
   /* GitHub's five-step greens: the one deliberate palette exception */
   --github-0: #ebedf0;
@@ -655,5 +666,41 @@
       text-orientation: sideways;
       box-shadow: calc(var(--light-side) * 3px) 3px 6px rgb(var(--shadow-tint) / var(--shadow-near-alpha));
     }
+  }
+
+  /*
+   * The work drawer: a wooden drawer pulled open, with manila folders standing
+   * in it and the drawer's front, label holder, and handle below them.
+   */
+  .board-drawer {
+    background: var(--drawer-inside);
+    border-inline: 12px solid var(--drawer-side);
+  }
+
+  .board-manila {
+    box-shadow: 0 -2px 3px rgb(var(--shadow-tint) / var(--shadow-near-alpha));
+  }
+
+  .board-drawer-front {
+    margin-inline: -12px;
+    background: var(--drawer-wood);
+    box-shadow: var(--drawer-sheen), var(--shadow-pin);
+  }
+
+  .board-drawer-label {
+    width: 180px;
+    height: 44px;
+    max-width: 45%;
+    border: 3px solid var(--drawer-label-edge);
+    border-radius: 3px;
+    background: var(--drawer-label);
+  }
+
+  .board-drawer-handle {
+    width: 90px;
+    height: 14px;
+    border-radius: 7px;
+    background: var(--drawer-handle);
+    box-shadow: var(--drawer-handle-shadow);
   }
 }

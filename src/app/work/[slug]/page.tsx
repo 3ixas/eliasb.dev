@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CaseFilePage } from "@/components/board/case-file";
-import { CaseStudyPage } from "@/components/site/case-study-page";
-import { caseFiles } from "@/content/case-files";
-import { caseStudies, isCaseStudySlug } from "@/content/case-studies";
+import { caseFiles, caseFileSlugs, isCaseFileSlug } from "@/content/case-files";
 
 export function generateStaticParams() {
-  return Object.keys(caseStudies).map((slug) => ({ slug }));
+  return caseFileSlugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
@@ -15,20 +13,17 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  if (!isCaseStudySlug(slug)) return {};
-  const study = caseStudies[slug];
-  const file = caseFiles[slug];
-  const description = file?.description ?? study.summary;
-  const image = file?.screenshot ?? study.hero;
+  if (!isCaseFileSlug(slug)) return {};
+  const { name, description, screenshot: image } = caseFiles[slug];
   return {
-    title: study.name,
+    title: name,
     description,
     alternates: { canonical: `/work/${slug}` },
     openGraph: {
       type: "website",
       siteName: "Elias B.",
       url: `/work/${slug}`,
-      title: `${study.name} · Elias B.`,
+      title: `${name} · Elias B.`,
       description,
       images: [{
         url: image.src,
@@ -39,7 +34,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${study.name} · Elias B.`,
+      title: `${name} · Elias B.`,
       description,
       images: [{ url: image.src, alt: image.alt }],
     },
@@ -52,7 +47,6 @@ export default async function WorkDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  if (!isCaseStudySlug(slug)) notFound();
-  const file = caseFiles[slug];
-  return file ? <CaseFilePage file={file} /> : <CaseStudyPage study={caseStudies[slug]} />;
+  if (!isCaseFileSlug(slug)) notFound();
+  return <CaseFilePage file={caseFiles[slug]} />;
 }

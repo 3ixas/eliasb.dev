@@ -50,7 +50,7 @@ test.describe("Board foundation", () => {
     expect(outline).toBe("solid");
   });
 
-  for (const route of ["/", "/work/threshold", "/fixtures/pins"]) {
+  for (const route of ["/", "/work/threshold", "/work/argus-risk", "/work/flowtime", "/fixtures/pins"]) {
     test(`every fixing is attached to a visible surface on ${route}`, async ({ page }) => {
       await page.goto(route);
       const fixings = await page.locator("[data-fixing]").evaluateAll((pins) =>
@@ -108,7 +108,7 @@ test.describe("Board foundation", () => {
     expect(external).toBe(0);
   });
 
-  for (const route of ["/", "/work", "/work/threshold", "/fixtures/pins"]) {
+  for (const route of ["/", "/work", "/work/threshold", "/work/argus-risk", "/work/flowtime", "/fixtures/pins"]) {
     test(`nothing scrolls sideways on ${route}`, async ({ page }) => {
       await page.goto(route);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);

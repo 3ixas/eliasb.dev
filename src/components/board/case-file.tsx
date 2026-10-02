@@ -39,7 +39,7 @@ export function CaseFilePage({ file }: { file: CaseFile }) {
           <div className="board-folder relative rounded-b-board rounded-tr-board p-2 shadow-pin sm:p-4 board:p-6">
             <div data-board-surface="paper" className="board-folder-sheet rounded-paper bg-paper py-8 pr-5 pl-10 text-ink sm:pr-8 sm:pl-16 board:px-14 board:py-12">
               <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-                <BackToWork />
+                <BackToDrawer />
                 <p className="board-stamp m-0 -rotate-3 board:-rotate-[8deg]">
                   {copy.stamp} {file.number}
                 </p>
@@ -57,13 +57,13 @@ export function CaseFilePage({ file }: { file: CaseFile }) {
                     surface="paper"
                     looseness="loose"
                     tilt={-1.5}
-                    stock="ochre"
+                    stock={file.noteStock}
                     className="max-w-[380px] self-start px-6 pt-9 pb-5"
                   >
                     <p className="m-0 font-display text-title italic">{file.thesis}</p>
                   </Pin>
                   <p className="m-0 max-w-[470px] text-lead">{file.summary}</p>
-                  <div className="flex flex-wrap gap-4">
+                  <div className="flex flex-wrap items-center gap-4">
                     {file.liveUrl && (
                       <a href={file.liveUrl} target="_blank" rel="noreferrer" className="board-stamp-button board-stamp-button-solid">
                         {copy.live} <Arrow>↗</Arrow>
@@ -72,6 +72,7 @@ export function CaseFilePage({ file }: { file: CaseFile }) {
                     <a href={file.codeUrl} target="_blank" rel="noreferrer" className="board-stamp-button board-stamp-button-outline">
                       {copy.code} <Arrow>↗</Arrow>
                     </a>
+                    {file.codeNote && <p className="m-0 text-small text-muted">{file.codeNote}</p>}
                   </div>
                 </div>
 
@@ -111,7 +112,7 @@ export function CaseFilePage({ file }: { file: CaseFile }) {
               </div>
 
               <p className="mt-20 mb-0">
-                <BackToWork />
+                <BackToDrawer />
               </p>
             </div>
           </div>
@@ -191,13 +192,13 @@ function Section({ section }: { section: CaseFileSection }) {
   );
 }
 
-function BackToWork() {
+function BackToDrawer() {
   return (
     <Link
-      href={copy.backToWorkHref}
+      href={copy.backToDrawerHref}
       className="board-focus inline-flex min-h-11 items-center gap-1 font-semibold text-muted underline decoration-accent decoration-2 underline-offset-4"
     >
-      <Arrow>←</Arrow> {copy.backToWork}
+      <Arrow>←</Arrow> {copy.backToDrawer}
     </Link>
   );
 }
