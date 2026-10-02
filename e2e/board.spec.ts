@@ -43,7 +43,7 @@ test.describe("The Board", () => {
     const board = section.locator("[data-pinboard]");
     await expect(board).toBeVisible();
     await expect(board.locator("[data-board-surface='linen']")).toBeVisible();
-    for (const light of ["festoon", "clamp-spotlight", "fairy-lights"]) {
+    for (const light of ["festoon", "fairy-lights"]) {
       await expect(board.locator(`[data-light-fixture='${light}']`)).toHaveAttribute("aria-hidden", "true");
     }
   });
@@ -59,7 +59,7 @@ test.describe("The Board", () => {
     await lightsOn(page);
     const board = page.locator("[data-pinboard]");
     await expect(board.locator(".board-night-dim")).toHaveCSS("opacity", "1");
-    for (const light of ["festoon", "clamp-spotlight", "fairy-lights"]) {
+    for (const light of ["festoon", "fairy-lights"]) {
       await expect(board.locator(`[data-light-fixture='${light}'] > div`).first()).toHaveCSS("opacity", "1");
     }
   });

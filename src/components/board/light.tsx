@@ -6,7 +6,7 @@
  *
  * Each section adds its own kind of light when it moves to the Board.
  */
-export type LightKind = "desk-lamp" | "picture-light" | "festoon" | "clamp-spotlight" | "fairy-lights";
+export type LightKind = "desk-lamp" | "picture-light" | "festoon" | "fairy-lights";
 
 export function Light({ kind }: { kind: LightKind }) {
   switch (kind) {
@@ -16,8 +16,6 @@ export function Light({ kind }: { kind: LightKind }) {
       return <PictureLight />;
     case "festoon":
       return <Festoon />;
-    case "clamp-spotlight":
-      return <ClampSpotlight />;
     case "fairy-lights":
       return <FairyLights />;
   }
@@ -83,7 +81,7 @@ const festoonBulbs = Array.from({ length: 9 }, (_, index) => {
 });
 
 /**
- * The Board's three lights hang on its frame. A festoon string runs across the
+ * The Board's two lights hang on its frame. A festoon string runs across the
  * top and pools light at the top right; at night the bulbs glow.
  */
 function Festoon() {
@@ -96,23 +94,6 @@ function Festoon() {
       {festoonBulbs.map(({ left, top }) => (
         <span key={left} className="board-festoon-bulb absolute -translate-x-1/2" style={{ left, top }} />
       ))}
-    </div>
-  );
-}
-
-/** A black clamp spotlight on the frame's left edge, throwing a beam across the middle of the Board. */
-function ClampSpotlight() {
-  return (
-    <div aria-hidden="true" inert data-light-fixture="clamp-spotlight" className="pointer-events-none absolute inset-0">
-      <div className="absolute inset-x-0 top-[38%] h-[30%] bg-(image:--spotlight-beam) opacity-(--is-night) [clip-path:polygon(0_42%,100%_0,100%_100%,0_58%)]" />
-      <svg width="64" height="56" viewBox="0 0 64 56" className="absolute top-[calc(38%+0.75rem)] -left-8">
-        <rect x="0" y="20" width="18" height="16" rx="2" fill="var(--iron)" />
-        <rect x="14" y="25" width="12" height="6" fill="var(--iron)" />
-        <g transform="rotate(-4 40 28)">
-          <path d="M24 16 L50 12 L50 44 L24 40 Z" fill="var(--iron)" />
-          <ellipse cx="50" cy="28" rx="5" ry="16" fill="var(--spotlight-face)" />
-        </g>
-      </svg>
     </div>
   );
 }

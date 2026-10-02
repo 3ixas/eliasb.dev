@@ -149,7 +149,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     |---|---|
     | Hero | Clamp desk lamp |
     | Work | A brass picture light above each project |
-    | Board | Three sources, each attached to the frame: the festoon string across the top (pooling top right), a black clamp spotlight on the left edge throwing a beam across the middle, and fairy lights wound down the bottom-right corner. At night the board dims overall so the pools and darker gaps read clearly, but every pin keeps AA-contrast text (measured, not judged by eye) |
+    | Board | Two sources, each attached to the frame: the festoon string across the top (pooling top right) and fairy lights wound down the bottom-right corner. At night the board dims overall so the pools and darker gaps read clearly, but every pin keeps AA-contrast text (measured, not judged by eye) |
     | About | A candle on a small wall shelf on iron brackets, beside a row of book spines, beside the About heading, in the top half and well away from the neon: gentle flicker at night, steady with reduced motion |
     | Contact | A bold neon sign: a dark scanlined sign box bolted to the wall with its cable to a socket, a large hot-pink "hello" with a small cyan "SAY" and underline tube. Unlit glass by day; at night it glows strongly and washes the wall pink and cyan. An occasional single-letter flicker, off under reduced motion |
 

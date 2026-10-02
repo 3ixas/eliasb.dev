@@ -94,7 +94,7 @@
   --manila-crease: inset 0 1px 0 rgb(255 255 255 / 0.35);
 
   /*
-   * The Board: a wooden frame round a linen pinboard, and its three lights.
+   * The Board: a wooden frame round a linen pinboard, and its two lights.
    * Day and night blend on --is-night, so they need no copy in the night blocks.
    */
   --frame-wood: linear-gradient(135deg, #c69c6d 0%, #b08457 45%, #9c7349 100%);
@@ -103,7 +103,6 @@
   --linen-inset: inset 3px 4px 10px rgb(60 35 15 / 0.3);
   --night-dim: rgb(38 24 12 / 0.38);
   --festoon-pool: radial-gradient(ellipse 55% 40% at 82% 0%, rgb(255 190 110 / 0.55), rgb(255 170 90 / 0.12) 45%, transparent 72%);
-  --spotlight-beam: linear-gradient(to right, rgb(255 226 170 / 0.45), rgb(255 210 150 / 0.14) 60%, transparent);
   --fairy-pool: radial-gradient(ellipse 40% 30% at 90% 92%, rgb(255 160 110 / 0.4), rgb(255 140 90 / 0.1) 50%, transparent 74%);
   --light-wire: color-mix(in srgb, #2a2420 calc(var(--is-night) * 100%), #5b524a);
   --festoon-bulb: color-mix(in srgb, #ffe3ae calc(var(--is-night) * 100%), rgb(250 246 238 / 0.6));
@@ -111,7 +110,6 @@
   --festoon-glow: 0 0 10px 3px rgb(255 190 110 / calc(var(--is-night) * 0.7));
   --fairy-bulb: color-mix(in srgb, #ffd9a0 calc(var(--is-night) * 100%), #d9cdb8);
   --fairy-glow: drop-shadow(0 0 3px rgb(255 184 107 / calc(var(--is-night) * 1)));
-  --spotlight-face: color-mix(in srgb, #fff1cf calc(var(--is-night) * 100%), #d8cfc0);
   --clock-rim: #3a332d;
   --clock-face: #f6f0e2;
   --clock-hands: #1d1a16;
@@ -816,7 +814,6 @@
   }
 
   [data-light-fixture="festoon"] > div,
-  [data-light-fixture="clamp-spotlight"] > div,
   [data-light-fixture="fairy-lights"] > div {
     mix-blend-mode: screen;
   }
