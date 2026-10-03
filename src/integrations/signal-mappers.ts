@@ -10,24 +10,7 @@ export type GitHubEventShape = {
 
 export type ContributionDayShape = { date: string; contributionCount: number };
 
-export type StravaActivityShape = {
-  type?: unknown;
-  sport_type?: unknown;
-};
-
-export type TrainingCategoryShape = {
-  label: string;
-  count: number;
-};
-
 export const GITHUB_ACTIVITY_DAYS = 365;
-
-export const TRAINING_CATEGORIES: TrainingCategoryShape[] = [
-  { label: "Lift", count: 0 },
-  { label: "Run", count: 0 },
-  { label: "Muay Thai", count: 0 },
-  { label: "Other", count: 0 },
-];
 
 export function datesForWindow(length: number, now = new Date()): ActivityDay[] {
   return Array.from({ length }, (_, index) => {
@@ -69,56 +52,15 @@ const london = new Intl.DateTimeFormat("en-GB", {
   hourCycle: "h23",
 });
 
-/** The time in London written as if it were UTC, so wall-clock sums ignore British Summer Time. */
+/** The time in London written as if it were UTC, so its calendar day is London's. */
 function londonWallClock(instant: number) {
   const part = (type: string) => Number(london.formatToParts(instant).find((entry) => entry.type === type)?.value);
   return Date.UTC(part("year"), part("month") - 1, part("day"), part("hour"), part("minute"), part("second"));
 }
 
-/** Midnight at the start of Monday in London: the training week's first moment. */
-export function londonWeekStart(now = new Date()) {
-  const wall = londonWallClock(now.getTime());
-  const today = new Date(wall);
-  const monday = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - ((today.getUTCDay() + 6) % 7));
-  // London's offset at Monday midnight, which can differ from now's if the clocks changed on Sunday.
-  const guess = monday - (wall - now.getTime());
-  return new Date(monday - (londonWallClock(guess) - guess));
-}
-
-export function classifyTrainingActivity(activity: StravaActivityShape) {
-  const type = `${activity.sport_type ?? activity.type ?? ""}`.toLowerCase();
-
-  if (["weighttraining", "workout", "crossfit", "strength", "elliptical"].some((value) => type.includes(value))) {
-    return "Lift";
-  }
-  if (type.includes("run")) return "Run";
-  if (["martial", "kickbox", "boxing", "muay"].some((value) => type.includes(value))) {
-    return "Muay Thai";
-  }
-  return "Other";
-}
-
-/** This week's sessions by category, in the card's order; categories with none are left out. */
-export function groupTrainingActivities(activities: StravaActivityShape[]) {
-  const counts = new Map(TRAINING_CATEGORIES.map((category) => [category.label, 0]));
-
-  for (const activity of activities) {
-    const label = classifyTrainingActivity(activity);
-    counts.set(label, (counts.get(label) ?? 0) + 1);
-  }
-
-  return TRAINING_CATEGORIES.map((category) => ({
-    ...category,
-    count: counts.get(category.label) ?? 0,
-  })).filter((category) => category.count > 0);
-}
-
-/** Tally marks as gates of five; past three gates the marks stop and the number carries the rest. */
-export const TALLY_LIMIT = 15;
-
-export function tallyGates(count: number) {
-  const marks = Math.min(Math.max(0, Math.floor(count)), TALLY_LIMIT);
-  return Array.from({ length: Math.ceil(marks / 5) }, (_, gate) => Math.min(5, marks - gate * 5));
+/** The day of the week in London, counting from Monday (0) to Sunday (6). */
+export function londonWeekday(now = new Date()) {
+  return (new Date(londonWallClock(now.getTime())).getUTCDay() + 6) % 7;
 }
 
 /** The fields read from a Goodreads currently-reading item, already decoded. */

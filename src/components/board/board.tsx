@@ -13,7 +13,6 @@ import { getReadingSignal } from "@/integrations/goodreads";
 import { getCachedHistorySignal } from "@/integrations/history-cache";
 import { getFilmSignal } from "@/integrations/letterboxd";
 import { getFantasySignal } from "@/integrations/sleeper";
-import { getTrainingSignal } from "@/integrations/strava";
 import type { PinStatus } from "@/integrations/pin-rules";
 
 // London is authored, a photo and the time, so it is always current (staleAfterDays.london is null).
@@ -26,12 +25,11 @@ const londonStatus: PinStatus = { kind: "current" };
  */
 export async function Board() {
   const now = new Date();
-  const [history, reading, film, fantasy, training] = await Promise.all([
+  const [history, reading, film, fantasy] = await Promise.all([
     getCachedHistorySignal(),
     getReadingSignal(),
     getFilmSignal(),
     getFantasySignal(now),
-    getTrainingSignal(now),
   ]);
 
   return (
@@ -50,7 +48,7 @@ export async function Board() {
         </h2>
         <Pinboard className="mt-12 board:mt-16">
           <ClippingPin history={history} now={now} />
-          <TrainingPin training={training} now={now} />
+          <TrainingPin now={now} />
           {/* London with the fantasy ticket pinned below it, beside the clipping. */}
           <div className="flex flex-col gap-16 board:col-span-4 board:col-start-9">
             <LondonPin />

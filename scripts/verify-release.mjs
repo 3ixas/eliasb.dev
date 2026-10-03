@@ -312,14 +312,13 @@ function verifyHomepage(markup) {
   check(/Now reading/.test(text) && /(Goodreads|Between books)/.test(text), "The book pin should show the book from Goodreads, or say I'm between books");
   check(/Admit one · Last watched/.test(text) && /(Letterboxd|Nothing logged yet)/.test(text), "The film ticket should show the film from Letterboxd, or say nothing is logged");
   check(!/private contributions are part of the total|keep their repositories private/i.test(text), "GitHub output should omit the redundant private-repository explanation");
-  // Training: the running photo always; the diary card only with this week's Strava counts.
+  // Training: the running photo with my week as a plan, today marked once, and nothing from Strava.
   const training = markup.match(/data-board-pin="training"([\s\S]*?)data-board-pin=/i)?.[1] ?? "";
   check(plainText(training).includes("Out on a run, central London."), "The training pin should show the running photo's caption");
   check(tags(training, "img").some((tag) => attribute(tag, "alt") === "Elias mid-run on a rainy street in central London"), "The running photo should describe itself");
-  if (training.includes("data-training-log")) {
-    check(/Training this week, from Strava: .+\. (Rest days, so far|Easing in|Steady week|Busy week)\./.test(plainText(training)), "The training card should read as one sentence to screen readers");
-  }
-  check(!/Typical week|My weekly training plan/.test(text), "The authored typical training week is retired");
+  check(/My training week, the plan\. Today, [A-Z][a-z]+day: /.test(plainText(training)), "The training plan should read once to screen readers, today first");
+  equal((training.match(/data-today="true"/g) ?? []).length, 1, "The training plan should mark exactly one day as today");
+  check(!/Strava|Typical week|My weekly training plan/.test(text), "Nothing on the homepage should come from Strava or the retired typical week");
   // The Weekly Curiosity: three oddities as a clipping, sourced to readable pages.
   // From the clipping's pin up to the next pin on the Board.
   const clipping = markup.match(/data-board-pin="clipping"([\s\S]*?)data-board-pin=/i)?.[1] ?? "";

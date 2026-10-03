@@ -22,7 +22,7 @@ Each pin carries one short label in mono capitals, saying what it shows. Where a
 | Weekly clipping (#84) | The Weekly Curiosity | The masthead is the label. |
 | Making (#87) | Now making | |
 | GitHub sheet (#87) | GitHub · the past year | |
-| Training (#86) | Training this week · via Strava | |
+| Training (#86) | My training week | Changed from "Training this week · via Strava" on 3 October 2026; see 09-training-log.md |
 | Fantasy ticket (#85) | NFL fantasy · Week 3 | The week number is live. |
 | London (#82) | Home, London | |
 | Culture corner (#83) | The culture corner | The corner's own heading. |
@@ -48,7 +48,7 @@ The clock face is drawn, so screen readers hear the time once, in 24-hour form, 
 | Stale | The pin looks sun-faded, with a pencilled date under it | as of 12 Sept |
 | Missing photo | A blank polaroid in the photo's place | photo coming |
 
-A pin goes stale only when it is showing saved data because its live source couldn't be reached, and that data is older than the pin's natural rhythm: training after 8 days, GitHub after 3, the book and film after 60. The playlist, Making, London, fantasy, and the clipping never go stale; they are authored, live, or already have their own windows. The limits live in `src/integrations/pin-rules.ts`.
+A pin goes stale only when it is showing saved data because its live source couldn't be reached, and that data is older than the pin's natural rhythm: GitHub after 3 days, the book and film after 60. Training, the playlist, Making, London, fantasy, and the clipping never go stale (training since it became an authored plan on 3 October 2026); they are authored, live, or already have their own windows. The limits live in `src/integrations/pin-rules.ts`.
 
 The "as of" date is the day the pin's data was last fresh, written day and short month ("as of 3 Oct", "as of 12 Sept"), the same in every locale. Screen readers hear it as part of the pin: "as of 12 September".
 

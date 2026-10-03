@@ -107,7 +107,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
 |---|---|---|---|---|---|---|
 | Home: hero | Is this person worth my time? | n/a | Fonts load without text jumping (metric-matched fallbacks) | JavaScript blocked: finished headline shown | Headline pinned, Board visible | First load, reload, back-navigation, reduced motion, day and night |
 | Home: Work | Which project should I open? | n/a | Screenshots have reserved sizes with a paper placeholder | Missing image shows a titled paper pin | Three projects pinned carefully, "View all work" | Hover lift, focus, 320 px stack |
-| Home: personal Board | What's he like? | A pin with nothing current is removed | Artwork placeholders reserve their space | Cached pin with a subtle "as of" date; authored fallback | A composed Board | Fantasy: live, last week, off-season. Clipping: closed, open, no image. Making fallback. Training with or without Strava |
+| Home: personal Board | What's he like? | A pin with nothing current is removed | Artwork placeholders reserve their space | Cached pin with a subtle "as of" date; authored fallback | A composed Board | Fantasy: live, last week, off-season. Clipping: closed, open, no image. Making fallback. Training plan with today marked |
 | Home: About | Do I connect with his story? | n/a | Portrait placeholder reserves space | n/a | Story opening with history, portrait | Long text, day and night |
 | Home: contact | How do I reach him? | n/a | n/a | n/a | Email as the main action; résumé, GitHub, LinkedIn | Contact cursors on fine pointers only |
 | `/work` archive | Which case study? | n/a | Image placeholders | n/a | All case studies | 320 px |
@@ -126,7 +126,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
   - `Board`: the weekly clipping, running photo, Making, fantasy (real week 3 result), book, film, London, GitHub year (real data), and music.
   - `Mobile`: 390 px.
   - Every artboard except `Type` has a Type tweak for switching pairings A, B, and C.
-  - Strava counts are shown as `[n]` placeholders because the production credentials are unconfirmed.
+  - Strava counts are shown as `[n]` placeholders because the production credentials are unconfirmed. (Superseded: the training pin became an authored plan in #86.)
   - The draft headline is "I build everyday software, and make complicated things feel simple." It still needs approval in the copy document.
 - **Round 3 (30 September 2026):**
   - Added the night Board, with the framed pinboard under the lamp.
@@ -168,7 +168,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     | Book | Cover plus a stamped library card |
     | Film | Poster plus a cinema ticket stub |
     | Music | A portable cassette player that opens to Spotify's own player (see the culture corner below) |
-    | Training | Polaroid plus tally marks, with the number beside them |
+    | Training | Polaroid plus a diary page of the week, today looped in pencil |
     | About | Prose beside a connected journey: a red string with arrowheads, pinned at five numbered stops and starting with a pencilled "start here". The stops are: (1) history essay, (2) plain bakery bag with doughnut (no brand logo), (3) speech bubble quoting "I need that feeling from what I do.", (4) code sticky note, (5) lanyard, "BNP Paribas, today". In the build, the string draws stop by stop on scroll, and is static under reduced motion |
     | Contact | A postcard with an E/B stamp, plus pinned link cards |
     | Footer | The frame's bottom edge and "Made by Elias" |
@@ -203,6 +203,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
   - **The training pin is a photo plus a log card (Elias, 1 October 2026).**
     - The polaroid carries the mood ("Out on a run, central London.").
     - A lined "Training this week · via Strava" card pinned over its edge carries the data: one row per activity (Lifts, Runs, and Muay Thai once recorded), each with tally marks and a number.
+    - **Changed (Elias, 3 October 2026):** Strava's API went subscriber-only, so the card is now "My training week", the plan: one ruled line per day, today looped in pencil, and a pencilled "Zone 2 means slow on purpose." Live tallies are the optional ticket #94.
   - **The GitHub pin is a full-width feature (Elias, 1 October 2026).**
     - A graph-paper sheet spanning the board, with a large ink total and month labels.
     - Days are small rounded squares in GitHub's five-step green scale (Elias: green is what people recognise). This is the one deliberate exception to the site palette. There is a Quiet-to-Busy legend.

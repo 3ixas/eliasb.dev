@@ -87,8 +87,8 @@ Keep the existing integrations, snapshots, content data, and routes. Rewrite eve
 36. As a visitor, I want a clipping without a usable image to stay text-only rather than show an unrelated picture.
 37. As a visitor, I want the Making pin as a blueprint sheet saying what Elias is building now, so that I see current work.
 38. As Elias, I want the Making pin to fall back to my latest public repository when nothing is current, so that it never goes stale.
-39. As a visitor, I want Elias's running photo with a "Training this week · via Strava" log card, showing lifts and runs as tally marks with numbers.
-40. As a visitor, I want a Muay Thai row to appear automatically once sessions are recorded, and nothing about Muay Thai before then.
+39. As a visitor, I want Elias's running photo with a diary page of his training week, labelled as the plan, with today marked. (Changed 3 October 2026: Strava's API went subscriber-only, so live tallies became the optional post-launch ticket #94.)
+40. Withdrawn 3 October 2026 with live tallies: there is no Muay Thai row.
 41. As a visitor, I want the fantasy pin as an NFL ticket stub: last week's result and season record from Tuesday until kickoff, the live score during games, and no pin off-season.
 42. As a visitor, I want the fantasy pin to name Elias's team and keep opponents and the league anonymous.
 43. As a visitor, I want the GitHub pin as a full-width graph-paper sheet: a big contribution total, GitHub-green days, month labels, a legend, and a pencil loop around the busiest stretch.
@@ -138,7 +138,7 @@ Keep the existing integrations, snapshots, content data, and routes. Rewrite eve
 ### Keep and change
 
 - **Keep:**
-  - Integrations and snapshot/fallback behaviour (GitHub, Goodreads, Letterboxd, Sleeper, Spotify, Strava, Wikimedia history with its cache).
+  - Integrations and snapshot/fallback behaviour (GitHub, Goodreads, Letterboxd, Sleeper, Spotify, Wikimedia history with its cache; Strava was removed in #86 when its API went subscriber-only).
   - Authored content data.
   - Routes and redirects.
   - Metadata generation.
@@ -206,7 +206,7 @@ These rules sit in the integration and mapper layer, not in components.
   - During game windows: the live score.
   - Off-season: no pin.
   - Shows Elias's team name; the opponent and the league stay anonymous.
-- **Training:** weekly counts by category from Strava (Lift, Run, plus Muay Thai and Other when present). Zero categories are hidden. If Strava has no data, the photo and caption stand alone.
+- **Training:** an authored weekly plan, Monday to Sunday, labelled as the plan, so it never goes stale. Today is marked by the day in London. No live source (see #94).
 - **GitHub:**
   - The total and per-day counts with GitHub's five-level scale.
   - The busiest stretch: the four-week window with the highest total, computed from the data.
@@ -261,7 +261,7 @@ These rules sit in the integration and mapper layer, not in components.
 - **Seam 2, signal and mapper contracts.** Extend the existing `verify:signals` scripts:
   - fantasy calendar states (Tuesday to Thursday shows last week; game windows; off-season shows no pin);
   - anonymisation;
-  - training categories and hidden zero categories;
+  - the training plan's day in London;
   - the GitHub busiest-stretch calculation and locale-independent labels;
   - clipping curation and fallbacks;
   - the readable source link;
@@ -288,6 +288,6 @@ These rules sit in the integration and mapper layer, not in components.
 ## Further Notes
 
 - **The known current defects are fixed by this rebuild, not patched separately:** blank scroll-reveal panels, the fantasy `0.0 vs 0.0`, and the Wikimedia JSON link.
-- **Strava credentials** in production must be confirmed during the training-pin slice.
+- **Strava credentials:** resolved 3 October 2026. Strava's API needs a paid subscription, so the training pin is an authored plan (#86) and live counts are optional (#94).
 - **Firefox support** for scroll-driven animations is checked during the motion slice. The static fallback is acceptable.
 - **The canvas About and postcard text is draft only.** The copy documents govern.

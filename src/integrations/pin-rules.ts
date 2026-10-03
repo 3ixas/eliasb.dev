@@ -25,10 +25,11 @@ export type PinKey =
 /**
  * Days before a pin's saved data counts as stale (approved by Elias,
  * 2 October 2026). null means the pin never goes stale: it is authored, live,
- * or already has its own windows and fallbacks.
+ * or already has its own windows and fallbacks. Training became an authored
+ * plan on 3 October 2026, when Strava's API went subscriber-only.
  */
 export const staleAfterDays: Record<PinKey, number | null> = {
-  training: 8,
+  training: null,
   github: 3,
   reading: 60,
   film: 60,

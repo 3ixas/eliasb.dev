@@ -7,15 +7,13 @@ import {
   bookFromGoodreads,
   datesForWindow,
   filmFromLetterboxd,
-  groupTrainingActivities,
   mapContributionDays,
   mapPublicActivity,
-  londonWeekStart,
-  tallyGates,
+  londonWeekday,
 } from "../src/integrations/signal-mappers.ts";
 import { integrationConfig } from "../src/content/integration-config.ts";
 import { asOfDate, pinStatus, staleAfterDays } from "../src/integrations/pin-rules.ts";
-import { fantasyRecord, fantasySpoken, fantasyVerdict, filmLine, isoWeek, stars, trainingNote, trainingRowLabel, trainingSpoken } from "../src/content/board.ts";
+import { fantasyRecord, fantasySpoken, fantasyVerdict, filmLine, isoWeek, stars, trainingSpoken } from "../src/content/board.ts";
 import { fantasyMoment, fantasyTicket } from "../src/integrations/fantasy.ts";
 import { readSleeperSnapshot } from "../src/integrations/sleeper-snapshot.ts";
 import { getHistorySignal, historyWeekStart, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "../src/integrations/history.ts";
@@ -601,14 +599,14 @@ assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "Escape"),
 assert.equal(createContributionCalendar([]), null);
 assert.equal(signalFallbacks.github.totalContributions, undefined, "Unavailable GitHub data should not imply a live aggregate");
 assert.match(signalFallbacks.github.headline, /couldn’t load GitHub/i);
-assert.equal("training" in signalFallbacks, false, "Without Strava, the running photo stands alone; there's no authored typical week");
+assert.equal("training" in signalFallbacks, false, "Training is an authored plan now; there's no live signal or fallback");
 
-// The training week is Monday to Sunday in London, through British Summer Time and the change back.
-assert.equal(londonWeekStart(now).toISOString(), "2026-09-13T23:00:00.000Z", "Monday 14 September, 00:00 BST");
-assert.equal(londonWeekStart(new Date("2026-09-13T22:59:59Z")).toISOString(), "2026-09-06T23:00:00.000Z", "Sunday 23:59 BST is still last week");
-assert.equal(londonWeekStart(new Date("2026-09-13T23:00:00Z")).toISOString(), "2026-09-13T23:00:00.000Z");
-assert.equal(londonWeekStart(new Date("2026-10-26T12:00:00Z")).toISOString(), "2026-10-26T00:00:00.000Z", "After the clocks go back, Monday starts at 00:00 GMT");
-assert.equal(londonWeekStart(new Date("2026-10-25T12:00:00Z")).toISOString(), "2026-10-18T23:00:00.000Z", "The Sunday the clocks go back belongs to a week that began in BST");
+// The plan's "today" is the day in London, Monday (0) to Sunday (6), through BST and GMT.
+assert.equal(londonWeekday(new Date("2026-10-04T22:59:00Z")), 6, "Sunday 23:59 BST");
+assert.equal(londonWeekday(new Date("2026-10-04T23:00:00Z")), 0, "Monday 00:00 BST, while it's still Sunday in UTC");
+assert.equal(londonWeekday(new Date("2026-10-03T12:00:00Z")), 5, "Saturday");
+assert.equal(londonWeekday(new Date("2026-11-01T23:30:00Z")), 6, "Sunday 23:30 GMT, after the clocks went back");
+assert.equal(londonWeekday(new Date("2026-11-02T00:00:00Z")), 0, "Monday 00:00 GMT");
 
 assert.deepEqual(
   mapContributionDays(
@@ -635,27 +633,6 @@ assert.deepEqual(
   { date: "2026-09-15", count: 2 },
 );
 
-const training = groupTrainingActivities([
-  { sport_type: "WeightTraining", name: "private gym" },
-  { sport_type: "Run", start_date: "private" },
-  { type: "MartialArts", map: { summary_polyline: "private" } },
-  { type: "Yoga" },
-]);
-
-assert.deepEqual(training.map(({ label, count }) => ({ label, count })), [
-  { label: "Lift", count: 1 },
-  { label: "Run", count: 1 },
-  { label: "Muay Thai", count: 1 },
-  { label: "Other", count: 1 },
-]);
-assert.equal(JSON.stringify(training).includes("private"), false);
-// Categories with no sessions are hidden, so Muay Thai appears only once it's been logged.
-assert.deepEqual(groupTrainingActivities([]), []);
-assert.deepEqual(
-  groupTrainingActivities([{ sport_type: "WeightTraining" }, { sport_type: "Run" }, { sport_type: "TrailRun" }, { sport_type: "Workout" }]),
-  [{ label: "Lift", count: 2 }, { label: "Run", count: 2 }],
-);
-
 // The running photo carries no embedded metadata: its WebP has image data only, no EXIF or XMP.
 const runningPhoto = readFileSync(new URL("../public/signals/running-central-london.webp", import.meta.url));
 const webpChunks = [];
@@ -665,33 +642,20 @@ for (let offset = 12; offset + 8 <= runningPhoto.length; offset += 8 + runningPh
 assert.equal(runningPhoto.toString("ascii", 8, 12), "WEBP");
 assert.deepEqual(webpChunks.filter((chunk) => ["EXIF", "XMP ", "ICCP"].includes(chunk)), [], "The running photo must not carry EXIF, XMP, or a colour profile");
 
-// Tallies come in gates of five, and stop at three gates; the number carries the rest.
-assert.deepEqual(tallyGates(0), []);
-assert.deepEqual(tallyGates(4), [4]);
-assert.deepEqual(tallyGates(5), [5]);
-assert.deepEqual(tallyGates(7), [5, 2]);
-assert.deepEqual(tallyGates(15), [5, 5, 5]);
-assert.deepEqual(tallyGates(40), [5, 5, 5]);
-
-// The pencilled note goes by the week's sessions, never by how they went.
-assert.deepEqual([0, 1, 2, 3, 5, 6, 12].map(trainingNote), [
-  "Rest days, so far.", "Easing in.", "Easing in.", "Steady week.", "Steady week.", "Busy week.", "Busy week.",
-]);
-assert.deepEqual(["Lift", "Run", "Muay Thai", "Other"].map(trainingRowLabel), ["Lifts", "Runs", "Muay Thai", "Other"]);
-assert.equal(trainingSpoken([{ label: "Lift", count: 4 }, { label: "Run", count: 2 }]), "Training this week, from Strava: 4 lifts and 2 runs. Busy week.");
+// The plan reads once to screen readers, today first; it claims nothing about sessions done.
 assert.equal(
-  trainingSpoken([{ label: "Lift", count: 1 }, { label: "Run", count: 3 }, { label: "Muay Thai", count: 1 }, { label: "Other", count: 1 }]),
-  "Training this week, from Strava: 1 lift, 3 runs, 1 Muay Thai session and 1 other session. Busy week.",
+  trainingSpoken(5),
+  "My training week, the plan. Today, Saturday: zone 2, rower or bike. Monday: full-body gym. Tuesday: zone 2 run. Wednesday: full-body gym. Thursday: interval run. Friday: full-body gym. Sunday: assault bike intervals. Zone 2 means slow on purpose.",
 );
-assert.equal(trainingSpoken([]), "Training this week, from Strava: nothing logged yet. Rest days, so far.");
+assert.match(trainingSpoken(0), /^My training week, the plan\. Today, Monday: full-body gym\. Tuesday:/);
 
 // Pin rules: nothing current is removed; saved data past its pin's limit is stale.
 const pinNow = new Date("2026-10-02T12:00:00.000Z");
 const daysAgo = (days) => new Date(pinNow.getTime() - days * 86_400_000).toISOString();
 assert.deepEqual(pinStatus("reading", { state: "unavailable", updatedAt: null }, pinNow), { kind: "removed" });
 assert.deepEqual(pinStatus("london", { state: "unavailable", updatedAt: null }, pinNow), { kind: "removed" });
-assert.deepEqual(pinStatus("training", { state: "live", updatedAt: daysAgo(8) }, pinNow), { kind: "current" });
-assert.deepEqual(pinStatus("training", { state: "live", updatedAt: daysAgo(10) }, pinNow), {
+assert.deepEqual(pinStatus("github", { state: "live", updatedAt: daysAgo(3) }, pinNow), { kind: "current" });
+assert.deepEqual(pinStatus("github", { state: "live", updatedAt: daysAgo(10) }, pinNow), {
   kind: "stale",
   asOf: { iso: daysAgo(10), short: "22 Sept", long: "22 September" },
 });
@@ -700,13 +664,13 @@ assert.equal(pinStatus("github", { state: "live", updatedAt: daysAgo(2) }, pinNo
 assert.equal(pinStatus("reading", { state: "live", updatedAt: daysAgo(61) }, pinNow).kind, "stale");
 assert.equal(pinStatus("film", { state: "live", updatedAt: daysAgo(59) }, pinNow).kind, "current");
 // Authored, curated, and never-stale pins stay current however old they are.
-for (const key of ["playlist", "making", "london", "fantasy", "clipping"]) {
+for (const key of ["training", "playlist", "making", "london", "fantasy", "clipping"]) {
   assert.equal(staleAfterDays[key], null);
   assert.equal(pinStatus(key, { state: "live", updatedAt: daysAgo(400) }, pinNow).kind, "current");
 }
-assert.equal(pinStatus("training", { state: "curated", updatedAt: daysAgo(400) }, pinNow).kind, "current");
-assert.equal(pinStatus("training", { state: "live", updatedAt: null }, pinNow).kind, "current");
-assert.equal(pinStatus("training", { state: "live", updatedAt: "not a date" }, pinNow).kind, "current");
+assert.equal(pinStatus("github", { state: "curated", updatedAt: daysAgo(400) }, pinNow).kind, "current");
+assert.equal(pinStatus("github", { state: "live", updatedAt: null }, pinNow).kind, "current");
+assert.equal(pinStatus("github", { state: "live", updatedAt: "not a date" }, pinNow).kind, "current");
 // "As of" dates are London days, the same in every locale.
 assert.deepEqual(asOfDate(new Date("2026-03-01T00:30:00.000Z")), { iso: "2026-03-01T00:30:00.000Z", short: "1 Mar", long: "1 March" });
 assert.equal(asOfDate(new Date("2026-06-30T23:30:00.000Z")).short, "1 July");

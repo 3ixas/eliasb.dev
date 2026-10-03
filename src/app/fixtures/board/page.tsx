@@ -16,8 +16,8 @@ const daysAgo = (days: number) => new Date(now.getTime() - days * 86_400_000).to
 
 const fixtures: readonly { key: PinKey; source: PinSource; photo?: string | null }[] = [
   { key: "github", source: { state: "live", updatedAt: daysAgo(1) } },
-  { key: "training", source: { state: "live", updatedAt: daysAgo(10) } },
-  { key: "reading", source: { state: "unavailable", updatedAt: null } },
+  { key: "reading", source: { state: "live", updatedAt: daysAgo(61) } },
+  { key: "playlist", source: { state: "unavailable", updatedAt: null } },
   { key: "film", source: { state: "live", updatedAt: daysAgo(2) }, photo: null },
   { key: "london", source: { state: "curated", updatedAt: null }, photo: board.london.src },
 ];

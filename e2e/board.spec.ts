@@ -100,8 +100,8 @@ test.describe("Pin states", () => {
   });
 
   test("a pin with nothing current is removed, leaving no gap", async ({ page }) => {
-    await expect(page.locator("[data-fixture-pin='reading']")).toHaveCount(0);
-    await expect(page.getByText("Now reading")).toHaveCount(0);
+    await expect(page.locator("[data-fixture-pin='playlist']")).toHaveCount(0);
+    await expect(page.getByText("On repeat")).toHaveCount(0);
     const cells = await page.locator("[data-pinboard] .grid > *").count();
     expect(cells).toBe(4);
   });
@@ -114,14 +114,14 @@ test.describe("Pin states", () => {
   });
 
   test("a stale pin is sun-faded with a pencilled date", async ({ page }) => {
-    const training = page.locator("[data-fixture-pin='training']");
-    await expect(training).toHaveAttribute("data-pin-state", "stale");
-    await expect(training.getByText("as of 22 Sept", { exact: true })).toBeVisible();
-    await expect(training.locator("time")).toHaveAttribute("datetime", "2026-09-22T12:00:00.000Z");
+    const reading = page.locator("[data-fixture-pin='reading']");
+    await expect(reading).toHaveAttribute("data-pin-state", "stale");
+    await expect(reading.getByText("as of 2 Aug", { exact: true })).toBeVisible();
+    await expect(reading.locator("time")).toHaveAttribute("datetime", "2026-08-02T12:00:00.000Z");
     // Screen readers hear the date in full.
-    await expect(training.locator(".sr-only")).toHaveText("as of 22 September");
-    await expect(training.locator("[data-pin]")).toHaveCSS("filter", /sepia/);
-    for (const { ratio } of await contrastOnPaper(page, "[data-fixture-pin='training'] .board-as-of")) expect(ratio).toBeGreaterThanOrEqual(4.5);
+    await expect(reading.locator(".sr-only")).toHaveText("as of 2 August");
+    await expect(reading.locator("[data-pin]")).toHaveCSS("filter", /sepia/);
+    for (const { ratio } of await contrastOnPaper(page, "[data-fixture-pin='reading'] .board-as-of")) expect(ratio).toBeGreaterThanOrEqual(4.5);
   });
 
   test("a missing photo shows a blank polaroid saying photo coming", async ({ page }) => {

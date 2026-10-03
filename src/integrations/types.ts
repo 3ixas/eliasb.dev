@@ -19,22 +19,6 @@ export type GitHubSignal = {
   href: string;
 };
 
-export type TrainingCategory = {
-  label: string;
-  count: number;
-};
-
-/**
- * Strava, this week (Monday to Sunday in London). rows is null when there is
- * no card: no credentials, or this week not fetched yet. An empty list means
- * nothing is logged yet this week.
- */
-export type TrainingSignal = {
-  state: SignalState;
-  rows: TrainingCategory[] | null;
-  updatedAt: string | null;
-};
-
 export type HistoryEvent = {
   year: number;
   kind: "event" | "birth";
