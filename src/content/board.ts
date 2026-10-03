@@ -1,5 +1,6 @@
 import type { FantasyGate, FantasyOutcome, FantasyRecord, FantasyTicket } from "@/integrations/fantasy";
 import type { PinKey } from "@/integrations/pin-rules";
+import type { TrainingCategory } from "@/integrations/types";
 
 /** The Board: the personal section's copy, approved in docs/content/copy/05-board.md. */
 export const board = {
@@ -47,6 +48,18 @@ export const board = {
     readMore: "Read more",
     moreFromDay: (day: string) => `More from ${day} on Wikipedia`,
     browseHistory: "Browse history on Wikipedia",
+  },
+  /** Approved in docs/content/copy/09-training-log.md. */
+  training: {
+    photo: {
+      src: "/signals/running-central-london.webp",
+      alt: "Elias mid-run on a rainy street in central London",
+      width: 960,
+      height: 1280,
+    },
+    caption: "Out on a run, central London.",
+    heading: "Training this week",
+    source: "via Strava",
   },
   cultureCorner: "The culture corner",
   /** Approved in docs/content/copy/06-culture-corner.md. */
@@ -170,4 +183,35 @@ export function fantasySpoken(ticket: FantasyTicket) {
     `Season record: ${tally.join(", ")}.`,
     gate && `${board.fantasy.gates[gate]}.`,
   ].filter(Boolean).join(" ");
+}
+
+/** Each Strava category as the log card writes it, and as a screen reader hears one or many. */
+const trainingWords: Record<string, { row: string; one: string; many: string }> = {
+  Lift: { row: "Lifts", one: "lift", many: "lifts" },
+  Run: { row: "Runs", one: "run", many: "runs" },
+  "Muay Thai": { row: "Muay Thai", one: "Muay Thai session", many: "Muay Thai sessions" },
+  Other: { row: "Other", one: "other session", many: "other sessions" },
+};
+const trainingWord = (label: string) => trainingWords[label] ?? { row: label, one: label.toLowerCase(), many: label.toLowerCase() };
+
+export function trainingRowLabel(label: string) {
+  return trainingWord(label).row;
+}
+
+/** The pencilled note: by the number of sessions this week, never by how they went. */
+export function trainingNote(sessions: number) {
+  if (sessions === 0) return "Rest days, so far.";
+  if (sessions <= 2) return "Easing in.";
+  if (sessions <= 5) return "Steady week.";
+  return "Busy week.";
+}
+
+/** The card as one sentence: "Training this week, from Strava: 4 lifts and 2 runs. Busy week." */
+export function trainingSpoken(rows: TrainingCategory[]) {
+  const parts = rows.map(({ label, count }) => `${count} ${count === 1 ? trainingWord(label).one : trainingWord(label).many}`);
+  const sessions = rows.reduce((total, { count }) => total + count, 0);
+  const logged = parts.length
+    ? parts.length === 1 ? parts[0] : `${parts.slice(0, -1).join(", ")} and ${parts.at(-1)}`
+    : "nothing logged yet";
+  return `Training this week, from Strava: ${logged}. ${trainingNote(sessions)}`;
 }

@@ -25,19 +25,4 @@ export const signalFallbacks: HomepageSignals = {
     updatedAt: null,
     href: "https://github.com/3ixas",
   },
-  training: {
-    state: "curated",
-    statusLabel: "Typical week",
-    headline: "My weekly training plan",
-    description: "",
-    weekly: [
-      { label: "Lift", count: 0 },
-      { label: "Run", count: 0 },
-      { label: "Muay Thai", count: 0 },
-      { label: "Other", count: 0 },
-    ],
-    totalActivities: 0,
-    windowLabel: "Typical week",
-    updatedAt: null,
-  },
 };

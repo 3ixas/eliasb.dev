@@ -22,7 +22,7 @@ export async function Homepage() {
 
         <Board />
 
-        {/* Pins not yet on the Board; each moves onto it in #86 and #87. */}
+        {/* GitHub, not yet on the Board; it moves onto it in #87. */}
         <div className="outside-work-section">
           <div className="currently-section">
             <div className="signal-grid">
@@ -44,28 +44,6 @@ export async function Homepage() {
                       I can’t show the full-year calendar just now.
                     </p>
                   ) : null}
-                </SignalPresentation>
-              </article>
-              <article className="signal signal-training" data-motion-reveal>
-                <p>Training</p>
-                <SignalPresentation
-                  signal={signals.training}
-                  source={{
-                    label: signals.training.href ? "Strava" : "My weekly plan",
-                    href: signals.training.href,
-                  }}
-                >
-                  <strong>{signals.training.headline}</strong>
-                  <div className="training-rhythm" aria-label={`${signals.training.windowLabel} training by type`} data-motion-reveal>
-                    {signals.training.weekly.map((category) => (
-                      <div className="training-metric" key={category.label}>
-                        <i style={{ height: `${Math.max(8, Math.min(100, category.count * 24 + 8))}%` }} aria-hidden="true" />
-                        <b>{category.count}</b>
-                        <span>{category.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                  {signals.training.description && <span>{signals.training.description}</span>}
                 </SignalPresentation>
               </article>
             </div>

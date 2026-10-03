@@ -24,10 +24,14 @@ export type TrainingCategory = {
   count: number;
 };
 
-export type TrainingSignal = PersonalSignal & {
-  weekly: TrainingCategory[];
-  totalActivities: number;
-  windowLabel: string;
+/**
+ * Strava, this week (Monday to Sunday in London). rows is null when there is
+ * no card: no credentials, or this week not fetched yet. An empty list means
+ * nothing is logged yet this week.
+ */
+export type TrainingSignal = {
+  state: SignalState;
+  rows: TrainingCategory[] | null;
   updatedAt: string | null;
 };
 
@@ -121,5 +125,4 @@ export type FantasySignal = {
 
 export type HomepageSignals = {
   github: GitHubSignal;
-  training: TrainingSignal;
 };

@@ -281,8 +281,8 @@ function verifyHomepage(markup) {
   check(markup.includes("Open in Spotify"), "Spotify fallback link should be visibly labelled");
 
   const statuses = [...markup.matchAll(/<span class="signal-status" data-state="([^"]+)">([^<]*)<\/span>/gi)];
-  // GitHub and training keep their legacy cards until they move onto the Board in #86 and #87.
-  check(statuses.length >= 2, "Outside work should expose status labels for its signal cards");
+  // GitHub keeps its legacy card until it moves onto the Board in #87.
+  check(statuses.length >= 1, "Outside work should expose status labels for its signal cards");
   for (const [, state, label] of statuses) {
     check(signalStates.has(state), `Signal state ${state} must use the shared signal contract`);
     check(Boolean(label.trim()), "Signal states must have a visible label");
@@ -312,13 +312,14 @@ function verifyHomepage(markup) {
   check(/Now reading/.test(text) && /(Goodreads|Between books)/.test(text), "The book pin should show the book from Goodreads, or say I'm between books");
   check(/Admit one · Last watched/.test(text) && /(Letterboxd|Nothing logged yet)/.test(text), "The film ticket should show the film from Letterboxd, or say nothing is logged");
   check(!/private contributions are part of the total|keep their repositories private/i.test(text), "GitHub output should omit the redundant private-repository explanation");
-  check(text.includes("Strava") || (text.includes("Typical week") && text.includes("My weekly plan")), "Training output should distinguish live activity from an authored typical week");
-  const trainingCard = markup.match(/<article class="signal signal-training">([\s\S]*?)<\/article>/i)?.[1] ?? "";
-  const trainingText = plainText(trainingCard);
-  if (trainingText.includes("My weekly training plan")) {
-    check(!/maintained by hand|not a live workout log|usual plan/i.test(trainingText), "Training should skip redundant schedule explanations");
-    check(!/class="training-day"/.test(trainingCard), "The retired authored training schedule should not render");
+  // Training: the running photo always; the diary card only with this week's Strava counts.
+  const training = markup.match(/data-board-pin="training"([\s\S]*?)data-board-pin=/i)?.[1] ?? "";
+  check(plainText(training).includes("Out on a run, central London."), "The training pin should show the running photo's caption");
+  check(tags(training, "img").some((tag) => attribute(tag, "alt") === "Elias mid-run on a rainy street in central London"), "The running photo should describe itself");
+  if (training.includes("data-training-log")) {
+    check(/Training this week, from Strava: .+\. (Rest days, so far|Easing in|Steady week|Busy week)\./.test(plainText(training)), "The training card should read as one sentence to screen readers");
   }
+  check(!/Typical week|My weekly training plan/.test(text), "The authored typical training week is retired");
   // The Weekly Curiosity: three oddities as a clipping, sourced to readable pages.
   // From the clipping's pin up to the next pin on the Board.
   const clipping = markup.match(/data-board-pin="clipping"([\s\S]*?)data-board-pin=/i)?.[1] ?? "";

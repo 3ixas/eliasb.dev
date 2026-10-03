@@ -138,6 +138,11 @@
   --matchday-muted: #4a4540;
   --matchday-tear: rgb(38 49 31 / 0.35);
   --pencil: #4a4540;
+
+  /* The training diary: a lined page with a red rule, and pencil tallies. */
+  --diary-lines: repeating-linear-gradient(to bottom, transparent 0 27px, rgb(90 110 150 / 0.3) 27px 28px);
+  --diary-rule: #b3261e;
+  --tally: #3a3530;
   --deck: #a93f1c;
   --deck-gradient: linear-gradient(180deg, #b5431e 0%, #9e3a1a 100%);
   --deck-sheen: inset 0 2px 0 rgb(255 220 190 / 0.4), inset 0 -3px 0 rgb(0 0 0 / 0.18);
@@ -1010,6 +1015,21 @@
 
   .board-matchday-muted {
     color: var(--matchday-muted);
+  }
+
+  .board-diary {
+    background-image: var(--diary-lines);
+    background-position: 0 40px;
+  }
+
+  .board-diary-rule {
+    border-bottom: 1.5px solid var(--diary-rule);
+  }
+
+  .board-tally {
+    stroke: var(--tally);
+    stroke-width: 2;
+    stroke-linecap: round;
   }
 
   /* A note pencilled on a pin, in the same hand as the "as of" date. */

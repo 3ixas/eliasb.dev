@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { ClippingPin } from "@/components/board/clipping";
 import { CultureCorner } from "@/components/board/culture-corner";
 import { FantasyTicketPin } from "@/components/board/fantasy-ticket";
+import { TrainingPin } from "@/components/board/training-log";
 import { LondonClock } from "@/components/board/london-clock";
 import { Pin } from "@/components/board/pin";
 import { PinPhoto, PinSlot } from "@/components/board/pin-states";
@@ -12,6 +13,7 @@ import { getReadingSignal } from "@/integrations/goodreads";
 import { getCachedHistorySignal } from "@/integrations/history-cache";
 import { getFilmSignal } from "@/integrations/letterboxd";
 import { getFantasySignal } from "@/integrations/sleeper";
+import { getTrainingSignal } from "@/integrations/strava";
 import type { PinStatus } from "@/integrations/pin-rules";
 
 // London is authored, a photo and the time, so it is always current (staleAfterDays.london is null).
@@ -19,16 +21,17 @@ const londonStatus: PinStatus = { kind: "current" };
 
 /**
  * The Board: the personal section, a framed linen pinboard on the wall.
- * The Weekly Curiosity, London, the fantasy ticket and the culture corner are
- * pinned here; the other pins move onto the board in #86 and #87.
+ * The Weekly Curiosity, training, London, the fantasy ticket and the culture
+ * corner are pinned here; GitHub and Making move onto the board in #87.
  */
 export async function Board() {
   const now = new Date();
-  const [history, reading, film, fantasy] = await Promise.all([
+  const [history, reading, film, fantasy, training] = await Promise.all([
     getCachedHistorySignal(),
     getReadingSignal(),
     getFilmSignal(),
     getFantasySignal(now),
+    getTrainingSignal(now),
   ]);
 
   return (
@@ -47,6 +50,7 @@ export async function Board() {
         </h2>
         <Pinboard className="mt-12 board:mt-16">
           <ClippingPin history={history} now={now} />
+          <TrainingPin training={training} now={now} />
           {/* London with the fantasy ticket pinned below it, beside the clipping. */}
           <div className="flex flex-col gap-16 board:col-span-4 board:col-start-9">
             <LondonPin />

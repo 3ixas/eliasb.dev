@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
@@ -9,11 +10,12 @@ import {
   groupTrainingActivities,
   mapContributionDays,
   mapPublicActivity,
-  startOfUtcWeek,
+  londonWeekStart,
+  tallyGates,
 } from "../src/integrations/signal-mappers.ts";
 import { integrationConfig } from "../src/content/integration-config.ts";
 import { asOfDate, pinStatus, staleAfterDays } from "../src/integrations/pin-rules.ts";
-import { fantasyRecord, fantasySpoken, fantasyVerdict, filmLine, isoWeek, stars } from "../src/content/board.ts";
+import { fantasyRecord, fantasySpoken, fantasyVerdict, filmLine, isoWeek, stars, trainingNote, trainingRowLabel, trainingSpoken } from "../src/content/board.ts";
 import { fantasyMoment, fantasyTicket } from "../src/integrations/fantasy.ts";
 import { readSleeperSnapshot } from "../src/integrations/sleeper-snapshot.ts";
 import { getHistorySignal, historyWeekStart, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "../src/integrations/history.ts";
@@ -599,9 +601,14 @@ assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "Escape"),
 assert.equal(createContributionCalendar([]), null);
 assert.equal(signalFallbacks.github.totalContributions, undefined, "Unavailable GitHub data should not imply a live aggregate");
 assert.match(signalFallbacks.github.headline, /couldn’t load GitHub/i);
-assert.equal("schedule" in signalFallbacks.training, false, "The authored training schedule is retired; the training pin shows Strava data only");
+assert.equal("training" in signalFallbacks, false, "Without Strava, the running photo stands alone; there's no authored typical week");
 
-assert.equal(startOfUtcWeek(now).toISOString(), "2026-09-14T00:00:00.000Z");
+// The training week is Monday to Sunday in London, through British Summer Time and the change back.
+assert.equal(londonWeekStart(now).toISOString(), "2026-09-13T23:00:00.000Z", "Monday 14 September, 00:00 BST");
+assert.equal(londonWeekStart(new Date("2026-09-13T22:59:59Z")).toISOString(), "2026-09-06T23:00:00.000Z", "Sunday 23:59 BST is still last week");
+assert.equal(londonWeekStart(new Date("2026-09-13T23:00:00Z")).toISOString(), "2026-09-13T23:00:00.000Z");
+assert.equal(londonWeekStart(new Date("2026-10-26T12:00:00Z")).toISOString(), "2026-10-26T00:00:00.000Z", "After the clocks go back, Monday starts at 00:00 GMT");
+assert.equal(londonWeekStart(new Date("2026-10-25T12:00:00Z")).toISOString(), "2026-10-18T23:00:00.000Z", "The Sunday the clocks go back belongs to a week that began in BST");
 
 assert.deepEqual(
   mapContributionDays(
@@ -642,7 +649,41 @@ assert.deepEqual(training.map(({ label, count }) => ({ label, count })), [
   { label: "Other", count: 1 },
 ]);
 assert.equal(JSON.stringify(training).includes("private"), false);
-assert.deepEqual(groupTrainingActivities([]).map((category) => category.count), [0, 0, 0, 0]);
+// Categories with no sessions are hidden, so Muay Thai appears only once it's been logged.
+assert.deepEqual(groupTrainingActivities([]), []);
+assert.deepEqual(
+  groupTrainingActivities([{ sport_type: "WeightTraining" }, { sport_type: "Run" }, { sport_type: "TrailRun" }, { sport_type: "Workout" }]),
+  [{ label: "Lift", count: 2 }, { label: "Run", count: 2 }],
+);
+
+// The running photo carries no embedded metadata: its WebP has image data only, no EXIF or XMP.
+const runningPhoto = readFileSync(new URL("../public/signals/running-central-london.webp", import.meta.url));
+const webpChunks = [];
+for (let offset = 12; offset + 8 <= runningPhoto.length; offset += 8 + runningPhoto.readUInt32LE(offset + 4) + (runningPhoto.readUInt32LE(offset + 4) % 2)) {
+  webpChunks.push(runningPhoto.toString("ascii", offset, offset + 4));
+}
+assert.equal(runningPhoto.toString("ascii", 8, 12), "WEBP");
+assert.deepEqual(webpChunks.filter((chunk) => ["EXIF", "XMP ", "ICCP"].includes(chunk)), [], "The running photo must not carry EXIF, XMP, or a colour profile");
+
+// Tallies come in gates of five, and stop at three gates; the number carries the rest.
+assert.deepEqual(tallyGates(0), []);
+assert.deepEqual(tallyGates(4), [4]);
+assert.deepEqual(tallyGates(5), [5]);
+assert.deepEqual(tallyGates(7), [5, 2]);
+assert.deepEqual(tallyGates(15), [5, 5, 5]);
+assert.deepEqual(tallyGates(40), [5, 5, 5]);
+
+// The pencilled note goes by the week's sessions, never by how they went.
+assert.deepEqual([0, 1, 2, 3, 5, 6, 12].map(trainingNote), [
+  "Rest days, so far.", "Easing in.", "Easing in.", "Steady week.", "Steady week.", "Busy week.", "Busy week.",
+]);
+assert.deepEqual(["Lift", "Run", "Muay Thai", "Other"].map(trainingRowLabel), ["Lifts", "Runs", "Muay Thai", "Other"]);
+assert.equal(trainingSpoken([{ label: "Lift", count: 4 }, { label: "Run", count: 2 }]), "Training this week, from Strava: 4 lifts and 2 runs. Busy week.");
+assert.equal(
+  trainingSpoken([{ label: "Lift", count: 1 }, { label: "Run", count: 3 }, { label: "Muay Thai", count: 1 }, { label: "Other", count: 1 }]),
+  "Training this week, from Strava: 1 lift, 3 runs, 1 Muay Thai session and 1 other session. Busy week.",
+);
+assert.equal(trainingSpoken([]), "Training this week, from Strava: nothing logged yet. Rest days, so far.");
 
 // Pin rules: nothing current is removed; saved data past its pin's limit is stale.
 const pinNow = new Date("2026-10-02T12:00:00.000Z");

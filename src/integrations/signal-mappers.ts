@@ -58,12 +58,31 @@ export function mapContributionDays(days: ContributionDayShape[], length = GITHU
   }));
 }
 
-export function startOfUtcWeek(now = new Date()) {
-  const date = new Date(now);
-  date.setUTCHours(0, 0, 0, 0);
-  const day = date.getUTCDay();
-  date.setUTCDate(date.getUTCDate() - (day === 0 ? 6 : day - 1));
-  return date;
+const london = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Europe/London",
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+  hour: "numeric",
+  minute: "numeric",
+  second: "numeric",
+  hourCycle: "h23",
+});
+
+/** The time in London written as if it were UTC, so wall-clock sums ignore British Summer Time. */
+function londonWallClock(instant: number) {
+  const part = (type: string) => Number(london.formatToParts(instant).find((entry) => entry.type === type)?.value);
+  return Date.UTC(part("year"), part("month") - 1, part("day"), part("hour"), part("minute"), part("second"));
+}
+
+/** Midnight at the start of Monday in London: the training week's first moment. */
+export function londonWeekStart(now = new Date()) {
+  const wall = londonWallClock(now.getTime());
+  const today = new Date(wall);
+  const monday = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - ((today.getUTCDay() + 6) % 7));
+  // London's offset at Monday midnight, which can differ from now's if the clocks changed on Sunday.
+  const guess = monday - (wall - now.getTime());
+  return new Date(monday - (londonWallClock(guess) - guess));
 }
 
 export function classifyTrainingActivity(activity: StravaActivityShape) {
@@ -79,6 +98,7 @@ export function classifyTrainingActivity(activity: StravaActivityShape) {
   return "Other";
 }
 
+/** This week's sessions by category, in the card's order; categories with none are left out. */
 export function groupTrainingActivities(activities: StravaActivityShape[]) {
   const counts = new Map(TRAINING_CATEGORIES.map((category) => [category.label, 0]));
 
@@ -90,7 +110,15 @@ export function groupTrainingActivities(activities: StravaActivityShape[]) {
   return TRAINING_CATEGORIES.map((category) => ({
     ...category,
     count: counts.get(category.label) ?? 0,
-  }));
+  })).filter((category) => category.count > 0);
+}
+
+/** Tally marks as gates of five; past three gates the marks stop and the number carries the rest. */
+export const TALLY_LIMIT = 15;
+
+export function tallyGates(count: number) {
+  const marks = Math.min(Math.max(0, Math.floor(count)), TALLY_LIMIT);
+  return Array.from({ length: Math.ceil(marks / 5) }, (_, gate) => Math.min(5, marks - gate * 5));
 }
 
 /** The fields read from a Goodreads currently-reading item, already decoded. */
