@@ -1,21 +1,10 @@
-import { signalFallbacks } from "@/content/signal-fallbacks";
-import { GITHUB_ACTIVITY_DAYS, mapContributionDays, mapPublicActivity } from "@/integrations/signal-mappers";
-import type { ActivityDay, GitHubSignal } from "@/integrations/types";
+import { unstable_cache } from "next/cache";
+import { integrationConfig } from "@/content/integration-config";
+import { GITHUB_ACTIVITY_DAYS, latestRepository, mapContributionDays } from "@/integrations/signal-mappers";
+import type { GitHubSignal, LatestRepositorySignal } from "@/integrations/types";
 
-const GITHUB_LOGIN = "3ixas";
-const GITHUB_PROFILE = `https://github.com/${GITHUB_LOGIN}`;
+const { username, profileUrl } = integrationConfig.github;
 const API_VERSION = "2026-03-10";
-
-type GitHubEvent = {
-  type: string;
-  repo: { name: string };
-  created_at: string;
-};
-
-type ContributionSnapshot = {
-  activity: ActivityDay[];
-  totalContributions: number;
-};
 
 type ContributionResponse = {
   data?: {
@@ -32,156 +21,100 @@ type ContributionResponse = {
   };
 };
 
-function isGitHubEvent(value: unknown): value is GitHubEvent {
-  if (!value || typeof value !== "object") return false;
-  const event = value as Partial<GitHubEvent>;
-
-  return (
-    typeof event.type === "string" &&
-    typeof event.created_at === "string" &&
-    !!event.repo &&
-    typeof event.repo.name === "string"
-  );
-}
-
-function repositoryName(fullName: string) {
-  return fullName.replace(`${GITHUB_LOGIN}/`, "");
-}
-
-function describeEvent(event: GitHubEvent) {
-  const repository = repositoryName(event.repo.name);
-
-  switch (event.type) {
-    case "CreateEvent":
-      return `Created ${repository}`;
-    case "PullRequestEvent":
-      return `Opened work in ${repository}`;
-    case "ReleaseEvent":
-      return `Released ${repository}`;
-    default:
-      return `Pushed to ${repository}`;
-  }
-}
-
-async function fetchContributionActivity(token: string): Promise<ContributionSnapshot | null> {
-  const to = new Date();
-  const from = new Date(to);
-  from.setUTCDate(to.getUTCDate() - (GITHUB_ACTIVITY_DAYS - 1));
-
-  const response = await fetch("https://api.github.com/graphql", {
-    method: "POST",
-    headers: {
-      Accept: "application/vnd.github+json",
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      "X-GitHub-Api-Version": API_VERSION,
-    },
-    body: JSON.stringify({
-      query: `query PortfolioContributions($login: String!, $from: DateTime!, $to: DateTime!) {
-        user(login: $login) {
-          contributionsCollection(from: $from, to: $to) {
-            contributionCalendar {
-              weeks { contributionDays { date contributionCount } }
-              totalContributions
-            }
-          }
-        }
-      }`,
-      variables: { login: GITHUB_LOGIN, from: from.toISOString(), to: to.toISOString() },
-    }),
-    next: { revalidate: 21600, tags: ["github-signal"] },
-    signal: AbortSignal.timeout(3500),
-  });
-
-  if (!response.ok) return null;
-
-  const result = (await response.json()) as ContributionResponse;
-  const collection = result.data?.user?.contributionsCollection;
-  const calendar = collection?.contributionCalendar;
-  const days = calendar?.weeks
-    ?.flatMap((week) => week.contributionDays ?? [])
-    .filter((day): day is { date: string; contributionCount: number } =>
-      typeof day.date === "string" && typeof day.contributionCount === "number",
-    );
-
-  if (!calendar || !days?.length || typeof calendar.totalContributions !== "number") return null;
-
+function headers(token?: string) {
   return {
-    activity: mapContributionDays(days, GITHUB_ACTIVITY_DAYS),
-    totalContributions: calendar.totalContributions,
+    Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": API_VERSION,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 }
 
-async function fetchPublicEvents(): Promise<GitHubEvent[]> {
-  const response = await fetch(
-    `https://api.github.com/users/${GITHUB_LOGIN}/events/public?per_page=100`,
-    {
-      headers: {
-        Accept: "application/vnd.github+json",
-        "X-GitHub-Api-Version": API_VERSION,
-      },
-      next: { revalidate: 21600, tags: ["github-signal"] },
+// The full year needs the token: GitHub's contribution calendar is GraphQL only.
+// Throwing keeps Next's last good year during a refresh.
+const fetchYear = unstable_cache(
+  async (): Promise<GitHubSignal> => {
+    const token = process.env.GITHUB_SIGNAL_TOKEN;
+    if (!token) throw new Error("GITHUB_SIGNAL_TOKEN is not set");
+    const to = new Date();
+    const from = new Date(to);
+    from.setUTCDate(to.getUTCDate() - (GITHUB_ACTIVITY_DAYS - 1));
+
+    const response = await fetch("https://api.github.com/graphql", {
+      method: "POST",
+      headers: { ...headers(token), "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query: `query PortfolioContributions($login: String!, $from: DateTime!, $to: DateTime!) {
+          user(login: $login) {
+            contributionsCollection(from: $from, to: $to) {
+              contributionCalendar {
+                weeks { contributionDays { date contributionCount } }
+                totalContributions
+              }
+            }
+          }
+        }`,
+        variables: { login: username, from: from.toISOString(), to: to.toISOString() },
+      }),
+      cache: "no-store",
       signal: AbortSignal.timeout(3500),
-    },
-  );
+    });
+    if (!response.ok) throw new Error(`GitHub contributions returned ${response.status}`);
 
-  if (!response.ok) throw new Error(`GitHub public activity returned ${response.status}`);
-  const payload: unknown = await response.json();
+    const calendar = ((await response.json()) as ContributionResponse).data?.user?.contributionsCollection?.contributionCalendar;
+    const days = calendar?.weeks
+      ?.flatMap((week) => week.contributionDays ?? [])
+      .filter((day): day is { date: string; contributionCount: number } =>
+        typeof day.date === "string" && typeof day.contributionCount === "number",
+      );
+    if (!calendar || !days?.length || typeof calendar.totalContributions !== "number") {
+      throw new Error("GitHub returned no contribution calendar");
+    }
 
-  if (!Array.isArray(payload)) throw new Error("GitHub public activity was not a list");
-  return payload.filter(isGitHubEvent);
+    return {
+      state: "live",
+      activity: mapContributionDays(days, GITHUB_ACTIVITY_DAYS, to),
+      total: calendar.totalContributions,
+      updatedAt: to.toISOString(),
+      href: profileUrl,
+    };
+  },
+  ["github-year-v1"],
+  { revalidate: 21600, tags: ["github-signal"] },
+);
+
+/** The past year of contributions, or no pin when there isn't a full year to show. */
+export async function getGitHubSignal(): Promise<GitHubSignal> {
+  try {
+    return await fetchYear();
+  } catch (error) {
+    // Nothing fetched successfully yet: no pin, rather than a partial year.
+    console.warn("[github] contribution year unavailable", error instanceof Error ? error.message : error);
+    return { state: "unavailable", activity: [], total: 0, updatedAt: null, href: profileUrl };
+  }
 }
 
-export async function getGitHubSignal(): Promise<GitHubSignal> {
-  const token = process.env.GITHUB_SIGNAL_TOKEN;
-  const [eventsResult, contributionResult] = await Promise.allSettled([
-    fetchPublicEvents(),
-    token ? fetchContributionActivity(token) : Promise.resolve(null),
-  ]);
-  const events = eventsResult.status === "fulfilled" ? eventsResult.value : [];
-  const contributions = contributionResult.status === "fulfilled" ? contributionResult.value : null;
-  const latest = events[0];
+const fetchLatestRepository = unstable_cache(
+  async (): Promise<LatestRepositorySignal> => {
+    const response = await fetch(`https://api.github.com/users/${username}/repos?sort=pushed&per_page=10`, {
+      headers: headers(process.env.GITHUB_SIGNAL_TOKEN),
+      cache: "no-store",
+      signal: AbortSignal.timeout(3500),
+    });
+    if (!response.ok) throw new Error(`GitHub repositories returned ${response.status}`);
+    const payload: unknown = await response.json();
+    if (!Array.isArray(payload)) throw new Error("GitHub repositories was not a list");
+    return { state: "live", repository: latestRepository(payload, username), updatedAt: new Date().toISOString() };
+  },
+  ["github-latest-repository-v1"],
+  { revalidate: 21600, tags: ["github-signal"] },
+);
 
-  if (contributions) {
-    return {
-      state: "live",
-      statusLabel: "Live · past year",
-      headline: `I’ve made ${contributions.totalContributions} contributions in the past year.`,
-      description: "",
-      activity: contributions.activity,
-      activityLabel: "GitHub contributions over the past year",
-      totalContributions: contributions.totalContributions,
-      updatedAt: new Date().toISOString(),
-      href: GITHUB_PROFILE,
-    };
+/** My most recently pushed public repository, for the Making pin's fallback. */
+export async function getLatestRepositorySignal(): Promise<LatestRepositorySignal> {
+  try {
+    return await fetchLatestRepository();
+  } catch (error) {
+    console.warn("[github] latest repository unavailable", error instanceof Error ? error.message : error);
+    return { state: "unavailable", repository: null, updatedAt: null };
   }
-
-  if (latest) {
-    const activity = mapPublicActivity(events, GITHUB_ACTIVITY_DAYS);
-    return {
-      state: "live",
-      statusLabel: token ? "Live · public only" : "Live · public",
-      headline: describeEvent(latest),
-      description: "",
-      activity,
-      activityLabel: "Public GitHub activity over the last year",
-      updatedAt: new Date().toISOString(),
-      href: GITHUB_PROFILE,
-    };
-  }
-
-  if (eventsResult.status === "fulfilled") {
-    return {
-      ...signalFallbacks.github,
-      state: "live",
-      statusLabel: token ? "Live · public only" : "Live · public",
-      headline: "A quiet stretch on public GitHub.",
-      description: "",
-      activity: mapPublicActivity(events, GITHUB_ACTIVITY_DAYS),
-      activityLabel: "Public GitHub activity over the last year",
-      updatedAt: new Date().toISOString(),
-    };
-  }
-
-  return signalFallbacks.github;
 }

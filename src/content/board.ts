@@ -1,5 +1,6 @@
 import type { FantasyGate, FantasyOutcome, FantasyRecord, FantasyTicket } from "@/integrations/fantasy";
 import type { PinKey } from "@/integrations/pin-rules";
+import type { GitHubRepository } from "@/integrations/types";
 
 /** The Board: the personal section's copy, approved in docs/content/copy/05-board.md. */
 export const board = {
@@ -71,6 +72,33 @@ export const board = {
     ],
     today: "← today",
     note: "Zone 2 means slow on purpose.",
+  },
+  /** Approved in docs/content/copy/10-github-and-making.md. */
+  github: {
+    beside: "contributions in the past year",
+    legend: { quiet: "Quiet", busy: "Busy" },
+    link: "github.com/3ixas",
+    /** The note sits right of the loop, or left of it near the year's end. */
+    stretch: (when: string) => `← busiest stretch, ${when}`,
+    stretchBefore: (when: string) => `busiest stretch, ${when} →`,
+    swipe: "Swipe for the whole year →",
+    keys: "Use the arrow keys to move between days.",
+    name: (total: string, when: string | null) =>
+      `GitHub contributions over the past year: ${total}${when ? `, busiest in ${when}` : ""}.`,
+  },
+  making: {
+    /** What I'm making now. It counts as now for MAKING_CURRENT_DAYS from writtenOn. */
+    entry: {
+      title: "Rebuilding Professor Past from scratch.",
+      line: "v1 is on GitHub if you want to meet the professor.",
+      link: { label: "Code", href: "https://github.com/3ixas/ask-professor-past" },
+      version: "v2",
+      writtenOn: "2026-10-03",
+    },
+    fallbackLabel: "Latest on GitHub",
+    fallbackLink: "View on GitHub",
+    drawnBy: "Drawn E.B.",
+    updated: (date: string) => `updated ${date}`,
   },
   cultureCorner: "The culture corner",
   /** Approved in docs/content/copy/06-culture-corner.md. */
@@ -205,4 +233,27 @@ export function trainingSpoken(today: number) {
   const session = (text: string) => text.charAt(0).toLowerCase() + text.slice(1);
   const others = days.filter((_, index) => index !== today).map((day) => `${day.long}: ${session(day.session)}.`);
   return [`${heading}, ${plan.toLowerCase()}.`, `Today, ${days[today].long}: ${session(days[today].session)}.`, ...others, note].join(" ");
+}
+
+/** A count with thousands commas, written by the site so it's the same in every locale: 1,089. */
+export function groupedNumber(value: number) {
+  return String(Math.round(value)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+/** How long a Making entry counts as "now": 8 weeks from the day it's written (Elias, 3 October 2026). */
+export const MAKING_CURRENT_DAYS = 56;
+
+export type MakingNote =
+  | { kind: "authored"; entry: (typeof board)["making"]["entry"] }
+  | { kind: "latest"; repository: GitHubRepository };
+
+/**
+ * What the Making pin shows: my authored entry while it's current, else my
+ * latest public repository, else nothing (and the pin comes down).
+ */
+export function makingNote(now: Date, latest: GitHubRepository | null): MakingNote | null {
+  const { entry } = board.making;
+  const expires = new Date(`${entry.writtenOn}T00:00:00Z`).getTime() + MAKING_CURRENT_DAYS * 86_400_000;
+  if (now.getTime() < expires) return { kind: "authored", entry };
+  return latest ? { kind: "latest", repository: latest } : null;
 }

@@ -7,16 +7,28 @@ export type ActivityDay = {
   count: number;
 };
 
+/** The past year from GitHub's contribution calendar; unavailable means no pin. */
 export type GitHubSignal = {
   state: SignalState;
-  statusLabel: string;
-  headline: string;
-  description: string;
   activity: ActivityDay[];
-  activityLabel: string;
-  totalContributions?: number;
+  total: number;
   updatedAt: string | null;
   href: string;
+};
+
+export type GitHubRepository = {
+  name: string;
+  description: string | null;
+  href: string;
+  /** When it was last pushed, as an ISO instant. */
+  pushedAt: string;
+};
+
+/** My latest public repository, for the Making pin's fallback. */
+export type LatestRepositorySignal = {
+  state: SignalState;
+  repository: GitHubRepository | null;
+  updatedAt: string | null;
 };
 
 export type HistoryEvent = {
@@ -50,14 +62,6 @@ export type HistorySignal = {
   /** The readable Wikipedia page for the day, or the history portal for saved examples. */
   sourceUrl: string;
   updatedAt: string | null;
-};
-
-export type PersonalSignal = {
-  state: SignalState;
-  statusLabel: string;
-  headline: string;
-  description: string;
-  href?: string;
 };
 
 /** The book on my currently-reading shelf. */
@@ -105,8 +109,4 @@ export type FantasySignal = {
   state: SignalState;
   ticket: FantasyTicket | null;
   updatedAt: string | null;
-};
-
-export type HomepageSignals = {
-  github: GitHubSignal;
 };

@@ -1,32 +1,30 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
 import {
   GITHUB_ACTIVITY_DAYS,
   bookFromGoodreads,
   datesForWindow,
   filmFromLetterboxd,
   mapContributionDays,
-  mapPublicActivity,
+  latestRepository,
   londonWeekday,
 } from "../src/integrations/signal-mappers.ts";
 import { integrationConfig } from "../src/content/integration-config.ts";
 import { asOfDate, pinStatus, staleAfterDays } from "../src/integrations/pin-rules.ts";
-import { fantasyRecord, fantasySpoken, fantasyVerdict, filmLine, isoWeek, stars, trainingSpoken } from "../src/content/board.ts";
+import { fantasyRecord, fantasySpoken, fantasyVerdict, filmLine, isoWeek, stars, trainingSpoken, groupedNumber, makingNote, MAKING_CURRENT_DAYS } from "../src/content/board.ts";
 import { fantasyMoment, fantasyTicket } from "../src/integrations/fantasy.ts";
 import { readSleeperSnapshot } from "../src/integrations/sleeper-snapshot.ts";
 import { getHistorySignal, historyWeekStart, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "../src/integrations/history.ts";
-import { signalFallbacks } from "../src/content/signal-fallbacks.ts";
-import { SignalPresentation } from "../src/components/site/signal-presentation.ts";
 import {
+  busiestStretch,
+  contributionLevel,
+  contributionTag,
   createContributionCalendar,
   formatContributionDate,
   moveContributionCalendarIndex,
 } from "../src/components/site/contribution-calendar-model.ts";
 
 const now = new Date("2026-09-16T12:00:00.000Z");
-const signalStates = new Set(["live", "curated", "pending", "unavailable"]);
 const historyNow = new Date("2026-09-24T12:00:00.000Z");
 const historyPage = (title, imageName, width = 330, height = 220) => ({
   titles: { canonical: title },
@@ -307,8 +305,6 @@ try {
 }
 
 // The book and film are live only: there are no saved copies to fall back on.
-assert.equal("reading" in signalFallbacks, false);
-assert.equal("culture" in signalFallbacks, false);
 
 // Goodreads: the series suffix comes off, and the shelf date is the start date.
 assert.deepEqual(
@@ -350,50 +346,6 @@ assert.deepEqual(filmLine(watched, 4.5), { shown: "Watched 14 Sept · ★★★�
 assert.deepEqual(filmLine(watched, null), { shown: "Watched 14 Sept", spoken: "Watched 14 September" });
 assert.deepEqual(filmLine(null, 3), { shown: "★★★", spoken: "Rated 3 out of 5" });
 assert.equal(filmLine(null, null), null);
-
-const signalPresentationFixtures = [
-  {
-    name: "cached",
-    signal: { state: "live", statusLabel: "Wikimedia · cached", updatedAt: null },
-    source: { label: "Wikimedia", href: "https://en.wikipedia.org/wiki/Portal:History" },
-    expected: { status: "Wikimedia · cached", source: "Wikimedia" },
-  },
-  {
-    name: "authored",
-    signal: { state: "curated", statusLabel: "Typical week", updatedAt: null },
-    source: { label: "My weekly plan", href: null },
-    expected: { status: "Typical week", source: "My weekly plan" },
-  },
-  {
-    name: "unavailable",
-    signal: { state: "unavailable", statusLabel: "Public only", updatedAt: null },
-    source: { label: "GitHub activity", href: signalFallbacks.github.href },
-    expected: { status: "Public only", source: "GitHub activity" },
-  },
-];
-
-assert.deepEqual(signalPresentationFixtures.map(({ name }) => name), ["cached", "authored", "unavailable"]);
-for (const fixture of signalPresentationFixtures) {
-  assert.ok(signalStates.has(fixture.signal.state), `${fixture.name} fixture should use a shared signal state`);
-  const markup = renderToStaticMarkup(createElement(SignalPresentation, {
-    signal: fixture.signal,
-    source: fixture.source,
-  }));
-  const visibleText = markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-  assert.match(markup, new RegExp(`data-state="${fixture.signal.state}"`), `${fixture.name} fixture should expose its state`);
-  assert.ok(visibleText.includes(fixture.expected.status), `${fixture.name} fixture should expose its visible status`);
-  if (fixture.expected.freshness) {
-    assert.ok(visibleText.includes(fixture.expected.freshness), `${fixture.name} fixture should expose a useful update date`);
-  } else {
-    assert.equal(markup.includes("signal-freshness"), false, `${fixture.name} fixture should not add generic freshness copy`);
-  }
-  assert.ok(visibleText.includes(fixture.expected.source), `${fixture.name} fixture should expose truthful source wording`);
-  if (fixture.source.href) {
-    assert.ok(markup.includes(`href="${fixture.source.href}"`), `${fixture.name} fixture should expose its source link`);
-  } else {
-    assert.equal(markup.includes("href="), false, `${fixture.name} fixture should not invent a source link`);
-  }
-}
 
 // Fantasy: the stub's state comes from the NFL calendar, in New York time.
 const eastern = (iso) => fantasyMoment(new Date(iso));
@@ -561,7 +513,6 @@ try {
 }
 
 assert.equal(GITHUB_ACTIVITY_DAYS, 365);
-assert.equal(signalFallbacks.github.activity.length, GITHUB_ACTIVITY_DAYS);
 const contributionDays = datesForWindow(GITHUB_ACTIVITY_DAYS, now).map((day, index) => ({
   ...day,
   count: index === 100 ? 4 : day.count,
@@ -597,9 +548,6 @@ assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "Home"), 9
 assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "End"), 101);
 assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "Escape"), null);
 assert.equal(createContributionCalendar([]), null);
-assert.equal(signalFallbacks.github.totalContributions, undefined, "Unavailable GitHub data should not imply a live aggregate");
-assert.match(signalFallbacks.github.headline, /couldn’t load GitHub/i);
-assert.equal("training" in signalFallbacks, false, "Training is an authored plan now; there's no live signal or fallback");
 
 // The plan's "today" is the day in London, Monday (0) to Sunday (6), through BST and GMT.
 assert.equal(londonWeekday(new Date("2026-10-04T22:59:00Z")), 6, "Sunday 23:59 BST");
@@ -621,17 +569,46 @@ assert.deepEqual(
   ],
 );
 
-assert.deepEqual(
-  mapPublicActivity(
-    [
-      { type: "PushEvent", repo: { name: "3ixas/public" }, created_at: "2026-09-15T08:00:00Z" },
-      { type: "PushEvent", repo: { name: "3ixas/public" }, created_at: "2026-09-15T09:00:00Z" },
-    ],
-    3,
-    now,
-  )[1],
-  { date: "2026-09-15", count: 2 },
-);
+// GitHub: the busiest four weeks, worked out from the data, with "early", "mid" or "late".
+const quietYear = datesForWindow(GITHUB_ACTIVITY_DAYS, new Date("2026-10-02T12:00:00Z")).map(({ date }) => ({ date, count: 0 }));
+assert.equal(busiestStretch(createContributionCalendar(quietYear)), null, "A year with nothing in it has no busiest stretch");
+const januaryYear = quietYear.map(({ date }) => ({ date, count: date >= "2026-01-04" && date <= "2026-01-31" ? 3 : date === "2026-06-10" ? 9 : 0 }));
+const januaryStretch = busiestStretch(createContributionCalendar(januaryYear));
+assert.equal(januaryStretch.total, 84, "Four full weeks of 3 a day beat one busy day");
+assert.equal(januaryStretch.when, "mid-January");
+assert.equal(januaryStretch.span, 4);
+const tiedYear = quietYear.map(({ date }) => ({ date, count: date === "2025-11-03" || date === "2026-08-03" ? 5 : 0 }));
+assert.equal(busiestStretch(createContributionCalendar(tiedYear)).when.endsWith("August"), true, "A tie goes to the most recent stretch");
+const earlyYear = quietYear.map(({ date }) => ({ date, count: date >= "2026-03-01" && date <= "2026-03-07" ? 4 : 0 }));
+assert.match(busiestStretch(createContributionCalendar(earlyYear)).when, /^(early|mid|late)-(February|March)$/);
+// Day tags and month labels are written by the site, the same in every locale.
+assert.equal(contributionTag({ date: "2026-01-15", count: 12 }), "12 contributions on Thu 15 Jan");
+assert.equal(contributionTag({ date: "2026-01-15", count: 1 }), "1 contribution on Thu 15 Jan");
+assert.equal(contributionTag({ date: "2026-01-15", count: 0 }), "Nothing on Thu 15 Jan");
+assert.deepEqual([0, 1, 2, 3, 4, 40].map(contributionLevel), [0, 1, 2, 3, 4, 4]);
+assert.deepEqual(createContributionCalendar(quietYear).monthLabels.map(({ label }) => label).filter((label) => /June|July/.test(label)), ["June", "July"]);
+assert.equal(groupedNumber(1089), "1,089");
+assert.equal(groupedNumber(175), "175");
+assert.equal(groupedNumber(1234567), "1,234,567");
+
+// Making: the authored entry for eight weeks, then my latest public repository, then nothing.
+const repositories = [
+  { name: "3ixas", html_url: "https://github.com/3ixas/3ixas", pushed_at: "2026-10-04T00:00:00Z" },
+  { name: "a-fork", html_url: "https://github.com/3ixas/a-fork", pushed_at: "2026-10-03T12:00:00Z", fork: true },
+  { name: "old-thing", html_url: "https://github.com/3ixas/old-thing", pushed_at: "2026-10-03T11:00:00Z", archived: true },
+  { name: "eliasb.dev", description: "  The site  ", html_url: "https://github.com/3ixas/eliasb.dev", pushed_at: "2026-10-03T05:36:51Z" },
+];
+assert.deepEqual(latestRepository(repositories, "3ixas"), {
+  name: "eliasb.dev", description: "The site", href: "https://github.com/3ixas/eliasb.dev", pushedAt: "2026-10-03T05:36:51Z",
+}, "The profile repository, forks and archives are skipped");
+assert.equal(latestRepository([{ name: "x", description: "", html_url: "https://github.com/3ixas/x", pushed_at: "2026-01-01T00:00:00Z" }], "3ixas").description, null);
+assert.equal(latestRepository([], "3ixas"), null);
+assert.equal(MAKING_CURRENT_DAYS, 56);
+const written = new Date("2026-10-03T00:00:00Z").getTime();
+const repo = latestRepository(repositories, "3ixas");
+assert.equal(makingNote(new Date(written + 55 * 86_400_000), repo).kind, "authored");
+assert.equal(makingNote(new Date(written + 56 * 86_400_000), repo).kind, "latest", "After eight weeks the entry is no longer now");
+assert.equal(makingNote(new Date(written + 56 * 86_400_000), null), null, "With no entry and no repository, there's no pin");
 
 // The running photo carries no embedded metadata: its WebP has image data only, no EXIF or XMP.
 const runningPhoto = readFileSync(new URL("../public/signals/running-central-london.webp", import.meta.url));

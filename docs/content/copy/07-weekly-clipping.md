@@ -31,6 +31,8 @@ The two extra clippings are smaller cuttings with the same parts: date line, fac
 
 For screen readers, the fan-out button says whether the extra clippings are showing, and the arrow on it (↓ closed, ↑ open) is decoration.
 
+The two extra clippings open below the main one on every screen (changed in #87, 3 October 2026), so they never cover the pins beside it.
+
 ## When Wikimedia can't be reached
 
 The weekly snapshot and its failure handling stay as they are. Once a week's clippings are fetched, a failed refresh later that week keeps them up. Last week's clippings are never shown as this week's, so if the new week's first fetch fails, the saved oddities show until a fetch works:

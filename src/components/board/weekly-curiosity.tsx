@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion, type Transition } from "motion/react";
 import Image from "next/image";
-import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { ExternalLink } from "@/components/board/external-link";
 import { Pin } from "@/components/board/pin";
 import { board } from "@/content/board";
@@ -20,20 +20,12 @@ export type ClippingStory = {
 // The approved fan-out: a gentle spring, each clipping 60 ms after the last.
 const SPRING = { type: "spring", bounce: 0.2, visualDuration: 0.5 } as const;
 const STAGGER = 0.06;
-const EXTRA_WIDTH = 280;
-
-const wideQuery = "(min-width: 900px)";
-const subscribeWide = (onChange: () => void) => {
-  const query = window.matchMedia(wideQuery);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
-};
 
 /**
- * The clipping and its fan-out. On wide screens the other two oddities are
- * tucked behind the main cutting and fan out to its right; on narrow screens
- * they open below it, the space growing to their measured height. With
- * reduced motion the change is instant. Folded clippings are inert and
+ * The clipping and its fan-out: the other two oddities open below it on
+ * every screen, the space growing to their height, so they never cover the
+ * pins beside it (Elias, 3 October 2026). With reduced motion the change is
+ * instant. Folded clippings are inert and
  * hidden from assistive technology, so the keyboard and screen readers skip them.
  */
 export function WeeklyCuriosity({
@@ -47,29 +39,10 @@ export function WeeklyCuriosity({
 }) {
   const [lead, ...extras] = stories;
   const [open, setOpen] = useState(false);
-  const wide = useSyncExternalStore(subscribeWide, () => window.matchMedia(wideQuery).matches, () => false);
   const reduced = useReducedMotion();
   const extrasId = useId();
   const toggle = useRef<HTMLButtonElement>(null);
-  const slot = useRef<HTMLDivElement>(null);
-  const [slotWidth, setSlotWidth] = useState(0);
-  const extraRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [extraHeights, setExtraHeights] = useState<number[]>([]);
   const copy = board.clipping;
-
-  // Fanned positions come from real sizes: the slot's width and each clipping's height.
-  useEffect(() => {
-    const element = slot.current;
-    if (!element) return;
-    const measure = () => {
-      setSlotWidth(element.getBoundingClientRect().width);
-      setExtraHeights(extraRefs.current.map((extra) => extra?.offsetHeight ?? 0));
-    };
-    const observer = new ResizeObserver(measure);
-    observer.observe(element);
-    for (const extra of extraRefs.current) if (extra) observer.observe(extra);
-    return () => observer.disconnect();
-  }, [wide]);
 
   useEffect(() => {
     if (!open) return;
@@ -86,19 +59,10 @@ export function WeeklyCuriosity({
   const transition = (index: number): Transition =>
     reduced ? { duration: 0 } : { ...SPRING, delay: (open ? index : extras.length - 1 - index) * STAGGER };
 
-  // Fanned out beside the main cutting, never over its own links or each other: each lies below the one before.
-  const fanned = (index: number) => ({
-    x: slotWidth + 16 + index * 32,
-    y: extraHeights.slice(0, index).reduce((total, height) => total + height + 20, 0),
-    rotate: index ? -2.5 : 3,
-  });
-  // Tucked low enough behind the main cutting that their pins are hidden too.
-  const tucked = (index: number) => ({ x: 10 * (index + 1), y: 28 + 10 * index, rotate: index ? -2 : 2.5 });
-
   if (!lead) return null;
 
   return (
-    <div ref={slot} className="relative">
+    <div className="relative">
       <div className="relative z-[2]">
         <Pin object="clipping" fixing="pushpin" surface="linen" looseness="loose" tilt={-1} stock="newsprint" className="p-5 sm:p-6">
           <p className="m-0 flex flex-wrap justify-between gap-x-3 border-y border-rule py-1 font-mono text-label uppercase">
@@ -127,52 +91,30 @@ export function WeeklyCuriosity({
         </Pin>
       </div>
 
-      {wide ? (
-        // Fanned clippings lie above everything beside the main cutting; tucked ones sit behind it.
-        <div id={extrasId} inert={!open} aria-hidden={!open || undefined} className={`pointer-events-none absolute inset-0 ${open ? "z-[3]" : "z-[1]"}`}>
+      <motion.div
+        id={extrasId}
+        inert={!open}
+        aria-hidden={!open || undefined}
+        className="overflow-hidden"
+        initial={false}
+        animate={{ height: open ? "auto" : 0 }}
+        transition={reduced ? { duration: 0 } : SPRING}
+      >
+        <div className="flex flex-col items-center gap-10 px-2 pt-10 pb-4">
           {extras.map((story, index) => (
             <motion.div
               key={story.key}
-              ref={(element) => {
-                extraRefs.current[index] = element;
-              }}
               data-clipping-extra
-              className="pointer-events-auto absolute top-0 left-0"
-              style={{ width: EXTRA_WIDTH, zIndex: extras.length - index }}
+              className="w-full max-w-[320px]"
               initial={false}
-              animate={open ? fanned(index) : tucked(index)}
+              animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: -16 }}
               transition={transition(index)}
             >
               <ExtraClipping story={story} />
             </motion.div>
           ))}
         </div>
-      ) : (
-        <motion.div
-          id={extrasId}
-          inert={!open}
-          aria-hidden={!open || undefined}
-          className="overflow-hidden"
-          initial={false}
-          animate={{ height: open ? "auto" : 0 }}
-          transition={reduced ? { duration: 0 } : SPRING}
-        >
-          <div className="flex flex-col items-center gap-10 px-2 pt-10 pb-4">
-            {extras.map((story, index) => (
-              <motion.div
-                key={story.key}
-                data-clipping-extra
-                className="w-full max-w-[320px]"
-                initial={false}
-                animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: -16 }}
-                transition={transition(index)}
-              >
-                <ExtraClipping story={story} />
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      )}
+      </motion.div>
     </div>
   );
 }

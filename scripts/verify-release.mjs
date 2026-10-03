@@ -45,7 +45,6 @@ const expectedIndexableRobots = [
 ];
 
 const requiredHomepageSections = ["work", "outside-work", "experiments", "about", "contact"];
-const signalStates = new Set(["live", "curated", "pending", "unavailable"]);
 const failures = [];
 let checkCount = 0;
 
@@ -280,35 +279,20 @@ function verifyHomepage(markup) {
   check(spotifyLink, "Homepage should expose a direct Spotify fallback link");
   check(markup.includes("Open in Spotify"), "Spotify fallback link should be visibly labelled");
 
-  const statuses = [...markup.matchAll(/<span class="signal-status" data-state="([^"]+)">([^<]*)<\/span>/gi)];
-  // GitHub keeps its legacy card until it moves onto the Board in #87.
-  check(statuses.length >= 1, "Outside work should expose status labels for its signal cards");
-  for (const [, state, label] of statuses) {
-    check(signalStates.has(state), `Signal state ${state} must use the shared signal contract`);
-    check(Boolean(label.trim()), "Signal states must have a visible label");
+  // The GitHub year is up only with a full year of data; when it is, it's 365 day buttons with tags.
+  const github = markup.match(/data-board-pin="github"([\s\S]*)$/i)?.[1] ?? "";
+  if (markup.includes('data-board-pin="github"')) {
+    equal((github.match(/class="board-github-day"/g) ?? []).length, 365, "The GitHub sheet should hold exactly 365 days");
+    check(/aria-label="(?:Nothing|\d+ contributions?) on [A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2,4}"/.test(github), "Each GitHub day should say its count and date");
+    check(/GitHub contributions over the past year: [\d,]+/.test(github), "The GitHub sheet should be named with its total");
+    check(!/\b3ixas\/[\w.-]+/.test(github), "The GitHub sheet should not expose repository details");
   }
-  const githubCalendar = [...markup.matchAll(/<[a-z][^>]*>/gi)]
-    .map(([tag]) => tag)
-    .find((tag) => attribute(tag, "role") === "grid" && /GitHub/i.test(attribute(tag, "aria-label") ?? ""));
-  const calendarUnavailableNotice = [...markup.matchAll(/<[a-z][^>]*>/gi)]
-    .map(([tag]) => tag)
-    .find((tag) => tag.includes("contribution-calendar-empty"));
-  if (githubCalendar) {
-    const githubCalendarLabel = attribute(githubCalendar, "aria-label") ?? "";
-    check(/GitHub contributions.*by day/i.test(githubCalendarLabel), "GitHub contribution grid should name its day-level data");
-    check(!/\b[\w.-]+\/[\w.-]+\b/.test(githubCalendarLabel), "GitHub contribution description should not expose repository details");
-    check((markup.match(/class="contribution-day"/g) ?? []).length === 365, "GitHub contribution grid should expose exactly 365 days");
-    check(markup.includes("Past 365 days"), "GitHub contribution grid should identify its time window");
-    check(/\b[A-Z][a-z]{2} 20\d{2} – [A-Z][a-z]{2} 20\d{2}\b/.test(plainText(markup)), "GitHub contribution grid should show month and year context");
-    check(markup.includes("contribution-calendar-instructions"), "GitHub contribution grid should explain its scroll and keyboard controls");
-  } else {
-    check(calendarUnavailableNotice || /I couldn’t load GitHub just now/.test(plainText(markup)), "Without the private aggregate snapshot, GitHub should explain why the full-year calendar is unavailable");
-    check(!/class="contribution-day"/.test(markup), "A partial public-event feed should not be shown as a complete year");
-  }
+  check(!/class="contribution-day"|signal-status|I couldn’t load GitHub/.test(markup), "The legacy GitHub card is gone");
+  // Making: the blueprint shows what I'm making now, or my latest public repository.
+  const making = markup.match(/data-board-pin="making"([\s\S]*?)data-board-pin=/i)?.[1] ?? "";
+  check(/(Now making|Latest on GitHub)/.test(plainText(making)), "The Making pin should say what I'm making, or show my latest repository");
 
   const text = plainText(markup);
-  const githubSignal = markup.match(/<article class="signal signal-building"[^>]*>([\s\S]*?)<\/article>/i)?.[1] ?? "";
-  check(!/Private contribution count|class="signal-metrics"/.test(githubSignal), "GitHub output should not show a separate private contribution statistic");
   check(/Now reading/.test(text) && /(Goodreads|Between books)/.test(text), "The book pin should show the book from Goodreads, or say I'm between books");
   check(/Admit one · Last watched/.test(text) && /(Letterboxd|Nothing logged yet)/.test(text), "The film ticket should show the film from Letterboxd, or say nothing is logged");
   check(!/private contributions are part of the total|keep their repositories private/i.test(text), "GitHub output should omit the redundant private-repository explanation");
@@ -343,7 +327,6 @@ function verifyHomepage(markup) {
   const daySource = hrefs(clipping).find(({ href }) => /^https:\/\/en\.wikipedia\.org\/wiki\/([A-Z][a-z]+_\d{1,2}|Portal:History)$/.test(href ?? ""));
   check(daySource, "The clipping's source should be the readable Wikipedia page for the day");
   check(!/api\/rest_v1/.test(clipping), "The clipping should never link to the feed's raw JSON");
-  check(/Updated \d{1,2} [A-Z][a-z]{2,4}|Wikimedia · cached/i.test(text), "Signal cards should expose a useful update date or cache label");
   check(["GitHub", "Goodreads", "Letterboxd", "Sleeper", "Wikimedia"].some((source) => text.includes(source)), "Signal cards should expose visible source wording");
   check(!/(ghp_|github_pat_|sk-[A-Za-z0-9]|STRAVA_CLIENT_SECRET)/i.test(text), "Rendered output must not contain credential-like values");
 

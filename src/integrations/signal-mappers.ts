@@ -1,12 +1,6 @@
-import type { Book, Film } from "./types";
+import type { Book, Film, GitHubRepository } from "./types";
 
 export type ActivityDay = { date: string; count: number };
-
-export type GitHubEventShape = {
-  type: string;
-  repo: { name: string };
-  created_at: string;
-};
 
 export type ContributionDayShape = { date: string; contributionCount: number };
 
@@ -18,18 +12,6 @@ export function datesForWindow(length: number, now = new Date()): ActivityDay[] 
     date.setUTCDate(now.getUTCDate() - (length - index - 1));
     return { date: date.toISOString().slice(0, 10), count: 0 };
   });
-}
-
-export function mapPublicActivity(events: GitHubEventShape[], length = GITHUB_ACTIVITY_DAYS, now = new Date()) {
-  const activity = datesForWindow(length, now);
-  const byDate = new Map(activity.map((day, index) => [day.date, index]));
-
-  for (const event of events) {
-    const index = byDate.get(event.created_at.slice(0, 10));
-    if (index !== undefined) activity[index].count += 1;
-  }
-
-  return activity;
 }
 
 export function mapContributionDays(days: ContributionDayShape[], length = GITHUB_ACTIVITY_DAYS, now = new Date()) {
@@ -116,4 +98,28 @@ function isoInstant(value: string | undefined) {
   if (!value) return null;
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+/** The fields read from a GitHub repository listing. */
+export type RepositoryShape = {
+  name?: unknown;
+  description?: unknown;
+  html_url?: unknown;
+  pushed_at?: unknown;
+  fork?: unknown;
+  archived?: unknown;
+};
+
+/**
+ * The most recently pushed public repository from a listing sorted by push
+ * date, skipping forks, archives and the profile repository; null if none.
+ */
+export function latestRepository(repositories: RepositoryShape[], profile: string): GitHubRepository | null {
+  for (const repository of repositories) {
+    const { name, description, html_url: href, pushed_at: pushedAt } = repository;
+    if (typeof name !== "string" || typeof href !== "string" || typeof pushedAt !== "string") continue;
+    if (repository.fork === true || repository.archived === true || name.toLowerCase() === profile.toLowerCase()) continue;
+    return { name, description: typeof description === "string" && description.trim() ? description.trim() : null, href, pushedAt };
+  }
+  return null;
 }

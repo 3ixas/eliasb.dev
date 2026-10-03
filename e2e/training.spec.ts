@@ -50,9 +50,10 @@ test.describe("Training plan states", () => {
       const today = plan(page, name).locator("[data-today]");
       await expect(today, `today on the ${name} fixture`).toHaveCount(1);
       await expect(today).toContainText(day);
-      // On narrow screens the pencil loop alone marks today, so the session keeps its room.
+      // On a narrow page (under 17.5rem, 280 px) the pencil loop alone marks today, so sessions keep to one line.
       const arrow = today.getByText("← today", { exact: true });
-      if (page.viewportSize()!.width >= 400) await expect(arrow).toBeVisible();
+      const width = (await plan(page, name).boundingBox())!.width;
+      if (width >= 280) await expect(arrow).toBeVisible();
       else await expect(arrow).toBeHidden();
     }
   });

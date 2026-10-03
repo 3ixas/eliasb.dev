@@ -1,17 +1,12 @@
 import Image from "next/image";
-import { ContributionCalendar } from "@/components/site/contribution-calendar";
-import { SignalPresentation } from "@/components/site/signal-presentation";
 import { Board } from "@/components/board/board";
 import { BoardHeader } from "@/components/board/board-header";
 import { Hero } from "@/components/board/hero";
 import { Work } from "@/components/board/work";
 import { careerTimeline, labItems } from "@/content/collections";
 import { profile } from "@/content/site";
-import { getHomepageSignals } from "@/integrations/homepage";
 
 export async function Homepage() {
-  const signals = await getHomepageSignals();
-
   return (
     <div className="prototype prototype-cabinet-of-curiosities selected-experience" id="top" tabIndex={-1}>
       <BoardHeader />
@@ -21,34 +16,6 @@ export async function Homepage() {
         <Work />
 
         <Board />
-
-        {/* GitHub, not yet on the Board; it moves onto it in #87. */}
-        <div className="outside-work-section">
-          <div className="currently-section">
-            <div className="signal-grid">
-              <article className="signal signal-building" data-motion-reveal>
-                <p>Recent building</p>
-                <SignalPresentation
-                  signal={signals.github}
-                  source={{
-                    label: signals.github.state === "unavailable" ? "GitHub activity" : "GitHub",
-                    href: signals.github.href,
-                  }}
-                >
-                  <strong>{signals.github.headline}</strong>
-                  {signals.github.description && <span>{signals.github.description}</span>}
-                  {signals.github.totalContributions !== undefined ? (
-                    <ContributionCalendar activity={signals.github.activity} label={signals.github.activityLabel} />
-                  ) : signals.github.state !== "unavailable" ? (
-                    <p className="contribution-calendar-empty">
-                      I can’t show the full-year calendar just now.
-                    </p>
-                  ) : null}
-                </SignalPresentation>
-              </article>
-            </div>
-          </div>
-        </div>
 
         <section className="lab-section experiments-section" id="experiments" tabIndex={-1} aria-labelledby="experiments-title">
           <div className="section-heading compact" data-motion-reveal>

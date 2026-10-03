@@ -88,8 +88,7 @@ test.describe("Weekly Curiosity states", () => {
     await expect(story.locator("img, figure, figcaption")).toHaveCount(0);
   });
 
-  test("on narrow screens the oddities open below the clipping, in their measured space", async ({ page }) => {
-    test.skip(page.viewportSize()!.width >= 900, "Wide screens fan the clippings out instead");
+  test("on every screen the oddities open below the clipping, in their measured space", async ({ page }) => {
     const clipping = week(page);
     const main = clipping.locator("[data-pin='clipping']").first();
     await toggleIn(clipping).click();
@@ -105,21 +104,25 @@ test.describe("Weekly Curiosity states", () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
   });
 
-  test("on wide screens the oddities fan out to the right, inside the board", async ({ page }) => {
-    test.skip(page.viewportSize()!.width < 900, "Narrow screens stack the clippings instead");
-    const clipping = week(page);
-    const before = await extraBoxes(clipping);
+  test("on the Board, the open oddities cover none of the pins beside the clipping", async ({ page }) => {
+    await page.goto("/#outside-work");
+    const clipping = page.locator("[data-board-pin='clipping']");
     await toggleIn(clipping).click();
-    await expect.poll(async () => (await extraBoxes(clipping))[1].x - before[1].x).toBeGreaterThan(100);
-    const frame = await page.locator("[data-pinboard]").evaluate((element) => element.getBoundingClientRect().right);
-    for (const box of await extraBoxes(clipping)) expect(box.x + box.width).toBeLessThanOrEqual(frame);
-    // Laid out from their measured heights: neither hides the other, nor the main clipping's links.
-    await expect.poll(async () => {
-      const [first, second] = await extraBoxes(clipping);
-      return second.y >= first.y + first.height - 12;
-    }).toBe(true);
-    const main = await clipping.locator("[data-pin='clipping']").first().evaluate((element) => element.getBoundingClientRect().right);
-    for (const box of await extraBoxes(clipping)) expect(box.x).toBeGreaterThanOrEqual(main - 12);
+    await expect.poll(async () => (await extraBoxes(clipping)).every(({ height }) => height > 0)).toBe(true);
+    await page.waitForTimeout(700);
+    const extras = await extraBoxes(clipping);
+    const others = await page.locator("[data-board-pin]:not([data-board-pin='clipping'])").evaluateAll((pins) =>
+      pins.map((pin) => {
+        const box = pin.getBoundingClientRect();
+        return { name: pin.getAttribute("data-board-pin"), x: box.x, y: box.y + window.scrollY, width: box.width, height: box.height };
+      }),
+    );
+    for (const extra of extras) {
+      for (const pin of others) {
+        const overlaps = extra.x < pin.x + pin.width && pin.x < extra.x + extra.width && extra.y < pin.y + pin.height && pin.y < extra.y + extra.height;
+        expect(overlaps, `an open oddity covers the ${pin.name} pin`).toBe(false);
+      }
+    }
   });
 
   test("with reduced motion the fan-out is instant", async ({ page }) => {

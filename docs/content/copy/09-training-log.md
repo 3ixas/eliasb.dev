@@ -36,7 +36,7 @@ One row per day, the day in mono capitals and the session in the display face:
 
 ### Today
 
-Today's row (London time) gets a pencil loop round the day and a pencilled "← today" beside the session, in the same hand as the fantasy stub's verdict. It's the only thing on the card that changes, and it only says which day it is. Below 400 px wide, the loop alone marks today, so the session keeps the room to sit on one or two lines.
+Today's row (London time) gets a pencil loop round the day and a pencilled "← today" beside the session, in the same hand as the fantasy stub's verdict. It's the only thing on the card that changes, and it only says which day it is. When the page is narrow (under about 280 px, as on phones and in the Board's middle column), the loop alone marks today, so each session keeps to one line.
 
 ### The pencilled note
 

@@ -4,6 +4,8 @@ import { CultureCorner } from "@/components/board/culture-corner";
 import { FantasyTicketPin } from "@/components/board/fantasy-ticket";
 import { TrainingPin } from "@/components/board/training-log";
 import { LondonClock } from "@/components/board/london-clock";
+import { GitHubPin } from "@/components/board/github-pin";
+import { MakingPin } from "@/components/board/making-pin";
 import { Pin } from "@/components/board/pin";
 import { PinPhoto, PinSlot } from "@/components/board/pin-states";
 import { Pinboard } from "@/components/board/pinboard";
@@ -11,6 +13,7 @@ import { BoardSurface } from "@/components/board/surface";
 import { board } from "@/content/board";
 import { getReadingSignal } from "@/integrations/goodreads";
 import { getCachedHistorySignal } from "@/integrations/history-cache";
+import { getGitHubSignal, getLatestRepositorySignal } from "@/integrations/github";
 import { getFilmSignal } from "@/integrations/letterboxd";
 import { getFantasySignal } from "@/integrations/sleeper";
 import type { PinStatus } from "@/integrations/pin-rules";
@@ -20,16 +23,18 @@ const londonStatus: PinStatus = { kind: "current" };
 
 /**
  * The Board: the personal section, a framed linen pinboard on the wall.
- * The Weekly Curiosity, training, London, the fantasy ticket and the culture
- * corner are pinned here; GitHub and Making move onto the board in #87.
+ * The Weekly Curiosity, Making and training, London and the fantasy ticket,
+ * the culture corner, and the GitHub year across the bottom.
  */
 export async function Board() {
   const now = new Date();
-  const [history, reading, film, fantasy] = await Promise.all([
+  const [history, reading, film, fantasy, github, latest] = await Promise.all([
     getCachedHistorySignal(),
     getReadingSignal(),
     getFilmSignal(),
     getFantasySignal(now),
+    getGitHubSignal(),
+    getLatestRepositorySignal(),
   ]);
 
   return (
@@ -48,13 +53,18 @@ export async function Board() {
         </h2>
         <Pinboard className="mt-12 board:mt-16">
           <ClippingPin history={history} now={now} />
-          <TrainingPin now={now} />
+          {/* Making above the training photo, in the middle columns. */}
+          <div className="mx-auto flex w-full max-w-[320px] flex-col gap-16 board:col-span-3 board:max-w-none">
+            <MakingPin latest={latest} now={now} />
+            <TrainingPin now={now} />
+          </div>
           {/* London with the fantasy ticket pinned below it, beside the clipping. */}
           <div className="flex flex-col gap-16 board:col-span-4 board:col-start-9">
             <LondonPin />
             <FantasyTicketPin fantasy={fantasy} now={now} />
           </div>
           <CultureCorner reading={reading} film={film} now={now} />
+          <GitHubPin github={github} now={now} />
         </Pinboard>
       </div>
     </BoardSurface>
