@@ -1,4 +1,4 @@
-import type { FantasySignal, HomepageSignals } from "@/integrations/types";
+import type { HomepageSignals } from "@/integrations/types";
 
 function recentDates(length: number) {
   const today = new Date();
@@ -40,51 +40,4 @@ export const signalFallbacks: HomepageSignals = {
     windowLabel: "Typical week",
     updatedAt: null,
   },
-  fantasy: {
-    state: "pending",
-    statusLabel: "No matchup just yet",
-    headline: "Main redraft league",
-    description: "",
-    matchupLabel: "Week unavailable",
-    updatedAt: null,
-  },
 };
-
-function unavailableFantasySignal({
-  href,
-  statusLabel,
-  description,
-  matchupLabel,
-}: {
-  href: string;
-  statusLabel: string;
-  description: string;
-  matchupLabel: string;
-}): FantasySignal {
-  return {
-    ...signalFallbacks.fantasy,
-    state: "unavailable",
-    statusLabel,
-    description,
-    matchupLabel,
-    href,
-  };
-}
-
-export function fantasyWeekUnavailable(href: string): FantasySignal {
-  return unavailableFantasySignal({
-    href,
-    statusLabel: "No current week yet",
-    description: "",
-    matchupLabel: "Week unavailable",
-  });
-}
-
-export function fantasySourceUnavailable(href: string, week?: number): FantasySignal {
-  return unavailableFantasySignal({
-    href,
-    statusLabel: "No live update from Sleeper",
-    description: "",
-    matchupLabel: week ? `Week ${week}` : "Week unavailable",
-  });
-}

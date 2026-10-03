@@ -1,3 +1,4 @@
+import type { FantasyGate, FantasyOutcome, FantasyRecord, FantasyTicket } from "@/integrations/fantasy";
 import type { PinKey } from "@/integrations/pin-rules";
 
 /** The Board: the personal section's copy, approved in docs/content/copy/05-board.md. */
@@ -16,7 +17,20 @@ export const board = {
     film: "Last watched",
     playlist: "On repeat",
   } satisfies Record<PinKey, string>,
-  fantasyWeek: (week: number) => `NFL fantasy · Week ${week}`,
+  // A no-break space keeps "Week 3" together when the label wraps.
+  fantasyWeek: (week: number) => `NFL fantasy · Week\u00a0${week}`,
+  /** Approved in docs/content/copy/08-fantasy-ticket.md. */
+  fantasy: {
+    outcomes: { won: "Won", lost: "Lost", tied: "Tied", ahead: "Ahead", behind: "Behind", level: "Level" },
+    team: (name: string) => `${name} vs. a rival who shall remain nameless`,
+    gates: {
+      thursday: "Gates open Thursday night",
+      live: "Live now",
+      sunday: "Back on Sunday",
+      monday: "Back on Monday night",
+    } satisfies Record<FantasyGate, string>,
+    source: "Sleeper",
+  },
   /** Approved in docs/content/copy/07-weekly-clipping.md. */
   clipping: {
     strapline: "Odd but true, from this week in history",
@@ -99,4 +113,61 @@ export function isoWeek(date: Date) {
   thursday.setUTCDate(thursday.getUTCDate() + 3 - ((thursday.getUTCDay() + 6) % 7));
   const firstOfYear = Date.UTC(thursday.getUTCFullYear(), 0, 1);
   return { year: thursday.getUTCFullYear(), week: Math.ceil(((thursday.getTime() - firstOfYear) / 86_400_000 + 1) / 7) };
+}
+
+/** Scores as Sleeper gives them, to two decimals: 151.24 – 90.52. */
+export function fantasyScore(points: number) {
+  return points.toFixed(2);
+}
+
+/** The season record on the stub's side: 1–2, or 8–5–1 once there's a tie. */
+export function fantasyRecord({ wins, losses, ties }: FantasyRecord) {
+  return ties ? `${wins}–${losses}–${ties}` : `${wins}–${losses}`;
+}
+
+/**
+ * The pencilled verdict beside the result. After a week it goes by the
+ * margin (a field goal is 3 points, a blowout 40 or more); in play, by who's
+ * ahead.
+ */
+export function fantasyVerdict(outcome: FantasyOutcome, margin: number) {
+  switch (outcome) {
+    case "ahead":
+      return "Don’t jinx it.";
+    case "behind":
+      return "Plenty of time.";
+    case "level":
+      return "Anyone’s game.";
+    case "tied":
+      return "Nobody’s happy.";
+    case "won":
+      return margin >= 40 ? "Not even close." : margin >= 3 ? "I’ll take it." : "By less than a field goal.";
+    case "lost":
+      return margin >= 40 ? "Took me to the cleaners." : margin >= 3 ? "There’s always next week." : "By less than a field goal. Ouch.";
+  }
+}
+
+const fantasyVerbs: Record<FantasyOutcome, string> = {
+  won: "won",
+  lost: "lost",
+  tied: "tied",
+  ahead: "is ahead",
+  behind: "is behind",
+  level: "is level",
+};
+
+const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
+/** The whole stub as one passage for screen readers; the sideways text and the tear are decoration. */
+export function fantasySpoken(ticket: FantasyTicket) {
+  const { week, outcome, scores, margin, teamName, record, gate } = ticket;
+  const tally = [count(record.wins, "win", "wins"), count(record.losses, "loss", "losses")];
+  if (record.ties) tally.push(count(record.ties, "tie", "ties"));
+  return [
+    `NFL fantasy, week ${week}.`,
+    `${teamName} ${fantasyVerbs[outcome]} ${fantasyScore(scores.team)} to ${fantasyScore(scores.opponent)} against a rival who shall remain nameless.`,
+    fantasyVerdict(outcome, margin),
+    `Season record: ${tally.join(", ")}.`,
+    gate && `${board.fantasy.gates[gate]}.`,
+  ].filter(Boolean).join(" ");
 }

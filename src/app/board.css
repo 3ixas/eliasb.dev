@@ -42,6 +42,7 @@
   --stock-kraft: #d7ae63;
   --stock-ticket: #e9c37a;
   --stock-newsprint: #f4efe3;
+  --stock-matchday: #f1e8d2;
 
   /* Surfaces and fixings that look the same by day and night */
   --linen: #e3d2b4;
@@ -125,6 +126,18 @@
   --library-stamp: #6a2e7a;
   --tag-ink: #5c3d10;
   --ticket-perforation: rgb(92 61 16 / 0.45);
+
+  /* The fantasy ticket stub: a strip of turf, and a pencilled verdict. */
+  --turf: #3f7a4b;
+  --turf-lines:
+    repeating-linear-gradient(to bottom, transparent 0 20px, rgb(255 255 255 / 0.6) 20px 22px),
+    repeating-linear-gradient(to bottom, transparent 0 4px, rgb(255 255 255 / 0.45) 4px 5px) 10px 0 / 8px 100% repeat-y;
+  --football: #7a3e1e;
+  --football-lace: #f4ebdd;
+  --matchday-ink: #2f5a38;
+  --matchday-muted: #4a4540;
+  --matchday-tear: rgb(38 49 31 / 0.35);
+  --pencil: #4a4540;
   --deck: #a93f1c;
   --deck-gradient: linear-gradient(180deg, #b5431e 0%, #9e3a1a 100%);
   --deck-sheen: inset 0 2px 0 rgb(255 220 190 / 0.4), inset 0 -3px 0 rgb(0 0 0 / 0.18);
@@ -320,6 +333,7 @@
   --color-stock-kraft: var(--stock-kraft);
   --color-stock-ticket: var(--stock-ticket);
   --color-stock-newsprint: var(--stock-newsprint);
+  --color-stock-matchday: var(--stock-matchday);
 
   --font-display: var(--font-newsreader), Georgia, serif;
   --font-sans: var(--font-hanken-grotesk), system-ui, sans-serif;
@@ -947,6 +961,82 @@
     left: 10px;
     width: 4px;
     background: radial-gradient(circle, var(--ticket-perforation) 0 1.5px, transparent 2px) 0 0 / 4px 8px repeat-y;
+  }
+
+  /*
+   * The fantasy ticket stub: turf, the main part, and the torn-off side with
+   * the record set sideways. The turf goes on the narrowest screens, where
+   * the score needs the room.
+   */
+  .board-matchday {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 36px;
+  }
+
+  .board-turf {
+    display: none;
+    position: relative;
+    border-radius: 2px 0 0 2px;
+    background: var(--turf-lines), var(--turf);
+  }
+
+  .board-football {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    rotate: -24deg;
+    filter: drop-shadow(1px 2px 1px rgb(0 0 0 / 0.35));
+  }
+
+  .board-matchday-main {
+    border-right: 2px dashed var(--matchday-tear);
+  }
+
+  .board-matchday-side {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .board-matchday-side p {
+    writing-mode: vertical-rl;
+    rotate: 180deg;
+  }
+
+  .board-matchday-ink {
+    color: var(--matchday-ink);
+  }
+
+  .board-matchday-muted {
+    color: var(--matchday-muted);
+  }
+
+  /* A note pencilled on a pin, in the same hand as the "as of" date. */
+  .board-pencil {
+    display: inline-block;
+    color: var(--pencil);
+    font-family: var(--font-newsreader), Georgia, serif;
+    font-size: var(--text-lead);
+    font-style: italic;
+    line-height: 1.2;
+    rotate: -2deg;
+  }
+
+  @media (min-width: 400px) {
+    .board-matchday {
+      grid-template-columns: 72px minmax(0, 1fr) 52px;
+    }
+
+    .board-turf {
+      display: block;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .board-matchday {
+      grid-template-columns: 86px minmax(0, 1fr) 58px;
+    }
   }
 
   .board-deck {

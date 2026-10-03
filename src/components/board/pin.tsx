@@ -20,7 +20,7 @@ export type Fixing = keyof FixingSurfaces;
 export type Surface = FixingSurfaces[Fixing];
 
 export type PinObject = "card" | "photo" | "note" | "sheet" | "clipping" | "ticket" | "object";
-export type PinStock = "paper" | "photo" | "ochre" | "blueprint" | "sage" | "terracotta" | "kraft" | "ticket" | "newsprint" | "none";
+export type PinStock = "paper" | "photo" | "ochre" | "blueprint" | "sage" | "terracotta" | "kraft" | "ticket" | "newsprint" | "matchday" | "none";
 
 /** Careful pins (hero, Work) stay within ±0.5°; loose pins (Board, About) within ±3°. */
 export type Looseness = "careful" | "loose";
@@ -37,6 +37,7 @@ const stockClasses: Record<PinStock, string> = {
   kraft: "bg-stock-kraft text-ink",
   ticket: "bg-stock-ticket text-ink",
   newsprint: "bg-stock-newsprint text-ink",
+  matchday: "bg-stock-matchday text-ink",
   // An object with no paper of its own sits straight on the wall.
   none: "text-wall-ink",
 };

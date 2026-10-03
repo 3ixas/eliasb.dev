@@ -281,7 +281,8 @@ function verifyHomepage(markup) {
   check(markup.includes("Open in Spotify"), "Spotify fallback link should be visibly labelled");
 
   const statuses = [...markup.matchAll(/<span class="signal-status" data-state="([^"]+)">([^<]*)<\/span>/gi)];
-  check(statuses.length >= 3, "Outside work should expose status labels for its signal cards");
+  // GitHub and training keep their legacy cards until they move onto the Board in #86 and #87.
+  check(statuses.length >= 2, "Outside work should expose status labels for its signal cards");
   for (const [, state, label] of statuses) {
     check(signalStates.has(state), `Signal state ${state} must use the shared signal contract`);
     check(Boolean(label.trim()), "Signal states must have a visible label");
@@ -310,7 +311,6 @@ function verifyHomepage(markup) {
   check(!/Private contribution count|class="signal-metrics"/.test(githubSignal), "GitHub output should not show a separate private contribution statistic");
   check(/Now reading/.test(text) && /(Goodreads|Between books)/.test(text), "The book pin should show the book from Goodreads, or say I'm between books");
   check(/Admit one · Last watched/.test(text) && /(Letterboxd|Nothing logged yet)/.test(text), "The film ticket should show the film from Letterboxd, or say nothing is logged");
-  check(!/other managers.{0,40}(names|private|anonymous)|names.{0,24}stay private/i.test(text), "Fantasy football output should omit the redundant privacy explanation");
   check(!/private contributions are part of the total|keep their repositories private/i.test(text), "GitHub output should omit the redundant private-repository explanation");
   check(text.includes("Strava") || (text.includes("Typical week") && text.includes("My weekly plan")), "Training output should distinguish live activity from an authored typical week");
   const trainingCard = markup.match(/<article class="signal signal-training">([\s\S]*?)<\/article>/i)?.[1] ?? "";
@@ -352,26 +352,16 @@ function verifyHomepage(markup) {
   check(descriptions.length >= 3 && descriptions.every((description) => description.length >= 60), "Long experiment descriptions should remain present in the rendered output");
   check(text.includes("first public version of Professor Past"), "Professor Past should be identified as its first public version");
 
-  const fantasyCard = [...markup.matchAll(/<article\b[^>]*>([\s\S]*?)<\/article>/gi)]
-    .map(([, card]) => card)
-    .find((card) => plainText(card).includes("Fantasy football")
-      && [...card.matchAll(/<[a-z][^>]*>/gi)].some(([tag]) => attribute(tag, "role") === "group"
-        && /fantasy football matchup$/i.test(attribute(tag, "aria-label")?.trim() ?? ""))) ?? "";
-  const fantasyStatus = fantasyCard.match(/<span\b(?=[^>]*\bdata-state="([^"]+)")[^>]*>([^<]*)<\/span>/i);
-  check(fantasyStatus, "Fantasy football card should expose a signal state");
-  const fantasyText = plainText(fantasyCard);
-  check(fantasyText.includes("Weekly matchup"), "Fantasy football card should label the matchup");
-  check(fantasyText.includes("My team") && fantasyText.includes("Opponent"), "Fantasy matchup should identify whose scores are shown");
-  check(!fantasyText.includes("NFL · week 1"), "Fantasy matchup should not show a hard-coded week");
-  if (fantasyStatus?.[1] === "pending") {
-    check(plainText(fantasyCard).includes("No matchup just yet"), "Pending fantasy state should show that no matchup is ready yet");
-    check(plainText(fantasyCard).includes("Sleeper"), "Pending fantasy state should identify the intended data source");
-    check(!hrefs(fantasyCard).some(({ href }) => href?.includes("sleeper.com")), "Pending fantasy state should not expose a Sleeper source link");
+  // The fantasy ticket is up only in season; when it is, it names my team and no one else.
+  const fantasyAt = markup.indexOf('data-board-pin="fantasy"');
+  if (fantasyAt >= 0) {
+    const nextPin = markup.indexOf("data-board-pin=", fantasyAt + 1);
+    const fantasyText = plainText(markup.slice(fantasyAt, nextPin > 0 ? nextPin : undefined));
+    check(/NFL fantasy · Week\s\d+/.test(fantasyText), "The fantasy ticket should show the NFL week");
+    check(fantasyText.includes("a rival who shall remain nameless"), "The fantasy ticket should keep the opponent anonymous");
+    check(!/\b0\.00 – 0\.00\b/.test(fantasyText), "The fantasy ticket should never show a 0.00 – 0.00 new week");
   }
-  if (fantasyStatus?.[1] === "live") {
-    check(hrefs(fantasyCard).some(({ href }) => href?.includes("sleeper.com")), "Live fantasy state should retain its Sleeper source link");
-    check(/Week \d+/.test(fantasyText), "Live fantasy matchup should show the current source week");
-  }
+  check(!hrefs(markup).some(({ href }) => href?.includes("sleeper.com")), "Nothing should link to the Sleeper league, which names the league and its teams");
 
   const sourceHosts = ["github.com", "goodreads.com", "letterboxd.com", "wikipedia.org"];
   for (const host of sourceHosts) {

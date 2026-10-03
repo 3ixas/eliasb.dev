@@ -1,3 +1,5 @@
+import type { FantasyTicket } from "./fantasy";
+
 export type SignalState = "live" | "curated" | "pending" | "unavailable";
 
 export type ActivityDay = {
@@ -110,15 +112,14 @@ export type FilmSignal = {
   updatedAt: string | null;
 };
 
-export type FantasySignal = PersonalSignal & {
-  matchupLabel: string;
-  teamScore?: number;
-  opponentScore?: number;
+/** Sleeper, read against the NFL calendar: ticket is null when there's no pin. */
+export type FantasySignal = {
+  state: SignalState;
+  ticket: FantasyTicket | null;
   updatedAt: string | null;
 };
 
 export type HomepageSignals = {
   github: GitHubSignal;
   training: TrainingSignal;
-  fantasy: FantasySignal;
 };

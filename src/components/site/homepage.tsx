@@ -1,7 +1,5 @@
 import Image from "next/image";
 import { ContributionCalendar } from "@/components/site/contribution-calendar";
-import { FantasyMatchup } from "@/components/site/fantasy-matchup";
-import { InViewMotion } from "@/components/site/in-view-motion";
 import { SignalPresentation } from "@/components/site/signal-presentation";
 import { Board } from "@/components/board/board";
 import { BoardHeader } from "@/components/board/board-header";
@@ -24,7 +22,7 @@ export async function Homepage() {
 
         <Board />
 
-        {/* Pins not yet on the Board; each moves onto it in #85 to #87. */}
+        {/* Pins not yet on the Board; each moves onto it in #86 and #87. */}
         <div className="outside-work-section">
           <div className="currently-section">
             <div className="signal-grid">
@@ -68,24 +66,6 @@ export async function Homepage() {
                     ))}
                   </div>
                   {signals.training.description && <span>{signals.training.description}</span>}
-                </SignalPresentation>
-              </article>
-              <article className="signal signal-fantasy" data-motion-reveal>
-                <p>Fantasy football</p>
-                <SignalPresentation
-                  signal={signals.fantasy}
-                  source={{
-                    label: "Sleeper",
-                    href: signals.fantasy.href,
-                  }}
-                >
-                  <InViewMotion>
-                    <FantasyMatchup signal={signals.fantasy} />
-                  </InViewMotion>
-                  {signals.fantasy.state === "live" && (
-                    <strong className="fantasy-season-record">{signals.fantasy.headline}</strong>
-                  )}
-                  {signals.fantasy.description && <span>{signals.fantasy.description}</span>}
                 </SignalPresentation>
               </article>
             </div>

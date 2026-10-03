@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { ClippingPin } from "@/components/board/clipping";
 import { CultureCorner } from "@/components/board/culture-corner";
+import { FantasyTicketPin } from "@/components/board/fantasy-ticket";
 import { LondonClock } from "@/components/board/london-clock";
 import { Pin } from "@/components/board/pin";
 import { PinPhoto, PinSlot } from "@/components/board/pin-states";
@@ -10,6 +11,7 @@ import { board } from "@/content/board";
 import { getReadingSignal } from "@/integrations/goodreads";
 import { getCachedHistorySignal } from "@/integrations/history-cache";
 import { getFilmSignal } from "@/integrations/letterboxd";
+import { getFantasySignal } from "@/integrations/sleeper";
 import type { PinStatus } from "@/integrations/pin-rules";
 
 // London is authored, a photo and the time, so it is always current (staleAfterDays.london is null).
@@ -17,12 +19,17 @@ const londonStatus: PinStatus = { kind: "current" };
 
 /**
  * The Board: the personal section, a framed linen pinboard on the wall.
- * The Weekly Curiosity, London and the culture corner are pinned here; the
- * other pins move onto the board in #85 to #87.
+ * The Weekly Curiosity, London, the fantasy ticket and the culture corner are
+ * pinned here; the other pins move onto the board in #86 and #87.
  */
 export async function Board() {
-  const [history, reading, film] = await Promise.all([getCachedHistorySignal(), getReadingSignal(), getFilmSignal()]);
   const now = new Date();
+  const [history, reading, film, fantasy] = await Promise.all([
+    getCachedHistorySignal(),
+    getReadingSignal(),
+    getFilmSignal(),
+    getFantasySignal(now),
+  ]);
 
   return (
     <BoardSurface
@@ -40,7 +47,11 @@ export async function Board() {
         </h2>
         <Pinboard className="mt-12 board:mt-16">
           <ClippingPin history={history} now={now} />
-          <LondonPin />
+          {/* London with the fantasy ticket pinned below it, beside the clipping. */}
+          <div className="flex flex-col gap-16 board:col-span-4 board:col-start-9">
+            <LondonPin />
+            <FantasyTicketPin fantasy={fantasy} now={now} />
+          </div>
           <CultureCorner reading={reading} film={film} now={now} />
         </Pinboard>
       </div>
@@ -54,7 +65,7 @@ function LondonPin() {
     <PinSlot
       status={londonStatus}
       data-board-pin="london"
-      className="board-sway relative mx-auto w-full max-w-[320px] board:col-span-4 board:col-start-9 board:max-w-none"
+      className="board-sway relative mx-auto w-full max-w-[320px] board:max-w-none"
       style={{ "--sway-depth": 0.7 } as CSSProperties}
     >
       <Pin object="photo" fixing="tape" surface="linen" looseness="loose" tilt={-1.2} stock="photo" className="p-3 pb-4">
