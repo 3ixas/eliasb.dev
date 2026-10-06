@@ -19,22 +19,22 @@ const canonicalPages = [
 const expectedSitemapUrls = new Set(canonicalPages.map((route) => route === "/" ? "https://www.eliasb.dev" : `https://www.eliasb.dev${route}`));
 const expectedWorkSocialCards = new Map([
   ["/work", {
-    title: "Work · Elias B.",
+    title: "Work · Elias Bennett",
     image: "/work/threshold/landing.webp",
     alt: "Threshold landing page introducing the real cost of moving out",
   }],
   ["/work/threshold", {
-    title: "Threshold · Elias B.",
+    title: "Threshold · Elias Bennett",
     image: "/work/threshold/landing.webp",
     alt: "Threshold landing page introducing the real cost of moving out",
   }],
   ["/work/argus-risk", {
-    title: "Argus Risk · Elias B.",
+    title: "Argus Risk · Elias Bennett",
     image: "/work/argus/overview.webp",
     alt: "Argus Risk dashboard showing portfolio value, profit and loss, exposure, and system status",
   }],
   ["/work/flowtime", {
-    title: "Flowtime · Elias B.",
+    title: "Flowtime · Elias Bennett",
     image: "/work/flowtime/timer.jpg",
     alt: "Flowtime focus timer interface",
   }],
@@ -344,6 +344,7 @@ async function verifyRoutes(baseUrl, pages) {
     pages.set(route, page);
     equal(page.response.status, 200, `${route} should render successfully`);
     verifyPageShell(page.markup, route);
+    if (route === "/") await verifyHomeSocialMetadata(baseUrl, page.document);
     if (route.startsWith("/work")) await verifyWorkSocialMetadata(baseUrl, page.document, route);
   }
 
@@ -351,12 +352,53 @@ async function verifyRoutes(baseUrl, pages) {
   equal(retiredConcepts.status, 404, "The retired /concepts design study should no longer exist");
   const fixtures = await fetch(new URL("/fixtures/pins", baseUrl), { redirect: "manual" });
   equal(fixtures.status, 404, "Test fixtures should not exist in production");
+  await verifyNotFound(baseUrl);
 
   for (const [route, location] of compatibilityRedirects) {
     const response = await fetch(new URL(route, baseUrl), { redirect: "manual" });
     equal(response.status, 308, `${route} should permanently redirect`);
     equal(response.headers.get("location"), location, `${route} compatibility target`);
   }
+}
+
+async function verifyHomeSocialMetadata(baseUrl, document) {
+  const title = "Elias Bennett, software engineer in London";
+  const description = "I’m Elias, a software engineer in London. I build everyday software, and make complicated things feel simple. Here’s my work, a few things I’m into, and how I got here.";
+  equal(document.match(/<title>([^<]*)<\/title>/i)?.[1], title, "Homepage title");
+  equal(metaContent(document, "description", "name"), description, "Homepage description");
+  equal(metaContent(document, "og:title"), title, "Homepage Open Graph title");
+  equal(metaContent(document, "og:site_name"), "Elias Bennett", "Open Graph site name");
+  equal(metaContent(document, "og:image:alt"), "A card pinned to a wall reading “I build everyday software, and make complicated things feel simple.”", "Homepage social image alternative text");
+  equal(metaContent(document, "twitter:title", "name"), title, "Homepage Twitter title");
+
+  const ogImage = metaContent(document, "og:image");
+  check(ogImage?.includes("/opengraph-image"), "Homepage Open Graph image should be the pinned headline card");
+  if (ogImage) {
+    const image = await fetch(new URL(new URL(ogImage).pathname + new URL(ogImage).search, baseUrl));
+    equal(image.status, 200, "The social image should return 200");
+    equal(image.headers.get("content-type"), "image/png", "The social image content type");
+  }
+  check(metaContent(document, "twitter:image", "name")?.includes("/opengraph-image"), "Homepage Twitter image should be the pinned headline card");
+
+  const icon = tags(document, "link").find((tag) => attribute(tag, "rel") === "icon");
+  check(attribute(icon ?? "", "href")?.startsWith("/icon.svg"), "The favicon should be the pushpin SVG");
+  const iconSvg = await fetchAsset(baseUrl, "/icon.svg");
+  check(iconSvg.includes("prefers-color-scheme: dark"), "The favicon should carry a dark-tab variant");
+}
+
+async function verifyNotFound(baseUrl) {
+  const { response, document, markup } = await fetchPage(baseUrl, "/nothing-pinned-here");
+  equal(response.status, 404, "An unknown route should return 404");
+  verifyPageShell(markup, "/404");
+  equal(document.match(/<title>([^<]*)<\/title>/i)?.[1], "Nothing pinned here · Elias Bennett", "404 title");
+  const robots = tags(document, "meta").filter((tag) => attribute(tag, "name") === "robots").map((tag) => attribute(tag, "content") ?? "");
+  check(robots.length > 0 && robots.every((content) => /noindex/.test(content)), `Every robots tag on the 404 should say noindex (received ${JSON.stringify(robots)})`);
+  equal(metaContent(document, "og:title"), "Nothing pinned here · Elias Bennett", "The 404 should share under its own title, not the home page's");
+  equal(metaContent(document, "og:url"), null, "The 404 should not claim the home page's URL when shared");
+  const heading = markup.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? "";
+  equal(plainText(heading), "Something was pinned here.", "404 heading");
+  check(plainText(markup).includes("It’s been taken down, or it was never up. The rest of the board is still here."), "404 line");
+  check(hrefs(markup).some(({ tag, href }) => href === "/" && plainText(markup.slice(markup.indexOf(tag))).startsWith("Back to the board")), "The 404 should link back to the board");
 }
 
 async function verifyWorkSocialMetadata(baseUrl, document, route) {

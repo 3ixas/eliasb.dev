@@ -46,6 +46,8 @@
 
   /* Surfaces and fixings that look the same by day and night */
   --linen: #e3d2b4;
+  /* The 404: the outline where a pin's paper used to be. */
+  --not-found-outline: rgb(90 60 30 / 0.3);
   --clipboard: #a27850;
   --clipboard-grain:
     linear-gradient(160deg, rgb(255 235 205 / 0.18), rgb(0 0 0 / 0.08)),
@@ -907,6 +909,12 @@
     opacity: var(--is-night);
   }
 
+  /* The 404: the torn corner of paper left under the pin. */
+  .board-not-found-scrap {
+    margin-left: -13px;
+    clip-path: polygon(0 0, 100% 0, 80% 60%, 55% 45%, 30% 100%, 10% 55%);
+  }
+
   [data-light-fixture="festoon"] > div,
   [data-light-fixture="fairy-lights"] > div {
     mix-blend-mode: screen;
@@ -1355,14 +1363,14 @@
     65% { opacity: 1; }
   }
 
-  .board-stamp {
+  .board-postage-stamp {
     width: 84px;
     height: 100px;
     border: 2px dotted #c9bfaf;
     background: var(--postcard);
   }
 
-  .board-stamp > span {
+  .board-postage-stamp > span {
     background: #b8431d;
     color: #fbf1e6;
   }

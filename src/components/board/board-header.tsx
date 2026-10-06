@@ -29,9 +29,9 @@ function sectionHref(id: string, isHome: boolean) {
 
 /**
  * The sticky header. On the home page the nav pin follows the section in view;
- * on other routes it marks the section the route belongs to.
+ * on other routes it marks the section the route belongs to, or none (`null`).
  */
-export function BoardHeader({ page }: { page?: Section }) {
+export function BoardHeader({ page }: { page?: Section | null }) {
   const isHome = page === undefined;
   const [inView, setInView] = useState<Section | null>(null);
   const headerRef = useRef<HTMLElement>(null);

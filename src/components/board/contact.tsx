@@ -104,7 +104,7 @@ function Postcard() {
           </span>
           <span aria-hidden="true" className="board-postcard-divider hidden sm:block" />
           <span className="relative flex flex-col justify-end gap-4 pt-28 sm:pt-0 sm:pb-2">
-            <span aria-hidden="true" className="board-stamp absolute top-0 right-0 p-1">
+            <span aria-hidden="true" className="board-postage-stamp absolute top-0 right-0 p-1">
               <span className="flex size-full items-center justify-center font-display text-title">{postcard.stamp}</span>
             </span>
             <svg aria-hidden="true" viewBox="0 0 120 40" className="board-postmark absolute top-6 right-16 w-28">

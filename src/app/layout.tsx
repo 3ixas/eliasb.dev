@@ -1,4 +1,4 @@
-import { siteDescription } from "@/content/site";
+import { homeTitle, siteDescription, siteName } from "@/content/site";
 import type { Metadata } from "next";
 import { Hanken_Grotesk, JetBrains_Mono, Newsreader } from "next/font/google";
 import "./board.css";
@@ -25,33 +25,26 @@ const isIndexable = process.env.SITE_INDEXABLE === "true";
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.eliasb.dev"),
   title: {
-    default: "Elias Bennett | Software engineer and product builder",
-    template: "%s · Elias B.",
+    default: homeTitle,
+    template: `%s · ${siteName}`,
   },
-  description:
-    siteDescription,
+  description: siteDescription,
   alternates: {
     canonical: "/",
   },
-  icons: {
-    icon: "/icon.svg",
-    shortcut: "/icon.svg",
-    apple: "/icon.svg",
-  },
+  // The favicon is app/icon.svg and the social image app/opengraph-image.tsx;
+  // Next.js links both from their file names.
   openGraph: {
     type: "website",
-    siteName: "Elias B.",
+    siteName,
     url: "/",
-    title: "Elias Bennett | Software engineer and product builder",
-    description:
-      siteDescription,
+    title: homeTitle,
+    description: siteDescription,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Elias Bennett | Software engineer and product builder",
-    description:
-      siteDescription,
-    images: ["/opengraph-image"],
+    title: homeTitle,
+    description: siteDescription,
   },
   robots: { index: isIndexable, follow: isIndexable },
 };

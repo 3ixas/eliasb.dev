@@ -34,8 +34,24 @@ export const work = {
   viewAll: "View all work",
 } as const;
 
+// Approved in docs/content/copy/13-404-social-metadata.md.
+export const siteName = "Elias Bennett";
+
+/** A route's title: "(page) · Elias Bennett". */
+export const pageTitle = (page: string) => `${page} · ${siteName}`;
+
+export const homeTitle = `${siteName}, software engineer in London`;
+
+const headline = `${hero.headline.lead} ${hero.headline.emphasis}`;
+
 export const siteDescription =
-  "I’m Elias, a software engineer in London. I take ideas through design, full-stack development, and iteration, aiming to make useful, enjoyable products.";
+  `I’m Elias, a software engineer in London. ${headline} Here’s my work, a few things I’m into, and how I got here.`;
+
+/** The image shown when a link to the site is shared: the headline on a pinned card. */
+export const socialImage = {
+  alt: `A card pinned to a wall reading “${headline}”`,
+  mark: { before: "E", slash: "/", after: "B" },
+} as const;
 
 export const profile = {
   name: "Elias Bennett",

@@ -87,7 +87,7 @@ for (const file of files) {
     });
 
     test("describes itself for search and sharing", async ({ page }) => {
-      await expect(page).toHaveTitle(`${file.name} · Elias B.`);
+      await expect(page).toHaveTitle(`${file.name} · Elias Bennett`);
       await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", file.description);
       await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", file.image);
     });

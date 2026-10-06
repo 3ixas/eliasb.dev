@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CaseFilePage } from "@/components/board/case-file";
 import { caseFiles, caseFileSlugs, isCaseFileSlug } from "@/content/case-files";
+import { pageTitle, siteName } from "@/content/site";
 
 export function generateStaticParams() {
   return caseFileSlugs.map((slug) => ({ slug }));
@@ -21,9 +22,9 @@ export async function generateMetadata({
     alternates: { canonical: `/work/${slug}` },
     openGraph: {
       type: "website",
-      siteName: "Elias B.",
+      siteName,
       url: `/work/${slug}`,
-      title: `${name} · Elias B.`,
+      title: pageTitle(name),
       description,
       images: [{
         url: image.src,
@@ -34,7 +35,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${name} · Elias B.`,
+      title: pageTitle(name),
       description,
       images: [{ url: image.src, alt: image.alt }],
     },

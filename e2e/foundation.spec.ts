@@ -108,7 +108,7 @@ test.describe("Board foundation", () => {
     expect(external).toBe(0);
   });
 
-  for (const route of ["/", "/work", "/work/threshold", "/work/argus-risk", "/work/flowtime", "/fixtures/pins"]) {
+  for (const route of ["/", "/work", "/work/threshold", "/work/argus-risk", "/work/flowtime", "/fixtures/pins", "/nothing-pinned-here"]) {
     test(`nothing scrolls sideways on ${route}`, async ({ page }) => {
       await page.goto(route);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
