@@ -6,7 +6,7 @@ import { setTimeout as delay } from "node:timers/promises";
 const compatibilityRedirects = new Map([
   ["/about", "/#about"],
   ["/library", "/#outside-work"],
-  ["/lab", "/#experiments"],
+  ["/lab", "/#outside-work"],
 ]);
 
 const canonicalPages = [
@@ -44,7 +44,7 @@ const expectedIndexableRobots = [
   ["host: https://www.eliasb.dev", "sitemap: https://www.eliasb.dev/sitemap.xml"],
 ];
 
-const requiredHomepageSections = ["work", "outside-work", "experiments", "about", "contact"];
+const requiredHomepageSections = ["work", "outside-work", "about", "contact"];
 const failures = [];
 let checkCount = 0;
 
@@ -209,35 +209,23 @@ function verifyHomepage(markup) {
 
   const outsideWorkTitle = markup.match(/<h2\b[^>]*\bid="outside-work-title"[^>]*>([\s\S]*?)<\/h2>/i)?.[1] ?? "";
   equal(plainText(outsideWorkTitle), "Some of what I’m into lately.", "Homepage #outside-work-title rendered text");
-  const aboutStart = markup.indexOf('<section class="about-section"');
+  const aboutStart = markup.lastIndexOf("<", markup.indexOf('id="about"'));
   const contactStart = markup.indexOf('<section id="contact"');
   const aboutSection = aboutStart >= 0 && contactStart > aboutStart ? markup.slice(aboutStart, contactStart) : "";
   check(Boolean(aboutSection), "Homepage should render its About section before Contact");
-  check(aboutSection.includes("Career path"), "About should identify the career overview");
-  const careerCopy = plainText(aboutSection);
-  check(careerCopy.includes("My career so far."), "About should introduce the career progression plainly");
-  check(careerCopy.includes("I started in marketing and data, then moved into software"), "About should explain the verified career progression in plain language");
-  check(careerCopy.includes("Core Web Vitals and split tests"), "About should ground the marketing stage in approved career evidence");
-  check(careerCopy.includes("React, MySQL, and Java/Spring Boot"), "About should explain the move into full-stack work with approved evidence");
-  check(careerCopy.includes("I work on software that brings market data into pricing and risk calculations"), "About should describe the current role with its verified pricing/risk systems context");
-  const careerRoles = [...aboutSection.matchAll(/<h4\b[^>]*>([\s\S]*?)<\/h4>/gi)].map(([, title]) => plainText(title));
-  equal(careerRoles.join("|"), "Marketing Executive|Full Stack Software Engineer|Software Engineer working on pricing and risk systems", "About career roles should describe the verified current work without inventing an official title");
-  const careerEmployers = [...aboutSection.matchAll(/class="career-employer"[^>]*>([\s\S]*?)<\/p>/gi)].map(([, employer]) => plainText(employer));
-  equal(careerEmployers.join("|"), "Optegra Eye Healthcare & Kensington Medical|Joveen|BNP Paribas CIB", "About should show the verified employers in order");
-  const careerDates = [...aboutSection.matchAll(/<time\b[^>]*>([\s\S]*?)<\/time>/gi)].map(([, date]) => plainText(date));
-  equal(careerDates.join("|"), "Sept 2021|Aug 2024|Aug 2024|June 2025|July 2025", "About should expose the verified role dates");
-  check(aboutSection.includes("Present"), "About should show the current role as ongoing");
-  check(aboutSection.includes("High-Performance Computing"), "About should retain the verified current team context");
-  check(!aboutSection.includes("AI model training"), "About should not claim unverified career experience");
-  equal((aboutSection.match(/\bawkward\b/gi) ?? []).length, 0, "About should not use vague filler language");
-  check(!aboutSection.includes("Outside the editor"), "About should not repeat the interests gathered in Library");
-  check(!aboutSection.includes("A few other ways I measure a week."), "About should not render the duplicate interests grid");
-  check(!aboutSection.includes("profile-links"), "About should not retain the profile-link group");
-  const aboutContactAction = [...aboutSection.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)]
-    .find(([, tag]) => attribute(tag, "class") === "about-contact-cta");
-  check(Boolean(aboutContactAction), "About should preserve its Contact shortcut");
-  equal(attribute(aboutContactAction?.[1] ?? "", "href"), "#contact", "About conversation action should use the existing Contact anchor");
-  check(plainText(aboutContactAction?.[2] ?? "").includes("Start a conversation"), "About Contact shortcut should retain its clear label");
+  // About: the story from the source note, five stops on the string, the grey-jumper photo.
+  const aboutText = plainText(aboutSection);
+  check(aboutText.includes("03 / About"), "About should be section 03, with Experiments gone");
+  check(aboutText.startsWith("03 / About A bit about me. I studied history at university."), "About should open with history");
+  check(aboutText.includes("a Greggs campaign"), "About should name the Greggs campaign, as approved");
+  check(!/_nology|Optegra|Joveen/i.test(aboutText), "The bootcamp and earlier employers stay unnamed in the story");
+  const stops = [...aboutSection.matchAll(/<li\b[^>]*data-stop="(\d)"[^>]*>([\s\S]*?)<\/li>/gi)].map(([, stop, body]) => `${stop} ${plainText(body)}`);
+  equal(stops.length, 5, "About should pin five stops on the string");
+  check(/^1 .*History at uni/.test(stops[0] ?? "") && /^5 .*BNP Paribas, today/.test(stops[4] ?? ""), "The stops should run from history to BNP Paribas");
+  check(aboutText.includes("“I need that feeling from what I do.”"), "The speech bubble should quote the source word for word");
+  check(tags(aboutSection, "img").some((tag) => attribute(tag, "alt") === "Elias smiling in a grey jumper outside a stone building on a sunny day"), "About should show the grey-jumper photo");
+  check(!/career-employer|about-contact-cta|Career path/.test(aboutSection), "The career timeline and About's contact shortcut are gone");
+  check(!markup.includes('id="experiments"'), "The Experiments section is gone; Making is on the Board");
   const contactEnd = markup.indexOf("<footer", contactStart);
   const contactSection = contactStart >= 0 && contactEnd > contactStart ? markup.slice(contactStart, contactEnd) : "";
   check(Boolean(contactSection), "Homepage should render its Contact section before the footer");
@@ -265,12 +253,7 @@ function verifyHomepage(markup) {
   check(imageTags.every((tag) => attribute(tag, "alt") !== null), "Every homepage image should declare alternative text");
   check(markup.includes("Threshold landing page showing rental affordability"), "Threshold imagery should have meaningful alternative text");
   check(markup.includes("London skyline from the Thames"), "London imagery should have meaningful alternative text");
-  check(markup.includes("Elias Bennett smiling in a white dinner jacket"), "About imagery should retain the selected portrait alternative text");
   check(tags(markup, "img").some((tag) => (attribute(tag, "srcset") ?? "").includes("/_next/image")), "Homepage imagery should use responsive Next Image sources");
-
-  const detailBlocks = [...markup.matchAll(/<details\b[\s\S]*?<\/details>/gi)].map(([block]) => block);
-  check(detailBlocks.length >= 2, "Homepage should retain native experiment disclosures");
-  check(detailBlocks.every((block) => /<summary\b/i.test(block)), "Every disclosure should use a native summary control");
 
   // The cassette player is a facade: Spotify's player loads only when Play is pressed.
   check(!/open\.spotify\.com\/embed/.test(markup), "Spotify's player should load only when Play is pressed");
@@ -330,10 +313,6 @@ function verifyHomepage(markup) {
   check(["GitHub", "Goodreads", "Letterboxd", "Sleeper", "Wikimedia"].some((source) => text.includes(source)), "Signal cards should expose visible source wording");
   check(!/(ghp_|github_pat_|sk-[A-Za-z0-9]|STRAVA_CLIENT_SECRET)/i.test(text), "Rendered output must not contain credential-like values");
 
-  const descriptions = [...markup.matchAll(/<span class="lab-description">([\s\S]*?)<\/span>/gi)]
-    .map(([, description]) => plainText(description));
-  check(descriptions.length >= 3 && descriptions.every((description) => description.length >= 60), "Long experiment descriptions should remain present in the rendered output");
-  check(text.includes("first public version of Professor Past"), "Professor Past should be identified as its first public version");
 
   // The fantasy ticket is up only in season; when it is, it names my team and no one else.
   const fantasyAt = markup.indexOf('data-board-pin="fantasy"');

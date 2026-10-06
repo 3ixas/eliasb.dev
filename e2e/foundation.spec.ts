@@ -182,7 +182,7 @@ test.describe("Board foundation", () => {
   });
 
   test("legacy routes land on their sections and retired ones are gone", async ({ page, request }) => {
-    for (const [from, hash] of [["/about", "#about"], ["/library", "#outside-work"], ["/lab", "#experiments"]] as const) {
+    for (const [from, hash] of [["/about", "#about"], ["/library", "#outside-work"], ["/lab", "#outside-work"]] as const) {
       await page.goto(from);
       await expect(page).toHaveURL(new RegExp(`/${hash}$`));
     }

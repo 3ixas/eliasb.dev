@@ -13,6 +13,7 @@ import { integrationConfig } from "../src/content/integration-config.ts";
 import { asOfDate, pinStatus, staleAfterDays } from "../src/integrations/pin-rules.ts";
 import { fantasyRecord, fantasySpoken, fantasyVerdict, filmLine, isoWeek, stars, trainingSpoken, groupedNumber, makingNote, MAKING_CURRENT_DAYS } from "../src/content/board.ts";
 import { fantasyMoment, fantasyTicket } from "../src/integrations/fantasy.ts";
+import { ARROW_GAP, stringStretches } from "../src/components/board/journey-geometry.ts";
 import { readSleeperSnapshot } from "../src/integrations/sleeper-snapshot.ts";
 import { getHistorySignal, historyWeekStart, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "../src/integrations/history.ts";
 import {
@@ -609,6 +610,16 @@ const repo = latestRepository(repositories, "3ixas");
 assert.equal(makingNote(new Date(written + 55 * 86_400_000), repo).kind, "authored");
 assert.equal(makingNote(new Date(written + 56 * 86_400_000), repo).kind, "latest", "After eight weeks the entry is no longer now");
 assert.equal(makingNote(new Date(written + 56 * 86_400_000), null), null, "With no entry and no repository, there's no pin");
+
+// About's red string: one stretch per pair of pins, each stopping short of the next pin for its arrow.
+assert.deepEqual(stringStretches([]), []);
+assert.deepEqual(stringStretches([{ x: 10, y: 10 }]), []);
+const stretches = stringStretches([{ x: 10, y: 0 }, { x: 200, y: 100 }, { x: 10, y: 200 }]);
+assert.equal(stretches.length, 2);
+assert.match(stretches[0], /^M 10\.0 0\.0 Q 140\.0 50\.0 /, "The first stretch bows to the right");
+assert.match(stretches[1], /^M 200\.0 100\.0 Q 70\.0 150\.0 /, "The next bows to the other side");
+const [endX, endY] = stretches[0].split(" ").slice(-2).map(Number);
+assert.ok(Math.abs(Math.hypot(200 - endX, 100 - endY) - ARROW_GAP) < 0.2, "Each stretch stops short of its pin by the arrow's gap");
 
 // The running photo carries no embedded metadata: its WebP has image data only, no EXIF or XMP.
 const runningPhoto = readFileSync(new URL("../public/signals/running-central-london.webp", import.meta.url));

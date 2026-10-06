@@ -43,8 +43,6 @@ export const profile = {
   role: "Software engineer",
   location: "London",
   statement: `${hero.headline.lead} ${hero.headline.emphasis}`,
-  about:
-    "I’m in London, where I work on high-performance pricing and risk systems. Outside work, I take my own product ideas from the first sketch through design and code, then keep improving them after they ship.",
   links: {
     email: "mailto:eliasthebennett@gmail.com",
     github: "https://github.com/3ixas",
@@ -141,39 +139,3 @@ export const featuredProjects = featuredProjectSlugs.map((slug): HomepageProject
   if (!project) throw new Error(`Featured project is missing from the project catalogue: ${slug}`);
   return project;
 });
-
-export const labNotes = [
-  {
-    index: "01",
-    title: "Ask Professor Past",
-    kind: "History experiment",
-    description:
-      "A small experiment in asking questions about history through an eccentric fictional professor.",
-    href: "/lab#lab-01",
-    treatment: "professor",
-    image: "/lab/professor-past.webp",
-    imageAlt: "Warm illustrated portrait of the eccentric Professor Past",
-  },
-  {
-    index: "02",
-    title: "Fantasy models",
-    kind: "Football · Data",
-    description:
-      "Matchup views, rankings, and draft tools for a redraft league. I’m still working out where predictions fit.",
-    href: "/lab#lab-02",
-    treatment: "fantasy",
-    image: "/signals/football-stadium.jpg",
-    imageAlt: "Aerial view of a football stadium and marked field",
-  },
-  {
-    index: "03",
-    title: "Interface studies",
-    kind: "Work in progress",
-    description:
-      "Small tests of controls and motion, with notes on what feels useful and what doesn’t.",
-    href: "/lab#lab-03",
-    treatment: "interface",
-    image: "/lab/flowtime-interface.jpg",
-    imageAlt: "Flowtime focus timer interface showing an idle session",
-  },
-] as const;

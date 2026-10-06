@@ -6,7 +6,7 @@
  *
  * Each section adds its own kind of light when it moves to the Board.
  */
-export type LightKind = "desk-lamp" | "picture-light" | "festoon" | "fairy-lights";
+export type LightKind = "desk-lamp" | "picture-light" | "festoon" | "fairy-lights" | "candle";
 
 export function Light({ kind }: { kind: LightKind }) {
   switch (kind) {
@@ -18,6 +18,8 @@ export function Light({ kind }: { kind: LightKind }) {
       return <Festoon />;
     case "fairy-lights":
       return <FairyLights />;
+    case "candle":
+      return <Candle />;
   }
 }
 
@@ -114,6 +116,51 @@ function FairyLights() {
         {fairyBulbs.map(([x, y]) => (
           <circle key={`${x}-${y}`} cx={x} cy={y} r="2.4" />
         ))}
+      </svg>
+    </div>
+  );
+}
+
+/**
+ * About's light: a candle on a small wall shelf on iron brackets, beside a
+ * row of book spines. Unlit by day; at night the flame is lit with a soft
+ * glow and a gentle flicker, which holds still with reduced motion.
+ */
+function Candle() {
+  return (
+    <div aria-hidden="true" inert data-light-fixture="candle" className="pointer-events-none relative h-[150px] w-[260px]">
+      {/* Lit at night only; the inner layer flickers, so the flicker can't relight it by day. */}
+      <div className="absolute -top-32 left-[30px] size-[300px] opacity-(--is-night)">
+        <div className="board-candle-glow board-candle-flicker size-full rounded-pill" />
+      </div>
+      {/* Book spines, leaning a little at the end of the row. */}
+      <div className="absolute bottom-[16px] left-0 flex items-end gap-0.5">
+        <span className="board-spine h-[100px] w-[20px] bg-[#6e3b2a]" />
+        <span className="board-spine h-[88px] w-[17px] bg-[#2f4b5e]" />
+        <span className="board-spine h-[94px] w-[23px] bg-[#4b5e3a]" />
+        <span className="board-spine h-[84px] w-[18px] origin-bottom-left rotate-[8deg] bg-[#8a6a3a]" />
+      </div>
+      <svg width="120" height="150" viewBox="40 30 80 180" className="absolute right-4 bottom-[16px] h-[134px] w-auto overflow-visible">
+        <g className="board-candle-flame opacity-(--is-night)">
+          <g className="board-candle-flicker">
+            <ellipse cx="80" cy="70" rx="16" ry="30" fill="rgb(255 200 120 / 0.35)" />
+            <path d="M80 44 C 92 62, 90 80, 80 88 C 70 80, 68 62, 80 44 Z" fill="#ffd27a" />
+            <path d="M80 60 C 86 70, 85 80, 80 84 C 75 80, 74 70, 80 60 Z" fill="#fff3d6" />
+          </g>
+        </g>
+        <line x1="80" y1="84" x2="80" y2="96" stroke="#2a2420" strokeWidth="2.5" />
+        <rect x="62" y="96" width="36" height="104" rx="3" fill="#f3ead9" />
+        <path d="M62 102 C 70 98, 76 108, 84 100 C 90 96, 94 104, 98 100 L98 96 L62 96 Z" fill="#e7dcc7" />
+        <ellipse cx="80" cy="206" rx="34" ry="8" fill="#a88a58" />
+        <rect x="58" y="196" width="44" height="12" rx="3" fill="#b8995f" />
+      </svg>
+      {/* The shelf on its iron brackets. */}
+      <div className="board-shelf absolute right-0 bottom-0 left-[-8px] h-4 rounded-[2px]" />
+      <svg width="40" height="54" viewBox="0 0 40 54" className="absolute top-full left-6">
+        <path d="M2 0 L38 0 L2 50 Z" fill="var(--iron)" />
+      </svg>
+      <svg width="40" height="54" viewBox="0 0 40 54" className="absolute top-full right-6">
+        <path d="M2 0 L38 0 L38 50 Z" fill="var(--iron)" />
       </svg>
     </div>
   );

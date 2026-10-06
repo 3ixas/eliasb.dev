@@ -158,6 +158,16 @@
     linear-gradient(90deg, rgb(255 255 255 / 0.12) 1px, transparent 1px);
   --blueprint-ink: #eaf2fa;
 
+  /* About: the red string, the objects on it, and the candle. */
+  --string-red: #b3261e;
+  --essay-rule: #6a7fa8;
+  --essay-ink: #3a3a5a;
+  --essay-lines: repeating-linear-gradient(to bottom, transparent 0 13px, rgb(90 110 150 / 0.3) 13px 14px);
+  --code-note-ink: #3a2e12;
+  --lanyard: #2f6b4f;
+  --lanyard-clip: #9a9084;
+  --candle-glow: radial-gradient(closest-side, rgb(255 190 110 / 0.32), rgb(255 170 90 / 0));
+
   /* The training diary: a lined page with a red rule. */
   --diary-lines: repeating-linear-gradient(to bottom, transparent 0 27px, rgb(90 110 150 / 0.3) 27px 28px);
   --diary-rule: #b3261e;
@@ -249,6 +259,7 @@
     --wall-ink: #efe4d2;
     --wall-muted: #b8ab95;
     --wall-accent: #ff8a5c;
+    --string-red: #ff8a7a;
     --rule: #3a322b;
     --paper: #f1e3c9;
     --paper-photo: #f6ebd6;
@@ -276,6 +287,7 @@
   --wall-ink: #efe4d2;
   --wall-muted: #b8ab95;
   --wall-accent: #ff8a5c;
+  --string-red: #ff8a7a;
   --rule: #3a322b;
   --paper: #f1e3c9;
   --paper-photo: #f6ebd6;
@@ -1155,6 +1167,114 @@
 
   .board-blueprint-link {
     color: var(--blueprint-ink);
+  }
+
+  .board-string-note,
+  .board-string-number {
+    color: var(--string-red);
+    font-family: var(--font-newsreader), Georgia, serif;
+    font-style: italic;
+  }
+
+  .board-string-note {
+    font-size: var(--text-lead);
+    rotate: -3deg;
+  }
+
+  .board-string-number {
+    font-size: 1.875rem;
+    line-height: 1;
+  }
+
+  .board-essay {
+    background-image: var(--essay-lines);
+    background-position: 0 30px;
+  }
+
+  .board-bubble {
+    border-radius: 14px;
+    background: #fffdf8;
+  }
+
+  /* The bubble's tail. */
+  .board-bubble::after {
+    content: "";
+    position: absolute;
+    bottom: -11px;
+    left: 30px;
+    width: 22px;
+    height: 22px;
+    background: #fffdf8;
+    rotate: 45deg;
+    box-shadow: 4px 4px 6px -3px rgb(40 25 10 / 0.2);
+  }
+
+  .board-code-note {
+    background-image: linear-gradient(to bottom, rgb(40 25 10 / 0.05) 0 16px, transparent 16px);
+  }
+
+  .board-lanyard-strap {
+    stroke: var(--lanyard);
+  }
+
+  /*
+   * The string draws itself as the journey scrolls through view. Without
+   * scroll-driven animations, or with reduced motion, it's simply complete.
+   */
+  .board-journey {
+    view-timeline-name: --journey;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .board-string {
+        stroke-dasharray: 1;
+        animation: board-string-draw linear both;
+        animation-timeline: --journey;
+        /* Four stretches, one after another through the journey's time on screen. */
+        animation-range: cover calc(10% + var(--stretch) * 14%) cover calc(24% + var(--stretch) * 14%);
+      }
+    }
+  }
+
+  @keyframes board-string-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .board-candle-glow {
+    background: var(--candle-glow);
+  }
+
+  .board-spine {
+    border-radius: 2px 2px 0 0;
+    box-shadow: inset -3px 0 0 rgb(0 0 0 / 0.15);
+  }
+
+  .board-shelf {
+    background: linear-gradient(180deg, #b8875a 0%, #9a6e45 100%);
+    box-shadow: 0 1px 0 rgb(255 230 200 / 0.35) inset, 6px 10px 14px -4px rgb(40 25 10 / 0.35);
+  }
+
+  /* A gentle flicker with motion allowed; by day the flame is out, so it doesn't show. */
+  @media (prefers-reduced-motion: no-preference) {
+    .board-candle-flicker {
+      animation: board-candle-flicker 3.2s ease-in-out infinite;
+      transform-box: fill-box;
+      transform-origin: 50% 100%;
+    }
+  }
+
+  @keyframes board-candle-flicker {
+    0%, 100% { scale: 1 1; opacity: 1; }
+    23% { scale: 0.97 1.03; opacity: 0.92; }
+    41% { scale: 1.02 0.98; opacity: 1; }
+    67% { scale: 0.98 1.02; opacity: 0.95; }
   }
 
   /* One day per ruled line. */
