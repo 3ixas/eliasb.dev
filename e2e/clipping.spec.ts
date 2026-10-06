@@ -128,18 +128,26 @@ test.describe("Weekly Curiosity states", () => {
   test("with reduced motion the fan-out is instant", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.reload();
+    // Hydrated first, so the click reaches React rather than landing on the server's HTML.
+    await page.waitForLoadState("networkidle");
     const clipping = week(page);
-    // What the spring animates: each clipping's transform and opacity, and the narrow-screen space.
-    const animated = () =>
-      clipping.locator("[data-clipping-extra]").evaluateAll((extras) =>
-        extras.map((extra) => [getComputedStyle(extra).transform, getComputedStyle(extra).opacity, (extra.closest("[id]") as HTMLElement).style.height]),
-      );
-    await toggleIn(clipping).click();
-    // Two frames for React to commit the change; a spring would still be moving after that.
-    await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-    const first = await animated();
-    await page.waitForTimeout(700);
-    expect(await animated()).toEqual(first);
+    // Time from the click until every oddity is fully open: in place, opaque, and given its space.
+    // A spring takes over half a second; reduced motion should land within a few frames.
+    const settled = await clipping.locator("[data-clipping-extra]").first().evaluate(
+      (first) =>
+        new Promise<number>((resolve) => {
+          const extras = [...first.closest("[id]")!.querySelectorAll<HTMLElement>("[data-clipping-extra]")];
+          const space = first.closest("[id]") as HTMLElement;
+          const open = () =>
+            extras.every((extra) => getComputedStyle(extra).transform === "none" && getComputedStyle(extra).opacity === "1") &&
+            space.style.height === "auto";
+          const start = performance.now();
+          const check = () => (open() ? resolve(performance.now() - start) : requestAnimationFrame(check));
+          first.closest("[data-fixture]")!.querySelector<HTMLButtonElement>("button[aria-controls]")!.click();
+          requestAnimationFrame(check);
+        }),
+    );
+    expect(settled).toBeLessThan(150);
   });
 
   test("the saved examples print from the archive, by year, with their own sources", async ({ page }) => {
