@@ -210,7 +210,7 @@ function verifyHomepage(markup) {
   const outsideWorkTitle = markup.match(/<h2\b[^>]*\bid="outside-work-title"[^>]*>([\s\S]*?)<\/h2>/i)?.[1] ?? "";
   equal(plainText(outsideWorkTitle), "Some of what I’m into lately.", "Homepage #outside-work-title rendered text");
   const aboutStart = markup.lastIndexOf("<", markup.indexOf('id="about"'));
-  const contactStart = markup.indexOf('<section id="contact"');
+  const contactStart = markup.lastIndexOf("<", markup.indexOf('id="contact"'));
   const aboutSection = aboutStart >= 0 && contactStart > aboutStart ? markup.slice(aboutStart, contactStart) : "";
   check(Boolean(aboutSection), "Homepage should render its About section before Contact");
   // About: the story from the source note, five stops on the string, the grey-jumper photo.
@@ -230,18 +230,21 @@ function verifyHomepage(markup) {
   const contactSection = contactStart >= 0 && contactEnd > contactStart ? markup.slice(contactStart, contactEnd) : "";
   check(Boolean(contactSection), "Homepage should render its Contact section before the footer");
   check(!/<img\b/i.test(contactSection), "Contact should keep its visual focus on ways to connect");
-  const contactActions = contactSection.match(/<nav class="contact-profile-links"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] ?? "";
-  const contactProfiles = [...contactActions.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)];
-  equal(contactProfiles.length, 3, "Contact should present GitHub, LinkedIn, and résumé actions");
-  for (const [index, [, tag, label]] of contactProfiles.entries()) {
-    const expectedLabel = ["GitHub", "LinkedIn", "Résumé"][index];
-    check(plainText(label).includes(expectedLabel), `Contact profile action ${index + 1} should be labelled ${expectedLabel}`);
-    equal(attribute(tag, "target"), "_blank", `${expectedLabel} should preserve its external-link behavior`);
-    check((attribute(tag, "rel") ?? "").split(/\s+/).includes("noreferrer"), `${expectedLabel} should retain safe external-link attributes`);
-  }
+  // Contact: the postcard is the email link; the CV, GitHub and LinkedIn are pinned cards, in that order.
+  check(plainText(contactSection).includes("04 / Contact"), "Contact should be section 04");
+  const contactHeading = contactSection.match(/<h2\b[^>]*id="contact-title"[^>]*>([\s\S]*?)<\/h2>/i)?.[1] ?? "";
+  equal(plainText(contactHeading), "Say hello", "Contact's heading should say hello");
   const emailAction = hrefs(contactSection).find(({ href }) => href?.startsWith("mailto:"));
-  check(emailAction, "Contact should retain the primary email action");
-  check(attribute(emailAction?.tag ?? "", "class") === "contact-link", "Email should remain the primary contact action");
+  check(emailAction, "Contact should keep the email action");
+  equal(attribute(emailAction?.tag ?? "", "aria-label"), "Email me at eliasthebennett@gmail.com", "The postcard should be named as the email link");
+  check(plainText(contactSection).includes("Wish you were here."), "The postcard should carry its message");
+  const cards = [...contactSection.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].filter(([, tag]) => attribute(tag, "target") === "_blank");
+  equal(cards.map(([, , body]) => plainText(body).split(" ")[0]).join("|"), "Résumé|GitHub|LinkedIn", "The cards should be the CV, GitHub and LinkedIn, in that order");
+  for (const [, tag, body] of cards) {
+    check((attribute(tag, "rel") ?? "").split(/\s+/).includes("noreferrer"), `${plainText(body)} should keep safe external-link attributes`);
+  }
+  const footer = markup.slice(markup.indexOf("<footer"), markup.indexOf("</footer>"));
+  equal(plainText(footer), "Made by Elias", "The footer should be the frame's edge and my signature");
   check(!plainText(markup).toLowerCase().includes("science fiction"), "Homepage should omit a standalone science-fiction category");
   check(markup.includes('href="/work"'), "Homepage should link to the complete Work archive");
   check(markup.includes('href="/work/threshold"'), "Homepage should link to the Threshold case study");

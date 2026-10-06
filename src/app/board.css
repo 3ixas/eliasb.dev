@@ -168,6 +168,19 @@
   --lanyard-clip: #9a9084;
   --candle-glow: radial-gradient(closest-side, rgb(255 190 110 / 0.32), rgb(255 170 90 / 0));
 
+  /*
+   * Contact: the neon sign on its dark backboard, and the postcard. Unlit, the
+   * tubes are a warm grey that still reads at 3:1 (large text) on the board.
+   */
+  --neon-board: linear-gradient(180deg, #2b2724 0%, #1b1816 100%);
+  --neon-hot: #8e847a;
+  --neon-hot-glow: none;
+  --neon-cool: #8e847a;
+  --neon-cool-glow: none;
+  --neon-wash: radial-gradient(ellipse 55% 50% at 30% 30%, rgb(255 46 126 / 0.2), rgb(25 199 240 / 0.06) 60%, transparent 80%);
+  --postcard: #fbf6ea;
+  --frame-edge: linear-gradient(180deg, #b08457 0%, #9c7349 100%);
+
   /* The training diary: a lined page with a red rule. */
   --diary-lines: repeating-linear-gradient(to bottom, transparent 0 27px, rgb(90 110 150 / 0.3) 27px 28px);
   --diary-rule: #b3261e;
@@ -260,6 +273,10 @@
     --wall-muted: #b8ab95;
     --wall-accent: #ff8a5c;
     --string-red: #ff8a7a;
+    --neon-hot: #ffe4f0;
+    --neon-hot-glow: 0 0 2px #fff, 0 0 6px #ff4f9a, 0 0 16px #ff2e7e, 0 0 36px #ff2e7e, 0 0 80px rgb(255 46 126 / 0.75), 0 0 140px rgb(255 46 126 / 0.45);
+    --neon-cool: #e0fbff;
+    --neon-cool-glow: 0 0 2px #fff, 0 0 8px #3ee6ff, 0 0 22px #19c7f0, 0 0 50px rgb(25 199 240 / 0.6);
     --rule: #3a322b;
     --paper: #f1e3c9;
     --paper-photo: #f6ebd6;
@@ -288,6 +305,10 @@
   --wall-muted: #b8ab95;
   --wall-accent: #ff8a5c;
   --string-red: #ff8a7a;
+  --neon-hot: #ffe4f0;
+  --neon-hot-glow: 0 0 2px #fff, 0 0 6px #ff4f9a, 0 0 16px #ff2e7e, 0 0 36px #ff2e7e, 0 0 80px rgb(255 46 126 / 0.75), 0 0 140px rgb(255 46 126 / 0.45);
+  --neon-cool: #e0fbff;
+  --neon-cool-glow: 0 0 2px #fff, 0 0 8px #3ee6ff, 0 0 22px #19c7f0, 0 0 50px rgb(25 199 240 / 0.6);
   --rule: #3a322b;
   --paper: #f1e3c9;
   --paper-photo: #f6ebd6;
@@ -1275,6 +1296,98 @@
     23% { scale: 0.97 1.03; opacity: 0.92; }
     41% { scale: 1.02 0.98; opacity: 1; }
     67% { scale: 0.98 1.02; opacity: 0.95; }
+  }
+
+  .board-neon-sign {
+    border-radius: 14px;
+    background: var(--neon-board);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), var(--shadow-pin);
+  }
+
+  .board-neon-bolt {
+    background: #6e6357;
+    box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.3);
+  }
+
+  .board-neon {
+    line-height: 0.9;
+  }
+
+  .board-neon-hot {
+    color: var(--neon-hot);
+    font-family: var(--font-newsreader), Georgia, serif;
+    font-size: clamp(5rem, 2.5rem + 9vw, 12rem);
+    font-style: italic;
+    text-shadow: var(--neon-hot-glow);
+  }
+
+  .board-neon-cool {
+    color: var(--neon-cool);
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-size: clamp(1.5rem, 1rem + 2.2vw, 3.375rem);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-shadow: var(--neon-cool-glow);
+  }
+
+  .board-neon-wash {
+    background: var(--neon-wash);
+  }
+
+  /* One letter flickers now and then, only while lit and with motion allowed. */
+  @media (prefers-reduced-motion: no-preference) {
+    :root[data-lights="on"] .board-neon-flicker {
+      animation: board-neon-flicker 7s steps(1, end) infinite;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) and (prefers-reduced-motion: no-preference) {
+    :root:not([data-lights]) .board-neon-flicker {
+      animation: board-neon-flicker 7s steps(1, end) infinite;
+    }
+  }
+
+  @keyframes board-neon-flicker {
+    0%, 100% { opacity: 1; }
+    61% { opacity: 0.35; }
+    62% { opacity: 1; }
+    64% { opacity: 0.5; }
+    65% { opacity: 1; }
+  }
+
+  .board-stamp {
+    width: 84px;
+    height: 100px;
+    border: 2px dotted #c9bfaf;
+    background: var(--postcard);
+  }
+
+  .board-stamp > span {
+    background: #b8431d;
+    color: #fbf1e6;
+  }
+
+  .board-postmark {
+    stroke: rgb(90 80 70 / 0.35);
+  }
+
+  /* The address in red ink, deep enough for AA on the postcard by day and night. */
+  .board-postcard-address {
+    color: #b3401b;
+  }
+
+  .board-postcard-divider {
+    background: #d6ccbc;
+  }
+
+  .board-address-line {
+    padding-bottom: 8px;
+    border-bottom: 1px solid #c9bfaf;
+  }
+
+  .board-frame-edge {
+    background: var(--frame-edge);
+    box-shadow: 0 6px 12px rgb(0 0 0 / 0.2);
   }
 
   /* One day per ruled line. */
