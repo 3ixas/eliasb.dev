@@ -39,6 +39,14 @@
   --stock-newsprint: #f4efe3;
   --stock-matchday: #f1e8d2;
 
+  /*
+   * Newsreader's two cuts, each a core face and an accents face with disjoint
+   * unicode-ranges: accented letters take the accents face, everything else
+   * the core, and the core's metric-matched fallback comes last.
+   */
+  --font-newsreader: var(--font-newsreader-accents), var(--font-newsreader-core);
+  --font-newsreader-display: var(--font-newsreader-display-accents), var(--font-newsreader-display-core);
+
   /* Surfaces and fixings that look the same by day and night */
   --linen: #e3d2b4;
   /*

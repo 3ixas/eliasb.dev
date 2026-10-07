@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { caseFileSlugs } from "../src/content/case-files";
 
 const headline = "I build everyday software, and make complicated things feel simple.";
 
@@ -145,6 +146,21 @@ test.describe("Board foundation", () => {
     }
   });
 
+  // The site's own copy stays inside Newsreader's preloaded core files, so no
+  // page pays for a late accents file. (The home page can show live titles
+  // and names with accents, which is what the accents files are for.)
+  for (const route of ["/work", ...caseFileSlugs.map((slug) => `/work/${slug}`), "/nothing-pinned-here"]) {
+    test(`${route} needs no Newsreader accents file`, async ({ page }) => {
+      await page.goto(route);
+      // next/font hashes the file names, so look at the faces the page asked for.
+      const accents = await page.evaluate(async () => {
+        await document.fonts.ready;
+        return [...document.fonts].filter((face) => /Accents$/.test(face.family) && face.status !== "unloaded").map((face) => `${face.family} ${face.weight} ${face.style}`);
+      });
+      expect(accents).toEqual([]);
+    });
+  }
+
   test("the site uses the self-hosted fonts", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => document.fonts.ready);
@@ -156,8 +172,11 @@ test.describe("Board foundation", () => {
     }));
     // Newsreader's two fixed optical sizes: the display cut for headlines, the text cut below.
     // next/font/local names each family after its const in layout.tsx.
-    expect(families.display).toMatch(/^newsreaderDisplay\b/);
-    expect(families.text).toMatch(/^newsreader\b(?!Display)/);
+    // Each cut lists its accents face, then its core face, then the core's fallback.
+    // Engines quote family names differently, so compare without the quotes.
+    const unquoted = (family: string) => family.replaceAll('"', "");
+    expect(unquoted(families.display)).toMatch(/^newsreaderDisplayAccents, newsreaderDisplay, newsreaderDisplay Fallback,/);
+    expect(unquoted(families.text)).toMatch(/^newsreaderAccents, newsreader, newsreader Fallback,/);
     const loaded = await page.evaluate(() => [...document.fonts].filter((font) => font.status === "loaded").map((font) => font.family));
     expect(loaded).toEqual(expect.arrayContaining(["newsreaderDisplay", "newsreader"]));
     expect(families.body).toMatch(/Hanken Grotesk/);
