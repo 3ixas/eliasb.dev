@@ -18,7 +18,7 @@ export function LightSwitch() {
       type="button"
       data-light-switch
       onClick={flipLights}
-      className="board-focus inline-flex h-14 w-11 shrink-0 cursor-pointer items-center justify-center rounded-board shadow-(--switch-glow)"
+      className="board-focus inline-flex h-14 w-11 shrink-0 cursor-pointer items-center justify-center rounded-board shadow-(--switch-glow) focus-visible:shadow-(--shadow-focus)"
     >
       <span className="sr-only">
         <span className="board-label-day">Turn the lights on</span>

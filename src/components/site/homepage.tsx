@@ -8,7 +8,7 @@ import { Work } from "@/components/board/work";
 
 export async function Homepage() {
   return (
-    <div className="prototype prototype-cabinet-of-curiosities selected-experience" id="top" tabIndex={-1}>
+    <div className="min-h-screen overflow-clip" id="top" tabIndex={-1}>
       <BoardHeader />
       <main id="main-content" tabIndex={-1}>
         <Hero />

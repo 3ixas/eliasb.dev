@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import { IntentLink } from "@/components/board/intent-link";
 import { Light } from "@/components/board/light";
 import { Pin } from "@/components/board/pin";
 import { BoardSurface } from "@/components/board/surface";
@@ -39,12 +39,12 @@ export function Work() {
         </div>
 
         <p className="mt-16 mb-0 text-center">
-          <Link
+          <IntentLink
             href="/work"
             className="board-focus inline-flex min-h-11 items-center gap-1 font-semibold text-wall-ink underline decoration-wall-accent decoration-2 underline-offset-4"
           >
             {work.viewAll} <Arrow>→</Arrow>
-          </Link>
+          </IntentLink>
         </p>
       </div>
     </BoardSurface>
@@ -63,7 +63,7 @@ function Project({ project, flipped, priority }: { project: HomepageProject; fli
       >
         <div className={flipped ? "relative z-10 board:col-span-7 board:col-start-6 board:row-start-1" : "relative z-10 board:col-span-7"}>
           <Pin object="sheet" fixing="clipboard" surface="wall" looseness="careful" tilt={flipped ? 0.35 : -0.3} interactive className="p-3">
-            <Link href={folder} aria-label={work.folderLabel(project.name)} className="board-focus block">
+            <IntentLink href={folder} aria-label={work.folderLabel(project.name)} className="board-focus block">
               <Image
                 src={project.image}
                 alt={project.imageAlt}
@@ -73,7 +73,7 @@ function Project({ project, flipped, priority }: { project: HomepageProject; fli
                 preload={priority}
                 className="board-screenshot block h-auto w-full"
               />
-            </Link>
+            </IntentLink>
           </Pin>
         </div>
 
@@ -115,12 +115,12 @@ function Project({ project, flipped, priority }: { project: HomepageProject; fli
               ))}
             </ul>
             <div className="flex flex-wrap items-center gap-x-6">
-              <Link
+              <IntentLink
                 href={folder}
                 className="board-focus inline-flex min-h-11 items-center gap-1 font-semibold underline decoration-accent decoration-2 underline-offset-4"
               >
                 {work.openFolder} <Arrow>→</Arrow>
-              </Link>
+              </IntentLink>
               {project.liveUrl && (
                 <a href={project.liveUrl} target="_blank" rel="noreferrer" className="board-focus inline-flex min-h-11 items-center gap-1 text-muted underline underline-offset-4">
                   {work.live} <Arrow>↗</Arrow>

@@ -36,6 +36,19 @@ test.describe("The 404", () => {
     await page.goto("/nothing-pinned-here");
     for (const lights of ["off", "on"]) {
       await page.evaluate((value) => (document.documentElement.dataset.lights = value), lights);
+      // Let the room finish changing before scanning, or axe reads a colour mid-fade.
+      // Styles are flushed and two frames pass first, so the transitions exist
+      // (WebKit starts them a frame late) when they are collected.
+      await page.evaluate(async () => {
+        void getComputedStyle(document.body).color;
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        await Promise.all(
+          document.getAnimations()
+            .filter((animation) => animation.effect?.getTiming().iterations !== Infinity)
+            // A transition replaced mid-change rejects; that still means it's done.
+            .map((animation) => animation.finished.catch(() => {})),
+        );
+      });
       const results = await new AxeBuilder({ page }).analyze();
       expect(results.violations, `lights ${lights}`).toEqual([]);
     }

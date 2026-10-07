@@ -81,7 +81,6 @@ export type HomepageProject = {
   imageAlt: string;
   codeUrl: string;
   liveUrl?: string;
-  qualities?: readonly string[];
   /** Headline technologies on the Work note's label tape (approved in docs/content/copy/02-work.md). */
   labelTape: readonly string[];
   /** The colour of the project's sticky note. */
@@ -99,11 +98,6 @@ export const projects = [
     thesis: "A clearer view of what moving could cost.",
     description:
       "A rental calculator for London, Basel, and Zurich. It brings salary, moving costs, and local assumptions together so you can work out what a move might take.",
-    qualities: [
-      "Shareable URL state",
-      "Typed city configuration",
-      "Accessible visual reasoning",
-    ],
     image: "/projects/threshold.webp",
     imageAlt:
       "Threshold landing page showing rental affordability choices for London, Basel, and Zurich",
