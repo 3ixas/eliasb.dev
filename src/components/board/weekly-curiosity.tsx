@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion, type Transition } from "motion/react";
+import { motion, type Transition } from "motion/react";
+import { usePrefersReducedMotion } from "@/components/board/use-reduced-motion";
 import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
 import { ExternalLink } from "@/components/board/external-link";
@@ -39,7 +40,7 @@ export function WeeklyCuriosity({
 }) {
   const [lead, ...extras] = stories;
   const [open, setOpen] = useState(false);
-  const reduced = useReducedMotion();
+  const reduced = usePrefersReducedMotion();
   const extrasId = useId();
   const toggle = useRef<HTMLButtonElement>(null);
   const copy = board.clipping;

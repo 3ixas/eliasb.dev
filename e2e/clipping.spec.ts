@@ -108,8 +108,11 @@ test.describe("Weekly Curiosity states", () => {
     await page.goto("/#outside-work");
     const clipping = page.locator("[data-board-pin='clipping']");
     await toggleIn(clipping).click();
-    await expect.poll(async () => (await extraBoxes(clipping)).every(({ height }) => height > 0)).toBe(true);
-    await page.waitForTimeout(700);
+    // Measure once the fan-out has finished: its space springs open to "auto",
+    // and on a slow machine that takes longer than any fixed wait.
+    await expect
+      .poll(() => clipping.locator("[data-clipping-extra]").first().evaluate((first) => (first.closest("[id]") as HTMLElement).style.height), { timeout: 5000 })
+      .toBe("auto");
     const extras = await extraBoxes(clipping);
     const others = await page.locator("[data-board-pin]:not([data-board-pin='clipping'])").evaluateAll((pins) =>
       pins.map((pin) => {

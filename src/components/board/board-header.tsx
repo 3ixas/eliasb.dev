@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { LightSwitch } from "@/components/board/light-switch";
 import { springs } from "@/components/board/motion";
 import { Pushpin } from "@/components/board/pin";
+import { usePrefersReducedMotion } from "@/components/board/use-reduced-motion";
 
 type Section = "work" | "outside-work" | "about";
 
@@ -33,6 +34,7 @@ function sectionHref(id: string, isHome: boolean) {
  */
 export function BoardHeader({ page }: { page?: Section | null }) {
   const isHome = page === undefined;
+  const reduced = usePrefersReducedMotion();
   const [inView, setInView] = useState<Section | null>(null);
   const headerRef = useRef<HTMLElement>(null);
 
@@ -75,7 +77,7 @@ export function BoardHeader({ page }: { page?: Section | null }) {
   const current = isHome ? inView : page;
 
   return (
-    <MotionConfig reducedMotion="user">
+    <MotionConfig reducedMotion={reduced ? "always" : "never"}>
       <header
         ref={headerRef}
         data-board-header
