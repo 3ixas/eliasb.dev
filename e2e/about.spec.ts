@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { contrastOnPaper } from "./support/contrast";
+import { attachMotionState } from "./support/motion-diagnostics";
 
 const about = (page: Page) => page.locator("#about");
 const tags = ["History at uni", "Into marketing", "The click", "Learning to code", "BNP Paribas, today"];
@@ -10,6 +11,8 @@ const scrollToJourney = (page: Page, offset: number) =>
   page.locator("[data-journey]").evaluate((element, by) => window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY + by), offset);
 
 test.describe("About", () => {
+  test.afterEach(async ({ page }, testInfo) => attachMotionState(page, testInfo));
+
   test.beforeEach(async ({ page }) => {
     await page.goto("/#about");
   });

@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { contrastOnPaper } from "./support/contrast";
+import { attachMotionState } from "./support/motion-diagnostics";
 
 const week = (page: Page) => page.locator("[data-fixture='week']");
 const toggleIn = (clipping: Locator) => clipping.getByRole("button", { name: /more oddities this week|Fold them away/ });
@@ -28,6 +29,8 @@ test.describe("The Weekly Curiosity on the Board", () => {
 });
 
 test.describe("Weekly Curiosity states", () => {
+  test.afterEach(async ({ page }, testInfo) => attachMotionState(page, testInfo));
+
   test.beforeEach(async ({ page }) => {
     await page.goto("/fixtures/clipping");
   });
