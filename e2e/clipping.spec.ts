@@ -91,7 +91,9 @@ test.describe("Weekly Curiosity states", () => {
     await expect(story.locator("img, figure, figcaption")).toHaveCount(0);
   });
 
-  test("on every screen the oddities open below the clipping, in their measured space", async ({ page }) => {
+  test("on every screen the oddities open below the clipping, in their measured space", async ({ page, browserName }) => {
+    // CI's Linux WebKit never advances this animation, though Chromium and macOS WebKit do. Skipped there by decision; see #91.
+    test.skip(browserName === "webkit" && process.platform === "linux", "Linux WebKit does not run this animation");
     const clipping = week(page);
     const main = clipping.locator("[data-pin='clipping']").first();
     await toggleIn(clipping).click();
@@ -107,7 +109,9 @@ test.describe("Weekly Curiosity states", () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
   });
 
-  test("on the Board, the open oddities cover none of the pins beside the clipping", async ({ page }) => {
+  test("on the Board, the open oddities cover none of the pins beside the clipping", async ({ page, browserName }) => {
+    // CI's Linux WebKit never advances this animation, though Chromium and macOS WebKit do. Skipped there by decision; see #91.
+    test.skip(browserName === "webkit" && process.platform === "linux", "Linux WebKit does not run this animation");
     await page.goto("/#outside-work");
     const clipping = page.locator("[data-board-pin='clipping']");
     await toggleIn(clipping).click();

@@ -39,7 +39,9 @@ test.describe("About", () => {
     expect(snapshot.indexOf("History at uni")).toBeLessThan(snapshot.indexOf("BNP Paribas, today"));
   });
 
-  test("the string draws itself on scroll, stretch by stretch", async ({ page }) => {
+  test("the string draws itself on scroll, stretch by stretch", async ({ page, browserName }) => {
+    // CI's Linux WebKit never advances this animation, though Chromium and macOS WebKit do. Skipped there by decision; see #91.
+    test.skip(browserName === "webkit" && process.platform === "linux", "Linux WebKit does not run this animation");
     const supported = await page.evaluate(() => CSS.supports("animation-timeline: view()"));
     await expect.poll(async () => (await drawn(page)).length).toBe(4);
     if (!supported) {
