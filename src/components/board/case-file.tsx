@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import { IntentLink } from "@/components/board/intent-link";
 import { BoardHeader } from "@/components/board/board-header";
 import { Pin } from "@/components/board/pin";
 import { BoardSurface } from "@/components/board/surface";
@@ -194,12 +194,12 @@ function Section({ section }: { section: CaseFileSection }) {
 
 function BackToDrawer() {
   return (
-    <Link
+    <IntentLink
       href={copy.backToDrawerHref}
       className="board-focus inline-flex min-h-11 items-center gap-1 font-semibold text-muted underline decoration-accent decoration-2 underline-offset-4"
     >
       <Arrow>←</Arrow> {copy.backToDrawer}
-    </Link>
+    </IntentLink>
   );
 }
 

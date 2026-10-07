@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { IntentLink } from "@/components/board/intent-link";
 import { BoardHeader } from "@/components/board/board-header";
 import { BoardSurface } from "@/components/board/surface";
 import { caseFiles, caseFileSlugs, drawer } from "@/content/case-files";
@@ -25,12 +25,12 @@ export function WorkDrawer() {
         className="px-4 pt-10 pb-24 sm:px-8 lg:px-16 lg:pt-16"
       >
         <div className="mx-auto max-w-[960px]">
-          <Link
+          <IntentLink
             href={drawer.backToBoardHref}
             className="board-focus inline-flex min-h-11 items-center gap-1 font-semibold text-wall-muted underline decoration-wall-accent decoration-2 underline-offset-4"
           >
             <span aria-hidden="true">←</span> {drawer.backToBoard}
-          </Link>
+          </IntentLink>
           <p className="mt-8 mb-0 font-mono text-label uppercase text-wall-muted">{drawer.kicker(caseFileSlugs.length)}</p>
           <h1 className="mt-4 mb-0 font-display text-display font-normal text-wall-ink">
             {drawer.heading.lead} <em className="text-wall-accent">{drawer.heading.emphasis}</em>
@@ -63,13 +63,13 @@ export function WorkDrawer() {
                           {drawer.folderNumber(file.number)} · {file.kicker}
                         </p>
                         <p className="mt-3 mb-0 font-display text-title italic">{file.thesis}</p>
-                        <Link
+                        <IntentLink
                           href={`/work/${slug}`}
                           aria-label={drawer.folderLabel(file.name)}
                           className="board-focus mt-4 inline-flex min-h-11 items-center gap-1 font-semibold underline decoration-accent decoration-2 underline-offset-4 after:absolute after:inset-0 after:content-['']"
                         >
                           {drawer.openFolder} <span aria-hidden="true">→</span>
-                        </Link>
+                        </IntentLink>
                       </article>
                     </li>
                   );

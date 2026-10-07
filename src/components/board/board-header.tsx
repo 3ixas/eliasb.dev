@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { IntentLink } from "@/components/board/intent-link";
 import { LayoutGroup, MotionConfig, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { LightSwitch } from "@/components/board/light-switch";
@@ -88,7 +88,7 @@ export function BoardHeader({ page }: { page?: Section | null }) {
           Skip to content
         </a>
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:px-8 lg:px-16">
-          <Link
+          <IntentLink
             href={isHome ? "#top" : "/"}
             aria-label="Elias Bennett, home"
             className="board-focus inline-flex min-h-11 min-w-11 items-center font-display text-title font-medium no-underline"
@@ -96,7 +96,7 @@ export function BoardHeader({ page }: { page?: Section | null }) {
             <span aria-hidden="true">E</span>
             <span aria-hidden="true" className="text-wall-accent">/</span>
             <span aria-hidden="true">B</span>
-          </Link>
+          </IntentLink>
 
           <nav aria-label="Primary navigation">
             <LayoutGroup>
@@ -116,13 +116,13 @@ export function BoardHeader({ page }: { page?: Section | null }) {
                           <Pushpin className="h-4 w-auto" />
                         </motion.span>
                       )}
-                      <Link
+                      <IntentLink
                         href={sectionHref(section, isHome)}
                         aria-current={active ? "location" : undefined}
                         className="board-focus inline-flex min-h-11 items-center px-1 text-body sm:px-2 font-medium text-wall-ink no-underline hover:underline hover:decoration-wall-accent hover:decoration-2 hover:underline-offset-4"
                       >
                         {label}
-                      </Link>
+                      </IntentLink>
                     </li>
                   );
                 })}
@@ -132,12 +132,12 @@ export function BoardHeader({ page }: { page?: Section | null }) {
 
           <div className="flex items-center gap-3 sm:gap-5">
             <LightSwitch />
-            <Link
+            <IntentLink
               href={sectionHref("contact", isHome)}
               className="board-focus hidden min-h-11 items-center rounded-pill border-[1.5px] border-wall-ink px-5 text-body font-medium no-underline sm:inline-flex"
             >
               Say hello
-            </Link>
+            </IntentLink>
           </div>
         </div>
       </header>

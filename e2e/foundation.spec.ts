@@ -161,6 +161,38 @@ test.describe("Board foundation", () => {
     });
   }
 
+  // Links hold back their prefetches until the page is idle after loading (or
+  // someone points at one), so a load fetches no other routes while it is
+  // still painting: the mobile Lighthouse bar (#91).
+  const routePrefetches = (page: import("@playwright/test").Page) =>
+    page.evaluate(() => {
+      const loaded = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
+      const prefetches = performance.getEntriesByType("resource").filter((entry) => new URL(entry.name).searchParams.has("_rsc"));
+      return {
+        beforeLoad: prefetches.filter((entry) => entry.startTime < loaded.loadEventStart).map((entry) => entry.name),
+        afterLoad: prefetches.filter((entry) => entry.startTime >= loaded.loadEventStart).length,
+      };
+    });
+
+  test("links prefetch nothing until the page is idle or someone points at one", async ({ page }) => {
+    // Idle never comes, so only intent can start a prefetch.
+    await page.addInitScript(() => {
+      window.requestIdleCallback = () => 0;
+      window.cancelIdleCallback = () => {};
+    });
+    await page.goto(`/work/${caseFileSlugs[0]}`, { waitUntil: "load" });
+    await page.waitForTimeout(2000);
+    expect((await routePrefetches(page)).afterLoad + (await routePrefetches(page)).beforeLoad.length).toBe(0);
+    await page.getByRole("link", { name: "Back to the drawer" }).first().focus();
+    await expect.poll(async () => (await routePrefetches(page)).afterLoad, { timeout: 5000 }).toBeGreaterThan(0);
+  });
+
+  test("a case study prefetches the routes it links to, once it has loaded", async ({ page }) => {
+    await page.goto(`/work/${caseFileSlugs[0]}`, { waitUntil: "load" });
+    await expect.poll(async () => (await routePrefetches(page)).afterLoad, { timeout: 5000 }).toBeGreaterThan(0);
+    expect((await routePrefetches(page)).beforeLoad).toEqual([]);
+  });
+
   test("the site uses the self-hosted fonts", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => document.fonts.ready);
