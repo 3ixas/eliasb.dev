@@ -217,7 +217,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
     - **Music (Elias, 2 October 2026):** a retro cassette player ("E/B Sound") built round Spotify's own player rather than beside it. Before Play: the tape in the deck's window, one Play button, and a handwritten J-card. Play opens the deck's window to Spotify's full player, 352 px tall, with its own controls and track list; nothing from Spotify loads before that. No Previous or Next buttons, since they couldn't control Spotify's player. An "Open in Spotify" link is always there.
   - **Photos (Elias, 1 October 2026):** the white-tux portrait (`public/profile/elias-evening.webp`), Elias's favourite, is the hero polaroid. The grey-jumper photo (`public/profile/elias.webp`) goes in About.
   - **Removed:** the scroll progress bar (the nav pin replaces it) and the per-link contact cursors (the postcard replaces them).
-  - **Kept plain:** focus states stay a solid, high-contrast accent outline.
+  - **Kept plain:** focus states stay a solid accent outline, now two-tone (Elias, 7 October 2026): the accent ring sits between two dark bands, so it reaches 3:1 on every surface by day and night (WCAG technique C40). A dark surface (the cassette deck, the blueprint) sets light bands instead (`--shadow-focus`). The bands are a box shadow, so a focused control's own shadow (the Live site button's raised edge) gives way to them; a control styled with a Tailwind `shadow-*` utility (the skip link, the light switch) adds `focus-visible:shadow-(--shadow-focus)`.
   - **Scroll sway:** kept, implemented with CSS scroll-driven animations (`animation-timeline: view()`) on transforms only. Browsers without support show still pins. Confirm support in Safari and Firefox during implementation.
   - **Canvas:** artboards `R4Work`, `R4Board`, and `R4Story` each have a Lighting tweak, and the `…Night` artboards show them with the lights on. `R4Extras` covers the case-study folder, 404, states, favicon, and social image.
   - **Copy status:** the About prose on the canvas is a draft from Elias's spoken story and is not approved. The copy document governs.
@@ -273,7 +273,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
   - Every pin says what it is to a stranger.
   - Lights are mounted objects and are not interactive.
   - The single theme control is the header rocker switch.
-  - Hover: lift and straighten. Press: squeeze. Focus: a solid accent outline.
+  - Hover: lift and straighten. Press: squeeze. Focus: the two-tone accent ring.
 - **Responsive:**
   - 12-column desktop. Below 900 px, a single column with tilt capped at ±1.5° and no overlap.
   - The sticky header keeps the switch visible.

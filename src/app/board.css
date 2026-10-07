@@ -41,6 +41,15 @@
 
   /* Surfaces and fixings that look the same by day and night */
   --linen: #e3d2b4;
+  /*
+   * Focus is a two-tone ring: the accent outline between two dark bands. Where
+   * the accent is faint against a surface (kraft, paper, the dimmed folders and
+   * linen by night) the dark bands carry the 3:1; on the night wall the accent
+   * does. A dark surface (the cassette deck, the blueprint) sets light bands instead.
+   * A focused control's own shadow gives way to the bands; one with a Tailwind
+   * shadow-* utility adds focus-visible:shadow-(--shadow-focus) to keep them.
+   */
+  --shadow-focus: 0 0 0 8px #1d1a16;
   /* The 404: the outline where a pin's paper used to be. */
   --not-found-outline: rgb(90 60 30 / 0.3);
   --clipboard: #a27850;
@@ -449,7 +458,8 @@
 
   :focus-visible {
     outline: 3px solid var(--focus);
-    outline-offset: 3px;
+    outline-offset: 2px;
+    box-shadow: var(--shadow-focus);
   }
 
   /*
@@ -540,7 +550,8 @@
   .board-surface :is(a, button):focus-visible,
   [data-board-header] :is(a, button):focus-visible {
     outline: 3px solid var(--focus);
-    outline-offset: 3px;
+    outline-offset: 2px;
+    box-shadow: var(--shadow-focus);
     border-radius: var(--radius-paper);
   }
 
@@ -1186,6 +1197,7 @@
   button.board-github-day:focus-visible {
     outline: 3px solid var(--focus);
     outline-offset: 2px;
+    box-shadow: var(--shadow-focus);
   }
 
   /* The pencil loop round the busiest four weeks. */
@@ -1214,6 +1226,8 @@
   }
 
   .board-blueprint {
+    /* Light focus bands on the dark blue, as on the cassette deck. */
+    --shadow-focus: 0 0 0 8px var(--blueprint-ink);
     background-color: var(--blueprint);
     background-image: var(--blueprint-grid);
     background-size: 16px 16px;
@@ -1490,6 +1504,8 @@
   }
 
   .board-deck {
+    /* Light focus bands on the rust; set here, as a token resolves where it is declared. */
+    --shadow-focus: 0 0 0 8px var(--deck-ink);
     border-radius: 18px;
     background-color: var(--deck);
     background-image: var(--deck-gradient);

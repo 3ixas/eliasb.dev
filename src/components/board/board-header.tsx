@@ -82,7 +82,7 @@ export function BoardHeader({ page }: { page?: Section | null }) {
         className="sticky top-0 z-50 border-b border-rule/60 bg-wall font-sans text-wall-ink"
       >
         <a
-          className="board-focus absolute left-4 top-2 z-10 -translate-y-24 rounded-paper bg-paper px-4 py-3 text-ink shadow-pin focus:translate-y-0"
+          className="board-focus absolute left-4 top-2 z-10 -translate-y-24 rounded-paper bg-paper px-4 py-3 text-ink shadow-pin focus:translate-y-0 focus-visible:shadow-(--shadow-focus)"
           href="#main-content"
         >
           Skip to content

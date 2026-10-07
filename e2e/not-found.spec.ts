@@ -36,6 +36,14 @@ test.describe("The 404", () => {
     await page.goto("/nothing-pinned-here");
     for (const lights of ["off", "on"]) {
       await page.evaluate((value) => (document.documentElement.dataset.lights = value), lights);
+      // Let the room finish changing before scanning, or axe reads a colour mid-fade.
+      await page.evaluate(() =>
+        Promise.all(
+          document.getAnimations()
+            .filter((animation) => animation.effect?.getTiming().iterations !== Infinity)
+            .map((animation) => animation.finished),
+        ),
+      );
       const results = await new AxeBuilder({ page }).analyze();
       expect(results.violations, `lights ${lights}`).toEqual([]);
     }
