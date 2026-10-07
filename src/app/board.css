@@ -962,6 +962,19 @@
     box-shadow: var(--linen-inset);
   }
 
+  /*
+   * Headline sizes take Newsreader's display cut; everything else its text cut.
+   * The font utilities inline --font-newsreader (@theme inline), so that is
+   * the variable to redefine. Only the bare classes match: a responsive
+   * variant (sm:text-heading) would need adding here. The element must carry
+   * font-display itself, not inherit it: an inherited family is already
+   * resolved on the ancestor, to the text cut.
+   */
+  .text-display,
+  .text-heading {
+    --font-newsreader: var(--font-newsreader-display);
+  }
+
   .board-night-dim {
     background: var(--night-dim);
     mix-blend-mode: multiply;
@@ -1028,7 +1041,7 @@
 
   /* The Weekly Curiosity: a newspaper cutting with a rubber-stamped picture. */
   .board-masthead {
-    font-family: var(--font-newsreader), Georgia, serif;
+    font-family: var(--font-newsreader-display), Georgia, serif;
     font-weight: 600;
     letter-spacing: -0.02em;
     line-height: 0.95;
@@ -1263,7 +1276,7 @@
   .board-string-note,
   .board-string-number {
     color: var(--string-red);
-    font-family: var(--font-newsreader), Georgia, serif;
+    font-family: var(--font-newsreader-display), Georgia, serif;
     font-style: italic;
   }
 
@@ -1385,7 +1398,7 @@
 
   .board-neon-hot {
     color: var(--neon-hot);
-    font-family: var(--font-newsreader), Georgia, serif;
+    font-family: var(--font-newsreader-display), Georgia, serif;
     font-size: clamp(5rem, 2.5rem + 9vw, 12rem);
     font-style: italic;
     text-shadow: var(--neon-hot-glow);

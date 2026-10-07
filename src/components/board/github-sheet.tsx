@@ -55,7 +55,7 @@ export function GitHubSheet({ activity, total, href }: { activity: ActivityDay[]
         <div>
           <p className="board-github-ink m-0 font-mono text-label uppercase">{board.labels.github}</p>
           <p className="m-0 mt-1.5 font-display leading-[0.9]">
-            <span className="board-github-total text-display font-medium">{totalText}</span>{" "}
+            <span className="board-github-total font-display text-display font-medium">{totalText}</span>{" "}
             <span className="text-title text-muted italic">{copy.beside}</span>
           </p>
         </div>

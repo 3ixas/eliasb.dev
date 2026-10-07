@@ -1,13 +1,32 @@
 import { homeTitle, siteDescription, siteName } from "@/content/site";
 import type { Metadata } from "next";
-import { Hanken_Grotesk, JetBrains_Mono, Newsreader } from "next/font/google";
+import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./board.css";
 
-const newsreader = Newsreader({
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  axes: ["opsz"],
+// Newsreader as two fixed optical sizes rather than the variable font with its
+// opsz axis (274 KiB): a text cut for body sizes and a display cut for
+// headlines, Latin subset, from Google Fonts under the OFL (fonts/newsreader).
+const newsreader = localFont({
+  src: [
+    { path: "./fonts/newsreader/text-400.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/newsreader/text-400-italic.woff2", weight: "400", style: "italic" },
+    { path: "./fonts/newsreader/text-500.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/newsreader/text-600.woff2", weight: "600", style: "normal" },
+  ],
   variable: "--font-newsreader",
+  adjustFontFallback: "Times New Roman",
+});
+
+const newsreaderDisplay = localFont({
+  src: [
+    { path: "./fonts/newsreader/display-400.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/newsreader/display-400-italic.woff2", weight: "400", style: "italic" },
+    { path: "./fonts/newsreader/display-500.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/newsreader/display-600.woff2", weight: "600", style: "normal" },
+  ],
+  variable: "--font-newsreader-display",
+  adjustFontFallback: "Times New Roman",
 });
 
 const hankenGrotesk = Hanken_Grotesk({
@@ -69,7 +88,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       lang="en-GB"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${newsreader.variable} ${hankenGrotesk.variable} ${jetbrainsMono.variable}`}
+      className={`${newsreader.variable} ${newsreaderDisplay.variable} ${hankenGrotesk.variable} ${jetbrainsMono.variable}`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: siteBootScript }} />

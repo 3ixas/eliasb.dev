@@ -150,10 +150,16 @@ test.describe("Board foundation", () => {
     await page.evaluate(() => document.fonts.ready);
     const families = await page.evaluate(() => ({
       display: getComputedStyle(document.querySelector("h1")!).fontFamily,
+      text: getComputedStyle(document.querySelector("[data-pin='clipping'] .italic")!).fontFamily,
       body: getComputedStyle(document.querySelector("[data-board-header] nav a")!).fontFamily,
       mono: getComputedStyle(document.querySelector("#main-content p")!).fontFamily,
     }));
-    expect(families.display).toMatch(/Newsreader/);
+    // Newsreader's two fixed optical sizes: the display cut for headlines, the text cut below.
+    // next/font/local names each family after its const in layout.tsx.
+    expect(families.display).toMatch(/^newsreaderDisplay\b/);
+    expect(families.text).toMatch(/^newsreader\b(?!Display)/);
+    const loaded = await page.evaluate(() => [...document.fonts].filter((font) => font.status === "loaded").map((font) => font.family));
+    expect(loaded).toEqual(expect.arrayContaining(["newsreaderDisplay", "newsreader"]));
     expect(families.body).toMatch(/Hanken Grotesk/);
     expect(families.mono).toMatch(/JetBrains Mono/);
     const external = await page.evaluate(() =>

@@ -265,7 +265,7 @@ Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the s
   - Pin stocks: ochre `#F2DFAA`, blueprint `#C9D8E6`, sage `#CCD8C1`, terracotta, kraft `#D7AE63`, ticket `#E9C37A`.
   - GitHub greens (exception).
   - Day shadow `1px 2px 2px rgba(70,45,20,.10), 8px 12px 22px -8px rgba(70,45,20,.28)`. Night shadows fall away from each section's light.
-  - Fonts: Newsreader, Hanken Grotesk, JetBrains Mono, all through `next/font`.
+  - Fonts: Newsreader, Hanken Grotesk, JetBrains Mono, all through `next/font`. Newsreader is self-hosted as two fixed optical sizes (Elias, 7 October 2026), since its variable opsz axis cost 274 KiB and the mobile Lighthouse bar: a display cut (opsz 72) for `text-display`, `text-heading`, the masthead, the neon sign, and the string numbers, and a text cut (opsz 20) for everything smaller, about 180 KiB in all (`src/app/fonts/newsreader`, OFL).
   - Spacing scale 4–128; one type scale with a fluid display size.
   - The canvas values are the starting point; they are normalised into the token file in the first slice.
 - **Component rules:**
