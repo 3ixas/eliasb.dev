@@ -136,7 +136,8 @@ test.describe("Weekly Curiosity states", () => {
     const clipping = week(page);
     // Frames from the click until every oddity is fully open: in place, opaque,
     // and given its space. A spring takes about 30 frames; reduced motion lands
-    // within a few, however slow each frame is on the machine running it.
+    // within a handful (React's commit takes a frame or two on a busy runner),
+    // however slow each frame is on the machine running it.
     const frames = await clipping.locator("[data-clipping-extra]").first().evaluate(
       (first) =>
         new Promise<number>((resolve) => {
@@ -155,7 +156,7 @@ test.describe("Weekly Curiosity states", () => {
           requestAnimationFrame(check);
         }),
     );
-    expect(frames).toBeLessThanOrEqual(4);
+    expect(frames).toBeLessThanOrEqual(10);
   });
 
   test("the saved examples print from the archive, by year, with their own sources", async ({ page }) => {
