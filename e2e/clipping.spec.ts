@@ -134,9 +134,10 @@ test.describe("Weekly Curiosity states", () => {
     // Hydrated first, so the click reaches React rather than landing on the server's HTML.
     await page.waitForLoadState("networkidle");
     const clipping = week(page);
-    // Time from the click until every oddity is fully open: in place, opaque, and given its space.
-    // A spring takes over half a second; reduced motion should land within a few frames.
-    const settled = await clipping.locator("[data-clipping-extra]").first().evaluate(
+    // Frames from the click until every oddity is fully open: in place, opaque,
+    // and given its space. A spring takes about 30 frames; reduced motion lands
+    // within a few, however slow each frame is on the machine running it.
+    const frames = await clipping.locator("[data-clipping-extra]").first().evaluate(
       (first) =>
         new Promise<number>((resolve) => {
           const extras = [...first.closest("[id]")!.querySelectorAll<HTMLElement>("[data-clipping-extra]")];
@@ -144,13 +145,17 @@ test.describe("Weekly Curiosity states", () => {
           const open = () =>
             extras.every((extra) => getComputedStyle(extra).transform === "none" && getComputedStyle(extra).opacity === "1") &&
             space.style.height === "auto";
-          const start = performance.now();
-          const check = () => (open() ? resolve(performance.now() - start) : requestAnimationFrame(check));
+          let count = 0;
+          const check = () => {
+            count += 1;
+            if (open()) resolve(count);
+            else requestAnimationFrame(check);
+          };
           first.closest("[data-fixture]")!.querySelector<HTMLButtonElement>("button[aria-controls]")!.click();
           requestAnimationFrame(check);
         }),
     );
-    expect(settled).toBeLessThan(150);
+    expect(frames).toBeLessThanOrEqual(4);
   });
 
   test("the saved examples print from the archive, by year, with their own sources", async ({ page }) => {
