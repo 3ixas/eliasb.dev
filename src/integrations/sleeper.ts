@@ -1,75 +1,30 @@
-import { fantasySourceUnavailable, fantasyWeekUnavailable, signalFallbacks } from "@/content/signal-fallbacks";
+import { unstable_cache } from "next/cache";
 import { integrationConfig } from "@/content/integration-config";
+import { fantasyMoment, fantasyTicket } from "@/integrations/fantasy";
+import { readSleeperSnapshot } from "@/integrations/sleeper-snapshot";
 import type { FantasySignal } from "@/integrations/types";
 
-const SLEEPER_API = "https://api.sleeper.app/v1";
+// Throwing keeps Next's last good snapshot for the week during a refresh, so
+// a Sleeper outage doesn't take the pin down while what it shows is still true.
+const fetchSnapshot = unstable_cache(
+  (season: number, week: number) => readSleeperSnapshot(integrationConfig.sleeper, season, week),
+  ["sleeper-fantasy-v1"],
+  // Every 15 minutes, so a live score is never far behind.
+  { revalidate: 900, tags: ["sleeper-signal"] },
+);
 
-type SleeperUser = { user_id?: string };
-type SleeperState = { week?: number; season_type?: string };
-type SleeperRoster = {
-  roster_id?: number;
-  owner_id?: string;
-  settings?: { wins?: number; losses?: number; ties?: number };
-};
-type SleeperMatchup = { roster_id?: number; matchup_id?: number | null; points?: number };
-
-async function sleeperJson<T>(path: string): Promise<T> {
-  const response = await fetch(`${SLEEPER_API}${path}`, {
-    next: { revalidate: 3600, tags: ["sleeper-signal"] },
-    signal: AbortSignal.timeout(3500),
-  });
-
-  if (!response.ok) throw new Error(`Sleeper returned ${response.status}`);
-  return response.json() as Promise<T>;
-}
-
-export async function getFantasySignal(): Promise<FantasySignal> {
-  const { username, leagueId } = integrationConfig.sleeper;
-  const leagueUrl = `https://sleeper.com/leagues/${leagueId}`;
-  let currentWeek: number | undefined;
+/** The fantasy ticket for now, or no pin in the off-season or without a trustworthy score. */
+export async function getFantasySignal(now = new Date()): Promise<FantasySignal> {
+  const moment = fantasyMoment(now);
+  if (!moment) return { state: "unavailable", ticket: null, updatedAt: null };
 
   try {
-    const [user, state, rosters] = await Promise.all([
-      sleeperJson<SleeperUser>(`/user/${encodeURIComponent(username)}`),
-      sleeperJson<SleeperState>("/state/nfl"),
-      sleeperJson<SleeperRoster[]>(`/league/${encodeURIComponent(leagueId)}/rosters`),
-    ]);
-
-    if (!user.user_id) return signalFallbacks.fantasy;
-    const roster = rosters.find((candidate) => candidate.owner_id === user.user_id);
-    if (!roster?.roster_id) return signalFallbacks.fantasy;
-
-    const week = state.week;
-    if (typeof week !== "number" || !Number.isSafeInteger(week) || week < 1) {
-      return fantasyWeekUnavailable(leagueUrl);
-    }
-    currentWeek = week;
-    const matchups = await sleeperJson<SleeperMatchup[]>(
-      `/league/${encodeURIComponent(leagueId)}/matchups/${week}`,
-    );
-    const ownMatchup = matchups.find((entry) => entry.roster_id === roster.roster_id);
-    const opponent = ownMatchup?.matchup_id == null
-      ? undefined
-      : matchups.find(
-          (entry) => entry.matchup_id === ownMatchup.matchup_id && entry.roster_id !== roster.roster_id,
-        );
-    const wins = roster.settings?.wins ?? 0;
-    const losses = roster.settings?.losses ?? 0;
-    const ties = roster.settings?.ties ?? 0;
-    const record = ties ? `${wins}–${losses}–${ties}` : `${wins}–${losses}`;
-
-    return {
-      state: "live",
-      statusLabel: "Live",
-      headline: `${record} this season`,
-      description: "",
-      matchupLabel: `Week ${week}`,
-      teamScore: ownMatchup?.points,
-      opponentScore: opponent?.points,
-      updatedAt: new Date().toISOString(),
-      href: leagueUrl,
-    };
-  } catch {
-    return fantasySourceUnavailable(leagueUrl, currentWeek);
+    const snapshot = await fetchSnapshot(moment.season, moment.week);
+    const ticket = fantasyTicket(snapshot, now);
+    return { state: ticket ? "live" : "unavailable", ticket, updatedAt: snapshot.fetchedAt };
+  } catch (error) {
+    // Nothing fetched successfully this week: no pin, rather than an old score.
+    console.warn("[sleeper] fantasy unavailable", error instanceof Error ? error.message : error);
+    return { state: "unavailable", ticket: null, updatedAt: null };
   }
 }

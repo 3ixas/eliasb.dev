@@ -1,205 +1,129 @@
-import { siteDescription } from "@/content/site";
+import { homeTitle, siteDescription, siteName } from "@/content/site";
 import type { Metadata } from "next";
-import "./globals.css";
+import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
+import "./board.css";
+
+// Newsreader as two fixed optical sizes rather than the variable font with its
+// opsz axis (274 KiB): a text cut for body sizes and a display cut for
+// headlines. Each face is split by unicode-range: a core file every page needs
+// (preloaded) and an accents file fetched only for a page that uses one. The
+// two are combined into --font-newsreader and --font-newsreader-display in
+// board.css.
+// Built by scripts/fonts/newsreader.py from Google Fonts, under the OFL; it
+// also writes the two ranges below, which must be literals for next/font.
+
+const newsreader = localFont({
+  src: [
+    { path: "./fonts/newsreader/text-400.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/newsreader/text-400-italic.woff2", weight: "400", style: "italic" },
+    { path: "./fonts/newsreader/text-500.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/newsreader/text-600.woff2", weight: "600", style: "normal" },
+  ],
+  variable: "--font-newsreader-core",
+  declarations: [{ prop: "unicode-range", value: "U+0020-007E, U+00A0, U+00B7, U+00BA, U+00D7, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2032-2033, U+2039-203A, U+2044, U+20AC, U+2122, U+2212" }],
+  adjustFontFallback: "Times New Roman",
+});
+
+const newsreaderAccents = localFont({
+  src: [
+    { path: "./fonts/newsreader/text-400-accents.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/newsreader/text-400-italic-accents.woff2", weight: "400", style: "italic" },
+    { path: "./fonts/newsreader/text-500-accents.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/newsreader/text-600-accents.woff2", weight: "600", style: "normal" },
+  ],
+  variable: "--font-newsreader-accents",
+  declarations: [{ prop: "unicode-range", value: "U+00A1-00B6, U+00B8-00B9, U+00BB-00D6, U+00D8-00FF, U+0131, U+0152-0153, U+02BC, U+02C6, U+02DA, U+02DC, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+2215" }],
+  adjustFontFallback: false,
+  preload: false,
+});
+
+const newsreaderDisplay = localFont({
+  src: [
+    { path: "./fonts/newsreader/display-400.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/newsreader/display-400-italic.woff2", weight: "400", style: "italic" },
+    { path: "./fonts/newsreader/display-500.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/newsreader/display-600.woff2", weight: "600", style: "normal" },
+  ],
+  variable: "--font-newsreader-display-core",
+  declarations: [{ prop: "unicode-range", value: "U+0020-007E, U+00A0, U+00B7, U+00BA, U+00D7, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2032-2033, U+2039-203A, U+2044, U+20AC, U+2122, U+2212" }],
+  adjustFontFallback: "Times New Roman",
+});
+
+const newsreaderDisplayAccents = localFont({
+  src: [
+    { path: "./fonts/newsreader/display-400-accents.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/newsreader/display-400-italic-accents.woff2", weight: "400", style: "italic" },
+    { path: "./fonts/newsreader/display-500-accents.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/newsreader/display-600-accents.woff2", weight: "600", style: "normal" },
+  ],
+  variable: "--font-newsreader-display-accents",
+  declarations: [{ prop: "unicode-range", value: "U+00A1-00B6, U+00B8-00B9, U+00BB-00D6, U+00D8-00FF, U+0131, U+0152-0153, U+02BC, U+02C6, U+02DA, U+02DC, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+2215" }],
+  adjustFontFallback: false,
+  preload: false,
+});
+
+const hankenGrotesk = Hanken_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-hanken-grotesk",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+});
 
 const isIndexable = process.env.SITE_INDEXABLE === "true";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.eliasb.dev"),
   title: {
-    default: "Elias Bennett | Software engineer and product builder",
-    template: "%s · Elias B.",
+    default: homeTitle,
+    template: `%s · ${siteName}`,
   },
-  description:
-    siteDescription,
+  description: siteDescription,
   alternates: {
     canonical: "/",
   },
-  icons: {
-    icon: "/icon.svg",
-    shortcut: "/icon.svg",
-    apple: "/icon.svg",
-  },
+  // The favicon is app/icon.svg and the social image app/opengraph-image.tsx;
+  // Next.js links both from their file names.
   openGraph: {
     type: "website",
-    siteName: "Elias B.",
+    siteName,
     url: "/",
-    title: "Elias Bennett | Software engineer and product builder",
-    description:
-      siteDescription,
+    title: homeTitle,
+    description: siteDescription,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Elias Bennett | Software engineer and product builder",
-    description:
-      siteDescription,
-    images: ["/opengraph-image"],
+    title: homeTitle,
+    description: siteDescription,
   },
   robots: { index: isIndexable, follow: isIndexable },
 };
 
 const siteBootScript = `
   try {
-    const saved = localStorage.getItem('elias-theme');
-    if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
-    else delete document.documentElement.dataset.theme;
+    const root = document.documentElement;
+    let saved = null;
+    try { saved = localStorage.getItem('elias-theme'); } catch (_) {}
+    if (saved === 'light' || saved === 'dark') root.dataset.theme = saved;
+    else delete root.dataset.theme;
+    // The Board follows data-lights once script runs, so the theme controller
+    // decides when the room changes, including when the device setting does.
+    const dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.lights = dark ? 'on' : 'off';
   } catch (_) {}
-  try {
-    (() => {
-      const root = document.documentElement;
-      const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-      if (location.pathname !== '/' || (location.hash && location.hash !== '#top') || motion.matches) return;
-      root.dataset.homeOpening = 'running';
-      let fallbackTimer;
-      const cleanup = () => {
-        window.clearTimeout(fallbackTimer);
-        motion.removeEventListener('change', onMotionChange);
-        window.removeEventListener('home-opening-started', onStarted);
-        window.removeEventListener('home-opening-completed', cleanup);
-      };
-      const finish = () => {
-        if (!root.hasAttribute('data-home-opening')) return;
-        root.removeAttribute('data-home-opening');
-        cleanup();
-        window.dispatchEvent(new Event('home-opening-finish'));
-      };
-      const onMotionChange = (event) => {
-        if (event.matches) finish();
-      };
-      const onStarted = (event) => {
-        // Hydration and playback have separate budgets. A slow bundle download
-        // must not use up the time reserved for the actual entrance.
-        window.clearTimeout(fallbackTimer);
-        fallbackTimer = window.setTimeout(finish, event.detail.durationMs + 2000);
-      };
-      motion.addEventListener('change', onMotionChange);
-      window.addEventListener('home-opening-started', onStarted);
-      window.addEventListener('home-opening-completed', cleanup);
-      // Fail open if the component never mounts. Late hydration must not hide
-      // the page again once this startup deadline has exposed it.
-      fallbackTimer = window.setTimeout(finish, 12000);
-    })();
-  } catch (_) {
-    document.documentElement.removeAttribute('data-home-opening');
-  }
-  try {
-    (() => {
-      const root = document.documentElement;
-      const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-      if (typeof IntersectionObserver === 'undefined') return;
-
-      let observer;
-      let mutationObserver;
-      let started = false;
-      const selector = '[data-motion-reveal]';
-
-      document.addEventListener('focusin', (event) => {
-        let target = event.target;
-        while (target instanceof Element) {
-          if (target.matches(selector)) {
-            observer?.unobserve(target);
-            target.dataset.motionEntered = 'complete';
-          }
-          target = target.parentElement;
-        }
-      });
-
-      const observeTarget = (target) => {
-        if (
-          target instanceof HTMLElement &&
-          target.matches(selector) &&
-          !target.dataset.motionEntered
-        ) {
-          observer?.observe(target);
-        }
-      };
-
-      const startObserving = () => {
-        if (started || motion.matches || !root.hasAttribute('data-motion-reveals')) return;
-        if (root.hasAttribute('data-home-opening') && root.dataset.homeOpening !== 'complete') return;
-        if (!document.body) {
-          window.addEventListener('DOMContentLoaded', startObserving, { once: true });
-          return;
-        }
-
-        try {
-          observer = new IntersectionObserver((entries) => {
-            for (const entry of entries) {
-              if (!entry.isIntersecting) continue;
-              const target = entry.target;
-              observer.unobserve(target);
-              target.dataset.motionEntered = 'true';
-              const markComplete = () => {
-                if (target.dataset.motionEntered === 'true') target.dataset.motionEntered = 'complete';
-              };
-              const onAnimationEnd = (event) => {
-                if (event.target !== target || event.animationName !== 'site-object-enter') return;
-                target.removeEventListener('animationend', onAnimationEnd);
-                markComplete();
-              };
-              target.addEventListener('animationend', onAnimationEnd);
-              window.setTimeout(() => {
-                target.removeEventListener('animationend', onAnimationEnd);
-                markComplete();
-              }, 1000);
-            }
-          }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
-          root.dataset.motionReveals = 'active';
-          started = true;
-          document.querySelectorAll(selector).forEach(observeTarget);
-          mutationObserver = new MutationObserver((records) => {
-            for (const record of records) {
-              for (const node of record.addedNodes) {
-                if (!(node instanceof HTMLElement)) continue;
-                observeTarget(node);
-                node.querySelectorAll(selector).forEach(observeTarget);
-              }
-            }
-          });
-          mutationObserver.observe(document.body, { childList: true, subtree: true });
-        } catch (_) {
-          observer?.disconnect();
-          mutationObserver?.disconnect();
-          started = false;
-          root.removeAttribute('data-motion-reveals');
-        }
-      };
-
-      window.addEventListener('home-opening-completed', startObserving);
-      window.addEventListener('home-opening-finish', startObserving);
-
-      const syncMotionPreference = (event) => {
-        if (event.matches) {
-          observer?.disconnect();
-          mutationObserver?.disconnect();
-          started = false;
-          document.querySelectorAll('[data-motion-entered="true"]').forEach((target) => {
-            target.dataset.motionEntered = 'complete';
-          });
-          root.removeAttribute('data-motion-reveals');
-          return;
-        }
-        root.dataset.motionReveals = 'pending';
-        startObserving();
-      };
-      motion.addEventListener('change', syncMotionPreference);
-
-      if (motion.matches) return;
-      root.dataset.motionReveals = 'pending';
-      if (document.readyState === 'loading') {
-        window.addEventListener('DOMContentLoaded', startObserving, { once: true });
-      } else {
-        startObserving();
-      }
-    })();
-  } catch (_) {
-    document.documentElement.removeAttribute('data-motion-reveals');
-  }
 `;
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
+    <html
+      lang="en-GB"
+      suppressHydrationWarning
+      data-scroll-behavior="smooth"
+      className={`${newsreader.variable} ${newsreaderAccents.variable} ${newsreaderDisplay.variable} ${newsreaderDisplayAccents.variable} ${hankenGrotesk.variable} ${jetbrainsMono.variable}`}
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: siteBootScript }} />
       </head>

@@ -1,3 +1,5 @@
+import type { FantasyTicket } from "./fantasy";
+
 export type SignalState = "live" | "curated" | "pending" | "unavailable";
 
 export type ActivityDay = {
@@ -5,33 +7,27 @@ export type ActivityDay = {
   count: number;
 };
 
+/** The past year from GitHub's contribution calendar; unavailable means no pin. */
 export type GitHubSignal = {
   state: SignalState;
-  statusLabel: string;
-  headline: string;
-  description: string;
   activity: ActivityDay[];
-  activityLabel: string;
-  totalContributions?: number;
+  total: number;
   updatedAt: string | null;
   href: string;
 };
 
-export type TrainingCategory = {
-  label: string;
-  count: number;
+export type GitHubRepository = {
+  name: string;
+  description: string | null;
+  href: string;
+  /** When it was last pushed, as an ISO instant. */
+  pushedAt: string;
 };
 
-export type TrainingDay = {
-  day: string;
-  activity: string;
-};
-
-export type TrainingSignal = PersonalSignal & {
-  weekly: TrainingCategory[];
-  schedule?: readonly TrainingDay[];
-  totalActivities: number;
-  windowLabel: string;
+/** My latest public repository, for the Making pin's fallback. */
+export type LatestRepositorySignal = {
+  state: SignalState;
+  repository: GitHubRepository | null;
   updatedAt: string | null;
 };
 
@@ -50,56 +46,67 @@ export type HistoryImage = {
   sourceUrl: string;
   licenseName: string;
   licenseUrl: string | null;
+  width: number;
+  height: number;
 };
 
+/**
+ * The Weekly Curiosity: three oddities from this week in history, the most
+ * surprising first. Saved examples have no week (weekOf is null).
+ */
 export type HistorySignal = {
   state: SignalState;
-  statusLabel: string;
-  headline: string;
-  description: string;
-  dateLabel: string;
+  /** The Monday the week starts, YYYY-MM-DD; the facts happened on this day. */
+  weekOf: string | null;
   events: HistoryEvent[];
+  /** The readable Wikipedia page for the day, or the history portal for saved examples. */
   sourceUrl: string;
   updatedAt: string | null;
 };
 
-export type PersonalSignal = {
+/** The book on my currently-reading shelf. */
+export type Book = {
+  title: string;
+  author: string;
+  /** When the book went onto the shelf, which is when I started it. */
+  startedAt: string | null;
+  coverUrl: string | null;
+};
+
+/**
+ * Goodreads, live only: book is null when the shelf is empty. "pending" means
+ * nothing has been fetched successfully yet, so there is nothing to show.
+ */
+export type ReadingSignal = {
   state: SignalState;
-  statusLabel: string;
-  headline: string;
-  description: string;
-  href?: string;
-};
-
-export type ReadingSignal = PersonalSignal & {
-  author?: string;
-  coverUrl?: string;
-  bookDescription?: string;
+  book: Book | null;
+  href: string;
   updatedAt: string | null;
 };
 
-export type CultureSignal = PersonalSignal & {
-  filmTitle?: string;
-  filmYear?: string;
-  filmRating?: string;
-  filmDescription?: string;
-  filmPosterUrl?: string;
-  filmHref?: string;
-  playlistHref: string;
+/** The latest film in my Letterboxd diary. */
+export type Film = {
+  title: string;
+  year: string | null;
+  /** Out of 5, in half stars. */
+  rating: number | null;
+  /** The diary date, YYYY-MM-DD. */
+  watchedOn: string | null;
+  posterUrl: string | null;
+  href: string;
+};
+
+/** Letterboxd, live only: film is null when the diary is empty. */
+export type FilmSignal = {
+  state: SignalState;
+  film: Film | null;
+  href: string;
   updatedAt: string | null;
 };
 
-export type FantasySignal = PersonalSignal & {
-  matchupLabel: string;
-  teamScore?: number;
-  opponentScore?: number;
+/** Sleeper, read against the NFL calendar: ticket is null when there's no pin. */
+export type FantasySignal = {
+  state: SignalState;
+  ticket: FantasyTicket | null;
   updatedAt: string | null;
-};
-
-export type HomepageSignals = {
-  github: GitHubSignal;
-  reading: ReadingSignal;
-  training: TrainingSignal;
-  fantasy: FantasySignal;
-  culture: CultureSignal;
 };

@@ -22,7 +22,4 @@ export const integrationConfig = {
     currentlyReadingFeedUrl:
       "https://www.goodreads.com/review/list_rss/171686303?shelf=currently-reading",
   },
-  strava: {
-    profileUrl: "https://www.strava.com/athletes/79346179",
-  },
 } as const;

@@ -1,84 +1,56 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
+import { spring } from 'motion';
+import { openingScript, openingTimings as opening, springCurve } from '../src/components/board/opening.ts';
 
+// The pre-paint boot script may only restore the theme and prepare optional
+// motion. It must never hide content while it waits for the opening: the
+// headline is server-rendered and the opening (#78) only decorates it.
 const layout = readFileSync(new URL('../src/app/layout.tsx', import.meta.url), 'utf8');
 const boot = layout.match(/const siteBootScript = `([\s\S]*?)`;/)?.[1];
 assert.ok(boot, 'The pre-paint boot script must exist');
+assert.doesNotMatch(boot, /homeOpening|home-opening/, 'The boot script must not gate content on the opening');
 
-function bootPage({ hash = '', reduced = false, pathname = '/' } = {}) {
-  let now = 0;
-  let nextId = 0;
-  const timers = new Map();
+for (const [hash, reduced] of [['', false], ['#top', false], ['', true]]) {
   const motion = new EventTarget();
   motion.matches = reduced;
-  const root = {
-    dataset: {},
-    hasAttribute(name) { return name === 'data-home-opening' && 'homeOpening' in this.dataset; },
-    removeAttribute(name) { if (name === 'data-home-opening') delete this.dataset.homeOpening; },
-  };
+  const root = { dataset: {}, hasAttribute: () => false, removeAttribute() {} };
   const window = new EventTarget();
   window.matchMedia = () => motion;
-  window.setTimeout = (fn, delay) => { const id = ++nextId; timers.set(id, { fn, at: now + delay }); return id; };
-  window.clearTimeout = (id) => timers.delete(id);
+  window.setTimeout = () => 0;
+  window.clearTimeout = () => {};
   runInNewContext(boot, {
-    window, document: { documentElement: root }, location: { pathname, hash },
-    localStorage: { getItem: () => null }, Event,
+    window,
+    document: { documentElement: root, readyState: 'complete', addEventListener() {}, querySelectorAll: () => [] },
+    location: { pathname: '/', hash },
+    localStorage: { getItem: () => null },
+    Event,
   });
-  return {
-    root, window, motion, timers,
-    advance(ms) {
-      const end = now + ms;
-      while (true) {
-        const due = [...timers].filter(([, timer]) => timer.at <= end).sort((a, b) => a[1].at - b[1].at)[0];
-        if (!due) break;
-        const [id, timer] = due;
-        timers.delete(id); now = timer.at; timer.fn();
-      }
-      now = end;
-    },
-    start(durationMs = 4500) { window.dispatchEvent(new CustomEvent('home-opening-started', { detail: { durationMs } })); },
-    complete() { root.dataset.homeOpening = 'complete'; window.dispatchEvent(new Event('home-opening-completed')); },
-  };
+  assert.equal(root.dataset.homeOpening, undefined, 'A fresh load must not start hidden');
 }
 
-// A delayed download must leave a complete playback budget once hydration starts.
-for (const delay of [0, 4000, 8000, 11000]) {
-  const page = bootPage();
-  page.advance(delay);
-  assert.equal(page.root.dataset.homeOpening, 'running', `Startup should survive a ${delay}ms download`);
-  page.start();
-  page.advance(4500);
-  assert.equal(page.root.dataset.homeOpening, 'running', 'Playback must not be cut off by the startup deadline');
-  page.complete();
-  page.advance(20000);
-  assert.equal(page.root.dataset.homeOpening, 'complete');
-  assert.equal(page.timers.size, 0, 'Completion must clear the watchdog');
+// The opening's CSS springs must match Motion's springs at the approved settings.
+for (const { bounce, visualDuration } of [opening.land, opening.settle, opening.press]) {
+  const curve = springCurve(bounce, visualDuration);
+  const points = curve.easing.slice('linear('.length, -1).split(',').map(Number);
+  const motion = spring({ keyframes: [0, 1], bounce, visualDuration });
+  points.forEach((value, index) => {
+    const at = (curve.duration * index) / (points.length - 1);
+    const expected = motion.next(at).value;
+    assert.ok(Math.abs(value - expected) < 0.01, `spring(${bounce}, ${visualDuration}) at ${Math.round(at)} ms: ${value} vs Motion ${expected}`);
+  });
+  assert.ok(Math.abs(motion.next(curve.duration).value - 1) < 0.002, `spring(${bounce}, ${visualDuration}) should be at rest when the curve ends`);
+  let restsAt = 0;
+  while (!motion.next(restsAt).done && restsAt < 3000) restsAt += 1;
+  assert.ok(Math.abs(curve.settled - restsAt) <= 2, `spring(${bounce}, ${visualDuration}) should settle when Motion does: ${curve.settled} vs ${restsAt} ms`);
 }
 
-const failed = bootPage();
-let finishes = 0;
-failed.window.addEventListener('home-opening-finish', () => finishes++);
-failed.advance(12000);
-assert.equal(failed.root.dataset.homeOpening, undefined, 'Missing hydration must expose static content');
-failed.start();
-assert.equal(failed.timers.size, 0, 'Late hydration must not restart a completed fallback');
-assert.equal(finishes, 1);
+// Without its hero, the inline opening does nothing and leaves nothing hidden.
+const emptyRoot = { removeAttribute() {}, setAttribute() { throw new Error('should not start'); } };
+runInNewContext(openingScript, {
+  document: { documentElement: emptyRoot, querySelector: () => null },
+  window: {}, performance: { getEntriesByType: () => [] }, location: { hash: '' }, CSS: { supports: () => true },
+});
 
-const stalled = bootPage();
-stalled.start();
-stalled.advance(6500);
-assert.equal(stalled.root.dataset.homeOpening, undefined, 'Stalled playback must also fail open');
-
-for (const options of [{ reduced: true }, { hash: '#about' }, { pathname: '/work' }]) {
-  assert.equal(bootPage(options).root.dataset.homeOpening, undefined);
-}
-assert.equal(bootPage({ hash: '#top' }).root.dataset.homeOpening, 'running');
-
-const interactive = bootPage();
-for (const name of ['touchstart', 'pointerdown', 'keydown', 'scroll', 'wheel']) interactive.window.dispatchEvent(new Event(name));
-assert.equal(interactive.root.dataset.homeOpening, 'running', 'Input must not skip the entrance');
-interactive.motion.dispatchEvent(Object.assign(new Event('change'), { matches: true }));
-assert.equal(interactive.root.dataset.homeOpening, undefined, 'A new reduced-motion preference must finish immediately');
-assert.equal(interactive.timers.size, 0);
-console.log('Opening startup, playback, fallback, input, and preference checks passed.');
+console.log('Opening checks passed: content is never hidden before paint, and the springs match Motion.');

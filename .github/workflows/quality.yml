@@ -15,7 +15,7 @@ concurrency:
 jobs:
   quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -57,3 +57,51 @@ jobs:
 
       - name: Check diff whitespace
         run: git diff --check
+
+  # The full Playwright matrix (16 projects, ~3,000 tests) takes about 45
+  # minutes on one runner, and WebKit at large sizes is slowest, so it runs
+  # as eight shards in parallel.
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build with webpack
+        run: SITE_INDEXABLE=true pnpm build --webpack
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium webkit
+
+      - name: End-to-end tests (shard ${{ matrix.shard }} of 8)
+        run: pnpm test:e2e --shard=${{ matrix.shard }}/8
+
+      # Also when the shard runs out of time, which cancels rather than fails it.
+      - name: Keep the report and traces of a failed shard
+        if: ${{ !success() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-shard-${{ matrix.shard }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

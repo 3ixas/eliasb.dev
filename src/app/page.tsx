@@ -1,9 +1,9 @@
-import { siteDescription } from "@/content/site";
+import { homeTitle, siteDescription } from "@/content/site";
 import type { Metadata } from "next";
 import { Homepage } from "@/components/site/homepage";
 
 export const metadata: Metadata = {
-  title: "Elias Bennett | Software engineer and product builder",
+  title: homeTitle,
   description: siteDescription,
 };
 

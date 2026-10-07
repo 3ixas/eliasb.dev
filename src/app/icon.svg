@@ -1,6 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="12" fill="#151512"/>
-  <path d="M9 15h20v6H16v5h11v6H16v6h14v6H9V15Z" fill="#f2f0e9"/>
-  <path d="m36 10 5 2-16 40-5-2 16-40Z" fill="#e95f38"/>
-  <path d="M39 15h9c6 0 9 3 9 8 0 3-1 5-4 6 4 1 6 4 6 8 0 6-4 10-11 10H39V15Zm7 6v6h2c2 0 3-1 3-3s-1-3-3-3h-2Zm0 12v8h3c3 0 4-1 4-4 0-2-2-4-4-4h-3Z" fill="#f2f0e9"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+  <style>
+    .tile { fill: #efe8dc; }
+    .needle { stroke: #6e6357; }
+    .head { fill: #d9542c; }
+    @media (prefers-color-scheme: dark) {
+      .tile { fill: #1d1915; }
+      .needle { stroke: #b8ab95; }
+      .head { fill: #e0602f; }
+      .shine { display: none; }
+    }
+  </style>
+  <rect class="tile" width="30" height="30" rx="7"/>
+  <line class="needle" x1="15" y1="16" x2="19" y2="26" stroke-width="2.4" stroke-linecap="round"/>
+  <circle class="head" cx="15" cy="12" r="8.5"/>
+  <circle class="shine" cx="12.4" cy="9.4" r="2.4" fill="rgba(255,255,255,.55)"/>
 </svg>

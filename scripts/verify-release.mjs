@@ -6,7 +6,7 @@ import { setTimeout as delay } from "node:timers/promises";
 const compatibilityRedirects = new Map([
   ["/about", "/#about"],
   ["/library", "/#outside-work"],
-  ["/lab", "/#experiments"],
+  ["/lab", "/#outside-work"],
 ]);
 
 const canonicalPages = [
@@ -19,33 +19,32 @@ const canonicalPages = [
 const expectedSitemapUrls = new Set(canonicalPages.map((route) => route === "/" ? "https://www.eliasb.dev" : `https://www.eliasb.dev${route}`));
 const expectedWorkSocialCards = new Map([
   ["/work", {
-    title: "Work · Elias B.",
+    title: "Work · Elias Bennett",
     image: "/work/threshold/landing.webp",
     alt: "Threshold landing page introducing the real cost of moving out",
   }],
   ["/work/threshold", {
-    title: "Threshold · Elias B.",
+    title: "Threshold · Elias Bennett",
     image: "/work/threshold/landing.webp",
     alt: "Threshold landing page introducing the real cost of moving out",
   }],
   ["/work/argus-risk", {
-    title: "Argus Risk · Elias B.",
+    title: "Argus Risk · Elias Bennett",
     image: "/work/argus/overview.webp",
     alt: "Argus Risk dashboard showing portfolio value, profit and loss, exposure, and system status",
   }],
   ["/work/flowtime", {
-    title: "Flowtime · Elias B.",
+    title: "Flowtime · Elias Bennett",
     image: "/work/flowtime/timer.jpg",
     alt: "Flowtime focus timer interface",
   }],
 ]);
 const expectedIndexableRobots = [
-  ["user-agent: *", "allow: /", "disallow: /concepts/"],
+  ["user-agent: *", "allow: /"],
   ["host: https://www.eliasb.dev", "sitemap: https://www.eliasb.dev/sitemap.xml"],
 ];
 
-const requiredHomepageSections = ["work", "outside-work", "experiments", "about", "contact"];
-const signalStates = new Set(["live", "curated", "pending", "unavailable"]);
+const requiredHomepageSections = ["work", "outside-work", "about", "contact"];
 const failures = [];
 let checkCount = 0;
 
@@ -171,20 +170,17 @@ function verifyPageShell(markup, route) {
   check(main, `${route} should have a main landmark`);
   equal(attribute(main ?? "", "id"), "main-content", `${route} main landmark id`);
   equal(attribute(main ?? "", "tabindex"), "-1", `${route} main landmark should accept skip-link focus`);
-  check(markup.includes('<a class="skip-link" href="#main-content">'), `${route} should expose a skip link`);
+  const skipLink = hrefs(markup).find(({ href }) => href === "#main-content");
+  check(skipLink && plainText(markup.slice(markup.indexOf(skipLink.tag))).startsWith("Skip to content"), `${route} should expose a skip link`);
   equal(tags(markup, "h1").length, 1, `${route} should have exactly one h1`);
 }
 
 function verifyHomepage(markup) {
   verifyPageShell(markup, "/");
-  const headline = tags(markup, "h1")[0];
-  const fullOpening = "I build software to make everyday things easier, and more enjoyable.";
-  equal(attribute(headline ?? "", "aria-label"), fullOpening, "Homepage opening should retain its complete semantic sentence");
+  const fullOpening = "I build everyday software, and make complicated things feel simple.";
   const headlineContent = markup.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? "";
-  check(plainText(headlineContent).includes(fullOpening), "Homepage opening should keep a complete static text fallback");
-  const animatedHeadline = markup.match(/<span class="homepage-signature-stage"[^>]*>([\s\S]*?)<\/span><\/h1>/i)?.[1] ?? "";
-  const animatedText = animatedHeadline.replace(/<[^>]+>/g, "").replace(/<!--.*?-->/gs, "");
-  check(animatedText.startsWith(" and more enjoyable."), "Animated homepage opening should place its second thought after a visible pause");
+  equal(plainText(headlineContent), fullOpening, "Homepage headline should be one complete, server-rendered sentence");
+  check(!/data-home-opening/.test(markup), "Homepage content should never wait for the opening");
   check(!/Replay the opening/i.test(markup), "Homepage should not expose an opening replay control");
 
   const top = tags(markup, "div").find((tag) => attribute(tag, "id") === "top");
@@ -193,9 +189,10 @@ function verifyHomepage(markup) {
 
   const nav = markup.match(/<nav aria-label="Primary navigation">([\s\S]*?)<\/nav>/i)?.[1] ?? "";
   const navHrefs = hrefs(nav).map(({ href }) => href);
-  equal(navHrefs.join("|"), "#top|#work|#outside-work|#about", "Homepage primary navigation targets");
+  equal(navHrefs.join("|"), "#work|#outside-work|#about", "Homepage primary navigation targets");
   const navLabels = [...nav.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/gi)].map(([, content]) => plainText(content));
-  equal(navLabels.join("|"), "Home|Work|Library|About", "Homepage primary navigation labels");
+  equal(navLabels.join("|"), "Work|Library|About", "Homepage primary navigation labels");
+  check(!/class="scroll-progress"/.test(markup), "Homepage should not render the retired scroll progress bar");
 
   const pageIds = ids(markup);
   for (const sectionId of requiredHomepageSections) {
@@ -212,51 +209,42 @@ function verifyHomepage(markup) {
 
   const outsideWorkTitle = markup.match(/<h2\b[^>]*\bid="outside-work-title"[^>]*>([\s\S]*?)<\/h2>/i)?.[1] ?? "";
   equal(plainText(outsideWorkTitle), "Some of what I’m into lately.", "Homepage #outside-work-title rendered text");
-  const aboutStart = markup.indexOf('<section class="about-section"');
-  const contactStart = markup.indexOf('<section id="contact"');
+  const aboutStart = markup.lastIndexOf("<", markup.indexOf('id="about"'));
+  const contactStart = markup.lastIndexOf("<", markup.indexOf('id="contact"'));
   const aboutSection = aboutStart >= 0 && contactStart > aboutStart ? markup.slice(aboutStart, contactStart) : "";
   check(Boolean(aboutSection), "Homepage should render its About section before Contact");
-  check(aboutSection.includes("Career path"), "About should identify the career overview");
-  const careerCopy = plainText(aboutSection);
-  check(careerCopy.includes("My career so far."), "About should introduce the career progression plainly");
-  check(careerCopy.includes("I started in marketing and data, then moved into software"), "About should explain the verified career progression in plain language");
-  check(careerCopy.includes("Core Web Vitals and split tests"), "About should ground the marketing stage in approved career evidence");
-  check(careerCopy.includes("React, MySQL, and Java/Spring Boot"), "About should explain the move into full-stack work with approved evidence");
-  check(careerCopy.includes("I work on software that brings market data into pricing and risk calculations"), "About should describe the current role with its verified pricing/risk systems context");
-  const careerRoles = [...aboutSection.matchAll(/<h4\b[^>]*>([\s\S]*?)<\/h4>/gi)].map(([, title]) => plainText(title));
-  equal(careerRoles.join("|"), "Marketing Executive|Full Stack Software Engineer|Software Engineer working on pricing and risk systems", "About career roles should describe the verified current work without inventing an official title");
-  const careerEmployers = [...aboutSection.matchAll(/class="career-employer"[^>]*>([\s\S]*?)<\/p>/gi)].map(([, employer]) => plainText(employer));
-  equal(careerEmployers.join("|"), "Optegra Eye Healthcare & Kensington Medical|Joveen|BNP Paribas CIB", "About should show the verified employers in order");
-  const careerDates = [...aboutSection.matchAll(/<time\b[^>]*>([\s\S]*?)<\/time>/gi)].map(([, date]) => plainText(date));
-  equal(careerDates.join("|"), "Sept 2021|Aug 2024|Aug 2024|June 2025|July 2025", "About should expose the verified role dates");
-  check(aboutSection.includes("Present"), "About should show the current role as ongoing");
-  check(aboutSection.includes("High-Performance Computing"), "About should retain the verified current team context");
-  check(!aboutSection.includes("AI model training"), "About should not claim unverified career experience");
-  equal((aboutSection.match(/\bawkward\b/gi) ?? []).length, 0, "About should not use vague filler language");
-  check(!aboutSection.includes("Outside the editor"), "About should not repeat the interests gathered in Library");
-  check(!aboutSection.includes("A few other ways I measure a week."), "About should not render the duplicate interests grid");
-  check(!aboutSection.includes("profile-links"), "About should not retain the profile-link group");
-  const aboutContactAction = [...aboutSection.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)]
-    .find(([, tag]) => attribute(tag, "class") === "about-contact-cta");
-  check(Boolean(aboutContactAction), "About should preserve its Contact shortcut");
-  equal(attribute(aboutContactAction?.[1] ?? "", "href"), "#contact", "About conversation action should use the existing Contact anchor");
-  check(plainText(aboutContactAction?.[2] ?? "").includes("Start a conversation"), "About Contact shortcut should retain its clear label");
+  // About: the story from the source note, five stops on the string, the grey-jumper photo.
+  const aboutText = plainText(aboutSection);
+  check(aboutText.includes("03 / About"), "About should be section 03, with Experiments gone");
+  check(aboutText.startsWith("03 / About A bit about me. I studied history at university."), "About should open with history");
+  check(aboutText.includes("a Greggs campaign"), "About should name the Greggs campaign, as approved");
+  check(!/_nology|Optegra|Joveen/i.test(aboutText), "The bootcamp and earlier employers stay unnamed in the story");
+  const stops = [...aboutSection.matchAll(/<li\b[^>]*data-stop="(\d)"[^>]*>([\s\S]*?)<\/li>/gi)].map(([, stop, body]) => `${stop} ${plainText(body)}`);
+  equal(stops.length, 5, "About should pin five stops on the string");
+  check(/^1 .*History at uni/.test(stops[0] ?? "") && /^5 .*BNP Paribas, today/.test(stops[4] ?? ""), "The stops should run from history to BNP Paribas");
+  check(aboutText.includes("“I need that feeling from what I do.”"), "The speech bubble should quote the source word for word");
+  check(tags(aboutSection, "img").some((tag) => attribute(tag, "alt") === "Elias smiling in a grey jumper outside a stone building on a sunny day"), "About should show the grey-jumper photo");
+  check(!/career-employer|about-contact-cta|Career path/.test(aboutSection), "The career timeline and About's contact shortcut are gone");
+  check(!markup.includes('id="experiments"'), "The Experiments section is gone; Making is on the Board");
   const contactEnd = markup.indexOf("<footer", contactStart);
   const contactSection = contactStart >= 0 && contactEnd > contactStart ? markup.slice(contactStart, contactEnd) : "";
   check(Boolean(contactSection), "Homepage should render its Contact section before the footer");
   check(!/<img\b/i.test(contactSection), "Contact should keep its visual focus on ways to connect");
-  const contactActions = contactSection.match(/<nav class="contact-profile-links"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] ?? "";
-  const contactProfiles = [...contactActions.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)];
-  equal(contactProfiles.length, 3, "Contact should present GitHub, LinkedIn, and résumé actions");
-  for (const [index, [, tag, label]] of contactProfiles.entries()) {
-    const expectedLabel = ["GitHub", "LinkedIn", "Résumé"][index];
-    check(plainText(label).includes(expectedLabel), `Contact profile action ${index + 1} should be labelled ${expectedLabel}`);
-    equal(attribute(tag, "target"), "_blank", `${expectedLabel} should preserve its external-link behavior`);
-    check((attribute(tag, "rel") ?? "").split(/\s+/).includes("noreferrer"), `${expectedLabel} should retain safe external-link attributes`);
-  }
+  // Contact: the postcard is the email link; the CV, GitHub and LinkedIn are pinned cards, in that order.
+  check(plainText(contactSection).includes("04 / Contact"), "Contact should be section 04");
+  const contactHeading = contactSection.match(/<h2\b[^>]*id="contact-title"[^>]*>([\s\S]*?)<\/h2>/i)?.[1] ?? "";
+  equal(plainText(contactHeading), "Say hello", "Contact's heading should say hello");
   const emailAction = hrefs(contactSection).find(({ href }) => href?.startsWith("mailto:"));
-  check(emailAction, "Contact should retain the primary email action");
-  check(attribute(emailAction?.tag ?? "", "class") === "contact-link", "Email should remain the primary contact action");
+  check(emailAction, "Contact should keep the email action");
+  equal(attribute(emailAction?.tag ?? "", "aria-label"), "Email me at eliasthebennett@gmail.com", "The postcard should be named as the email link");
+  check(plainText(contactSection).includes("Wish you were here."), "The postcard should carry its message");
+  const cards = [...contactSection.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].filter(([, tag]) => attribute(tag, "target") === "_blank");
+  equal(cards.map(([, , body]) => plainText(body).split(" ")[0]).join("|"), "Résumé|GitHub|LinkedIn", "The cards should be the CV, GitHub and LinkedIn, in that order");
+  for (const [, tag, body] of cards) {
+    check((attribute(tag, "rel") ?? "").split(/\s+/).includes("noreferrer"), `${plainText(body)} should keep safe external-link attributes`);
+  }
+  const footer = markup.slice(markup.indexOf("<footer"), markup.indexOf("</footer>"));
+  equal(plainText(footer), "Made by Elias", "The footer should be the frame's edge and my signature");
   check(!plainText(markup).toLowerCase().includes("science fiction"), "Homepage should omit a standalone science-fiction category");
   check(markup.includes('href="/work"'), "Homepage should link to the complete Work archive");
   check(markup.includes('href="/work/threshold"'), "Homepage should link to the Threshold case study");
@@ -268,110 +256,77 @@ function verifyHomepage(markup) {
   check(imageTags.every((tag) => attribute(tag, "alt") !== null), "Every homepage image should declare alternative text");
   check(markup.includes("Threshold landing page showing rental affordability"), "Threshold imagery should have meaningful alternative text");
   check(markup.includes("London skyline from the Thames"), "London imagery should have meaningful alternative text");
-  check(markup.includes("Elias Bennett smiling in a white dinner jacket"), "About imagery should retain the selected portrait alternative text");
   check(tags(markup, "img").some((tag) => (attribute(tag, "srcset") ?? "").includes("/_next/image")), "Homepage imagery should use responsive Next Image sources");
 
-  const detailBlocks = [...markup.matchAll(/<details\b[\s\S]*?<\/details>/gi)].map(([block]) => block);
-  check(detailBlocks.length >= 4, "Homepage should retain native reading, cinema, and experiment disclosures");
-  check(detailBlocks.every((block) => /<summary\b/i.test(block)), "Every disclosure should use a native summary control");
-  check(markup.includes('data-close-object'), "Open culture objects should expose a keyboard-accessible close control");
-
-  const spotifyFrame = tags(markup, "iframe").find((tag) => (attribute(tag, "src") ?? "").includes("open.spotify.com/embed/playlist/"));
-  check(spotifyFrame, "Homepage should retain the official Spotify playlist embed");
-  equal(attribute(spotifyFrame ?? "", "title"), "Elias’s current Spotify playlist", "Spotify iframe title");
+  // The cassette player is a facade: Spotify's player loads only when Play is pressed.
+  check(!/open\.spotify\.com\/embed/.test(markup), "Spotify's player should load only when Play is pressed");
+  check(tags(markup, "button").some((tag) => attribute(tag, "aria-label") === "Play my playlist on Spotify"), "The cassette player should have a named Play button");
   const spotifyLink = hrefs(markup).find(({ href }) => href?.includes("open.spotify.com/playlist/"));
   check(spotifyLink, "Homepage should expose a direct Spotify fallback link");
-  check(markup.includes("Open playlist in Spotify"), "Spotify fallback link should be visibly labelled");
+  check(markup.includes("Open in Spotify"), "Spotify fallback link should be visibly labelled");
 
-  const statuses = [...markup.matchAll(/<span class="signal-status" data-state="([^"]+)">([^<]*)<\/span>/gi)];
-  check(statuses.length >= 6, "Outside work should expose status labels for its signal cards");
-  for (const [, state, label] of statuses) {
-    check(signalStates.has(state), `Signal state ${state} must use the shared signal contract`);
-    check(Boolean(label.trim()), "Signal states must have a visible label");
+  // The GitHub year is up only with a full year of data; when it is, it's 365 day buttons with tags.
+  const github = markup.match(/data-board-pin="github"([\s\S]*)$/i)?.[1] ?? "";
+  if (markup.includes('data-board-pin="github"')) {
+    equal((github.match(/class="board-github-day"/g) ?? []).length, 365, "The GitHub sheet should hold exactly 365 days");
+    check(/aria-label="(?:Nothing|\d+ contributions?) on [A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2,4}"/.test(github), "Each GitHub day should say its count and date");
+    check(/GitHub contributions over the past year: [\d,]+/.test(github), "The GitHub sheet should be named with its total");
+    check(!/\b3ixas\/[\w.-]+/.test(github), "The GitHub sheet should not expose repository details");
   }
-  const githubCalendar = [...markup.matchAll(/<[a-z][^>]*>/gi)]
-    .map(([tag]) => tag)
-    .find((tag) => attribute(tag, "role") === "grid" && /GitHub/i.test(attribute(tag, "aria-label") ?? ""));
-  const calendarUnavailableNotice = [...markup.matchAll(/<[a-z][^>]*>/gi)]
-    .map(([tag]) => tag)
-    .find((tag) => tag.includes("contribution-calendar-empty"));
-  if (githubCalendar) {
-    const githubCalendarLabel = attribute(githubCalendar, "aria-label") ?? "";
-    check(/GitHub contributions.*by day/i.test(githubCalendarLabel), "GitHub contribution grid should name its day-level data");
-    check(!/\b[\w.-]+\/[\w.-]+\b/.test(githubCalendarLabel), "GitHub contribution description should not expose repository details");
-    check((markup.match(/class="contribution-day"/g) ?? []).length === 365, "GitHub contribution grid should expose exactly 365 days");
-    check(markup.includes("Past 365 days"), "GitHub contribution grid should identify its time window");
-    check(/\b[A-Z][a-z]{2} 20\d{2} – [A-Z][a-z]{2} 20\d{2}\b/.test(plainText(markup)), "GitHub contribution grid should show month and year context");
-    check(markup.includes("contribution-calendar-instructions"), "GitHub contribution grid should explain its scroll and keyboard controls");
-  } else {
-    check(calendarUnavailableNotice || /I couldn’t load GitHub just now/.test(plainText(markup)), "Without the private aggregate snapshot, GitHub should explain why the full-year calendar is unavailable");
-    check(!/class="contribution-day"/.test(markup), "A partial public-event feed should not be shown as a complete year");
-  }
+  check(!/class="contribution-day"|signal-status|I couldn’t load GitHub/.test(markup), "The legacy GitHub card is gone");
+  // Making: the blueprint shows what I'm making now, or my latest public repository.
+  const making = markup.match(/data-board-pin="making"([\s\S]*?)data-board-pin=/i)?.[1] ?? "";
+  check(/(Now making|Latest on GitHub)/.test(plainText(making)), "The Making pin should say what I'm making, or show my latest repository");
 
   const text = plainText(markup);
-  const githubSignal = markup.match(/<article class="signal signal-building"[^>]*>([\s\S]*?)<\/article>/i)?.[1] ?? "";
-  check(!/Private contribution count|class="signal-metrics"/.test(githubSignal), "GitHub output should not show a separate private contribution statistic");
-  check(/Goodreads/i.test(text) && /(Currently reading|Last on Goodreads)/i.test(text), "Reading signal should identify Goodreads and the current or last logged book");
-  check(/Letterboxd/i.test(text) && /(Most recently watched|Last logged)/i.test(text), "Cinema signal should identify Letterboxd and the most recent or last logged film");
-  check(!/other managers.{0,40}(names|private|anonymous)|names.{0,24}stay private/i.test(text), "Fantasy football output should omit the redundant privacy explanation");
+  check(/Now reading/.test(text) && /(Goodreads|Between books)/.test(text), "The book pin should show the book from Goodreads, or say I'm between books");
+  check(/Admit one · Last watched/.test(text) && /(Letterboxd|Nothing logged yet)/.test(text), "The film ticket should show the film from Letterboxd, or say nothing is logged");
   check(!/private contributions are part of the total|keep their repositories private/i.test(text), "GitHub output should omit the redundant private-repository explanation");
-  check(text.includes("Strava") || (text.includes("Typical week") && text.includes("My weekly plan")), "Training output should distinguish live activity from an authored typical week");
-  const trainingCard = markup.match(/<article class="signal signal-training">([\s\S]*?)<\/article>/i)?.[1] ?? "";
-  const trainingText = plainText(trainingCard);
-  if (trainingText.includes("My weekly training plan")) {
-    check(!/maintained by hand|not a live workout log|usual plan/i.test(trainingText), "Training should skip redundant schedule explanations");
-    check((trainingCard.match(/class="training-day"/g) ?? []).length === 7, "Authored training schedule should retain all seven days");
-  }
-  check(text.includes("Wikimedia") || text.includes("fallback"), "History output should identify its live or fallback source");
-  const historyList = markup.match(/<ol\b(?=[^>]*\baria-label="Historical moments")[^>]*>([\s\S]*?)<\/ol>/i)?.[1] ?? "";
-  const historyEvents = [...historyList.matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/gi)].map(([, event]) => event);
-  equal(historyEvents.length, 3, "History should show three historical moments");
-  const historyYears = historyEvents.map((event) => Number(event.match(/<strong\b[^>]*>(\d{1,4})<\/strong>/i)?.[1] ?? 0));
-  check(historyYears.every((year) => year > 0), "Each history moment should show its year");
-  check(new Set(historyYears.map((year) => Math.floor((year - 1) / 100))).size >= 3, "History should span at least three centuries");
-  check(historyYears.some((year) => year < 1900), "History should include a moment before 1900");
-  for (const event of historyEvents) {
-    const record = hrefs(event).find(({ href }) => href?.startsWith("https://"));
-    check(record, "Each history moment should link directly to its source");
-    check(plainText(event).includes("Read the record"), "Each history source link should have a clear label");
-    if (event.includes("history-event-visual")) {
-      const credits = hrefs(event);
-      check(/<img\b[^>]*alt="[^"]+"/i.test(event), "Each history image should have useful alternative text");
-      check(plainText(event).includes("Image:"), "Each history image should name its creator");
-      check(credits.some(({ href }) => href?.startsWith("https://commons.wikimedia.org/wiki/File:")), "Each history image should link to its Commons file record");
-      check(/(?:CC BY|CC0|Public domain|GFDL|Free Art License)/i.test(plainText(event)), "Each history image should display its reuse license");
-      check(credits.some(({ href }) => href?.startsWith("https://creativecommons.org/") || href?.startsWith("https://commons.wikimedia.org/wiki/File:")), "Each history image should link to its license or Commons reuse record");
+  // Training: the running photo with my week as a plan, today marked once, and nothing from Strava.
+  const training = markup.match(/data-board-pin="training"([\s\S]*?)data-board-pin=/i)?.[1] ?? "";
+  check(plainText(training).includes("Out on a run, central London."), "The training pin should show the running photo's caption");
+  check(tags(training, "img").some((tag) => attribute(tag, "alt") === "Elias mid-run on a rainy street in central London"), "The running photo should describe itself");
+  check(/My training week, the plan\. Today, [A-Z][a-z]+day: /.test(plainText(training)), "The training plan should read once to screen readers, today first");
+  equal((training.match(/data-today="true"/g) ?? []).length, 1, "The training plan should mark exactly one day as today");
+  check(!/Strava|Typical week|My weekly training plan/.test(text), "Nothing on the homepage should come from Strava or the retired typical week");
+  // The Weekly Curiosity: three oddities as a clipping, sourced to readable pages.
+  // From the clipping's pin up to the next pin on the Board.
+  const clipping = markup.match(/data-board-pin="clipping"([\s\S]*?)data-board-pin=/i)?.[1] ?? "";
+  check(plainText(clipping).includes("The Weekly Curiosity"), "The clipping should carry its masthead");
+  const stories = [...clipping.matchAll(/<article\b[^>]*>([\s\S]*?)<\/article>/gi)].map(([, story]) => story);
+  equal(stories.length, 3, "The clipping should hold three oddities");
+  const storyYears = stories.map((story) => Number(plainText(story).match(/(\d{1,4})\s+Read (?:on Wikipedia|more)/)?.[1] ?? 0));
+  check(storyYears.every((year) => year > 0), "Each oddity should show its year");
+  check(new Set(storyYears.map((year) => Math.floor((year - 1) / 100))).size >= 3, "The oddities should span at least three centuries");
+  check(storyYears.some((year) => year < 1900), "The oddities should include one before 1900");
+  for (const story of stories) {
+    check(hrefs(story).some(({ href }) => href?.startsWith("https://")), "Each oddity should link directly to its source");
+    check(/Read (?:on Wikipedia|more)/.test(plainText(story)), "Each oddity's source link should have a clear label");
+    if (/<img\b/i.test(story)) {
+      const credits = hrefs(story);
+      check(/<img\b[^>]*alt="[^"]+"/i.test(story), "Each oddity's picture should have useful alternative text");
+      check(plainText(story).includes("Image:"), "Each oddity's picture should name its creator");
+      check(credits.some(({ href }) => href?.startsWith("https://commons.wikimedia.org/wiki/File:")), "Each oddity's picture should link to its Commons file record");
+      check(/(?:CC BY|CC0|Public domain|GFDL|Free Art License)/i.test(plainText(story)), "Each oddity's picture should display its reuse licence");
     }
   }
-  check(/Updated \d{1,2} [A-Z][a-z]{2,4}|Wikimedia · cached/i.test(text), "Signal cards should expose a useful update date or cache label");
+  const daySource = hrefs(clipping).find(({ href }) => /^https:\/\/en\.wikipedia\.org\/wiki\/([A-Z][a-z]+_\d{1,2}|Portal:History)$/.test(href ?? ""));
+  check(daySource, "The clipping's source should be the readable Wikipedia page for the day");
+  check(!/api\/rest_v1/.test(clipping), "The clipping should never link to the feed's raw JSON");
   check(["GitHub", "Goodreads", "Letterboxd", "Sleeper", "Wikimedia"].some((source) => text.includes(source)), "Signal cards should expose visible source wording");
   check(!/(ghp_|github_pat_|sk-[A-Za-z0-9]|STRAVA_CLIENT_SECRET)/i.test(text), "Rendered output must not contain credential-like values");
 
-  const descriptions = [...markup.matchAll(/<span class="lab-description">([\s\S]*?)<\/span>/gi)]
-    .map(([, description]) => plainText(description));
-  check(descriptions.length >= 3 && descriptions.every((description) => description.length >= 60), "Long experiment descriptions should remain present in the rendered output");
-  check(text.includes("first public version of Professor Past"), "Professor Past should be identified as its first public version");
 
-  const fantasyCard = [...markup.matchAll(/<article\b[^>]*>([\s\S]*?)<\/article>/gi)]
-    .map(([, card]) => card)
-    .find((card) => plainText(card).includes("Fantasy football")
-      && [...card.matchAll(/<[a-z][^>]*>/gi)].some(([tag]) => attribute(tag, "role") === "group"
-        && /fantasy football matchup$/i.test(attribute(tag, "aria-label")?.trim() ?? ""))) ?? "";
-  const fantasyStatus = fantasyCard.match(/<span\b(?=[^>]*\bdata-state="([^"]+)")[^>]*>([^<]*)<\/span>/i);
-  check(fantasyStatus, "Fantasy football card should expose a signal state");
-  const fantasyText = plainText(fantasyCard);
-  check(fantasyText.includes("Weekly matchup"), "Fantasy football card should label the matchup");
-  check(fantasyText.includes("My team") && fantasyText.includes("Opponent"), "Fantasy matchup should identify whose scores are shown");
-  check(!fantasyText.includes("NFL · week 1"), "Fantasy matchup should not show a hard-coded week");
-  if (fantasyStatus?.[1] === "pending") {
-    check(plainText(fantasyCard).includes("No matchup just yet"), "Pending fantasy state should show that no matchup is ready yet");
-    check(plainText(fantasyCard).includes("Sleeper"), "Pending fantasy state should identify the intended data source");
-    check(!hrefs(fantasyCard).some(({ href }) => href?.includes("sleeper.com")), "Pending fantasy state should not expose a Sleeper source link");
+  // The fantasy ticket is up only in season; when it is, it names my team and no one else.
+  const fantasyAt = markup.indexOf('data-board-pin="fantasy"');
+  if (fantasyAt >= 0) {
+    const nextPin = markup.indexOf("data-board-pin=", fantasyAt + 1);
+    const fantasyText = plainText(markup.slice(fantasyAt, nextPin > 0 ? nextPin : undefined));
+    check(/NFL fantasy · Week\s\d+/.test(fantasyText), "The fantasy ticket should show the NFL week");
+    check(fantasyText.includes("a rival who shall remain nameless"), "The fantasy ticket should keep the opponent anonymous");
+    check(!/\b0\.00 – 0\.00\b/.test(fantasyText), "The fantasy ticket should never show a 0.00 – 0.00 new week");
   }
-  if (fantasyStatus?.[1] === "live") {
-    check(hrefs(fantasyCard).some(({ href }) => href?.includes("sleeper.com")), "Live fantasy state should retain its Sleeper source link");
-    check(/Week \d+/.test(fantasyText), "Live fantasy matchup should show the current source week");
-  }
+  check(!hrefs(markup).some(({ href }) => href?.includes("sleeper.com")), "Nothing should link to the Sleeper league, which names the league and its teams");
 
   const sourceHosts = ["github.com", "goodreads.com", "letterboxd.com", "wikipedia.org"];
   for (const host of sourceHosts) {
@@ -389,41 +344,61 @@ async function verifyRoutes(baseUrl, pages) {
     pages.set(route, page);
     equal(page.response.status, 200, `${route} should render successfully`);
     verifyPageShell(page.markup, route);
+    if (route === "/") await verifyHomeSocialMetadata(baseUrl, page.document);
     if (route.startsWith("/work")) await verifyWorkSocialMetadata(baseUrl, page.document, route);
   }
 
-  const conceptIndex = await fetchPage(baseUrl, "/concepts");
-  pages.set("/concepts", conceptIndex);
-  equal(conceptIndex.response.status, 200, "Concept direction index should render successfully");
-  equal(tags(conceptIndex.markup, "h1").length, 1, "Concept direction index should have one h1");
-  const conceptLinks = hrefs(conceptIndex.markup)
-    .map(({ href }) => href)
-    .filter((href) => href?.startsWith("/concepts/"))
-    .sort();
-  equal(
-    conceptLinks.join("|"),
-    "/concepts/cabinet-of-curiosities|/concepts/living-editorial|/concepts/signals-and-systems",
-    "Concept index should link to each design direction",
-  );
-
-  const conceptPrototype = await fetchPage(baseUrl, "/concepts/cabinet-of-curiosities");
-  pages.set("/concepts/cabinet-of-curiosities", conceptPrototype);
-  equal(conceptPrototype.response.status, 200, "Selected concept direction should render successfully");
-  const toolbar = conceptPrototype.markup.match(/<aside\b[^>]*aria-label="Concept controls"[^>]*>[\s\S]*?<\/aside>/i)?.[0] ?? "";
-  check(Boolean(toolbar), "Selected concept direction should expose its controls");
-  const backLink = hrefs(toolbar).find(({ tag }) => attribute(tag, "class") === "toolbar-back");
-  const backLinkText = toolbar.match(/<a\b[^>]*class="toolbar-back"[^>]*>([\s\S]*?)<\/a>/i)?.[1] ?? "";
-  equal(plainText(backLinkText), "All directions", "Concept toolbar back-link label");
-  equal(backLink?.href, "/concepts", "Concept toolbar should return to the direction index");
-  const selectedDirection = tags(toolbar, "a")
-    .find((tag) => attribute(tag, "aria-current") === "page");
-  equal(attribute(selectedDirection ?? "", "href"), "/concepts/cabinet-of-curiosities", "Concept toolbar selected direction");
+  const retiredConcepts = await fetch(new URL("/concepts", baseUrl), { redirect: "manual" });
+  equal(retiredConcepts.status, 404, "The retired /concepts design study should no longer exist");
+  const fixtures = await fetch(new URL("/fixtures/pins", baseUrl), { redirect: "manual" });
+  equal(fixtures.status, 404, "Test fixtures should not exist in production");
+  await verifyNotFound(baseUrl);
 
   for (const [route, location] of compatibilityRedirects) {
     const response = await fetch(new URL(route, baseUrl), { redirect: "manual" });
     equal(response.status, 308, `${route} should permanently redirect`);
     equal(response.headers.get("location"), location, `${route} compatibility target`);
   }
+}
+
+async function verifyHomeSocialMetadata(baseUrl, document) {
+  const title = "Elias Bennett, software engineer in London";
+  const description = "I’m Elias, a software engineer in London. I build everyday software, and make complicated things feel simple. Here’s my work, a few things I’m into, and how I got here.";
+  equal(document.match(/<title>([^<]*)<\/title>/i)?.[1], title, "Homepage title");
+  equal(metaContent(document, "description", "name"), description, "Homepage description");
+  equal(metaContent(document, "og:title"), title, "Homepage Open Graph title");
+  equal(metaContent(document, "og:site_name"), "Elias Bennett", "Open Graph site name");
+  equal(metaContent(document, "og:image:alt"), "A card pinned to a wall reading “I build everyday software, and make complicated things feel simple.”", "Homepage social image alternative text");
+  equal(metaContent(document, "twitter:title", "name"), title, "Homepage Twitter title");
+
+  const ogImage = metaContent(document, "og:image");
+  check(ogImage?.includes("/opengraph-image"), "Homepage Open Graph image should be the pinned headline card");
+  if (ogImage) {
+    const image = await fetch(new URL(new URL(ogImage).pathname + new URL(ogImage).search, baseUrl));
+    equal(image.status, 200, "The social image should return 200");
+    equal(image.headers.get("content-type"), "image/png", "The social image content type");
+  }
+  check(metaContent(document, "twitter:image", "name")?.includes("/opengraph-image"), "Homepage Twitter image should be the pinned headline card");
+
+  const icon = tags(document, "link").find((tag) => attribute(tag, "rel") === "icon");
+  check(attribute(icon ?? "", "href")?.startsWith("/icon.svg"), "The favicon should be the pushpin SVG");
+  const iconSvg = await fetchAsset(baseUrl, "/icon.svg");
+  check(iconSvg.includes("prefers-color-scheme: dark"), "The favicon should carry a dark-tab variant");
+}
+
+async function verifyNotFound(baseUrl) {
+  const { response, document, markup } = await fetchPage(baseUrl, "/nothing-pinned-here");
+  equal(response.status, 404, "An unknown route should return 404");
+  verifyPageShell(markup, "/404");
+  equal(document.match(/<title>([^<]*)<\/title>/i)?.[1], "Nothing pinned here · Elias Bennett", "404 title");
+  const robots = tags(document, "meta").filter((tag) => attribute(tag, "name") === "robots").map((tag) => attribute(tag, "content") ?? "");
+  check(robots.length > 0 && robots.every((content) => /noindex/.test(content)), `Every robots tag on the 404 should say noindex (received ${JSON.stringify(robots)})`);
+  equal(metaContent(document, "og:title"), "Nothing pinned here · Elias Bennett", "The 404 should share under its own title, not the home page's");
+  equal(metaContent(document, "og:url"), null, "The 404 should not claim the home page's URL when shared");
+  const heading = markup.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? "";
+  equal(plainText(heading), "Something was pinned here.", "404 heading");
+  check(plainText(markup).includes("It’s been taken down, or it was never up. The rest of the board is still here."), "404 line");
+  check(hrefs(markup).some(({ tag, href }) => href === "/" && plainText(markup.slice(markup.indexOf(tag))).startsWith("Back to the board")), "The 404 should link back to the board");
 }
 
 async function verifyWorkSocialMetadata(baseUrl, document, route) {

@@ -1,28 +1,31 @@
 import assert from "node:assert/strict";
-import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+import { readFileSync } from "node:fs";
 import {
   GITHUB_ACTIVITY_DAYS,
+  bookFromGoodreads,
   datesForWindow,
-  groupTrainingActivities,
+  filmFromLetterboxd,
   mapContributionDays,
-  mapPublicActivity,
-  startOfUtcWeek,
+  latestRepository,
+  londonWeekday,
 } from "../src/integrations/signal-mappers.ts";
 import { integrationConfig } from "../src/content/integration-config.ts";
+import { asOfDate, pinStatus, staleAfterDays } from "../src/integrations/pin-rules.ts";
+import { fantasyRecord, fantasySpoken, fantasyVerdict, filmLine, isoWeek, stars, trainingSpoken, groupedNumber, makingNote, MAKING_CURRENT_DAYS } from "../src/content/board.ts";
+import { fantasyMoment, fantasyTicket } from "../src/integrations/fantasy.ts";
+import { ARROW_GAP, stringStretches } from "../src/components/board/journey-geometry.ts";
+import { readSleeperSnapshot } from "../src/integrations/sleeper-snapshot.ts";
 import { getHistorySignal, historyWeekStart, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "../src/integrations/history.ts";
-import { fantasySourceUnavailable, fantasyWeekUnavailable, signalFallbacks } from "../src/content/signal-fallbacks.ts";
-import { FantasyMatchup } from "../src/components/site/fantasy-matchup.ts";
-import { SignalPresentation } from "../src/components/site/signal-presentation.ts";
 import {
+  busiestStretch,
+  contributionLevel,
+  contributionTag,
   createContributionCalendar,
   formatContributionDate,
   moveContributionCalendarIndex,
 } from "../src/components/site/contribution-calendar-model.ts";
 
 const now = new Date("2026-09-16T12:00:00.000Z");
-const signalStates = new Set(["live", "curated", "pending", "unavailable"]);
-const sleeperHref = `https://sleeper.com/leagues/${integrationConfig.sleeper.leagueId}`;
 const historyNow = new Date("2026-09-24T12:00:00.000Z");
 const historyPage = (title, imageName, width = 330, height = 220) => ({
   titles: { canonical: title },
@@ -97,6 +100,31 @@ assert.equal(selectedHistory.some(({ year, text }) => year === 2013 || /attack|k
 assert.equal(selectedHistory.some(({ year }) => year === 2024), false, "Recent entries should not crowd out older events");
 assert.equal(selectedHistory.some(({ text }) => /Green Day|studio album/i.test(text)), false, "Routine album-release anniversaries should lose out to more distinctive stories");
 assert.equal(selectHistoryEvents({ events: historyFixture.events.slice(1, 2) }, historyNow).length, 0, "A narrow feed should fall back rather than present three items from one century");
+// Curation: an oddity beats a news headline from the same century, and the
+// most surprising fact leads the clipping, with the others in date order.
+const oddities = selectHistoryEvents({
+  events: [
+    { year: 1849, text: "The president signs a treaty with a neighbouring government.", pages: [historyPage("Treaty", "Treaty.jpg")] },
+    { year: 1858, text: "A sheep becomes the first animal to cross the Channel by balloon.", pages: [historyPage("Balloon_sheep", "Balloon_sheep.jpg")] },
+    { year: 1937, text: "J.R.R. Tolkien’s The Hobbit is published for the first time.", pages: [historyPage("The_Hobbit", "The_Hobbit.jpg")] },
+    { year: 2003, text: "The Galileo spacecraft was deliberately sent into Jupiter’s atmosphere.", pages: [historyPage("Galileo_(spacecraft)", "Galileo.jpg")] },
+  ],
+}, historyNow);
+assert.deepEqual(oddities.map(({ year }) => year), [1858, 1937, 2003], "The sheep beats the treaty, and leads");
+assert.equal(selectHistoryEvents({
+  events: [
+    { year: 1810, text: "Parliament votes to declare independence and elect a president.", pages: [historyPage("Independence", "Independence.jpg")] },
+    { year: 1937, text: "J.R.R. Tolkien’s The Hobbit is published for the first time.", pages: [historyPage("The_Hobbit", "The_Hobbit.jpg")] },
+    { year: 2003, text: "The Galileo spacecraft was deliberately sent into Jupiter’s atmosphere.", pages: [historyPage("Galileo_(spacecraft)", "Galileo.jpg")] },
+  ],
+}, historyNow).length, 0, "A news headline doesn't make the cut, even to fill the clipping");
+
+// The dateline's volume and number are the ISO week-year and week.
+assert.deepEqual(isoWeek(new Date("2026-09-28T12:00:00Z")), { year: 2026, week: 40 });
+assert.deepEqual(isoWeek(new Date("2026-01-01T12:00:00Z")), { year: 2026, week: 1 });
+assert.deepEqual(isoWeek(new Date("2027-01-01T12:00:00Z")), { year: 2026, week: 53 });
+assert.deepEqual(isoWeek(new Date("2024-12-30T12:00:00Z")), { year: 2025, week: 1 });
+
 assert.deepEqual(HISTORY_FALLBACK_EVENTS.map(({ year }) => year), [1783, 1933, 2003]);
 assert.equal(new Set(HISTORY_FALLBACK_EVENTS.map(({ year }) => Math.floor((year - 1) / 100))).size, 3);
 assert.deepEqual(HISTORY_FALLBACK_EVENTS.map(({ sourceUrl }) => new URL(sourceUrl).hostname), ["airandspace.si.edu", "cmll.com", "www.jpl.nasa.gov"]);
@@ -151,7 +179,10 @@ try {
   assert.equal(historyRequestCacheDurations.every((seconds) => seconds === 604800), true);
   assert.ok(historyRequestAgents.every((agent) => agent === "EliasBHistory/1.0 (https://www.eliasb.dev/)"), "Feed and Commons requests must identify the site to Wikimedia");
   assert.deepEqual(commonsRequestTitles.sort(), ["Galileo_spacecraft.jpg", "Montgolfier_balloon.jpg", "Salvador_Lutteroth.jpg"]);
-  assert.match(liveHistory.sourceUrl, /\/feed\/onthisday\/all\/09\/21$/);
+  // The source is the readable page for the day, never the feed's raw JSON.
+  assert.equal(liveHistory.sourceUrl, "https://en.wikipedia.org/wiki/September_21");
+  assert.equal(liveHistory.weekOf, "2026-09-21");
+  assert.equal(liveHistory.events.every(({ image }) => image?.width === 640 && image?.height === 426), true);
   assert.deepEqual(liveHistory.events.map(({ year }) => year), [1783, 1933, 2003]);
   assert.equal(liveHistory.events.every(({ image }) => image?.creator === "Ada Example"), true);
   assert.equal(liveHistory.events.every(({ image }) => image?.licenseName === "CC BY-SA 4.0"), true);
@@ -190,6 +221,30 @@ try {
   assert.equal(textOnlyHistory.events.find(({ year }) => year === 2003).image, undefined, "A missing Commons file should leave its story text-only");
   assert.equal(textOnlyHistory.events.find(({ year }) => year === 1783).image, undefined, "Missing license metadata should leave its story text-only");
   assert.equal(textOnlyHistory.events.filter(({ image }) => image).length, 1);
+  assert.equal(textOnlyHistory.events[0].year, 1933, "The fact with a picture leads when the most surprising has none");
+  assert.deepEqual(textOnlyHistory.events.slice(1).map(({ year }) => year), [1783, 2003], "The rest follow in date order");
+
+  // A fact's picture comes from its own subject's page or not at all: never a
+  // flag, map or logo, and never a picture from a page further down the list.
+  const unrelatedPictures = structuredClone(historyFixture);
+  unrelatedPictures.events[0].pages = [{ titles: { canonical: "Montgolfier_brothers" } }, historyPage("France", "Flag_of_France.svg")];
+  unrelatedPictures.events[1].pages = [historyPage("Salvador_Lutteroth", "Locator_map_of_Mexico.png")];
+  const unrelatedRequests = [];
+  globalThis.fetch = async (input) => {
+    const url = new URL(String(input));
+    if (url.hostname === "commons.wikimedia.org") {
+      const title = url.searchParams.get("titles").replace(/^File:/, "");
+      unrelatedRequests.push(title);
+      return commonsImageResponse(title);
+    }
+    const feedName = url.pathname.split("/").at(-3);
+    return new Response(JSON.stringify({ [feedName]: unrelatedPictures[feedName] }), { status: 200 });
+  };
+  const unrelatedHistory = await getHistorySignal(historyNow);
+  assert.deepEqual(unrelatedRequests, ["Galileo_spacecraft.jpg"], "Only the subject's own picture is fetched");
+  assert.equal(unrelatedHistory.events.find(({ year }) => year === 1783).image, undefined, "A picture from another page leaves the fact text-only");
+  assert.equal(unrelatedHistory.events.find(({ year }) => year === 1783).sourceUrl, "https://en.wikipedia.org/wiki/Montgolfier_brothers");
+  assert.equal(unrelatedHistory.events.find(({ year }) => year === 1933).image, undefined, "A locator map leaves the fact text-only");
 
   globalThis.fetch = async (input) => {
     const url = new URL(String(input));
@@ -210,7 +265,7 @@ try {
   };
   const partialHistory = await getHistorySignal(historyNow);
   assert.equal(partialHistory.state, "curated", "Insufficient stories after a feed failure should not be labelled live");
-  assert.equal(partialHistory.dateLabel, "Saved examples");
+  assert.equal(partialHistory.weekOf, null, "Saved examples belong to no week");
 
   globalThis.fetch = async (input) => {
     const feedName = new URL(String(input)).pathname.split("/").at(-3);
@@ -239,130 +294,211 @@ try {
   };
   const insufficientHistory = await getHistorySignal(historyNow);
   assert.equal(insufficientHistory.state, "curated");
-  assert.equal(insufficientHistory.description, "");
 
   globalThis.fetch = async () => { throw new Error("simulated Wikimedia outage"); };
   const savedHistory = await getHistorySignal(historyNow);
   assert.equal(savedHistory.state, "curated");
-  assert.equal(savedHistory.headline, "A few curious turns");
-  assert.equal(savedHistory.dateLabel, "Saved examples");
+  assert.equal(savedHistory.weekOf, null);
+  assert.equal(savedHistory.sourceUrl, "https://en.wikipedia.org/wiki/Portal:History");
   assert.deepEqual(savedHistory.events.map(({ year }) => year), [1783, 1933, 2003]);
-  assert.equal(savedHistory.description, "");
 } finally {
   globalThis.fetch = originalFetch;
 }
 
-assert.equal(signalFallbacks.fantasy.href ?? null, null);
-assert.equal(signalFallbacks.reading.statusLabel, "Last on Goodreads");
-assert.equal(signalFallbacks.reading.bookDescription, "");
-assert.equal(signalFallbacks.culture.statusLabel, "Last logged");
-assert.equal(signalFallbacks.culture.description, "");
+// The book and film are live only: there are no saved copies to fall back on.
 
-/** @type {import("../src/integrations/types.ts").FantasySignal} */
-const fantasyLiveSignal = {
-  ...signalFallbacks.fantasy,
-  state: "live",
-  statusLabel: "Live",
-  headline: "1–0 this season",
-  description: "",
-  matchupLabel: "Week 1",
-  teamScore: 112.4,
-  opponentScore: 98.7,
-  updatedAt: "2026-09-22T12:00:00.000Z",
-  href: sleeperHref,
+// Goodreads: the series suffix comes off, and the shelf date is the start date.
+assert.deepEqual(
+  bookFromGoodreads({
+    title: "Dark Age (Red Rising Saga, #5)",
+    author: "Pierce Brown",
+    dateAdded: "Mon, 14 Sep 2026 03:52:45 -0700",
+    coverUrl: "https://i.gr-assets.com/cover.jpg",
+  }),
+  { title: "Dark Age", author: "Pierce Brown", startedAt: "2026-09-14T10:52:45.000Z", coverUrl: "https://i.gr-assets.com/cover.jpg" },
+);
+assert.equal(bookFromGoodreads({ title: "Dark Age", author: "Pierce Brown", dateAdded: "not a date" }).startedAt, null);
+assert.equal(bookFromGoodreads({ title: "Dark Age", author: "Pierce Brown" }).coverUrl, null);
+assert.equal(bookFromGoodreads({ title: "Dark Age" }), null);
+assert.equal(bookFromGoodreads({ author: "Pierce Brown" }), null);
+
+// Letterboxd: half-star ratings and the diary date, or nothing where they're missing or malformed.
+const letterboxdProfile = "https://letterboxd.com/3lxas/";
+assert.deepEqual(
+  filmFromLetterboxd(
+    { title: "The Invite", year: "2026", rating: "4.0", watchedDate: "2026-09-14", posterUrl: "https://a.ltrbxd.com/p.jpg", href: "https://letterboxd.com/3lxas/film/the-invite/" },
+    letterboxdProfile,
+  ),
+  { title: "The Invite", year: "2026", rating: 4, watchedOn: "2026-09-14", posterUrl: "https://a.ltrbxd.com/p.jpg", href: "https://letterboxd.com/3lxas/film/the-invite/" },
+);
+const sparseFilm = filmFromLetterboxd({ title: "Unrated", rating: "", watchedDate: "14 Sept" }, letterboxdProfile);
+assert.deepEqual(sparseFilm, { title: "Unrated", year: null, rating: null, watchedOn: null, posterUrl: null, href: letterboxdProfile });
+assert.equal(filmFromLetterboxd({ title: "Odd", rating: "7" }, letterboxdProfile).rating, null);
+assert.equal(filmFromLetterboxd({ title: "Half", rating: "0.5" }, letterboxdProfile).rating, 0.5);
+assert.equal(filmFromLetterboxd({ title: " " }, letterboxdProfile), null);
+
+// The ticket's line, shown and spoken.
+assert.equal(stars(4), "★★★★");
+assert.equal(stars(4.5), "★★★★½");
+assert.equal(stars(0.5), "½");
+const watched = { short: "14 Sept", long: "14 September" };
+assert.deepEqual(filmLine(watched, 4), { shown: "Watched 14 Sept · ★★★★", spoken: "Watched 14 September, rated 4 out of 5" });
+assert.deepEqual(filmLine(watched, 4.5), { shown: "Watched 14 Sept · ★★★★½", spoken: "Watched 14 September, rated 4.5 out of 5" });
+assert.deepEqual(filmLine(watched, null), { shown: "Watched 14 Sept", spoken: "Watched 14 September" });
+assert.deepEqual(filmLine(null, 3), { shown: "★★★", spoken: "Rated 3 out of 5" });
+assert.equal(filmLine(null, null), null);
+
+// Fantasy: the stub's state comes from the NFL calendar, in New York time.
+const eastern = (iso) => fantasyMoment(new Date(iso));
+const momentAt = (iso) => {
+  const moment = eastern(iso);
+  return moment && `${moment.season} W${moment.week} ${moment.phase} ${moment.gate}`;
 };
+// 2026: Labor Day is 7 September, so week 1 opens on Thursday 10 September.
+assert.equal(momentAt("2026-09-08T04:29:00Z"), null, "Before week 1 (00:29 Tuesday in New York) is the off-season");
+assert.equal(momentAt("2026-09-08T04:30:00Z"), "2026 W1 last-week thursday");
+assert.equal(momentAt("2026-09-29T16:00:00Z"), "2026 W4 last-week thursday", "Tuesday shows last week");
+assert.equal(momentAt("2026-10-01T23:59:00Z"), "2026 W4 last-week thursday", "Thursday 19:59 is still last week");
+assert.equal(momentAt("2026-10-02T00:00:00Z"), "2026 W4 live live", "Thursday 20:00 in New York is game time");
+assert.equal(momentAt("2026-10-02T04:30:00Z"), "2026 W4 between sunday", "After Thursday night, it's back on Sunday");
+assert.equal(momentAt("2026-10-04T13:00:00Z"), "2026 W4 live live", "Sunday 09:00, for London games");
+assert.equal(momentAt("2026-10-05T04:29:00Z"), "2026 W4 live live", "Sunday night runs past midnight");
+assert.equal(momentAt("2026-10-05T16:00:00Z"), "2026 W4 between monday");
+assert.equal(momentAt("2026-10-05T23:00:00Z"), "2026 W4 live live", "Monday night from 19:00");
+assert.equal(momentAt("2026-10-06T04:30:00Z"), "2026 W5 last-week thursday", "Tuesday 00:30 starts the next week");
+// The windows keep to New York's clocks through the change on 1 November 2026.
+assert.equal(momentAt("2026-11-03T05:30:00Z"), "2026 W9 last-week thursday", "Tuesday 00:30 EST, after the clocks change");
+assert.equal(momentAt("2026-11-03T05:29:00Z"), "2026 W8 live live");
+assert.equal(momentAt("2027-01-12T12:00:00Z")?.startsWith("2026 W19"), true, "January belongs to the season that started in September");
+assert.equal(momentAt("2027-02-16T12:00:00Z"), null, "After the playoffs is the off-season");
+assert.equal(momentAt("2027-07-01T12:00:00Z"), null);
 
-/** @type {import("../src/integrations/types.ts").FantasySignal} */
-const fantasyPendingSignal = signalFallbacks.fantasy;
-const fantasyWeekUnavailableSignal = fantasyWeekUnavailable(sleeperHref);
-const fantasySourceUnavailableSignal = fantasySourceUnavailable(sleeperHref, 3);
+const fantasySnapshot = (fetchedAt, overrides = {}) => ({
+  fetchedAt,
+  season: 2026,
+  week: 4,
+  teamName: "K9 Unit",
+  record: { wins: 1, losses: 2, ties: 0 },
+  regularSeasonWeeks: 14,
+  thisWeek: { team: 0, opponent: 0 },
+  lastWeek: { team: 151.24, opponent: 90.52 },
+  ...overrides,
+});
+const ticketAt = (iso, overrides) => fantasyTicket(fantasySnapshot(iso, overrides), new Date(iso));
+const tuesday = "2026-09-29T16:00:00Z";
+const saturday = "2026-10-03T16:00:00Z";
+const sunday = "2026-10-04T18:00:00Z";
 
-const signalPresentationFixtures = [
-  {
-    name: "fantasy-live",
-    signal: fantasyLiveSignal,
-    source: { label: "Sleeper", href: sleeperHref },
-    expected: { status: "Live", freshness: "Updated 22 Sep", source: "Sleeper" },
-  },
-  {
-    name: "cached",
-    signal: { state: "live", statusLabel: "Wikimedia · cached", updatedAt: null },
-    source: { label: "Wikimedia", href: "https://en.wikipedia.org/wiki/Portal:History" },
-    expected: { status: "Wikimedia · cached", source: "Wikimedia" },
-  },
-  {
-    name: "authored",
-    signal: { state: "curated", statusLabel: "Typical week", updatedAt: null },
-    source: { label: "My weekly plan", href: null },
-    expected: { status: "Typical week", source: "My weekly plan" },
-  },
-  {
-    name: "fantasy-pending",
-    signal: fantasyPendingSignal,
-    source: { label: "Sleeper", href: null },
-    expected: { status: "No matchup just yet", source: "Sleeper" },
-  },
-  {
-    name: "fantasy-source-unavailable",
-    signal: fantasySourceUnavailableSignal,
-    source: { label: "Sleeper", href: sleeperHref },
-    expected: { status: "No live update from Sleeper", source: "Sleeper" },
-  },
-  {
-    name: "unavailable",
-    signal: { state: "unavailable", statusLabel: "Public only", updatedAt: null },
-    source: { label: "GitHub activity", href: signalFallbacks.github.href },
-    expected: { status: "Public only", source: "GitHub activity" },
-  },
-];
-
-assert.deepEqual(signalPresentationFixtures.map(({ name }) => name), ["fantasy-live", "cached", "authored", "fantasy-pending", "fantasy-source-unavailable", "unavailable"]);
-for (const fixture of signalPresentationFixtures) {
-  assert.ok(signalStates.has(fixture.signal.state), `${fixture.name} fixture should use a shared signal state`);
-  const markup = renderToStaticMarkup(createElement(SignalPresentation, {
-    signal: fixture.signal,
-    source: fixture.source,
-  }));
-  const visibleText = markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-  assert.match(markup, new RegExp(`data-state="${fixture.signal.state}"`), `${fixture.name} fixture should expose its state`);
-  assert.ok(visibleText.includes(fixture.expected.status), `${fixture.name} fixture should expose its visible status`);
-  if (fixture.expected.freshness) {
-    assert.ok(visibleText.includes(fixture.expected.freshness), `${fixture.name} fixture should expose a useful update date`);
-  } else {
-    assert.equal(markup.includes("signal-freshness"), false, `${fixture.name} fixture should not add generic freshness copy`);
-  }
-  assert.ok(visibleText.includes(fixture.expected.source), `${fixture.name} fixture should expose truthful source wording`);
-  if (fixture.source.href) {
-    assert.ok(markup.includes(`href="${fixture.source.href}"`), `${fixture.name} fixture should expose its source link`);
-  } else {
-    assert.equal(markup.includes("href="), false, `${fixture.name} fixture should not invent a source link`);
-  }
+// Tuesday to Thursday kickoff: last week's final and the season record.
+assert.deepEqual(ticketAt(tuesday), {
+  week: 3, outcome: "won", scores: { team: 151.24, opponent: 90.52 }, margin: 60.72, teamName: "K9 Unit", record: { wins: 1, losses: 2, ties: 0 }, gate: "thursday",
+});
+// During and between game windows: this week's score so far.
+assert.deepEqual(ticketAt(saturday, { thisWeek: { team: 24.6, opponent: 0 } }), {
+  week: 4, outcome: "ahead", scores: { team: 24.6, opponent: 0 }, margin: 24.6, teamName: "K9 Unit", record: { wins: 1, losses: 2, ties: 0 }, gate: "sunday",
+});
+assert.equal(ticketAt(sunday, { thisWeek: { team: 61.1, opponent: 88.42 } }).outcome, "behind");
+assert.equal(ticketAt(sunday, { thisWeek: { team: 61.1, opponent: 88.42 } }).gate, "live");
+assert.equal(ticketAt("2026-10-05T16:00:00Z", { thisWeek: { team: 101.3, opponent: 101.3 } }).outcome, "level");
+// A new week can't show 0.00 – 0.00: last week's final stays until either side scores.
+const heldOver = ticketAt("2026-10-02T16:00:00Z");
+assert.equal(heldOver.week, 3);
+assert.equal(heldOver.outcome, "won");
+assert.equal(heldOver.gate, null, "A held-over result doesn't claim the gates are open or the game is live");
+for (const iso of [tuesday, "2026-10-02T01:00:00Z", saturday, sunday, "2026-10-05T23:00:00Z"]) {
+  const ticket = ticketAt(iso);
+  assert.ok(ticket && (ticket.scores.team > 0 || ticket.scores.opponent > 0), `No 0.00 – 0.00 stub at ${iso}`);
 }
+assert.equal(ticketAt("2026-09-15T16:00:00Z", { week: 2, lastWeek: null }), null, "Without last week's result, an unscored week has no pin");
+assert.equal(ticketAt("2026-09-10T16:00:00Z", { week: 1, lastWeek: null }), null, "Week 1 before kickoff has no pin");
+// Off-season, and a season that's over, have no pin.
+assert.equal(fantasyTicket(fantasySnapshot("2027-07-01T12:00:00Z"), new Date("2027-07-01T12:00:00Z")), null);
+assert.equal(ticketAt(tuesday, { thisWeek: null }), null, "No matchup this week means my season is over");
+assert.equal(fantasyTicket(null, new Date(tuesday)), null);
+// A snapshot from another week is never shown as this week's.
+assert.equal(fantasyTicket(fantasySnapshot(tuesday, { week: 3 }), new Date(tuesday)), null);
+// Last good fetch: a final score holds all week; a live score only for its window or an hour.
+assert.equal(fantasyTicket(fantasySnapshot("2026-09-29T05:00:00Z"), new Date("2026-10-01T20:00:00Z"))?.week, 3, "Last week's final stays up through an outage");
+const fridayFetch = fantasySnapshot("2026-10-02T05:00:00Z", { thisWeek: { team: 24.6, opponent: 0 } });
+assert.equal(fantasyTicket(fridayFetch, new Date(saturday))?.outcome, "ahead", "Between games the score can't have moved");
+assert.equal(fantasyTicket(fridayFetch, new Date(sunday)), null, "An old score is never shown as live");
+assert.equal(fantasyTicket(fantasySnapshot("2026-10-04T17:15:00Z", { thisWeek: { team: 40, opponent: 30 } }), new Date(sunday))?.outcome, "ahead", "A fetch under an hour old stands in");
+// The record counts finished weeks only, and adds last week's until Sleeper settles it.
+assert.deepEqual(ticketAt(tuesday, { record: { wins: 0, losses: 2, ties: 0 } }).record, { wins: 1, losses: 2, ties: 0 });
+assert.deepEqual(ticketAt(tuesday, { record: { wins: 0, losses: 2, ties: 0 }, lastWeek: { team: 99, opponent: 99 } }).record, { wins: 0, losses: 2, ties: 1 });
+assert.deepEqual(ticketAt(tuesday, { week: 4, regularSeasonWeeks: 2, record: { wins: 1, losses: 1, ties: 0 } }).record, { wins: 1, losses: 1, ties: 0 }, "Playoff weeks don't count towards the record");
+assert.equal(fantasyRecord({ wins: 1, losses: 2, ties: 0 }), "1–2");
+assert.equal(fantasyRecord({ wins: 8, losses: 5, ties: 1 }), "8–5–1");
 
-const fantasyPendingMarkup = renderToStaticMarkup(createElement(SignalPresentation, {
-  signal: fantasyPendingSignal,
-  source: { label: "Sleeper", href: null },
-}));
-assert.equal(fantasyPendingMarkup.includes("href="), false, "Pending fantasy presenter should not expose a source href");
-assert.equal(fantasyPendingMarkup.includes("<a "), false, "Pending fantasy presenter should not expose a Sleeper link");
+// The pencilled verdict: a field goal is 3 points, a blowout 40 or more.
+assert.equal(fantasyVerdict("won", 60.72), "Not even close.");
+assert.equal(fantasyVerdict("won", 40), "Not even close.");
+assert.equal(fantasyVerdict("won", 39.99), "I’ll take it.");
+assert.equal(fantasyVerdict("won", 3), "I’ll take it.");
+assert.equal(fantasyVerdict("won", 2.99), "By less than a field goal.");
+assert.equal(fantasyVerdict("lost", 2.99), "By less than a field goal. Ouch.");
+assert.equal(fantasyVerdict("lost", 3), "There’s always next week.");
+assert.equal(fantasyVerdict("lost", 40), "Took me to the cleaners.");
+assert.equal(fantasyVerdict("tied", 0), "Nobody’s happy.");
+assert.equal(fantasyVerdict("ahead", 24.6), "Don’t jinx it.");
+assert.equal(fantasyVerdict("behind", 1), "Plenty of time.");
+assert.equal(fantasyVerdict("level", 0), "Anyone’s game.");
+assert.equal(ticketAt(tuesday, { lastWeek: { team: 100.1, opponent: 100.1 } }).outcome, "tied");
 
-const unavailableWeekMarkup = renderToStaticMarkup(createElement(SignalPresentation, {
-  signal: fantasyWeekUnavailableSignal,
-  source: { label: "Sleeper", href: fantasyWeekUnavailableSignal.href },
-}));
-assert.match(unavailableWeekMarkup, /No current week yet/);
-assert.match(unavailableWeekMarkup, new RegExp(`href="${sleeperHref}"`));
-assert.equal(unavailableWeekMarkup.includes("No matchup just yet"), false, "A missing week should not imply the league is disconnected");
+assert.equal(
+  fantasySpoken(ticketAt(tuesday)),
+  "NFL fantasy, week 3. K9 Unit won 151.24 to 90.52 against a rival who shall remain nameless. Not even close. Season record: 1 win, 2 losses. Gates open Thursday night.",
+);
+assert.equal(
+  fantasySpoken(ticketAt(saturday, { thisWeek: { team: 24.6, opponent: 0 } })),
+  "NFL fantasy, week 4. K9 Unit is ahead 24.60 to 0.00 against a rival who shall remain nameless. Don’t jinx it. Season record: 1 win, 2 losses. Back on Sunday.",
+);
 
-
-const liveMatchupMarkup = renderToStaticMarkup(createElement(FantasyMatchup, { signal: fantasyLiveSignal }));
-assert.match(liveMatchupMarkup, /Weekly matchup[\s\S]*Week 1/);
-assert.match(liveMatchupMarkup, /My team[\s\S]*112\.4[\s\S]*Opponent[\s\S]*98\.7/);
-assert.match(liveMatchupMarkup, /class="matchup-bars"/, "Known scores should have a visual score comparison");
-
-const pendingMatchupMarkup = renderToStaticMarkup(createElement(FantasyMatchup, { signal: fantasyPendingSignal }));
-assert.match(pendingMatchupMarkup, /My team[\s\S]*–[\s\S]*Opponent[\s\S]*–/);
-assert.equal(pendingMatchupMarkup.includes('class="matchup-bars"'), false, "Unknown scores should not imply an equal matchup");
+// Sleeper, read with fixture responses: my team is named; the opponent and the league never are.
+const leagueId = integrationConfig.sleeper.leagueId;
+const sleeperFixture = {
+  "/user/3ixas": { user_id: "me", display_name: "3ixas" },
+  "/state/nfl": { season: "2026", season_type: "regular", week: 4 },
+  [`/league/${leagueId}`]: { name: "The Example League", season: "2026", settings: { playoff_week_start: 15 } },
+  [`/league/${leagueId}/users`]: [
+    { user_id: "me", display_name: "3ixas", metadata: { team_name: "K9 Unit" } },
+    { user_id: "rival", display_name: "rivalmanager", metadata: { team_name: "The Rival Squad" } },
+  ],
+  [`/league/${leagueId}/rosters`]: [
+    { roster_id: 7, owner_id: "me", settings: { wins: 1, losses: 2, ties: 0 } },
+    { roster_id: 3, owner_id: "rival", settings: { wins: 3, losses: 0, ties: 0 } },
+  ],
+  [`/league/${leagueId}/matchups/4`]: [{ roster_id: 7, matchup_id: 1, points: 24.6 }, { roster_id: 3, matchup_id: 1, points: 0 }, { roster_id: 1, matchup_id: 2, points: 9 }],
+  [`/league/${leagueId}/matchups/3`]: [{ roster_id: 7, matchup_id: 4, points: 151.24 }, { roster_id: 5, matchup_id: 4, points: 90.52 }],
+};
+const sleeperRequests = [];
+globalThis.fetch = async (url) => {
+  const path = String(url).replace("https://api.sleeper.app/v1", "");
+  sleeperRequests.push(path);
+  return path in sleeperFixture ? Response.json(sleeperFixture[path]) : new Response("Not found", { status: 404 });
+};
+try {
+  const sleeperSnapshot = await readSleeperSnapshot(integrationConfig.sleeper, 2026, 4);
+  assert.equal(sleeperSnapshot.teamName, "K9 Unit");
+  assert.deepEqual(sleeperSnapshot.thisWeek, { team: 24.6, opponent: 0 });
+  assert.deepEqual(sleeperSnapshot.lastWeek, { team: 151.24, opponent: 90.52 });
+  assert.equal(sleeperSnapshot.regularSeasonWeeks, 14);
+  const shown = JSON.stringify({ sleeperSnapshot, spoken: fantasySpoken(fantasyTicket(sleeperSnapshot, new Date(saturday))) });
+  for (const secret of ["The Example League", "The Rival Squad", "rivalmanager", leagueId]) {
+    assert.equal(shown.includes(secret), false, `The fantasy stub must never carry "${secret}"`);
+  }
+  // Between seasons, or a league from last season, there's nothing to show.
+  sleeperFixture["/state/nfl"] = { season: "2026", season_type: "off" };
+  assert.equal((await readSleeperSnapshot(integrationConfig.sleeper, 2026, 4)).thisWeek, null);
+  sleeperFixture["/state/nfl"] = { season: "2026", season_type: "regular" };
+  sleeperFixture[`/league/${leagueId}`] = { season: "2025", settings: {} };
+  assert.equal((await readSleeperSnapshot(integrationConfig.sleeper, 2026, 4)).thisWeek, null);
+  // An unreadable Sleeper throws, so the cache keeps its last good snapshot.
+  delete sleeperFixture[`/league/${leagueId}/rosters`];
+  await assert.rejects(readSleeperSnapshot(integrationConfig.sleeper, 2026, 4));
+} finally {
+  globalThis.fetch = originalFetch;
+}
 
 // Simulate a browser with different locale data. Calendar HTML must not depend
 // on Intl at either render, otherwise React can replace the page during hydration.
@@ -378,7 +514,6 @@ try {
 }
 
 assert.equal(GITHUB_ACTIVITY_DAYS, 365);
-assert.equal(signalFallbacks.github.activity.length, GITHUB_ACTIVITY_DAYS);
 const contributionDays = datesForWindow(GITHUB_ACTIVITY_DAYS, now).map((day, index) => ({
   ...day,
   count: index === 100 ? 4 : day.count,
@@ -414,19 +549,13 @@ assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "Home"), 9
 assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "End"), 101);
 assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "Escape"), null);
 assert.equal(createContributionCalendar([]), null);
-assert.equal(signalFallbacks.github.totalContributions, undefined, "Unavailable GitHub data should not imply a live aggregate");
-assert.match(signalFallbacks.github.headline, /couldn’t load GitHub/i);
-assert.deepEqual(signalFallbacks.training.schedule?.map(({ day, activity }) => ({ day, activity })), [
-  { day: "Mon", activity: "Full body" },
-  { day: "Tue", activity: "Zone 2 run" },
-  { day: "Wed", activity: "Full body" },
-  { day: "Thu", activity: "Interval run" },
-  { day: "Fri", activity: "Full body" },
-  { day: "Sat", activity: "Zone 2 rowing machine" },
-  { day: "Sun", activity: "Interval assault bike" },
-]);
 
-assert.equal(startOfUtcWeek(now).toISOString(), "2026-09-14T00:00:00.000Z");
+// The plan's "today" is the day in London, Monday (0) to Sunday (6), through BST and GMT.
+assert.equal(londonWeekday(new Date("2026-10-04T22:59:00Z")), 6, "Sunday 23:59 BST");
+assert.equal(londonWeekday(new Date("2026-10-04T23:00:00Z")), 0, "Monday 00:00 BST, while it's still Sunday in UTC");
+assert.equal(londonWeekday(new Date("2026-10-03T12:00:00Z")), 5, "Saturday");
+assert.equal(londonWeekday(new Date("2026-11-01T23:30:00Z")), 6, "Sunday 23:30 GMT, after the clocks went back");
+assert.equal(londonWeekday(new Date("2026-11-02T00:00:00Z")), 0, "Monday 00:00 GMT");
 
 assert.deepEqual(
   mapContributionDays(
@@ -441,32 +570,98 @@ assert.deepEqual(
   ],
 );
 
-assert.deepEqual(
-  mapPublicActivity(
-    [
-      { type: "PushEvent", repo: { name: "3ixas/public" }, created_at: "2026-09-15T08:00:00Z" },
-      { type: "PushEvent", repo: { name: "3ixas/public" }, created_at: "2026-09-15T09:00:00Z" },
-    ],
-    3,
-    now,
-  )[1],
-  { date: "2026-09-15", count: 2 },
+// GitHub: the busiest four weeks, worked out from the data, with "early", "mid" or "late".
+const quietYear = datesForWindow(GITHUB_ACTIVITY_DAYS, new Date("2026-10-02T12:00:00Z")).map(({ date }) => ({ date, count: 0 }));
+assert.equal(busiestStretch(createContributionCalendar(quietYear)), null, "A year with nothing in it has no busiest stretch");
+const januaryYear = quietYear.map(({ date }) => ({ date, count: date >= "2026-01-04" && date <= "2026-01-31" ? 3 : date === "2026-06-10" ? 9 : 0 }));
+const januaryStretch = busiestStretch(createContributionCalendar(januaryYear));
+assert.equal(januaryStretch.total, 84, "Four full weeks of 3 a day beat one busy day");
+assert.equal(januaryStretch.when, "mid-January");
+assert.equal(januaryStretch.span, 4);
+const tiedYear = quietYear.map(({ date }) => ({ date, count: date === "2025-11-03" || date === "2026-08-03" ? 5 : 0 }));
+assert.equal(busiestStretch(createContributionCalendar(tiedYear)).when.endsWith("August"), true, "A tie goes to the most recent stretch");
+const earlyYear = quietYear.map(({ date }) => ({ date, count: date >= "2026-03-01" && date <= "2026-03-07" ? 4 : 0 }));
+assert.match(busiestStretch(createContributionCalendar(earlyYear)).when, /^(early|mid|late)-(February|March)$/);
+// Day tags and month labels are written by the site, the same in every locale.
+assert.equal(contributionTag({ date: "2026-01-15", count: 12 }), "12 contributions on Thu 15 Jan");
+assert.equal(contributionTag({ date: "2026-01-15", count: 1 }), "1 contribution on Thu 15 Jan");
+assert.equal(contributionTag({ date: "2026-01-15", count: 0 }), "Nothing on Thu 15 Jan");
+assert.deepEqual([0, 1, 2, 3, 4, 40].map(contributionLevel), [0, 1, 2, 3, 4, 4]);
+assert.deepEqual(createContributionCalendar(quietYear).monthLabels.map(({ label }) => label).filter((label) => /June|July/.test(label)), ["June", "July"]);
+assert.equal(groupedNumber(1089), "1,089");
+assert.equal(groupedNumber(175), "175");
+assert.equal(groupedNumber(1234567), "1,234,567");
+
+// Making: the authored entry for eight weeks, then my latest public repository, then nothing.
+const repositories = [
+  { name: "3ixas", html_url: "https://github.com/3ixas/3ixas", pushed_at: "2026-10-04T00:00:00Z" },
+  { name: "a-fork", html_url: "https://github.com/3ixas/a-fork", pushed_at: "2026-10-03T12:00:00Z", fork: true },
+  { name: "old-thing", html_url: "https://github.com/3ixas/old-thing", pushed_at: "2026-10-03T11:00:00Z", archived: true },
+  { name: "eliasb.dev", description: "  The site  ", html_url: "https://github.com/3ixas/eliasb.dev", pushed_at: "2026-10-03T05:36:51Z" },
+];
+assert.deepEqual(latestRepository(repositories, "3ixas"), {
+  name: "eliasb.dev", description: "The site", href: "https://github.com/3ixas/eliasb.dev", pushedAt: "2026-10-03T05:36:51Z",
+}, "The profile repository, forks and archives are skipped");
+assert.equal(latestRepository([{ name: "x", description: "", html_url: "https://github.com/3ixas/x", pushed_at: "2026-01-01T00:00:00Z" }], "3ixas").description, null);
+assert.equal(latestRepository([], "3ixas"), null);
+assert.equal(MAKING_CURRENT_DAYS, 56);
+const written = new Date("2026-10-03T00:00:00Z").getTime();
+const repo = latestRepository(repositories, "3ixas");
+assert.equal(makingNote(new Date(written + 55 * 86_400_000), repo).kind, "authored");
+assert.equal(makingNote(new Date(written + 56 * 86_400_000), repo).kind, "latest", "After eight weeks the entry is no longer now");
+assert.equal(makingNote(new Date(written + 56 * 86_400_000), null), null, "With no entry and no repository, there's no pin");
+
+// About's red string: one stretch per pair of pins, each stopping short of the next pin for its arrow.
+assert.deepEqual(stringStretches([]), []);
+assert.deepEqual(stringStretches([{ x: 10, y: 10 }]), []);
+const stretches = stringStretches([{ x: 10, y: 0 }, { x: 200, y: 100 }, { x: 10, y: 200 }]);
+assert.equal(stretches.length, 2);
+assert.match(stretches[0], /^M 10\.0 0\.0 Q 140\.0 50\.0 /, "The first stretch bows to the right");
+assert.match(stretches[1], /^M 200\.0 100\.0 Q 70\.0 150\.0 /, "The next bows to the other side");
+const [endX, endY] = stretches[0].split(" ").slice(-2).map(Number);
+assert.ok(Math.abs(Math.hypot(200 - endX, 100 - endY) - ARROW_GAP) < 0.2, "Each stretch stops short of its pin by the arrow's gap");
+
+// The running photo carries no embedded metadata: its WebP has image data only, no EXIF or XMP.
+const runningPhoto = readFileSync(new URL("../public/signals/running-central-london.webp", import.meta.url));
+const webpChunks = [];
+for (let offset = 12; offset + 8 <= runningPhoto.length; offset += 8 + runningPhoto.readUInt32LE(offset + 4) + (runningPhoto.readUInt32LE(offset + 4) % 2)) {
+  webpChunks.push(runningPhoto.toString("ascii", offset, offset + 4));
+}
+assert.equal(runningPhoto.toString("ascii", 8, 12), "WEBP");
+assert.deepEqual(webpChunks.filter((chunk) => ["EXIF", "XMP ", "ICCP"].includes(chunk)), [], "The running photo must not carry EXIF, XMP, or a colour profile");
+
+// The plan reads once to screen readers, today first; it claims nothing about sessions done.
+assert.equal(
+  trainingSpoken(5),
+  "My training week, the plan. Today, Saturday: zone 2, rower or bike. Monday: full-body gym. Tuesday: zone 2 run. Wednesday: full-body gym. Thursday: interval run. Friday: full-body gym. Sunday: assault bike intervals. Zone 2 means slow on purpose.",
 );
+assert.match(trainingSpoken(0), /^My training week, the plan\. Today, Monday: full-body gym\. Tuesday:/);
 
-const training = groupTrainingActivities([
-  { sport_type: "WeightTraining", name: "private gym" },
-  { sport_type: "Run", start_date: "private" },
-  { type: "MartialArts", map: { summary_polyline: "private" } },
-  { type: "Yoga" },
-]);
-
-assert.deepEqual(training.map(({ label, count }) => ({ label, count })), [
-  { label: "Lift", count: 1 },
-  { label: "Run", count: 1 },
-  { label: "Muay Thai", count: 1 },
-  { label: "Other", count: 1 },
-]);
-assert.equal(JSON.stringify(training).includes("private"), false);
-assert.deepEqual(groupTrainingActivities([]).map((category) => category.count), [0, 0, 0, 0]);
+// Pin rules: nothing current is removed; saved data past its pin's limit is stale.
+const pinNow = new Date("2026-10-02T12:00:00.000Z");
+const daysAgo = (days) => new Date(pinNow.getTime() - days * 86_400_000).toISOString();
+assert.deepEqual(pinStatus("reading", { state: "unavailable", updatedAt: null }, pinNow), { kind: "removed" });
+assert.deepEqual(pinStatus("london", { state: "unavailable", updatedAt: null }, pinNow), { kind: "removed" });
+assert.deepEqual(pinStatus("github", { state: "live", updatedAt: daysAgo(3) }, pinNow), { kind: "current" });
+assert.deepEqual(pinStatus("github", { state: "live", updatedAt: daysAgo(10) }, pinNow), {
+  kind: "stale",
+  asOf: { iso: daysAgo(10), short: "22 Sept", long: "22 September" },
+});
+assert.equal(pinStatus("github", { state: "live", updatedAt: daysAgo(4) }, pinNow).kind, "stale");
+assert.equal(pinStatus("github", { state: "live", updatedAt: daysAgo(2) }, pinNow).kind, "current");
+assert.equal(pinStatus("reading", { state: "live", updatedAt: daysAgo(61) }, pinNow).kind, "stale");
+assert.equal(pinStatus("film", { state: "live", updatedAt: daysAgo(59) }, pinNow).kind, "current");
+// Authored, curated, and never-stale pins stay current however old they are.
+for (const key of ["training", "playlist", "making", "london", "fantasy", "clipping"]) {
+  assert.equal(staleAfterDays[key], null);
+  assert.equal(pinStatus(key, { state: "live", updatedAt: daysAgo(400) }, pinNow).kind, "current");
+}
+assert.equal(pinStatus("github", { state: "curated", updatedAt: daysAgo(400) }, pinNow).kind, "current");
+assert.equal(pinStatus("github", { state: "live", updatedAt: null }, pinNow).kind, "current");
+assert.equal(pinStatus("github", { state: "live", updatedAt: "not a date" }, pinNow).kind, "current");
+// "As of" dates are London days, the same in every locale.
+assert.deepEqual(asOfDate(new Date("2026-03-01T00:30:00.000Z")), { iso: "2026-03-01T00:30:00.000Z", short: "1 Mar", long: "1 March" });
+assert.equal(asOfDate(new Date("2026-06-30T23:30:00.000Z")).short, "1 July");
+assert.equal(asOfDate(new Date("2026-09-12T09:00:00.000Z")).short, "12 Sept");
 
 console.log("Signal contract checks passed.");

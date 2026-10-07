@@ -1,21 +1,64 @@
-export const homepageHeadline = {
-  first: "I build software to make everyday things easier,",
-  second: "and more enjoyable.",
+import type { PinStock } from "@/components/board/pin";
+// Approved in docs/content/copy/01-board-foundation.md.
+export const hero = {
+  kicker: "Elias Bennett · Software engineer · London",
+  headline: {
+    lead: "I build everyday software, and make complicated things",
+    emphasis: "feel simple.",
+  },
+  supportingLine:
+    "I take ideas all the way through: deciding what’s worth making, designing it, building it across the stack, and improving it after it ships.",
+  portrait: {
+    alt: "Elias in a white tuxedo, smiling",
+    caption: "Elias · London",
+  },
+  links: {
+    work: "See my work",
+    workArrow: "↓",
+    email: "Email me",
+    emailArrow: "↗",
+    emailHref: "mailto:eliasthebennett@gmail.com",
+  },
 } as const;
 
+// Approved in docs/content/copy/02-work.md.
+export const work = {
+  kicker: "01 / Work",
+  heading: { lead: "Things I’ve been", emphasis: "building." },
+  openFolder: "Open the folder",
+  /** The screenshot link's accessible name. */
+  folderLabel: (name: string) => `Open the ${name} folder`,
+  live: "Live",
+  code: "Code",
+  builtWith: "Built with",
+  viewAll: "View all work",
+} as const;
+
+// Approved in docs/content/copy/13-404-social-metadata.md.
+export const siteName = "Elias Bennett";
+
+/** A route's title: "(page) · Elias Bennett". */
+export const pageTitle = (page: string) => `${page} · ${siteName}`;
+
+export const homeTitle = `${siteName}, software engineer in London`;
+
+const headline = `${hero.headline.lead} ${hero.headline.emphasis}`;
+
 export const siteDescription =
-  "I’m Elias, a software engineer in London. I take ideas through design, full-stack development, and iteration, aiming to make useful, enjoyable products.";
+  `I’m Elias, a software engineer in London. ${headline} Here’s my work, a few things I’m into, and how I got here.`;
+
+/** The image shown when a link to the site is shared: the headline on a pinned card. */
+export const socialImage = {
+  alt: `A card pinned to a wall reading “${headline}”`,
+  mark: { before: "E", slash: "/", after: "B" },
+} as const;
 
 export const profile = {
   name: "Elias Bennett",
   shortName: "Elias",
   role: "Software engineer",
   location: "London",
-  statement: `${homepageHeadline.first} ${homepageHeadline.second}`,
-  introduction:
-    "I like taking an idea all the way through: deciding what’s worth making, shaping the design, building across the stack, and continuing to improve it after it ships. I work with others along the way.",
-  about:
-    "I’m in London, where I work on high-performance pricing and risk systems. Outside work, I take my own product ideas from the first sketch through design and code, then keep improving them after they ship.",
+  statement: `${hero.headline.lead} ${hero.headline.emphasis}`,
   links: {
     email: "mailto:eliasthebennett@gmail.com",
     github: "https://github.com/3ixas",
@@ -38,7 +81,10 @@ export type HomepageProject = {
   imageAlt: string;
   codeUrl: string;
   liveUrl?: string;
-  qualities?: readonly string[];
+  /** Headline technologies on the Work note's label tape (approved in docs/content/copy/02-work.md). */
+  labelTape: readonly string[];
+  /** The colour of the project's sticky note. */
+  noteStock: Extract<PinStock, "ochre" | "blueprint" | "sage">;
   imageWidth: number;
   imageHeight: number;
 };
@@ -52,16 +98,13 @@ export const projects = [
     thesis: "A clearer view of what moving could cost.",
     description:
       "A rental calculator for London, Basel, and Zurich. It brings salary, moving costs, and local assumptions together so you can work out what a move might take.",
-    qualities: [
-      "Shareable URL state",
-      "Typed city configuration",
-      "Accessible visual reasoning",
-    ],
     image: "/projects/threshold.webp",
     imageAlt:
       "Threshold landing page showing rental affordability choices for London, Basel, and Zurich",
     liveUrl: "https://threshold-beta.vercel.app",
     codeUrl: "https://github.com/3ixas/threshold",
+    labelTape: ["React 19", "TypeScript", "MapLibre"],
+    noteStock: "ochre",
     imageWidth: 1804,
     imageHeight: 1376,
   },
@@ -75,6 +118,8 @@ export const projects = [
     image: "/work/argus/overview.webp",
     imageAlt: "Argus Risk interface showing event-driven risk positions",
     codeUrl: "https://github.com/3ixas/argus-risk",
+    labelTape: [".NET 8", "Kafka", "PostgreSQL", "SignalR"],
+    noteStock: "blueprint",
     imageWidth: 1280,
     imageHeight: 770,
   },
@@ -89,6 +134,8 @@ export const projects = [
     imageAlt: "Flowtime focus timer interface",
     liveUrl: "https://flowtime-focus-timer.vercel.app",
     codeUrl: "https://github.com/3ixas/flowtime-focus-timer",
+    labelTape: ["Next.js", "TypeScript", "Service Worker"],
+    noteStock: "sage",
     imageWidth: 1280,
     imageHeight: 640,
   },
@@ -102,39 +149,3 @@ export const featuredProjects = featuredProjectSlugs.map((slug): HomepageProject
   if (!project) throw new Error(`Featured project is missing from the project catalogue: ${slug}`);
   return project;
 });
-
-export const labNotes = [
-  {
-    index: "01",
-    title: "Ask Professor Past",
-    kind: "History experiment",
-    description:
-      "A small experiment in asking questions about history through an eccentric fictional professor.",
-    href: "/lab#lab-01",
-    treatment: "professor",
-    image: "/lab/professor-past.webp",
-    imageAlt: "Warm illustrated portrait of the eccentric Professor Past",
-  },
-  {
-    index: "02",
-    title: "Fantasy models",
-    kind: "Football · Data",
-    description:
-      "Matchup views, rankings, and draft tools for a redraft league. I’m still working out where predictions fit.",
-    href: "/lab#lab-02",
-    treatment: "fantasy",
-    image: "/signals/football-stadium.jpg",
-    imageAlt: "Aerial view of a football stadium and marked field",
-  },
-  {
-    index: "03",
-    title: "Interface studies",
-    kind: "Work in progress",
-    description:
-      "Small tests of controls and motion, with notes on what feels useful and what doesn’t.",
-    href: "/lab#lab-03",
-    treatment: "interface",
-    image: "/lab/flowtime-interface.jpg",
-    imageAlt: "Flowtime focus timer interface showing an idle session",
-  },
-] as const;

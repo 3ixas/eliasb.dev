@@ -1,52 +1,30 @@
 import type { Metadata } from "next";
-import { WorkArchiveCard } from "@/components/site/featured-work";
-import { PageHeader } from "@/components/site/page-header";
-import { caseStudies } from "@/content/case-studies";
+import { WorkDrawer } from "@/components/board/work-drawer";
+import { caseFiles, drawer } from "@/content/case-files";
+import { pageTitle, siteName } from "@/content/site";
+
+const image = caseFiles.threshold.screenshot;
 
 export const metadata: Metadata = {
   title: "Work",
-  description: "A closer look at the projects I’ve built and how I approached them.",
+  description: drawer.description,
   alternates: { canonical: "/work" },
   openGraph: {
     type: "website",
-    siteName: "Elias B.",
+    siteName,
     url: "/work",
-    title: "Work · Elias B.",
-    description: "A closer look at the projects I’ve built and how I approached them.",
-    images: [{
-      url: "/work/threshold/landing.webp",
-      width: 2294,
-      height: 1750,
-      alt: "Threshold landing page introducing the real cost of moving out",
-    }],
+    title: pageTitle("Work"),
+    description: drawer.description,
+    images: [{ url: image.src, width: image.width, height: image.height, alt: image.alt }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Work · Elias B.",
-    description: "A closer look at the projects I’ve built and how I approached them.",
-    images: [{
-      url: "/work/threshold/landing.webp",
-      alt: "Threshold landing page introducing the real cost of moving out",
-    }],
+    title: pageTitle("Work"),
+    description: drawer.description,
+    images: [{ url: image.src, alt: image.alt }],
   },
 };
 
 export default function WorkPage() {
-  const studies = Object.values(caseStudies);
-
-  return (
-    <div className="work-index-page">
-      <PageHeader />
-      <main id="main-content" tabIndex={-1}>
-        <header className="work-index-hero">
-          <p>{studies.length} case studies</p>
-          <h1>What I built, and how I approached it.</h1>
-          <span>What I was trying to solve, how I went about it, and what I learned along the way.</span>
-        </header>
-        <ol className="work-index-list">
-          {studies.map((study) => <WorkArchiveCard key={study.slug} study={study} />)}
-        </ol>
-      </main>
-    </div>
-  );
+  return <WorkDrawer />;
 }
