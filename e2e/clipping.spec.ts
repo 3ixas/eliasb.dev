@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { contrastOnPaper } from "./support/contrast";
+import { scrollSettled } from "./support/scroll";
 
 const week = (page: Page) => page.locator("[data-fixture='week']");
 const toggleIn = (clipping: Locator) => clipping.getByRole("button", { name: /more oddities this week|Fold them away/ });
@@ -13,6 +14,25 @@ const extraBoxes = (clipping: Locator) =>
       return { x: Math.round(box.x), y: Math.round(box.y + window.scrollY), width: Math.round(box.width), height: Math.round(box.height) };
     }),
   );
+
+/**
+ * Waits until the fan-out has finished: every oddity in place and opaque, and
+ * their space sprung open to "auto". Motion advances a spring by at most 40 ms
+ * a frame, so its length is counted in frames (about 60 at 60 fps, never fewer
+ * than 25), and a slow, software-rendered frame stretches it in real time.
+ */
+const fannedOut = (clipping: Locator) =>
+  expect
+    .poll(
+      () =>
+        clipping.locator("[data-clipping-extra]").first().evaluate((first) => {
+          const space = first.closest("[id]") as HTMLElement;
+          const extras = [...space.querySelectorAll<HTMLElement>("[data-clipping-extra]")];
+          return space.style.height === "auto" && extras.every((extra) => getComputedStyle(extra).transform === "none" && getComputedStyle(extra).opacity === "1");
+        }),
+      { message: "the oddities finish fanning out", timeout: 20_000 },
+    )
+    .toBe(true);
 
 test.describe("The Weekly Curiosity on the Board", () => {
   test("is a clipping with its masthead, and its source is the readable page for the day", async ({ page }) => {
@@ -92,27 +112,26 @@ test.describe("Weekly Curiosity states", () => {
     const clipping = week(page);
     const main = clipping.locator("[data-pin='clipping']").first();
     await toggleIn(clipping).click();
-    await expect.poll(async () => (await extraBoxes(clipping)).every(({ height }) => height > 0)).toBe(true);
-    // Settled: the space has grown to fit them, so the next pin moves down rather than being covered.
-    await expect.poll(async () => {
-      const boxes = await extraBoxes(clipping);
-      const mainBox = await main.evaluate((element) => element.getBoundingClientRect().bottom + window.scrollY);
-      const saved = await page.locator("[data-fixture='saved']").evaluate((element) => element.getBoundingClientRect().top + window.scrollY);
-      const last = boxes.at(-1)!;
-      return boxes[0].y >= mainBox && boxes[1].y >= boxes[0].y + boxes[0].height && saved >= last.y + last.height;
-    }).toBe(true);
+    await fannedOut(clipping);
+    // The space has grown to fit them, so the next pin moves down rather than being covered.
+    const boxes = await extraBoxes(clipping);
+    const mainBottom = await main.evaluate((element) => element.getBoundingClientRect().bottom + window.scrollY);
+    const saved = await page.locator("[data-fixture='saved']").evaluate((element) => element.getBoundingClientRect().top + window.scrollY);
+    expect(boxes.every(({ height }) => height > 0)).toBe(true);
+    expect(boxes[0].y).toBeGreaterThanOrEqual(mainBottom);
+    expect(boxes[1].y).toBeGreaterThanOrEqual(boxes[0].y + boxes[0].height);
+    expect(saved).toBeGreaterThanOrEqual(boxes.at(-1)!.y + boxes.at(-1)!.height);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
   });
 
   test("on the Board, the open oddities cover none of the pins beside the clipping", async ({ page }) => {
     await page.goto("/#outside-work");
+    // Hydrated, so the click reaches React, and done scrolling to the section, so it lands on the button.
+    await page.waitForLoadState("networkidle");
+    await scrollSettled(page);
     const clipping = page.locator("[data-board-pin='clipping']");
     await toggleIn(clipping).click();
-    // Measure once the fan-out has finished: its space springs open to "auto",
-    // and on a slow machine that takes longer than any fixed wait.
-    await expect
-      .poll(() => clipping.locator("[data-clipping-extra]").first().evaluate((first) => (first.closest("[id]") as HTMLElement).style.height), { timeout: 5000 })
-      .toBe("auto");
+    await fannedOut(clipping);
     const extras = await extraBoxes(clipping);
     const others = await page.locator("[data-board-pin]:not([data-board-pin='clipping'])").evaluateAll((pins) =>
       pins.map((pin) => {
@@ -134,28 +153,34 @@ test.describe("Weekly Curiosity states", () => {
     // Hydrated first, so the click reaches React rather than landing on the server's HTML.
     await page.waitForLoadState("networkidle");
     const clipping = week(page);
-    // Frames from the click until every oddity is fully open: in place, opaque,
-    // and given its space. A spring takes about 30 frames; reduced motion lands
-    // within a few, however slow each frame is on the machine running it.
-    const frames = await clipping.locator("[data-clipping-extra]").first().evaluate(
+    // Every frame from the click until the oddities are open shows each one, and
+    // their space, either as it started or as it ends: nothing in between. A
+    // spring passes through dozens of in-between frames (about 25 at the least),
+    // however slow the machine; how many frames the jump takes depends only on
+    // when the browser schedules React and Motion, so it isn't counted.
+    const seen = await clipping.locator("[data-clipping-extra]").first().evaluate(
       (first) =>
-        new Promise<number>((resolve) => {
-          const extras = [...first.closest("[id]")!.querySelectorAll<HTMLElement>("[data-clipping-extra]")];
+        new Promise<{ opened: boolean; heights: string[]; looks: string[][] }>((resolve) => {
           const space = first.closest("[id]") as HTMLElement;
-          const open = () =>
-            extras.every((extra) => getComputedStyle(extra).transform === "none" && getComputedStyle(extra).opacity === "1") &&
-            space.style.height === "auto";
-          let count = 0;
+          const extras = [...space.querySelectorAll<HTMLElement>("[data-clipping-extra]")];
+          const heights = new Set<string>();
+          const looks = extras.map(() => new Set<string>());
+          let frames = 0;
           const check = () => {
-            count += 1;
-            if (open()) resolve(count);
+            frames += 1;
+            heights.add(space.style.height);
+            extras.forEach((extra, index) => looks[index].add(`${getComputedStyle(extra).opacity} ${getComputedStyle(extra).transform}`));
+            const opened = space.style.height === "auto" && extras.every((extra) => getComputedStyle(extra).transform === "none" && getComputedStyle(extra).opacity === "1");
+            if (opened || frames === 120) resolve({ opened, heights: [...heights], looks: looks.map((look) => [...look]) });
             else requestAnimationFrame(check);
           };
           first.closest("[data-fixture]")!.querySelector<HTMLButtonElement>("button[aria-controls]")!.click();
           requestAnimationFrame(check);
         }),
     );
-    expect(frames).toBeLessThanOrEqual(4);
+    expect(seen.opened, "the oddities open").toBe(true);
+    expect(seen.heights.filter((height) => height !== "0px" && height !== "auto"), "in-between heights of their space").toEqual([]);
+    for (const look of seen.looks) expect(look.length, `an oddity's looks on the way: ${look.join(" → ")}`).toBeLessThanOrEqual(2);
   });
 
   test("the saved examples print from the archive, by year, with their own sources", async ({ page }) => {
