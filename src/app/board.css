@@ -1,11 +1,4 @@
-/*
- * The legacy stylesheet sits in its own layer, above Tailwind's base but
- * below utilities, so new components win while old sections keep working.
- * It is deleted once every section has moved to the Board (#91).
- */
-@layer theme, base, legacy, components, utilities;
 @import "tailwindcss";
-@import "./globals.css" layer(legacy);
 
 /*
  * Board design tokens, normalised from the signed-off canvas (version 32).
@@ -28,6 +21,8 @@
   --ink: #1d1a16;
   --muted: #5f574d;
   --accent: #c94a22;
+  /* A shade under the accent for solid buttons, so a paper-coloured label clears AA (4.9:1 by day, 4.8:1 by night). */
+  --accent-solid: color-mix(in srgb, var(--accent) 93%, black);
   --pushpin: #d9542c;
   --pushpin-needle: #8c8276;
   --pushpin-shine: rgb(255 255 255 / 0.55);
@@ -428,6 +423,59 @@
   --breakpoint-board: 900px;
 }
 
+/* The page itself: the wall behind everything, and what applies everywhere. */
+@layer base {
+  html,
+  body {
+    background-color: var(--wall);
+    color: var(--wall-ink);
+  }
+
+  /* Anchor jumps and focus stop below the sticky header (81 px tall) at every width. */
+  html {
+    scroll-padding-top: 5.5rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  ::selection {
+    background-color: var(--wall-ink);
+    color: var(--wall);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  /*
+   * With reduced motion, nothing animates or eases. While the room changes the
+   * transitions stand down, so the 200 ms crossfade in the components layer
+   * applies. As !important rules in an earlier layer, these win over the
+   * components layer's own.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+
+    :root:not([data-theme-changing]),
+    :root:not([data-theme-changing]) *,
+    :root:not([data-theme-changing]) *::before,
+    :root:not([data-theme-changing]) *::after {
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
 /*
  * Component rules live in the components layer, so a utility on the element
  * (for example a hover that straightens a pin) can still override them.
@@ -754,7 +802,7 @@
   }
 
   .board-stamp-button-solid {
-    background: var(--accent);
+    background: var(--accent-solid);
     color: var(--paper);
     box-shadow: 0 3px 0 color-mix(in srgb, var(--accent) 62%, black);
   }

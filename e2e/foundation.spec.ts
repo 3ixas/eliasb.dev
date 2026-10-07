@@ -21,6 +21,60 @@ test.describe("Board foundation", () => {
     await expect(page.locator("[data-board-header]")).toBeInViewport();
   });
 
+  test("each nav jump lands the section's kicker below the sticky header", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const headerBottom = await page.locator("[data-board-header]").evaluate((header) => header.getBoundingClientRect().bottom);
+    const nav = page.getByRole("navigation", { name: "Primary navigation" });
+    for (const [link, kicker] of [["Work", "01 / Work"], ["Library", "02 / Library"], ["About", "03 / About"]]) {
+      await nav.getByRole("link", { name: link }).click();
+      const top = await page.getByText(kicker, { exact: true }).evaluate((element) => element.getBoundingClientRect().top);
+      expect(top, link).toBeGreaterThanOrEqual(headerBottom);
+    }
+  });
+
+  for (const route of ["/", "/work/threshold"]) {
+    test(`a fast scroll down ${route} finds nothing blank, and nothing shifts`, async ({ page, browserName }) => {
+      await page.addInitScript(() => {
+        const shifts: number[] = [];
+        (window as unknown as { shifts: number[] }).shifts = shifts;
+        try {
+          new PerformanceObserver((list) => {
+            for (const entry of list.getEntries() as (PerformanceEntry & { value: number; hadRecentInput: boolean })[]) {
+              if (!entry.hadRecentInput) shifts.push(entry.value);
+            }
+          }).observe({ type: "layout-shift", buffered: true });
+        } catch {}
+      });
+      await page.goto(route, { waitUntil: "load" });
+      const { height, viewport } = await page.evaluate(() => ({ height: document.documentElement.scrollHeight, viewport: innerHeight }));
+      for (let y = 0; y < height; y += viewport * 1.5) {
+        await page.mouse.wheel(0, viewport * 1.5);
+        await page.waitForTimeout(60);
+        const blank = await page.evaluate(() =>
+          [...document.querySelectorAll("main img, main [data-pin]")].filter((element) => {
+            const box = element.getBoundingClientRect();
+            if (box.bottom < 0 || box.top > innerHeight || box.height === 0) return false;
+            // Folded away on purpose (the clipping's extra oddities) isn't late.
+            if (element.closest("[inert]")) return false;
+            // Hidden or fading, here or on an ancestor, or an image still loading.
+            const showing = element.checkVisibility({ opacityProperty: true, visibilityProperty: true });
+            let opacity = 1;
+            for (let node: Element | null = element; node; node = node.parentElement) opacity *= Number(getComputedStyle(node).opacity);
+            const loading = element instanceof HTMLImageElement && (!element.complete || element.naturalWidth === 0);
+            return !showing || opacity < 1 || loading;
+          }).map((element) => element.getAttribute("alt") ?? element.getAttribute("data-pin")),
+        );
+        expect(blank, `in view at ${y}px`).toEqual([]);
+      }
+      // WebKit has no layout-shift entries to read.
+      if (browserName === "chromium") {
+        const shift = await page.evaluate(() => (window as unknown as { shifts: number[] }).shifts.reduce((sum, value) => sum + value, 0));
+        expect(shift).toBeLessThan(0.001);
+      }
+    });
+  }
+
   test("the nav pin marks the section in view", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("[data-nav-pin]")).toHaveCount(0);
