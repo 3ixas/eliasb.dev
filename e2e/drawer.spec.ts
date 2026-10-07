@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { scrollSettled } from "./support/scroll";
 
 const folders = [
   { name: "Threshold", slug: "threshold" },
@@ -60,6 +61,8 @@ test.describe("Work drawer", () => {
 
   test("the home page opens the drawer", async ({ page }) => {
     await page.goto("/#work");
+    // Done scrolling to the section, so the click lands on the link rather than where it was mid-scroll.
+    await scrollSettled(page);
     await page.getByRole("link", { name: "View all work" }).click();
     await expect(page).toHaveURL(/\/work$/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Everything I’ve built, filed.");
