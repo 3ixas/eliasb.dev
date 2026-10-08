@@ -1,0 +1,369 @@
+<!doctype html>
+<!--
+  PROTOTYPE, throwaway. Lives only on the prototype/stretch-motion branch.
+  Question (#111): how does the Stretch direction behave at 320–390 px?
+  View it at phone width (the Browser pane's Viewport menu > Mobile, or a narrow window).
+  Variants for each open choice are in the bottom bar. No page-level horizontal scroll.
+  Run: python3 -m http.server --directory prototypes/stretch-mobile
+-->
+<html lang="en" data-theme="light" data-nav="menu" data-hero="stacked" data-tiles="scroll" data-index="thumbs" data-training="today" data-github="swipe" data-rm="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stretch mobile prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#fbfbf8; --ink:#111114; --muted:#5a5a63; --rule:#dcdcd6; --card:#f0f0ea; --cobalt:#2340ff; --on-cobalt:#fff; --tape:rgba(232,222,188,.85); --edge:transparent; }
+[data-theme="dark"] { --bg:#0d0d12; --ink:#f1f1f4; --muted:#a2a2ad; --rule:#2a2a33; --card:#17171f; --cobalt:#8b9cff; --on-cobalt:#0d0d12; --tape:rgba(232,222,188,.6); --edge:#2a2a33; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Bricolage Grotesque', sans-serif; overflow-x: hidden; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+.wrap { max-width: 520px; margin: 0 auto; padding: 0 16px 140px; }
+a { color: inherit; }
+.hold { transition: opacity .5s cubic-bezier(.23,1,.32,1); }
+[data-held] { opacity: 0; }
+
+/* Header and navigation */
+header { position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 0; background: var(--bg); }
+.pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--ink); background: transparent; color: var(--ink); font: 12px 'JetBrains Mono', monospace; cursor: pointer; white-space: nowrap; }
+.menu-btn { background: var(--ink); color: var(--bg); border-color: var(--ink); font: 700 15px 'Bricolage Grotesque', sans-serif; }
+.sheet { position: fixed; inset: 0; z-index: 30; background: var(--bg); padding: 16px; display: none; flex-direction: column; }
+.sheet.open { display: flex; }
+.sheet a { display: block; padding: 6px 0; text-decoration: none; font-weight: 800; font-stretch: 75%; font-size: 56px; line-height: .95; text-transform: uppercase; }
+.sheet a.cta { color: var(--cobalt); }
+.tabbar { position: fixed; left: 12px; right: 12px; bottom: 64px; z-index: 25; display: none; gap: 4px; padding: 6px; border-radius: 999px; background: var(--ink); overflow-x: auto; scrollbar-width: none; }
+.tabbar a { flex: 0 0 auto; display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 999px; color: var(--bg); text-decoration: none; font-weight: 600; font-size: 15px; }
+.tabbar a.cta { background: var(--cobalt); color: var(--on-cobalt); }
+.hello-float { position: fixed; right: 16px; bottom: 64px; z-index: 25; display: none; min-height: 48px; padding: 0 20px; align-items: center; border-radius: 999px; background: var(--cobalt); color: var(--on-cobalt); text-decoration: none; font-weight: 700; box-shadow: 0 8px 20px rgba(0,0,0,.2); }
+[data-nav="menu"] .menu-btn { display: inline-flex; }
+.menu-btn { display: none; }
+[data-nav="bar"] .tabbar { display: flex; }
+[data-nav="none"] .hello-float { display: inline-flex; }
+
+/* Hero */
+.hero { position: relative; padding: 12px 0 48px; }
+.name { margin: 0; font-weight: 800; font-stretch: 75%; font-size: 36vw; line-height: .8; white-space: nowrap; letter-spacing: -.04em; color: var(--cobalt); text-transform: uppercase; }
+@media (min-width: 521px) { .name { font-size: 187px; } }
+.name .ch { display: inline-block; }
+h1 { position: relative; margin: 20px 0 0; font-weight: 600; font-size: 28px; line-height: 1.1; letter-spacing: -.02em; }
+.hl { position: relative; display: inline-block; color: var(--cobalt); }
+.hl svg { position: absolute; left: 0; right: 0; bottom: -.12em; width: 100%; height: .3em; overflow: visible; }
+.hl path { fill: none; stroke: var(--cobalt); stroke-width: 6; stroke-linecap: round; }
+.support { margin: 14px 0 0; font-size: 17px; line-height: 1.5; color: var(--muted); }
+.portrait { position: relative; margin: 28px 8px 0; transform: rotate(2deg); }
+.portrait img { display: block; width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 18px; }
+.label { position: absolute; left: -8px; bottom: 20px; transform: rotate(-6deg); background: var(--cobalt); color: var(--on-cobalt); font-weight: 700; font-size: 16px; padding: 9px 14px; border-radius: 999px; }
+/* Hero variant: tucked — a small portrait beside the name */
+[data-hero="tucked"] .portrait { position: absolute; top: 6px; right: 0; width: 34%; margin: 0; transform: rotate(5deg); }
+[data-hero="tucked"] .portrait img { aspect-ratio: 4/5; border-radius: 12px; }
+[data-hero="tucked"] .label { font-size: 12px; padding: 6px 10px; left: -18px; bottom: 10px; white-space: nowrap; }
+[data-hero="tucked"] .name { font-size: 30vw; padding-top: 4px; }
+[data-hero="tucked"] .portrait { width: 30%; top: 0; }
+/* Hero variant: banner — the portrait first, the name over its lower edge */
+[data-hero="banner"] .hero { display: flex; flex-direction: column; }
+[data-hero="banner"] .portrait { order: -1; margin: 0 0 -14vw; transform: rotate(-1.5deg); }
+[data-hero="banner"] .portrait img { aspect-ratio: 1/1; }
+[data-hero="banner"] .label { left: auto; right: -6px; top: 16px; bottom: auto; transform: rotate(6deg); }
+[data-hero="banner"] .name { position: relative; z-index: 2; text-shadow: 0 0 0 transparent; }
+
+.cta-row { display: flex; gap: 8px; margin-top: 20px; }
+.btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--ink); text-decoration: none; font-weight: 600; font-size: 16px; }
+.btn.primary { background: var(--cobalt); color: var(--on-cobalt); border-color: var(--cobalt); }
+
+/* Sections */
+.h2 { margin: 0; font-weight: 800; font-stretch: 75%; font-size: 64px; line-height: .9; letter-spacing: -.03em; text-transform: uppercase; }
+.note { display: block; margin-top: 8px; font: 12px 'JetBrains Mono', monospace; color: var(--muted); }
+section { padding-top: 56px; }
+
+/* Work tiles */
+.tile { position: relative; display: block; margin-top: 28px; padding: 18px; border-radius: 20px; text-decoration: none; border: 1px solid var(--edge); }
+.tile .shot { display: block; width: 100%; aspect-ratio: 16/10; object-fit: cover; object-position: top left; border-radius: 10px; box-shadow: 0 16px 32px rgba(0,0,0,.35); }
+.tile .num { margin: 16px 0 0; font-weight: 800; font-stretch: 75%; font-size: 44px; line-height: .9; color: transparent; -webkit-text-stroke: 1.5px var(--sw); }
+.tile h3 { margin: 6px 0 0; font-weight: 700; font-size: 34px; line-height: .95; letter-spacing: -.02em; }
+.tile p { margin: 8px 0 0; font-size: 17px; line-height: 1.3; }
+.fast { position: absolute; z-index: 2; pointer-events: none; }
+.tape { top: -12px; left: 50%; width: 100px; height: 28px; margin-left: -50px; transform: rotate(-3deg); background: var(--tape); }
+.clip { top: -20px; left: 28px; }
+.pinf { top: -8px; right: 30px; width: 18px; height: 18px; border-radius: 50%; background: #e9e4da; box-shadow: 2px 4px 5px rgba(0,0,0,.35); }
+
+/* Index */
+.index { list-style: none; margin: 28px 0 0; padding: 0; }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 14px 0; border-top: 1px solid var(--rule); text-decoration: none; min-height: 64px; }
+.row .nm { display: block; font-weight: 800; font-stretch: 75%; font-size: 34px; line-height: .92; text-transform: uppercase; }
+.row .meta { display: block; margin-top: 4px; font: 11px 'JetBrains Mono', monospace; color: var(--muted); }
+.row .out { display: block; margin-top: 4px; font-size: 15px; color: var(--muted); }
+.thumb { width: 72px; aspect-ratio: 4/3; border-radius: 8px; display: none; align-items: center; justify-content: center; color: #d8d8e0; font: 9px 'JetBrains Mono', monospace; text-align: center; padding: 4px; }
+[data-index="thumbs"] .thumb { display: flex; }
+[data-index="thumbs"] .row { grid-template-columns: 72px 1fr; }
+[data-index="thumbs"] .row .arrow { display: none; }
+.expand { display: none; grid-column: 1 / -1; margin-top: 10px; }
+.row.open .expand { display: block; }
+.expand .ph { aspect-ratio: 16/10; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #d8d8e0; font: 11px 'JetBrains Mono', monospace; }
+.expand .go { display: inline-flex; margin-top: 10px; min-height: 44px; align-items: center; font-weight: 700; color: var(--cobalt); }
+
+/* Where I've been */
+.log { list-style: none; margin: 24px 0 0; padding: 0; border-top: 2px solid var(--ink); }
+.log li { display: grid; grid-template-columns: 8px 1fr; gap: 14px; padding: 18px 0; border-bottom: 1px solid var(--rule); }
+.log .bar { border-radius: 4px; }
+.log .when { font: 12px 'JetBrains Mono', monospace; color: var(--muted); }
+.log .t { margin: 4px 0 0; font-weight: 800; font-stretch: 75%; font-size: 32px; line-height: .95; text-transform: uppercase; }
+.log .o { margin: 2px 0 0; font-size: 15px; color: var(--muted); }
+.log .n { margin: 8px 0 0; font-size: 16px; line-height: 1.4; }
+
+/* Training */
+.train { margin-top: 24px; }
+.strip { display: none; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; }
+.strip li { flex: 0 0 120px; scroll-snap-align: center; list-style: none; min-height: 200px; border-radius: 16px; padding: 14px 12px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--rule); background: var(--card); }
+.strip li.today { background: var(--cobalt); color: var(--on-cobalt); border-color: var(--cobalt); }
+.strip .d { font-weight: 800; font-stretch: 75%; font-size: 36px; line-height: .9; text-transform: uppercase; }
+[data-training="strip"] .strip { display: flex; }
+.tlist { display: none; list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.tlist li { display: flex; gap: 12px; align-items: baseline; min-height: 48px; padding: 12px 10px; border-bottom: 1px solid var(--rule); font-size: 17px; }
+.tlist li.today { background: var(--cobalt); color: var(--on-cobalt); border-radius: 10px; }
+.tlist .d { width: 44px; font-weight: 800; font-stretch: 75%; font-size: 22px; text-transform: uppercase; }
+[data-training="list"] .tlist { display: block; }
+.ttoday { display: none; }
+[data-training="today"] .ttoday { display: block; }
+.big-today { border-radius: 20px; background: var(--cobalt); color: var(--on-cobalt); padding: 20px; }
+.big-today .k { font: 12px 'JetBrains Mono', monospace; }
+.big-today .s { margin: 8px 0 0; font-weight: 800; font-stretch: 75%; font-size: 56px; line-height: .9; text-transform: uppercase; }
+.weekdots { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 6px; margin-top: 10px; }
+.weekdots span { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0; border-radius: 10px; background: var(--card); font-size: 12px; }
+.weekdots span b { font-weight: 800; font-stretch: 75%; font-size: 18px; }
+.weekdots span.today { background: var(--cobalt); color: var(--on-cobalt); }
+
+/* Book card + GitHub */
+.card { position: relative; margin-top: 24px; border-radius: 18px; padding: 18px; background: var(--card); }
+.bookcard { display: flex; gap: 14px; align-items: flex-end; }
+.cover { flex: 0 0 96px; aspect-ratio: 2/3; border-radius: 3px 6px 6px 3px; background: repeating-linear-gradient(135deg,#e2e2db 0 8px,#d8d8d0 8px 16px); display: flex; align-items: center; justify-content: center; text-align: center; font: 9px 'JetBrains Mono', monospace; color: #3f3f46; padding: 4px; }
+.gh-scroll { overflow-x: auto; margin-top: 14px; padding-bottom: 6px; }
+.gh-grid { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 11px); grid-auto-columns: 11px; gap: 3px; }
+.gh-grid span { border-radius: 2px; }
+.gh-recent { display: none; }
+[data-github="recent"] .gh-scroll { display: none; }
+[data-github="recent"] .gh-recent { display: block; }
+.gh-recent .gh-grid { grid-template-rows: repeat(7, minmax(0,1fr)); grid-auto-columns: minmax(0,1fr); }
+.gh-recent .gh-grid span { aspect-ratio: 1; }
+
+/* Prototype bar */
+.pbar { position: fixed; left: 8px; right: 8px; bottom: 8px; z-index: 50; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; padding: 8px 10px; border-radius: 12px; background: #111114; color: #f1f1f4; font: 11px 'JetBrains Mono', monospace; box-shadow: 0 8px 30px rgba(0,0,0,.3); max-height: 70vh; overflow-y: auto; }
+.pbar .grp { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.pbar button { min-height: 30px; padding: 0 8px; border-radius: 7px; border: 1px solid #3a3a44; background: transparent; color: #f1f1f4; font: inherit; cursor: pointer; }
+.pbar button[aria-pressed="true"] { background: #f1f1f4; color: #111114; }
+.pbar[data-open="false"] .grp:not(:first-child), .pbar[data-open="false"] .state { display: none; }
+.pbar[data-open="false"] { left: auto; }
+.pbar .state { flex-basis: 100%; color: #b9b9c2; }
+.introline { position: fixed; z-index: 40; left: 16px; right: 16px; margin: 0; font-weight: 600; font-size: 28px; line-height: 1.1; letter-spacing: -.02em; display: none; }
+.introline.on { display: block; }
+.caret { display: inline-block; width: 2px; height: .9em; margin-left: 2px; background: var(--ink); vertical-align: -.08em; }
+</style>
+</head>
+<body>
+<p class="introline" id="introline" aria-hidden="true"><span id="it1"></span><span class="caret" id="icaret"></span><span id="it2"></span></p>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Sections">
+  <div style="display:flex;justify-content:space-between;align-items:center"><span class="pill" aria-hidden="true">London <span class="clock">14:05</span></span><button type="button" class="pill" id="closeSheet">Close</button></div>
+  <nav aria-label="Sections" style="margin-top:32px"><a href="#work">Work</a><a href="#how">How I work</a><a href="#been">Where I’ve been</a><a href="#clock">Off the clock</a><a class="cta" href="#hello">Say hello</a></nav>
+</div>
+<nav class="tabbar" aria-label="Sections"><a href="#work">Work</a><a href="#how">How I work</a><a href="#been">Where I’ve been</a><a href="#clock">Off the clock</a><a class="cta" href="#hello">Say hello</a></nav>
+<a class="hello-float" href="#hello">Say hello</a>
+
+<div class="wrap">
+<header class="hold">
+  <span class="pill" aria-label="The time in London">London <span class="clock">14:05</span></span>
+  <span style="display:flex;gap:6px"><button type="button" class="pill" id="lights" aria-pressed="true">Lights on</button><button type="button" class="pill menu-btn" id="openSheet" aria-haspopup="dialog">Menu</button></span>
+</header>
+
+<section class="hero" aria-labelledby="h1" style="padding-top:12px">
+  <p class="name hold" id="name" aria-label="Elias Bennett"><span aria-hidden="true" id="nameVis">Elias<br>Bennett</span></p>
+  <h1 id="h1" class="hold">I build everyday software, and make complicated things <span class="hl">feel simple.<svg viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden="true"><path d="M6 26 C 80 17, 170 31, 250 21 S 360 15, 394 25"></path></svg></span></h1>
+  <p class="support hold">I take ideas all the way through: deciding what’s worth making, designing it, building it across the stack, and measuring whether it actually works.</p>
+  <div class="cta-row hold"><a class="btn" href="#work">See my work ↓</a><a class="btn primary" href="#hello">Say hello</a></div>
+  <figure class="portrait hold" id="portrait"><img src="assets/portrait.webp" alt="Elias in a white tuxedo, smiling"><figcaption class="label" id="label">Software engineer</figcaption></figure>
+</section>
+
+<section id="work" class="hold" aria-labelledby="work-h">
+  <h2 class="h2" id="work-h">Work</h2><span class="note">06 things I’ve built · 03 I’m proudest of</span>
+  <a class="tile" href="#work" style="background:#1a1714;color:#f2efe9;--sw:#c08a5a"><span class="fast tape" aria-hidden="true"></span><img class="shot" src="assets/threshold.webp" alt="Threshold landing page" data-tilt="-1"><p class="num">01</p><h3>Threshold</h3><p>A clearer view of what moving could cost.</p><p class="mono" style="font-size:11px;opacity:.8">Product · Data visualisation · 2026</p></a>
+  <a class="tile" href="#work" style="background:#0a0a0a;color:#f2f2f2;--sw:#4f86f7"><svg class="fast clip" aria-hidden="true" width="28" height="70" viewBox="0 0 34 86" fill="none" stroke="#b8babd" stroke-width="3" stroke-linecap="round"><path d="M10 30 V70 a7 7 0 0 0 14 0 V16 a11 11 0 0 0 -22 0 V64"></path></svg><img class="shot" src="assets/argus.webp" alt="Argus Risk dashboard" data-tilt="1"><p class="num">02</p><h3>Argus Risk</h3><p>Every number shows where it came from and how old it is.</p><p class="mono" style="font-size:11px;opacity:.8">Event-driven systems · 2026</p></a>
+  <a class="tile" href="#work" style="background:#1e1915;color:#ece4d8;--sw:#c0876a"><span class="fast pinf" aria-hidden="true"></span><img class="shot" src="assets/flowtime.jpg" alt="Flowtime focus timer" data-tilt="-1"><p class="num">03</p><h3>Flowtime</h3><p>Breaks that match how long you actually focused.</p><p class="mono" style="font-size:11px;opacity:.8">Offline-first interaction · 2026</p></a>
+  <ul class="index" id="index">
+    <li><a class="row" href="#work" data-p="Ask Professor Past" style="--c:#2a2622"><span class="thumb" style="background:#2a2622">[shot]</span><span><span class="nm">Ask Professor Past</span><span class="out">An AI history chatbot, now being rebuilt.</span><span class="meta">AI product · 2025</span></span><span class="arrow" aria-hidden="true" style="font-size:22px">↗</span><span class="expand"><span class="ph" style="background:#2a2622">[Ask Professor Past screenshot]</span><span class="go">Open the case →</span></span></a></li>
+    <li><a class="row" href="#work" data-p="Home Secretary"><span class="thumb" style="background:#23262a">[shot]</span><span><span class="nm">Home Secretary</span><span class="out">A household coordination prototype.</span><span class="meta">Prototype · 2026</span></span><span class="arrow" aria-hidden="true" style="font-size:22px">↗</span><span class="expand"><span class="ph" style="background:#23262a">[Home Secretary screenshot]</span><span class="go">Open the case →</span></span></a></li>
+    <li><a class="row" href="#work" data-p="Risk Event Tracker"><span class="thumb" style="background:#1d2230">[shot]</span><span><span class="nm">Risk Event Tracker</span><span class="out">A testable C# Web API for risk events.</span><span class="meta">Systems · API · 2025</span></span><span class="arrow" aria-hidden="true" style="font-size:22px">↗</span><span class="expand"><span class="ph" style="background:#1d2230">[Risk Event Tracker screenshot]</span><span class="go">Open the case →</span></span></a></li>
+  </ul>
+  <a class="btn primary" href="#work" style="margin-top:20px">All work (06) →</a>
+</section>
+
+<section id="been" class="hold" aria-labelledby="been-h">
+  <h2 class="h2" id="been-h">Where I’ve been</h2><span class="note">History, then marketing, then code.</span>
+  <ol class="log">
+    <li><span class="bar" style="background:#111114"></span><div><span class="when">Sep 2021 – Aug 2024</span><p class="t">Marketing Executive</p><p class="o">Optegra Eye Healthcare &amp; Kensington Medical</p><p class="n">The click: a friend’s hectic week I wanted for myself. <span class="mono" style="font-size:11px;color:var(--muted)">Early 2024</span></p></div></li>
+    <li><span class="bar" style="background:var(--cobalt)"></span><div><span class="when" style="color:var(--cobalt)">Jul 2025 – now</span><p class="t">Software Engineer</p><p class="o">BNP Paribas CIB, through _nology</p><p class="n" style="font-weight:700">◆ Won the Early Careers digitisation competition <span class="mono" style="font-size:11px;font-weight:400;color:var(--muted)">Nov 2025</span></p></div></li>
+  </ol>
+</section>
+
+<section id="clock" class="hold" aria-labelledby="clock-h">
+  <h2 class="h2" id="clock-h">Off the clock</h2><span class="note">What my own time looks like this week.</span>
+  <div class="train">
+    <div class="ttoday"><div class="big-today"><span class="k">Today · Thursday</span><p class="s">Interval run</p></div>
+      <div class="weekdots" aria-label="My training week">
+        <span>M<b>Gym</b></span><span>T<b>Z2</b></span><span>W<b>Gym</b></span><span class="today">T<b>Int</b></span><span>F<b>Gym</b></span><span>S<b>Z2</b></span><span>S<b>Bike</b></span>
+      </div>
+      <p class="note">Gym three days, runs and bike the rest. Zone 2 means slow on purpose.</p></div>
+    <ol class="strip" id="strip" aria-label="My training week">
+      <li><span class="d">Mon</span>Full-body gym</li><li><span class="d">Tue</span>Zone 2 run</li><li><span class="d">Wed</span>Full-body gym</li><li class="today" id="todayCard"><span class="d">Thu</span>Interval run<span class="mono" style="font-size:11px">← today</span></li><li><span class="d">Fri</span>Full-body gym</li><li><span class="d">Sat</span>Zone 2, rower or bike</li><li><span class="d">Sun</span>Assault bike intervals</li>
+    </ol>
+    <ol class="tlist" aria-label="My training week">
+      <li><span class="d">Mon</span>Full-body gym</li><li><span class="d">Tue</span>Zone 2 run</li><li><span class="d">Wed</span>Full-body gym</li><li class="today"><span class="d">Thu</span>Interval run · today</li><li><span class="d">Fri</span>Full-body gym</li><li><span class="d">Sat</span>Zone 2, rower or bike</li><li><span class="d">Sun</span>Assault bike intervals</li>
+    </ol>
+  </div>
+  <div class="card bookcard"><span class="cover">[Dark Age cover]</span><div><span class="mono" style="font-size:11px;color:var(--muted)">Now reading</span><p style="margin:6px 0 0;font-weight:800;font-stretch:75%;font-size:40px;line-height:.9;text-transform:uppercase">Dark Age</p><p style="margin:6px 0 0">Pierce Brown</p></div></div>
+  <div class="card">
+    <p style="margin:0"><span style="font-weight:800;font-stretch:75%;font-size:44px;line-height:.9">1,221</span> <span style="color:var(--muted)">contributions this year</span></p>
+    <div class="gh-scroll" id="ghScroll" tabindex="0" aria-label="GitHub contributions over the past year: 1,221, busiest in September and October 2026. Scrolls sideways."><div class="gh-grid" id="ghFull"></div></div>
+    <p class="note gh-swipe-note">← swipe for the whole year</p>
+    <div class="gh-recent"><div class="gh-grid" id="ghRecent" role="img" aria-label="GitHub contributions over the past 17 weeks, busiest in September and October 2026."></div><p class="note">The past four months. The year’s total is above.</p></div>
+  </div>
+</section>
+
+<section id="hello" class="hold" aria-labelledby="hello-h">
+  <a href="mailto:eliasthebennett@gmail.com" id="hello-h" style="display:block;text-decoration:none;color:var(--cobalt);font-weight:800;font-stretch:75%;font-size:25vw;line-height:.85;text-transform:uppercase">Say hello ↗</a>
+</section>
+</div>
+
+<div class="pbar" id="pbar" role="region" aria-label="Prototype controls" data-open="false">
+  <div class="grp"><button type="button" id="ptoggle" aria-expanded="false">Prototype ▴</button><button type="button" id="replay">Replay entrance</button></div>
+  <div class="grp">Nav <button type="button" data-set="nav" data-val="menu">A Menu sheet</button><button type="button" data-set="nav" data-val="bar">B Tab bar</button><button type="button" data-set="nav" data-val="none">C Floating hello</button></div>
+  <div class="grp">Hero <button type="button" data-set="hero" data-val="stacked">A Stacked</button><button type="button" data-set="hero" data-val="tucked">B Tucked</button><button type="button" data-set="hero" data-val="banner">C Banner</button></div>
+  <div class="grp">Tiles <button type="button" data-set="tiles" data-val="scroll">Straighten in view</button><button type="button" data-set="tiles" data-val="still">Still tilt</button></div>
+  <div class="grp">Index <button type="button" data-set="index" data-val="thumbs">A Thumbnails</button><button type="button" data-set="index" data-val="plain">B Plain</button><button type="button" data-set="index" data-val="expand">C Tap to expand</button></div>
+  <div class="grp">Training <button type="button" data-set="training" data-val="today">A Today + week</button><button type="button" data-set="training" data-val="strip">B Swipe strip</button><button type="button" data-set="training" data-val="list">C List</button></div>
+  <div class="grp">GitHub <button type="button" data-set="github" data-val="swipe">A Swipe the year</button><button type="button" data-set="github" data-val="recent">B Recent 17 weeks</button></div>
+  <div class="grp">Reduced motion <button type="button" data-set="rm" data-val="no">Off</button><button type="button" data-set="rm" data-val="yes">On</button></div>
+  <div class="state" id="state" aria-live="polite"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/motion@13.4.6/dist/motion.js" integrity="sha384-r/e4U+dyOcWBX2/DXrTeaB1R9i9FhnrrxlcxehiAjy3Z1fa8134rTLsgfThF9tYQ" crossorigin="anonymous"></script>
+<script>
+const { animate, scroll, inView } = window.Motion || {};
+const root = document.documentElement;
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => [...document.querySelectorAll(s)];
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) root.dataset.rm = 'yes';
+const rm = () => root.dataset.rm === 'yes';
+const spring = (bounce, visualDuration) => ({ type: 'spring', bounce, visualDuration });
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/* Readout and switches */
+function renderState() {
+  $$('[data-set]').forEach((b) => b.setAttribute('aria-pressed', String(root.dataset[b.dataset.set] === b.dataset.val)));
+  const d = root.dataset;
+  $('#state').textContent = `width ${innerWidth}px · page scrolls sideways: ${document.documentElement.scrollWidth > innerWidth ? 'YES' : 'no'} · nav ${d.nav} · hero ${d.hero} · tiles ${d.tiles} · index ${d.index} · training ${d.training} · github ${d.github} · reduced motion ${d.rm}`;
+}
+$$('[data-set]').forEach((b) => b.addEventListener('click', () => {
+  root.dataset[b.dataset.set] = b.dataset.val;
+  if (b.dataset.set === 'hero' || b.dataset.set === 'rm') playEntrance();
+  if (b.dataset.set === 'tiles' || b.dataset.set === 'rm') setupTiles();
+  if (b.dataset.set === 'training') centreToday();
+  renderState();
+}));
+addEventListener('resize', renderState);
+$('#ptoggle').addEventListener('click', () => { const p = $('#pbar'); const o = p.dataset.open !== 'true'; p.dataset.open = String(o); $('#ptoggle').setAttribute('aria-expanded', String(o)); $('#ptoggle').textContent = o ? 'Prototype ▾' : 'Prototype ▴'; });
+$('#replay').addEventListener('click', playEntrance);
+
+/* Clock, lights, menu */
+const tick = () => $$('.clock').forEach((c) => (c.textContent = new Date().toLocaleTimeString('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit' })));
+tick(); setInterval(tick, 10000);
+$('#lights').addEventListener('click', () => { const dark = root.dataset.theme !== 'dark'; root.dataset.theme = dark ? 'dark' : 'light'; $('#lights').textContent = dark ? 'Lights off' : 'Lights on'; $('#lights').setAttribute('aria-pressed', String(!dark)); });
+$('#openSheet').addEventListener('click', () => { $('#sheet').classList.add('open'); $('#closeSheet').focus(); });
+$('#closeSheet').addEventListener('click', () => { $('#sheet').classList.remove('open'); $('#openSheet').focus(); });
+$$('#sheet a').forEach((a) => a.addEventListener('click', () => $('#sheet').classList.remove('open')));
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('#sheet').classList.contains('open')) { $('#sheet').classList.remove('open'); $('#openSheet').focus(); } });
+
+/* Index: tap to expand */
+$$('.row').forEach((r) => r.addEventListener('click', (e) => {
+  if (root.dataset.index !== 'expand') return;
+  if (!r.classList.contains('open')) { e.preventDefault(); $$('.row.open').forEach((o) => o.classList.remove('open')); r.classList.add('open'); }
+}));
+
+/* Training strip: today centred */
+function centreToday() { const s = $('#strip'), t = $('#todayCard'); if (root.dataset.training === 'strip') s.scrollLeft = t.offsetLeft - (s.clientWidth - t.clientWidth) / 2; }
+
+/* GitHub grid from real daily levels */
+const levels = '000000000000000000200000000000000000000000000000000000000000000020112000120200000000011110202343410000002332223222201030200200022132012303000144200142301133021012304000000000000000100000000002041302110000000000000000004120000000300000000000000000000000000000100000000000100000000100000000000000023434002424204000300002404423312110034200000000004400010142443424344202244';
+const shades = () => root.dataset.theme === 'dark' ? ['#1d1d26', '#3a3a47', '#666676', '#a2a2ad', '#f1f1f4'] : ['#e4e4dd', '#b9b9c0', '#85858e', '#4a4a52', '#111114'];
+function drawGrid(el, from) {
+  el.innerHTML = '';
+  const sh = shades();
+  for (let i = from; i < levels.length; i++) { const s = document.createElement('span'); s.style.gridRow = String(i % 7 + 1); s.style.background = i === levels.length - 1 ? 'var(--cobalt)' : sh[+levels[i]]; el.appendChild(s); }
+}
+drawGrid($('#ghFull'), 0); drawGrid($('#ghRecent'), (Math.floor((levels.length - 1) / 7) - 16) * 7);
+requestAnimationFrame(() => { const g = $('#ghScroll'); g.scrollLeft = g.scrollWidth; });
+
+/* Tiles: straighten as they reach the middle of the screen */
+let stops = [];
+function setupTiles() {
+  stops.forEach((s) => s && s()); stops = [];
+  $$('.tile .shot').forEach((img) => { img.style.transform = `rotate(${img.dataset.tilt}deg)`; });
+  if (rm() || !scroll || root.dataset.tiles !== 'scroll') return;
+  $$('.tile .shot').forEach((img) => {
+    const t = +img.dataset.tilt;
+    stops.push(scroll(animate(img, { transform: [`rotate(${t * 2}deg)`, 'rotate(0deg)', `rotate(${-t}deg)`] }, { ease: 'linear' }), { target: img, offset: ['start end', 'end start'] }));
+  });
+}
+
+/* Entrance D at phone width */
+const h1 = $('#h1');
+const LINE = 'I build everyday software, and make complicated things ';
+const HL = 'feel simple.';
+const HLSVG = '<svg viewBox="0 0 400 40" preserveAspectRatio="none"><path d="M6 26 C 80 17, 170 31, 250 21 S 360 15, 394 25"></path></svg>';
+let run = 0;
+$('#nameVis').innerHTML = ['Elias', 'Bennett'].map((w) => [...w].map((c) => `<span class="ch">${c}</span>`).join('')).join('<br>');
+function resetAll() {
+  $$('.hold').forEach((el) => el.removeAttribute('data-held'));
+  const ol = $('#introline'); ol.classList.remove('on'); ol.style.transform = ''; ol.style.opacity = ''; $('#it1').textContent = ''; $('#it2').innerHTML = ''; $('#icaret').style.display = '';
+  $$('.name .ch').forEach((c) => { c.style.transform = ''; c.style.fontStretch = ''; });
+  $('#portrait').style.transform = ''; $('#label').style.transform = '';
+}
+async function playEntrance() {
+  const id = ++run; resetAll(); window.scrollTo(0, 0);
+  if (rm() || !animate) return;
+  $$('.hold').forEach((el) => el.setAttribute('data-held', ''));
+  const ol = $('#introline'), it1 = $('#it1'), it2 = $('#it2');
+  const target = h1.getBoundingClientRect();
+  ol.classList.add('on');
+  ol.style.top = (innerHeight - target.height) / 2 + 'px';
+  await wait(200); if (id !== run) return;
+  for (const ch of LINE) { if (id !== run) return; it1.textContent += ch; await wait(ch === ' ' ? 28 : ch === ',' ? 420 : 38); }
+  $('#icaret').style.display = 'none';
+  it2.innerHTML = `<span class="hl">${HL}${HLSVG}</span>`; it2.style.display = 'inline-block';
+  const path = it2.querySelector('path'); const len = path.getTotalLength(); path.style.strokeDasharray = len; path.style.strokeDashoffset = len;
+  const land = animate(it2, { transform: ['translateY(14px) rotate(-2deg)', 'translateY(0px) rotate(0deg)'] }, spring(.3, .45));
+  await wait(200); if (id !== run) return;
+  await Promise.all([land, animate(path, { strokeDashoffset: [len, 0] }, { duration: .52, ease: [0.23, 1, 0.32, 1] })]); if (id !== run) return;
+  const from = ol.getBoundingClientRect();
+  const fits = target.bottom <= innerHeight - 24;
+  const move = fits ? animate(ol, { transform: ['translate(0px,0px)', `translate(${target.left - from.left}px, ${target.top - from.top}px)`] }, spring(.15, .7)) : animate(ol, { opacity: [1, 0] }, { duration: .3 });
+  await wait(100); if (id !== run) return;
+  $('#name').removeAttribute('data-held');
+  const chars = $$('.name .ch');
+  const settle = Promise.all(chars.map((c, i) => animate(c, { transform: ['translateY(0.18em)', 'translateY(0em)'], fontStretch: ['100%', '75%'] }, { ...spring(.35, .55), delay: i * .035 })));
+  await wait(200); if (id !== run) return;
+  $('#portrait').removeAttribute('data-held');
+  const swing = animate('#portrait', { transform: [`rotate(${root.dataset.hero === 'tucked' ? 12 : 8}deg) translateY(-14px)`, `rotate(${root.dataset.hero === 'tucked' ? 5 : root.dataset.hero === 'banner' ? -1.5 : 2}deg) translateY(0px)`] }, spring(.4, .6));
+  await move; if (id !== run) return;
+  h1.removeAttribute('data-held'); ol.classList.remove('on'); ol.style.opacity = '';
+  animate('#label', { scale: [1.25, 1] }, spring(.45, .3));
+  $$('header, .support, .cta-row').forEach((el) => el.removeAttribute('data-held'));
+  await Promise.all([settle, swing]); if (id !== run) return;
+  $('#portrait').style.transform = '';
+  $$('.hold').forEach((el) => el.removeAttribute('data-held'));
+}
+addEventListener('pageshow', (e) => { if (e.persisted) { run++; resetAll(); } });
+
+renderState(); setupTiles(); playEntrance();
+</script>
+</body>
+</html>
