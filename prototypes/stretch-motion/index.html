@@ -6,7 +6,7 @@
   Variants for each open choice are in the bottom bar.
   Run: python3 -m http.server --directory prototypes/stretch-motion, then open the printed address.
 -->
-<html lang="en" data-theme="light" data-entrance="a" data-hover="straighten" data-fasteners="on" data-themechange="crossfade" data-scroll="sway" data-preview="fixed" data-rm="no">
+<html lang="en" data-theme="light" data-entrance="d" data-hover="straighten" data-fasteners="on" data-themechange="crossfade" data-scroll="sway" data-preview="fixed" data-rm="no">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -99,7 +99,6 @@ h1 .vis { position: absolute; inset: 0; }
 </head>
 <body class="fade-all">
 <p class="introline" id="introline" aria-hidden="true"><span id="it1"></span><span class="caret" id="icaret"></span><span id="it2"></span></p>
-<p class="skiphint" id="skiphint" aria-hidden="true">Press any key to skip</p>
 <div class="wrap">
 <header class="hold">
   <span class="pill" aria-label="The time in London"><span>London</span> <span id="clock">14:05</span></span>
@@ -180,7 +179,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 /* ---------- Readout and switches ---------- */
 const labels = {
   entrance: { a: 'A: the line types, "feel simple." lands and underlines', b: 'B: the name settles letter by letter, then the underline draws', c: 'C: name settles, portrait swings in, label presses on, then the line types',
-    d: 'D: the line types alone on a blank page, moves into place, then the name settles, portrait swings in, label presses on, and the rest appears (any key, scroll or click skips)' },
+    d: 'D: the line types alone on a blank page, moves into place, then the name settles, portrait swings in, label presses on, and the rest appears (no skip; replays on reload)' },
   hover: { straighten: 'tiles: screenshot straightens and lifts', lift: 'tiles: whole tile lifts', none: 'tiles: no hover motion' },
   fasteners: { on: 'fasteners react on hover', off: 'fasteners still' },
   themechange: { crossfade: 'lights: 1.2 s calm crossfade', quick: 'lights: 0.3 s fade', instant: 'lights: instant' },
@@ -234,7 +233,6 @@ function splitName() {
 function resetAll() {
   $$('.hold').forEach((el) => el.removeAttribute('data-held'));
   const ol = $('#introline'); ol.classList.remove('on'); ol.style.transform = ''; $('#it1').textContent = ''; $('#it2').innerHTML = ''; $('#icaret').style.display = '';
-  $('#skiphint').classList.remove('on');
   h1.classList.remove('typing'); vis.innerHTML = '';
   $$('.name .ch').forEach((c) => { c.style.transform = ''; c.style.fontStretch = ''; });
   $('#portrait').style.transform = ''; $('#label').style.transform = '';
@@ -271,7 +269,7 @@ async function settleName(id) {
   const chars = $$('.name .ch');
   // Visible from the first frame: letters start a little low and wide, never hidden.
   chars.forEach((c) => { c.style.transform = 'translateY(0.18em)'; c.style.fontStretch = '100%'; });
-  await wait(250); if (id !== run) return false;
+  await wait(root.dataset.entrance === 'd' ? 0 : 250); if (id !== run) return false;
   await Promise.all(chars.map((c, i) => animate(c, { transform: ['translateY(0.18em)', 'translateY(0em)'], fontStretch: ['100%', '75%'] }, { ...spring(.35, .55), delay: i * .035 })));
   return id === run;
 }
@@ -304,46 +302,41 @@ async function commissioner(id) {
   const ol = $('#introline'), it1 = $('#it1'), it2 = $('#it2'), caret = $('#icaret');
   const target = h1.getBoundingClientRect();
   ol.style.width = target.width + 'px';
-  ol.classList.add('on'); $('#skiphint').classList.add('on');
+  ol.classList.add('on');
   const placeCentre = () => { ol.style.left = (innerWidth - target.width) / 2 + 'px'; ol.style.top = (innerHeight - target.height) / 2 + 'px'; };
   placeCentre();
-  await wait(500); if (id !== run) return;
+  await wait(200); if (id !== run) return;
   for (const ch of LINE) { if (id !== run) return; it1.textContent += ch; await wait(ch === ' ' ? 28 : ch === ',' ? 420 : 38); }
   caret.style.display = 'none';
   it2.innerHTML = `<span class="hl">${HL}${HLSVG}</span>`; it2.style.display = 'inline-block';
   const path = it2.querySelector('path'); const len = path.getTotalLength(); path.style.strokeDasharray = len; path.style.strokeDashoffset = len;
-  await animate(it2, { transform: ['translateY(14px) rotate(-2deg)', 'translateY(0px) rotate(0deg)'] }, spring(.3, .45)); if (id !== run) return;
-  await animate(path, { strokeDashoffset: [len, 0] }, { duration: .52, ease: [0.23, 1, 0.32, 1] }); if (id !== run) return;
-  await wait(350); if (id !== run) return;
-  // The line moves up into its place in the hero.
+  // "feel simple." lands while its underline is already drawing.
+  const land = animate(it2, { transform: ['translateY(14px) rotate(-2deg)', 'translateY(0px) rotate(0deg)'] }, spring(.3, .45));
+  await wait(200); if (id !== run) return;
+  await Promise.all([land, animate(path, { strokeDashoffset: [len, 0] }, { duration: .52, ease: [0.23, 1, 0.32, 1] })]); if (id !== run) return;
+  // The line moves up into its place, and the hero arrives around it as it travels.
   const from = ol.getBoundingClientRect();
-  if (target.bottom <= innerHeight - 24) {
-    await animate(ol, { transform: ['translate(0px, 0px)', `translate(${target.left - from.left}px, ${target.top - from.top}px)`] }, spring(.15, .7)); if (id !== run) return;
-  } else {
-    // Its place is below the fold (narrow screens): fade out here and let the hero arrive around it.
-    await animate(ol, { opacity: [1, 0] }, { duration: .3 }); ol.style.opacity = ''; if (id !== run) return;
-  }
-  h1.removeAttribute('data-held'); h1.style.transition = 'none'; requestAnimationFrame(() => (h1.style.transition = ''));
-  ol.classList.remove('on'); $('#skiphint').classList.remove('on');
-  // Then the rest of the hero arrives.
-  $('#name').removeAttribute('data-held');
+  const move = target.bottom <= innerHeight - 24
+    ? animate(ol, { transform: ['translate(0px, 0px)', `translate(${target.left - from.left}px, ${target.top - from.top}px)`] }, spring(.15, .7))
+    : animate(ol, { opacity: [1, 0] }, { duration: .3 }); // Its place is below the fold on narrow screens.
   $('#portrait').style.transform = 'rotate(9deg) translateY(-14px)';
   $('#label').style.transform = 'rotate(-7deg) scale(1.25)';
-  if (!(await settleName(id))) return;
-  $('#portrait').removeAttribute('data-held');
-  await animate('#portrait', { transform: ['rotate(9deg) translateY(-14px)', 'rotate(3deg) translateY(0px)'] }, spring(.4, .6)); if (id !== run) return;
-  await animate('#label', { transform: ['rotate(-7deg) scale(1.25)', 'rotate(-7deg) scale(1)'] }, spring(.45, .3)); if (id !== run) return;
-  $$('header, .support').forEach((el) => el.removeAttribute('data-held'));
+  await wait(100); if (id !== run) return;
+  $('#name').removeAttribute('data-held');
+  const name = settleName(id);
   await wait(200); if (id !== run) return;
+  $('#portrait').removeAttribute('data-held');
+  const swing = animate('#portrait', { transform: ['rotate(9deg) translateY(-14px)', 'rotate(3deg) translateY(0px)'] }, spring(.4, .6));
+  await move; if (id !== run) return;
+  h1.removeAttribute('data-held'); h1.style.transition = 'none'; requestAnimationFrame(() => (h1.style.transition = ''));
+  ol.classList.remove('on'); ol.style.opacity = '';
+  animate('#label', { transform: ['rotate(-7deg) scale(1.25)', 'rotate(-7deg) scale(1)'] }, spring(.45, .3));
+  $$('header, .support').forEach((el) => el.removeAttribute('data-held'));
+  await Promise.all([name, swing]); if (id !== run) return;
   $$('#work, #clock-sec').forEach((el) => el.removeAttribute('data-held'));
 }
-// Any key, scroll, click or touch during the opening jumps to the finished page.
-const skip = (e) => {
-  if (!$('#introline').classList.contains('on') && !document.querySelector('.hold[data-held]')) return;
-  if (e && e.target && e.target.closest && e.target.closest('.bar')) return;
-  run++; resetAll();
-};
-['keydown', 'wheel', 'pointerdown', 'touchstart'].forEach((t) => addEventListener(t, skip, { passive: true }));
+// No skip: the opening is part of the design. It plays on every load and reload, never on back-navigation.
+addEventListener('pageshow', (e) => { if (e.persisted) { run++; resetAll(); } });
 
 /* ---------- Tile hover and fasteners ---------- */
 $$('.tile').forEach((t) => {
