@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { caseFileSlugs } from "../src/content/case-files";
@@ -147,60 +146,6 @@ test.describe("Board foundation", () => {
     }
   });
 
-  // The site's own copy stays inside Newsreader's preloaded core files, so no
-  // page pays for a late accents file. (The home page can show live titles
-  // and names with accents, which is what the accents files are for.)
-  for (const route of ["/work", ...caseFileSlugs.map((slug) => `/work/${slug}`), "/nothing-pinned-here"]) {
-    test(`${route} needs no Newsreader accents file`, async ({ page }) => {
-      await page.goto(route);
-      // next/font hashes the file names, so look at the faces the page asked for.
-      const accents = await page.evaluate(async () => {
-        await document.fonts.ready;
-        return [...document.fonts].filter((face) => /Accents$/.test(face.family) && face.status !== "unloaded").map((face) => `${face.family} ${face.weight} ${face.style}`);
-      });
-      expect(accents).toEqual([]);
-    });
-  }
-
-  // The home page's live pins (history, books, film, GitHub, Making, fantasy)
-  // can show titles and names with accents, which is what the accents files are
-  // for. Everything else is authored copy, and none of it may use a character
-  // in the accents range, or every visitor pays for a file the page doesn't
-  // need. When the live text has none either, no accents file loads at all.
-  // (Arrows and other symbols are in neither file; the browser falls back.)
-  test("/ keeps its authored copy out of Newsreader's accents range", async ({ page }) => {
-    const ranges = (literal: string) =>
-      literal.split(",").map((part) => {
-        const [from, to = from] = part.trim().replace(/^U\+/, "").split("-").map((hex) => parseInt(hex, 16));
-        return [from, to];
-      });
-    const [, accentsRange] = readFileSync("src/app/layout.tsx", "utf8").match(/value: "(U\+00A1-00B6[^"]*)"/)!;
-    const live = ["clipping", "reading", "film", "github", "making", "fantasy"].map((pin) => `[data-board-pin='${pin}']`).join(", ");
-    await page.goto("/");
-    const { authored, fromLive, accents } = await page.evaluate(
-      async ({ accentRanges, liveSelector }) => {
-        await document.fonts.ready;
-        const authored: string[] = [];
-        const fromLive: string[] = [];
-        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-        for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-          const element = node.parentElement;
-          if (!element || element.closest("script, style, noscript") || !/newsreader/i.test(getComputedStyle(element).fontFamily)) continue;
-          const found = element.closest(liveSelector) ? fromLive : authored;
-          for (const character of node.textContent ?? "") {
-            const code = character.codePointAt(0)!;
-            if (accentRanges.some(([from, to]) => code >= from && code <= to)) found.push(character);
-          }
-        }
-        const accents = [...document.fonts].filter((face) => /Accents$/.test(face.family) && face.status !== "unloaded").map((face) => face.family);
-        return { authored, fromLive, accents };
-      },
-      { accentRanges: ranges(accentsRange), liveSelector: live },
-    );
-    expect(authored, "authored copy in the accents range").toEqual([]);
-    if (fromLive.length === 0) expect(accents).toEqual([]);
-  });
-
   // Links hold back their prefetches until the page is idle after loading (or
   // someone points at one), so a load fetches no other routes while it is
   // still painting: the mobile Lighthouse bar (#91).
@@ -242,16 +187,14 @@ test.describe("Board foundation", () => {
       body: getComputedStyle(document.querySelector("[data-board-header] nav a")!).fontFamily,
       mono: getComputedStyle(document.querySelector("#main-content p")!).fontFamily,
     }));
-    // Newsreader's two fixed optical sizes: the display cut for headlines, the text cut below.
-    // next/font/local names each family after its const in layout.tsx.
-    // Each cut lists its accents face, then its core face, then the core's fallback.
+    // next/font names each family after the font itself.
     // Engines quote family names differently, so compare without the quotes.
     const unquoted = (family: string) => family.replaceAll('"', "");
-    expect(unquoted(families.display)).toMatch(/^newsreaderDisplayAccents, newsreaderDisplay, newsreaderDisplay Fallback,/);
-    expect(unquoted(families.text)).toMatch(/^newsreaderAccents, newsreader, newsreader Fallback,/);
+    expect(unquoted(families.display)).toMatch(/^Bricolage Grotesque,/);
+    expect(unquoted(families.text)).toMatch(/^Bricolage Grotesque,/);
     const loaded = await page.evaluate(() => [...document.fonts].filter((font) => font.status === "loaded").map((font) => font.family));
-    expect(loaded).toEqual(expect.arrayContaining(["newsreaderDisplay", "newsreader"]));
-    expect(families.body).toMatch(/Hanken Grotesk/);
+    expect(loaded).toEqual(expect.arrayContaining(["Bricolage Grotesque"]));
+    expect(families.body).toMatch(/Bricolage Grotesque/);
     expect(families.mono).toMatch(/JetBrains Mono/);
     const external = await page.evaluate(() =>
       performance.getEntriesByType("resource").filter((entry) => /fonts\.(googleapis|gstatic)\.com/.test(entry.name)).length,

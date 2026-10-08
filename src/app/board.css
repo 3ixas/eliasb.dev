@@ -39,14 +39,6 @@
   --stock-newsprint: #f4efe3;
   --stock-matchday: #f1e8d2;
 
-  /*
-   * Newsreader's two cuts, each a core face and an accents face with disjoint
-   * unicode-ranges: accented letters take the accents face, everything else
-   * the core, and the core's metric-matched fallback comes last.
-   */
-  --font-newsreader: var(--font-newsreader-accents), var(--font-newsreader-core);
-  --font-newsreader-display: var(--font-newsreader-display-accents), var(--font-newsreader-display-core);
-
   /* Surfaces and fixings that look the same by day and night */
   --linen: #e3d2b4;
   /*
@@ -405,8 +397,8 @@
   --color-stock-newsprint: var(--stock-newsprint);
   --color-stock-matchday: var(--stock-matchday);
 
-  --font-display: var(--font-newsreader), Georgia, serif;
-  --font-sans: var(--font-hanken-grotesk), system-ui, sans-serif;
+  --font-display: var(--font-bricolage), system-ui, sans-serif;
+  --font-sans: var(--font-bricolage), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 
   --shadow-pin: var(--shadow-pin);
@@ -944,7 +936,7 @@
     border-radius: 3px;
     background: var(--drawer-label);
     color: var(--ink);
-    font-family: var(--font-newsreader), Georgia, serif;
+    font-family: var(--font-bricolage), system-ui, sans-serif;
     font-size: var(--text-lead);
     white-space: nowrap;
   }
@@ -968,19 +960,6 @@
 
   .board-linen {
     box-shadow: var(--linen-inset);
-  }
-
-  /*
-   * Headline sizes take Newsreader's display cut; everything else its text cut.
-   * The font utilities inline --font-newsreader (@theme inline), so that is
-   * the variable to redefine. Only the bare classes match: a responsive
-   * variant (sm:text-heading) would need adding here. The element must carry
-   * font-display itself, not inherit it: an inherited family is already
-   * resolved on the ancestor, to the text cut.
-   */
-  .text-display,
-  .text-heading {
-    --font-newsreader: var(--font-newsreader-display);
   }
 
   .board-night-dim {
@@ -1032,7 +1011,7 @@
     rotate: -2deg;
     background: var(--paper);
     color: var(--ink);
-    font-family: var(--font-newsreader), Georgia, serif;
+    font-family: var(--font-bricolage), system-ui, sans-serif;
     font-size: var(--text-small);
     font-style: italic;
     box-shadow: var(--shadow-contact);
@@ -1049,7 +1028,7 @@
 
   /* The Weekly Curiosity: a newspaper cutting with a rubber-stamped picture. */
   .board-masthead {
-    font-family: var(--font-newsreader-display), Georgia, serif;
+    font-family: var(--font-bricolage), system-ui, sans-serif;
     font-weight: 600;
     letter-spacing: -0.02em;
     line-height: 0.95;
@@ -1240,7 +1219,7 @@
     padding: 2px 8px;
     background: var(--paper);
     color: var(--pencil);
-    font-family: var(--font-newsreader), Georgia, serif;
+    font-family: var(--font-bricolage), system-ui, sans-serif;
     font-size: var(--text-small);
     font-style: italic;
     box-shadow: var(--shadow-contact);
@@ -1284,7 +1263,7 @@
   .board-string-note,
   .board-string-number {
     color: var(--string-red);
-    font-family: var(--font-newsreader-display), Georgia, serif;
+    font-family: var(--font-bricolage), system-ui, sans-serif;
     font-style: italic;
   }
 
@@ -1406,7 +1385,7 @@
 
   .board-neon-hot {
     color: var(--neon-hot);
-    font-family: var(--font-newsreader-display), Georgia, serif;
+    font-family: var(--font-bricolage), system-ui, sans-serif;
     font-size: clamp(5rem, 2.5rem + 9vw, 12rem);
     font-style: italic;
     text-shadow: var(--neon-hot-glow);
@@ -1501,7 +1480,7 @@
   .board-pencil {
     display: inline-block;
     color: var(--pencil);
-    font-family: var(--font-newsreader), Georgia, serif;
+    font-family: var(--font-bricolage), system-ui, sans-serif;
     font-size: var(--text-lead);
     font-style: italic;
     line-height: 1.2;

@@ -17,9 +17,11 @@ const words = [
 ];
 
 /**
- * Newsreader's display cut, from the same core files the pages ship, unpacked
- * to TrueType because Satori can't read woff2 (scripts/fonts/og-faces.py).
- * Read from disk, so the image never depends on Google Fonts being reachable.
+ * Newsreader's display cut as TrueType, because Satori can't read woff2. The
+ * pages no longer use Newsreader; these two files and src/app/fonts/newsreader/
+ * (with its licence) remain only until the social image is redrawn in Bricolage
+ * Grotesque (#135), which removes them. Read from disk, so the image never
+ * depends on Google Fonts being reachable.
  */
 async function newsreader(style: "normal" | "italic") {
   const file = style === "italic" ? "og-display-400-italic.ttf" : "og-display-400.ttf";
