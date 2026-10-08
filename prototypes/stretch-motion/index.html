@@ -46,6 +46,12 @@ h1 .vis { position: absolute; inset: 0; }
 .caret { display: inline-block; width: .06em; height: .9em; margin-left: 2px; background: var(--ink); vertical-align: -.08em; }
 .caret.blink { animation: blink .42s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
+.hold { transition: opacity .5s cubic-bezier(.23,1,.32,1); }
+[data-held] { opacity: 0; }
+.introline { position: fixed; z-index: 40; margin: 0; font-weight: 600; font-size: clamp(30px, 3.6vw, 52px); line-height: 1.08; letter-spacing: -.025em; color: var(--ink); display: none; will-change: transform; }
+.introline.on { display: block; }
+.skiphint { position: fixed; z-index: 41; left: 50%; bottom: 84px; transform: translateX(-50%); font: 12px 'JetBrains Mono', monospace; color: var(--muted); display: none; }
+.skiphint.on { display: block; }
 .support { flex: 1 1 320px; margin: 0; font-size: 19px; line-height: 1.5; color: var(--muted); max-width: 26em; }
 
 .h2 { margin: 0; font-weight: 800; font-stretch: 75%; font-size: 96px; line-height: .9; letter-spacing: -.03em; text-transform: uppercase; }
@@ -92,8 +98,10 @@ h1 .vis { position: absolute; inset: 0; }
 </style>
 </head>
 <body class="fade-all">
+<p class="introline" id="introline" aria-hidden="true"><span id="it1"></span><span class="caret" id="icaret"></span><span id="it2"></span></p>
+<p class="skiphint" id="skiphint" aria-hidden="true">Press any key to skip</p>
 <div class="wrap">
-<header>
+<header class="hold">
   <span class="pill" aria-label="The time in London"><span>London</span> <span id="clock">14:05</span></span>
   <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">
     <button type="button" class="pill" id="lights" aria-pressed="true">Lights on</button>
@@ -104,15 +112,15 @@ h1 .vis { position: absolute; inset: 0; }
 </header>
 
 <section class="hero" aria-labelledby="h1">
-  <p class="name" id="name" aria-label="Elias Bennett"><span aria-hidden="true" id="nameVis">Elias<br>Bennett</span></p>
-  <figure class="portrait" id="portrait"><img src="assets/portrait.webp" alt="Elias in a white tuxedo, smiling"><figcaption class="label" id="label">Software engineer</figcaption></figure>
+  <p class="name hold" id="name" aria-label="Elias Bennett"><span aria-hidden="true" id="nameVis">Elias<br>Bennett</span></p>
+  <figure class="portrait hold" id="portrait"><img src="assets/portrait.webp" alt="Elias in a white tuxedo, smiling"><figcaption class="label" id="label">Software engineer</figcaption></figure>
   <div class="lede">
-    <h1 id="h1"><span class="real">I build everyday software, and make complicated things <span class="hl">feel simple.<svg viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden="true"><path d="M6 26 C 80 17, 170 31, 250 21 S 360 15, 394 25"></path></svg></span></span><span class="vis" id="vis" aria-hidden="true"></span></h1>
-    <p class="support">I take ideas all the way through: deciding what’s worth making, designing it, building it across the stack, and measuring whether it actually works.</p>
+    <h1 id="h1" class="hold"><span class="real">I build everyday software, and make complicated things <span class="hl">feel simple.<svg viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden="true"><path d="M6 26 C 80 17, 170 31, 250 21 S 360 15, 394 25"></path></svg></span></span><span class="vis" id="vis" aria-hidden="true"></span></h1>
+    <p class="support hold">I take ideas all the way through: deciding what’s worth making, designing it, building it across the stack, and measuring whether it actually works.</p>
   </div>
 </section>
 
-<section id="work" aria-labelledby="work-h" style="padding:40px 0 0">
+<section id="work" class="hold" aria-labelledby="work-h" style="padding:40px 0 0">
   <div class="sechead"><h2 class="h2" id="work-h">Work</h2><span class="mono" style="font-size:14px;color:var(--muted)">06 things I’ve built · 03 I’m proudest of</span></div>
   <div class="tiles">
     <a class="tile wide" href="#work" style="background:#1a1714;color:#f2efe9;--sw:#c08a5a"><span class="fast tape" aria-hidden="true"></span>
@@ -135,7 +143,7 @@ h1 .vis { position: absolute; inset: 0; }
   </div>
 </section>
 
-<section id="clock-sec" class="clock-sec" aria-label="Off the clock (excerpt)">
+<section id="clock-sec" class="clock-sec hold" aria-label="Off the clock (excerpt)">
   <div class="card" style="padding:0;background:transparent"><span class="fast tape" aria-hidden="true" style="z-index:3"></span><img src="assets/running.webp" alt="Elias mid-run on a rainy street in central London" style="display:block;width:100%;height:360px;object-fit:cover;border-radius:20px"></div>
   <div class="card" style="background:#fff;color:#111114;border:1px solid var(--rule);border-radius:6px"><svg class="fast clip" aria-hidden="true" width="30" height="76" viewBox="0 0 34 86" fill="none" stroke="#8d8f93" stroke-width="3" stroke-linecap="round" style="left:28px"><path d="M10 30 V70 a7 7 0 0 0 14 0 V16 a11 11 0 0 0 -22 0 V64"></path></svg>
     <p style="margin:0;text-align:center;font-weight:800;font-stretch:75%;font-size:28px;text-transform:uppercase;border-bottom:3px double #111114;padding-bottom:8px">The Weekly Curiosity</p>
@@ -148,7 +156,7 @@ h1 .vis { position: absolute; inset: 0; }
 
 <div class="bar" role="region" aria-label="Prototype controls" data-open="false">
   <div class="grp"><button type="button" id="barToggle" aria-expanded="false">Prototype ▴</button><button type="button" id="replay">Replay entrance</button></div>
-  <div class="grp">Entrance <button type="button" data-set="entrance" data-val="a">A typed</button><button type="button" data-set="entrance" data-val="b">B name settles</button><button type="button" data-set="entrance" data-val="c">C full sequence</button></div>
+  <div class="grp">Entrance <button type="button" data-set="entrance" data-val="a">A typed</button><button type="button" data-set="entrance" data-val="b">B name settles</button><button type="button" data-set="entrance" data-val="c">C full sequence</button><button type="button" data-set="entrance" data-val="d">D Commissioner-style</button></div>
   <div class="grp">Tile hover <button type="button" data-set="hover" data-val="straighten">Straighten</button><button type="button" data-set="hover" data-val="lift">Lift</button><button type="button" data-set="hover" data-val="none">None</button></div>
   <div class="grp">Fasteners <button type="button" data-set="fasteners" data-val="on">React</button><button type="button" data-set="fasteners" data-val="off">Still</button></div>
   <div class="grp">Lights <button type="button" data-set="themechange" data-val="crossfade">1.2 s crossfade</button><button type="button" data-set="themechange" data-val="quick">0.3 s fade</button><button type="button" data-set="themechange" data-val="instant">Instant</button></div>
@@ -171,7 +179,8 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /* ---------- Readout and switches ---------- */
 const labels = {
-  entrance: { a: 'A: the line types, "feel simple." lands and underlines', b: 'B: the name settles letter by letter, then the underline draws', c: 'C: name settles, portrait swings in, label presses on, then the line types' },
+  entrance: { a: 'A: the line types, "feel simple." lands and underlines', b: 'B: the name settles letter by letter, then the underline draws', c: 'C: name settles, portrait swings in, label presses on, then the line types',
+    d: 'D: the line types alone on a blank page, moves into place, then the name settles, portrait swings in, label presses on, and the rest appears (any key, scroll or click skips)' },
   hover: { straighten: 'tiles: screenshot straightens and lifts', lift: 'tiles: whole tile lifts', none: 'tiles: no hover motion' },
   fasteners: { on: 'fasteners react on hover', off: 'fasteners still' },
   themechange: { crossfade: 'lights: 1.2 s calm crossfade', quick: 'lights: 0.3 s fade', instant: 'lights: instant' },
@@ -223,6 +232,9 @@ function splitName() {
   $('#nameVis').innerHTML = ['Elias', 'Bennett'].map((w) => [...w].map((c) => `<span class="ch">${c}</span>`).join('')).join('<br>');
 }
 function resetAll() {
+  $$('.hold').forEach((el) => el.removeAttribute('data-held'));
+  const ol = $('#introline'); ol.classList.remove('on'); ol.style.transform = ''; $('#it1').textContent = ''; $('#it2').innerHTML = ''; $('#icaret').style.display = '';
+  $('#skiphint').classList.remove('on');
   h1.classList.remove('typing'); vis.innerHTML = '';
   $$('.name .ch').forEach((c) => { c.style.transform = ''; c.style.fontStretch = ''; });
   $('#portrait').style.transform = ''; $('#label').style.transform = '';
@@ -268,6 +280,7 @@ async function playEntrance() {
   resetAll();
   if (rm() || !animate) return; // Reduced motion: the finished hero, exactly as served.
   const mode = root.dataset.entrance;
+  if (mode === 'd') { await commissioner(id); return; }
   if (mode === 'a') { await wait(450); if (id === run) await typeLine(id); return; }
   if (mode === 'b') {
     if (!(await settleName(id))) return;
@@ -284,6 +297,53 @@ async function playEntrance() {
   if (id !== run) return;
   await typeLine(id);
 }
+
+async function commissioner(id) {
+  window.scrollTo(0, 0);
+  const holds = $$('.hold'); holds.forEach((el) => el.setAttribute('data-held', ''));
+  const ol = $('#introline'), it1 = $('#it1'), it2 = $('#it2'), caret = $('#icaret');
+  const target = h1.getBoundingClientRect();
+  ol.style.width = target.width + 'px';
+  ol.classList.add('on'); $('#skiphint').classList.add('on');
+  const placeCentre = () => { ol.style.left = (innerWidth - target.width) / 2 + 'px'; ol.style.top = (innerHeight - target.height) / 2 + 'px'; };
+  placeCentre();
+  await wait(500); if (id !== run) return;
+  for (const ch of LINE) { if (id !== run) return; it1.textContent += ch; await wait(ch === ' ' ? 28 : ch === ',' ? 420 : 38); }
+  caret.style.display = 'none';
+  it2.innerHTML = `<span class="hl">${HL}${HLSVG}</span>`; it2.style.display = 'inline-block';
+  const path = it2.querySelector('path'); const len = path.getTotalLength(); path.style.strokeDasharray = len; path.style.strokeDashoffset = len;
+  await animate(it2, { transform: ['translateY(14px) rotate(-2deg)', 'translateY(0px) rotate(0deg)'] }, spring(.3, .45)); if (id !== run) return;
+  await animate(path, { strokeDashoffset: [len, 0] }, { duration: .52, ease: [0.23, 1, 0.32, 1] }); if (id !== run) return;
+  await wait(350); if (id !== run) return;
+  // The line moves up into its place in the hero.
+  const from = ol.getBoundingClientRect();
+  if (target.bottom <= innerHeight - 24) {
+    await animate(ol, { transform: ['translate(0px, 0px)', `translate(${target.left - from.left}px, ${target.top - from.top}px)`] }, spring(.15, .7)); if (id !== run) return;
+  } else {
+    // Its place is below the fold (narrow screens): fade out here and let the hero arrive around it.
+    await animate(ol, { opacity: [1, 0] }, { duration: .3 }); ol.style.opacity = ''; if (id !== run) return;
+  }
+  h1.removeAttribute('data-held'); h1.style.transition = 'none'; requestAnimationFrame(() => (h1.style.transition = ''));
+  ol.classList.remove('on'); $('#skiphint').classList.remove('on');
+  // Then the rest of the hero arrives.
+  $('#name').removeAttribute('data-held');
+  $('#portrait').style.transform = 'rotate(9deg) translateY(-14px)';
+  $('#label').style.transform = 'rotate(-7deg) scale(1.25)';
+  if (!(await settleName(id))) return;
+  $('#portrait').removeAttribute('data-held');
+  await animate('#portrait', { transform: ['rotate(9deg) translateY(-14px)', 'rotate(3deg) translateY(0px)'] }, spring(.4, .6)); if (id !== run) return;
+  await animate('#label', { transform: ['rotate(-7deg) scale(1.25)', 'rotate(-7deg) scale(1)'] }, spring(.45, .3)); if (id !== run) return;
+  $$('header, .support').forEach((el) => el.removeAttribute('data-held'));
+  await wait(200); if (id !== run) return;
+  $$('#work, #clock-sec').forEach((el) => el.removeAttribute('data-held'));
+}
+// Any key, scroll, click or touch during the opening jumps to the finished page.
+const skip = (e) => {
+  if (!$('#introline').classList.contains('on') && !document.querySelector('.hold[data-held]')) return;
+  if (e && e.target && e.target.closest && e.target.closest('.bar')) return;
+  run++; resetAll();
+};
+['keydown', 'wheel', 'pointerdown', 'touchstart'].forEach((t) => addEventListener(t, skip, { passive: true }));
 
 /* ---------- Tile hover and fasteners ---------- */
 $$('.tile').forEach((t) => {
