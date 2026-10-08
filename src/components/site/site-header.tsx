@@ -10,7 +10,7 @@ import { SiteClock } from "@/components/site/site-clock";
  */
 export function SiteHeader() {
   return (
-    <header className="stretch-header" data-stretch-header>
+    <header className="stretch-header" data-stretch-header data-entrance="header">
       <a className="stretch-skip" href="#main-content">
         Skip to content
       </a>

@@ -118,8 +118,10 @@ test.describe("Lights and theme", () => {
   });
 
   test("a change of device setting crossfades the page too", async ({ page }) => {
-    await page.emulateMedia({ colorScheme: "light", reducedMotion: "no-preference" });
+    // Motion goes on after the page has loaded, so the signature entrance does not hold this one.
+    await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
     // The crossfade lasts 1.2 s, and under load a round trip to the page can
     // take as long, so read the page in the task that flips the theme.
     await page.evaluate(() => {
@@ -146,8 +148,9 @@ test.describe("Lights and theme", () => {
   });
 
   test("the page fades over 1.2 s, and settles afterwards", async ({ page }) => {
-    await page.emulateMedia({ colorScheme: "light", reducedMotion: "no-preference" });
+    await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
     const header = page.locator("[data-stretch-header]");
     await expect(header).toHaveCSS("transition-duration", "0s");
     const during = await page.evaluate(() => {

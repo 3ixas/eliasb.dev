@@ -2,36 +2,107 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import { spring } from 'motion';
-import { openingScript, openingTimings as opening, springCurve } from '../src/components/board/opening.ts';
+import { entranceGuardScript, entranceScript, entranceTimings as timings, springCurve } from '../src/components/site/entrance.ts';
 
-// The pre-paint boot script may only restore the theme and prepare optional
-// motion. It must never hide content while it waits for the opening: the
-// headline is server-rendered and the opening (#78) only decorates it.
+// The signature entrance (#130) holds the homepage by opacity only after its
+// guard script has marked the document, and only when motion is welcome. The
+// site-wide boot script must never gate content on it.
 const layout = readFileSync(new URL('../src/app/layout.tsx', import.meta.url), 'utf8');
 const boot = layout.match(/const siteBootScript = `([\s\S]*?)`;/)?.[1];
 assert.ok(boot, 'The pre-paint boot script must exist');
-assert.doesNotMatch(boot, /homeOpening|home-opening/, 'The boot script must not gate content on the opening');
+assert.doesNotMatch(boot, /entering|entrance|opening/i, 'The boot script must not gate content on the entrance');
 
-for (const [hash, reduced] of [['', false], ['#top', false], ['', true]]) {
-  const motion = new EventTarget();
-  motion.matches = reduced;
-  const root = { dataset: {}, hasAttribute: () => false, removeAttribute() {} };
-  const window = new EventTarget();
-  window.matchMedia = () => motion;
-  window.setTimeout = () => 0;
-  window.clearTimeout = () => {};
-  runInNewContext(boot, {
+/** Runs the guard in a fake page and reports what it did. */
+function runGuard({ reduced = false, navigation = 'navigate', hash = '', hidden = false, animate = true } = {}) {
+  const attributes = new Map();
+  const timers = [];
+  const listeners = [];
+  const root = {
+    hasAttribute: (name) => attributes.has(name),
+    setAttribute: (name, value) => attributes.set(name, value),
+    removeAttribute: (name) => attributes.delete(name),
+  };
+  const window = {
+    matchMedia: () => ({ matches: reduced }),
+    setTimeout: (callback, delay) => timers.push({ callback, delay }),
+    addEventListener: (type, callback) => listeners.push({ type, callback }),
+  };
+  runInNewContext(entranceGuardScript, {
     window,
-    document: { documentElement: root, readyState: 'complete', addEventListener() {}, querySelectorAll: () => [], createElement: () => ({}), head: { appendChild() {} } },
-    location: { pathname: '/', hash },
-    localStorage: { getItem: () => null },
-    Event,
+    document: { documentElement: root, hidden },
+    performance: { getEntriesByType: () => [{ type: navigation }] },
+    location: { hash },
+    Element: { prototype: animate ? { animate() {} } : {} },
   });
-  assert.equal(root.dataset.homeOpening, undefined, 'A fresh load must not start hidden');
+  return { root, timers, listeners };
 }
 
-// The opening's CSS springs must match Motion's springs at the approved settings.
-for (const { bounce, visualDuration } of [opening.land, opening.settle, opening.press]) {
+// A fresh load, or #top, is held, with a seven second safety timeout.
+for (const hash of ['', '#top']) {
+  const { root, timers } = runGuard({ hash });
+  assert.ok(root.hasAttribute('data-entering'), `A fresh load at "${hash}" should be held`);
+  assert.equal(timers.length, 1, 'The hold needs exactly one safety timeout');
+  assert.equal(timers[0].delay, 7000, 'The safety timeout is seven seconds');
+  timers[0].callback();
+  assert.ok(!root.hasAttribute('data-entering'), 'The safety timeout releases the hold');
+}
+
+// A restored page is released, not replayed.
+{
+  const { root, listeners } = runGuard();
+  const pageshow = listeners.find((listener) => listener.type === 'pageshow');
+  assert.ok(pageshow, 'The guard must listen for a page restored from the back-forward cache');
+  pageshow.callback({ persisted: false });
+  assert.ok(root.hasAttribute('data-entering'), 'A normal pageshow does not release the hold');
+  pageshow.callback({ persisted: true });
+  assert.ok(!root.hasAttribute('data-entering'), 'A restored page is released');
+}
+
+// None of these may be held.
+for (const [what, options] of [
+  ['reduced motion', { reduced: true }],
+  ['a back-forward load', { navigation: 'back_forward' }],
+  ['a section link', { hash: '#work' }],
+  ['a hidden tab', { hidden: true }],
+  ['a browser without Web Animations', { animate: false }],
+]) {
+  assert.ok(!runGuard(options).root.hasAttribute('data-entering'), `${what} must never be held`);
+}
+
+// If the guard itself fails, nothing is left held.
+{
+  const attributes = new Map([['data-entering', '']]);
+  runInNewContext(entranceGuardScript, {
+    window: {},
+    document: { documentElement: { removeAttribute: (name) => attributes.delete(name) } },
+  });
+  assert.equal(attributes.size, 0, 'A guard error must release the hold');
+}
+
+// The player does nothing, and touches nothing, when the page was not held.
+runInNewContext(entranceScript, {
+  document: {
+    documentElement: { hasAttribute: () => false, removeAttribute() { throw new Error('should not touch an unheld page'); } },
+    querySelector() { throw new Error('should not read an unheld page'); },
+  },
+  window: {},
+});
+
+// A held page missing its hero is released rather than left blank.
+{
+  const attributes = new Map([['data-entering', '']]);
+  runInNewContext(entranceScript, {
+    document: {
+      documentElement: { hasAttribute: (name) => attributes.has(name), removeAttribute: (name) => attributes.delete(name) },
+      querySelector: () => null,
+    },
+    window: {},
+  });
+  assert.equal(attributes.size, 0, 'A held page without its hero must be released');
+}
+
+// The entrance's CSS springs must match Motion's springs at the approved settings.
+for (const { bounce, visualDuration } of [timings.land, timings.move, timings.name, timings.portrait, timings.label]) {
   const curve = springCurve(bounce, visualDuration);
   const points = curve.easing.slice('linear('.length, -1).split(',').map(Number);
   const motion = spring({ keyframes: [0, 1], bounce, visualDuration });
@@ -46,11 +117,4 @@ for (const { bounce, visualDuration } of [opening.land, opening.settle, opening.
   assert.ok(Math.abs(curve.settled - restsAt) <= 2, `spring(${bounce}, ${visualDuration}) should settle when Motion does: ${curve.settled} vs ${restsAt} ms`);
 }
 
-// Without its hero, the inline opening does nothing and leaves nothing hidden.
-const emptyRoot = { removeAttribute() {}, setAttribute() { throw new Error('should not start'); } };
-runInNewContext(openingScript, {
-  document: { documentElement: emptyRoot, querySelector: () => null },
-  window: {}, performance: { getEntriesByType: () => [] }, location: { hash: '' }, CSS: { supports: () => true },
-});
-
-console.log('Opening checks passed: content is never hidden before paint, and the springs match Motion.');
+console.log('Entrance checks passed: the page is held only when motion is welcome, every failure releases it, and the springs match Motion.');

@@ -1,3 +1,4 @@
+import { EntranceGuard, EntrancePlayer } from "@/components/site/entrance-scripts";
 import { sectionLabel } from "@/components/site/sections";
 import { CareerRuler } from "@/components/site/career-ruler";
 import { Hero } from "@/components/site/hero";
@@ -16,17 +17,19 @@ import { siteCopy, workSection } from "@/content/stretch/site-copy";
 
 /**
  * The Stretch homepage shell: the header, the hero and five anchored sections
- * with their headings, notes and true counts, and the footer. The section
- * bodies are empty until their own tickets fill them.
+ * with their headings, notes and true counts, and the footer. The signature
+ * entrance (entrance.ts) holds all of it for about five seconds on a fresh
+ * load; the server renders the finished page.
  */
 export function Homepage() {
   return (
     <div data-stretch-shell>
+      <EntranceGuard />
       <SiteHeader />
       <main id="main-content" tabIndex={-1}>
         <Hero />
 
-        <section id="work" className="stretch-wrap stretch-section" aria-labelledby="work-heading">
+        <section id="work" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="work-heading">
           <SectionHeading
             id="work-heading"
             heading={workSection.heading}
@@ -40,30 +43,31 @@ export function Homepage() {
           />
         </section>
 
-        <section id="how-i-work" className="stretch-wrap stretch-section" aria-labelledby="how-i-work-heading">
+        <section id="how-i-work" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="how-i-work-heading">
           <SectionHeading id="how-i-work-heading" heading={howIWork.heading} note={howIWork.note} />
           <HowIWork />
         </section>
 
-        <section id="where-ive-been" className="stretch-wrap stretch-section" aria-labelledby="where-ive-been-heading">
+        <section id="where-ive-been" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="where-ive-been-heading">
           <SectionHeading id="where-ive-been-heading" heading={careerLog.heading} note={careerLog.note} />
           <CareerRuler />
         </section>
 
-        <section id="off-the-clock" className="stretch-wrap stretch-section" aria-labelledby="off-the-clock-heading">
+        <section id="off-the-clock" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="off-the-clock-heading">
           <SectionHeading id="off-the-clock-heading" heading={offTheClock.heading} note={offTheClock.note} />
           <OffTheClock />
         </section>
 
-        <section id="say-hello" className="stretch-wrap stretch-section" aria-labelledby="say-hello-heading">
+        <section id="say-hello" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="say-hello-heading">
           <SectionHeading id="say-hello-heading" heading={sectionLabel["say-hello"]} />
           <SayHello />
         </section>
       </main>
 
-      <footer className="stretch-wrap stretch-footer">
+      <footer className="stretch-wrap stretch-footer" data-entrance="rest">
         <p className="stretch-mono">{siteCopy.footer}</p>
       </footer>
+      <EntrancePlayer />
     </div>
   );
 }
