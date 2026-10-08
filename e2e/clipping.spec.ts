@@ -160,18 +160,25 @@ test.describe("Weekly Curiosity states", () => {
     // when the browser schedules React and Motion, so it isn't counted.
     const seen = await clipping.locator("[data-clipping-extra]").first().evaluate(
       (first) =>
-        new Promise<{ opened: boolean; heights: string[]; looks: string[][] }>((resolve) => {
+        new Promise<{ opened: boolean; heights: string[]; between: string[] }>((resolve) => {
           const space = first.closest("[id]") as HTMLElement;
           const extras = [...space.querySelectorAll<HTMLElement>("[data-clipping-extra]")];
+          const look = (extra: HTMLElement) => `${getComputedStyle(extra).opacity} ${getComputedStyle(extra).transform}`;
+          // Each oddity's look before the click, and the look of one fully open.
+          const closed = extras.map(look);
+          const open = "1 none";
           const heights = new Set<string>();
-          const looks = extras.map(() => new Set<string>());
+          const between = new Set<string>();
           let frames = 0;
           const check = () => {
             frames += 1;
             heights.add(space.style.height);
-            extras.forEach((extra, index) => looks[index].add(`${getComputedStyle(extra).opacity} ${getComputedStyle(extra).transform}`));
+            extras.forEach((extra, index) => {
+              const now = look(extra);
+              if (now !== closed[index] && now !== open) between.add(now);
+            });
             const opened = space.style.height === "auto" && extras.every((extra) => getComputedStyle(extra).transform === "none" && getComputedStyle(extra).opacity === "1");
-            if (opened || frames === 120) resolve({ opened, heights: [...heights], looks: looks.map((look) => [...look]) });
+            if (opened || frames === 120) resolve({ opened, heights: [...heights], between: [...between] });
             else requestAnimationFrame(check);
           };
           first.closest("[data-fixture]")!.querySelector<HTMLButtonElement>("button[aria-controls]")!.click();
@@ -180,7 +187,7 @@ test.describe("Weekly Curiosity states", () => {
     );
     expect(seen.opened, "the oddities open").toBe(true);
     expect(seen.heights.filter((height) => height !== "0px" && height !== "auto"), "in-between heights of their space").toEqual([]);
-    for (const look of seen.looks) expect(look.length, `an oddity's looks on the way: ${look.join(" → ")}`).toBeLessThanOrEqual(2);
+    expect(seen.between, "in-between looks of the oddities").toEqual([]);
   });
 
   test("the saved examples print from the archive, by year, with their own sources", async ({ page }) => {
