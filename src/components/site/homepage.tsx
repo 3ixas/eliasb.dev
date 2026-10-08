@@ -2,7 +2,8 @@ import { sectionLabel } from "@/components/site/sections";
 import { Hero } from "@/components/site/hero";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SiteHeader } from "@/components/site/site-header";
-import { featuredSlugs, projects } from "@/content/projects";
+import { FeaturedTiles } from "@/components/site/featured-tiles";
+import { featuredProjects, featuredSlugs, projects } from "@/content/projects";
 import { careerLog } from "@/content/stretch/career";
 import { howIWork } from "@/content/stretch/how-i-work";
 import { offTheClock } from "@/content/stretch/off-the-clock";
@@ -26,6 +27,7 @@ export function Homepage() {
             heading={workSection.heading}
             note={workSection.note(projects.length, featuredSlugs.length)}
           />
+          <FeaturedTiles projects={featuredProjects(projects, featuredSlugs)} />
         </section>
 
         <section id="how-i-work" className="stretch-wrap stretch-section" aria-labelledby="how-i-work-heading">

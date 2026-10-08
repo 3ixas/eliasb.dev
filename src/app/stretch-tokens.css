@@ -22,6 +22,7 @@
   --stretch-cobalt: #2340ff;
   --stretch-on-cobalt: #ffffff;
   --stretch-tile-edge: transparent;
+  --stretch-tape: rgba(232, 222, 188, 0.85);
   color-scheme: light;
 }
 
@@ -35,6 +36,7 @@
     --stretch-cobalt: #8b9cff;
     --stretch-on-cobalt: #0d0d12;
     --stretch-tile-edge: #2a2a33;
+    --stretch-tape: rgba(232, 222, 188, 0.6);
     color-scheme: dark;
   }
 }
@@ -48,6 +50,7 @@
   --stretch-cobalt: #8b9cff;
   --stretch-on-cobalt: #0d0d12;
   --stretch-tile-edge: #2a2a33;
+  --stretch-tape: rgba(232, 222, 188, 0.6);
   color-scheme: dark;
 }
 
@@ -60,5 +63,6 @@
   --stretch-cobalt: #8b9cff;
   --stretch-on-cobalt: #0d0d12;
   --stretch-tile-edge: #2a2a33;
+  --stretch-tape: rgba(232, 222, 188, 0.6);
   color-scheme: dark;
 }

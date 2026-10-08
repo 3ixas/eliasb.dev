@@ -19,6 +19,7 @@ Defined in `src/app/stretch-tokens.css` as `--stretch-*` variables. Dark follows
 | `--stretch-card` | `#f0f0ea` | `#17171f` | Cards and raised surfaces |
 | `--stretch-cobalt` | `#2340ff` | `#8b9cff` | The Cobalt accent |
 | `--stretch-on-cobalt` | `#ffffff` | `#0d0d12` | Text on a cobalt surface |
+| `--stretch-tape` | `rgba(232,222,188,.85)` | `rgba(232,222,188,.6)` | Fastener tape, more transparent in dark |
 | `--stretch-tile-edge` | none | `#2a2a33` | Hairline that keeps tiles visible in dark |
 
 Every text pair passes WCAG 2.2 AA (5.7:1 to 18.2:1, [#108](https://github.com/3ixas/eliasb.dev/issues/108)); `e2e/stretch-tokens.spec.ts` measures them on the rendered page. Rules are decorative and are not held to the text ratio.
