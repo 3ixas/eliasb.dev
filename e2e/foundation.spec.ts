@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { caseFileSlugs } from "../src/content/case-files";
@@ -160,6 +161,38 @@ test.describe("Board foundation", () => {
       expect(accents).toEqual([]);
     });
   }
+
+  // The home page can show live titles and names with accents, so it may fetch
+  // an accents file, but only when the text set in Newsreader has a character
+  // in the accents range. Otherwise the authored copy has slipped into that
+  // range, and every visitor pays for a file the page doesn't need. (Arrows and
+  // other symbols are in neither file; the browser falls back for those.)
+  test("/ fetches a Newsreader accents file only for text that needs one", async ({ page }) => {
+    const ranges = (literal: string) =>
+      literal.split(",").map((part) => {
+        const [from, to = from] = part.trim().replace(/^U\+/, "").split("-").map((hex) => parseInt(hex, 16));
+        return [from, to];
+      });
+    const [, accentsRange] = readFileSync("src/app/layout.tsx", "utf8").match(/value: "(U\+00A1-00B6[^"]*)"/)!;
+    await page.goto("/");
+    const { needing, accents } = await page.evaluate(async (accentRanges) => {
+      await document.fonts.ready;
+      const needing: string[] = [];
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        const element = node.parentElement;
+        if (!element || element.closest("script, style, noscript") || !/newsreader/i.test(getComputedStyle(element).fontFamily)) continue;
+        for (const character of node.textContent ?? "") {
+          const code = character.codePointAt(0)!;
+          if (accentRanges.some(([from, to]) => code >= from && code <= to)) needing.push(character);
+        }
+      }
+      const accents = [...document.fonts].filter((face) => /Accents$/.test(face.family) && face.status !== "unloaded").map((face) => face.family);
+      return { needing, accents };
+    }, ranges(accentsRange));
+    if (needing.length === 0) expect(accents).toEqual([]);
+    else test.info().annotations.push({ type: "accents needed", description: [...new Set(needing)].join(" ") });
+  });
 
   // Links hold back their prefetches until the page is idle after loading (or
   // someone points at one), so a load fetches no other routes while it is
