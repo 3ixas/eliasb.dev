@@ -20,6 +20,10 @@ _Avoid_: Using it for project tiles or as decoration
 The colours a project already has in its own interface, carried by its Work tile and swatches: Threshold gold, Argus Risk blue, Flowtime copper. The work carries the colour; the page stays neutral.
 _Avoid_: Recolouring projects in the Cobalt accent
 
+**Case study**:
+A project's own page at `/work/[slug]`, short and in its **Project colour**: Where it started, What I wrote down first, Decisions, How it's built, Where it stands, What I'd do next, then the next project. Every number comes from the project's own records, and "Where it stands" says plainly what isn't launched or measured ([#112](https://github.com/3ixas/eliasb.dev/issues/112)).
+_Avoid_: Case file, long write-up
+
 **Project index**:
 The newest-first list under **Featured work** that holds every other project worth talking through in an interview. Each row has a number, name, one-line outcome, type, and year, with a screenshot that previews on hover or focus. It shows about ten rows, then links to the **Work archive**.
 _Avoid_: Grid of every project, filters on the homepage
@@ -65,7 +69,7 @@ Up to three of Elias's strongest projects, chosen by hand and shown as big tiles
 _Avoid_: Treating the homepage as a complete project archive.
 
 **Work archive**:
-The durable Work destination containing the full collection of project case studies. Each substantial project can have its own case-study page with a blog-like narrative and technical depth.
+The `/work` page: the full **Project index**, newest first, with filters (Products, Systems, Experiments) once there are more than 10 projects ([#112](https://github.com/3ixas/eliasb.dev/issues/112)). A project with a **Case study** links to it; others link to the live site or the code.
 _Avoid_: Limiting the Work destination to the homepage selection.
 
 **Primary audience**:
