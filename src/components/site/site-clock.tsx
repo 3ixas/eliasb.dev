@@ -24,11 +24,11 @@ function subscribe(onChange: () => void) {
  * then the time appears. Screen readers hear a full sentence, not the digits
  * on their own.
  */
-export function SiteClock() {
+export function SiteClock({ className = "" }: { className?: string }) {
   const time = useSyncExternalStore(subscribe, readLondonTime, () => null);
 
   return (
-    <p className="stretch-pill stretch-mono" data-london-clock={time ?? ""}>
+    <p className={`stretch-pill stretch-mono ${className}`.trim()} data-london-clock={time ?? ""}>
       <span aria-hidden="true">{time ? siteCopy.clock.label(time) : "London"}</span>
       {time && <span className="sr-only">{siteCopy.clock.spoken(time)}</span>}
     </p>
