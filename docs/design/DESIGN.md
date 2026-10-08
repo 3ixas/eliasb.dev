@@ -1,5 +1,7 @@
 # DESIGN.md: The Board
 
+> **History.** Superseded on 8 October 2026 by the Stretch direction. The live design reference is `docs/design/STRETCH.md` ([ADR 0005](../adr/0005-stretch-redesign.md)). Kept for the record.
+
 Supersedes the 21 September 2026 refinement brief and `SELECTED-DIRECTION.md` (Cabinet of Curiosities). The product scope is in `docs/specs/REFOUNDATION-SCOPE.md`; ADR 0004 covers the motion and styling architecture.
 
 ## Product and decision

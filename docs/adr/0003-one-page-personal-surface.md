@@ -4,6 +4,8 @@ date: 2026-09-21
 supersedes: 0002-library-label.md
 ---
 
+> **Superseded in part** on 8 October 2026 by [ADR 0005](0005-stretch-redesign.md): the section list, navigation, Library label and About section. The one-page structure, the `/work` archive and stable case-study URLs stand.
+
 # Make the homepage the canonical personal surface
 
 The site will use one scroll-first homepage as the primary personal experience. Its navigation moves between four meaningful anchors: Home, Work, Outside work, and About. The homepage carries the authored narrative from the introduction through featured work, personal signals, experiments, portrait, and contact.

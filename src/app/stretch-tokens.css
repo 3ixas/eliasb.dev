@@ -1,0 +1,45 @@
+/*
+ * Stretch design tokens (ADR 0005, docs/design/STRETCH.md). Values come from
+ * the spec table in docs/specs/STRETCH-REDESIGN-SPEC.md; change them there
+ * first. They carry a --stretch- prefix because the Board's stylesheet still
+ * owns --ink, --muted and --rule until the Board is retired.
+ *
+ * Dark follows the device unless a visitor has chosen light (data-theme is set
+ * by the boot script from the remembered choice). CSS cannot share one block
+ * between a media query and an attribute selector, so the dark block appears
+ * twice; keep the copies identical.
+ */
+:root {
+  --stretch-page: #fbfbf8;
+  --stretch-ink: #111114;
+  --stretch-muted: #5a5a63;
+  --stretch-rule: #dcdcd6;
+  --stretch-card: #f0f0ea;
+  --stretch-cobalt: #2340ff;
+  --stretch-on-cobalt: #ffffff;
+  --stretch-tile-edge: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --stretch-page: #0d0d12;
+    --stretch-ink: #f1f1f4;
+    --stretch-muted: #a2a2ad;
+    --stretch-rule: #2a2a33;
+    --stretch-card: #17171f;
+    --stretch-cobalt: #8b9cff;
+    --stretch-on-cobalt: #0d0d12;
+    --stretch-tile-edge: #2a2a33;
+  }
+}
+
+:root[data-theme="dark"] {
+  --stretch-page: #0d0d12;
+  --stretch-ink: #f1f1f4;
+  --stretch-muted: #a2a2ad;
+  --stretch-rule: #2a2a33;
+  --stretch-card: #17171f;
+  --stretch-cobalt: #8b9cff;
+  --stretch-on-cobalt: #0d0d12;
+  --stretch-tile-edge: #2a2a33;
+}

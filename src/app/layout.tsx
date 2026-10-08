@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "./board.css";
+import "./stretch-tokens.css";
 
 // Newsreader as two fixed optical sizes rather than the variable font with its
 // opsz axis (274 KiB): a text cut for body sizes and a display cut for
