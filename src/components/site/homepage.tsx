@@ -3,7 +3,8 @@ import { Hero } from "@/components/site/hero";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SiteHeader } from "@/components/site/site-header";
 import { FeaturedTiles } from "@/components/site/featured-tiles";
-import { featuredProjects, featuredSlugs, projects } from "@/content/projects";
+import { ProjectIndex } from "@/components/site/project-index";
+import { featuredProjects, featuredSlugs, projectIndex, projects } from "@/content/projects";
 import { careerLog } from "@/content/stretch/career";
 import { howIWork } from "@/content/stretch/how-i-work";
 import { offTheClock } from "@/content/stretch/off-the-clock";
@@ -28,6 +29,11 @@ export function Homepage() {
             note={workSection.note(projects.length, featuredSlugs.length)}
           />
           <FeaturedTiles projects={featuredProjects(projects, featuredSlugs)} />
+          <ProjectIndex
+            rows={projectIndex(projects, featuredSlugs)}
+            firstNumber={featuredProjects(projects, featuredSlugs).length + 1}
+            total={projects.length}
+          />
         </section>
 
         <section id="how-i-work" className="stretch-wrap stretch-section" aria-labelledby="how-i-work-heading">

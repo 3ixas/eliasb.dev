@@ -134,6 +134,9 @@ export const featuredSlugs: readonly string[] = ["threshold", "argus-risk", "flo
 
 export const MAX_FEATURED = 3;
 
+/** The homepage Project index stops here; the rest is on /work behind "All work". */
+export const HOMEPAGE_INDEX_ROWS = 10;
+
 /** The featured projects, in the order of `featured`. Slugs not in the catalogue are skipped. */
 export function featuredProjects(catalogue: readonly Project[], featured: readonly string[]): Project[] {
   return featured.flatMap((slug) => catalogue.filter((project) => project.slug === slug));

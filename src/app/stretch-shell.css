@@ -698,3 +698,205 @@ html:has(.stretch-menu[open]) {
     }
   }
 }
+
+/* ---- Project index: a typographic list, newest first ---- */
+
+.stretch-index {
+  margin-top: 56px;
+}
+
+.stretch-index__list {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--stretch-rule);
+}
+
+.stretch-index__row {
+  border-bottom: 1px solid var(--stretch-rule);
+}
+
+.stretch-index__link {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto 24px;
+  align-items: baseline;
+  gap: 4px 16px;
+  min-height: 44px;
+  padding: 20px 0;
+  color: var(--stretch-ink);
+  text-decoration: none;
+}
+
+.stretch-index__number {
+  color: var(--stretch-muted);
+  font-size: 13px;
+}
+
+.stretch-index__text {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.stretch-index__name {
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.stretch-index__outcome {
+  color: var(--stretch-muted);
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+.stretch-index__meta {
+  color: var(--stretch-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.stretch-index__arrow {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.stretch-index__link:is(:hover, :focus-visible) :is(.stretch-index__name, .stretch-index__arrow) {
+  color: var(--stretch-cobalt);
+}
+
+.stretch-index__all {
+  margin: 24px 0 0;
+}
+
+.stretch-index__all a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--stretch-ink);
+  font-size: 14px;
+}
+
+.stretch-index__all a:is(:hover, :focus-visible) {
+  color: var(--stretch-cobalt);
+}
+
+/* Desktop: the rows keep the left of the list and the screenshot previews on the right. */
+@media (min-width: 761px) {
+  .stretch-index__list {
+    padding-right: 38%;
+  }
+
+  .stretch-index__link {
+    grid-template-columns: 40px minmax(0, 1fr) 24px;
+  }
+
+  .stretch-index__meta {
+    grid-column: 2;
+    grid-row: 2;
+    white-space: normal;
+  }
+
+  .stretch-index__arrow {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .stretch-index__shot {
+    position: absolute;
+    top: 24px;
+    right: 0;
+    width: calc(38% - 32px);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .stretch-index__link:is(:hover, :focus-visible) .stretch-index__shot {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+.stretch-index__shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  border: 1px solid var(--stretch-rule);
+  border-radius: 12px;
+  object-fit: cover;
+  object-position: top left;
+}
+
+/* Phones have no hover: the screenshot is a small thumbnail and a row is one tap. */
+@media (max-width: 760px) {
+  .stretch-index__link {
+    grid-template-columns: 96px minmax(0, 1fr) 20px;
+    align-items: center;
+    padding: 16px 0;
+  }
+
+  .stretch-index__number {
+    display: none;
+  }
+
+  .stretch-index__text {
+    grid-column: 2;
+  }
+
+  .stretch-index__meta {
+    grid-column: 2;
+    grid-row: 2;
+    white-space: normal;
+  }
+
+  .stretch-index__arrow {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+
+  .stretch-index__shot {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  .stretch-index__name {
+    font-size: 26px;
+  }
+
+  .stretch-index__outcome {
+    font-size: 15px;
+  }
+
+  /* A row without a thumbnail uses the full width. */
+  .stretch-index__link:not(:has(.stretch-index__shot)) {
+    grid-template-columns: minmax(0, 1fr) 20px;
+  }
+
+  .stretch-index__link:not(:has(.stretch-index__shot)) :is(.stretch-index__text, .stretch-index__meta) {
+    grid-column: 1;
+  }
+
+  .stretch-index__link:not(:has(.stretch-index__shot)) .stretch-index__arrow {
+    grid-column: 2;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .stretch-index__arrow {
+    transition: transform 0.2s ease-out;
+  }
+
+  .stretch-index__link:is(:hover, :focus-visible) .stretch-index__arrow {
+    transform: translateX(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stretch-index__shot {
+    transition: none;
+  }
+}
