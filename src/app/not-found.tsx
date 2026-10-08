@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IntentLink } from "@/components/board/intent-link";
+import { LazyPrefetchLink } from "@/components/board/lazy-prefetch-link";
 import { BoardHeader } from "@/components/board/board-header";
 import { BoardFooter } from "@/components/board/footer";
 import { Pushpin } from "@/components/board/pin";
@@ -51,9 +51,9 @@ export default function NotFound() {
             <div className="relative z-10 mt-4 text-center text-ink">
               <h1 className="m-0 font-display text-title font-normal sm:text-[2.125rem]">{copy.heading}</h1>
               <p className="mx-auto mt-3 mb-5 max-w-[22rem] text-body leading-normal">{copy.line}</p>
-              <IntentLink href="/" className="board-focus inline-flex min-h-11 items-center gap-1.5 font-semibold underline underline-offset-4">
+              <LazyPrefetchLink href="/" className="board-focus inline-flex min-h-11 items-center gap-1.5 font-semibold underline underline-offset-4">
                 {copy.back} <span aria-hidden="true">{copy.backArrow}</span>
-              </IntentLink>
+              </LazyPrefetchLink>
             </div>
           </BoardSurface>
         </div>

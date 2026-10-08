@@ -19,6 +19,8 @@ unicode-range literals into src/app/layout.tsx, which next/font needs written
 out. Splitting a face means the browser can't kern a core letter against an
 accented one, as with Google's own split, and combining marks only position
 correctly on precomposed (NFC) text.
+The social image reads TrueType copies of two display faces; after a rebuild,
+run scripts/fonts/og-faces.py to refresh them.
 Newsreader is under the SIL Open Font License (src/app/fonts/newsreader/OFL.txt).
 """
 

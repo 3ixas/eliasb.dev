@@ -1,4 +1,6 @@
 import { hero, socialImage } from "@/content/site";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
 export const alt = socialImage.alt;
@@ -15,29 +17,18 @@ const words = [
 ];
 
 /**
- * Newsreader, subset to the glyphs the card uses. The image is built once at
- * build time; if Google Fonts can't be reached, it falls back to the default
- * face rather than failing the build.
+ * Newsreader's display cut, from the same core files the pages ship, unpacked
+ * to TrueType because Satori can't read woff2 (scripts/fonts/og-faces.py).
+ * Read from disk, so the image never depends on Google Fonts being reachable.
  */
-async function newsreader(style: "normal" | "italic", text: string) {
-  try {
-    const axis = style === "italic" ? "1" : "0";
-    const css = await fetch(
-      `https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@${axis},6..72,400&text=${encodeURIComponent(text)}`,
-    ).then((response) => response.text());
-    const url = css.match(/src: url\((.+?)\) format\('(?:opentype|truetype)'\)/)?.[1];
-    const response = url ? await fetch(url) : null;
-    if (response?.ok) return { name: "Newsreader", data: await response.arrayBuffer(), style, weight: 400 as const };
-  } catch {}
-  console.warn(`opengraph-image: Newsreader (${style}) couldn't be loaded; the social image falls back to the default face.`);
-  return null;
+async function newsreader(style: "normal" | "italic") {
+  const file = style === "italic" ? "og-display-400-italic.ttf" : "og-display-400.ttf";
+  const data = await readFile(join(process.cwd(), "src/app/fonts/newsreader", file));
+  return { name: "Newsreader", data, style, weight: 400 as const };
 }
 
 export default async function OpenGraphImage() {
-  const fonts = (await Promise.all([
-    newsreader("normal", `${hero.headline.lead} ${mark.before}${mark.slash}${mark.after}`),
-    newsreader("italic", hero.headline.emphasis),
-  ])).filter((font) => font !== null);
+  const fonts = await Promise.all([newsreader("normal"), newsreader("italic")]);
 
   return new ImageResponse(
     <div
