@@ -1,4 +1,5 @@
 import { sectionLabel } from "@/components/site/sections";
+import { CareerRuler } from "@/components/site/career-ruler";
 import { Hero } from "@/components/site/hero";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SiteHeader } from "@/components/site/site-header";
@@ -45,6 +46,7 @@ export function Homepage() {
 
         <section id="where-ive-been" className="stretch-wrap stretch-section" aria-labelledby="where-ive-been-heading">
           <SectionHeading id="where-ive-been-heading" heading={careerLog.heading} note={careerLog.note} />
+          <CareerRuler />
         </section>
 
         <section id="off-the-clock" className="stretch-wrap stretch-section" aria-labelledby="off-the-clock-heading">

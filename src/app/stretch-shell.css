@@ -1533,3 +1533,115 @@ button.stretch-gh__day[data-selected] {
     transition: none;
   }
 }
+
+/* ---- Where I've been: the career ruler ---- */
+
+.stretch-ruler {
+  display: grid;
+  gap: 32px;
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stretch-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 6px;
+  padding-left: 28px;
+  border-left: 2px solid var(--stretch-rule);
+}
+
+/* The node on the ruler. */
+.stretch-stage::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: -7px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--stretch-ink);
+  border-radius: 50%;
+  background-color: var(--stretch-page);
+}
+
+.stretch-stage[data-current="true"] {
+  border-left-color: var(--stretch-cobalt);
+}
+
+.stretch-stage[data-current="true"]::before {
+  border-color: var(--stretch-cobalt);
+  background-color: var(--stretch-cobalt);
+}
+
+.stretch-stage__dates {
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.stretch-stage[data-current="true"] .stretch-stage__dates,
+.stretch-stage[data-current="true"] .stretch-stage__role {
+  color: var(--stretch-cobalt);
+}
+
+.stretch-stage__role {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.stretch-stage__org {
+  margin: 4px 0 0;
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.stretch-stage__notes,
+.stretch-stage__milestones {
+  max-width: 60ch;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.stretch-stage__notes li + li {
+  margin-top: 8px;
+}
+
+.stretch-stage__when {
+  color: var(--stretch-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.stretch-milestone {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  margin-top: 8px;
+}
+
+.stretch-milestone__mark {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background-color: var(--stretch-cobalt);
+  transform: translateY(-1px) rotate(45deg);
+}
+
+@media (min-width: 761px) {
+  .stretch-stage {
+    grid-template-columns: 200px minmax(0, 1fr);
+    column-gap: 32px;
+  }
+
+  .stretch-stage__dates {
+    padding-top: 2px;
+  }
+}
