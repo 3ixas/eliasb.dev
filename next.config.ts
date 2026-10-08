@@ -1,4 +1,10 @@
 import type { NextConfig } from "next";
+import { caseFiles } from "./src/content/case-files";
+import { assertCatalogue, featuredSlugs, projects } from "./src/content/projects";
+
+// A featured project without a case study, screenshot or colours fails the
+// build (and `next dev`) here, whichever pages use the catalogue.
+assertCatalogue(projects, featuredSlugs, Object.keys(caseFiles));
 
 const securityHeaders = [
   { key: "Content-Security-Policy", value: "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://i.gr-assets.com https://a.ltrbxd.com; font-src 'self' data:; connect-src 'self'; frame-src 'none'; media-src 'self';" },
