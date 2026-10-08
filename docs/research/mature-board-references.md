@@ -6,6 +6,8 @@ Research for [#101](https://github.com/3ixas/eliasb.dev/issues/101), part of the
 
 **Answer in brief:** the mature sites keep the canvas almost colourless (off-white `#f7f7f7`–`#fdfdfc` or near-black `#0a0a0a`–`#1c1a17`) and let real images carry all the colour. When they use props, they use one per object and rarely more than a handful per page, drawn realistically and at small scale. Sections get plain labels ("Work", "Where I've been", "Off the clock"). The only theme or mode changes that read as mature come from the owner's subject: a lamp seller's light switch, a person's "living space" with its lights, a Notes-app clone for someone who writes in notes. This supports Elias's suspicion: a neutral base with objects carrying their own colour, plus one subject-derived light change, is the pattern that recurs.
 
+**Update after Elias's ten additions (8 October 2026):** the core conclusion holds; 20 of the 25 sites use a neutral base and let the work carry the colour. Three things changed. Tactile props turn out to be optional rather than the source of maturity, because none of the additions use them and they get their energy from type scale and how the work is presented instead. One accent may be used large when it carries identity. And Work gains a clear model: an index plus one showcase image, with a one-line outcome and the project's own colours. The additions also show a common failure to avoid: seven of the ten hide content behind a loader, intro or gate, which the Board's first-paint rule already forbids.
+
 ## Method and limits
 
 - Every site below was loaded in a real browser on **8 October 2026** and screenshotted at desktop width. Background and text colours, font stacks and heading text were read from computed styles in the live DOM, so the hex/RGB values are measured, not guessed.
@@ -183,29 +185,172 @@ Research for [#101](https://github.com/3ixas/eliasb.dev/issues/101), part of the
 
 [incommonwith.com](https://www.incommonwith.com/collections/all-products), already in DESIGN.md. Confirmed live: the collection page still has a "Light:" control labelled "Toggle Lighting" beside "All Products¹⁰⁰", on an off-white canvas with thin oxblood rules, where the lamps themselves carry the colour (red glass shades). It remains the clearest example of a theme change that comes from what the business sells.
 
+## Elias's additions (8 October 2026)
+
+After the first pass, Elias added ten sites, each with his reason. The method is the same as above: each site was loaded in the built-in browser on 8 October 2026, screenshotted at desktop width, and measured from computed styles. Two caveats apply to this group:
+
+- **Five are studios or agencies, not personal sites:** Obys, Garden Eight, Unseen Studio, Locomotive and PORTO ROCHA. They show composition and art direction made with a team's budget, not a single person's voice. Mat Voyce's site is personal, but its footer credits the studio Uncommon with the design.
+- **Several rely on WebGL or heavy motion** (Bruno Simon, Unseen, Garden Eight, Obys, Huy Phan) or on heavy media (Mat Voyce, PORTO ROCHA). That conflicts with the constraints in `DESIGN.md`: "All content in the HTML and visible from first paint", "Content never waits for motion", the anti-goals "Novelty that hides content" and "Blank panels while scrolling", and the earlier rejection of Mohit Virli for "3D, heavy loading, blank first paint".
+
+### First-content timing
+
+These are rough, single cold loads in the built-in browser on a home connection, so the numbers give an order of magnitude, not a benchmark. "FCP" is the browser's first-contentful-paint entry. "Readable content" is when a screenshot first showed the site's real headline or work rather than a loader. "Transferred" adds up `transferSize` for resources loaded by the time of measurement (about 5–15 s); it undercounts cross-origin media that hides its size. The server-HTML check fetched each page with `curl` and stripped scripts and styles.
+
+| Site | Server HTML has text? | FCP | First thing painted | Readable content | Transferred |
+| --- | --- | --- | --- | --- | --- |
+| Mat Voyce | Yes | 2.2 s | Blue letters animating in on cream | About 8 s for the work grid | About 63 MB (4 videos, 72 images) |
+| Dennis Snellenberg | Yes | 0.4 s | Dark loader cycling greetings ("Hello", "Bonjour"…) | About 2–4 s | 0.5 MB |
+| Isabel Moranta | Yes | 0.3 s | Black screen with a "( LOADED )" counter | About 5 s | Not reported (11 videos) |
+| Huy Phan | Yes | 0.3 s | Black, then a red name wipe | About 1 s (name); work on scroll | 2.7 MB |
+| Bruno Simon | Yes, but none of it visible | 3.1 s | Violet grid with a loading ring | About 15 s for the 3D world | About 7.2 MB (1.6 MB physics WASM, 1 MB JS) |
+| Obys | Yes | 0.4 s | Black intro with one image | About 5–8 s | Not reliable (38 mostly cross-origin images) |
+| Garden Eight | Yes | 1.2 s | Tiny wordmark on dark | 6.1 s (largest paint, the hero type) | 1.9 MB |
+| Unseen Studio | Yes | 0.35 s | Pink entry gate: "Enter" or "Enter without audio" | Only after a click | About 7 MB before entering |
+| Locomotive | Yes | 0.4 s | Black logo splash | About 2 s (video hero) | 2.1 MB |
+| PORTO ROCHA | Yes | 2.6 s | Black | 3.1 s (largest paint, an image) | About 15 MB (344 images) |
+
+**Reading:** all ten put their text in the server HTML, which is good, but **seven of the ten hide it behind a loader, intro or gate** for 2–15 s. Only Huy Phan (about 1 s), Locomotive and Dennis Snellenberg (about 2 s) come close to the Board's rule that content is visible from first paint, and even those three show a splash first. None of the first fifteen sites did this; the nearest was Commissioner's lazy-loaded panels, which `DESIGN.md` already rejects.
+
+### 16. Mat Voyce — type designer and animator
+
+[matvoyce.tv](https://matvoyce.tv/) · Elias's reason: personality. Huge blue italic lettering, playful animated graphics and colourful work; the site expresses his energy as a type designer and animator.
+
+- **Colour base:** cream-white `rgb(255, 254, 248)`, black text, F37 Judge and F37 Judge Extended.
+- **Colour:** a giant sky-blue "MAT VOYCE" behind the content, and a wall of saturated lettering tiles, each a piece of his work, filling the first screen. The featured projects ("Olipop TV", "Friends 30th") are full-colour animations.
+- **Props:** none. The lettering is the object.
+- **Sections:** "His best work / Featured work", "What he does" (Type design & illustration, Type animation, Motion design), "Brands Mat's worked with", "Contact Mat". They are written in the third person, plain and slightly cheeky.
+- **Timing:** see the table: about 8 s before the grid is readable, and around 63 MB of video and images.
+- **Take:** the play is the craft itself. The canvas stays near-white while the work is as loud as it likes. **Extends** pattern 2: one accent can be huge when it *is* the person's identity (here, his type). **Conflicts** with the first-paint rule and is far too heavy.
+
+### 17. Dennis Snellenberg — freelance designer and developer
+
+[dennissnellenberg.com](https://www.dennissnellenberg.com/) · Elias's reason: a polished designer-developer portfolio. A portrait hero, an oversized moving name, restrained colours and clear navigation.
+
+- **Colour base:** the loader is `rgb(28, 29, 32)`; the hero is a grey studio portrait; the content below sits on white. One custom face, "Dennis Sans".
+- **Colour:** almost none outside the project images (a black-and-orange TWICE site, a green-shaded hotel shot).
+- **Props:** a black pill badge, "Located in the Netherlands", with a spinning globe; round magnetic buttons ("About me").
+- **Sections:** three nav words, "Work", "About", "Contact". Each project shows its name, role and year ("TWICE · Interaction & Development · 2024"); "More work 11" carries a count; the footer shows "Version 2022 © Edition" and "Local time 12:33 PM CEST".
+- **Take:** an oversized marquee of the name over a real portrait makes a confident, grown-up hero. The local time in the footer is another live-state detail. The greeting loader is the part not to copy.
+
+### 18. Isabel Moranta — design and art director
+
+[isabelmoranta.com](https://www.isabelmoranta.com/) · Elias's reason: editorial art direction. A dramatic serif, tiny informational text, grainy black backgrounds and empty space.
+
+- **Colour base:** grainy `rgb(8, 8, 8)` with off-white `rgb(239, 239, 238)` text. Ogg (a display serif) set against CentSchbook Mono at a tiny size.
+- **Colour:** only the work thumbnails, one of them red; a greyscale hero image.
+- **Props:** none. Parentheses act as the graphic device: "( Art Director )", "( Canada )", "( Play showreel )", "( 1 / 8 )", "( Socials )", "( Reach out )", "( Development )".
+- **Sections:** "About", "Work", "Archive"; a scroll-driven quotation in huge serif, attributed to Virginia Woolf's *Orlando*; a project viewer with "Project", the client and a counter.
+- **Take:** the strongest example of **scale contrast**, enormous serif against tiny mono, and it would suit Newsreader directly. It **supports** a black base. The preloader conflicts with the first-paint rule.
+
+### 19. Huy Phan — designer
+
+[huyml.co](https://huyml.co/) · Elias's reason: inventive project presentation. Imagery, descriptions and credits are arranged in space, giving an exhibition feel in which the work and its supporting information share the screen.
+
+- **Colour base:** light grey `rgb(236, 236, 236)`, black text; BT Grotesk, BT Glyphius and F37 Bolton.
+- **Colour:** a red name in the intro, then each project's own imagery. Each project also shows **three colour swatches**, its palette as small chips under the description.
+- **Props:** project images fan out and tilt in 3D around a centred caption (a WebGL canvas).
+- **Sections:** a huge index number with the total ("01 /19"), then the category ("Agency & Studio"), the project name ("Fromanother"), a one-line description and the palette chips; "Come say hi" closes the page.
+- **Take:** the clearest model for **Work on the Board**: number, category, name, one sentence, and the project's own colours shown as swatches. The swatches make "objects carry their own colour" literal. The 3D fan is optional; the information layout is the lesson.
+
+### 20. Bruno Simon — creative developer
+
+[bruno-simon.com](https://bruno-simon.com/) · Elias's reason: the most memorable concept. You drive a car through a 3D world, and the experience itself demonstrates the skill.
+
+- **Colour base:** a violet night grid, then a lit 3D island (a pink tree, low-poly objects). Nunito in the UI.
+- **Colour:** the world itself.
+- **Props:** the whole site is made of props: a drivable car, and signs and buildings that stand for projects and links.
+- **Sections:** places in the world instead of headings; while you drive, the page title becomes an emoji road ("Bruno 🚗 🌳").
+- **Timing:** about 15 s to a usable world, with no visible text until then.
+- **Take:** this is pattern 7 at full strength: the subject (a creative developer who builds 3D web experiences) *is* the site. For a product engineer the equivalent is not 3D; it is a working product moment. It **conflicts** with almost every Board constraint (first paint, content not waiting for motion, keyboard access, mobile) and is the definition of novelty that hides content. Use it as a test of how strong a concept is, not as a model for execution.
+
+### 21. Obys — design studio (agency)
+
+[obys.agency](https://obys.agency/) · Elias's reason: an unconventional work browser. A sparse white canvas, a vertical ribbon of project images, precise metadata, and vertical, horizontal and grid views.
+
+- **Colour base:** white, black text, a custom "Obys" face.
+- **Colour:** the images in the ribbon, mostly muted or greyscale, with the focused one framed by bracket marks.
+- **Props:** none; the brackets are the only graphic device.
+- **Sections:** a left-hand list of every project name; for the focused project, its sector ("Fashion, Photography"), services ("Creative Direction, Web Design/Dev") and number ("10"); view switches "Vertical, Horizontal, Grid"; and "Work", "About", "Contact".
+- **Take:** precise metadata beside one large image is very close to Commissioner's project row, turned into a browser. A list-or-grid switch is a mature, useful interaction for Work. The intro conflicts with first paint.
+
+### 22. Garden Eight — digital design studio, Tokyo (agency)
+
+[garden-eight.com](https://garden-eight.com/) · Elias's reason: typography and atmosphere. A sculptural serif over soft cream 3D forms, with understated navigation.
+
+- **Colour base:** the loader is `rgb(30, 31, 31)`; the hero is a soft cream 3D scene of white sculpted lizards and birds; text `rgb(219, 214, 208)`, with Lausanne for the UI.
+- **Colour:** almost none: cream on cream, with shadow doing the work.
+- **Props:** the sculptures are WebGL objects.
+- **Sections:** small-caps nav, "Cases", "About", "Archives", "Contact", "AI", "JA", with a one-line studio description at top left. The hero asks "What can we make next" in a high-contrast display face.
+- **Timing:** the hero type is the largest paint, at 6.1 s.
+- **Take:** shows that a near-monochrome scene can feel warm without brown: the warmth comes from light and shadow, not a tinted base. That is useful for the lighting-change idea. The 3D and the 6 s wait conflict with the constraints.
+
+### 23. Unseen Studio — brand, digital and motion studio (agency)
+
+[unseen.co](https://unseen.co/) · Elias's reason: immersive art direction. Dreamlike architecture, water, pastels and a serif/sans contrast; a world you recognise straight away.
+
+- **Colour base:** a dusty-pink entry gate, then a pastel 3D world of arches, stairs and water. Saol Display italic over Neue Montreal.
+- **Colour:** the world.
+- **Props:** a cartoon pair of eyes as the gate's mascot, and the rendered architecture.
+- **Sections:** "Index", "Projects", "Contact"; a single hero line mixing italic serif and sans; "View our work" and "Our 2025 Wrapped".
+- **Timing:** nothing is reachable until the visitor chooses "Enter" or "Enter without audio".
+- **Take:** the italic-serif-plus-sans headline is the same device as Elias's italic last word, at its most confident. Everything else (the gate, the world, the mascot) **conflicts** with the constraints and with Elias's own "kiddie" concern.
+
+### 24. Locomotive — digital-first design agency, Montréal (agency)
+
+[locomotive.ca](https://locomotive.ca/en) · Elias's reason: cinematic presentation. Full-screen moving imagery, elegant type and a clear route into featured projects; a strong opening that leads into a substantial portfolio.
+
+- **Colour base:** white `rgb(255, 255, 255)`, black text; Helvetica Now Display and a custom "LocomotiveNew" serif.
+- **Colour:** a full-bleed video hero (a saturated blue portrait with pixelated eyes), then the project imagery.
+- **Props:** small tag boxes, "OPS · DES · DEV", beside the H1.
+- **Sections:** "Featured work" is a list of huge serif project names separated by hairline rules ("Lightship", "Wolverine Worldwide"…), followed by "All work", "Extras (13)", "Articles", "Culture" and "Store". The nav reads "Work", "Agency", "Careers", "Store", "Let's talk".
+- **Timing:** about 2 s, behind a logo splash; the H1 is the largest paint, at 0.5 s.
+- **Take:** the route from opening to work is one scroll: the hero, one line about the studio, then a typographic index of featured work. That index of names suits a short list like Elias's. The count in "Extras (13)" repeats pattern 5. A cookie banner appears on load; it was left unanswered.
+
+### 25. PORTO ROCHA — strategy and design agency, New York and London (agency)
+
+[portorocha.com](https://www.portorocha.com/) · Elias's reason: the work carries the design. A compact project index beside a large visual showcase, with a quiet interface.
+
+- **Colour base:** black `rgb(0, 0, 0)`, pale grey `rgb(226, 230, 227)` text, SF Pro Text and Display.
+- **Colour:** only the work and news images (an orange folded map at MoMA, a pink Common Matters poster).
+- **Props:** none. Rounded dark cards carry each client's logo.
+- **Sections:** a fixed left column holds the studio name, a **live date and clock** ("Thursday, October 8 / New York, 06:37:05"), "About us", and a project index in which each entry is a client plus a one-line outcome ("FURSYS — Making room for workplace reinvention"). The right column is a dated news feed. "Show all projects" opens the full index.
+- **Timing:** FCP 2.6 s, about 15 MB of images within 5 s, and a page about 168,000 px tall.
+- **Take:** the one-line *outcome* for each project ("Making room for…") is exactly the product framing Elias wants: what changed, not what was made. The live clock repeats pattern 8. The page weight is not a model.
+
+### Rauno Freiberg, revisited
+
+Elias listed Rauno for **graphic restraint**: large typographic panels, a grey and white canvas, one vivid yellow accent, few ingredients. Entry 8 already records the grey `rgb(237, 237, 237)` page, the white panels, the black type and the single yellow circle. One point to add: what makes it mature is how few ingredients it uses (one typeface, three neutrals, one accent, one shape), and that is a useful budget for the Board.
+
 ## Patterns that recur
 
-1. **A neutral canvas, measured.** Of the 15 sites, 13 put content on a background with no meaningful hue: off-white or light grey (`#f7f7f7`, `#fafafa`, `#fdfcf9`, `#ededed`, white) or near-black (`#0a0a0a`–`#1c1a17`). The two exceptions are both whole-site conceits: Spencer Chang's cream paper (a room that swaps to night) and Alana Goyal's macOS wallpaper (around a neutral dark Notes window). None uses a brown or umber base.
-2. **Colour lives in the evidence.** Screenshots, photos, sketchbook scans and logos supply nearly all the colour. Where the page itself adds colour, it is one accent used for one job: Tim Ritter's red marks where he is now; Rauno's yellow circle sits behind his name; Wattenberger's gradient sits inside her name.
-3. **One prop per object, few per page, drawn true.** Commissioner uses one paperclip, tape strip or torn edge per card, about 3–5 on the page, rendered realistically and small. Matthew Yu has exactly one object. Nobody stacks several prop types on one card or uses cartoon outlines.
-4. **The card stays clean; the prop sits on its edge.** Props attach to a plain rectangle rather than replacing it, so the content's layout never depends on the prop.
-5. **Plain section names, often with a gloss or count.** "Work", "Where I've been", "Off the clock", "Fun experiments I did recently", "Work 19+", "Articles — Polished, complete guides and essays", "I. About". Labels say what is there; the personality is in the gloss.
-6. **Metadata in a second typeface.** Commissioner, Tim Ritter, Ryo Lu and Henry Desroches set dates, disciplines and status in mono or small caps beneath a humane display face. It reads as a professional's index.
-7. **Subject-derived play beats added play.** The props that read as mature come from the owner's work or life: tldraw's drawing style, a real sketchbook, a Notes app, a career ruler with real dates, a live location line. Theme changes that work are lighting in a room or a lamp shop.
-8. **Live, true state is a playful device.** Ryo's "last seen" line, Mackenzie's ticking age, Spencer's visitor counter. Small, factual, and current.
+Revised on 8 October 2026 after Elias's additions. Each pattern is marked **Holds**, **Extended** or **Changed**, with the reason.
+
+1. **A neutral canvas, measured.** *Holds, widened.* Of the first 15 sites, 13 put content on a background with no meaningful hue: off-white or light grey (`#f7f7f7`, `#fafafa`, `#fdfcf9`, `#ededed`, white) or near-black (`#0a0a0a`–`#1c1a17`). Seven of the ten additions do the same: Mat Voyce `#fffef8`, Dennis Snellenberg white, Isabel Moranta `#080808`, Huy Phan `#ececec`, Obys white, Locomotive white, PORTO ROCHA `#000`. That makes **20 of 25**. The five exceptions are all whole-site worlds: Spencer Chang's paper room, Alana Goyal's macOS desktop, Bruno Simon's island, Garden Eight's cream sculpture scene (still near-monochrome) and Unseen's pastel architecture. None uses a brown or umber base. New evidence: pure black works for editorial portfolios (Isabel Moranta, PORTO ROCHA), not only near-black.
+2. **Colour lives in the evidence.** *Holds, extended.* The additions confirm it strongly: Mat Voyce's tile wall, PORTO ROCHA's showcase and Obys's ribbon are the only colour on their pages. Extension: the one accent can be *large* when it is the person's identity (Mat Voyce's giant blue name, Huy Phan's red name). Huy Phan also shows a project's palette as swatches, which makes "objects carry their own colour" literal.
+3. **One prop per object, few per page, drawn true.** *Changed: props are optional, not required.* None of the ten additions uses a tactile prop. Their play comes from type scale, motion and how the work is presented. The rule still holds where props are used, but maturity does not need them.
+4. **The card stays clean; the prop sits on its edge.** *Holds.*
+5. **Plain section names, often with a gloss or count.** *Holds, reinforced.* More counts: "01 /19", "( 1 / 8 )", "Extras (13)", "More work 11". A new form of gloss: a one-line *outcome* per project (PORTO ROCHA).
+6. **Metadata in a second typeface.** *Extended into scale contrast.* Isabel Moranta, Obys, Huy Phan and Garden Eight pair a very large display face with tiny mono or small-caps metadata. The gap in size is part of what reads as grown-up.
+7. **Subject-derived play beats added play.** *Holds, extended.* The subject can be the owner's craft, not only their topic: Bruno Simon's drivable world for a 3D developer, Mat Voyce's lettering for a type animator. For a product engineer, the equivalent is a real product moment, not a 3D scene.
+8. **Live, true state is a playful device.** *Holds, reinforced.* PORTO ROCHA's live New York clock and Dennis Snellenberg's local time join Ryo Lu's "last seen" line.
+9. **New: openings that gate content are the usual failure of award-winning sites.** Seven of the ten additions show a loader, intro or entry gate for 2–15 s; none of the first fifteen did. The Board's first-paint rule sets it apart from these sites. Keep it rather than relax it to match them.
+10. **New: Work as an index plus a showcase.** Obys, PORTO ROCHA, Locomotive and Huy Phan all pair a compact list of every project with one large image of the focused project and precise metadata.
 
 ## Implications for a more mature Board
 
-These are recommendations for the map's design and grilling tickets, not decisions.
+These are recommendations for the map's design and grilling tickets, not decisions. Changes made after Elias's additions are marked.
 
-1. **Change the base to near-white and near-black.** Replace plaster and umber with a neutral off-white (around `#f7f7f5`) and a neutral near-black (around `#111110`). Keep Newsreader. Let the pinned objects carry colour: project screenshots, the book cover, the film still, real photos. This is the single change most consistent across the references.
-2. **One accent, one job.** Keep the italic, differently coloured last word in the headline and use the same accent only for "now" states (current project, this week's training). Drop every other warm tint.
-3. **Cut prop types to one per pin, and attach rather than replace.** Each pin becomes a clean card or image with at most one realistic fastener (paperclip, tape, pin) or edge treatment (torn, folded). Retire props that are a whole cartoon object standing in for content (the cassette player and neon sign are the likeliest candidates), or redraw them photographically.
-4. **Name sections plainly and add a gloss.** Use the agreed order (Hero → Work → How I work → Where I've been → Off the clock → Contact) as visible labels, each with a one-line gloss in the second typeface, and a count where it helps ("Work · 6").
-5. **Turn the red-string timeline into a ruler.** Follow Mackenzie Child or Tim Ritter: real dates on a precise scale, or a small map, for "Where I've been". The string can survive as a single thin line, not a prop.
-6. **Make the newspaper clipping typographic.** Borrow from henry.codes: a real masthead, dateline and column rules set in type, rather than a beige paper shape.
-7. **Tie the light switch to the studio, or drop it.** The lamp only earns its place if the Board is literally a studio wall with a lamp on it, and the change reads as light falling on objects (In Common With, Spencer Chang), ideally following London time. A generic light/dark switch styled as a lamp is the bolted-on version.
-8. **Let the headline carry live, true state.** A typed line that says what Elias is building or training for right now is more mature play than another object.
+1. **Change the base to near-white and near-black.** Replace plaster and umber with a neutral off-white (around `#f7f7f5`) and a neutral near-black (around `#111110`). Keep Newsreader. Let the pinned objects carry colour: project screenshots, the book cover, the film still, real photos. This is the single change most consistent across the references. *Unchanged; now 20 of 25 sites. The dark theme can go as far as true black (Isabel Moranta, PORTO ROCHA).*
+2. **One accent, one meaning.** Keep the italic, differently coloured last word in the headline and use the same accent only for "now" states (current project, this week's training). Drop every other warm tint. *Changed: the accent may also be used large, once (for example, the last word at display scale, as with Mat Voyce's and Huy Phan's names), as long as it still means one thing.*
+3. **At most one prop per pin, and consider none on Work.** Each personal pin becomes a clean card or image with at most one realistic fastener (paperclip, tape, pin) or edge treatment (torn, folded). Retire props that are a whole cartoon object standing in for content (the cassette player and neon sign are the likeliest candidates), or redraw them photographically. *Changed: props are now optional rather than the default. All ten additions show work with no props at all. Commissioner remains the precedent for one small fastener on a work card, so whether Work keeps a fastener or has none is a choice for grilling. Either way, the screenshot carries the card.*
+4. **Name sections plainly and add a gloss.** Use the agreed order (Hero → Work → How I work → Where I've been → Off the clock → Contact) as visible labels, each with a one-line gloss in the second typeface, and a count where it helps ("Work · 6" or "01 / 06"). *Unchanged.*
+5. **Turn the red-string timeline into a ruler.** Follow Mackenzie Child or Tim Ritter: real dates on a precise scale, or a small map, for "Where I've been". The string can survive as a single thin line, not a prop. *Unchanged.*
+6. **Make the newspaper clipping typographic.** Borrow from henry.codes: a real masthead, dateline and column rules set in type, rather than a beige paper shape. *Unchanged.*
+7. **Tie the light switch to the studio, or drop it.** The lamp only earns its place if the Board is literally a studio wall with a lamp on it, and the change reads as light falling on objects (In Common With, Spencer Chang), ideally following London time. A generic light/dark switch styled as a lamp is the bolted-on version. *Unchanged; Garden Eight adds that warmth should come from light and shadow, not from tinting the base.*
+8. **Let the headline carry live, true state.** A typed line that says what Elias is building or training for right now is more mature play than another object. *Unchanged; reinforced by PORTO ROCHA and Dennis Snellenberg.*
+9. **New: present Work as an index plus a showcase.** Each project gets a number, category, name, one-line *outcome* (PORTO ROCHA), role and year (Dennis Snellenberg, Commissioner), and three swatches of its own colours (Huy Phan), with one large real screenshot. A list/grid switch (Obys) is optional. This also gives `/work/[slug]` a natural entry point.
+10. **New: use scale contrast in type.** Set the headline and section titles in larger Newsreader, and metadata in a small mono or small caps (Isabel Moranta, Obys, Huy Phan). It adds energy without adding objects, which answers "kiddie" with type rather than props.
+11. **New: borrow composition, never loading.** Do not take loaders, intros, entry gates, WebGL scenes, sound or autoplaying video walls from the additions. Any motion runs on content that is already visible. This keeps the first-paint constraint in `DESIGN.md` and the Mohit Virli rejection consistent.
 
 ## Sources
 
@@ -227,4 +372,14 @@ All accessed 8 October 2026.
 - Alana Goyal: <https://www.alanagoyal.com>
 - Lynn Fisher: <https://lynnandtonic.com>
 - In Common With: <https://www.incommonwith.com/collections/all-products>
+- Mat Voyce: <https://matvoyce.tv/>
+- Dennis Snellenberg: <https://www.dennissnellenberg.com/>
+- Isabel Moranta: <https://www.isabelmoranta.com/>
+- Huy Phan: <https://huyml.co/>
+- Bruno Simon: <https://bruno-simon.com/>
+- Obys: <https://obys.agency/>
+- Garden Eight: <https://garden-eight.com/>
+- Unseen Studio: <https://unseen.co/>
+- Locomotive: <https://locomotive.ca/en>
+- PORTO ROCHA: <https://www.portorocha.com/>
 - Existing references and rejections: [`docs/design/DESIGN.md`](../design/DESIGN.md)
