@@ -45,7 +45,7 @@ The single small prop on a card's edge: tape, a paperclip, or a pin. There is at
 _Avoid_: Prop that stands in for content, more than one per card
 
 **Career ruler**:
-Where I've been, shown as each role on a precise, dated scale rather than a string of pins.
+Where I've been, shown as a vertical log, oldest first: each stage has its dates, a bar (cobalt for the current role), the role, and the organisation, with story beats as one-line notes and milestones as marked lines beneath it ([#110](https://github.com/3ixas/eliasb.dev/issues/110)).
 _Avoid_: Red string, timeline pins
 
 **Board** (superseded):
