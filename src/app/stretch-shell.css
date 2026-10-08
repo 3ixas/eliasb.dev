@@ -1,0 +1,264 @@
+/*
+ * The Stretch homepage shell (docs/design/STRETCH.md): page surface, header,
+ * Lights pill, section headings and footer. Everything is scoped to
+ * [data-stretch-shell] so the Board's pages are untouched until they are
+ * rebuilt; only the page surface needs :has(), because the Board stylesheet
+ * paints html and body.
+ */
+
+/* The surface behind the shell, so overscroll and the toolbar match the page. */
+html:has([data-stretch-shell]) {
+  scroll-padding-top: 6rem;
+}
+
+html:has([data-stretch-shell]),
+html:has([data-stretch-shell]) body {
+  background-color: var(--stretch-page);
+  color: var(--stretch-ink);
+}
+
+[data-stretch-shell] {
+  --stretch-gutter: 16px;
+  min-height: 100vh;
+  font-family: var(--font-bricolage), system-ui, sans-serif;
+  background-color: var(--stretch-page);
+  color: var(--stretch-ink);
+}
+
+@media (min-width: 761px) {
+  [data-stretch-shell] {
+    --stretch-gutter: 32px;
+  }
+}
+
+[data-stretch-shell] ::selection {
+  background-color: var(--stretch-cobalt);
+  color: var(--stretch-on-cobalt);
+}
+
+[data-stretch-shell] :focus-visible {
+  outline: 3px solid var(--stretch-cobalt);
+  outline-offset: 3px;
+}
+
+.stretch-wrap {
+  width: 100%;
+  max-width: 1400px;
+  margin-inline: auto;
+  padding-inline: var(--stretch-gutter);
+}
+
+/* ---- Theme change: a calm crossfade, a quick fade for reduced motion ---- */
+
+:root {
+  --stretch-room-duration: 1.2s;
+  --stretch-room-ease: cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --stretch-room-duration: 0.2s;
+  }
+}
+
+/* Set by the theme controller just before the theme flips, and cleared after. */
+:root[data-theme-changing],
+:root[data-theme-changing] body,
+:root[data-theme-changing] [data-stretch-shell],
+:root[data-theme-changing] [data-stretch-shell] *,
+:root[data-theme-changing] [data-stretch-shell] *::before,
+:root[data-theme-changing] [data-stretch-shell] *::after {
+  transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke;
+  transition-duration: var(--stretch-room-duration);
+  transition-timing-function: var(--stretch-room-ease);
+  transition-delay: 0s;
+}
+
+/* ---- Header ---- */
+
+.stretch-skip {
+  position: absolute;
+  left: var(--stretch-gutter);
+  top: 8px;
+  z-index: 60;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background-color: var(--stretch-cobalt);
+  color: var(--stretch-on-cobalt);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.stretch-skip:focus {
+  transform: none;
+}
+
+.stretch-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--stretch-page);
+  border-bottom: 1px solid var(--stretch-rule);
+}
+
+.stretch-header__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding-block: 12px;
+}
+
+.stretch-header__right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.stretch-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stretch-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 14px;
+  border-radius: 999px;
+  color: var(--stretch-ink);
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.stretch-nav a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+/* Say hello: the one link that takes the cobalt. */
+.stretch-nav a.stretch-nav__cta {
+  background-color: var(--stretch-cobalt);
+  color: var(--stretch-on-cobalt);
+}
+
+.stretch-nav a.stretch-nav__cta:hover {
+  text-decoration: none;
+}
+
+.stretch-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin: 0;
+  padding-inline: 16px;
+  border: 1px solid var(--stretch-ink);
+  border-radius: 999px;
+  background-color: transparent;
+  color: var(--stretch-ink);
+  font-size: 13px;
+}
+
+button.stretch-pill {
+  cursor: pointer;
+}
+
+/*
+ * The Lights pill names the state it is in, from the first paint: "Lights on"
+ * while the page is light, "Lights off" while it is dark. Which theme is in
+ * force is decided as in stretch-tokens.css.
+ */
+.stretch-lights-off {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-lights]):not([data-theme]) .stretch-lights-on {
+    display: none;
+  }
+
+  :root:not([data-lights]):not([data-theme]) .stretch-lights-off {
+    display: inline;
+  }
+}
+
+:root[data-lights="on"]:not([data-theme="light"]) .stretch-lights-on,
+:root[data-theme="dark"] .stretch-lights-on {
+  display: none;
+}
+
+:root[data-lights="on"]:not([data-theme="light"]) .stretch-lights-off,
+:root[data-theme="dark"] .stretch-lights-off {
+  display: inline;
+}
+
+/* ---- Sections ---- */
+
+.stretch-section {
+  padding-block: 64px 0;
+}
+
+.stretch-section__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+}
+
+.stretch-h2 {
+  margin: 0;
+  font-size: clamp(64px, 9vw, 96px);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+}
+
+.stretch-note {
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* The hero's placeholder: the real h1, until the Hero is built. */
+.stretch-hero {
+  padding-block: 48px 0;
+}
+
+.stretch-hero h1 {
+  max-width: 17em;
+  margin: 0;
+  font-size: clamp(30px, 3.6vw, 52px);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+}
+
+.stretch-hero em {
+  color: var(--stretch-cobalt);
+  font-style: normal;
+}
+
+/* ---- Footer ---- */
+
+.stretch-footer {
+  margin-top: 96px;
+  padding-block: 32px;
+  border-top: 1px solid var(--stretch-rule);
+}
+
+.stretch-footer p {
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: 14px;
+}

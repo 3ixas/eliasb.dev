@@ -4,6 +4,7 @@ import { Bricolage_Grotesque, JetBrains_Mono } from "next/font/google";
 import "./board.css";
 import "./stretch-tokens.css";
 import "./stretch-type.css";
+import "./stretch-shell.css";
 
 // Self-hosted at build time by next/font, so no request goes to Google when a
 // visitor loads a page. Bricolage Grotesque is variable in weight, optical size
@@ -61,6 +62,15 @@ const siteBootScript = `
     // decides when the room changes, including when the device setting does.
     const dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
     root.dataset.lights = dark ? 'on' : 'off';
+    // The browser's toolbar colour follows the page, including a remembered
+    // choice that differs from the device. This meta is made here, not in JSX:
+    // React would recreate a hoisted meta whose attributes script had changed.
+    // The page colours, as in TOOLBAR_COLOUR (components/site/theme.ts); theme.spec.ts keeps them level.
+    const toolbar = { light: '#fbfbf8', dark: '#0d0d12' };
+    const meta = document.createElement('meta');
+    meta.name = 'theme-color';
+    meta.content = dark ? toolbar.dark : toolbar.light;
+    document.head.appendChild(meta);
   } catch (_) {}
 `;
 

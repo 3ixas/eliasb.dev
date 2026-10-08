@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { flipLights, watchSystemTheme } from "@/components/board/theme";
+import { flipLights, watchSystemTheme } from "@/components/site/theme";
 
 /**
  * The header light switch, modelled on a UK MK Logic Plus one-gang rocker:

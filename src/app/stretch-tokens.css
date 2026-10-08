@@ -4,10 +4,14 @@
  * first. They carry a --stretch- prefix because the Board's stylesheet still
  * owns --ink, --muted and --rule until the Board is retired.
  *
- * Dark follows the device unless a visitor has chosen light (data-theme is set
- * by the boot script from the remembered choice). CSS cannot share one block
- * between a media query and an attribute selector, so the dark block appears
- * twice; keep the copies identical.
+ * Which theme applies, in order:
+ * 1. data-theme, a remembered choice (the boot script sets it before paint).
+ * 2. data-lights, which the boot script and the theme controller keep at the
+ *    appearance in force. The controller flips it after marking the page as
+ *    changing, so a change of the device setting crossfades like a click.
+ * 3. The device setting alone, when script has not run.
+ * CSS cannot share one block between a media query and attribute selectors,
+ * so the dark block appears three times; keep the copies identical.
  */
 :root {
   --stretch-page: #fbfbf8;
@@ -18,10 +22,11 @@
   --stretch-cobalt: #2340ff;
   --stretch-on-cobalt: #ffffff;
   --stretch-tile-edge: transparent;
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
+  :root:not([data-lights]):not([data-theme]) {
     --stretch-page: #0d0d12;
     --stretch-ink: #f1f1f4;
     --stretch-muted: #a2a2ad;
@@ -30,7 +35,20 @@
     --stretch-cobalt: #8b9cff;
     --stretch-on-cobalt: #0d0d12;
     --stretch-tile-edge: #2a2a33;
+    color-scheme: dark;
   }
+}
+
+:root[data-lights="on"]:not([data-theme="light"]) {
+  --stretch-page: #0d0d12;
+  --stretch-ink: #f1f1f4;
+  --stretch-muted: #a2a2ad;
+  --stretch-rule: #2a2a33;
+  --stretch-card: #17171f;
+  --stretch-cobalt: #8b9cff;
+  --stretch-on-cobalt: #0d0d12;
+  --stretch-tile-edge: #2a2a33;
+  color-scheme: dark;
 }
 
 :root[data-theme="dark"] {
@@ -42,4 +60,5 @@
   --stretch-cobalt: #8b9cff;
   --stretch-on-cobalt: #0d0d12;
   --stretch-tile-edge: #2a2a33;
+  color-scheme: dark;
 }

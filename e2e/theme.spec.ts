@@ -1,39 +1,50 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const switchButton = (page: Page) => page.locator("[data-light-switch]");
+const pill = (page: Page) => page.locator("[data-lights-pill]");
 const scheme = (page: Page) => page.evaluate(() => getComputedStyle(document.documentElement).colorScheme);
 const stored = (page: Page) => page.evaluate(() => localStorage.getItem("elias-theme"));
+const token = (page: Page, name: string) =>
+  page.evaluate((property) => getComputedStyle(document.documentElement).getPropertyValue(property).trim().toLowerCase(), name);
+/** The colours of every theme-color meta, which must all be the page background. */
+const toolbar = (page: Page) =>
+  page.evaluate(() => [...document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')].map((meta) => meta.content.toLowerCase()));
 
-test.describe("Light switch and theme", () => {
+test.describe("Lights and theme", () => {
   test("starts in the device appearance and follows it live", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     expect(await scheme(page)).toBe("light");
+    await expect(pill(page)).toHaveAccessibleName("Lights on");
+    await expect(pill(page)).toHaveAttribute("aria-pressed", "true");
     await page.emulateMedia({ colorScheme: "dark" });
     await expect.poll(() => scheme(page)).toBe("dark");
-    await expect(switchButton(page)).toHaveAccessibleName("Turn the lights off");
+    await expect(pill(page)).toHaveAccessibleName("Lights off");
+    await expect(pill(page)).toHaveAttribute("aria-pressed", "false");
   });
 
-  test("the switch names its action and flips the lights", async ({ page }) => {
+  test("the pill is a button: pressed means the lights are on, and it flips them", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
-    const light = switchButton(page);
-    await expect(light).toHaveAccessibleName("Turn the lights on");
-    await light.click();
+    await expect(page.getByRole("button", { name: "Lights on", pressed: true })).toBeVisible();
+    await pill(page).click();
     await expect.poll(() => scheme(page)).toBe("dark");
-    await expect(light).toHaveAccessibleName("Turn the lights off");
+    await expect(page.getByRole("button", { name: "Lights off", pressed: false })).toBeVisible();
+    await pill(page).click();
+    await expect.poll(() => scheme(page)).toBe("light");
+    await expect(page.getByRole("button", { name: "Lights on", pressed: true })).toBeVisible();
   });
 
   test("a choice persists until the visitor is back on their device setting", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
-    await switchButton(page).click();
+    await pill(page).click();
     expect(await stored(page)).toBe("dark");
     await page.reload();
     expect(await scheme(page)).toBe("dark");
+    await expect(pill(page)).toHaveAccessibleName("Lights off");
 
-    // Flipping back to match the device returns to following it.
-    await switchButton(page).click();
+    // Choosing what the device already shows returns to following the device.
+    await pill(page).click();
     await expect.poll(() => scheme(page)).toBe("light");
     expect(await stored(page)).toBeNull();
     await page.emulateMedia({ colorScheme: "dark" });
@@ -46,98 +57,122 @@ test.describe("Light switch and theme", () => {
       await page.addInitScript((theme) => {
         localStorage.setItem("elias-theme", theme);
         requestAnimationFrame(() => {
-          (window as unknown as { firstPaintScheme: string }).firstPaintScheme = getComputedStyle(document.documentElement).colorScheme;
+          const root = document.documentElement;
+          (window as unknown as { firstPaint: object }).firstPaint = {
+            scheme: getComputedStyle(root).colorScheme,
+            page: getComputedStyle(root).getPropertyValue("--stretch-page").trim().toLowerCase(),
+            background: getComputedStyle(document.body).backgroundColor,
+            toolbar: [...document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')].map((meta) => meta.content.toLowerCase()),
+          };
         });
       }, chosen);
       await page.goto("/");
-      expect(await page.evaluate(() => (window as unknown as { firstPaintScheme: string }).firstPaintScheme)).toBe(chosen);
+      const paint = await page.evaluate(() => (window as unknown as { firstPaint: { scheme: string; page: string; background: string; toolbar: string[] } }).firstPaint);
+      expect(paint.scheme).toBe(chosen);
+      expect(paint.background).toBe(chosen === "dark" ? "rgb(13, 13, 18)" : "rgb(251, 251, 248)");
+      // The toolbar colour is the page's, before the first paint.
+      expect(paint.toolbar.length).toBeGreaterThan(0);
+      for (const colour of paint.toolbar) expect(colour).toBe(paint.page);
     });
   }
 
-  test("a change of device setting crossfades the room too", async ({ page }) => {
+  for (const [device, label, background] of [["dark", "Lights off", "rgb(13, 13, 18)"], ["light", "Lights on", "rgb(251, 251, 248)"]] as const) {
+    test(`with script off, a ${device} device still gets the ${device} page and its label`, async ({ browser }) => {
+      const context = await browser.newContext({ javaScriptEnabled: false, colorScheme: device });
+      const page = await context.newPage();
+      await page.goto("/");
+      // innerText, so the label hidden by CSS is not counted.
+      await expect(pill(page)).toHaveText(label, { useInnerText: true });
+      expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(background);
+      await context.close();
+    });
+  }
+
+  test("the toolbar colour follows the page background through every change", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.goto("/");
+    const follows = async (label: string) => {
+      const background = await token(page, "--stretch-page");
+      const colours = await toolbar(page);
+      expect(colours.length, label).toBeGreaterThan(0);
+      for (const colour of colours) expect(colour, label).toBe(background);
+    };
+    await follows("light device");
+    await pill(page).click();
+    await expect.poll(() => scheme(page)).toBe("dark");
+    await follows("chose dark on a light device");
+    await pill(page).click();
+    await expect.poll(() => scheme(page)).toBe("light");
+    await follows("back on the device");
+    await page.emulateMedia({ colorScheme: "dark" });
+    await expect.poll(() => scheme(page)).toBe("dark");
+    await follows("the device went dark");
+  });
+
+  test("dark mode shows the tile-edge hairline", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "dark" });
+    await page.goto("/");
+    expect(await token(page, "--stretch-tile-edge")).toBe("#2a2a33");
+    await page.emulateMedia({ colorScheme: "light" });
+    await expect.poll(() => token(page, "--stretch-tile-edge")).toBe("transparent");
+  });
+
+  test("a change of device setting crossfades the page too", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "no-preference" });
     await page.goto("/");
-    // The crossfade lasts 1.3 s, and under load a round trip to the page can
-    // take as long, so read the room in the task that turns the lights on.
+    // The crossfade lasts 1.2 s, and under load a round trip to the page can
+    // take as long, so read the page in the task that flips the theme.
     await page.evaluate(() => {
       const root = document.documentElement;
       (window as unknown as { fading: Promise<number> }).fading = new Promise((resolve) => {
         new MutationObserver((_, observer) => {
           if (root.dataset.lights !== "on") return;
           observer.disconnect();
-          resolve(document.querySelector("[data-board-header]")!.getAnimations().length);
+          resolve(document.querySelector("[data-stretch-header]")!.getAnimations().length);
         }).observe(root, { attributes: true, attributeFilter: ["data-lights"] });
       });
     });
     await page.emulateMedia({ colorScheme: "dark" });
-    const fading = await page.evaluate(() => (window as unknown as { fading: Promise<number> }).fading);
-    expect(fading).toBeGreaterThan(0);
+    expect(await page.evaluate(() => (window as unknown as { fading: Promise<number> }).fading)).toBeGreaterThan(0);
   });
 
-  test("the switch is a 44 px target with a solid focus outline", async ({ page }) => {
+  test("the pill is a 44 px target with a solid focus outline", async ({ page }) => {
     await page.goto("/");
-    const light = switchButton(page);
-    const box = await light.boundingBox();
+    const box = await pill(page).boundingBox();
     expect(box?.width).toBeGreaterThanOrEqual(44);
     expect(box?.height).toBeGreaterThanOrEqual(44);
-    await light.focus();
-    await expect(light).toHaveCSS("outline-style", "solid");
+    await pill(page).focus();
+    await expect(pill(page)).toHaveCSS("outline-style", "solid");
   });
 
-  test("the room fades over 1.2 s, and hover shadows stay quick otherwise", async ({ page }) => {
+  test("the page fades over 1.2 s, and settles afterwards", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "no-preference" });
     await page.goto("/");
-    const pin = page.locator("[data-pin]").first();
-    await expect(pin).toHaveCSS("transition-duration", "0.22s");
+    const header = page.locator("[data-stretch-header]");
+    await expect(header).toHaveCSS("transition-duration", "0s");
     const during = await page.evaluate(() => {
-      document.querySelector<HTMLButtonElement>("[data-light-switch]")!.click();
-      const header = getComputedStyle(document.querySelector("[data-board-header]")!);
-      const pin = getComputedStyle(document.querySelector("[data-pin]")!);
-      const nightWall = getComputedStyle(document.querySelector(".board-surface-wall")!, "::before");
+      document.querySelector<HTMLButtonElement>("[data-lights-pill]")!.click();
+      const read = (selector: string) => getComputedStyle(document.querySelector(selector)!);
       return {
-        header: header.transitionDuration,
-        wall: nightWall.transitionDuration,
-        pin: pin.transitionProperty,
-        pinDuration: pin.transitionDuration,
+        header: read("[data-stretch-header]").transitionDuration,
+        heading: read("#work h2").transitionDuration,
+        timing: read("[data-stretch-header]").transitionTimingFunction,
       };
     });
     expect(during.header).toBe("1.2s");
-    expect(during.wall).toMatch(/^1\.2s/);
-    expect(during.pin).toMatch(/box-shadow/);
-    expect(during.pinDuration).toMatch(/^1\.2s/);
-    await expect(pin).toHaveCSS("transition-duration", "0.22s", { timeout: 3000 });
+    expect(during.heading).toMatch(/^1\.2s/);
+    expect(during.timing).toBe("cubic-bezier(0.42, 0, 0.58, 1)");
+    await expect(header).toHaveCSS("transition-duration", "0s", { timeout: 3000 });
   });
 
-  test("shadows fall away from the hero lamp at night", async ({ page }) => {
-    await page.emulateMedia({ colorScheme: "dark" });
-    await page.goto("/");
-    const shadow = await page.locator("#main-content [data-pin]").first().evaluate((pin) => getComputedStyle(pin).boxShadow);
-    const offsets = [...shadow.matchAll(/\) (-?\d+(?:\.\d+)?)px/g)].map(([, x]) => Number(x)).filter((x) => x !== 0);
-    expect(offsets.length).toBeGreaterThan(0);
-    for (const x of offsets) expect(x).toBeLessThan(0);
-  });
-
-  test("with reduced motion the room crossfades in 200 ms without swinging shadows", async ({ page }) => {
+  test("with reduced motion the page crossfades in 200 ms", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
     await page.goto("/");
-    // The reduced window is short, so click and read in the same task.
+    // The window is short, so click and read in the same task.
     const during = await page.evaluate(() => {
-      document.querySelector<HTMLButtonElement>("[data-light-switch]")!.click();
-      const style = getComputedStyle(document.querySelector("[data-board-header]")!);
-      return { duration: style.transitionDuration, properties: style.transitionProperty };
+      document.querySelector<HTMLButtonElement>("[data-lights-pill]")!.click();
+      return getComputedStyle(document.querySelector("[data-stretch-header]")!).transitionDuration;
     });
-    expect(during.duration).toBe("0.2s");
-    expect(during.properties).not.toMatch(/box-shadow/);
-  });
-
-  test("lights are scenery, not controls", async ({ page }) => {
-    await page.goto("/");
-    const lights = page.locator("[data-light-fixture]");
-    await expect(lights).not.toHaveCount(0);
-    for (const light of await lights.all()) {
-      await expect(light).toHaveAttribute("aria-hidden", "true");
-      await expect(light).toHaveCSS("pointer-events", "none");
-      expect(await light.locator("a, button, input, [tabindex]").count()).toBe(0);
-    }
+    expect(during).toBe("0.2s");
   });
 });

@@ -22,7 +22,7 @@ for (const [hash, reduced] of [['', false], ['#top', false], ['', true]]) {
   window.clearTimeout = () => {};
   runInNewContext(boot, {
     window,
-    document: { documentElement: root, readyState: 'complete', addEventListener() {}, querySelectorAll: () => [] },
+    document: { documentElement: root, readyState: 'complete', addEventListener() {}, querySelectorAll: () => [], createElement: () => ({}), head: { appendChild() {} } },
     location: { pathname: '/', hash },
     localStorage: { getItem: () => null },
     Event,

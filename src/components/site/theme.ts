@@ -2,16 +2,37 @@
  * The theme controller. There are three preferences: "system" follows the
  * device live, and "light" or "dark" is an explicit choice that persists.
  * The pre-paint boot script in the root layout reads the same storage key
- * and sets data-lights, so the page never paints in the wrong theme.
+ * and sets data-theme (and data-lights, which the Board still reads), so the
+ * page never paints in the wrong theme.
  *
- * The Board's styles follow data-lights rather than the device media query,
- * so this controller always marks the room as changing before the lights
- * change, and the change crossfades even when the device setting causes it.
+ * Every change marks the document as changing (data-theme-changing) before
+ * the theme flips, so the stylesheet crossfades it even when the device
+ * setting causes it. The browser's toolbar colour follows the page.
+ *
+ * No imports, and nothing runs at load, so the root layout can read the
+ * constants below on the server.
  */
 export type Theme = "light" | "dark";
 export type ThemePreference = Theme | "system";
 
 export const THEME_STORAGE_KEY = "elias-theme";
+
+/** The page background in each theme: `--stretch-page` in stretch-tokens.css. */
+export const TOOLBAR_COLOUR: Record<Theme, string> = { light: "#fbfbf8", dark: "#0d0d12" };
+
+/**
+ * Sets the browser's toolbar colour to the page's. The boot script in the root
+ * layout makes the meta before first paint; this keeps it current.
+ */
+export function syncToolbarColour(theme: Theme) {
+  let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  if (!meta) {
+    meta = document.createElement("meta");
+    meta.name = "theme-color";
+    document.head.appendChild(meta);
+  }
+  meta.content = TOOLBAR_COLOUR[theme];
+}
 
 const ROOM_CHANGE_MS = 1200;
 const REDUCED_ROOM_CHANGE_MS = 200;
@@ -60,6 +81,7 @@ function markRoomChanging() {
 function setLights(theme: Theme) {
   markRoomChanging();
   document.documentElement.dataset.lights = theme === "dark" ? "on" : "off";
+  syncToolbarColour(theme);
 }
 
 export function applyPreference(preference: ThemePreference) {

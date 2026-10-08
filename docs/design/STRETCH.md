@@ -8,7 +8,7 @@ The page stays neutral and the work carries the colour. Expressiveness comes fro
 
 ## Tokens
 
-Defined in `src/app/stretch-tokens.css` as `--stretch-*` variables. Dark follows the device unless a visitor has chosen light.
+Defined in `src/app/stretch-tokens.css` as `--stretch-*` variables. Dark follows the device unless a visitor has chosen light. Once script runs, the theme controller decides: it flips `data-lights` after marking the page as changing, so a change of the device setting crossfades like a click; the media query alone applies only when script has not run.
 
 | Token | Light | Dark | Role |
 |---|---|---|---|

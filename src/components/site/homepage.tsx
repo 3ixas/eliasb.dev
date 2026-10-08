@@ -1,28 +1,56 @@
-import { About } from "@/components/board/about";
-import { Board } from "@/components/board/board";
-import { Contact } from "@/components/board/contact";
-import { BoardFooter } from "@/components/board/footer";
-import { BoardHeader } from "@/components/board/board-header";
-import { Hero } from "@/components/board/hero";
-import { Work } from "@/components/board/work";
+import { sectionLabel } from "@/components/site/sections";
+import { SectionHeading } from "@/components/site/section-heading";
+import { SiteHeader } from "@/components/site/site-header";
+import { featuredSlugs, projects } from "@/content/projects";
+import { careerLog } from "@/content/stretch/career";
+import { howIWork } from "@/content/stretch/how-i-work";
+import { offTheClock } from "@/content/stretch/off-the-clock";
+import { hero, siteCopy, workSection } from "@/content/stretch/site-copy";
 
-export async function Homepage() {
+/**
+ * The Stretch homepage shell: the header, the hero and five anchored sections
+ * with their headings, notes and true counts, and the footer. The section
+ * bodies are empty until their own tickets fill them.
+ */
+export function Homepage() {
   return (
-    <div className="min-h-screen overflow-clip" id="top" tabIndex={-1}>
-      <BoardHeader />
+    <div data-stretch-shell>
+      <SiteHeader />
       <main id="main-content" tabIndex={-1}>
-        <Hero />
+        <section className="stretch-wrap stretch-hero" aria-label="Introduction">
+          <h1>
+            {hero.headline.lead} <em>{hero.headline.emphasis}</em>
+          </h1>
+        </section>
 
-        <Work />
+        <section id="work" className="stretch-wrap stretch-section" aria-labelledby="work-heading">
+          <SectionHeading
+            id="work-heading"
+            heading={workSection.heading}
+            note={workSection.note(projects.length, featuredSlugs.length)}
+          />
+        </section>
 
-        <Board />
+        <section id="how-i-work" className="stretch-wrap stretch-section" aria-labelledby="how-i-work-heading">
+          <SectionHeading id="how-i-work-heading" heading={howIWork.heading} note={howIWork.note} />
+        </section>
 
-        <About />
+        <section id="where-ive-been" className="stretch-wrap stretch-section" aria-labelledby="where-ive-been-heading">
+          <SectionHeading id="where-ive-been-heading" heading={careerLog.heading} note={careerLog.note} />
+        </section>
 
-        <Contact />
+        <section id="off-the-clock" className="stretch-wrap stretch-section" aria-labelledby="off-the-clock-heading">
+          <SectionHeading id="off-the-clock-heading" heading={offTheClock.heading} note={offTheClock.note} />
+        </section>
+
+        <section id="say-hello" className="stretch-wrap stretch-section" aria-labelledby="say-hello-heading">
+          <SectionHeading id="say-hello-heading" heading={sectionLabel["say-hello"]} />
+        </section>
       </main>
 
-      <BoardFooter />
+      <footer className="stretch-wrap stretch-footer">
+        <p className="stretch-mono">{siteCopy.footer}</p>
+      </footer>
     </div>
   );
 }
