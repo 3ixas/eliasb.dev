@@ -1,18 +1,26 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { contrastOnPaper } from "./support/contrast";
-import { attachMotionState } from "./support/motion-diagnostics";
+import { scrollInstantlyTo, scrollSettled } from "./support/scroll";
 
 const about = (page: Page) => page.locator("#about");
 const tags = ["History at uni", "Into marketing", "The click", "Learning to code", "BNP Paribas, today"];
 const drawn = (page: Page) =>
   page.locator(".board-string").evaluateAll((paths) => paths.map((path) => parseFloat(getComputedStyle(path).strokeDashoffset) || 0));
-const scrollToJourney = (page: Page, offset: number) =>
-  page.locator("[data-journey]").evaluate((element, by) => window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY + by), offset);
+/** Where the journey is on screen: its top and bottom, in viewport pixels. */
+const journeyOnScreen = (page: Page) =>
+  page.locator("[data-journey]").evaluate((element) => {
+    const { top, bottom } = element.getBoundingClientRect();
+    return { top, bottom };
+  });
+/** Scrolls until the journey's top is `top` px down the screen, once the arrival at #about has finished scrolling. */
+const scrollJourneyTo = async (page: Page, top: number) => {
+  await scrollSettled(page);
+  const target = await page.locator("[data-journey]").evaluate((element, at) => element.getBoundingClientRect().top + window.scrollY - at, top);
+  await scrollInstantlyTo(page, target);
+};
 
 test.describe("About", () => {
-  test.afterEach(async ({ page }, testInfo) => attachMotionState(page, testInfo));
-
   test.beforeEach(async ({ page }) => {
     await page.goto("/#about");
   });
@@ -39,9 +47,7 @@ test.describe("About", () => {
     expect(snapshot.indexOf("History at uni")).toBeLessThan(snapshot.indexOf("BNP Paribas, today"));
   });
 
-  test("the string draws itself on scroll, stretch by stretch", async ({ page, browserName }) => {
-    // CI's Linux WebKit never advances this animation, though Chromium and macOS WebKit do. Skipped there by decision; see #91.
-    test.skip(browserName === "webkit" && process.platform === "linux", "Linux WebKit does not run this animation");
+  test("the string draws itself on scroll, stretch by stretch", async ({ page }) => {
     const supported = await page.evaluate(() => CSS.supports("animation-timeline: view()"));
     await expect.poll(async () => (await drawn(page)).length).toBe(4);
     if (!supported) {
@@ -49,17 +55,28 @@ test.describe("About", () => {
       expect(await drawn(page)).toEqual([0, 0, 0, 0]);
       return;
     }
-    await scrollToJourney(page, -700);
+    // Each stretch is a running animation on the journey's view timeline.
+    await expect
+      .poll(() => page.locator(".board-string").evaluateAll((paths) => paths.map((path) => path.getAnimations().length)), {
+        message: "every stretch has its scroll-driven animation",
+      })
+      .toEqual([1, 1, 1, 1]);
+    // The journey just coming up from the bottom of the screen: the last stretch isn't drawn yet.
+    await scrollJourneyTo(page, 700);
+    // Landed where intended (within a few pixels of rounding), not somewhere a mid-scroll measurement put it.
+    expect((await journeyOnScreen(page)).top).toBeCloseTo(700, -1);
     await expect.poll(async () => (await drawn(page)).at(-1)).toBeGreaterThan(0.9);
     // Scrolled until the journey's end is near the top of the screen: all four stretches are drawn.
-    await page.locator("[data-journey]").evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().bottom + window.scrollY - 150));
+    const { top, bottom } = await journeyOnScreen(page);
+    await scrollJourneyTo(page, 150 - (bottom - top));
+    expect((await journeyOnScreen(page)).bottom).toBeCloseTo(150, -1);
     await expect.poll(async () => (await drawn(page)).every((offset) => offset < 0.05)).toBe(true);
   });
 
   test("with reduced motion the string is complete and the candle holds still", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.reload();
-    await scrollToJourney(page, -700);
+    await scrollJourneyTo(page, 700);
     await expect.poll(async () => (await drawn(page)).length).toBe(4);
     expect(await drawn(page)).toEqual([0, 0, 0, 0]);
     await expect(page.locator(".board-candle-flicker").first()).toHaveCSS("animation-name", "none");
