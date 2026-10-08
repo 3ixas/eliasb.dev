@@ -44,6 +44,7 @@ export const notFound = {
 } as const;
 
 export const hero = {
+  name: { first: "Elias", last: "Bennett" },
   portraitLabel: "Software engineer",
   headline: { lead: "I build everyday software, and make complicated things", emphasis: "feel simple." },
   support:

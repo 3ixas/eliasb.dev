@@ -322,9 +322,30 @@ html:has(.stretch-menu[open]) {
   line-height: 1.4;
 }
 
-/* The hero's placeholder: the real h1, until the Hero is built. */
+/* ---- Hero ---- */
+
 .stretch-hero {
-  padding-block: 48px 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  padding-block: 12px 48px;
+}
+
+/* The name: 36vw on phones so "Bennett" fills the width without wrapping. */
+.stretch-name {
+  margin: 0;
+  color: var(--stretch-cobalt);
+  font-size: 36vw;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.stretch-name span {
+  display: block;
+}
+
+.stretch-hero__lede {
+  margin-top: 28px;
 }
 
 .stretch-hero h1 {
@@ -339,6 +360,110 @@ html:has(.stretch-menu[open]) {
 .stretch-hero em {
   color: var(--stretch-cobalt);
   font-style: normal;
+}
+
+.stretch-hero__support {
+  max-width: 26em;
+  margin: 14px 0 0;
+  color: var(--stretch-muted);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.stretch-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.stretch-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding-inline: 20px;
+  border: 1px solid var(--stretch-ink);
+  border-radius: 999px;
+  color: var(--stretch-ink);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.stretch-button--primary {
+  border-color: var(--stretch-cobalt);
+  background-color: var(--stretch-cobalt);
+  color: var(--stretch-on-cobalt);
+}
+
+/* The portrait, tilted 2 degrees on phones and 3 on desktop, with its cobalt label. */
+.stretch-portrait {
+  position: relative;
+  justify-self: start;
+  width: min(100% - 16px, 360px);
+  margin: 28px 0 0 8px;
+  transform: rotate(2deg);
+  transform-origin: 50% 0;
+}
+
+.stretch-portrait img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  border-radius: 18px;
+  object-fit: cover;
+}
+
+.stretch-portrait__label {
+  position: absolute;
+  left: -8px;
+  bottom: 20px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background-color: var(--stretch-cobalt);
+  color: var(--stretch-on-cobalt);
+  font-size: 16px;
+  font-weight: 700;
+  transform: rotate(-6deg);
+}
+
+@media (min-width: 761px) {
+  .stretch-hero {
+    grid-template-columns: minmax(0, 1fr) 290px;
+    column-gap: 48px;
+    padding-block: 24px 80px;
+  }
+
+  .stretch-name {
+    font-size: clamp(88px, 18vw, 280px);
+  }
+
+  .stretch-hero__lede {
+    margin-top: 48px;
+  }
+
+  .stretch-hero__support {
+    font-size: 19px;
+  }
+
+  .stretch-portrait {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: start;
+    justify-self: stretch;
+    width: auto;
+    margin: 16px 0 0;
+    transform: rotate(3deg);
+  }
+
+  .stretch-portrait__label {
+    left: -28px;
+    bottom: 28px;
+    padding: 10px 16px;
+    font-size: 17px;
+    transform: rotate(-7deg);
+  }
 }
 
 /* ---- Footer ---- */

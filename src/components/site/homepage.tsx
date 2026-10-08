@@ -1,11 +1,12 @@
 import { sectionLabel } from "@/components/site/sections";
+import { Hero } from "@/components/site/hero";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SiteHeader } from "@/components/site/site-header";
 import { featuredSlugs, projects } from "@/content/projects";
 import { careerLog } from "@/content/stretch/career";
 import { howIWork } from "@/content/stretch/how-i-work";
 import { offTheClock } from "@/content/stretch/off-the-clock";
-import { hero, siteCopy, workSection } from "@/content/stretch/site-copy";
+import { siteCopy, workSection } from "@/content/stretch/site-copy";
 
 /**
  * The Stretch homepage shell: the header, the hero and five anchored sections
@@ -17,11 +18,7 @@ export function Homepage() {
     <div data-stretch-shell>
       <SiteHeader />
       <main id="main-content" tabIndex={-1}>
-        <section className="stretch-wrap stretch-hero" aria-label="Introduction">
-          <h1>
-            {hero.headline.lead} <em>{hero.headline.emphasis}</em>
-          </h1>
-        </section>
+        <Hero />
 
         <section id="work" className="stretch-wrap stretch-section" aria-labelledby="work-heading">
           <SectionHeading

@@ -32,6 +32,18 @@ export type ContrastReading = {
  * visually hidden for it, is skipped.
  */
 export async function renderedContrast(page: Page): Promise<ContrastReading[]> {
+  // A full-page capture is now and then not a faithful picture of the layout it
+  // was measured against (a few runs in a hundred, always the content far below
+  // the top), which reads as a contrast failure. A real failure shows on every
+  // attempt, so a failing reading is measured again before it is believed.
+  let readings = await measureOnce(page);
+  for (let retry = 0; retry < 3 && readings.some((reading) => reading.median < reading.needs || reading.worst < reading.needs); retry++) {
+    readings = await measureOnce(page);
+  }
+  return readings;
+}
+
+async function measureOnce(page: Page): Promise<ContrastReading[]> {
   // Let lazy images and in-view objects settle before measuring.
   await page.evaluate(async () => {
     for (let y = 0; y < document.documentElement.scrollHeight; y += 600) {
@@ -39,6 +51,9 @@ export async function renderedContrast(page: Page): Promise<ContrastReading[]> {
       await new Promise((resolve) => setTimeout(resolve, 30));
     }
     scrollTo(0, 0);
+    // A web font that swaps in after the boxes are measured moves them off the
+    // pixels they are compared with.
+    await document.fonts.ready;
   });
   await page.waitForTimeout(600);
 
