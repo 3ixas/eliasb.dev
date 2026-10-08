@@ -14,6 +14,7 @@ import { asOfDate, pinStatus, staleAfterDays } from "../src/integrations/pin-rul
 import { fantasyRecord, fantasySpoken, fantasyVerdict, filmLine, isoWeek, stars, trainingSpoken, groupedNumber, makingNote, MAKING_CURRENT_DAYS } from "../src/content/board.ts";
 import { fantasyMoment, fantasyTicket } from "../src/integrations/fantasy.ts";
 import { ARROW_GAP, stringStretches } from "../src/components/board/journey-geometry.ts";
+import { sleeperLeagueId } from "../src/integrations/sleeper-config.ts";
 import { readSleeperSnapshot } from "../src/integrations/sleeper-snapshot.ts";
 import { getHistorySignal, historyWeekStart, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "../src/integrations/history.ts";
 import {
@@ -455,7 +456,8 @@ assert.equal(
 );
 
 // Sleeper, read with fixture responses: my team is named; the opponent and the league never are.
-const leagueId = integrationConfig.sleeper.leagueId;
+const leagueId = "9000000000000000001";
+const sleeper = { username: integrationConfig.sleeper.username, leagueId };
 const sleeperFixture = {
   "/user/3ixas": { user_id: "me", display_name: "3ixas" },
   "/state/nfl": { season: "2026", season_type: "regular", week: 4 },
@@ -478,7 +480,7 @@ globalThis.fetch = async (url) => {
   return path in sleeperFixture ? Response.json(sleeperFixture[path]) : new Response("Not found", { status: 404 });
 };
 try {
-  const sleeperSnapshot = await readSleeperSnapshot(integrationConfig.sleeper, 2026, 4);
+  const sleeperSnapshot = await readSleeperSnapshot(sleeper, 2026, 4);
   assert.equal(sleeperSnapshot.teamName, "K9 Unit");
   assert.deepEqual(sleeperSnapshot.thisWeek, { team: 24.6, opponent: 0 });
   assert.deepEqual(sleeperSnapshot.lastWeek, { team: 151.24, opponent: 90.52 });
@@ -489,16 +491,23 @@ try {
   }
   // Between seasons, or a league from last season, there's nothing to show.
   sleeperFixture["/state/nfl"] = { season: "2026", season_type: "off" };
-  assert.equal((await readSleeperSnapshot(integrationConfig.sleeper, 2026, 4)).thisWeek, null);
+  assert.equal((await readSleeperSnapshot(sleeper, 2026, 4)).thisWeek, null);
   sleeperFixture["/state/nfl"] = { season: "2026", season_type: "regular" };
   sleeperFixture[`/league/${leagueId}`] = { season: "2025", settings: {} };
-  assert.equal((await readSleeperSnapshot(integrationConfig.sleeper, 2026, 4)).thisWeek, null);
+  assert.equal((await readSleeperSnapshot(sleeper, 2026, 4)).thisWeek, null);
   // An unreadable Sleeper throws, so the cache keeps its last good snapshot.
   delete sleeperFixture[`/league/${leagueId}/rosters`];
-  await assert.rejects(readSleeperSnapshot(integrationConfig.sleeper, 2026, 4));
+  await assert.rejects(readSleeperSnapshot(sleeper, 2026, 4));
 } finally {
   globalThis.fetch = originalFetch;
 }
+
+// The league's ID comes from the environment, never the source: without it there is no fantasy pin.
+assert.equal(sleeperLeagueId({}), null);
+assert.equal(sleeperLeagueId({ SLEEPER_LEAGUE_ID: "" }), null);
+assert.equal(sleeperLeagueId({ SLEEPER_LEAGUE_ID: "  " }), null);
+assert.equal(sleeperLeagueId({ SLEEPER_LEAGUE_ID: " 9000000000000000001 " }), "9000000000000000001");
+assert.equal("leagueId" in integrationConfig.sleeper, false, "The league ID belongs in SLEEPER_LEAGUE_ID, not in integration-config");
 
 // Simulate a browser with different locale data. Calendar HTML must not depend
 // on Intl at either render, otherwise React can replace the page during hydration.

@@ -5,7 +5,6 @@ export const integrationConfig = {
   },
   sleeper: {
     username: "3ixas",
-    leagueId: "1389388491485384704",
   },
   spotify: {
     playlistId: "3t859SH3i1qKfvsDlGWm9F",
