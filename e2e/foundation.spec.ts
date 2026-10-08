@@ -162,36 +162,43 @@ test.describe("Board foundation", () => {
     });
   }
 
-  // The home page can show live titles and names with accents, so it may fetch
-  // an accents file, but only when the text set in Newsreader has a character
-  // in the accents range. Otherwise the authored copy has slipped into that
-  // range, and every visitor pays for a file the page doesn't need. (Arrows and
-  // other symbols are in neither file; the browser falls back for those.)
-  test("/ fetches a Newsreader accents file only for text that needs one", async ({ page }) => {
+  // The home page's live pins (history, books, film, GitHub, Making, fantasy)
+  // can show titles and names with accents, which is what the accents files are
+  // for. Everything else is authored copy, and none of it may use a character
+  // in the accents range, or every visitor pays for a file the page doesn't
+  // need. When the live text has none either, no accents file loads at all.
+  // (Arrows and other symbols are in neither file; the browser falls back.)
+  test("/ keeps its authored copy out of Newsreader's accents range", async ({ page }) => {
     const ranges = (literal: string) =>
       literal.split(",").map((part) => {
         const [from, to = from] = part.trim().replace(/^U\+/, "").split("-").map((hex) => parseInt(hex, 16));
         return [from, to];
       });
     const [, accentsRange] = readFileSync("src/app/layout.tsx", "utf8").match(/value: "(U\+00A1-00B6[^"]*)"/)!;
+    const live = ["clipping", "reading", "film", "github", "making", "fantasy"].map((pin) => `[data-board-pin='${pin}']`).join(", ");
     await page.goto("/");
-    const { needing, accents } = await page.evaluate(async (accentRanges) => {
-      await document.fonts.ready;
-      const needing: string[] = [];
-      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-        const element = node.parentElement;
-        if (!element || element.closest("script, style, noscript") || !/newsreader/i.test(getComputedStyle(element).fontFamily)) continue;
-        for (const character of node.textContent ?? "") {
-          const code = character.codePointAt(0)!;
-          if (accentRanges.some(([from, to]) => code >= from && code <= to)) needing.push(character);
+    const { authored, fromLive, accents } = await page.evaluate(
+      async ({ accentRanges, liveSelector }) => {
+        await document.fonts.ready;
+        const authored: string[] = [];
+        const fromLive: string[] = [];
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+          const element = node.parentElement;
+          if (!element || element.closest("script, style, noscript") || !/newsreader/i.test(getComputedStyle(element).fontFamily)) continue;
+          const found = element.closest(liveSelector) ? fromLive : authored;
+          for (const character of node.textContent ?? "") {
+            const code = character.codePointAt(0)!;
+            if (accentRanges.some(([from, to]) => code >= from && code <= to)) found.push(character);
+          }
         }
-      }
-      const accents = [...document.fonts].filter((face) => /Accents$/.test(face.family) && face.status !== "unloaded").map((face) => face.family);
-      return { needing, accents };
-    }, ranges(accentsRange));
-    if (needing.length === 0) expect(accents).toEqual([]);
-    else test.info().annotations.push({ type: "accents needed", description: [...new Set(needing)].join(" ") });
+        const accents = [...document.fonts].filter((face) => /Accents$/.test(face.family) && face.status !== "unloaded").map((face) => face.family);
+        return { authored, fromLive, accents };
+      },
+      { accentRanges: ranges(accentsRange), liveSelector: live },
+    );
+    expect(authored, "authored copy in the accents range").toEqual([]);
+    if (fromLive.length === 0) expect(accents).toEqual([]);
   });
 
   // Links hold back their prefetches until the page is idle after loading (or
