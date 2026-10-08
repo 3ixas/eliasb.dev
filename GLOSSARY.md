@@ -20,6 +20,26 @@ _Avoid_: Using it for project tiles or as decoration
 The colours a project already has in its own interface, carried by its Work tile and swatches: Threshold gold, Argus Risk blue, Flowtime copper. The work carries the colour; the page stays neutral.
 _Avoid_: Recolouring projects in the Cobalt accent
 
+**Project index**:
+The newest-first list under **Featured work** that holds every other project worth talking through in an interview. Each row has a number, name, one-line outcome, type, and year, with a screenshot that previews on hover or focus. It shows about ten rows, then links to the **Work archive**.
+_Avoid_: Grid of every project, filters on the homepage
+
+**How I work**:
+The homepage section with three beats (start from a real problem, write it down first, measure whether it works), each with one true proof, and an honest line that Elias's own projects are not yet launched or measured.
+_Avoid_: Claims of users or impact
+
+**Where I've been**:
+The homepage section that tells Elias's path on a **Career ruler**, with his story as one-line notes and CV-level milestones as markers. It replaces the **About section**.
+_Avoid_: About, long biography
+
+**Off the clock**:
+The homepage section for Elias's own time: his training week, what he is reading and last watched, the weekly history clipping, **Now making**, and his GitHub contributions. Each item is a **Live signal** with a fallback.
+_Avoid_: Library, Personal signals, Board
+
+**Now making**:
+The **Off the clock** item showing the project Elias is building in his own time, in one line. It replaces the **Making pin**.
+_Avoid_: Experiments, Lab
+
 **Fastener**:
 The single small prop on a card's edge: tape, a paperclip, or a pin. There is at most one per object, the card itself stays clean, and the image carries the colour.
 _Avoid_: Prop that stands in for content, more than one per card
@@ -37,11 +57,11 @@ One item placed on the Board, such as a project, a book, a film, a playlist, or 
 _Avoid_: Widget, card (when meaning the Board item)
 
 **One-page home**:
-The canonical scrollable homepage where the primary navigation moves between authored sections of one narrative: introduction, featured work, personal signals, experiments, about, and contact.
+The canonical scrollable homepage where the primary navigation moves between six authored sections of one narrative: Hero, Work, How I work, Where I've been, Off the clock, and Say hello ([#106](https://github.com/3ixas/eliasb.dev/issues/106)).
 _Avoid_: Making Library, Lab, or About separate primary destinations.
 
 **Featured work**:
-A curated selection of Elias's strongest projects shown on the homepage. Its size is intentionally flexible; it represents the work he most wants a visitor to see first.
+Up to three of Elias's strongest projects, chosen by hand and shown as big tiles in their **Project colour**, above the **Project index**. A featured project needs a case study, a screenshot, and its colours.
 _Avoid_: Treating the homepage as a complete project archive.
 
 **Work archive**:
@@ -49,7 +69,7 @@ The durable Work destination containing the full collection of project case stud
 _Avoid_: Limiting the Work destination to the homepage selection.
 
 **Primary audience**:
-People seeking founding engineers or product engineers who care about product thinking, design, UI, UX, and code. Elias presents as a **product engineer**: someone who codes and also decides what is worth building, so engineering work is shown alongside how he chooses what to make and how he knows it is working. Fellow builders are also an important audience.
+People seeking founding engineers or product engineers who care about product thinking, design, UI, UX, and code. Elias's title is **Software engineer**. **How I work** shows that he also decides what is worth building and checks whether it works, so the evidence makes the product claim, not the title. Fellow builders are also an important audience.
 
 **Signature entrance**:
 A brief automatic opening sequence that introduces the site's voice and flows directly into accessible content.
@@ -78,16 +98,16 @@ _Avoid_: Claims of users, traction, or "can't live without" as a fact
 **Experiments section** (retired):
 A former compact homepage section for Lab material. It is replaced by the Making pin.
 
-**Library**:
-The public primary-navigation label for the unified Personal signals section. It takes visitors to the existing one-page collection and does not create a separate Library page.
+**Library** (superseded):
+The public primary-navigation label for the unified Personal signals section. It takes visitors to the existing one-page collection and does not create a separate Library page. Superseded on 8 October 2026 by the six-section homepage ([#106](https://github.com/3ixas/eliasb.dev/issues/106)); kept for history.
 _Avoid_: Treating the legacy `/library` path as a separate content system.
 
-**Personal signals section**:
-The single homepage section reached by the **Library** navigation item. Its stable anchor remains #outside-work. It gathers current building, London status, training, fantasy football, reading, cinema, music, and history as personal signals alongside the case studies. Its cards can be grouped and arranged according to the material rather than a fixed taxonomy.
+**Personal signals section** (superseded):
+The single homepage section reached by the **Library** navigation item. Its stable anchor remains #outside-work. It gathers current building, London status, training, fantasy football, reading, cinema, music, and history as personal signals alongside the case studies. Its cards can be grouped and arranged according to the material rather than a fixed taxonomy. Superseded on 8 October 2026 by the six-section homepage ([#106](https://github.com/3ixas/eliasb.dev/issues/106)); kept for history.
 _Avoid_: Splitting personality across separate Now and Library sections, or presenting science fiction as a standalone category without enough material to support it.
 
-**About section**:
-The homepage's long-form personal section containing Elias's professional context, connecting thread, interests, portrait, and contact links. The white-tux portrait is the chosen primary image for this section.
+**About section** (superseded):
+The homepage's long-form personal section containing Elias's professional context, connecting thread, interests, portrait, and contact links. The white-tux portrait is the chosen primary image for this section. Superseded on 8 October 2026 by the six-section homepage ([#106](https://github.com/3ixas/eliasb.dev/issues/106)); kept for history.
 _Avoid_: A detached profile page that repeats the homepage story.
 
 **Live signal**:
