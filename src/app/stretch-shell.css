@@ -1645,3 +1645,61 @@ button.stretch-gh__day[data-selected] {
     padding-top: 2px;
   }
 }
+
+/* ---- Say hello: the big link, the line and the three links ---- */
+
+.stretch-hello {
+  display: grid;
+  justify-items: start;
+  gap: 24px;
+  margin-top: 40px;
+}
+
+/* The one cobalt block: a tall slab of a link with a 44 px+ target at every width. */
+.stretch-hello__big {
+  display: inline-flex;
+  align-items: center;
+  min-height: 72px;
+  padding: 12px 28px;
+  border-radius: 999px;
+  background-color: var(--stretch-cobalt);
+  color: var(--stretch-on-cobalt);
+  font-size: clamp(36px, 8vw, 72px);
+  line-height: 1;
+  text-decoration: none;
+}
+
+.stretch-hello__line {
+  max-width: 60ch;
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+.stretch-hello__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stretch-hello__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding-inline: 18px;
+  border: 1px solid var(--stretch-ink);
+  border-radius: 999px;
+  color: var(--stretch-ink);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.stretch-hello__link:hover {
+  background-color: var(--stretch-ink);
+  color: var(--stretch-page);
+}
