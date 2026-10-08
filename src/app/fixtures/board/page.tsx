@@ -17,9 +17,9 @@ const daysAgo = (days: number) => new Date(now.getTime() - days * 86_400_000).to
 const fixtures: readonly { key: PinKey; source: PinSource; photo?: string | null }[] = [
   { key: "github", source: { state: "live", updatedAt: daysAgo(1) } },
   { key: "reading", source: { state: "live", updatedAt: daysAgo(61) } },
-  { key: "playlist", source: { state: "unavailable", updatedAt: null } },
+  { key: "making", source: { state: "unavailable", updatedAt: null } },
   { key: "film", source: { state: "live", updatedAt: daysAgo(2) }, photo: null },
-  { key: "london", source: { state: "curated", updatedAt: null }, photo: board.london.src },
+  { key: "training", source: { state: "curated", updatedAt: null }, photo: board.training.photo.src },
 ];
 
 /**
@@ -40,7 +40,7 @@ export default async function BoardFixtures() {
             <PinSlot key={key} status={pinStatus(key, source, now)} data-fixture-pin={key} className="board-sway board:col-span-4">
               <Pin object="photo" fixing="tape" surface="linen" looseness="loose" tilt={1} stock="photo" className="p-3 pb-4">
                 {photo !== undefined && (
-                  <PinPhoto src={photo} alt={board.london.alt} width={board.london.width} height={board.london.height} sizes="320px" />
+                  <PinPhoto src={photo} alt={board.training.photo.alt} width={board.training.photo.width} height={board.training.photo.height} sizes="320px" />
                 )}
                 <p className="mt-3 mb-0 font-mono text-label uppercase">{board.labels[key]}</p>
               </Pin>

@@ -6,15 +6,14 @@ import { contrastOnPaper } from "./support/contrast";
 const lightsOn = (page: Page) => page.evaluate(() => (document.documentElement.dataset.lights = "on"));
 
 test.describe("The culture corner", () => {
-  test("hangs the book, the film, and the cassette player under its heading", async ({ page }) => {
+  test("hangs the book and the film under its heading", async ({ page }) => {
     await page.goto("/#outside-work");
     const board = page.locator("[data-pinboard]");
     await expect(board.getByRole("heading", { level: 3, name: "The culture corner" })).toBeVisible();
     await expect(board.locator("[data-board-pin='reading']").getByText("Now reading")).toBeVisible();
     await expect(board.locator("[data-board-pin='film']").getByText("Admit one · Last watched")).toBeVisible();
-    await expect(board.locator("[data-board-pin='playlist']").getByText("On repeat")).toBeVisible();
-    // The legacy book, film, and playlist are gone from below the Board.
-    await expect(page.locator(".library-objects, .playlist-room")).toHaveCount(0);
+    // The legacy book and film are gone from below the Board.
+    await expect(page.locator(".library-objects")).toHaveCount(0);
   });
 
   test("every cover and poster says what it shows", async ({ page }) => {
@@ -24,46 +23,13 @@ test.describe("The culture corner", () => {
     }
   });
 
-  test("loads nothing from Spotify until Play is pressed, then shows Spotify's player", async ({ page }) => {
-    const spotifyRequests: string[] = [];
-    page.on("request", (request) => {
-      if (new URL(request.url()).hostname.endsWith("spotify.com")) spotifyRequests.push(request.url());
-    });
-    // Stand in for Spotify, so the suite doesn't depend on its network.
-    await page.route("https://open.spotify.com/**", (route) => route.fulfill({ contentType: "text/html", body: "<!doctype html><title>Player</title>" }));
-    await page.goto("/#outside-work");
-    await page.waitForLoadState("networkidle");
-
-    const playlist = page.locator("[data-board-pin='playlist']");
-    await expect(playlist.locator("iframe")).toHaveCount(0);
-    expect(spotifyRequests).toEqual([]);
-    await expect(playlist.getByText("Side A · press play to see what’s on it")).toBeVisible();
-
-    const play = playlist.getByRole("button", { name: "Play my playlist on Spotify" });
-    await expect(play).toContainText("Play");
-    const target = (await play.boundingBox())!;
-    expect(target.height).toBeGreaterThanOrEqual(44);
-    expect(target.width).toBeGreaterThanOrEqual(44);
-
-    await play.click();
-    const player = playlist.locator("iframe[title='My Spotify playlist']");
-    await expect(player).toHaveAttribute("src", /^https:\/\/open\.spotify\.com\/embed\/playlist\/3t859SH3i1qKfvsDlGWm9F/);
-    await expect(player).toHaveAttribute("height", "352");
-    await expect(player).toBeFocused();
-    await expect(play).toHaveCount(0);
-    await expect.poll(() => spotifyRequests.length).toBeGreaterThan(0);
-    await expect(playlist.getByText("Side A", { exact: true })).toBeVisible();
-    // The way out to Spotify stays, before and after Play.
-    await expect(playlist.getByRole("link", { name: "Open in Spotify" })).toHaveAttribute("href", "https://open.spotify.com/playlist/3t859SH3i1qKfvsDlGWm9F");
-  });
-
   test("stacks without overlap or sideways scroll on narrow screens", async ({ page }) => {
     const width = page.viewportSize()!.width;
     test.skip(width >= 900, "The corner sits in a row on wide screens");
     await page.goto("/#outside-work");
     // Measured together in page coordinates, so the smooth scroll to the Board can't skew them.
     const boxes = await page.evaluate(() =>
-      ["reading", "film", "playlist"].map((pin) => {
+      ["reading", "film"].map((pin) => {
         const box = document.querySelector(`[data-board-pin='${pin}']`)!.getBoundingClientRect();
         return { x: box.x, y: box.y + window.scrollY, width: box.width, height: box.height };
       }),

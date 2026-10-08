@@ -1,13 +1,8 @@
-import type { CSSProperties } from "react";
 import { ClippingPin } from "@/components/board/clipping";
 import { CultureCorner } from "@/components/board/culture-corner";
-import { FantasyTicketPin } from "@/components/board/fantasy-ticket";
 import { TrainingPin } from "@/components/board/training-log";
-import { LondonClock } from "@/components/board/london-clock";
 import { GitHubPin } from "@/components/board/github-pin";
 import { MakingPin } from "@/components/board/making-pin";
-import { Pin } from "@/components/board/pin";
-import { PinPhoto, PinSlot } from "@/components/board/pin-states";
 import { Pinboard } from "@/components/board/pinboard";
 import { BoardSurface } from "@/components/board/surface";
 import { board } from "@/content/board";
@@ -15,24 +10,18 @@ import { getReadingSignal } from "@/integrations/goodreads";
 import { getCachedHistorySignal } from "@/integrations/history-cache";
 import { getGitHubSignal, getLatestRepositorySignal } from "@/integrations/github";
 import { getFilmSignal } from "@/integrations/letterboxd";
-import { getFantasySignal } from "@/integrations/sleeper";
-import type { PinStatus } from "@/integrations/pin-rules";
-
-// London is authored, a photo and the time, so it is always current (staleAfterDays.london is null).
-const londonStatus: PinStatus = { kind: "current" };
 
 /**
  * The Board: the personal section, a framed linen pinboard on the wall.
- * The Weekly Curiosity, Making and training, London and the fantasy ticket,
- * the culture corner, and the GitHub year across the bottom.
+ * The Weekly Curiosity, Making and training, the culture corner, and the
+ * GitHub year across the bottom.
  */
 export async function Board() {
   const now = new Date();
-  const [history, reading, film, fantasy, github, latest] = await Promise.all([
+  const [history, reading, film, github, latest] = await Promise.all([
     getCachedHistorySignal(),
     getReadingSignal(),
     getFilmSignal(),
-    getFantasySignal(now),
     getGitHubSignal(),
     getLatestRepositorySignal(),
   ]);
@@ -58,39 +47,10 @@ export async function Board() {
             <MakingPin latest={latest} now={now} />
             <TrainingPin now={now} />
           </div>
-          {/* London with the fantasy ticket pinned below it, beside the clipping. */}
-          <div className="flex flex-col gap-16 board:col-span-4 board:col-start-9">
-            <LondonPin />
-            <FantasyTicketPin fantasy={fantasy} now={now} />
-          </div>
           <CultureCorner reading={reading} film={film} now={now} />
           <GitHubPin github={github} now={now} />
         </Pinboard>
       </div>
     </BoardSurface>
-  );
-}
-
-/** London: a photo taped to the linen, with an analogue clock set to London time. */
-function LondonPin() {
-  return (
-    <PinSlot
-      status={londonStatus}
-      data-board-pin="london"
-      className="board-sway relative mx-auto w-full max-w-[320px] board:max-w-none"
-      style={{ "--sway-depth": 0.7 } as CSSProperties}
-    >
-      <Pin object="photo" fixing="tape" surface="linen" looseness="loose" tilt={-1.2} stock="photo" className="p-3 pb-4">
-        <PinPhoto
-          src={board.london.src}
-          alt={board.london.alt}
-          width={board.london.width}
-          height={board.london.height}
-          sizes="(max-width: 899px) 296px, 360px"
-        />
-        <p className="mt-3 mb-0 font-mono text-label uppercase">{board.labels.london}</p>
-      </Pin>
-      <LondonClock className="board-clock absolute -right-3 -bottom-8 z-20" />
-    </PinSlot>
   );
 }

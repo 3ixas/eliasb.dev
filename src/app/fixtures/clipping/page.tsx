@@ -24,7 +24,7 @@ const week: HistorySignal = {
       text: "The first aerial circumnavigation is completed by a team from the US Army.",
       sourceUrl: "https://en.wikipedia.org/wiki/First_aerial_circumnavigation",
       image: {
-        src: "/signals/london-st-pauls.jpg",
+        src: "/projects/threshold.webp",
         alt: "Douglas World Cruisers on a beach",
         creator: "The Museum of Flight",
         sourceUrl: "https://commons.wikimedia.org/wiki/File:Douglas_World_Cruisers.jpg",
@@ -46,7 +46,7 @@ const week: HistorySignal = {
       text: "Henri Moissan, French chemist who first isolated fluorine",
       sourceUrl: "https://en.wikipedia.org/wiki/Henri_Moissan",
       image: {
-        src: "/signals/football-stadium.jpg",
+        src: "/profile/elias-evening.webp",
         alt: "Henri Moissan in his laboratory",
         creator: "Ada Example",
         sourceUrl: "https://commons.wikimedia.org/wiki/File:Henri_Moissan.jpg",

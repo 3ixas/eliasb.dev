@@ -37,7 +37,6 @@
   --stock-kraft: #d7ae63;
   --stock-ticket: #e9c37a;
   --stock-newsprint: #f4efe3;
-  --stock-matchday: #f1e8d2;
 
   /* Surfaces and fixings that look the same by day and night */
   --linen: #e3d2b4;
@@ -45,7 +44,7 @@
    * Focus is a two-tone ring: the accent outline between two dark bands. Where
    * the accent is faint against a surface (kraft, paper, the dimmed folders and
    * linen by night) the dark bands carry the 3:1; on the night wall the accent
-   * does. A dark surface (the cassette deck, the blueprint) sets light bands instead.
+   * does. A dark surface (the blueprint) sets light bands instead.
    * A focused control's own shadow gives way to the bands; one with a Tailwind
    * shadow-* utility adds focus-visible:shadow-(--shadow-focus) to keep them.
    */
@@ -126,23 +125,14 @@
   --photo-coming-ink: #5f574d;
   --stale-fade: sepia(0.35) saturate(0.6);
 
-  /* The culture corner: a library card, a cinema ticket, and a cassette player. */
+  /* The culture corner: a library card and a cinema ticket. */
   --library-card: #efe3c8;
   --library-card-rule: rgb(90 110 150 / 0.35);
   --library-stamp: #6a2e7a;
   --tag-ink: #5c3d10;
   --ticket-perforation: rgb(92 61 16 / 0.45);
 
-  /* The fantasy ticket stub: a strip of turf, and a pencilled verdict. */
-  --turf: #3f7a4b;
-  --turf-lines:
-    repeating-linear-gradient(to bottom, transparent 0 20px, rgb(255 255 255 / 0.6) 20px 22px),
-    repeating-linear-gradient(to bottom, transparent 0 4px, rgb(255 255 255 / 0.45) 4px 5px) 10px 0 / 8px 100% repeat-y;
-  --football: #7a3e1e;
-  --football-lace: #f4ebdd;
-  --matchday-ink: #2f5a38;
-  --matchday-muted: #4a4540;
-  --matchday-tear: rgb(38 49 31 / 0.35);
+  /* A pencilled note, as in the training diary and the "as of" dates. */
   --pencil: #4a4540;
 
   /* The GitHub sheet: graph paper, GitHub's five greens, and its own ink. */
@@ -190,20 +180,6 @@
   /* The training diary: a lined page with a red rule. */
   --diary-lines: repeating-linear-gradient(to bottom, transparent 0 27px, rgb(90 110 150 / 0.3) 27px 28px);
   --diary-rule: #b3261e;
-  --deck: #a93f1c;
-  --deck-gradient: linear-gradient(180deg, #b5431e 0%, #9e3a1a 100%);
-  --deck-sheen: inset 0 2px 0 rgb(255 220 190 / 0.4), inset 0 -3px 0 rgb(0 0 0 / 0.18);
-  --deck-ink: #fff4ec;
-  --deck-window: #2a2420;
-  --deck-window-depth: inset 0 3px 8px rgb(0 0 0 / 0.6);
-  --tape-label: #efe6d2;
-  --tape-reel: radial-gradient(circle, #efe6d2 0 17%, #2a2420 18.5% 28%, #5a4e44 29.5% 50%, transparent 51%);
-  --deck-button: #1d1a16;
-  --deck-button-ink: #f3e6da;
-  --deck-button-edge: #000;
-  --j-card: #f5eedd;
-  --j-card-ink: #3a3129;
-
   /* GitHub's five-step greens: the one deliberate palette exception */
   --github-0: #ebedf0;
   --github-1: #9be9a8;
@@ -395,7 +371,6 @@
   --color-stock-kraft: var(--stock-kraft);
   --color-stock-ticket: var(--stock-ticket);
   --color-stock-newsprint: var(--stock-newsprint);
-  --color-stock-matchday: var(--stock-matchday);
 
   --font-display: var(--font-bricolage), system-ui, sans-serif;
   --font-sans: var(--font-bricolage), system-ui, sans-serif;
@@ -1086,55 +1061,6 @@
     background: radial-gradient(circle, var(--ticket-perforation) 0 1.5px, transparent 2px) 0 0 / 4px 8px repeat-y;
   }
 
-  /*
-   * The fantasy ticket stub: turf, the main part, and the torn-off side with
-   * the record set sideways. The turf goes on the narrowest screens, where
-   * the score needs the room.
-   */
-  .board-matchday {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 36px;
-  }
-
-  .board-turf {
-    display: none;
-    position: relative;
-    border-radius: 2px 0 0 2px;
-    background: var(--turf-lines), var(--turf);
-  }
-
-  .board-football {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    translate: -50% -50%;
-    rotate: -24deg;
-    filter: drop-shadow(1px 2px 1px rgb(0 0 0 / 0.35));
-  }
-
-  .board-matchday-main {
-    border-right: 2px dashed var(--matchday-tear);
-  }
-
-  .board-matchday-side {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .board-matchday-side p {
-    writing-mode: vertical-rl;
-    rotate: 180deg;
-  }
-
-  .board-matchday-ink {
-    color: var(--matchday-ink);
-  }
-
-  .board-matchday-muted {
-    color: var(--matchday-muted);
-  }
-
   .board-diary {
     background-image: var(--diary-lines);
     background-position: 0 40px;
@@ -1226,7 +1152,7 @@
   }
 
   .board-blueprint {
-    /* Light focus bands on the dark blue, as on the cassette deck. */
+    /* Light focus bands on the dark blue. */
     --shadow-focus: 0 0 0 8px var(--blueprint-ink);
     background-color: var(--blueprint);
     background-image: var(--blueprint-grid);
@@ -1485,76 +1411,6 @@
     font-style: italic;
     line-height: 1.2;
     rotate: -2deg;
-  }
-
-  @media (min-width: 400px) {
-    .board-matchday {
-      grid-template-columns: 72px minmax(0, 1fr) 52px;
-    }
-
-    .board-turf {
-      display: block;
-    }
-  }
-
-  @media (min-width: 900px) {
-    .board-matchday {
-      grid-template-columns: 86px minmax(0, 1fr) 58px;
-    }
-  }
-
-  .board-deck {
-    /* Light focus bands on the rust; set here, as a token resolves where it is declared. */
-    --shadow-focus: 0 0 0 8px var(--deck-ink);
-    border-radius: 18px;
-    background-color: var(--deck);
-    background-image: var(--deck-gradient);
-    color: var(--deck-ink);
-    box-shadow: var(--shadow-pin), var(--deck-sheen);
-  }
-
-  .board-deck-window {
-    border-radius: 10px;
-    background: var(--deck-window);
-    box-shadow: var(--deck-window-depth);
-  }
-
-  .board-tape-label {
-    border-radius: 6px;
-    background: var(--tape-label);
-    color: var(--ink);
-  }
-
-  .board-tape-reel {
-    flex: none;
-    border-radius: 50%;
-    background: var(--tape-reel);
-  }
-
-  .board-deck-button {
-    min-height: 48px;
-    border-radius: 8px;
-    background: var(--deck-button);
-    color: var(--deck-button-ink);
-    box-shadow: 0 3px 0 var(--deck-button-edge);
-    font-weight: 600;
-    transition: translate var(--duration-quick) var(--ease-out-strong), box-shadow var(--duration-quick) var(--ease-out-strong);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .board-deck-button:active {
-      translate: 0 2px;
-      box-shadow: 0 1px 0 var(--deck-button-edge);
-    }
-  }
-
-  /* The cassette's paper insert, tucked under the deck. */
-  .board-j-card {
-    background-color: var(--j-card);
-    background-image: repeating-linear-gradient(to bottom, transparent 0 27px, var(--margin-rule) 27px 28px);
-    background-position: 0 14px;
-    color: var(--j-card-ink);
-    box-shadow: var(--shadow-contact);
   }
 
   /*

@@ -16,11 +16,8 @@ export type PinKey =
   | "making"
   | "github"
   | "training"
-  | "fantasy"
-  | "london"
   | "reading"
-  | "film"
-  | "playlist";
+  | "film";
 
 /**
  * Days before a pin's saved data counts as stale (approved by Elias,
@@ -33,10 +30,7 @@ export const staleAfterDays: Record<PinKey, number | null> = {
   github: 3,
   reading: 60,
   film: 60,
-  playlist: null,
   making: null,
-  london: null,
-  fantasy: null,
   clipping: null,
 };
 

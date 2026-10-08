@@ -1,10 +1,8 @@
 import type { CSSProperties } from "react";
-import { CassettePlayer } from "@/components/board/cassette-player";
 import { ExternalLink } from "@/components/board/external-link";
 import { Pin } from "@/components/board/pin";
 import { PinPhoto, PinSlot } from "@/components/board/pin-states";
 import { board, filmLine } from "@/content/board";
-import { integrationConfig } from "@/content/integration-config";
 import { asOfDate, pinStatus } from "@/integrations/pin-rules";
 import type { FilmSignal, ReadingSignal } from "@/integrations/types";
 
@@ -12,8 +10,8 @@ const sway = (depth: number) => ({ "--sway-depth": depth }) as CSSProperties;
 
 /**
  * The culture corner: the book I'm reading with its library card, the film I
- * last watched with its ticket, and a cassette player for my playlist. Three
- * pins across the Board's lower half on wide screens, stacked below 900 px.
+ * last watched with its ticket. Two pins across the Board's lower half on wide
+ * screens, stacked below 900 px.
  */
 export function CultureCorner({ reading, film, now }: { reading: ReadingSignal; film: FilmSignal; now: Date }) {
   return (
@@ -25,14 +23,6 @@ export function CultureCorner({ reading, film, now }: { reading: ReadingSignal; 
       </div>
       <BookPin reading={reading} now={now} />
       <FilmPin film={film} now={now} />
-      <PinSlot
-        status={pinStatus("playlist", { state: "curated", updatedAt: null }, now)}
-        data-board-pin="playlist"
-        className="board-sway mx-auto w-full max-w-[400px] board:col-span-5 board:max-w-none"
-        style={sway(0.5)}
-      >
-        <CassettePlayer playlistId={integrationConfig.spotify.playlistId} playlistUrl={integrationConfig.spotify.playlistUrl} />
-      </PinSlot>
     </>
   );
 }

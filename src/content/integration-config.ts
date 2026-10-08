@@ -3,13 +3,6 @@ export const integrationConfig = {
     username: "3ixas",
     profileUrl: "https://github.com/3ixas",
   },
-  sleeper: {
-    username: "3ixas",
-  },
-  spotify: {
-    playlistId: "3t859SH3i1qKfvsDlGWm9F",
-    playlistUrl: "https://open.spotify.com/playlist/3t859SH3i1qKfvsDlGWm9F",
-  },
   letterboxd: {
     username: "3lxas",
     profileUrl: "https://letterboxd.com/3lxas/",

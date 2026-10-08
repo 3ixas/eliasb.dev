@@ -255,15 +255,12 @@ function verifyHomepage(markup) {
   check(imageTags.length >= 8, "Homepage should render the authored imagery and signal imagery");
   check(imageTags.every((tag) => attribute(tag, "alt") !== null), "Every homepage image should declare alternative text");
   check(markup.includes("Threshold landing page showing rental affordability"), "Threshold imagery should have meaningful alternative text");
-  check(markup.includes("London skyline from the Thames"), "London imagery should have meaningful alternative text");
   check(tags(markup, "img").some((tag) => (attribute(tag, "srcset") ?? "").includes("/_next/image")), "Homepage imagery should use responsive Next Image sources");
 
-  // The cassette player is a facade: Spotify's player loads only when Play is pressed.
-  check(!/open\.spotify\.com\/embed/.test(markup), "Spotify's player should load only when Play is pressed");
-  check(tags(markup, "button").some((tag) => attribute(tag, "aria-label") === "Play my playlist on Spotify"), "The cassette player should have a named Play button");
-  const spotifyLink = hrefs(markup).find(({ href }) => href?.includes("open.spotify.com/playlist/"));
-  check(spotifyLink, "Homepage should expose a direct Spotify fallback link");
-  check(markup.includes("Open in Spotify"), "Spotify fallback link should be visibly labelled");
+  // The playlist, the fantasy ticket and the London photo are gone, with their sources.
+  check(!/spotify/i.test(markup), "Nothing from Spotify should remain on the homepage");
+  check(!/sleeper|NFL fantasy/i.test(markup), "Nothing from Sleeper or fantasy football should remain on the homepage");
+  check(!markup.includes('data-board-pin="playlist"') && !markup.includes('data-board-pin="fantasy"') && !markup.includes('data-board-pin="london"'), "The playlist, fantasy and London pins should be gone");
 
   // The GitHub year is up only with a full year of data; when it is, it's 365 day buttons with tags.
   const github = markup.match(/data-board-pin="github"([\s\S]*)$/i)?.[1] ?? "";
@@ -313,20 +310,9 @@ function verifyHomepage(markup) {
   const daySource = hrefs(clipping).find(({ href }) => /^https:\/\/en\.wikipedia\.org\/wiki\/([A-Z][a-z]+_\d{1,2}|Portal:History)$/.test(href ?? ""));
   check(daySource, "The clipping's source should be the readable Wikipedia page for the day");
   check(!/api\/rest_v1/.test(clipping), "The clipping should never link to the feed's raw JSON");
-  check(["GitHub", "Goodreads", "Letterboxd", "Sleeper", "Wikimedia"].some((source) => text.includes(source)), "Signal cards should expose visible source wording");
+  check(["GitHub", "Goodreads", "Letterboxd", "Wikimedia"].some((source) => text.includes(source)), "Signal cards should expose visible source wording");
   check(!/(ghp_|github_pat_|sk-[A-Za-z0-9]|STRAVA_CLIENT_SECRET)/i.test(text), "Rendered output must not contain credential-like values");
 
-
-  // The fantasy ticket is up only in season; when it is, it names my team and no one else.
-  const fantasyAt = markup.indexOf('data-board-pin="fantasy"');
-  if (fantasyAt >= 0) {
-    const nextPin = markup.indexOf("data-board-pin=", fantasyAt + 1);
-    const fantasyText = plainText(markup.slice(fantasyAt, nextPin > 0 ? nextPin : undefined));
-    check(/NFL fantasy · Week\s\d+/.test(fantasyText), "The fantasy ticket should show the NFL week");
-    check(fantasyText.includes("a rival who shall remain nameless"), "The fantasy ticket should keep the opponent anonymous");
-    check(!/\b0\.00 – 0\.00\b/.test(fantasyText), "The fantasy ticket should never show a 0.00 – 0.00 new week");
-  }
-  check(!hrefs(markup).some(({ href }) => href?.includes("sleeper.com")), "Nothing should link to the Sleeper league, which names the league and its teams");
 
   const sourceHosts = ["github.com", "goodreads.com", "letterboxd.com", "wikipedia.org"];
   for (const host of sourceHosts) {

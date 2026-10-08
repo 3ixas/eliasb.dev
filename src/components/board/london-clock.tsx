@@ -1,5 +1,9 @@
 "use client";
 
+// No page renders this since the London pin left the Board (#117). It is kept
+// for the Stretch header's clock (#120), which should reuse it. Its time-zone
+// and hydration check went with the pin; write a new one against the header.
+
 import { useSyncExternalStore } from "react";
 import { board } from "@/content/board";
 

@@ -11,11 +11,8 @@ import {
 } from "../src/integrations/signal-mappers.ts";
 import { integrationConfig } from "../src/content/integration-config.ts";
 import { asOfDate, pinStatus, staleAfterDays } from "../src/integrations/pin-rules.ts";
-import { fantasyRecord, fantasySpoken, fantasyVerdict, filmLine, isoWeek, stars, trainingSpoken, groupedNumber, makingNote, MAKING_CURRENT_DAYS } from "../src/content/board.ts";
-import { fantasyMoment, fantasyTicket } from "../src/integrations/fantasy.ts";
+import { filmLine, isoWeek, stars, trainingSpoken, groupedNumber, makingNote, MAKING_CURRENT_DAYS } from "../src/content/board.ts";
 import { ARROW_GAP, stringStretches } from "../src/components/board/journey-geometry.ts";
-import { sleeperLeagueId } from "../src/integrations/sleeper-config.ts";
-import { readSleeperSnapshot } from "../src/integrations/sleeper-snapshot.ts";
 import { getHistorySignal, historyWeekStart, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "../src/integrations/history.ts";
 import {
   busiestStretch,
@@ -349,165 +346,8 @@ assert.deepEqual(filmLine(watched, null), { shown: "Watched 14 Sept", spoken: "W
 assert.deepEqual(filmLine(null, 3), { shown: "★★★", spoken: "Rated 3 out of 5" });
 assert.equal(filmLine(null, null), null);
 
-// Fantasy: the stub's state comes from the NFL calendar, in New York time.
-const eastern = (iso) => fantasyMoment(new Date(iso));
-const momentAt = (iso) => {
-  const moment = eastern(iso);
-  return moment && `${moment.season} W${moment.week} ${moment.phase} ${moment.gate}`;
-};
-// 2026: Labor Day is 7 September, so week 1 opens on Thursday 10 September.
-assert.equal(momentAt("2026-09-08T04:29:00Z"), null, "Before week 1 (00:29 Tuesday in New York) is the off-season");
-assert.equal(momentAt("2026-09-08T04:30:00Z"), "2026 W1 last-week thursday");
-assert.equal(momentAt("2026-09-29T16:00:00Z"), "2026 W4 last-week thursday", "Tuesday shows last week");
-assert.equal(momentAt("2026-10-01T23:59:00Z"), "2026 W4 last-week thursday", "Thursday 19:59 is still last week");
-assert.equal(momentAt("2026-10-02T00:00:00Z"), "2026 W4 live live", "Thursday 20:00 in New York is game time");
-assert.equal(momentAt("2026-10-02T04:30:00Z"), "2026 W4 between sunday", "After Thursday night, it's back on Sunday");
-assert.equal(momentAt("2026-10-04T13:00:00Z"), "2026 W4 live live", "Sunday 09:00, for London games");
-assert.equal(momentAt("2026-10-05T04:29:00Z"), "2026 W4 live live", "Sunday night runs past midnight");
-assert.equal(momentAt("2026-10-05T16:00:00Z"), "2026 W4 between monday");
-assert.equal(momentAt("2026-10-05T23:00:00Z"), "2026 W4 live live", "Monday night from 19:00");
-assert.equal(momentAt("2026-10-06T04:30:00Z"), "2026 W5 last-week thursday", "Tuesday 00:30 starts the next week");
-// The windows keep to New York's clocks through the change on 1 November 2026.
-assert.equal(momentAt("2026-11-03T05:30:00Z"), "2026 W9 last-week thursday", "Tuesday 00:30 EST, after the clocks change");
-assert.equal(momentAt("2026-11-03T05:29:00Z"), "2026 W8 live live");
-assert.equal(momentAt("2027-01-12T12:00:00Z")?.startsWith("2026 W19"), true, "January belongs to the season that started in September");
-assert.equal(momentAt("2027-02-16T12:00:00Z"), null, "After the playoffs is the off-season");
-assert.equal(momentAt("2027-07-01T12:00:00Z"), null);
-
-const fantasySnapshot = (fetchedAt, overrides = {}) => ({
-  fetchedAt,
-  season: 2026,
-  week: 4,
-  teamName: "K9 Unit",
-  record: { wins: 1, losses: 2, ties: 0 },
-  regularSeasonWeeks: 14,
-  thisWeek: { team: 0, opponent: 0 },
-  lastWeek: { team: 151.24, opponent: 90.52 },
-  ...overrides,
-});
-const ticketAt = (iso, overrides) => fantasyTicket(fantasySnapshot(iso, overrides), new Date(iso));
-const tuesday = "2026-09-29T16:00:00Z";
-const saturday = "2026-10-03T16:00:00Z";
-const sunday = "2026-10-04T18:00:00Z";
-
-// Tuesday to Thursday kickoff: last week's final and the season record.
-assert.deepEqual(ticketAt(tuesday), {
-  week: 3, outcome: "won", scores: { team: 151.24, opponent: 90.52 }, margin: 60.72, teamName: "K9 Unit", record: { wins: 1, losses: 2, ties: 0 }, gate: "thursday",
-});
-// During and between game windows: this week's score so far.
-assert.deepEqual(ticketAt(saturday, { thisWeek: { team: 24.6, opponent: 0 } }), {
-  week: 4, outcome: "ahead", scores: { team: 24.6, opponent: 0 }, margin: 24.6, teamName: "K9 Unit", record: { wins: 1, losses: 2, ties: 0 }, gate: "sunday",
-});
-assert.equal(ticketAt(sunday, { thisWeek: { team: 61.1, opponent: 88.42 } }).outcome, "behind");
-assert.equal(ticketAt(sunday, { thisWeek: { team: 61.1, opponent: 88.42 } }).gate, "live");
-assert.equal(ticketAt("2026-10-05T16:00:00Z", { thisWeek: { team: 101.3, opponent: 101.3 } }).outcome, "level");
-// A new week can't show 0.00 – 0.00: last week's final stays until either side scores.
-const heldOver = ticketAt("2026-10-02T16:00:00Z");
-assert.equal(heldOver.week, 3);
-assert.equal(heldOver.outcome, "won");
-assert.equal(heldOver.gate, null, "A held-over result doesn't claim the gates are open or the game is live");
-for (const iso of [tuesday, "2026-10-02T01:00:00Z", saturday, sunday, "2026-10-05T23:00:00Z"]) {
-  const ticket = ticketAt(iso);
-  assert.ok(ticket && (ticket.scores.team > 0 || ticket.scores.opponent > 0), `No 0.00 – 0.00 stub at ${iso}`);
-}
-assert.equal(ticketAt("2026-09-15T16:00:00Z", { week: 2, lastWeek: null }), null, "Without last week's result, an unscored week has no pin");
-assert.equal(ticketAt("2026-09-10T16:00:00Z", { week: 1, lastWeek: null }), null, "Week 1 before kickoff has no pin");
-// Off-season, and a season that's over, have no pin.
-assert.equal(fantasyTicket(fantasySnapshot("2027-07-01T12:00:00Z"), new Date("2027-07-01T12:00:00Z")), null);
-assert.equal(ticketAt(tuesday, { thisWeek: null }), null, "No matchup this week means my season is over");
-assert.equal(fantasyTicket(null, new Date(tuesday)), null);
-// A snapshot from another week is never shown as this week's.
-assert.equal(fantasyTicket(fantasySnapshot(tuesday, { week: 3 }), new Date(tuesday)), null);
-// Last good fetch: a final score holds all week; a live score only for its window or an hour.
-assert.equal(fantasyTicket(fantasySnapshot("2026-09-29T05:00:00Z"), new Date("2026-10-01T20:00:00Z"))?.week, 3, "Last week's final stays up through an outage");
-const fridayFetch = fantasySnapshot("2026-10-02T05:00:00Z", { thisWeek: { team: 24.6, opponent: 0 } });
-assert.equal(fantasyTicket(fridayFetch, new Date(saturday))?.outcome, "ahead", "Between games the score can't have moved");
-assert.equal(fantasyTicket(fridayFetch, new Date(sunday)), null, "An old score is never shown as live");
-assert.equal(fantasyTicket(fantasySnapshot("2026-10-04T17:15:00Z", { thisWeek: { team: 40, opponent: 30 } }), new Date(sunday))?.outcome, "ahead", "A fetch under an hour old stands in");
-// The record counts finished weeks only, and adds last week's until Sleeper settles it.
-assert.deepEqual(ticketAt(tuesday, { record: { wins: 0, losses: 2, ties: 0 } }).record, { wins: 1, losses: 2, ties: 0 });
-assert.deepEqual(ticketAt(tuesday, { record: { wins: 0, losses: 2, ties: 0 }, lastWeek: { team: 99, opponent: 99 } }).record, { wins: 0, losses: 2, ties: 1 });
-assert.deepEqual(ticketAt(tuesday, { week: 4, regularSeasonWeeks: 2, record: { wins: 1, losses: 1, ties: 0 } }).record, { wins: 1, losses: 1, ties: 0 }, "Playoff weeks don't count towards the record");
-assert.equal(fantasyRecord({ wins: 1, losses: 2, ties: 0 }), "1–2");
-assert.equal(fantasyRecord({ wins: 8, losses: 5, ties: 1 }), "8–5–1");
-
-// The pencilled verdict: a field goal is 3 points, a blowout 40 or more.
-assert.equal(fantasyVerdict("won", 60.72), "Not even close.");
-assert.equal(fantasyVerdict("won", 40), "Not even close.");
-assert.equal(fantasyVerdict("won", 39.99), "I’ll take it.");
-assert.equal(fantasyVerdict("won", 3), "I’ll take it.");
-assert.equal(fantasyVerdict("won", 2.99), "By less than a field goal.");
-assert.equal(fantasyVerdict("lost", 2.99), "By less than a field goal. Ouch.");
-assert.equal(fantasyVerdict("lost", 3), "There’s always next week.");
-assert.equal(fantasyVerdict("lost", 40), "Took me to the cleaners.");
-assert.equal(fantasyVerdict("tied", 0), "Nobody’s happy.");
-assert.equal(fantasyVerdict("ahead", 24.6), "Don’t jinx it.");
-assert.equal(fantasyVerdict("behind", 1), "Plenty of time.");
-assert.equal(fantasyVerdict("level", 0), "Anyone’s game.");
-assert.equal(ticketAt(tuesday, { lastWeek: { team: 100.1, opponent: 100.1 } }).outcome, "tied");
-
-assert.equal(
-  fantasySpoken(ticketAt(tuesday)),
-  "NFL fantasy, week 3. K9 Unit won 151.24 to 90.52 against a rival who shall remain nameless. Not even close. Season record: 1 win, 2 losses. Gates open Thursday night.",
-);
-assert.equal(
-  fantasySpoken(ticketAt(saturday, { thisWeek: { team: 24.6, opponent: 0 } })),
-  "NFL fantasy, week 4. K9 Unit is ahead 24.60 to 0.00 against a rival who shall remain nameless. Don’t jinx it. Season record: 1 win, 2 losses. Back on Sunday.",
-);
-
-// Sleeper, read with fixture responses: my team is named; the opponent and the league never are.
-const leagueId = "9000000000000000001";
-const sleeper = { username: integrationConfig.sleeper.username, leagueId };
-const sleeperFixture = {
-  "/user/3ixas": { user_id: "me", display_name: "3ixas" },
-  "/state/nfl": { season: "2026", season_type: "regular", week: 4 },
-  [`/league/${leagueId}`]: { name: "The Example League", season: "2026", settings: { playoff_week_start: 15 } },
-  [`/league/${leagueId}/users`]: [
-    { user_id: "me", display_name: "3ixas", metadata: { team_name: "K9 Unit" } },
-    { user_id: "rival", display_name: "rivalmanager", metadata: { team_name: "The Rival Squad" } },
-  ],
-  [`/league/${leagueId}/rosters`]: [
-    { roster_id: 7, owner_id: "me", settings: { wins: 1, losses: 2, ties: 0 } },
-    { roster_id: 3, owner_id: "rival", settings: { wins: 3, losses: 0, ties: 0 } },
-  ],
-  [`/league/${leagueId}/matchups/4`]: [{ roster_id: 7, matchup_id: 1, points: 24.6 }, { roster_id: 3, matchup_id: 1, points: 0 }, { roster_id: 1, matchup_id: 2, points: 9 }],
-  [`/league/${leagueId}/matchups/3`]: [{ roster_id: 7, matchup_id: 4, points: 151.24 }, { roster_id: 5, matchup_id: 4, points: 90.52 }],
-};
-const sleeperRequests = [];
-globalThis.fetch = async (url) => {
-  const path = String(url).replace("https://api.sleeper.app/v1", "");
-  sleeperRequests.push(path);
-  return path in sleeperFixture ? Response.json(sleeperFixture[path]) : new Response("Not found", { status: 404 });
-};
-try {
-  const sleeperSnapshot = await readSleeperSnapshot(sleeper, 2026, 4);
-  assert.equal(sleeperSnapshot.teamName, "K9 Unit");
-  assert.deepEqual(sleeperSnapshot.thisWeek, { team: 24.6, opponent: 0 });
-  assert.deepEqual(sleeperSnapshot.lastWeek, { team: 151.24, opponent: 90.52 });
-  assert.equal(sleeperSnapshot.regularSeasonWeeks, 14);
-  const shown = JSON.stringify({ sleeperSnapshot, spoken: fantasySpoken(fantasyTicket(sleeperSnapshot, new Date(saturday))) });
-  for (const secret of ["The Example League", "The Rival Squad", "rivalmanager", leagueId]) {
-    assert.equal(shown.includes(secret), false, `The fantasy stub must never carry "${secret}"`);
-  }
-  // Between seasons, or a league from last season, there's nothing to show.
-  sleeperFixture["/state/nfl"] = { season: "2026", season_type: "off" };
-  assert.equal((await readSleeperSnapshot(sleeper, 2026, 4)).thisWeek, null);
-  sleeperFixture["/state/nfl"] = { season: "2026", season_type: "regular" };
-  sleeperFixture[`/league/${leagueId}`] = { season: "2025", settings: {} };
-  assert.equal((await readSleeperSnapshot(sleeper, 2026, 4)).thisWeek, null);
-  // An unreadable Sleeper throws, so the cache keeps its last good snapshot.
-  delete sleeperFixture[`/league/${leagueId}/rosters`];
-  await assert.rejects(readSleeperSnapshot(sleeper, 2026, 4));
-} finally {
-  globalThis.fetch = originalFetch;
-}
-
-// The league's ID comes from the environment, never the source: without it there is no fantasy pin.
-assert.equal(sleeperLeagueId({}), null);
-assert.equal(sleeperLeagueId({ SLEEPER_LEAGUE_ID: "" }), null);
-assert.equal(sleeperLeagueId({ SLEEPER_LEAGUE_ID: "  " }), null);
-assert.equal(sleeperLeagueId({ SLEEPER_LEAGUE_ID: " 9000000000000000001 " }), "9000000000000000001");
-assert.equal("leagueId" in integrationConfig.sleeper, false, "The league ID belongs in SLEEPER_LEAGUE_ID, not in integration-config");
+// The fantasy, Sleeper and Spotify sources are gone, so no config for them is left.
+assert.deepEqual(Object.keys(integrationConfig).sort(), ["github", "goodreads", "letterboxd"], "Only the live integrations keep configuration");
 
 // Simulate a browser with different locale data. Calendar HTML must not depend
 // on Intl at either render, otherwise React can replace the page during hydration.
@@ -650,7 +490,6 @@ assert.match(trainingSpoken(0), /^My training week, the plan\. Today, Monday: fu
 const pinNow = new Date("2026-10-02T12:00:00.000Z");
 const daysAgo = (days) => new Date(pinNow.getTime() - days * 86_400_000).toISOString();
 assert.deepEqual(pinStatus("reading", { state: "unavailable", updatedAt: null }, pinNow), { kind: "removed" });
-assert.deepEqual(pinStatus("london", { state: "unavailable", updatedAt: null }, pinNow), { kind: "removed" });
 assert.deepEqual(pinStatus("github", { state: "live", updatedAt: daysAgo(3) }, pinNow), { kind: "current" });
 assert.deepEqual(pinStatus("github", { state: "live", updatedAt: daysAgo(10) }, pinNow), {
   kind: "stale",
@@ -661,7 +500,7 @@ assert.equal(pinStatus("github", { state: "live", updatedAt: daysAgo(2) }, pinNo
 assert.equal(pinStatus("reading", { state: "live", updatedAt: daysAgo(61) }, pinNow).kind, "stale");
 assert.equal(pinStatus("film", { state: "live", updatedAt: daysAgo(59) }, pinNow).kind, "current");
 // Authored, curated, and never-stale pins stay current however old they are.
-for (const key of ["training", "playlist", "making", "london", "fantasy", "clipping"]) {
+for (const key of ["training", "making", "clipping"]) {
   assert.equal(staleAfterDays[key], null);
   assert.equal(pinStatus(key, { state: "live", updatedAt: daysAgo(400) }, pinNow).kind, "current");
 }

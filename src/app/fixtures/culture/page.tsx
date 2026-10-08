@@ -16,14 +16,14 @@ const book: Book = {
   title: "Dark Age",
   author: "Pierce Brown",
   startedAt: "2026-09-14T10:52:45.000Z",
-  coverUrl: "/signals/london-st-pauls.jpg",
+  coverUrl: "/projects/threshold.webp",
 };
 const film: Film = {
   title: "The Invite",
   year: "2026",
   rating: 4.5,
   watchedOn: "2026-09-14",
-  posterUrl: "/signals/football-stadium.jpg",
+  posterUrl: "/profile/elias-evening.webp",
   href: "https://letterboxd.com/3lxas/film/the-invite/",
 };
 const reading = (overrides: Partial<ReadingSignal>): ReadingSignal => ({

@@ -24,13 +24,6 @@ test.describe("The Board", () => {
     }
   });
 
-  test("London is a labelled photo with a clock", async ({ page }) => {
-    const london = page.locator("[data-board-pin='london']");
-    await expect(london.getByText("Home, London")).toBeVisible();
-    await expect(london.getByRole("img", { name: /London skyline from the Thames/ })).toBeVisible();
-    await expect(london.getByRole("img", { name: /^The time in London: \d{2}:\d{2}$/ })).toBeVisible();
-  });
-
   test("at night the board dims and its lights come on", async ({ page }) => {
     await lightsOn(page);
     const board = page.locator("[data-pinboard]");
@@ -68,40 +61,14 @@ test.describe("The Board", () => {
   });
 });
 
-test.describe("The London clock", () => {
-  // A visitor on the other side of the world still sees London's time.
-  test.use({ timezoneId: "Pacific/Auckland" });
-
-  test("shows London time, whatever the visitor's time zone, without a hydration mismatch", async ({ page }) => {
-    const problems: string[] = [];
-    page.on("console", (message) => {
-      if (message.type() === "error" && /hydrat|did not match/i.test(message.text())) problems.push(message.text());
-    });
-    await page.goto("/#outside-work");
-    const clock = page.locator("[data-london-clock]");
-    await expect(clock).not.toHaveAttribute("data-london-clock", "");
-    const shown = (await clock.getAttribute("data-london-clock"))!;
-    const toMinutes = (time: string) => {
-      const [hours, minutes] = time.split(":").map(Number);
-      return hours * 60 + minutes;
-    };
-    const london = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date());
-    const browserLocal = await page.evaluate(() => new Date().toTimeString().slice(0, 5));
-    expect(Math.abs(toMinutes(shown) - toMinutes(london)) % (24 * 60)).toBeLessThanOrEqual(1);
-    expect(shown).not.toBe(browserLocal);
-    await expect(clock.locator("[data-hand]")).toHaveCount(2);
-    expect(problems).toEqual([]);
-  });
-});
-
 test.describe("Pin states", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/fixtures/board");
   });
 
   test("a pin with nothing current is removed, leaving no gap", async ({ page }) => {
-    await expect(page.locator("[data-fixture-pin='playlist']")).toHaveCount(0);
-    await expect(page.getByText("On repeat")).toHaveCount(0);
+    await expect(page.locator("[data-fixture-pin='making']")).toHaveCount(0);
+    await expect(page.getByText("Now making")).toHaveCount(0);
     const cells = await page.locator("[data-pinboard] .grid > *").count();
     expect(cells).toBe(4);
   });
@@ -142,13 +109,13 @@ test.describe("Scroll sway", () => {
   test("pins sway with scroll where supported, and never vanish on a fast scroll", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
-    const pin = page.locator("[data-board-pin='london']");
+    const pin = page.locator("[data-board-pin='training']");
     const supported = await page.evaluate(() => CSS.supports("animation-timeline: view()"));
     await expect(pin).toHaveCSS("animation-name", supported ? "board-sway" : "none");
 
     // Fling to the bottom and back, then the pin must be there and within the sway limits.
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-    await page.evaluate(() => document.querySelector("[data-board-pin='london']")!.scrollIntoView({ block: "center", behavior: "instant" }));
+    await page.evaluate(() => document.querySelector("[data-board-pin='training']")!.scrollIntoView({ block: "center", behavior: "instant" }));
     await expect(pin).toBeInViewport();
     await expect(pin).toHaveCSS("opacity", "1");
     const sway = await pin.evaluate((element) => {
@@ -162,6 +129,6 @@ test.describe("Scroll sway", () => {
   test("is absent with reduced motion", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/#outside-work");
-    await expect(page.locator("[data-board-pin='london']")).toHaveCSS("animation-name", "none");
+    await expect(page.locator("[data-board-pin='training']")).toHaveCSS("animation-name", "none");
   });
 });
