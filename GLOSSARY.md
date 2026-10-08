@@ -72,8 +72,8 @@ _Avoid_: Limiting the Work destination to the homepage selection.
 People seeking founding engineers or product engineers who care about product thinking, design, UI, UX, and code. Elias's title is **Software engineer**. **How I work** shows that he also decides what is worth building and checks whether it works, so the evidence makes the product claim, not the title. Fellow builders are also an important audience.
 
 **Signature entrance**:
-A brief automatic opening sequence that introduces the site's voice and flows directly into accessible content.
-_Avoid_: Splash screen, interaction gate
+The Commissioner-style opening on every load and reload ([#109](https://github.com/3ixas/eliasb.dev/issues/109)): the headline types alone on a blank page, moves up into the hero, then the name settles, the portrait swings in, the label presses on, and the rest of the page arrives, in about 5 s. It can't be skipped, it doesn't replay on back-navigation, and reduced motion gets the finished page. The content is in the HTML throughout.
+_Avoid_: Loader, interaction gate, anything else that holds the page
 
 **Living area** (superseded):
 The parts of the site that can grow through notes, experiments, cultural entries, or discoveries without a publishing schedule. Superseded on 8 October 2026 by the **Stretch direction** ([#107](https://github.com/3ixas/eliasb.dev/issues/107)); kept for history.
