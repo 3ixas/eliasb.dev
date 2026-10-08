@@ -1,0 +1,354 @@
+<!doctype html>
+<!--
+  PROTOTYPE, throwaway. Lives only on the prototype/stretch-motion branch.
+  Question (#109): what moves in the Stretch direction, and how does it behave under reduced motion?
+  Everything is visible from first paint; motion only plays on content that is already there.
+  Variants for each open choice are in the bottom bar.
+  Run: python3 -m http.server --directory prototypes/stretch-motion, then open the printed address.
+-->
+<html lang="en" data-theme="light" data-entrance="a" data-hover="straighten" data-fasteners="on" data-themechange="crossfade" data-scroll="sway" data-preview="fixed" data-rm="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stretch motion prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#fbfbf8; --ink:#111114; --muted:#5a5a63; --rule:#dcdcd6; --card:#f0f0ea; --cobalt:#2340ff; --on-cobalt:#ffffff; --tape:rgba(232,222,188,.85); --tile-edge:transparent; }
+[data-theme="dark"] { --bg:#0d0d12; --ink:#f1f1f4; --muted:#a2a2ad; --rule:#2a2a33; --card:#17171f; --cobalt:#8b9cff; --on-cobalt:#0d0d12; --tape:rgba(232,222,188,.6); --tile-edge:#2a2a33; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Bricolage Grotesque', sans-serif; }
+html.switching body, html.switching .fade { transition: background-color var(--tc-dur) var(--tc-ease), color var(--tc-dur) var(--tc-ease), border-color var(--tc-dur) var(--tc-ease); }
+html.switching .fade-all * { transition: background-color var(--tc-dur) var(--tc-ease), color var(--tc-dur) var(--tc-ease), border-color var(--tc-dur) var(--tc-ease); }
+.mono { font-family: 'JetBrains Mono', monospace; }
+.wrap { max-width: 1400px; margin: 0 auto; padding: 0 32px; }
+a { color: inherit; }
+header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 24px 0; }
+.pill { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--ink); background: transparent; color: var(--ink); font: 13px 'JetBrains Mono', monospace; cursor: pointer; }
+.pill .colon { display: inline-block; }
+nav a { text-decoration: none; font-weight: 600; font-size: 17px; padding: 10px 14px; }
+nav .cta { background: var(--cobalt); color: var(--on-cobalt); border-radius: 999px; }
+
+.hero { position: relative; padding: 24px 0 80px; }
+.name { margin: 0; font-weight: 800; font-stretch: 75%; font-size: clamp(110px, 18vw, 280px); line-height: .8; letter-spacing: -.04em; color: var(--cobalt); text-transform: uppercase; }
+.name .ch { display: inline-block; will-change: transform; }
+.portrait { position: absolute; right: 24px; top: 40px; width: 290px; margin: 0; transform: rotate(3deg); transform-origin: 50% 0; }
+.portrait img { display: block; width: 290px; height: 362px; object-fit: cover; border-radius: 18px; }
+.label { position: absolute; left: -28px; bottom: 28px; transform: rotate(-7deg); background: var(--cobalt); color: var(--on-cobalt); font-weight: 700; font-size: 17px; padding: 10px 16px; border-radius: 999px; }
+.lede { display: flex; flex-wrap: wrap; gap: 40px; margin-top: 48px; align-items: flex-end; }
+h1 { position: relative; flex: 1 1 560px; margin: 0; font-weight: 600; font-size: clamp(30px, 3.6vw, 52px); line-height: 1.08; letter-spacing: -.025em; max-width: 17em; }
+h1 .real { visibility: visible; }
+h1.typing .real { visibility: hidden; }
+h1 .vis { position: absolute; inset: 0; }
+.hl { position: relative; display: inline-block; color: var(--cobalt); }
+.hl svg { position: absolute; left: 0; right: 0; bottom: -.12em; width: 100%; height: .3em; overflow: visible; }
+.hl path { fill: none; stroke: var(--cobalt); stroke-width: 6; stroke-linecap: round; }
+.caret { display: inline-block; width: .06em; height: .9em; margin-left: 2px; background: var(--ink); vertical-align: -.08em; }
+.caret.blink { animation: blink .42s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.support { flex: 1 1 320px; margin: 0; font-size: 19px; line-height: 1.5; color: var(--muted); max-width: 26em; }
+
+.h2 { margin: 0; font-weight: 800; font-stretch: 75%; font-size: 96px; line-height: .9; letter-spacing: -.03em; text-transform: uppercase; }
+.sechead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 16px; margin-bottom: 32px; }
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.tile { position: relative; display: flex; flex-wrap: wrap; gap: 32px; align-items: center; padding: 36px; border-radius: 24px; text-decoration: none; border: 1px solid var(--tile-edge); }
+.tile.wide { grid-column: span 2; }
+.tile .shot { flex: 1 1 280px; min-width: 0; max-width: 100%; aspect-ratio: 16/10; object-fit: cover; object-position: top left; border-radius: 12px; box-shadow: 0 24px 48px rgba(0,0,0,.35); will-change: transform; }
+.tile.wide .shot { flex-basis: 520px; }
+.tile .num { margin: 0; font-weight: 800; font-stretch: 75%; font-size: 64px; line-height: .9; color: transparent; -webkit-text-stroke: 2px var(--sw); }
+.tile h3 { margin: 10px 0 0; font-weight: 700; font-size: 48px; line-height: .95; letter-spacing: -.03em; }
+.tile p { margin: 12px 0 0; font-size: 19px; line-height: 1.3; }
+.fast { position: absolute; z-index: 2; pointer-events: none; will-change: transform; }
+.tape { top: -14px; left: 50%; width: 130px; height: 34px; margin-left: -65px; transform: rotate(-3deg); background: var(--tape); box-shadow: 0 1px 2px rgba(0,0,0,.15); transform-origin: 0 50%; }
+.clip { top: -22px; left: 40px; transform-origin: 50% 80%; }
+.pin { top: -9px; right: 40px; width: 20px; height: 20px; border-radius: 50%; background: #e9e4da; box-shadow: 2px 4px 5px rgba(0,0,0,.35); }
+
+.indexwrap { display: flex; flex-wrap: wrap; gap: 40px; margin-top: 56px; align-items: flex-start; position: relative; }
+.index { flex: 999 1 640px; list-style: none; margin: 0; padding: 0; }
+.row { display: grid; grid-template-columns: 56px minmax(0,1fr) 180px 64px 28px; gap: 20px; align-items: baseline; padding: 18px 0; border-top: 1px solid var(--rule); text-decoration: none; color: var(--ink); }
+.row .nm { display: block; font-weight: 800; font-stretch: 75%; font-size: 56px; line-height: .9; letter-spacing: -.02em; text-transform: uppercase; transition: color .15s ease; }
+.row:hover .nm, .row:focus-visible .nm { color: var(--cobalt); }
+.row .arrow { transition: transform .2s cubic-bezier(.23,1,.32,1); }
+.row:hover .arrow, .row:focus-visible .arrow { transform: translate(4px,-4px); }
+.preview { flex: 1 1 340px; max-width: 400px; margin-top: 28px; aspect-ratio: 4/3; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: #e6e6ec; font: 12px 'JetBrains Mono', monospace; text-align: center; padding: 16px; transform: rotate(2deg); }
+[data-preview="follow"] .preview { position: absolute; width: 300px; max-width: none; margin: 0; pointer-events: none; opacity: 0; z-index: 3; }
+
+.clock-sec { margin-top: 96px; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 28px; }
+.card { position: relative; border-radius: 20px; padding: 24px; background: var(--card); }
+.making { border: 2px solid var(--cobalt); background: transparent; }
+.making .lbl { color: var(--cobalt); }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--cobalt); margin-right: 6px; }
+[data-rm="no"] .dot { animation: pulse 2.4s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+
+.bar { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 50; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; padding: 10px 14px; border-radius: 14px; background: #111114; color: #f1f1f4; font: 12px 'JetBrains Mono', monospace; box-shadow: 0 8px 30px rgba(0,0,0,.3); }
+.bar .grp { display: flex; gap: 4px; align-items: center; }
+.bar button { min-height: 32px; padding: 0 10px; border-radius: 8px; border: 1px solid #3a3a44; background: transparent; color: #f1f1f4; font: inherit; cursor: pointer; }
+.bar button[aria-pressed="true"] { background: #f1f1f4; color: #111114; }
+.bar .state { flex-basis: 100%; color: #b9b9c2; }
+.bar[data-open="false"] .grp:not(:first-child), .bar[data-open="false"] .state { display: none; }
+.bar[data-open="false"] { left: auto; }
+@media (max-width: 760px) { .portrait { position: relative; right: auto; top: auto; margin-top: 24px; } .tiles, .clock-sec { grid-template-columns: 1fr; } .tile.wide { grid-column: auto; } .h2 { font-size: 64px; } }
+</style>
+</head>
+<body class="fade-all">
+<div class="wrap">
+<header>
+  <span class="pill" aria-label="The time in London"><span>London</span> <span id="clock">14:05</span></span>
+  <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">
+    <button type="button" class="pill" id="lights" aria-pressed="true">Lights on</button>
+    <nav aria-label="Sections" style="display:flex;flex-wrap:wrap;gap:4px">
+      <a href="#work">Work</a><a href="#how">How I work</a><a href="#been">Where I’ve been</a><a href="#clock-sec">Off the clock</a><a class="cta" href="#contact">Say hello</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" aria-labelledby="h1">
+  <p class="name" id="name" aria-label="Elias Bennett"><span aria-hidden="true" id="nameVis">Elias<br>Bennett</span></p>
+  <figure class="portrait" id="portrait"><img src="assets/portrait.webp" alt="Elias in a white tuxedo, smiling"><figcaption class="label" id="label">Software engineer</figcaption></figure>
+  <div class="lede">
+    <h1 id="h1"><span class="real">I build everyday software, and make complicated things <span class="hl">feel simple.<svg viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden="true"><path d="M6 26 C 80 17, 170 31, 250 21 S 360 15, 394 25"></path></svg></span></span><span class="vis" id="vis" aria-hidden="true"></span></h1>
+    <p class="support">I take ideas all the way through: deciding what’s worth making, designing it, building it across the stack, and measuring whether it actually works.</p>
+  </div>
+</section>
+
+<section id="work" aria-labelledby="work-h" style="padding:40px 0 0">
+  <div class="sechead"><h2 class="h2" id="work-h">Work</h2><span class="mono" style="font-size:14px;color:var(--muted)">06 things I’ve built · 03 I’m proudest of</span></div>
+  <div class="tiles">
+    <a class="tile wide" href="#work" style="background:#1a1714;color:#f2efe9;--sw:#c08a5a"><span class="fast tape" aria-hidden="true"></span>
+      <div style="flex:1 1 280px;min-width:0"><p class="num">01</p><h3>Threshold</h3><p>A clearer view of what moving could cost.</p><p class="mono" style="font-size:12px;opacity:.8">Product · Data visualisation · 2026</p></div>
+      <img class="shot" src="assets/threshold.webp" alt="Threshold landing page" style="--tilt:-1.5deg;transform:rotate(-1.5deg)"></a>
+    <a class="tile" href="#work" style="background:#0a0a0a;color:#f2f2f2;--sw:#4f86f7"><svg class="fast clip" aria-hidden="true" width="34" height="86" viewBox="0 0 34 86" fill="none" stroke="#b8babd" stroke-width="3" stroke-linecap="round"><path d="M10 30 V70 a7 7 0 0 0 14 0 V16 a11 11 0 0 0 -22 0 V64"></path></svg>
+      <div style="flex:1 1 280px;min-width:0"><p class="num">02</p><h3>Argus Risk</h3><p>Every number shows where it came from and how old it is.</p><p class="mono" style="font-size:12px;opacity:.8">Event-driven systems · 2026</p></div>
+      <img class="shot" src="assets/argus.webp" alt="Argus Risk dashboard" style="--tilt:1.5deg;transform:rotate(1.5deg)"></a>
+    <a class="tile" href="#work" style="background:#1e1915;color:#ece4d8;--sw:#c0876a"><span class="fast pin" aria-hidden="true"></span>
+      <div style="flex:1 1 280px;min-width:0"><p class="num">03</p><h3>Flowtime</h3><p>Breaks that match how long you actually focused.</p><p class="mono" style="font-size:12px;opacity:.8">Offline-first interaction · 2026</p></div>
+      <img class="shot" src="assets/flowtime.jpg" alt="Flowtime focus timer" style="--tilt:-1deg;transform:rotate(-1deg)"></a>
+  </div>
+  <div class="indexwrap" id="indexwrap">
+    <ul class="index">
+      <li><a class="row" href="#work" data-p="Ask Professor Past" data-c="#2a2622"><span class="mono" style="font-size:13px">04</span><span><span class="nm">Ask Professor Past</span><span style="display:block;margin-top:6px;font-size:18px;color:var(--muted)">An AI history chatbot. Version 1, now being rebuilt.</span></span><span class="mono" style="font-size:12px;color:var(--muted)">AI product</span><span class="mono" style="font-size:12px;color:var(--muted)">2025</span><span class="arrow" aria-hidden="true" style="font-size:22px">↗</span></a></li>
+      <li><a class="row" href="#work" data-p="Home Secretary" data-c="#23262a"><span class="mono" style="font-size:13px">05</span><span><span class="nm">Home Secretary</span><span style="display:block;margin-top:6px;font-size:18px;color:var(--muted)">A household coordination prototype, built for coursework.</span></span><span class="mono" style="font-size:12px;color:var(--muted)">Prototype</span><span class="mono" style="font-size:12px;color:var(--muted)">2026</span><span class="arrow" aria-hidden="true" style="font-size:22px">↗</span></a></li>
+      <li><a class="row" href="#work" data-p="Risk Event Tracker" data-c="#1d2230"><span class="mono" style="font-size:13px">06</span><span><span class="nm">Risk Event Tracker</span><span style="display:block;margin-top:6px;font-size:18px;color:var(--muted)">A testable C# Web API for managing risk events.</span></span><span class="mono" style="font-size:12px;color:var(--muted)">Systems · API</span><span class="mono" style="font-size:12px;color:var(--muted)">2025</span><span class="arrow" aria-hidden="true" style="font-size:22px">↗</span></a></li>
+    </ul>
+    <div class="preview" id="preview" style="background:#2a2622" aria-hidden="true">[Ask Professor Past screenshot to come]</div>
+  </div>
+</section>
+
+<section id="clock-sec" class="clock-sec" aria-label="Off the clock (excerpt)">
+  <div class="card" style="padding:0;background:transparent"><span class="fast tape" aria-hidden="true" style="z-index:3"></span><img src="assets/running.webp" alt="Elias mid-run on a rainy street in central London" style="display:block;width:100%;height:360px;object-fit:cover;border-radius:20px"></div>
+  <div class="card" style="background:#fff;color:#111114;border:1px solid var(--rule);border-radius:6px"><svg class="fast clip" aria-hidden="true" width="30" height="76" viewBox="0 0 34 86" fill="none" stroke="#8d8f93" stroke-width="3" stroke-linecap="round" style="left:28px"><path d="M10 30 V70 a7 7 0 0 0 14 0 V16 a11 11 0 0 0 -22 0 V64"></path></svg>
+    <p style="margin:0;text-align:center;font-weight:800;font-stretch:75%;font-size:28px;text-transform:uppercase;border-bottom:3px double #111114;padding-bottom:8px">The Weekly Curiosity</p>
+    <p style="margin:12px 0 0;font-weight:800;font-stretch:75%;font-size:48px;line-height:.9">1783</p>
+    <p style="margin:8px 0 0;font-size:17px;line-height:1.4">The first living creatures to ride in a balloon were a sheep, a duck and a rooster. All three survived the flight at Versailles.</p></div>
+  <div class="card making"><p class="mono lbl" style="margin:0;font-size:12px"><span class="dot" aria-hidden="true"></span>Now making</p><p style="margin:10px 0 0;font-weight:700;font-size:34px;line-height:1">Rebuilding Professor Past from scratch.</p><p style="margin:10px 0 0;font-size:17px;color:var(--muted)">v1 is on GitHub if you want to meet the professor.</p></div>
+</section>
+<div style="height:60vh"></div>
+</div>
+
+<div class="bar" role="region" aria-label="Prototype controls" data-open="false">
+  <div class="grp"><button type="button" id="barToggle" aria-expanded="false">Prototype ▴</button><button type="button" id="replay">Replay entrance</button></div>
+  <div class="grp">Entrance <button type="button" data-set="entrance" data-val="a">A typed</button><button type="button" data-set="entrance" data-val="b">B name settles</button><button type="button" data-set="entrance" data-val="c">C full sequence</button></div>
+  <div class="grp">Tile hover <button type="button" data-set="hover" data-val="straighten">Straighten</button><button type="button" data-set="hover" data-val="lift">Lift</button><button type="button" data-set="hover" data-val="none">None</button></div>
+  <div class="grp">Fasteners <button type="button" data-set="fasteners" data-val="on">React</button><button type="button" data-set="fasteners" data-val="off">Still</button></div>
+  <div class="grp">Lights <button type="button" data-set="themechange" data-val="crossfade">1.2 s crossfade</button><button type="button" data-set="themechange" data-val="quick">0.3 s fade</button><button type="button" data-set="themechange" data-val="instant">Instant</button></div>
+  <div class="grp">Scroll <button type="button" data-set="scroll" data-val="still">Still</button><button type="button" data-set="scroll" data-val="sway">Sway</button></div>
+  <div class="grp">Index preview <button type="button" data-set="preview" data-val="fixed">Fixed</button><button type="button" data-set="preview" data-val="follow">Follows cursor</button></div>
+  <div class="grp">Reduced motion <button type="button" data-set="rm" data-val="no">Off</button><button type="button" data-set="rm" data-val="yes">On</button></div>
+  <div class="state" id="state" aria-live="polite"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/motion@13.4.6/dist/motion.js" integrity="sha384-r/e4U+dyOcWBX2/DXrTeaB1R9i9FhnrrxlcxehiAjy3Z1fa8134rTLsgfThF9tYQ" crossorigin="anonymous"></script>
+<script>
+const { animate, scroll } = window.Motion || {};
+const root = document.documentElement;
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => [...document.querySelectorAll(s)];
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) root.dataset.rm = 'yes';
+const rm = () => root.dataset.rm === 'yes';
+const spring = (bounce, visualDuration) => ({ type: 'spring', bounce, visualDuration });
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/* ---------- Readout and switches ---------- */
+const labels = {
+  entrance: { a: 'A: the line types, "feel simple." lands and underlines', b: 'B: the name settles letter by letter, then the underline draws', c: 'C: name settles, portrait swings in, label presses on, then the line types' },
+  hover: { straighten: 'tiles: screenshot straightens and lifts', lift: 'tiles: whole tile lifts', none: 'tiles: no hover motion' },
+  fasteners: { on: 'fasteners react on hover', off: 'fasteners still' },
+  themechange: { crossfade: 'lights: 1.2 s calm crossfade', quick: 'lights: 0.3 s fade', instant: 'lights: instant' },
+  scroll: { still: 'scroll: still', sway: 'scroll: tiles and cards sway slightly' },
+  preview: { fixed: 'index preview: fixed beside the list', follow: 'index preview: follows the cursor' },
+  rm: { no: 'off', yes: 'on' }
+};
+function renderState() {
+  $$('[data-set]').forEach((b) => b.setAttribute('aria-pressed', String(root.dataset[b.dataset.set] === b.dataset.val)));
+  const d = root.dataset;
+  $('#state').textContent = `theme ${d.theme} · entrance ${labels.entrance[d.entrance]} · ${labels.hover[d.hover]} · ${labels.fasteners[d.fasteners]} · ${labels.themechange[d.themechange]} · ${labels.scroll[d.scroll]} · ${labels.preview[d.preview]} · reduced motion ${labels.rm[d.rm]}`;
+}
+$$('[data-set]').forEach((b) => b.addEventListener('click', () => {
+  root.dataset[b.dataset.set] = b.dataset.val;
+  if (b.dataset.set === 'entrance' || b.dataset.set === 'rm') playEntrance();
+  if (b.dataset.set === 'scroll' || b.dataset.set === 'rm') setupScroll();
+  if (b.dataset.set === 'preview') resetPreview();
+  renderState();
+}));
+$('#replay').addEventListener('click', playEntrance);
+$('#barToggle').addEventListener('click', () => { const bar = $('.bar'); const open = bar.dataset.open !== 'true'; bar.dataset.open = String(open); $('#barToggle').setAttribute('aria-expanded', String(open)); $('#barToggle').textContent = open ? 'Prototype ▾' : 'Prototype ▴'; });
+
+/* ---------- Live London clock ---------- */
+function tick() { $('#clock').textContent = new Date().toLocaleTimeString('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit' }); }
+tick(); setInterval(tick, 10000);
+
+/* ---------- Lights ---------- */
+$('#lights').addEventListener('click', () => {
+  const dark = root.dataset.theme !== 'dark';
+  const mode = rm() ? 'reduced' : root.dataset.themechange;
+  const dur = { crossfade: '1.2s', quick: '.3s', instant: '0s', reduced: '.2s' }[mode];
+  root.style.setProperty('--tc-dur', dur);
+  root.style.setProperty('--tc-ease', 'cubic-bezier(0.42, 0, 0.58, 1)');
+  root.classList.add('switching');
+  clearTimeout(window.__sw); window.__sw = setTimeout(() => root.classList.remove('switching'), 1400);
+  root.dataset.theme = dark ? 'dark' : 'light';
+  $('#lights').textContent = dark ? 'Lights off' : 'Lights on';
+  $('#lights').setAttribute('aria-pressed', String(!dark));
+  renderState();
+});
+
+/* ---------- The entrance ---------- */
+const h1 = $('#h1'), vis = $('#vis');
+const LINE = 'I build everyday software, and make complicated things ';
+const HL = 'feel simple.';
+const HLSVG = '<svg viewBox="0 0 400 40" preserveAspectRatio="none"><path id="hlPath" d="M6 26 C 80 17, 170 31, 250 21 S 360 15, 394 25"></path></svg>';
+let run = 0;
+function splitName() {
+  $('#nameVis').innerHTML = ['Elias', 'Bennett'].map((w) => [...w].map((c) => `<span class="ch">${c}</span>`).join('')).join('<br>');
+}
+function resetAll() {
+  h1.classList.remove('typing'); vis.innerHTML = '';
+  $$('.name .ch').forEach((c) => { c.style.transform = ''; c.style.fontStretch = ''; });
+  $('#portrait').style.transform = ''; $('#label').style.transform = '';
+  const p = $('.real .hl path'); p.style.strokeDasharray = ''; p.style.strokeDashoffset = '';
+}
+async function drawUnderline(path, id) {
+  const len = path.getTotalLength();
+  path.style.strokeDasharray = len; path.style.strokeDashoffset = len;
+  if (id !== run) return;
+  await animate(path, { strokeDashoffset: [len, 0] }, { duration: .52, ease: [0.23, 1, 0.32, 1] });
+}
+async function typeLine(id) {
+  h1.classList.add('typing');
+  vis.innerHTML = '<span id="t1"></span><span class="caret" id="caret"></span><span id="t2"></span>';
+  const t1 = $('#t1'), caret = $('#caret'), t2 = $('#t2');
+  for (const ch of LINE) {
+    if (id !== run) return false;
+    t1.textContent += ch;
+    await wait(ch === ' ' ? 28 : ch === ',' ? 420 : 38);
+  }
+  caret.remove();
+  t2.innerHTML = `<span class="hl">${HL}${HLSVG}</span>`;
+  t2.style.display = 'inline-block';
+  const path = $('#hlPath'); const len = path.getTotalLength();
+  path.style.strokeDasharray = len; path.style.strokeDashoffset = len;
+  await animate(t2, { transform: ['translateY(14px) rotate(-2deg)', 'translateY(0px) rotate(0deg)'] }, spring(.3, .45));
+  if (id !== run) return false;
+  await animate(path, { strokeDashoffset: [len, 0] }, { duration: .52, ease: [0.23, 1, 0.32, 1] });
+  if (id !== run) return false;
+  h1.classList.remove('typing'); vis.innerHTML = '';
+  return true;
+}
+async function settleName(id) {
+  const chars = $$('.name .ch');
+  // Visible from the first frame: letters start a little low and wide, never hidden.
+  chars.forEach((c) => { c.style.transform = 'translateY(0.18em)'; c.style.fontStretch = '100%'; });
+  await wait(250); if (id !== run) return false;
+  await Promise.all(chars.map((c, i) => animate(c, { transform: ['translateY(0.18em)', 'translateY(0em)'], fontStretch: ['100%', '75%'] }, { ...spring(.35, .55), delay: i * .035 })));
+  return id === run;
+}
+async function playEntrance() {
+  const id = ++run;
+  resetAll();
+  if (rm() || !animate) return; // Reduced motion: the finished hero, exactly as served.
+  const mode = root.dataset.entrance;
+  if (mode === 'a') { await wait(450); if (id === run) await typeLine(id); return; }
+  if (mode === 'b') {
+    if (!(await settleName(id))) return;
+    await drawUnderline($('.real .hl path'), id);
+    return;
+  }
+  // C: the full sequence.
+  $('#portrait').style.transform = 'rotate(9deg) translateY(-14px)';
+  $('#label').style.transform = 'rotate(-7deg) scale(1.25)';
+  if (!(await settleName(id))) return;
+  await animate('#portrait', { transform: ['rotate(9deg) translateY(-14px)', 'rotate(3deg) translateY(0px)'] }, spring(.4, .6));
+  if (id !== run) return;
+  await animate('#label', { transform: ['rotate(-7deg) scale(1.25)', 'rotate(-7deg) scale(1)'] }, spring(.45, .3));
+  if (id !== run) return;
+  await typeLine(id);
+}
+
+/* ---------- Tile hover and fasteners ---------- */
+$$('.tile').forEach((t) => {
+  const shot = t.querySelector('.shot'); const fast = t.querySelector('.fast');
+  const enter = () => {
+    if (rm() || !animate) return;
+    const h = root.dataset.hover;
+    if (h === 'straighten') animate(shot, { transform: 'rotate(0deg) translateY(-6px) scale(1.02)' }, spring(.25, .35));
+    if (h === 'lift') animate(t, { transform: 'translateY(-6px)' }, spring(.25, .35));
+    if (root.dataset.fasteners === 'on' && fast) {
+      if (fast.classList.contains('tape')) animate(fast, { transform: ['rotate(-3deg)', 'rotate(-6deg) translateY(-3px)', 'rotate(-3deg)'] }, { duration: .5, ease: 'easeOut' });
+      if (fast.classList.contains('clip')) animate(fast, { transform: ['rotate(0deg)', 'rotate(-8deg)', 'rotate(3deg)', 'rotate(0deg)'] }, { duration: .55 });
+      if (fast.classList.contains('pin')) animate(fast, { transform: ['scale(1)', 'scale(1.15) translateY(-2px)', 'scale(1)'] }, { duration: .35 });
+    }
+  };
+  const leave = () => {
+    if (!animate) return;
+    animate(shot, { transform: `rotate(${shot.style.getPropertyValue('--tilt')}) translateY(0px) scale(1)` }, spring(.25, .35));
+    animate(t, { transform: 'translateY(0px)' }, spring(.25, .35));
+  };
+  t.addEventListener('pointerenter', enter); t.addEventListener('focus', enter);
+  t.addEventListener('pointerleave', leave); t.addEventListener('blur', leave);
+});
+
+/* ---------- Index preview ---------- */
+const preview = $('#preview'), wrap = $('#indexwrap');
+function showRow(row) {
+  preview.style.background = row.dataset.c;
+  preview.textContent = `[${row.dataset.p} screenshot to come]`;
+  if (!rm() && animate && root.dataset.preview === 'fixed') animate(preview, { opacity: [0.4, 1] }, { duration: .2 });
+}
+function resetPreview() { preview.style.left = ''; preview.style.top = ''; preview.style.opacity = ''; }
+$$('.row').forEach((row) => {
+  row.addEventListener('pointerenter', () => { showRow(row); if (root.dataset.preview === 'follow') preview.style.opacity = 1; });
+  row.addEventListener('focus', () => {
+    showRow(row);
+    if (root.dataset.preview === 'follow') { const r = row.getBoundingClientRect(), w = wrap.getBoundingClientRect(); preview.style.left = (r.right - w.left - 340) + 'px'; preview.style.top = (r.top - w.top - 40) + 'px'; preview.style.opacity = 1; }
+  });
+  row.addEventListener('pointerleave', () => { if (root.dataset.preview === 'follow') preview.style.opacity = 0; });
+  row.addEventListener('blur', () => { if (root.dataset.preview === 'follow') preview.style.opacity = 0; });
+});
+wrap.addEventListener('pointermove', (e) => {
+  if (root.dataset.preview !== 'follow') return;
+  const w = wrap.getBoundingClientRect();
+  const x = e.clientX - w.left + 24, y = e.clientY - w.top - 110;
+  if (rm() || !animate) { preview.style.left = x + 'px'; preview.style.top = y + 'px'; return; }
+  animate(preview, { left: x + 'px', top: y + 'px' }, spring(.2, .35));
+});
+
+/* ---------- Scroll sway ---------- */
+let stops = [];
+function setupScroll() {
+  stops.forEach((s) => s && s()); stops = [];
+  $$('.tile, .clock-sec .card').forEach((el) => { el.style.translate = ''; el.style.rotate = ''; });
+  if (rm() || !scroll || root.dataset.scroll !== 'sway') return;
+  $$('.tile, .clock-sec .card').forEach((el, i) => {
+    const dir = i % 2 ? 1 : -1;
+    stops.push(scroll(animate(el, { translate: [`0 ${14 * dir}px`, `0 ${-14 * dir}px`], rotate: [`${0.6 * dir}deg`, `${-0.6 * dir}deg`] }, { ease: 'linear' }), { target: el, offset: ['start end', 'end start'] }));
+  });
+}
+
+splitName();
+renderState();
+setupScroll();
+playEntrance();
+</script>
+</body>
+</html>
