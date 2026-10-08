@@ -61,6 +61,10 @@ export const offTheClock = {
     line: "Rebuilding Professor Past from scratch.",
     note: "v1 is on GitHub if you want to meet the professor.",
     code: "Code ↗",
+    href: "https://github.com/3ixas/ask-professor-past",
+    /** The entry counts as "now" for 8 weeks from the day it was written (Elias, 3 October 2026). */
+    writtenOn: "2026-10-03",
+    currentDays: 56,
     fallback: {
       label: "Latest on GitHub",
       latest: (repo: string, updated: string) => `${repo}, updated ${updated}`,
@@ -68,10 +72,29 @@ export const offTheClock = {
     },
   },
   github: {
+    /** Heard by screen readers only; the visible card leads with the total. */
+    heading: "GitHub, the past year",
     contributions: (count: string) => `${count} contributions in the past year`,
     busiest: (stretch: string) => `busiest stretch, ${stretch} →`,
+    /** The same note when the stretch sits to its right. */
+    busiestAfter: (stretch: string) => `← busiest stretch, ${stretch}`,
+    keys: "Use the arrow keys to move between days.",
+    name: (count: string, stretch: string | null) =>
+      `GitHub contributions over the past year: ${count}${stretch ? `, busiest in ${stretch}` : ""}.`,
     swipe: "← swipe for the whole year",
     legend: { quiet: "Quiet", busy: "Busy", today: "today" },
     asOf: (date: string) => `as of ${date}`,
   },
 } as const;
+
+export type NowMakingNote =
+  | { kind: "authored" }
+  | { kind: "latest"; repository: { name: string; href: string; pushedAt: string } };
+
+/** What Now making shows: the written entry while it counts as now, else the latest public repository, else nothing. */
+export function nowMakingNote(now: Date, latest: { name: string; href: string; pushedAt: string } | null): NowMakingNote | null {
+  const { writtenOn, currentDays } = offTheClock.nowMaking;
+  const expires = new Date(`${writtenOn}T00:00:00Z`).getTime() + currentDays * 86_400_000;
+  if (now.getTime() < expires) return { kind: "authored" };
+  return latest ? { kind: "latest", repository: latest } : null;
+}

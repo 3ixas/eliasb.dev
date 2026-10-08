@@ -176,6 +176,111 @@ test.describe("Off the clock: the clipping", () => {
   });
 });
 
+test.describe("Off the clock: Now making", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/fixtures/off-the-clock");
+  });
+
+  const { nowMaking } = offTheClock;
+
+  test("shows the written entry with a cobalt mark and a Code link", async ({ page }) => {
+    const card = fixture(page, "making");
+    await expect(card.getByRole("heading", { level: 3 })).toHaveText(nowMaking.label);
+    await expect(card.getByText(nowMaking.line)).toBeVisible();
+    await expect(card.getByText(nowMaking.note)).toBeVisible();
+    await expect(links(card)).toHaveText(nowMaking.code);
+    await expect(links(card)).toHaveAttribute("href", nowMaking.href);
+    await expect(card.locator("[data-now-mark]")).toHaveCSS("background-color", await token(page, "--stretch-cobalt"));
+  });
+
+  test("the mark pulses, and stops for reduced motion", async ({ page }) => {
+    const mark = fixture(page, "making").locator("[data-now-mark]");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await expect(mark).toHaveCSS("animation-name", "stretch-now-pulse");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await expect(mark).toHaveCSS("animation-name", "none");
+  });
+
+  test("after eight weeks it falls back to the latest repository, without the mark", async ({ page }) => {
+    const card = fixture(page, "making-fallback");
+    await expect(card.getByRole("heading", { level: 3 })).toHaveText(nowMaking.fallback.label);
+    await expect(card.getByText(nowMaking.fallback.latest("ask-professor-past", "20 Sept"), { exact: true })).toBeVisible();
+    await expect(links(card)).toHaveText(nowMaking.fallback.link);
+    await expect(links(card)).toHaveAttribute("href", /github\.com\/3ixas\/ask-professor-past/);
+    await expect(card.locator("[data-now-mark]")).toHaveCount(0);
+  });
+
+  test("with no entry and no repository the card is gone", async ({ page }) => {
+    await expect(fixture(page, "making-none").locator("[data-otc]")).toHaveCount(0);
+  });
+});
+
+test.describe("Off the clock: the GitHub year", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/fixtures/off-the-clock");
+  });
+
+  test("draws the year with a total, a text alternative, a busiest stretch and a legend", async ({ page }) => {
+    const card = fixture(page, "github");
+    const days = card.locator("[data-github-days]");
+    await expect(days.locator("button")).toHaveCount(365);
+    await expect(days).toHaveAttribute("aria-label", /^GitHub contributions over the past year: [\d,]+, busiest in (early|mid|late)-July\.$/);
+    await expect(card.locator(".stretch-gh__count")).toHaveText(/^[\d,]+$/);
+    await expect(card.locator("[data-busiest]")).toBeVisible();
+    await expect(card.locator(".stretch-gh__legend")).toContainText(offTheClock.github.legend.today);
+  });
+
+  test("today is the last day, in cobalt, and marked once", async ({ page }) => {
+    const card = fixture(page, "github");
+    const today = card.locator("[data-github-days] button[data-today]");
+    await expect(today).toHaveCount(1);
+    await expect(today).toHaveAttribute("aria-current", "date");
+    await expect(today).toHaveAttribute("aria-label", /2 Oct$/);
+    await expect(today).toHaveCSS("background-color", await token(page, "--stretch-cobalt"));
+  });
+
+  test("hovering or focusing a day reads out its count; arrow keys move between days", async ({ page }) => {
+    const card = fixture(page, "github");
+    const today = card.locator("[data-github-days] button[data-today]");
+    await today.focus();
+    await expect(card.locator("[data-readout]")).toHaveText(/2 Oct/);
+    await page.keyboard.press("ArrowUp");
+    await expect(card.locator("[data-github-days] button:focus")).toHaveAttribute("aria-label", /1 Oct/);
+    await expect(card.locator("[data-readout]")).toHaveText(/1 Oct/);
+  });
+
+  test("only one day is a tab stop, so the grid costs a keyboard user one Tab", async ({ page }) => {
+    const stops = fixture(page, "github").locator("[data-github-days] button:not([tabindex='-1'])");
+    await expect(stops).toHaveCount(1);
+  });
+
+  test("a stale year says when its data is from; a missing year is gone", async ({ page }) => {
+    await expect(fixture(page, "github-stale")).toContainText("as of 28 Sept");
+    await expect(fixture(page, "github")).not.toContainText("as of");
+    await expect(fixture(page, "github-unavailable").locator("[data-otc]")).toHaveCount(0);
+  });
+
+  test("on phones only the grid scrolls sideways, inside its card, and it opens on today", async ({ page }) => {
+    const card = fixture(page, "github");
+    const scroller = card.locator("[data-github-scroll]");
+    const { scrollWidth, clientWidth, scrollLeft } = await scroller.evaluate((el) => ({
+      scrollWidth: el.scrollWidth,
+      clientWidth: el.clientWidth,
+      scrollLeft: el.scrollLeft,
+    }));
+    if (phone(page)) {
+      expect(scrollWidth).toBeGreaterThan(clientWidth);
+      expect(scrollLeft + clientWidth).toBeGreaterThanOrEqual(scrollWidth - 1);
+      const [todayBox, scrollerBox] = [await card.locator("button[data-today]").boundingBox(), await scroller.boundingBox()];
+      expect(todayBox!.x + todayBox!.width).toBeLessThanOrEqual(scrollerBox!.x + scrollerBox!.width + 1);
+      await card.locator("button[data-today]").focus();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    } else {
+      expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1);
+    }
+  });
+});
+
 test.describe("Off the clock: contrast, targets and layout", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
@@ -200,6 +305,9 @@ test.describe("Off the clock: contrast, targets and layout", () => {
       ".stretch-story__figure figcaption",
       ".stretch-link",
       ".stretch-more summary",
+      ".stretch-gh__beside",
+      ".stretch-gh__note",
+      ".stretch-gh__foot",
     ]) {
       for (const reading of await contrastOnPaper(page, selector)) expect(reading.ratio, `${selector}: ${reading.text}`).toBeGreaterThanOrEqual(4.5);
     }

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
-import { BookCard, ClippingCard, FilmCard, TrainingPoster } from "@/components/site/off-the-clock";
+import { BookCard, ClippingCard, FilmCard, GitHubCard, NowMakingCard, TrainingPoster } from "@/components/site/off-the-clock";
 import { savedHistorySignal } from "@/integrations/history";
-import type { Book, Film, FilmSignal, HistorySignal, ReadingSignal } from "@/integrations/types";
+import type { ActivityDay, Book, Film, FilmSignal, GitHubSignal, HistorySignal, LatestRepositorySignal, ReadingSignal } from "@/integrations/types";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
@@ -39,6 +39,26 @@ const diary = (overrides: Partial<FilmSignal>): FilmSignal => ({
   updatedAt: daysAgo(1),
   ...overrides,
 });
+
+// A year of activity ending on the fixed "now": busy in mid-July, quiet on Sundays.
+const year: ActivityDay[] = Array.from({ length: 365 }, (_, index) => {
+  const date = new Date(now.getTime() - (364 - index) * 86_400_000);
+  const month = date.getUTCMonth();
+  const base = month === 6 ? 6 : (date.getUTCDate() * 7 + month * 3) % 5;
+  return { date: date.toISOString().slice(0, 10), count: date.getUTCDay() === 0 ? 0 : base };
+});
+const github = (overrides: Partial<GitHubSignal>): GitHubSignal => ({
+  state: "live",
+  activity: year,
+  total: year.reduce((sum, day) => sum + day.count, 0),
+  updatedAt: daysAgo(0),
+  href: "https://github.com/3ixas",
+  ...overrides,
+});
+const repository = { name: "ask-professor-past", description: null, href: "https://github.com/3ixas/ask-professor-past", pushedAt: "2026-09-20T09:00:00.000Z" };
+const latest = (overrides: Partial<LatestRepositorySignal>): LatestRepositorySignal => ({ state: "live", repository, updatedAt: daysAgo(0), ...overrides });
+/** Past the eight weeks the written entry counts as now. */
+const later = new Date("2026-12-15T12:00:00.000Z");
 
 // A live week: a pictured lead, a text-only event, and a pictured birth.
 const week: HistorySignal = {
@@ -108,6 +128,12 @@ const items = [
   { name: "film-empty", item: <FilmCard film={diary({ film: null })} now={now} /> },
   { name: "film-stale", item: <FilmCard film={diary({ updatedAt: daysAgo(61) })} now={now} /> },
   { name: "film-unrated", item: <FilmCard film={diary({ film: { ...film, rating: null, posterUrl: null } })} now={now} /> },
+  { name: "making", item: <NowMakingCard latest={latest({})} now={now} /> },
+  { name: "making-fallback", item: <NowMakingCard latest={latest({})} now={later} /> },
+  { name: "making-none", item: <NowMakingCard latest={latest({ state: "unavailable", repository: null })} now={later} /> },
+  { name: "github", item: <GitHubCard github={github({})} now={now} /> },
+  { name: "github-stale", item: <GitHubCard github={github({ updatedAt: daysAgo(4) })} now={now} /> },
+  { name: "github-unavailable", item: <GitHubCard github={github({ state: "unavailable", activity: [], total: 0, updatedAt: null })} now={now} /> },
   { name: "clipping-week", item: <ClippingCard history={week} /> },
   { name: "clipping-saved", item: <ClippingCard history={savedHistorySignal()} /> },
 ];

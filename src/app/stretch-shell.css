@@ -1339,6 +1339,194 @@ html:has(.stretch-menu[open]) {
   }
 }
 
+/* ---- Now making and the GitHub year ---- */
+
+.stretch-now {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background-color: var(--stretch-cobalt);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .stretch-now {
+    animation: stretch-now-pulse 1.8s ease-in-out infinite;
+  }
+}
+
+@keyframes stretch-now-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--stretch-cobalt) 55%, transparent);
+  }
+  60% {
+    box-shadow: 0 0 0 7px transparent;
+  }
+}
+
+.stretch-gh__total {
+  margin: 0;
+}
+
+.stretch-gh__count {
+  font-size: clamp(40px, 5vw, 56px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.stretch-gh__beside {
+  color: var(--stretch-muted);
+  font-size: 16px;
+}
+
+.stretch-gh__readout {
+  margin: 0;
+  min-height: 1.4em;
+  color: var(--stretch-cobalt);
+  font-size: 13px;
+}
+
+/* The grid scrolls inside its card on phones, so the page never does. */
+.stretch-gh__scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding-bottom: 4px;
+}
+
+.stretch-gh__sheet {
+  position: relative;
+}
+
+@media (max-width: 760px) {
+  .stretch-gh__sheet {
+    min-width: 700px;
+  }
+}
+
+.stretch-gh__months,
+.stretch-gh__days {
+  display: grid;
+  grid-template-columns: repeat(var(--weeks), minmax(0, 1fr));
+  column-gap: 3px;
+}
+
+.stretch-gh__months {
+  margin-bottom: 6px;
+  color: var(--stretch-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.stretch-gh__days {
+  grid-template-rows: repeat(7, auto);
+  grid-auto-flow: column;
+  row-gap: 3px;
+}
+
+.stretch-gh__day {
+  display: block;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background-color: var(--stretch-rule);
+}
+
+.stretch-gh__day[data-level="1"] { background-color: color-mix(in srgb, var(--stretch-ink) 22%, var(--stretch-card)); }
+.stretch-gh__day[data-level="2"] { background-color: color-mix(in srgb, var(--stretch-ink) 42%, var(--stretch-card)); }
+.stretch-gh__day[data-level="3"] { background-color: color-mix(in srgb, var(--stretch-ink) 65%, var(--stretch-card)); }
+.stretch-gh__day[data-level="4"] { background-color: var(--stretch-ink); }
+.stretch-gh__day[data-today] { background-color: var(--stretch-cobalt); }
+
+button.stretch-gh__day {
+  cursor: pointer;
+}
+
+button.stretch-gh__day[data-selected] {
+  outline: 2px solid var(--stretch-cobalt);
+  outline-offset: 1px;
+}
+
+.stretch-gh__stretch {
+  position: relative;
+  height: 32px;
+  margin-top: 8px;
+}
+
+.stretch-gh__bracket {
+  position: absolute;
+  top: 0;
+  height: 8px;
+  border: 2px solid var(--stretch-cobalt);
+  border-top: 0;
+  border-radius: 0 0 4px 4px;
+}
+
+.stretch-gh__note {
+  position: absolute;
+  top: 12px;
+  color: var(--stretch-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.stretch-gh__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
+  color: var(--stretch-muted);
+  font-size: 12px;
+}
+
+.stretch-gh__swipe {
+  display: none;
+}
+
+.stretch-gh__legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stretch-gh__legend .stretch-gh__day {
+  width: 12px;
+  height: 12px;
+}
+
+.stretch-gh__legend .stretch-gh__day[data-today] {
+  margin-left: 12px;
+}
+
+@media (max-width: 760px) {
+  .stretch-gh__swipe {
+    display: inline;
+  }
+}
+
+@media (min-width: 761px) {
+  .stretch-otc__making {
+    grid-column: span 12;
+  }
+
+  .stretch-otc__github {
+    grid-column: span 12;
+  }
+}
+
+@media (min-width: 1100px) {
+  .stretch-otc__making {
+    grid-column: span 5;
+  }
+
+  .stretch-otc__github {
+    grid-column: span 7;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .stretch-otc__print,
   .stretch-otc__photo img {

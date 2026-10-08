@@ -1,13 +1,15 @@
 import Image from "next/image";
 import { useId, type ReactNode } from "react";
 import { TrainingWeek } from "@/components/site/training-week";
-import { offTheClock } from "@/content/stretch/off-the-clock";
+import { GitHubYear } from "@/components/site/github-year";
+import { nowMakingNote, offTheClock } from "@/content/stretch/off-the-clock";
 import { filmLine } from "@/content/stretch/film-line";
+import { getGitHubSignal, getLatestRepositorySignal } from "@/integrations/github";
 import { getReadingSignal } from "@/integrations/goodreads";
 import { getCachedHistorySignal } from "@/integrations/history-cache";
 import { getFilmSignal } from "@/integrations/letterboxd";
 import { asOfDate, pinStatus, type PinStatus } from "@/integrations/pin-rules";
-import type { FilmSignal, HistoryEvent, HistorySignal, ReadingSignal } from "@/integrations/types";
+import type { FilmSignal, GitHubSignal, HistoryEvent, HistorySignal, LatestRepositorySignal, ReadingSignal } from "@/integrations/types";
 
 const copy = offTheClock;
 
@@ -201,17 +203,79 @@ export function ClippingCard({ history }: { history: HistorySignal }) {
   );
 }
 
-/** The four items, in their grid. `todayAt` fixes the training week's "now" for the fixtures route. */
+/**
+ * What I'm making now: the written entry while it counts as now (8 weeks), with
+ * a pulsing cobalt mark; after that my latest public repository; with neither,
+ * the card comes down.
+ */
+export function NowMakingCard({ latest, now }: { latest: LatestRepositorySignal; now: Date }) {
+  const headingId = useId();
+  const note = nowMakingNote(now, latest.repository);
+  if (!note) return null;
+  const making = copy.nowMaking;
+  const pushed = note.kind === "latest" ? asOfDate(new Date(note.repository.pushedAt)) : null;
+  return (
+    <article className="stretch-otc__card stretch-otc__making" data-otc="making" data-state={note.kind} aria-labelledby={headingId}>
+      <span className="stretch-fastener stretch-fastener--pin" aria-hidden="true" />
+      <h3 id={headingId} className="stretch-mono stretch-otc__label">
+        {note.kind === "authored" && <span className="stretch-now" data-now-mark aria-hidden="true" />}
+        {note.kind === "authored" ? making.label : making.fallback.label}
+      </h3>
+      {note.kind === "authored" ? (
+        <>
+          <p className="stretch-otc__name">{making.line}</p>
+          <p className="stretch-otc__by">{making.note}</p>
+          <ExternalLink href={making.href}>{making.code}</ExternalLink>
+        </>
+      ) : (
+        <>
+          <p className="stretch-otc__name">
+            {pushed && (
+              <time dateTime={pushed.iso}>
+                <span aria-hidden="true">{making.fallback.latest(note.repository.name, pushed.short)}</span>
+                <span className="sr-only">{making.fallback.latest(note.repository.name, pushed.long)}</span>
+              </time>
+            )}
+          </p>
+          <ExternalLink href={note.repository.href}>{making.fallback.link}</ExternalLink>
+        </>
+      )}
+    </article>
+  );
+}
+
+/** My GitHub year as a grid of squares. Gone when there is no full year to show. */
+export function GitHubCard({ github, now }: { github: GitHubSignal; now: Date }) {
+  const headingId = useId();
+  const status = pinStatus("github", github, now);
+  if (status.kind === "removed" || github.activity.length === 0) return null;
+  return (
+    <article className="stretch-otc__card stretch-otc__github" data-otc="github" data-state={status.kind === "stale" ? "stale" : "current"} aria-labelledby={headingId}>
+      <span className="stretch-fastener stretch-fastener--tape" aria-hidden="true" />
+      <h3 id={headingId} className="sr-only">
+        {copy.github.heading}
+      </h3>
+      <GitHubYear activity={github.activity} total={github.total} />
+      <AsOf status={status} />
+    </article>
+  );
+}
+
+/** The six items, in their grid. `todayAt` fixes the training week's "now" for the fixtures route. */
 export function OffTheClockItems({
   history,
   reading,
   film,
+  latest,
+  github,
   now,
   todayAt,
 }: {
   history: HistorySignal;
   reading: ReadingSignal;
   film: FilmSignal;
+  latest: LatestRepositorySignal;
+  github: GitHubSignal;
   now: Date;
   todayAt?: string;
 }): ReactNode {
@@ -221,6 +285,8 @@ export function OffTheClockItems({
       <ClippingCard history={history} />
       <BookCard reading={reading} now={now} />
       <FilmCard film={film} now={now} />
+      <NowMakingCard latest={latest} now={now} />
+      <GitHubCard github={github} now={now} />
     </div>
   );
 }
@@ -228,6 +294,12 @@ export function OffTheClockItems({
 /** The live version: reads the signals, each of which falls back to written copy. */
 export async function OffTheClock() {
   const now = new Date();
-  const [history, reading, film] = await Promise.all([getCachedHistorySignal(), getReadingSignal(), getFilmSignal()]);
-  return <OffTheClockItems history={history} reading={reading} film={film} now={now} />;
+  const [history, reading, film, latest, github] = await Promise.all([
+    getCachedHistorySignal(),
+    getReadingSignal(),
+    getFilmSignal(),
+    getLatestRepositorySignal(),
+    getGitHubSignal(),
+  ]);
+  return <OffTheClockItems history={history} reading={reading} film={film} latest={latest} github={github} now={now} />;
 }
