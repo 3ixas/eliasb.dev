@@ -996,3 +996,352 @@ html:has(.stretch-menu[open]) {
     margin-top: 20px;
   }
 }
+
+/* ---- Off the clock: the training poster, the book, the film and the clipping ---- */
+
+.stretch-otc {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  margin-top: 40px;
+}
+
+.stretch-otc__card {
+  position: relative;
+  display: grid;
+  gap: 20px;
+  padding: 28px 24px 24px;
+  border: 1px solid var(--stretch-rule);
+  border-radius: 12px;
+  background-color: var(--stretch-card);
+  color: var(--stretch-ink);
+}
+
+.stretch-otc__title {
+  margin: 0;
+  font-size: clamp(40px, 5vw, 56px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.stretch-otc__label {
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: 13px;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.stretch-otc__kicker {
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.stretch-otc__name {
+  margin: 0;
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.stretch-otc__year {
+  color: var(--stretch-muted);
+  font-weight: 500;
+}
+
+.stretch-otc__by {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.stretch-otc__note,
+.stretch-otc__asof {
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* A cover or poster, tilted a little like a print on the page, or a blank in its place. */
+.stretch-otc__print {
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  border: 1px solid var(--stretch-rule);
+  border-radius: 6px;
+  object-fit: cover;
+  transform: rotate(-1.5deg);
+}
+
+.stretch-otc__film .stretch-otc__print {
+  transform: rotate(1.5deg);
+}
+
+.stretch-otc__print--blank {
+  background-color: var(--stretch-rule);
+}
+
+.stretch-otc__book,
+.stretch-otc__film {
+  grid-template-columns: minmax(0, 40%) minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+}
+
+.stretch-otc__text {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.stretch-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  width: fit-content;
+  color: var(--stretch-ink);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  text-transform: uppercase;
+}
+
+.stretch-link:hover {
+  color: var(--stretch-cobalt);
+}
+
+/* The training poster. */
+.stretch-otc__training {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.stretch-otc__photo {
+  margin: 0;
+}
+
+.stretch-otc__photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  border-radius: 8px;
+  object-fit: cover;
+  object-position: center top;
+  transform: rotate(-1deg);
+}
+
+.stretch-otc__photo figcaption {
+  margin-top: 12px;
+  color: var(--stretch-muted);
+  font-size: 13px;
+}
+
+.stretch-otc__plan {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+}
+
+.stretch-week {
+  display: grid;
+  gap: 16px;
+}
+
+.stretch-week__days {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stretch-week__day {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--stretch-rule);
+}
+
+.stretch-week__short {
+  flex: none;
+  width: 3ch;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.stretch-week__session {
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.stretch-week__tag {
+  margin-left: auto;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+/* Today, in cobalt. */
+.stretch-week__day[data-today] {
+  border-radius: 8px;
+  border-bottom-color: transparent;
+  background-color: var(--stretch-cobalt);
+  color: var(--stretch-on-cobalt);
+}
+
+/* On phones, today is also a large card over the week. The space is held until today is known. */
+.stretch-week__today {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .stretch-week__today {
+    display: grid;
+    align-content: center;
+    gap: 4px;
+    min-height: 168px;
+    padding: 20px;
+    border-radius: 12px;
+    background-color: var(--stretch-cobalt);
+    color: var(--stretch-on-cobalt);
+  }
+
+  .stretch-week__today-label {
+    margin: 0;
+    font-size: 13px;
+    text-transform: uppercase;
+  }
+
+  .stretch-week__today-day {
+    margin: 0;
+    font-size: 56px;
+    line-height: 0.95;
+  }
+
+  .stretch-week__today-session {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .stretch-week:not([data-today-known]) .stretch-week__today {
+    visibility: hidden;
+  }
+}
+
+/* The clipping. */
+.stretch-otc__clipping {
+  align-content: start;
+  background-color: var(--stretch-page);
+}
+
+.stretch-story {
+  display: grid;
+  gap: 8px;
+}
+
+.stretch-story__figure {
+  margin: 0 0 4px;
+}
+
+.stretch-story__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+  border-radius: 6px;
+  object-fit: cover;
+  filter: grayscale(0.35);
+}
+
+.stretch-story__figure figcaption {
+  margin-top: 6px;
+  color: var(--stretch-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.stretch-story__figure figcaption a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+.stretch-story__fact {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.stretch-story--lead .stretch-story__fact {
+  font-size: clamp(22px, 2.4vw, 26px);
+}
+
+.stretch-story__date {
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: 13px;
+}
+
+.stretch-more {
+  display: grid;
+  gap: 24px;
+}
+
+.stretch-more summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  text-transform: uppercase;
+}
+
+.stretch-more[open] > summary {
+  margin-bottom: 8px;
+}
+
+.stretch-more > .stretch-story {
+  padding-top: 24px;
+  border-top: 1px solid var(--stretch-rule);
+}
+
+@media (min-width: 761px) {
+  .stretch-otc {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: start;
+    gap: 40px 32px;
+  }
+
+  .stretch-otc__training {
+    grid-column: span 7;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    gap: 28px;
+  }
+
+  .stretch-otc__clipping {
+    grid-column: span 5;
+  }
+
+  .stretch-otc__book,
+  .stretch-otc__film {
+    grid-column: span 6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stretch-otc__print,
+  .stretch-otc__photo img {
+    transition: none;
+  }
+}

@@ -4,6 +4,7 @@ import { SectionHeading } from "@/components/site/section-heading";
 import { SiteHeader } from "@/components/site/site-header";
 import { FeaturedTiles } from "@/components/site/featured-tiles";
 import { HowIWork } from "@/components/site/how-i-work";
+import { OffTheClock } from "@/components/site/off-the-clock";
 import { ProjectIndex } from "@/components/site/project-index";
 import { featuredProjects, featuredSlugs, projectIndex, projects } from "@/content/projects";
 import { careerLog } from "@/content/stretch/career";
@@ -48,6 +49,7 @@ export function Homepage() {
 
         <section id="off-the-clock" className="stretch-wrap stretch-section" aria-labelledby="off-the-clock-heading">
           <SectionHeading id="off-the-clock-heading" heading={offTheClock.heading} note={offTheClock.note} />
+          <OffTheClock />
         </section>
 
         <section id="say-hello" className="stretch-wrap stretch-section" aria-labelledby="say-hello-heading">

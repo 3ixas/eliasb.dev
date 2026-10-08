@@ -10,3 +10,6 @@ export const metadata: Metadata = {
 export default function Home() {
   return <Homepage />;
 }
+
+/** The Off the clock signals (book, film, history) refresh through this cached page every 15 minutes, the shortest of their own caches (Letterboxd). */
+export const revalidate = 900;
