@@ -1,7 +1,41 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type ComponentProps } from "react";
+import { useState, useSyncExternalStore, type ComponentProps } from "react";
+
+/*
+ * One signal for every link on the page: "the page has loaded and the browser
+ * is idle". It is scheduled once, when the first link subscribes, and each
+ * link then reads it, rather than every link queueing an idle callback.
+ */
+let pageIdle = false;
+let scheduled = false;
+const listeners = new Set<() => void>();
+
+function markIdle() {
+  pageIdle = true;
+  listeners.forEach((listener) => listener());
+}
+
+function whenPageIdle() {
+  if (scheduled) return;
+  scheduled = true;
+  const afterLoad = () => {
+    if (typeof window.requestIdleCallback === "function") window.requestIdleCallback(markIdle, { timeout: 2000 });
+    // Safari has no requestIdleCallback.
+    else window.setTimeout(markIdle, 500);
+  };
+  if (document.readyState === "complete") afterLoad();
+  else window.addEventListener("load", afterLoad, { once: true });
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  whenPageIdle();
+  return () => {
+    listeners.delete(listener);
+  };
+}
 
 /**
  * A Link that holds back its prefetch until the page has loaded, so a page
@@ -11,43 +45,24 @@ import { useEffect, useState, type ComponentProps } from "react";
  * the browser is idle, so on a phone the next page is still ready before the
  * tap. The intent pattern is from Next.js's prefetching guide.
  */
-export function IntentLink({ onPointerEnter, onFocus, onTouchStart, ...props }: Omit<ComponentProps<typeof Link>, "prefetch">) {
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    let cancel = () => {};
-    const whenIdle = () => {
-      if (typeof window.requestIdleCallback === "function") {
-        const id = window.requestIdleCallback(() => setReady(true), { timeout: 2000 });
-        cancel = () => window.cancelIdleCallback(id);
-      } else {
-        // Safari has no requestIdleCallback.
-        const id = window.setTimeout(() => setReady(true), 500);
-        cancel = () => window.clearTimeout(id);
-      }
-    };
-    if (document.readyState === "complete") whenIdle();
-    else window.addEventListener("load", whenIdle, { once: true });
-    return () => {
-      window.removeEventListener("load", whenIdle);
-      cancel();
-    };
-  }, []);
+export function LazyPrefetchLink({ onPointerEnter, onFocus, onTouchStart, ...props }: Omit<ComponentProps<typeof Link>, "prefetch">) {
+  const idle = useSyncExternalStore(subscribe, () => pageIdle, () => false);
+  const [intent, setIntent] = useState(false);
 
   return (
     <Link
       {...props}
-      prefetch={ready ? null : false}
+      prefetch={idle || intent ? null : false}
       onPointerEnter={(event) => {
-        setReady(true);
+        setIntent(true);
         onPointerEnter?.(event);
       }}
       onFocus={(event) => {
-        setReady(true);
+        setIntent(true);
         onFocus?.(event);
       }}
       onTouchStart={(event) => {
-        setReady(true);
+        setIntent(true);
         onTouchStart?.(event);
       }}
     />
