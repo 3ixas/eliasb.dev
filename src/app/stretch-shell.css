@@ -900,3 +900,99 @@ html:has(.stretch-menu[open]) {
     transition: none;
   }
 }
+
+/* ---- How I work: three beats, the PRD card and the honest line ---- */
+
+.stretch-how {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 40px 48px;
+  margin-top: 40px;
+}
+
+.stretch-beats {
+  display: grid;
+  gap: 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stretch-beat {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  column-gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid var(--stretch-rule);
+}
+
+.stretch-beat__number {
+  grid-row: 1 / span 2;
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: 44px;
+  line-height: 1;
+}
+
+.stretch-beat__habit {
+  margin: 0;
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.stretch-beat__proof {
+  max-width: 60ch;
+  margin: 8px 0 0;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.stretch-prd {
+  position: relative;
+  align-self: start;
+  margin: 14px 0 0;
+  padding: 32px 24px 20px;
+  border: 1px solid var(--stretch-rule);
+  border-radius: 12px;
+  background-color: var(--stretch-card);
+  color: var(--stretch-ink);
+  transform: rotate(1deg);
+}
+
+.stretch-prd__quote {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.stretch-prd__caption {
+  margin-top: 16px;
+  color: var(--stretch-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.stretch-honest {
+  max-width: 60ch;
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+@media (min-width: 761px) {
+  .stretch-how {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  }
+
+  .stretch-honest {
+    grid-column: 1;
+  }
+
+  .stretch-prd {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin-top: 20px;
+  }
+}

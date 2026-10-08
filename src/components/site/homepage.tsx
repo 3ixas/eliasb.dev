@@ -3,6 +3,7 @@ import { Hero } from "@/components/site/hero";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SiteHeader } from "@/components/site/site-header";
 import { FeaturedTiles } from "@/components/site/featured-tiles";
+import { HowIWork } from "@/components/site/how-i-work";
 import { ProjectIndex } from "@/components/site/project-index";
 import { featuredProjects, featuredSlugs, projectIndex, projects } from "@/content/projects";
 import { careerLog } from "@/content/stretch/career";
@@ -38,6 +39,7 @@ export function Homepage() {
 
         <section id="how-i-work" className="stretch-wrap stretch-section" aria-labelledby="how-i-work-heading">
           <SectionHeading id="how-i-work-heading" heading={howIWork.heading} note={howIWork.note} />
+          <HowIWork />
         </section>
 
         <section id="where-ive-been" className="stretch-wrap stretch-section" aria-labelledby="where-ive-been-heading">
