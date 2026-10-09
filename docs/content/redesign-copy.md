@@ -28,7 +28,7 @@ Approved by Elias on 8 October 2026 for [#113](https://github.com/3ixas/eliasb.d
 
 - Label on the portrait: Software engineer
 - Headline: I build everyday software, and make complicated things *feel simple.*
-- Supporting line: I take ideas all the way through: deciding what’s worth making, designing it, building it across the stack, and measuring whether it actually works.
+- Supporting line: I take ideas all the way through: deciding what’s worth making, designing it, building it across the stack, and finding out whether it actually works.
 - Buttons: See my work ↓ · Say hello
 
 The headline stays as it is (Elias, #113): the entrance is built around “*feel simple.*” landing.
@@ -114,7 +114,7 @@ Strings added while building, shipped, and recorded here on 2026-10-09 so `verif
 - Heading: Work
 - Note: Everything I’ve built that I’d happily talk through.
 - Filters, after 10 projects: All · Products · Systems · Experiments
-- Meta description: Projects I’ve built, from a rental calculator to a risk simulator, with the thinking behind each.
+- Meta description: Projects I’ve built, from a rental calculator to a risk simulator, with the thinking behind the main ones.
 
 ## Case studies
 

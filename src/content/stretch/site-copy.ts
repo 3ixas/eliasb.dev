@@ -48,7 +48,7 @@ export const hero = {
   portraitLabel: "Software engineer",
   headline: { lead: "I build everyday software, and make complicated things", emphasis: "feel simple." },
   support:
-    "I take ideas all the way through: deciding what’s worth making, designing it, building it across the stack, and measuring whether it actually works.",
+    "I take ideas all the way through: deciding what’s worth making, designing it, building it across the stack, and finding out whether it actually works.",
   actions: { work: "See my work ↓", hello: "Say hello" },
 } as const;
 
@@ -74,5 +74,5 @@ export const workArchive = {
   filters: ["All", "Products", "Systems", "Experiments"],
   /** Read out to assistive technology when a filter changes the list; not shown. */
   count: (shown: number) => `Showing ${shown} ${shown === 1 ? "project" : "projects"}`,
-  description: "Projects I’ve built, from a rental calculator to a risk simulator, with the thinking behind each.",
+  description: "Projects I’ve built, from a rental calculator to a risk simulator, with the thinking behind the main ones.",
 } as const;
