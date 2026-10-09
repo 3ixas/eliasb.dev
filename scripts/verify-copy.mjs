@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { caseFiles } from "../src/content/case-files.ts";
 import { projects, featuredSlugs } from "../src/content/projects.ts";
 import { careerLog } from "../src/content/stretch/career.ts";
 import { caseStudies } from "../src/content/stretch/case-studies.ts";
@@ -140,7 +139,6 @@ for (const study of studies) {
 // ---- Shape and the catalogue ----------------------------------------------------------------
 
 assert.deepEqual(caseStudyProblems(studies, projects), []);
-assert.deepEqual(Object.keys(caseStudies).sort(), Object.keys(caseFiles).sort(), "The new case studies cover the Board's case files");
 for (const slug of featuredSlugs) assert.ok(caseStudies[slug], `${slug} is featured and has a case study`);
 assert.deepEqual(studies.map((study) => study.next), ["argus-risk", "flowtime", "threshold"], "Next project follows the featured order");
 assert.deepEqual(studies.map((study) => study.number), ["01", "02", "03"]);

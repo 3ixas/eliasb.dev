@@ -4,7 +4,7 @@
  * (approved 8 October 2026); `scripts/verify-copy.mjs` checks that.
  *
  * No runtime imports, so Node can load it directly (the contract script) as
- * well as Next. The old Board modules stay beside it until the Board retires.
+ * well as Next.
  */
 
 const pad = (n: number) => String(n).padStart(2, "0");

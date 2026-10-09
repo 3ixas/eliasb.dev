@@ -1,7 +1,7 @@
 import { homeTitle, siteDescription, siteName } from "@/content/site";
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, JetBrains_Mono } from "next/font/google";
-import "./board.css";
+import "./base.css";
 import "./stretch-tokens.css";
 import "./stretch-type.css";
 import "./stretch-shell.css";
@@ -58,8 +58,9 @@ const siteBootScript = `
     try { saved = localStorage.getItem('elias-theme'); } catch (_) {}
     if (saved === 'light' || saved === 'dark') root.dataset.theme = saved;
     else delete root.dataset.theme;
-    // The Board follows data-lights once script runs, so the theme controller
-    // decides when the room changes, including when the device setting does.
+    // data-lights follows the appearance once script runs, so the theme
+    // controller decides when the room changes, including when the device
+    // setting does.
     const dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
     root.dataset.lights = dark ? 'on' : 'off';
     // The browser's toolbar colour follows the page, including a remembered

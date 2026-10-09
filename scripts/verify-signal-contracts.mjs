@@ -11,8 +11,8 @@ import {
 } from "../src/integrations/signal-mappers.ts";
 import { integrationConfig } from "../src/content/integration-config.ts";
 import { asOfDate, pinStatus, staleAfterDays } from "../src/integrations/pin-rules.ts";
-import { filmLine, isoWeek, stars, trainingSpoken, groupedNumber, makingNote, MAKING_CURRENT_DAYS } from "../src/content/board.ts";
-import { ARROW_GAP, stringStretches } from "../src/components/board/journey-geometry.ts";
+import { filmLine } from "../src/content/stretch/film-line.ts";
+import { nowMakingNote, offTheClock } from "../src/content/stretch/off-the-clock.ts";
 import { getHistorySignal, historyWeekStart, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "../src/integrations/history.ts";
 import {
   busiestStretch,
@@ -116,12 +116,6 @@ assert.equal(selectHistoryEvents({
     { year: 2003, text: "The Galileo spacecraft was deliberately sent into Jupiter’s atmosphere.", pages: [historyPage("Galileo_(spacecraft)", "Galileo.jpg")] },
   ],
 }, historyNow).length, 0, "A news headline doesn't make the cut, even to fill the clipping");
-
-// The dateline's volume and number are the ISO week-year and week.
-assert.deepEqual(isoWeek(new Date("2026-09-28T12:00:00Z")), { year: 2026, week: 40 });
-assert.deepEqual(isoWeek(new Date("2026-01-01T12:00:00Z")), { year: 2026, week: 1 });
-assert.deepEqual(isoWeek(new Date("2027-01-01T12:00:00Z")), { year: 2026, week: 53 });
-assert.deepEqual(isoWeek(new Date("2024-12-30T12:00:00Z")), { year: 2025, week: 1 });
 
 assert.deepEqual(HISTORY_FALLBACK_EVENTS.map(({ year }) => year), [1783, 1933, 2003]);
 assert.equal(new Set(HISTORY_FALLBACK_EVENTS.map(({ year }) => Math.floor((year - 1) / 100))).size, 3);
@@ -336,9 +330,6 @@ assert.equal(filmFromLetterboxd({ title: "Half", rating: "0.5" }, letterboxdProf
 assert.equal(filmFromLetterboxd({ title: " " }, letterboxdProfile), null);
 
 // The ticket's line, shown and spoken.
-assert.equal(stars(4), "★★★★");
-assert.equal(stars(4.5), "★★★★½");
-assert.equal(stars(0.5), "½");
 const watched = { short: "14 Sept", long: "14 September" };
 assert.deepEqual(filmLine(watched, 4), { shown: "Watched 14 Sept · ★★★★", spoken: "Watched 14 September, rated 4 out of 5" });
 assert.deepEqual(filmLine(watched, 4.5), { shown: "Watched 14 Sept · ★★★★½", spoken: "Watched 14 September, rated 4.5 out of 5" });
@@ -437,9 +428,6 @@ assert.equal(contributionTag({ date: "2026-01-15", count: 1 }), "1 contribution 
 assert.equal(contributionTag({ date: "2026-01-15", count: 0 }), "Nothing on Thu 15 Jan");
 assert.deepEqual([0, 1, 2, 3, 4, 40].map(contributionLevel), [0, 1, 2, 3, 4, 4]);
 assert.deepEqual(createContributionCalendar(quietYear).monthLabels.map(({ label }) => label).filter((label) => /June|July/.test(label)), ["June", "July"]);
-assert.equal(groupedNumber(1089), "1,089");
-assert.equal(groupedNumber(175), "175");
-assert.equal(groupedNumber(1234567), "1,234,567");
 
 // Making: the authored entry for eight weeks, then my latest public repository, then nothing.
 const repositories = [
@@ -453,22 +441,13 @@ assert.deepEqual(latestRepository(repositories, "3ixas"), {
 }, "The profile repository, forks and archives are skipped");
 assert.equal(latestRepository([{ name: "x", description: "", html_url: "https://github.com/3ixas/x", pushed_at: "2026-01-01T00:00:00Z" }], "3ixas").description, null);
 assert.equal(latestRepository([], "3ixas"), null);
-assert.equal(MAKING_CURRENT_DAYS, 56);
-const written = new Date("2026-10-03T00:00:00Z").getTime();
+const { writtenOn, currentDays } = offTheClock.nowMaking;
+assert.equal(currentDays, 56);
+const written = new Date(`${writtenOn}T00:00:00Z`).getTime();
 const repo = latestRepository(repositories, "3ixas");
-assert.equal(makingNote(new Date(written + 55 * 86_400_000), repo).kind, "authored");
-assert.equal(makingNote(new Date(written + 56 * 86_400_000), repo).kind, "latest", "After eight weeks the entry is no longer now");
-assert.equal(makingNote(new Date(written + 56 * 86_400_000), null), null, "With no entry and no repository, there's no pin");
-
-// About's red string: one stretch per pair of pins, each stopping short of the next pin for its arrow.
-assert.deepEqual(stringStretches([]), []);
-assert.deepEqual(stringStretches([{ x: 10, y: 10 }]), []);
-const stretches = stringStretches([{ x: 10, y: 0 }, { x: 200, y: 100 }, { x: 10, y: 200 }]);
-assert.equal(stretches.length, 2);
-assert.match(stretches[0], /^M 10\.0 0\.0 Q 140\.0 50\.0 /, "The first stretch bows to the right");
-assert.match(stretches[1], /^M 200\.0 100\.0 Q 70\.0 150\.0 /, "The next bows to the other side");
-const [endX, endY] = stretches[0].split(" ").slice(-2).map(Number);
-assert.ok(Math.abs(Math.hypot(200 - endX, 100 - endY) - ARROW_GAP) < 0.2, "Each stretch stops short of its pin by the arrow's gap");
+assert.equal(nowMakingNote(new Date(written + (currentDays - 1) * 86_400_000), repo).kind, "authored");
+assert.equal(nowMakingNote(new Date(written + currentDays * 86_400_000), repo).kind, "latest", "After eight weeks the entry is no longer now");
+assert.equal(nowMakingNote(new Date(written + currentDays * 86_400_000), null), null, "With no entry and no repository, there's nothing to show");
 
 // The running photo carries no embedded metadata: its WebP has image data only, no EXIF or XMP.
 const runningPhoto = readFileSync(new URL("../public/signals/running-central-london.webp", import.meta.url));
@@ -478,13 +457,6 @@ for (let offset = 12; offset + 8 <= runningPhoto.length; offset += 8 + runningPh
 }
 assert.equal(runningPhoto.toString("ascii", 8, 12), "WEBP");
 assert.deepEqual(webpChunks.filter((chunk) => ["EXIF", "XMP ", "ICCP"].includes(chunk)), [], "The running photo must not carry EXIF, XMP, or a colour profile");
-
-// The plan reads once to screen readers, today first; it claims nothing about sessions done.
-assert.equal(
-  trainingSpoken(5),
-  "My training week, the plan. Today, Saturday: zone 2, rower or bike. Monday: full-body gym. Tuesday: zone 2 run. Wednesday: full-body gym. Thursday: interval run. Friday: full-body gym. Sunday: assault bike intervals. Zone 2 means slow on purpose.",
-);
-assert.match(trainingSpoken(0), /^My training week, the plan\. Today, Monday: full-body gym\. Tuesday:/);
 
 // Pin rules: nothing current is removed; saved data past its pin's limit is stale.
 const pinNow = new Date("2026-10-02T12:00:00.000Z");

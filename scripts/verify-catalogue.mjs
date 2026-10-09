@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { caseFiles } from "../src/content/case-files.ts";
+import { caseStudies } from "../src/content/stretch/case-studies.ts";
 import {
   MAX_FEATURED,
   assertCatalogue,
@@ -11,7 +11,7 @@ import {
   projects,
 } from "../src/content/projects.ts";
 
-const caseStudySlugs = Object.keys(caseFiles);
+const caseStudySlugs = Object.keys(caseStudies);
 const base = (slug, year = 2025, overrides = {}) => ({ slug, name: slug, outcome: "o", type: "t", year, category: "products", links: {}, ...overrides });
 const featurable = (slug) =>
   base(slug, 2026, {

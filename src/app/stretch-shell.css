@@ -1,9 +1,8 @@
 /*
  * The Stretch homepage shell (docs/design/STRETCH.md): page surface, header,
  * Lights pill, section headings and footer. Everything is scoped to
- * [data-stretch-shell] so the Board's pages are untouched until they are
- * rebuilt; only the page surface needs :has(), because the Board stylesheet
- * paints html and body.
+ * [data-stretch-shell]; only the page surface reaches up to html and body,
+ * through :has().
  */
 
 /* The surface behind the shell, so overscroll and the toolbar match the page. */

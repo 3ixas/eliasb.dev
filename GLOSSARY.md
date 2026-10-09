@@ -83,8 +83,8 @@ _Avoid_: Loader, interaction gate, anything else that holds the page
 The parts of the site that can grow through notes, experiments, cultural entries, or discoveries without a publishing schedule. Superseded on 8 October 2026 by the **Stretch direction** ([#107](https://github.com/3ixas/eliasb.dev/issues/107)); kept for history.
 _Avoid_: Blog, feed
 
-**Lab**:
-The legacy name for experiments, works in progress, making notes, and playful technical experiences. The current visible term is **Experiments**, a compact homepage section.
+**Lab** (superseded):
+The legacy name for experiments, works in progress, making notes, and playful technical experiences. Superseded on 8 October 2026 by **Now making** under **Off the clock** ([#107](https://github.com/3ixas/eliasb.dev/issues/107)); kept for history.
 _Avoid_: Treating Lab as a separate publishing destination or confusing it with the main Work archive.
 
 **Making pin** (superseded):
@@ -100,7 +100,7 @@ Elias's positioning. He builds everyday software, end to end, that makes complic
 _Avoid_: Claims of users, traction, or "can't live without" as a fact
 
 **Experiments section** (retired):
-A former compact homepage section for Lab material. It is replaced by the Making pin.
+A former compact homepage section for Lab material. It is replaced by **Now making**.
 
 **Library** (superseded):
 The public primary-navigation label for the unified Personal signals section. It takes visitors to the existing one-page collection and does not create a separate Library page. Superseded on 8 October 2026 by the six-section homepage ([#106](https://github.com/3ixas/eliasb.dev/issues/106)); kept for history.
@@ -123,9 +123,9 @@ A small site-owned record derived from an external source and retained as the la
 _Avoid_: Live API response
 
 **Interaction island**:
-A focused interactive component inside an otherwise pre-rendered page, used for experiences such as the signature entrance, a tactile book, or a data visualization.
+A focused interactive component inside an otherwise pre-rendered page, used for experiences such as the signature entrance or a data visualization.
 _Avoid_: Making an entire page client-rendered for one interaction
 
 **Authored content**:
-Project stories, Experiments entries, Outside work selections, status, and other material Elias maintains directly in version-controlled MDX or typed data.
+Project stories, the **Now making** entry, the training week, status, and other material Elias maintains directly in version-controlled typed data.
 _Avoid_: CMS content

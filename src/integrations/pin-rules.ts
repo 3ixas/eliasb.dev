@@ -1,8 +1,8 @@
 import type { SignalState } from "./types";
 
 /*
- * Pin rules for the Board, kept beside the integrations so every pin follows
- * them and they can be checked with plain fixture data (verify:signals).
+ * Pin rules for the Off the clock items, kept beside the integrations so every
+ * item follows them and they can be checked with plain fixture data (verify:signals).
  *
  * - A pin with nothing current is removed.
  * - A pin showing saved data, because its live source could not be reached,

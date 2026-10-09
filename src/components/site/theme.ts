@@ -2,8 +2,8 @@
  * The theme controller. There are three preferences: "system" follows the
  * device live, and "light" or "dark" is an explicit choice that persists.
  * The pre-paint boot script in the root layout reads the same storage key
- * and sets data-theme (and data-lights, which the Board still reads), so the
- * page never paints in the wrong theme.
+ * and sets data-theme and data-lights, so the page never paints in the wrong
+ * theme.
  *
  * Every change marks the document as changing (data-theme-changing) before
  * the theme flips, so the stylesheet crossfades it even when the device

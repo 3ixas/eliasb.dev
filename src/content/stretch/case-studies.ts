@@ -1,8 +1,7 @@
 /*
  * The three case studies in the Stretch shape. Copy is from
  * docs/content/redesign-copy.md ("Case studies"); the figures and their alt
- * text and captions are carried over from the Board's `case-files.ts`, which
- * stays until the Board retires.
+ * text and captions are carried over from the Board's old case files.
  */
 import type { CaseStudy } from "./case-study";
 
