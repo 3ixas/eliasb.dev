@@ -772,21 +772,43 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   }
 }
 
-/* Hover and keyboard focus: the screenshot straightens and the prop reacts. */
+/*
+ * Hover and keyboard focus: the screenshot straightens and the prop reacts.
+ * Hover only moves things where there is a real hover, so a tap on a phone
+ * (or a return by the back button) never leaves a tile in its hover pose.
+ */
 @media (prefers-reduced-motion: no-preference) {
-  .stretch-tile:is(:hover, :focus-visible) .stretch-tile__shot {
+  .stretch-tile:focus-visible .stretch-tile__shot {
     transform: rotate(0deg) translateY(-6px) scale(1.02);
   }
 
-  .stretch-tile:is(:hover, :focus-visible) .stretch-fastener--tape {
+  .stretch-tile:focus-visible .stretch-fastener--tape {
     animation: stretch-tape-lift 0.5s ease-out;
   }
 
-  .stretch-tile:is(:hover, :focus-visible) .stretch-fastener--paperclip {
+  .stretch-tile:focus-visible .stretch-fastener--paperclip {
     animation: stretch-clip-swing 0.55s ease-in-out;
   }
 
-  .stretch-tile:is(:hover, :focus-visible) .stretch-fastener--pin {
+  .stretch-tile:focus-visible .stretch-fastener--pin {
+    animation: stretch-pin-press 0.35s ease-out;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  .stretch-tile:hover .stretch-tile__shot {
+    transform: rotate(0deg) translateY(-6px) scale(1.02);
+  }
+
+  .stretch-tile:hover .stretch-fastener--tape {
+    animation: stretch-tape-lift 0.5s ease-out;
+  }
+
+  .stretch-tile:hover .stretch-fastener--paperclip {
+    animation: stretch-clip-swing 0.55s ease-in-out;
+  }
+
+  .stretch-tile:hover .stretch-fastener--pin {
     animation: stretch-pin-press 0.35s ease-out;
   }
 }
@@ -817,6 +839,41 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
     .stretch-tile__shot {
       animation: stretch-shot-straighten linear both;
       animation-timeline: view();
+    }
+  }
+}
+
+/*
+ * Scroll sway: tiles and cards drift up to 14 px and tilt at most 0.6° as they
+ * cross the screen, level and in place when centred. The individual translate
+ * and rotate properties are used so it composes with a card's own resting
+ * tilt, and only they change, so it runs off the main thread. Under reduced
+ * motion, or without scroll-driven animations, cards simply stay still.
+ */
+@keyframes stretch-sway {
+  from {
+    translate: 0 14px;
+    rotate: calc(var(--sway-tilt, 0.6deg) * -1);
+  }
+
+  to {
+    translate: 0 -14px;
+    rotate: var(--sway-tilt, 0.6deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .stretch-tile,
+    .stretch-otc__card,
+    .stretch-prd {
+      animation: stretch-sway linear both;
+      animation-timeline: view();
+    }
+
+    .stretch-tile:nth-child(even),
+    .stretch-otc__card:nth-child(even) {
+      --sway-tilt: -0.6deg;
     }
   }
 }
@@ -1009,10 +1066,16 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
 
 @media (prefers-reduced-motion: no-preference) {
   .stretch-index__arrow {
-    transition: transform 0.2s ease-out;
+    transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
   }
 
-  .stretch-index__link:is(:hover, :focus-visible) .stretch-index__arrow {
+  .stretch-index__link:focus-visible .stretch-index__arrow {
+    transform: translateX(6px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  .stretch-index__link:hover .stretch-index__arrow {
     transform: translateX(6px);
   }
 }
