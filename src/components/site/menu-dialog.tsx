@@ -13,14 +13,18 @@ const DESKTOP = "(min-width: 761px)";
  * big section names and the London clock inside. The dialog is a native modal,
  * so the browser traps focus, makes the page behind inert and closes it on
  * Escape; Close and Escape both end in the same close event, which gives focus
- * back to Menu. Tab wraps from the last link to Close and back, because a
- * native modal would otherwise let it leave for the browser's own controls. The section links are in the server HTML, and the clock is
- * mounted only while the dialog is open.
+ * back to Menu. Choosing a section closes it too, and focus then moves to that
+ * section, so the next Tab starts there. Tab wraps from the last link to Close
+ * and back, because a native modal would otherwise let it leave for the
+ * browser's own controls. The section links are in the server HTML, and the
+ * clock is mounted only while the dialog is open.
  */
 export function MenuDialog() {
   const dialog = useRef<HTMLDialogElement>(null);
   const opener = useRef<HTMLButtonElement>(null);
   const closer = useRef<HTMLButtonElement>(null);
+  /** The section a link in the menu was chosen for, so focus can follow the page to it. */
+  const chosen = useRef<string | null>(null);
   const [open, setOpen] = useState(false);
 
   // A dialog left open when the window grows to the desktop layout would cover it.
@@ -64,6 +68,14 @@ export function MenuDialog() {
         onKeyDown={wrapTab}
         onClose={() => {
           setOpen(false);
+          const section = chosen.current ? document.getElementById(chosen.current) : null;
+          chosen.current = null;
+          if (section) {
+            // The page has scrolled to the section: start the next Tab there, not back at Menu.
+            if (!section.hasAttribute("tabindex")) section.setAttribute("tabindex", "-1");
+            section.focus({ preventScroll: true });
+            return;
+          }
           opener.current?.focus({ preventScroll: true });
         }}
       >
@@ -80,7 +92,10 @@ export function MenuDialog() {
                 <a
                   href={`#${id}`}
                   className={index === sectionLinks.length - 1 ? "stretch-menu__cta" : undefined}
-                  onClick={close}
+                  onClick={() => {
+                    chosen.current = id;
+                    close();
+                  }}
                 >
                   {label}
                 </a>

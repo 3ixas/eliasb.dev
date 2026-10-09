@@ -36,7 +36,7 @@ Every text pair passes WCAG 2.2 AA (5.7:1 to 18.2:1, [#108](https://github.com/3
 
 - **Bricolage Grotesque** (variable `opsz`, `wdth`, `wght`), self-hosted through `next/font`. Display text is at 75% width, weight 800, uppercase. Body copy uses the same family at normal width.
 - **JetBrains Mono** for metadata, counts, dates and section notes.
-- The name fills the screen on phones (32vw, no wrap) and is capped on desktop. Section headings are giant, condensed and uppercase, with a mono note and true counts ("06 things I've built · 03 I'm proudest of").
+- The name fills the screen on phones (31.5vw, no wrap) and is capped on desktop. Section headings are giant, condensed and uppercase, with a mono note and true counts ("06 things I've built · 03 I'm proudest of").
 - Newsreader is retired.
 
 ## Fasteners

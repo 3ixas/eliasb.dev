@@ -50,6 +50,26 @@ test.describe("Signature entrance", () => {
     expect(await page.locator(".stretch-portrait").evaluate((element) => element.getAnimations().length)).toBe(0);
   });
 
+  test("the first Tab shows the page, so focus never lands on a held control", async ({ page, browserName }) => {
+    await page.goto("/", { waitUntil: "commit" });
+    await page.waitForSelector("[data-entrance-layer]");
+    expect(await isEntering(page)).toBe(true);
+    await page.keyboard.press("Tab");
+    await expect.poll(() => isEntering(page)).toBe(false);
+    await expect(page.locator("[data-entrance-layer]")).toHaveCount(0);
+    expect(await opacityOf(page, '[data-entrance="header"]')).toBe(1);
+    // Safari does not tab to links by default, so there it is enough that the page was released.
+    if (browserName === "chromium") {
+      const focused = await page.evaluate(() => {
+        let opacity = 1;
+        for (let node: Element | null = document.activeElement; node; node = node.parentElement) opacity *= Number(getComputedStyle(node).opacity);
+        return { tag: document.activeElement?.tagName, opacity };
+      });
+      expect(focused.tag).not.toBe("BODY");
+      expect(focused.opacity, "the focused control is visible").toBe(1);
+    }
+  });
+
   test("ends on exactly the finished hero", async ({ page }) => {
     const rest = async () =>
       page.evaluate(() =>

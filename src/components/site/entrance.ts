@@ -131,6 +131,13 @@ export function holdPage(safetyMs: number) {
   const release = () => root.removeAttribute("data-entering");
   root.setAttribute("data-entering", "");
   window.setTimeout(release, safetyMs);
+  // Someone tabbing around would land on held, invisible controls: the first Tab shows the page.
+  const onKey = (event: KeyboardEvent) => {
+    if (event.key !== "Tab") return;
+    release();
+    window.removeEventListener("keydown", onKey, true);
+  };
+  window.addEventListener("keydown", onKey, true);
   // A page restored from the back-forward cache is shown as it was left.
   window.addEventListener("pageshow", (event) => {
     if (event.persisted) release();

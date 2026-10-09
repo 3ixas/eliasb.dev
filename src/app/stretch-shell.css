@@ -53,6 +53,11 @@ html:has([data-stretch-shell]) body {
   outline-offset: 3px;
 }
 
+/* A section that focus was sent to (after the phone menu) is not a control, so it wears no ring. */
+[data-stretch-shell] section[tabindex="-1"]:focus-visible {
+  outline: none;
+}
+
 .stretch-wrap {
   width: 100%;
   max-width: 1400px;
@@ -342,15 +347,25 @@ html:has(.stretch-menu[open]) {
   padding-block: 12px 48px;
 }
 
-/* The name: 32vw on phones so "Bennett" fills the width without wrapping. */
+/* The name: 31.5vw on phones so "Bennett" fills the width without wrapping. */
 .stretch-name,
 .stretch-entrance__name {
   margin: 0;
   color: var(--stretch-cobalt);
-  font-size: 32vw;
+  font-size: 31.5vw;
   line-height: 0.8;
   letter-spacing: 0.005em;
   white-space: nowrap;
+}
+
+/*
+ * The name never wraps at its own size, but a visitor who forces wider letter
+ * spacing (WCAG 1.4.12) would otherwise push the page sideways, so it may break
+ * as a last resort. The entrance layer keeps its single lines.
+ */
+.stretch-name {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .stretch-name span,

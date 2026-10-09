@@ -61,6 +61,16 @@ test.describe("Phone header and menu", () => {
     await expect(menuButton(page)).toBeFocused();
   });
 
+  test("choosing a section closes the menu and moves focus to that section", async ({ page }) => {
+    await menuButton(page).click();
+    await dialog(page).getByRole("link", { name: "How I work" }).click();
+    await expect(dialog(page)).toBeHidden();
+    await expect(page.locator("#how-i-work")).toBeFocused();
+    expect(await page.evaluate(() => location.hash)).toBe("#how-i-work");
+    // The section is a place to start from, not a control, so it wears no focus ring.
+    expect(await page.locator("#how-i-work").evaluate((element) => getComputedStyle(element).outlineStyle)).toBe("none");
+  });
+
   test("focus stays inside the open menu", async ({ page, browserName }) => {
     test.skip(browserName === "webkit", "Safari does not tab through links by default");
     await menuButton(page).click();
