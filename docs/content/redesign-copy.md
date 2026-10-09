@@ -97,7 +97,7 @@ The headline stays as it is (Elias, #113): the entrance is built around “*feel
 | Now making | ● Now making · Rebuilding Professor Past from scratch. · v1 is on GitHub if you want to meet the professor. · Code ↗ | Latest on GitHub · {repo}, updated {date} · View on GitHub ↗ |
 | GitHub | {1,221} contributions in the past year · busiest stretch, {September–October} → · ← swipe for the whole year · Quiet / Busy / today | as of {date} |
 
-Strings added while building, shipped, and recorded here on 2026-10-09 so `verify:copy` covers them. They were not in the original approved copy; they await Elias's sign-off.
+Strings added while building, shipped, and recorded here on 2026-10-09 so `verify:copy` covers them. They were not in the original approved copy; Elias signed them off on 2026-10-09.
 
 - Training week plan: Mon Monday Full-body gym · Tue Tuesday Zone 2 run · Wed Wednesday Full-body gym · Thu Thursday Interval run · Fri Friday Full-body gym · Sat Saturday Zone 2, rower or bike · Sun Sunday Assault bike intervals
 - Weekly Curiosity: Read more ↗ · Image:
