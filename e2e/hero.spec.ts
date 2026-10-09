@@ -40,7 +40,7 @@ test.describe("Hero", () => {
     for (const height of lines) expect(height, "each name stays on one line").toBeLessThanOrEqual(Math.round(font * 0.8) + 1);
   });
 
-  test("on phones the name is 36vw, fills the width and does not wrap", async ({ page }) => {
+  test("on phones the name is 32vw, fills the width and does not wrap", async ({ page }) => {
     test.skip(!phone(page), "Phone layout");
     const { font, widest, column, width } = await page.evaluate(() => {
       const element = document.querySelector(".stretch-name")!;
@@ -56,7 +56,7 @@ test.describe("Hero", () => {
         width: innerWidth,
       };
     });
-    expect(font).toBeCloseTo(width * 0.36, 0);
+    expect(font).toBeCloseTo(width * 0.32, 0);
     expect(widest / column, "fills the width").toBeGreaterThan(0.9);
     expect(widest / column, "and does not run over it").toBeLessThan(1.01);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

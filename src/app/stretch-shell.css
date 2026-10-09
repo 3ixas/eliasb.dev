@@ -342,14 +342,14 @@ html:has(.stretch-menu[open]) {
   padding-block: 12px 48px;
 }
 
-/* The name: 36vw on phones so "Bennett" fills the width without wrapping. */
+/* The name: 32vw on phones so "Bennett" fills the width without wrapping. */
 .stretch-name,
 .stretch-entrance__name {
   margin: 0;
   color: var(--stretch-cobalt);
-  font-size: 36vw;
+  font-size: 32vw;
   line-height: 0.8;
-  letter-spacing: -0.04em;
+  letter-spacing: 0.005em;
   white-space: nowrap;
 }
 
@@ -476,7 +476,6 @@ html:has(.stretch-menu[open]) {
   .stretch-name,
   .stretch-entrance__name {
     font-size: clamp(88px, 18vw, 280px);
-    letter-spacing: 0.005em;
   }
 
   .stretch-hero__lede {
