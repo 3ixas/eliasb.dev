@@ -42,8 +42,9 @@ test.describe("Signature entrance", () => {
 
     await finished(page);
     expect(await page.evaluate(() => (window as unknown as { heldUntil: number }).heldUntil), "the whole page is there within 6 s").toBeLessThan(6000);
+    // The hold clears as the last fade ends; a slow runner can read the tail of it (0.9999).
     for (const part of ["header", "name", "headline", "support", "portrait", "rest"]) {
-      expect(await opacityOf(page, `[data-entrance="${part}"]`), `${part} is released`).toBe(1);
+      await expect.poll(() => opacityOf(page, `[data-entrance="${part}"]`), { message: `${part} is released` }).toBe(1);
     }
     await expect(page.locator("[data-entrance-layer]")).toHaveCount(0);
     // Nothing is left running on the hero.
