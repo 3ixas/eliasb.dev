@@ -240,8 +240,8 @@ function verifyHomepage(markup) {
   for (const host of ["github.com"]) {
     check(hrefs(markup).some(({ href }) => href?.includes(host)), `Homepage should retain a ${host} link`);
   }
-  // The project index's rows are whole-row links that open the destination in this tab.
-  const external = hrefs(markup).filter(({ tag, href }) => href?.startsWith("http") && !(attribute(tag, "class") ?? "").includes("stretch-index__link"));
+  // Every external link, the project index rows included, opens in a new tab with noreferrer.
+  const external = hrefs(markup).filter(({ tag, href }) => href?.startsWith("http"));
   for (const { tag, href } of external) {
     check(attribute(tag, "target") === "_blank", `External link ${href} should open in a new browsing context`);
     check((attribute(tag, "rel") ?? "").split(/\s+/).includes("noreferrer"), `External link ${href} should carry noreferrer`);
@@ -291,7 +291,7 @@ async function verifyHomeSocialMetadata(baseUrl, document) {
   check(metaContent(document, "twitter:image", "name")?.includes("/opengraph-image"), "Homepage Twitter image should be the headline card");
 
   const icon = tags(document, "link").find((tag) => attribute(tag, "rel") === "icon");
-  check(attribute(icon ?? "", "href")?.startsWith("/icon.svg"), "The favicon should be the pushpin SVG");
+  check(attribute(icon ?? "", "href")?.startsWith("/icon.svg"), "The favicon should be the cobalt E SVG");
   const iconSvg = await fetchAsset(baseUrl, "/icon.svg");
   check(iconSvg.includes("prefers-color-scheme: dark"), "The favicon should carry a dark-tab variant");
 }

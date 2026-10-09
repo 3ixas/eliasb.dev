@@ -137,7 +137,8 @@ test.describe("Signature entrance", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await expect.poll(() => isEntering(page)).toBe(false);
     await expect(page.locator("[data-entrance-layer]")).toHaveCount(0);
-    expect(await opacityOf(page, "#work")).toBe(1);
+    // Reduced motion shortens transitions to a frame, so opacity lands on 1 a frame after the hold lifts.
+    await expect.poll(() => opacityOf(page, "#work")).toBe(1);
   });
 
   test("gives up and shows the finished page if the page stalls", async ({ page }) => {

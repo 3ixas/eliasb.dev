@@ -69,7 +69,7 @@ export function ProjectIndex({
           return (
             <li key={project.slug} className="stretch-index__row">
               {external ? (
-                <a className="stretch-index__link" href={href}>
+                <a className="stretch-index__link" href={href} target="_blank" rel="noreferrer">
                   {content}
                 </a>
               ) : (
