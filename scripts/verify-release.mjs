@@ -36,7 +36,7 @@ const expectedWorkSocialCards = new Map([
   ["/work/flowtime", {
     title: "Flowtime · Elias Bennett",
     image: "/work/flowtime/timer.jpg",
-    alt: "Flowtime focus timer interface",
+    alt: "Flowtime focus timer showing 00:00:00 and a Start Focus Session button",
   }],
 ]);
 const expectedIndexableRobots = [

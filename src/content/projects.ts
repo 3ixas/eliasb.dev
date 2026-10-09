@@ -103,7 +103,7 @@ export const projects: readonly Project[] = [
     },
     screenshot: {
       src: "/work/flowtime/timer.jpg",
-      alt: "Flowtime focus timer interface",
+      alt: "Flowtime focus timer showing 00:00:00 and a Start Focus Session button",
       width: 1280,
       height: 640,
     },

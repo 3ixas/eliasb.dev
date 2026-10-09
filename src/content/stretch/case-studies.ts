@@ -100,7 +100,7 @@ export const caseStudies: Record<string, CaseStudy> = {
       "where-it-started": {
         heading: "A total doesn’t say how old it is.",
         paragraphs: [
-          "This one was deliberate. I work on pricing and risk systems, and I wanted to build a small version of that world end to end, with a front end that makes it easy to see. Most risk dashboards show a portfolio’s value, but not how old it is, which feed it came from, or whether the system is keeping up. Argus is a simulator: no real market data, and it runs on your machine.",
+          "I built this one on purpose. I work on pricing and risk systems, and I wanted to build a small version of that world end to end, with a front end that makes it easy to see. Most risk dashboards show a portfolio’s value, but not how old it is, which feed it came from, or whether the system is keeping up. Argus is a simulator: no real market data, and it runs on your machine.",
         ],
       },
       "written-down-first": { heading: "Two users, on paper." },
