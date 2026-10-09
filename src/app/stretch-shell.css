@@ -2271,3 +2271,31 @@ button.stretch-gh__day[data-selected] {
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* ---- The 404: a heading, one line and a way home ---- */
+
+.stretch-404 {
+  padding-block: 96px 0;
+}
+
+.stretch-404__line {
+  max-width: 34rem;
+  margin: 24px 0 0;
+  color: var(--stretch-muted);
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.stretch-404__home {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-top: 24px;
+  color: var(--stretch-ink);
+  font-size: 20px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}

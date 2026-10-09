@@ -102,7 +102,7 @@ test.describe("Signature entrance", () => {
 
   test("does not play on a client-side return to the homepage", async ({ page }) => {
     await page.goto("/no-such-page");
-    await page.getByRole("link", { name: /^Back to the (board|homepage)/ }).click();
+    await page.getByRole("link", { name: /^Back to the homepage/ }).click();
     await expect(page).toHaveURL(/\/$/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName(headline);
     expect(await isEntering(page)).toBe(false);

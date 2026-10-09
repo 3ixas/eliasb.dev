@@ -5,9 +5,9 @@ import process from "node:process";
 import { setTimeout as delay } from "node:timers/promises";
 
 const redirectContracts = [
-  ["/about", "/#about"],
-  ["/library", "/#outside-work"],
-  ["/lab", "/#outside-work"],
+  ["/about", "/#where-ive-been"],
+  ["/library", "/#off-the-clock"],
+  ["/lab", "/#off-the-clock"],
 ];
 const expectedSitemapUrls = new Set([
   "https://www.eliasb.dev",
