@@ -30,6 +30,19 @@ html:has([data-stretch-shell]) body {
   }
 }
 
+/* Short pages keep the footer at the foot of the window instead of mid-screen. */
+[data-not-found],
+[data-work-archive] {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+[data-not-found] > main,
+[data-work-archive] > main {
+  flex: 1 0 auto;
+}
+
 [data-stretch-shell] ::selection {
   background-color: var(--stretch-cobalt);
   color: var(--stretch-on-cobalt);
@@ -311,7 +324,7 @@ html:has(.stretch-menu[open]) {
   margin: 0;
   font-size: clamp(64px, 9vw, 96px);
   line-height: 0.9;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.015em;
 }
 
 .stretch-note {
@@ -463,6 +476,7 @@ html:has(.stretch-menu[open]) {
   .stretch-name,
   .stretch-entrance__name {
     font-size: clamp(88px, 18vw, 280px);
+    letter-spacing: 0.005em;
   }
 
   .stretch-hero__lede {
@@ -1365,6 +1379,7 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   height: auto;
   max-height: 320px;
   border-radius: 6px;
+  background-color: var(--stretch-rule);
   object-fit: cover;
   filter: grayscale(0.35);
 }
@@ -1870,7 +1885,7 @@ button.stretch-gh__day[data-selected] {
   font-size: clamp(56px, 13vw, 128px);
   font-weight: 800;
   line-height: 0.9;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.015em;
   overflow-wrap: anywhere;
 }
 
