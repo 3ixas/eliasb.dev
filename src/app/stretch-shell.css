@@ -1813,3 +1813,411 @@ button.stretch-gh__day[data-selected] {
   background-color: var(--stretch-ink);
   color: var(--stretch-page);
 }
+
+/* ---- Case study: the opening band, section links, reading column and Next project ---- */
+
+/* The project's own colours arrive as --cs-* on the element that owns them. */
+.stretch-cs-home {
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.stretch-cs-open {
+  background-color: var(--cs-field);
+  color: var(--cs-ink);
+  border-bottom: 1px solid var(--stretch-tile-edge);
+}
+
+/* Cobalt would sink into the project's dark field, so its focus ring there is the project's ink. */
+[data-stretch-shell] .stretch-cs-open :focus-visible {
+  outline-color: var(--cs-ink);
+}
+
+.stretch-cs-open__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
+  padding-block: 16px 48px;
+}
+
+.stretch-cs-back {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--cs-ink);
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.stretch-cs-open__text {
+  min-width: 0;
+}
+
+.stretch-cs-open__number {
+  margin: 0;
+  font-size: 64px;
+  line-height: 0.9;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--cs-swatch);
+}
+
+.stretch-cs-open__name {
+  margin: 10px 0 0;
+  font-size: clamp(56px, 13vw, 128px);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+}
+
+.stretch-cs-open__outcome {
+  max-width: 28ch;
+  margin: 20px 0 0;
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.stretch-cs-open__meta {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.stretch-cs-open__meta + .stretch-cs-open__meta {
+  margin-top: 4px;
+}
+
+.stretch-cs-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.stretch-cs-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding-inline: 22px;
+  border: 2px solid var(--cs-ink);
+  border-radius: 999px;
+  color: var(--cs-ink);
+  font-size: 17px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.stretch-cs-button--solid {
+  border-color: var(--cs-swatch);
+  background-color: var(--cs-swatch);
+  color: var(--cs-field);
+}
+
+.stretch-cs-button:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.stretch-cs-open__note {
+  max-width: 44ch;
+  margin: 14px 0 0;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.stretch-cs-open__shot {
+  min-width: 0;
+  align-self: center;
+  border-radius: 12px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+}
+
+.stretch-cs-open__shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  border-radius: 12px;
+  object-fit: cover;
+  object-position: top left;
+}
+
+@media (min-width: 761px) {
+  .stretch-cs-open__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    column-gap: 56px;
+    padding-bottom: 64px;
+  }
+
+  .stretch-cs-back {
+    grid-column: 1 / -1;
+  }
+}
+
+/* The row of section links: neutral, wrapping, every target 44 px tall. */
+.stretch-cs-links-row {
+  border-bottom: 1px solid var(--stretch-rule);
+}
+
+.stretch-cs-links-row ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 8px;
+  margin: 0 auto;
+  padding-block: 8px;
+  list-style: none;
+}
+
+.stretch-cs-links-row a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding-inline: 12px;
+  border-radius: 999px;
+  color: var(--stretch-ink);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.stretch-cs-links-row a span {
+  color: var(--stretch-muted);
+  font-size: 13px;
+}
+
+.stretch-cs-links-row a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+/* The reading column is about 720 px; figures and the evidence strip use the wider box. */
+.stretch-cs-body {
+  max-width: 1080px;
+  padding-block: 24px 0;
+}
+
+.stretch-cs-section {
+  padding-top: 56px;
+}
+
+.stretch-cs-section__text {
+  max-width: 720px;
+}
+
+.stretch-cs-kicker {
+  margin: 0 0 12px;
+  color: var(--stretch-muted);
+  font-size: 13px;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.stretch-cs-h2 {
+  margin: 0;
+  font-size: clamp(30px, 4.5vw, 44px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.stretch-cs-p {
+  margin: 20px 0 0;
+  font-size: 19px;
+  line-height: 1.55;
+}
+
+.stretch-cs-points {
+  display: grid;
+  gap: 18px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stretch-cs-points li {
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+.stretch-cs-lead {
+  font-style: italic;
+  font-weight: 700;
+}
+
+/* The PRD card reuses How I work's card; here it sits in the reading column, with the evidence beside or below. */
+.stretch-cs-prd-group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  margin-top: 32px;
+}
+
+.stretch-cs-prd {
+  grid-column: auto;
+  grid-row: auto;
+  max-width: 720px;
+  margin: 14px 0 0;
+}
+
+.stretch-cs-prd__around {
+  margin: 12px 0;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.stretch-cs-prd .stretch-prd__quote {
+  margin-block: 12px;
+}
+
+.stretch-cs-evidence {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-block: 1px solid var(--stretch-rule);
+}
+
+.stretch-cs-evidence li {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 16px 20px 0;
+  border-bottom: 1px solid var(--stretch-rule);
+}
+
+.stretch-cs-evidence li:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.stretch-cs-evidence__value {
+  font-size: clamp(44px, 9vw, 72px);
+  line-height: 0.95;
+  overflow-wrap: anywhere;
+}
+
+.stretch-cs-evidence__label {
+  color: var(--stretch-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+@media (min-width: 761px) {
+  .stretch-cs-evidence {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .stretch-cs-evidence li {
+    border-bottom: 0;
+    padding-block: 24px;
+  }
+
+  .stretch-cs-evidence li + li {
+    padding-left: 24px;
+    border-left: 1px solid var(--stretch-rule);
+  }
+}
+
+/* A wide figure, framed in the project's colour. */
+.stretch-cs-figure {
+  margin: 40px 0 0;
+}
+
+.stretch-cs-figure__frame {
+  padding: 12px;
+  border: 1px solid var(--stretch-tile-edge);
+  border-radius: 20px;
+  background-color: var(--cs-field);
+}
+
+@media (min-width: 761px) {
+  .stretch-cs-figure__frame {
+    padding: 24px;
+  }
+}
+
+.stretch-cs-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.stretch-cs-figure figcaption {
+  margin-top: 12px;
+  color: var(--stretch-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* The Next-project tile: the next study in its own colours. */
+.stretch-cs-next {
+  max-width: 1080px;
+  padding-top: 80px;
+}
+
+.stretch-cs-next__tile {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  min-height: 44px;
+  padding: 28px 24px;
+  border: 1px solid var(--stretch-tile-edge);
+  border-radius: 24px;
+  background-color: var(--cs-field);
+  color: var(--cs-ink);
+  text-decoration: none;
+}
+
+.stretch-cs-next__label {
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.stretch-cs-next__number {
+  font-size: 56px;
+  line-height: 0.9;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--cs-swatch);
+}
+
+.stretch-cs-next__name {
+  font-size: clamp(36px, 6vw, 56px);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.stretch-cs-next__outcome {
+  max-width: 36ch;
+  font-size: 19px;
+  line-height: 1.3;
+}
+
+.stretch-cs-next__arrow {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.stretch-cs-next__tile:hover .stretch-cs-next__name {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 6px;
+}
+
+@media (min-width: 761px) {
+  .stretch-cs-next__tile {
+    padding: 40px;
+  }
+}
