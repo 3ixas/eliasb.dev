@@ -1345,12 +1345,16 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
 
 .stretch-otc__plan {
   display: grid;
+  /* A bounded column: left to size itself, it grows to the longest unbreakable
+     word and pushes the page sideways when a visitor forces wider spacing. */
+  grid-template-columns: minmax(0, 1fr);
   align-content: start;
   gap: 16px;
 }
 
 .stretch-week {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
 }
 
