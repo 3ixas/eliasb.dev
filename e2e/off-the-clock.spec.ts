@@ -263,6 +263,12 @@ test.describe("Off the clock: the GitHub year", () => {
   test("on phones only the grid scrolls sideways, inside its card, and it opens on today", async ({ page }) => {
     const card = fixture(page, "github");
     const scroller = card.locator("[data-github-scroll]");
+    // The grid moves to today when the page hydrates, which a slow runner can do after load.
+    if (phone(page)) {
+      await expect
+        .poll(() => scroller.evaluate((el) => el.scrollLeft + el.clientWidth >= el.scrollWidth - 1), { message: "the grid opens on today" })
+        .toBe(true);
+    }
     const { scrollWidth, clientWidth, scrollLeft } = await scroller.evaluate((el) => ({
       scrollWidth: el.scrollWidth,
       clientWidth: el.clientWidth,
