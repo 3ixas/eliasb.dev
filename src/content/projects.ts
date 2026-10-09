@@ -14,6 +14,10 @@
 /** The single small prop on a card's edge (see the Fastener in GLOSSARY.md). */
 export type Fastener = "tape" | "paperclip" | "pin";
 
+/** What the /work filters group by: Products, Systems or Experiments. */
+export const PROJECT_CATEGORIES = ["products", "systems", "experiments"] as const;
+export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number];
+
 export type ProjectImage = { src: string; alt: string; width: number; height: number };
 
 export type Project = {
@@ -24,6 +28,8 @@ export type Project = {
   /** Shown beside the year: "Product · Data visualisation". */
   type: string;
   year: number;
+  /** Which /work filter it falls under. */
+  category: ProjectCategory;
   links: {
     /** Its case study's path, `/work/<slug>`. Only projects that have one. */
     caseStudy?: string;
@@ -48,6 +54,7 @@ export const projects: readonly Project[] = [
     outcome: "A clearer view of what moving could cost.",
     type: "Product · Data visualisation",
     year: 2026,
+    category: "products",
     links: {
       caseStudy: "/work/threshold",
       live: "https://threshold-beta.vercel.app",
@@ -68,6 +75,7 @@ export const projects: readonly Project[] = [
     outcome: "Every number shows where it came from and how old it is.",
     type: "Event-driven systems",
     year: 2026,
+    category: "systems",
     links: {
       caseStudy: "/work/argus-risk",
       code: "https://github.com/3ixas/argus-risk",
@@ -87,6 +95,7 @@ export const projects: readonly Project[] = [
     outcome: "Breaks that match how long you actually focused.",
     type: "Offline-first interaction",
     year: 2026,
+    category: "products",
     links: {
       caseStudy: "/work/flowtime",
       live: "https://flowtime-focus-timer.vercel.app",
@@ -107,6 +116,7 @@ export const projects: readonly Project[] = [
     outcome: "A household coordination prototype, built for my software engineering coursework.",
     type: "Prototype",
     year: 2026,
+    category: "experiments",
     links: { code: "https://github.com/3ixas/home-secretary-prototype" },
   },
   {
@@ -115,6 +125,7 @@ export const projects: readonly Project[] = [
     outcome: "A tested C# Web API for managing risk events.",
     type: "Systems · API",
     year: 2025,
+    category: "systems",
     links: { code: "https://github.com/3ixas/risk-event-tracker" },
   },
   {
@@ -125,6 +136,7 @@ export const projects: readonly Project[] = [
     outcome: "History you can talk to. Version 1; I’m rebuilding it.",
     type: "AI product",
     year: 2025,
+    category: "products",
     links: { code: "https://github.com/3ixas/ask-professor-past" },
   },
 ];
@@ -172,6 +184,9 @@ export function catalogueProblems(
   }
   for (const project of catalogue) {
     if (!Number.isInteger(project.year)) problems.push(`"${project.slug}" needs a whole-number year.`);
+    if (!PROJECT_CATEGORIES.includes(project.category)) {
+      problems.push(`"${project.slug}" needs a category: ${PROJECT_CATEGORIES.join(", ")}.`);
+    }
   }
 
   if (featured.length > MAX_FEATURED) {

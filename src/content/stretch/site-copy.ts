@@ -72,5 +72,7 @@ export const workArchive = {
   /** Filters appear only once the archive has more than this many projects. */
   filtersAfter: 10,
   filters: ["All", "Products", "Systems", "Experiments"],
+  /** Read out to assistive technology when a filter changes the list; not shown. */
+  count: (shown: number) => `Showing ${shown} ${shown === 1 ? "project" : "projects"}`,
   description: "Projects I’ve built, from a rental calculator to a risk simulator, with the thinking behind each.",
 } as const;

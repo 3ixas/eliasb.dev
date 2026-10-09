@@ -12,7 +12,7 @@ import {
 } from "../src/content/projects.ts";
 
 const caseStudySlugs = Object.keys(caseFiles);
-const base = (slug, year = 2025, overrides = {}) => ({ slug, name: slug, outcome: "o", type: "t", year, links: {}, ...overrides });
+const base = (slug, year = 2025, overrides = {}) => ({ slug, name: slug, outcome: "o", type: "t", year, category: "products", links: {}, ...overrides });
 const featurable = (slug) =>
   base(slug, 2026, {
     links: { caseStudy: `/work/${slug}` },
@@ -60,6 +60,7 @@ assert.match(catalogueProblems(four, ["a", "b", "c", "d"], ["a", "b", "c", "d"])
 assert.match(catalogueProblems(featuredOne, ["a", "a"], ["a"]).join(" "), /featured more than once/);
 assert.match(catalogueProblems([base("a"), base("a")], [], []).join(" "), /"a" more than once/);
 assert.match(catalogueProblems([base("a", 2025.5)], [], []).join(" "), /whole-number year/);
+assert.match(catalogueProblems([base("a", 2025, { category: "lab" })], [], []).join(" "), /needs a category/);
 
 // assertCatalogue is what fails the build, and says why.
 assert.throws(() => assertCatalogue(featuredOne, ["a"], []), /The project catalogue \(src\/content\/projects\.ts\) is invalid:\n- Featured project "a" needs a case study/);

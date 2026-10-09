@@ -2221,3 +2221,53 @@ button.stretch-gh__day[data-selected] {
     padding: 40px;
   }
 }
+
+/* ---- Work archive: /work, the full Project index with filters above ten projects ---- */
+
+.stretch-archive .stretch-index {
+  margin-top: 40px;
+}
+
+.stretch-archive__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 32px;
+}
+
+.stretch-archive__filter {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--stretch-rule);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--stretch-ink);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.stretch-archive__filter:is(:hover, :focus-visible) {
+  border-color: var(--stretch-ink);
+}
+
+.stretch-archive__filter[aria-pressed="true"] {
+  border-color: var(--stretch-ink);
+  background-color: var(--stretch-ink);
+  color: var(--stretch-page);
+}
+
+.stretch-archive__filters + .stretch-index {
+  margin-top: 24px;
+}
+
+/* Read out by assistive technology when a filter changes the list; never seen. */
+.stretch-archive__count {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

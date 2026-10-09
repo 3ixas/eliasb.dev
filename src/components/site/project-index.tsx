@@ -10,8 +10,10 @@ const destination = ({ links }: Project) => links.caseStudy ?? links.live ?? lin
 
 /**
  * The Project index: every non-featured project as a typographic row, newest
- * first, capped for the homepage with "All work (n)" after it. `rows` is the
- * whole index; `total` is the catalogue's count for the link. Hover and focus
+ * first. On the homepage it is capped at ten with "All work (n)" after it:
+ * `rows` is the whole index and `total` is the catalogue's count for the link.
+ * The archive passes `limit` of `Infinity` and no `total`, so it lists every
+ * row and has no link to itself. Hover and focus
  * are CSS only: the screenshot is the preview beside the list on desktop and
  * the thumbnail inside the row on phones, so it needs no script and a row
  * without a screenshot simply has none. The screenshot is decorative here: the
@@ -21,12 +23,14 @@ export function ProjectIndex({
   rows,
   firstNumber,
   total,
+  limit = HOMEPAGE_INDEX_ROWS,
 }: {
   rows: readonly Project[];
   firstNumber: number;
-  total: number;
+  total?: number;
+  limit?: number;
 }) {
-  const shown = rows.slice(0, HOMEPAGE_INDEX_ROWS);
+  const shown = rows.slice(0, limit);
   return (
     <div className="stretch-index">
       <ol className="stretch-index__list">
@@ -77,11 +81,13 @@ export function ProjectIndex({
           );
         })}
       </ol>
-      <p className="stretch-index__all">
-        <Link className="stretch-mono" href="/work">
-          {workSection.allWork(total)}
-        </Link>
-      </p>
+      {total !== undefined && (
+        <p className="stretch-index__all">
+          <Link className="stretch-mono" href="/work">
+            {workSection.allWork(total)}
+          </Link>
+        </p>
+      )}
     </div>
   );
 }

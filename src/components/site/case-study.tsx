@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { LightsPill } from "@/components/site/lights-pill";
+import { SubpageHeader } from "@/components/site/subpage-header";
 import { projects, type Project } from "@/content/projects";
 import { caseStudies } from "@/content/stretch/case-studies";
 import {
@@ -50,17 +50,7 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
 
   return (
     <div data-stretch-shell data-case-study={study.slug}>
-      <header className="stretch-header">
-        <a className="stretch-skip" href="#main-content">
-          Skip to content
-        </a>
-        <div className="stretch-wrap stretch-header__inner">
-          <Link className="stretch-pill stretch-cs-home" href="/" aria-label="Elias Bennett, home">
-            Elias Bennett
-          </Link>
-          <LightsPill />
-        </div>
-      </header>
+      <SubpageHeader />
 
       <main id="main-content" tabIndex={-1}>
         <article aria-labelledby="case-study-title">

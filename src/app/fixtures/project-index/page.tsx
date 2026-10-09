@@ -12,6 +12,7 @@ const catalogue: Project[] = Array.from({ length: 14 }, (_, position) => ({
   name: `Fixture ${position + 1}`,
   outcome: `Outcome of fixture ${position + 1}.`,
   type: "Prototype",
+  category: "experiments",
   year: 2026 - Math.floor(position / 3),
   links: { code: `https://github.com/3ixas/fixture-${position + 1}` },
   ...(position === 0 ? { screenshot: projects[0].screenshot } : {}),
