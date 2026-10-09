@@ -15,6 +15,10 @@ const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
   axes: ["opsz", "wdth"],
   variable: "--font-bricolage",
+  // The fallback faces are in stretch-type.css, sized per style; next/font's
+  // own would be one width for every style, wrong for the condensed display type.
+  adjustFontFallback: false,
+  fallback: ["Bricolage Fallback", "system-ui", "sans-serif"],
 });
 
 const jetbrainsMono = JetBrains_Mono({

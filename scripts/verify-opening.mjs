@@ -101,6 +101,35 @@ runInNewContext(entranceScript, {
   assert.equal(attributes.size, 0, 'A held page without its hero must be released');
 }
 
+// While the page's fonts are loading the entrance waits for them, so it measures the real typeface: it
+// starts when they arrive, or after the cap, whichever is first, and only once.
+for (const [what, settle] of [['the fonts arriving', 'fonts'], ['the cap running out', 'timer']]) {
+  const attributes = new Map([['data-entering', '']]);
+  let resolveFonts;
+  const timers = [];
+  runInNewContext(entranceScript, {
+    document: {
+      documentElement: { offsetHeight: 0, hasAttribute: (name) => attributes.has(name), removeAttribute: (name) => attributes.delete(name) },
+      querySelector: () => null,
+      fonts: { status: 'loading', ready: new Promise((resolve) => { resolveFonts = resolve; }) },
+    },
+    window: { setTimeout: (callback, delay) => timers.push({ callback, delay }) },
+  });
+  assert.ok(attributes.has('data-entering'), 'The entrance must not start while fonts are loading');
+  assert.equal(timers.length, 1, 'The font wait must be capped by one timer');
+  assert.equal(timers[0].delay, timings.fontWaitMs, 'The font wait must use the approved cap');
+  assert.ok(timings.fontWaitMs + 5500 < timings.safetyMs, 'The font wait plus the sequence must fit inside the safety timeout');
+  if (settle === 'fonts') {
+    resolveFonts();
+    await Promise.resolve();
+    await Promise.resolve();
+  } else {
+    timers[0].callback();
+  }
+  assert.ok(!attributes.has('data-entering'), `The entrance must start after ${what}`);
+  timers[0].callback();
+}
+
 // The entrance's CSS springs must match Motion's springs at the approved settings.
 for (const { bounce, visualDuration } of [timings.land, timings.move, timings.name, timings.portrait, timings.label]) {
   const curve = springCurve(bounce, visualDuration);

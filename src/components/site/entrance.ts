@@ -53,6 +53,12 @@ export const entranceTimings = {
   fadeMs: 500,
   /** If the hold has not been released after this long, the guard releases it. */
   safetyMs: 7000,
+  /**
+   * The entrance waits at most this long for the page's fonts, so the spots it
+   * measures are those of the real typeface. It must leave room under
+   * `safetyMs` for the five seconds of the sequence itself.
+   */
+  fontWaitMs: 1000,
   /** A timer this much later than planned means the page stalled; the entrance gives up. */
   maxLatenessMs: 1000,
 } as const;
@@ -142,6 +148,31 @@ export function holdPage(safetyMs: number) {
   window.addEventListener("pageshow", (event) => {
     if (event.persisted) release();
   });
+}
+
+/**
+ * Calls `play` once the page's fonts have loaded, or after `waitMs`, whichever
+ * comes first. The entrance measures the headline and the name once, up front;
+ * measured in the fallback font on a slow connection, the typed line would land
+ * in the wrong place and the page would jump when the real font arrived.
+ * Self-contained: it is serialised into an inline script.
+ */
+export function whenFontsReady(play: () => void, waitMs: number) {
+  const fonts = document.fonts;
+  // Reading a layout value makes the page request the fonts it uses.
+  void document.documentElement.offsetHeight;
+  if (!fonts || fonts.status !== "loading") {
+    play();
+    return;
+  }
+  let played = false;
+  const once = () => {
+    if (played) return;
+    played = true;
+    play();
+  };
+  window.setTimeout(once, waitMs);
+  fonts.ready.then(once, once);
 }
 
 /** Plays the entrance. Self-contained: it is serialised into an inline script. */
@@ -403,4 +434,4 @@ export function runEntrance(spring: (bounce: number, visualDuration: number) => 
 export const entranceGuardScript = `try{(${holdPage.toString()})(${entranceTimings.safetyMs})}catch(_){document.documentElement.removeAttribute("data-entering")}`;
 
 /** The inline script that plays the entrance. */
-export const entranceScript = `try{(${runEntrance.toString()})(${springCurve.toString()},${JSON.stringify(entranceTimings)})}catch(_){document.documentElement.removeAttribute("data-entering")}`;
+export const entranceScript = `try{(${whenFontsReady.toString()})(function(){try{(${runEntrance.toString()})(${springCurve.toString()},${JSON.stringify(entranceTimings)})}catch(_){document.documentElement.removeAttribute("data-entering")}},${entranceTimings.fontWaitMs})}catch(_){document.documentElement.removeAttribute("data-entering")}`;
