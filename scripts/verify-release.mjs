@@ -241,7 +241,7 @@ function verifyHomepage(markup) {
     check(hrefs(markup).some(({ href }) => href?.includes(host)), `Homepage should retain a ${host} link`);
   }
   // Every external link, the project index rows included, opens in a new tab with noreferrer.
-  const external = hrefs(markup).filter(({ tag, href }) => href?.startsWith("http"));
+  const external = hrefs(markup).filter(({ href }) => href?.startsWith("http"));
   for (const { tag, href } of external) {
     check(attribute(tag, "target") === "_blank", `External link ${href} should open in a new browsing context`);
     check((attribute(tag, "rel") ?? "").split(/\s+/).includes("noreferrer"), `External link ${href} should carry noreferrer`);

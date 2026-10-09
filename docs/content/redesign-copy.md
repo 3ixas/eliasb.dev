@@ -90,12 +90,18 @@ The headline stays as it is (Elias, #113): the entrance is built around “*feel
 
 | Item | Live | When the source is empty |
 | --- | --- | --- |
-| Training | Today · {Thursday} / {Interval run} · My training week · Zone 2 means slow on purpose. · Photo caption: Out on a run, central London. | Authored, so never empty. |
+| Training | Today · {Thursday} / {Interval run} · My training week · Zone 2 means slow on purpose. · Photo caption: Out on a run, central London. · Photo alt: Elias mid-run on a rainy street in central London | Authored, so never empty. |
 | Now reading | Now reading · {title} · {author} · Goodreads ↗ | Between books. |
 | Last watched | Admit one · Last watched · {title} · {year} · Letterboxd ↗ | Nothing logged yet. |
 | The Weekly Curiosity | Odd but true, from this week in history · {fact} · {year} · {n} more oddities this week ↓ · Read on Wikipedia ↗ | From the archive |
 | Now making | ● Now making · Rebuilding Professor Past from scratch. · v1 is on GitHub if you want to meet the professor. · Code ↗ | Latest on GitHub · {repo}, updated {date} · View on GitHub ↗ |
 | GitHub | {1,221} contributions in the past year · busiest stretch, {September–October} → · ← swipe for the whole year · Quiet / Busy / today | as of {date} |
+
+Strings added while building, shipped, and recorded here on 2026-10-09 so `verify:copy` covers them. They were not in the original approved copy; they await Elias's sign-off.
+
+- Training week plan: Mon Monday Full-body gym · Tue Tuesday Zone 2 run · Wed Wednesday Full-body gym · Thu Thursday Interval run · Fri Friday Full-body gym · Sat Saturday Zone 2, rower or bike · Sun Sunday Assault bike intervals
+- Weekly Curiosity: Read more ↗ · Image:
+- GitHub: GitHub, the past year · Use the arrow keys to move between days.
 
 ## Say hello
 

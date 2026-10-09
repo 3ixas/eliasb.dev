@@ -21,7 +21,8 @@ const plain = raw.replace(/\*/g, "").replace(/[{}]/g, "");
 // ---- Every string in the typed modules is in the approved copy ----------------------------
 
 const leaves = (value, path = "") => {
-  if (typeof value === "string") return path.endsWith("href") ? [] : [[path, value]];
+  // Links, image paths and dates are addresses and data, not words, so the approved copy does not list them.
+  if (typeof value === "string") return /(href|src|writtenOn)$/.test(path) ? [] : [[path, value]];
   if (Array.isArray(value)) return value.flatMap((item, index) => leaves(item, `${path}[${index}]`));
   if (value && typeof value === "object") return Object.entries(value).flatMap(([key, item]) => leaves(item, `${path}.${key}`));
   return [];

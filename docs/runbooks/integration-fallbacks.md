@@ -1,6 +1,6 @@
 # Integration fallback runbook
 
-The homepage and Library use small server-owned snapshots from external services. Each adapter has a bounded timeout, a revalidation window, response-shape checks, and an authored fallback. A visitor should see a truthful state label or fallback rather than an empty card or a client-side error.
+The homepage's Off the clock section uses small server-owned snapshots from external services. Each adapter has a bounded timeout, a revalidation window, response-shape checks, and an authored fallback. A visitor should see a truthful state label or fallback rather than an empty card or a client-side error.
 
 ## Production questions
 
