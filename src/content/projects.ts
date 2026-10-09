@@ -118,6 +118,12 @@ export const projects: readonly Project[] = [
     year: 2026,
     category: "experiments",
     links: { code: "https://github.com/3ixas/home-secretary-prototype" },
+    screenshot: {
+      src: "/work/home-secretary/noticeboard.webp",
+      alt: "Home Secretary noticeboard for a household, with a form to add an event and one upcoming birthday dinner",
+      width: 1280,
+      height: 800,
+    },
   },
   {
     slug: "risk-event-tracker",
@@ -127,6 +133,12 @@ export const projects: readonly Project[] = [
     year: 2025,
     category: "systems",
     links: { code: "https://github.com/3ixas/risk-event-tracker" },
+    screenshot: {
+      src: "/work/risk-event-tracker/swagger.webp",
+      alt: "Swagger documentation for the Risk Event Tracker API, listing its five risk event endpoints",
+      width: 1600,
+      height: 1000,
+    },
   },
   {
     // Version 1 has no live link: askprofessorpast.com no longer serves it, and
@@ -138,6 +150,12 @@ export const projects: readonly Project[] = [
     year: 2025,
     category: "products",
     links: { code: "https://github.com/3ixas/ask-professor-past" },
+    screenshot: {
+      src: "/work/ask-professor-past/chat.webp",
+      alt: "Ask Professor Past chat, with the professor answering a question about ancient Egypt",
+      width: 1600,
+      height: 1000,
+    },
   },
 ];
 
