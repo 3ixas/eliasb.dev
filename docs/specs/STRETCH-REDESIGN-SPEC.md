@@ -126,7 +126,7 @@ All text pairs pass WCAG 2.2 AA (5.7:1–18.2:1, #108). Project colours are data
 
 **Homepage composition**
 - **Hero:** the name at 31.5vw on phones (no wrap, capped on desktop), the headline (a real `h1`), the supporting line, two actions, and the portrait tilted 3° (2° on phones) with a cobalt "Software engineer" label. On desktop the portrait sits to the right of the name; on phones it's stacked below the actions.
-- **Work:** the featured tiles (the first spans two columns), each in its project colour, with its outline number, name, outcome and metadata, a screenshot tilted ±1–1.5°, and one fastener. Then the index rows, the preview, and *All work (n)*.
+- **Work:** the featured tiles (the first spans two columns), each in its project colour, with its outline number, name, outcome and metadata, a screenshot tilted ±1–1.5°, and one fastener. Then the index rows, the preview, and *All work (n)*. Desktop previews follow the hovered or focused row: centre on middle rows, align to the top/bottom at the list edges. Mobile keeps inline thumbnails.
 - **Section headers (except Say hello, whose email action is its heading):** a giant condensed uppercase heading with a mono note and counts where true ("06 things I've built · 03 I'm proudest of").
 
 **The signature entrance (homepage only)**

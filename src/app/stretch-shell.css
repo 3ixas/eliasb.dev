@@ -976,12 +976,15 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
 
 /* Desktop: the rows keep the left of the list and the screenshot previews on the right. */
 @media (min-width: 761px) {
-  .stretch-index__list {
-    padding-right: 38%;
+  .stretch-index__row {
+    position: relative;
+    border-bottom: 0;
   }
 
   .stretch-index__link {
+    width: 62%;
     grid-template-columns: 40px minmax(0, 1fr) 24px;
+    border-bottom: 1px solid var(--stretch-rule);
   }
 
   .stretch-index__meta {
@@ -997,12 +1000,25 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
 
   .stretch-index__shot {
     position: absolute;
-    top: 24px;
+    top: 50%;
     right: 0;
     width: calc(38% - 32px);
+    translate: 0 -50%;
     visibility: hidden;
     opacity: 0;
     transition: opacity 0.2s ease;
+  }
+
+  /* End rows keep the preview inside the list; middle rows centre it. */
+  .stretch-index__row:first-child .stretch-index__shot {
+    top: 20px;
+    translate: none;
+  }
+
+  .stretch-index__row:last-child:not(:first-child) .stretch-index__shot {
+    top: auto;
+    bottom: 20px;
+    translate: none;
   }
 
   .stretch-index__link:is(:hover, :focus-visible) .stretch-index__shot {

@@ -6,7 +6,7 @@ import { projects, projectIndex, type Project } from "@/content/projects";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-/** Fourteen projects across several years, the first with a screenshot, the rest without. */
+/** Fourteen projects across several years, pictured rows at the start, middle and end of the visible list. */
 const catalogue: Project[] = Array.from({ length: 14 }, (_, position) => ({
   slug: `fixture-${position + 1}`,
   name: `Fixture ${position + 1}`,
@@ -15,7 +15,7 @@ const catalogue: Project[] = Array.from({ length: 14 }, (_, position) => ({
   category: "experiments",
   year: 2026 - Math.floor(position / 3),
   links: { code: `https://github.com/3ixas/fixture-${position + 1}` },
-  ...(position === 0 ? { screenshot: projects[0].screenshot } : {}),
+  ...([0, 4, 9].includes(position) ? { screenshot: projects[0].screenshot } : {}),
 }));
 
 /**
