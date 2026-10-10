@@ -75,6 +75,18 @@ _Avoid_: Limiting the Work destination to the homepage selection.
 **Primary audience**:
 People seeking founding engineers or product engineers who care about product thinking, design, UI, UX, and code. Elias's title is **Software engineer**. **How I work** shows that he also decides what is worth building and checks whether it works, so the evidence makes the product claim, not the title. Fellow builders are also an important audience.
 
+**Role story**:
+An employer's own page, telling what Elias did and achieved there, as a **Case study** does for a project. Every employer gets one, including marketing, which is the product edge a typical computer science graduate lacks. Detail is anything he could reasonably brag about in an interview, and never proprietary. Freelance work through platforms (such as AI training) is not an employer and gets a line, not a Role story.
+_Avoid_: Job description, CV entry
+
+**Where I'm headed**:
+The forward-facing successor to **Where I've been**: who Elias is now, who he wants to become as an engineer (a direction of growth, not a target job or company), and then, with less emphasis, the path that got him here.
+_Avoid_: Timeline, CV in chronological order
+
+**First glance**:
+What a skimming recruiter takes from the first screen in about a second: who Elias is, what he does now (Software engineer at BNP Paribas), and his strongest proof. It serves a second audience alongside the **Primary audience** without replacing it.
+_Avoid_: Treating the whole site as a CV for skimmers
+
 **Signature entrance**:
 The Commissioner-style opening on every load and reload ([#109](https://github.com/3ixas/eliasb.dev/issues/109)): the headline types alone on a blank page, moves up into the hero, then the name settles, the portrait swings in, the label presses on, and the rest of the page arrives, in about 5 s. It can't be skipped, it doesn't replay on back-navigation, and reduced motion gets the finished page. The content is in the HTML throughout.
 _Avoid_: Loader, interaction gate, anything else that holds the page
