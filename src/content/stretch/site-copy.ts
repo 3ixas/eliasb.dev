@@ -3,9 +3,11 @@
  * Work archive and the 404. Every string is from docs/content/redesign-copy.md
  * (approved 8 October 2026); `scripts/verify-copy.mjs` checks that.
  *
- * No runtime imports, so Node can load it directly (the contract script) as
- * well as Next.
+ * No runtime imports (the type import is erased), so Node can load it directly
+ * (the contract script) as well as Next.
  */
+
+import type { ProjectCategory } from "../projects";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -20,7 +22,14 @@ export const siteCopy = {
     lead: "I build everyday software, and make complicated things",
     emphasis: "feel simple.",
   },
-  menu: ["Work", "How I work", "Where I’ve been", "Off the clock", "Say hello"],
+  /** The homepage's anchored sections after the hero, in order: each section's anchor with its label. */
+  menu: [
+    { id: "work", label: "Work" },
+    { id: "how-i-work", label: "How I work" },
+    { id: "where-ive-been", label: "Where I’ve been" },
+    { id: "off-the-clock", label: "Off the clock" },
+    { id: "say-hello", label: "Say hello" },
+  ],
   header: {
     lightsOn: "Lights on",
     lightsOff: "Lights off",
@@ -62,7 +71,12 @@ export const workSection = {
 export const sayHello = {
   bigLink: "Say hello ↗",
   line: "Got an idea, a project, or just want to talk about building things? Email’s the best way to reach me.",
-  links: ["Résumé", "GitHub", "LinkedIn"],
+  /** In the order shown. `id` names the profile link (src/content/site.ts) each one opens. */
+  links: [
+    { id: "resume", label: "Résumé" },
+    { id: "github", label: "GitHub" },
+    { id: "linkedin", label: "LinkedIn" },
+  ],
 } as const;
 
 /** The archive at /work. */
@@ -71,7 +85,13 @@ export const workArchive = {
   note: "Everything I’ve built that I’d happily talk through.",
   /** Filters appear only once the archive has more than this many projects. */
   filtersAfter: 10,
-  filters: ["All", "Products", "Systems", "Experiments"],
+  /** In the order shown; `category: null` is All. */
+  filters: [
+    { label: "All", category: null },
+    { label: "Products", category: "products" },
+    { label: "Systems", category: "systems" },
+    { label: "Experiments", category: "experiments" },
+  ] satisfies readonly { label: string; category: ProjectCategory | null }[],
   /** Read out to assistive technology when a filter changes the list; not shown. */
   count: (shown: number) => `Showing ${shown} ${shown === 1 ? "project" : "projects"}`,
   description: "Projects I’ve built, from a rental calculator to a risk simulator, with the thinking behind the main ones.",

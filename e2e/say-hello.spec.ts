@@ -4,7 +4,6 @@ import { sayHello, siteCopy } from "../src/content/stretch/site-copy";
 import { contrastOnPaper } from "./support/contrast";
 
 const section = (page: Page) => page.locator("section#say-hello");
-const hrefs = [profile.links.resume, profile.links.github, profile.links.linkedin];
 
 test.describe("Say hello and the footer", () => {
   test.beforeEach(async ({ page }) => {
@@ -26,10 +25,10 @@ test.describe("Say hello and the footer", () => {
   });
 
   test("Résumé, GitHub and LinkedIn go where the profile says, in a new tab", async ({ page }) => {
-    for (const [index, label] of sayHello.links.entries()) {
+    for (const [index, { id, label }] of sayHello.links.entries()) {
       const link = section(page).locator(".stretch-hello__link").nth(index);
       await expect(link).toContainText(label);
-      await expect(link).toHaveAttribute("href", hrefs[index]);
+      await expect(link).toHaveAttribute("href", profile.links[id]);
       await expect(link).toHaveAttribute("target", "_blank");
       await expect(link).toHaveAttribute("rel", /noreferrer/);
     }

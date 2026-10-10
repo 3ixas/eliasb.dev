@@ -2,6 +2,8 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { siteCopy } from "../src/content/stretch/site-copy";
 
+const menuLabels = siteCopy.menu.map(({ label }) => label);
+
 const header = (page: Page) => page.locator("[data-stretch-header]");
 const menuButton = (page: Page) => page.getByRole("button", { name: "Menu" });
 const dialog = (page: Page) => page.getByRole("dialog", { name: "Menu" });
@@ -41,7 +43,7 @@ test.describe("Phone header and menu", () => {
     expect(box.height).toBe(viewport.height);
     await expect(menu.locator("[data-london-clock]")).toHaveAttribute("data-london-clock", /^\d\d:\d\d$/);
     await expect(menu.locator("[data-london-clock]")).toContainText("London");
-    await expect(menu.getByRole("navigation", { name: "Primary navigation" }).getByRole("link")).toHaveText(siteCopy.menu);
+    await expect(menu.getByRole("navigation", { name: "Primary navigation" }).getByRole("link")).toHaveText(menuLabels);
     await expect(menu.getByRole("link", { name: "Work", exact: true })).toHaveCSS("text-transform", "uppercase");
   });
 
@@ -145,7 +147,7 @@ test("without script the section links stay on the phone header", async ({ brows
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   await page.goto("/");
-  await expect(page.getByRole("navigation", { name: "Primary navigation" }).getByRole("link")).toHaveText(siteCopy.menu);
+  await expect(page.getByRole("navigation", { name: "Primary navigation" }).getByRole("link")).toHaveText(menuLabels);
   await expect(menuButton(page)).toBeHidden();
   expect(await overflows(page)).toBe(false);
   await context.close();
@@ -157,6 +159,6 @@ test.describe("Desktop", () => {
     await page.goto("/");
     await expect(menuButton(page)).toBeHidden();
     await expect(page.locator("[data-london-clock]:visible")).toHaveCount(1);
-    await expect(page.getByRole("navigation", { name: "Primary navigation" }).getByRole("link")).toHaveText(siteCopy.menu);
+    await expect(page.getByRole("navigation", { name: "Primary navigation" }).getByRole("link")).toHaveText(menuLabels);
   });
 });

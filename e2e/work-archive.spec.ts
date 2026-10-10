@@ -66,7 +66,7 @@ test.describe("Work archive: a catalogue above ten (fixtures)", () => {
     await expect(rows(page)).toHaveCount(12);
     newestFirst(await years(page));
     const buttons = filters(page).getByRole("button");
-    await expect(buttons).toHaveText([...workArchive.filters]);
+    await expect(buttons).toHaveText(workArchive.filters.map(({ label }) => label));
     await expect(filters(page).getByRole("button", { name: "All", exact: true })).toHaveAttribute("aria-pressed", "true");
   });
 

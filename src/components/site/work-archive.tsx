@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ProjectIndex } from "@/components/site/project-index";
-import { PROJECT_CATEGORIES, projectIndex, type Project } from "@/content/projects";
+import { projectIndex, type Project, type ProjectCategory } from "@/content/projects";
 import { workArchive } from "@/content/stretch/site-copy";
 
 /**
@@ -13,25 +13,24 @@ import { workArchive } from "@/content/stretch/site-copy";
  * the full list is on the page before any script runs.
  */
 export function WorkArchive({ catalogue }: { catalogue: readonly Project[] }) {
-  const [filter, setFilter] = useState(0);
+  const [category, setCategory] = useState<ProjectCategory | null>(null);
   const ordered = projectIndex(catalogue, []);
   const filtered = catalogue.length > workArchive.filtersAfter;
-  const category = filter > 0 ? PROJECT_CATEGORIES[filter - 1] : undefined;
   const rows = category ? ordered.filter((project) => project.category === category) : ordered;
 
   return (
     <>
       {filtered && (
         <div className="stretch-archive__filters" role="group" aria-label="Filter projects">
-          {workArchive.filters.map((label, index) => (
+          {workArchive.filters.map((filter) => (
             <button
-              key={label}
+              key={filter.label}
               type="button"
               className="stretch-archive__filter stretch-mono"
-              aria-pressed={filter === index}
-              onClick={() => setFilter(index)}
+              aria-pressed={category === filter.category}
+              onClick={() => setCategory(filter.category)}
             >
-              {label}
+              {filter.label}
             </button>
           ))}
         </div>

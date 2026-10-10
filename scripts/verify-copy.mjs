@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { projects, featuredSlugs } from "../src/content/projects.ts";
+import { PROJECT_CATEGORIES, projects, featuredSlugs } from "../src/content/projects.ts";
 import { careerLog } from "../src/content/stretch/career.ts";
 import { caseStudies } from "../src/content/stretch/case-studies.ts";
 import {
@@ -21,8 +21,8 @@ const plain = raw.replace(/\*/g, "").replace(/[{}]/g, "");
 // ---- Every string in the typed modules is in the approved copy ----------------------------
 
 const leaves = (value, path = "") => {
-  // Links, image paths and dates are addresses and data, not words, so the approved copy does not list them.
-  if (typeof value === "string") return /(href|src|writtenOn)$/.test(path) ? [] : [[path, value]];
+  // Links, image paths, dates, anchors and category keys are addresses and data, not words, so the approved copy does not list them.
+  if (typeof value === "string") return /(href|src|writtenOn|\.id|\.category)$/.test(path) ? [] : [[path, value]];
   if (Array.isArray(value)) return value.flatMap((item, index) => leaves(item, `${path}[${index}]`));
   if (value && typeof value === "object") return Object.entries(value).flatMap(([key, item]) => leaves(item, `${path}.${key}`));
   return [];
@@ -154,5 +154,11 @@ assert.match(
   /empty "decisions" section/,
 );
 assert.throws(() => caseStudyOpening({ ...threshold, slug: "home-secretary" }, projects), /needs its project's screenshot and colours/);
+
+// Each entry owns its pairing, so reordering the copy cannot redirect a link or a filter.
+assert.deepEqual(workArchive.filters.map(({ category }) => category), [null, ...PROJECT_CATEGORIES], "the filters are All, then every category once, in the catalogue's order");
+for (const [what, ids] of [["menu", siteCopy.menu.map(({ id }) => id)], ["Say hello links", sayHello.links.map(({ id }) => id)]]) {
+  assert.equal(new Set(ids).size, ids.length, `the ${what} lists each id once`);
+}
 
 console.log("Redesign copy checks passed.");

@@ -7,6 +7,8 @@ import { offTheClock } from "../src/content/stretch/off-the-clock";
 import { hero, siteCopy, workSection } from "../src/content/stretch/site-copy";
 import { renderedContrast } from "./support/rendered-contrast";
 
+const menuLabels = siteCopy.menu.map(({ label }) => label);
+
 const sections = [
   { id: "work", heading: "Work", note: workSection.note(projects.length, featuredSlugs.length) },
   { id: "how-i-work", heading: howIWork.heading, note: howIWork.note },
@@ -52,10 +54,10 @@ test.describe("Homepage shell", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     const nav = page.getByRole("navigation", { name: "Primary navigation" });
-    await expect(nav.getByRole("link")).toHaveText(siteCopy.menu);
+    await expect(nav.getByRole("link")).toHaveText(menuLabels);
     const headerBottom = await page.locator("[data-stretch-header]").evaluate((header) => header.getBoundingClientRect().bottom);
     for (const [index, { id, heading }] of sections.entries()) {
-      await nav.getByRole("link", { name: siteCopy.menu[index], exact: true }).click();
+      await nav.getByRole("link", { name: siteCopy.menu[index].label, exact: true }).click();
       await expect(page).toHaveURL(new RegExp(`#${id}$`));
       const top = await page.locator(`section#${id}`).getByRole("heading", { name: heading, exact: true }).evaluate((element) => element.getBoundingClientRect().top);
       expect(top, id).toBeGreaterThanOrEqual(headerBottom - 1);
@@ -131,7 +133,7 @@ test.describe("Accessibility and contrast", () => {
       const readings = await renderedContrast(page);
       const texts = readings.map((reading) => reading.text);
       // The clock is hydrated by now, and the pill, nav, headings and notes were measured.
-      for (const expected of [siteCopy.menu[0], siteCopy.menu[4], "Work", workSection.note(projects.length, featuredSlugs.length)]) {
+      for (const expected of [siteCopy.menu[0].label, siteCopy.menu[4].label, "Work", workSection.note(projects.length, featuredSlugs.length)]) {
         expect(texts.some((text) => text.includes(expected)), expected).toBe(true);
       }
       expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);
