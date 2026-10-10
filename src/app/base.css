@@ -19,12 +19,8 @@
     }
   }
 
-  /*
-   * With reduced motion, nothing animates or eases. While the theme changes
-   * the transitions stand down from this rule, so the quick fade in
-   * stretch-shell.css applies. As !important rules in an earlier layer, these
-   * win over the rest of the page's own.
-   */
+  /* Reduced motion removes transitions, including theme changes. The tiny
+   * animation duration preserves completion events used by other effects. */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -32,13 +28,7 @@
       scroll-behavior: auto !important;
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
-    }
-
-    :root:not([data-theme-changing]),
-    :root:not([data-theme-changing]) *,
-    :root:not([data-theme-changing]) *::before,
-    :root:not([data-theme-changing]) *::after {
-      transition-duration: 0.01ms !important;
+      transition-duration: 0s !important;
     }
   }
 }
