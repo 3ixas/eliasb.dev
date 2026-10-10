@@ -1,5 +1,3 @@
-import type { FantasyTicket } from "./fantasy";
-
 export type SignalState = "live" | "curated" | "pending" | "unavailable";
 
 export type ActivityDay = {
@@ -101,12 +99,5 @@ export type FilmSignal = {
   state: SignalState;
   film: Film | null;
   href: string;
-  updatedAt: string | null;
-};
-
-/** Sleeper, read against the NFL calendar: ticket is null when there's no pin. */
-export type FantasySignal = {
-  state: SignalState;
-  ticket: FantasyTicket | null;
   updatedAt: string | null;
 };

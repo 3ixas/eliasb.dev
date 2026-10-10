@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { caseFileSlugs } from "../src/content/case-files";
+import { caseStudies } from "../src/content/stretch/case-studies";
 import { focusContrast, minimumChanged, minimumShare, type FocusReading } from "./support/focus-contrast";
 import { renderedContrast } from "./support/rendered-contrast";
 
@@ -8,7 +8,7 @@ import { renderedContrast } from "./support/rendered-contrast";
 // by day and by night (the project's colour scheme sets the lights).
 test.use({ reducedMotion: "reduce" });
 
-const routes = ["/", "/work", ...caseFileSlugs.map((slug) => `/work/${slug}`), "/nothing-pinned-here"];
+const routes = ["/", "/work", ...Object.keys(caseStudies).map((slug) => `/work/${slug}`), "/nothing-pinned-here"];
 
 test.describe("Contrast, measured from the rendered page", () => {
   test.beforeEach(({ browserName }) => {
@@ -33,16 +33,6 @@ test.describe("Contrast, measured from the rendered page", () => {
       expect(weakRings(readings)).toEqual([]);
     });
   }
-
-  test("focus rings on the clipping's opened oddities stand out at 3:1", async ({ page }) => {
-    await page.goto("/");
-    await page.locator("[data-pin='clipping'] button[aria-expanded='false']").click();
-    // Measures from the toggle onwards, which includes every oddity it opened.
-    const { readings, complete } = await focusContrast(page);
-    expect(complete).toBe(true);
-    expect(readings.some((reading) => /^Read /.test(reading.name))).toBe(true);
-    expect(weakRings(readings)).toEqual([]);
-  });
 });
 
 /** An indicator that changes nothing is invisible; one that does must contrast. */

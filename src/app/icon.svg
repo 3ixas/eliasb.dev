@@ -1,17 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <style>
-    .tile { fill: #efe8dc; }
-    .needle { stroke: #6e6357; }
-    .head { fill: #d9542c; }
+    .tile { fill: #2340ff; }
+    .mark { fill: #ffffff; }
     @media (prefers-color-scheme: dark) {
-      .tile { fill: #1d1915; }
-      .needle { stroke: #b8ab95; }
-      .head { fill: #e0602f; }
-      .shine { display: none; }
+      .tile { fill: #8b9cff; }
+      .mark { fill: #0d0d12; }
     }
   </style>
-  <rect class="tile" width="30" height="30" rx="7"/>
-  <line class="needle" x1="15" y1="16" x2="19" y2="26" stroke-width="2.4" stroke-linecap="round"/>
-  <circle class="head" cx="15" cy="12" r="8.5"/>
-  <circle class="shine" cx="12.4" cy="9.4" r="2.4" fill="rgba(255,255,255,.55)"/>
+  <rect class="tile" width="32" height="32" rx="7"/>
+  <path class="mark" d="M9 7h15v4.6H13.8v3.3H22v4.2h-8.2v3.3H24V25H9z"/>
 </svg>

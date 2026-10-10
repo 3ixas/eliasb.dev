@@ -1,0 +1,68 @@
+/*
+ * Stretch design tokens (ADR 0005, docs/design/STRETCH.md). Values come from
+ * the spec table in docs/specs/STRETCH-REDESIGN-SPEC.md; change them there
+ * first. They carry a --stretch- prefix, which keeps them apart from any
+ * other custom property on the page.
+ *
+ * Which theme applies, in order:
+ * 1. data-theme, a remembered choice (the boot script sets it before paint).
+ * 2. data-lights, which the boot script and the theme controller keep at the
+ *    appearance in force. The controller flips it after marking the page as
+ *    changing, so a change of the device setting crossfades like a click.
+ * 3. The device setting alone, when script has not run.
+ * CSS cannot share one block between a media query and attribute selectors,
+ * so the dark block appears three times; keep the copies identical.
+ */
+:root {
+  --stretch-page: #fbfbf8;
+  --stretch-ink: #111114;
+  --stretch-muted: #5a5a63;
+  --stretch-rule: #dcdcd6;
+  --stretch-card: #f0f0ea;
+  --stretch-cobalt: #2340ff;
+  --stretch-on-cobalt: #ffffff;
+  --stretch-tile-edge: transparent;
+  --stretch-tape: rgba(232, 222, 188, 0.85);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-lights]):not([data-theme]) {
+    --stretch-page: #0d0d12;
+    --stretch-ink: #f1f1f4;
+    --stretch-muted: #a2a2ad;
+    --stretch-rule: #2a2a33;
+    --stretch-card: #17171f;
+    --stretch-cobalt: #8b9cff;
+    --stretch-on-cobalt: #0d0d12;
+    --stretch-tile-edge: #2a2a33;
+    --stretch-tape: rgba(232, 222, 188, 0.6);
+    color-scheme: dark;
+  }
+}
+
+:root[data-lights="on"]:not([data-theme="light"]) {
+  --stretch-page: #0d0d12;
+  --stretch-ink: #f1f1f4;
+  --stretch-muted: #a2a2ad;
+  --stretch-rule: #2a2a33;
+  --stretch-card: #17171f;
+  --stretch-cobalt: #8b9cff;
+  --stretch-on-cobalt: #0d0d12;
+  --stretch-tile-edge: #2a2a33;
+  --stretch-tape: rgba(232, 222, 188, 0.6);
+  color-scheme: dark;
+}
+
+:root[data-theme="dark"] {
+  --stretch-page: #0d0d12;
+  --stretch-ink: #f1f1f4;
+  --stretch-muted: #a2a2ad;
+  --stretch-rule: #2a2a33;
+  --stretch-card: #17171f;
+  --stretch-cobalt: #8b9cff;
+  --stretch-on-cobalt: #0d0d12;
+  --stretch-tile-edge: #2a2a33;
+  --stretch-tape: rgba(232, 222, 188, 0.6);
+  color-scheme: dark;
+}

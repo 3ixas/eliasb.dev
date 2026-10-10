@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
-import { LazyPrefetchLink } from "@/components/board/lazy-prefetch-link";
-import { BoardHeader } from "@/components/board/board-header";
-import { BoardFooter } from "@/components/board/footer";
-import { Pushpin } from "@/components/board/pin";
-import { BoardSurface } from "@/components/board/surface";
-import { notFoundPage as copy } from "@/content/not-found";
+import Link from "next/link";
+import { SubpageHeader } from "@/components/site/subpage-header";
 import { pageTitle } from "@/content/site";
+import { notFound as copy, siteCopy } from "@/content/stretch/site-copy";
 
 export const metadata: Metadata = {
   title: { absolute: pageTitle(copy.title) },
@@ -20,45 +17,24 @@ export const metadata: Metadata = {
 };
 
 /**
- * The 404: a gap on the linen where something used to be pinned. Its outline
- * is still there, the pin is still in the board, and a torn corner of paper is
- * caught under it.
+ * The 404 (docs/content/redesign-copy.md): the slim header, a short heading
+ * and line, and one link home. It has no entrance and no cobalt beyond focus,
+ * selection and hover.
  */
 export default function NotFound() {
   return (
-    <>
-      <BoardHeader page={null} />
-      <BoardSurface
-        kind="wall"
-        as="main"
-        id="main-content"
-        tabIndex={-1}
-        className="flex justify-center px-4 pt-12 pb-24 sm:px-8 lg:pt-20"
-      >
-        <div data-light="right" className="board-frame relative w-full max-w-[30rem] rounded-[6px] p-3">
-          <BoardSurface kind="linen" className="board-linen relative isolate rounded-paper px-6 pt-8 pb-12 sm:px-10">
-            <div aria-hidden="true" className="board-night-dim pointer-events-none absolute inset-0" />
-
-            <div aria-hidden="true" data-not-found-gap className="relative z-10 mx-auto h-[190px] w-[16rem] max-w-full">
-              <div className="absolute inset-x-6 top-12 h-[120px] border-[1.5px] border-dashed border-(--not-found-outline)" />
-              <div className="board-not-found-scrap absolute top-[3.25rem] left-1/2 h-[26px] w-[34px] bg-paper" />
-              <Pushpin className="absolute top-8 left-1/2 -translate-x-1/2" />
-              <p className="board-stamp absolute -top-1 right-0 m-0 rotate-[10deg] border-4 px-3 py-0.5 text-[1.75rem] leading-none font-medium tracking-[0.1em]">
-                {copy.stamp}
-              </p>
-            </div>
-
-            <div className="relative z-10 mt-4 text-center text-ink">
-              <h1 className="m-0 font-display text-title font-normal sm:text-[2.125rem]">{copy.heading}</h1>
-              <p className="mx-auto mt-3 mb-5 max-w-[22rem] text-body leading-normal">{copy.line}</p>
-              <LazyPrefetchLink href="/" className="board-focus inline-flex min-h-11 items-center gap-1.5 font-semibold underline underline-offset-4">
-                {copy.back} <span aria-hidden="true">{copy.backArrow}</span>
-              </LazyPrefetchLink>
-            </div>
-          </BoardSurface>
-        </div>
-      </BoardSurface>
-      <BoardFooter />
-    </>
+    <div data-stretch-shell data-not-found>
+      <SubpageHeader />
+      <main id="main-content" tabIndex={-1} className="stretch-wrap stretch-404">
+        <h1 className="stretch-display stretch-h2">{copy.heading}</h1>
+        <p className="stretch-404__line">{copy.line}</p>
+        <Link className="stretch-404__home" href="/">
+          {copy.button.replace(/ →$/, "")} <span aria-hidden="true">→</span>
+        </Link>
+      </main>
+      <footer className="stretch-wrap stretch-footer">
+        <p className="stretch-mono">{siteCopy.footer}</p>
+      </footer>
+    </div>
   );
 }

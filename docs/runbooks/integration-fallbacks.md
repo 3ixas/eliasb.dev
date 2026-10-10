@@ -1,6 +1,6 @@
 # Integration fallback runbook
 
-The homepage and Library use small server-owned snapshots from external services. Each adapter has a bounded timeout, a revalidation window, response-shape checks, and an authored fallback. A visitor should see a truthful state label or fallback rather than an empty card or a client-side error.
+The homepage's Off the clock section uses small server-owned snapshots from external services. Each adapter has a bounded timeout, a revalidation window, response-shape checks, and an authored fallback. A visitor should see a truthful state label or fallback rather than an empty card or a client-side error.
 
 ## Production questions
 
@@ -27,9 +27,7 @@ When a signal looks stale or incomplete, answer these questions in order:
 | GitHub activity | GitHub GraphQL/public events; 6 hours; 3.5-second request timeout | Public-only or authored activity when the private token is absent or the endpoint fails |
 | Letterboxd culture | Letterboxd RSS; 15 minutes; 3.5-second request timeout | Authored culture card when the feed is missing, malformed, or unavailable |
 | Goodreads reading | Goodreads RSS; 30 minutes; 3.5-second request timeout | Authored reading card when the feed is missing, malformed, or unavailable |
-| Sleeper fantasy | Sleeper public API; 1 hour; 3.5-second request timeout | No fantasy pin when `SLEEPER_LEAGUE_ID` is unset (a warning is logged in season), or when the league or endpoint cannot be read |
 | Wikimedia history | Wikimedia/English Wikipedia On This Day `events`, `selected`, and `births` feeds plus Commons image metadata; 7 days; 3.5-second request timeout per request | If the live feed fails or cannot provide three source-checked curiosities spanning three centuries (including two on-this-day events), show the saved balloon, wrestling, and Galileo examples rather than padding the list with routine birthdays. If an image lacks a Commons file page, creator, or license, keep its story text-only |
-| Spotify playlist | Cross-origin Spotify iframe | A keyboard-accessible titled iframe or Open in Spotify fallback; provider loading is outside site-owned runtime control |
 
 The authoritative signal details live in [`docs/integrations/SIGNALS.md`](../integrations/SIGNALS.md). The card's state label and source link are part of the user-facing contract.
 

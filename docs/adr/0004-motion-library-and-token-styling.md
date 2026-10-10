@@ -3,6 +3,8 @@ status: accepted
 date: 2026-09-29
 ---
 
+> **Amended** on 8 October 2026 by [ADR 0005](0005-stretch-redesign.md): the first-paint constraint at the end is replaced. Only the homepage's signature entrance may hold the page visually, for about 5 seconds; content is in the server HTML throughout. Motion is no longer a runtime dependency either: the entrance runs its own spring (`components/site/entrance.ts`), and `verify:opening` checks it against Motion's `spring`, so the package is a dev dependency.
+
 # Rebuild the presentation layer on Motion and design tokens
 
 The re-founded site uses Motion (motion.dev) for springs, scroll-linked movement, and layout transitions. Plain CSS handles only trivial hover changes. The single hand-written `globals.css` (about 99 KB) is replaced by design tokens, which are CSS variables derived from the new `DESIGN.md`, plus component-scoped Tailwind v4 utilities.

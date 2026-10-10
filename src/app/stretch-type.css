@@ -1,0 +1,48 @@
+/*
+ * Stretch type (docs/design/STRETCH.md). Bricolage Grotesque is loaded by
+ * next/font in layout.tsx with its width and optical-size axes; JetBrains Mono
+ * carries metadata. Display text is condensed to 75% width at weight 800 and
+ * set in capitals.
+ */
+/*
+ * What shows until Bricolage Grotesque arrives (layout.tsx lists it as the
+ * font's fallback). One Arial face per style, scaled to the width that style
+ * has in Bricolage (measured), so nothing wraps or moves when the real font
+ * swaps in: the condensed display type is far narrower than Arial, and the
+ * name would otherwise break onto extra lines on a slow connection.
+ */
+@font-face {
+  font-family: "Bricolage Fallback";
+  src: local("Arial");
+  font-weight: 300 599;
+  font-stretch: 100%;
+  size-adjust: 94%;
+}
+
+@font-face {
+  font-family: "Bricolage Fallback";
+  src: local("Arial Bold");
+  font-weight: 600 800;
+  font-stretch: 100%;
+  size-adjust: 91%;
+}
+
+@font-face {
+  font-family: "Bricolage Fallback";
+  src: local("Arial Bold");
+  font-weight: 300 800;
+  font-stretch: 75%;
+  size-adjust: 58%;
+}
+
+.stretch-display {
+  font-family: var(--font-bricolage), system-ui, sans-serif;
+  font-optical-sizing: auto;
+  font-stretch: 75%;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.stretch-mono {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+}

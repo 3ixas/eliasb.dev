@@ -1,0 +1,2396 @@
+/*
+ * The Stretch homepage shell (docs/design/STRETCH.md): page surface, header,
+ * Lights pill, section headings and footer. Everything is scoped to
+ * [data-stretch-shell]; only the page surface reaches up to html and body,
+ * through :has().
+ */
+
+/* The surface behind the shell, so overscroll and the toolbar match the page. */
+html:has([data-stretch-shell]) {
+  scroll-padding-top: 6rem;
+}
+
+html:has([data-stretch-shell]),
+html:has([data-stretch-shell]) body {
+  background-color: var(--stretch-page);
+  color: var(--stretch-ink);
+}
+
+[data-stretch-shell] {
+  --stretch-gutter: 16px;
+  min-height: 100vh;
+  font-family: var(--font-bricolage), system-ui, sans-serif;
+  background-color: var(--stretch-page);
+  color: var(--stretch-ink);
+}
+
+@media (min-width: 761px) {
+  [data-stretch-shell] {
+    --stretch-gutter: 32px;
+  }
+}
+
+/* Short pages keep the footer at the foot of the window instead of mid-screen. */
+[data-not-found],
+[data-work-archive] {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+[data-not-found] > main,
+[data-work-archive] > main {
+  flex: 1 0 auto;
+}
+
+[data-stretch-shell] ::selection {
+  background-color: var(--stretch-cobalt);
+  color: var(--stretch-on-cobalt);
+}
+
+[data-stretch-shell] :focus-visible {
+  outline: 3px solid var(--stretch-cobalt);
+  outline-offset: 3px;
+}
+
+/* A section that focus was sent to (after the phone menu) is not a control, so it wears no ring. */
+[data-stretch-shell] section[tabindex="-1"]:focus-visible {
+  outline: none;
+}
+
+.stretch-wrap {
+  width: 100%;
+  max-width: 1400px;
+  margin-inline: auto;
+  padding-inline: var(--stretch-gutter);
+}
+
+/* ---- Theme change: a calm crossfade, a quick fade for reduced motion ---- */
+
+:root {
+  --stretch-room-duration: 1.2s;
+  --stretch-room-ease: cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --stretch-room-duration: 0.2s;
+  }
+}
+
+/* Set by the theme controller just before the theme flips, and cleared after. */
+:root[data-theme-changing],
+:root[data-theme-changing] body,
+:root[data-theme-changing] [data-stretch-shell],
+:root[data-theme-changing] [data-stretch-shell] *,
+:root[data-theme-changing] [data-stretch-shell] *::before,
+:root[data-theme-changing] [data-stretch-shell] *::after {
+  transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke;
+  transition-duration: var(--stretch-room-duration);
+  transition-timing-function: var(--stretch-room-ease);
+  transition-delay: 0s;
+}
+
+/* ---- Header ---- */
+
+.stretch-skip {
+  position: absolute;
+  left: var(--stretch-gutter);
+  top: 8px;
+  z-index: 60;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background-color: var(--stretch-cobalt);
+  color: var(--stretch-on-cobalt);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.stretch-skip:focus {
+  transform: none;
+}
+
+.stretch-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--stretch-page);
+  border-bottom: 1px solid var(--stretch-rule);
+}
+
+.stretch-header__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding-block: 12px;
+}
+
+.stretch-header__right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.stretch-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stretch-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 14px;
+  border-radius: 999px;
+  color: var(--stretch-ink);
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.stretch-nav a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+/* Say hello: the one link that takes the cobalt. */
+.stretch-nav a.stretch-nav__cta {
+  background-color: var(--stretch-cobalt);
+  color: var(--stretch-on-cobalt);
+}
+
+.stretch-nav a.stretch-nav__cta:hover {
+  text-decoration: none;
+}
+
+.stretch-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin: 0;
+  padding-inline: 16px;
+  border: 1px solid var(--stretch-ink);
+  border-radius: 999px;
+  background-color: transparent;
+  color: var(--stretch-ink);
+  font-size: 13px;
+}
+
+button.stretch-pill {
+  cursor: pointer;
+}
+
+/*
+ * The Lights pill names the state it is in, from the first paint: "Lights on"
+ * while the page is light, "Lights off" while it is dark. Which theme is in
+ * force is decided as in stretch-tokens.css.
+ */
+.stretch-lights-off {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-lights]):not([data-theme]) .stretch-lights-on {
+    display: none;
+  }
+
+  :root:not([data-lights]):not([data-theme]) .stretch-lights-off {
+    display: inline;
+  }
+}
+
+:root[data-lights="on"]:not([data-theme="light"]) .stretch-lights-on,
+:root[data-theme="dark"] .stretch-lights-on {
+  display: none;
+}
+
+:root[data-lights="on"]:not([data-theme="light"]) .stretch-lights-off,
+:root[data-theme="dark"] .stretch-lights-off {
+  display: inline;
+}
+
+/* ---- Phones: Lights and Menu only, the rest in the menu dialog ---- */
+
+.stretch-menu-button {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .stretch-header__clock,
+  .stretch-header .stretch-nav {
+    display: none;
+  }
+
+  .stretch-header__right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .stretch-menu-button {
+    display: inline-flex;
+    border-color: var(--stretch-ink);
+    background-color: var(--stretch-ink);
+    color: var(--stretch-page);
+    font-family: var(--font-bricolage), system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+  }
+}
+
+.stretch-menu {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 16px;
+  border: 0;
+  background-color: var(--stretch-page);
+  color: var(--stretch-ink);
+}
+
+.stretch-menu[open] {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* The page behind a modal menu does not scroll. */
+html:has(.stretch-menu[open]) {
+  overflow: hidden;
+}
+
+.stretch-menu__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.stretch-menu__close {
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.stretch-menu__nav {
+  margin-top: 32px;
+}
+
+.stretch-menu__nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stretch-menu__nav a {
+  display: block;
+  padding-block: 6px;
+  font-family: var(--font-bricolage), system-ui, sans-serif;
+  font-size: 56px;
+  font-stretch: 75%;
+  font-weight: 800;
+  line-height: 0.95;
+  text-decoration: none;
+  text-transform: uppercase;
+  color: var(--stretch-ink);
+}
+
+.stretch-menu__nav a.stretch-menu__cta {
+  color: var(--stretch-cobalt);
+}
+
+/* ---- Sections ---- */
+
+.stretch-section {
+  padding-block: 64px 0;
+}
+
+.stretch-section__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+}
+
+.stretch-h2 {
+  margin: 0;
+  font-size: clamp(64px, 9vw, 96px);
+  line-height: 0.9;
+  letter-spacing: -0.015em;
+}
+
+.stretch-note {
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* ---- Hero ---- */
+
+.stretch-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  padding-block: 12px 48px;
+}
+
+/* The name: 31.5vw on phones so "Bennett" fills the width without wrapping. */
+.stretch-name,
+.stretch-entrance__name {
+  margin: 0;
+  color: var(--stretch-cobalt);
+  font-size: 31.5vw;
+  line-height: 0.8;
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+}
+
+/*
+ * The name never wraps at its own size, but a visitor who forces wider letter
+ * spacing (WCAG 1.4.12) would otherwise push the page sideways, so it may break
+ * as a last resort. The entrance layer keeps its single lines.
+ */
+.stretch-name {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.stretch-name span,
+.stretch-entrance__name span {
+  display: block;
+}
+
+.stretch-hero__lede {
+  margin-top: 28px;
+}
+
+.stretch-hero h1,
+.stretch-entrance__line {
+  max-width: 17em;
+  margin: 0;
+  font-size: clamp(30px, 3.6vw, 52px);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+}
+
+.stretch-hero em,
+.stretch-entrance em {
+  position: relative;
+  display: inline-block;
+  color: var(--stretch-cobalt);
+  font-style: normal;
+}
+
+/* The hand-drawn highlight under "feel simple."; the entrance draws it. */
+.stretch-hero em svg,
+.stretch-entrance em svg {
+  position: absolute;
+  right: 0;
+  bottom: -0.12em;
+  left: 0;
+  width: 100%;
+  height: 0.3em;
+  overflow: visible;
+}
+
+.stretch-hero em path,
+.stretch-entrance em path {
+  fill: none;
+  stroke: var(--stretch-cobalt);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.stretch-hero__support {
+  max-width: 26em;
+  margin: 14px 0 0;
+  color: var(--stretch-muted);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.stretch-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.stretch-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding-inline: 20px;
+  border: 1px solid var(--stretch-ink);
+  border-radius: 999px;
+  color: var(--stretch-ink);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.stretch-button--primary {
+  border-color: var(--stretch-cobalt);
+  background-color: var(--stretch-cobalt);
+  color: var(--stretch-on-cobalt);
+}
+
+/* The portrait, tilted 2 degrees on phones and 3 on desktop, with its cobalt label. */
+.stretch-portrait {
+  position: relative;
+  justify-self: start;
+  width: min(100% - 16px, 360px);
+  margin: 28px 0 0 8px;
+  transform: rotate(2deg);
+  transform-origin: 50% 0;
+}
+
+.stretch-portrait img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  border-radius: 18px;
+  object-fit: cover;
+}
+
+.stretch-portrait__label {
+  position: absolute;
+  left: -8px;
+  bottom: 20px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background-color: var(--stretch-cobalt);
+  color: var(--stretch-on-cobalt);
+  font-size: 16px;
+  font-weight: 700;
+  transform: rotate(-6deg);
+}
+
+@media (min-width: 761px) {
+  .stretch-hero {
+    grid-template-columns: minmax(0, 1fr) 290px;
+    column-gap: 48px;
+    padding-block: 24px 80px;
+  }
+
+  .stretch-name,
+  .stretch-entrance__name {
+    font-size: clamp(88px, 18vw, 280px);
+  }
+
+  .stretch-hero__lede {
+    margin-top: 48px;
+  }
+
+  .stretch-hero__support {
+    font-size: 19px;
+  }
+
+  .stretch-portrait {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: start;
+    justify-self: stretch;
+    width: auto;
+    margin: 16px 0 0;
+    transform: rotate(3deg);
+  }
+
+  .stretch-portrait__label {
+    left: -28px;
+    bottom: 28px;
+    padding: 10px 16px;
+    font-size: 17px;
+    transform: rotate(-7deg);
+  }
+}
+
+/* ---- Signature entrance (entrance.ts) ---- */
+
+/*
+ * While the document is marked as entering, each part of the homepage is held
+ * by opacity until the entrance releases it. Opacity keeps everything in the
+ * accessibility tree and in the layout, so the headline's slot can be measured
+ * and the real h1 is complete throughout. Without script nothing is marked.
+ */
+html[data-entering] [data-entrance] {
+  transition: opacity var(--entrance-fade, 0.5s) cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* The headline and name hand over from their stand-ins on the entrance layer, so they must not fade. */
+html[data-entering] [data-entrance="headline"],
+html[data-entering] [data-entrance="name"] {
+  transition: none;
+}
+
+html[data-entering] [data-entrance="portrait"] {
+  --entrance-fade: 0.3s;
+}
+
+html[data-entering]:not([data-released~="header"]) [data-entrance="header"],
+html[data-entering]:not([data-released~="name"]) [data-entrance="name"],
+html[data-entering]:not([data-released~="headline"]) [data-entrance="headline"],
+html[data-entering]:not([data-released~="support"]) [data-entrance="support"],
+html[data-entering]:not([data-released~="portrait"]) [data-entrance="portrait"],
+html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
+  opacity: 0;
+}
+
+/* The decorative layer the entrance plays on: the typed line and the name's letters. */
+.stretch-entrance {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  overflow: hidden;
+  pointer-events: none;
+  font-family: var(--font-bricolage), system-ui, sans-serif;
+  color: var(--stretch-ink);
+}
+
+.stretch-entrance__line,
+.stretch-entrance__name {
+  position: absolute;
+  margin: 0;
+}
+
+.stretch-entrance__untyped {
+  color: transparent;
+}
+
+/* Zero width, so the caret never moves the text it sits between. */
+.stretch-entrance__caret {
+  position: relative;
+  display: inline-block;
+  width: 0;
+}
+
+.stretch-entrance__caret > span {
+  position: absolute;
+  bottom: -0.08em;
+  left: 2px;
+  width: 0.06em;
+  height: 0.9em;
+  background-color: currentColor;
+}
+
+.stretch-entrance__caret--blink > span {
+  animation: stretch-entrance-blink 0.42s steps(1) infinite;
+}
+
+@keyframes stretch-entrance-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.stretch-entrance__name i {
+  display: inline-block;
+  font-style: normal;
+}
+
+/* ---- Footer ---- */
+
+.stretch-footer {
+  margin-top: 96px;
+  padding-block: 32px;
+  border-top: 1px solid var(--stretch-rule);
+}
+
+.stretch-footer p {
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: 14px;
+}
+
+/* ---- Work: featured tiles ---- */
+
+.stretch-tiles {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stretch-tiles__item {
+  display: flex;
+}
+
+@media (min-width: 761px) {
+  .stretch-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stretch-tiles__item[data-wide] {
+    grid-column: span 2;
+  }
+}
+
+/* The project's own colours arrive as --tile-* on the link. */
+.stretch-tile {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 28px;
+  min-height: 44px;
+  padding: 24px;
+  border: 1px solid var(--stretch-tile-edge);
+  border-radius: 24px;
+  background-color: var(--tile-field);
+  color: var(--tile-ink);
+  text-decoration: none;
+}
+
+@media (min-width: 761px) {
+  .stretch-tile {
+    padding: 36px;
+  }
+
+  .stretch-tiles__item[data-wide] .stretch-tile {
+    flex-direction: row;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .stretch-tiles__item[data-wide] .stretch-tile__text {
+    flex: 0 1 38%;
+  }
+
+  .stretch-tiles__item[data-wide] .stretch-tile__shot {
+    flex: 1 1 0;
+  }
+}
+
+.stretch-tile__text {
+  min-width: 0;
+}
+
+.stretch-tile__number {
+  margin: 0;
+  font-size: 64px;
+  line-height: 0.9;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--tile-swatch);
+}
+
+.stretch-tile__name {
+  margin: 10px 0 0;
+  font-size: clamp(36px, 4vw, 48px);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.stretch-tile__outcome {
+  margin: 12px 0 0;
+  font-size: 19px;
+  line-height: 1.3;
+}
+
+.stretch-tile__meta {
+  margin: 14px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.stretch-tile__shot {
+  min-width: 0;
+  margin-top: auto;
+  transform: rotate(var(--tile-tilt, 0deg));
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+  border-radius: 12px;
+}
+
+.stretch-tile__shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  border-radius: 12px;
+  object-fit: cover;
+  object-position: top left;
+}
+
+/* ---- Fasteners: one prop on each tile's edge ---- */
+
+.stretch-fastener {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.stretch-fastener--tape {
+  top: -14px;
+  left: 50%;
+  width: 130px;
+  height: 34px;
+  margin-left: -65px;
+  background-color: var(--stretch-tape);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  transform: rotate(-3deg);
+  transform-origin: 0 50%;
+}
+
+.stretch-fastener--paperclip {
+  top: -22px;
+  right: 40px;
+  transform-origin: 50% 80%;
+}
+
+.stretch-fastener--pin {
+  top: -9px;
+  right: 40px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #e9e4da;
+  box-shadow: 2px 4px 5px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes stretch-tape-lift {
+  50% {
+    transform: rotate(-6deg) translateY(-3px);
+  }
+}
+
+@keyframes stretch-clip-swing {
+  25% {
+    transform: rotate(-8deg);
+  }
+
+  60% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes stretch-pin-press {
+  50% {
+    transform: scale(1.15) translateY(-2px);
+  }
+}
+
+/*
+ * Hover and keyboard focus: the screenshot straightens and the prop reacts.
+ * Hover only moves things where there is a real hover, so a tap on a phone
+ * (or a return by the back button) never leaves a tile in its hover pose.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .stretch-tile:focus-visible .stretch-tile__shot {
+    transform: rotate(0deg) translateY(-6px) scale(1.02);
+  }
+
+  .stretch-tile:focus-visible .stretch-fastener--tape {
+    animation: stretch-tape-lift 0.5s ease-out;
+  }
+
+  .stretch-tile:focus-visible .stretch-fastener--paperclip {
+    animation: stretch-clip-swing 0.55s ease-in-out;
+  }
+
+  .stretch-tile:focus-visible .stretch-fastener--pin {
+    animation: stretch-pin-press 0.35s ease-out;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  .stretch-tile:hover .stretch-tile__shot {
+    transform: rotate(0deg) translateY(-6px) scale(1.02);
+  }
+
+  .stretch-tile:hover .stretch-fastener--tape {
+    animation: stretch-tape-lift 0.5s ease-out;
+  }
+
+  .stretch-tile:hover .stretch-fastener--paperclip {
+    animation: stretch-clip-swing 0.55s ease-in-out;
+  }
+
+  .stretch-tile:hover .stretch-fastener--pin {
+    animation: stretch-pin-press 0.35s ease-out;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stretch-tile__shot {
+    transition: none;
+  }
+
+  .stretch-tile:is(:hover, :focus-visible) .stretch-tile__shot {
+    transform: rotate(0deg);
+  }
+}
+
+/*
+ * Phones have no hover: a screenshot straightens as it crosses the middle of
+ * the screen and tilts again as it leaves. Browsers without scroll-driven
+ * animations keep the static tilt.
+ */
+@keyframes stretch-shot-straighten {
+  50% {
+    transform: rotate(0deg);
+  }
+}
+
+@media (max-width: 760px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .stretch-tile__shot {
+      animation: stretch-shot-straighten linear both;
+      animation-timeline: view();
+    }
+  }
+}
+
+/*
+ * Scroll sway: tiles and cards drift up to 14 px and tilt at most 0.6° as they
+ * cross the screen, level and in place when centred. The individual translate
+ * and rotate properties are used so it composes with a card's own resting
+ * tilt, and only they change, so it runs off the main thread. Under reduced
+ * motion, or without scroll-driven animations, cards simply stay still.
+ */
+@keyframes stretch-sway {
+  from {
+    translate: 0 14px;
+    rotate: calc(var(--sway-tilt, 0.6deg) * -1);
+  }
+
+  to {
+    translate: 0 -14px;
+    rotate: var(--sway-tilt, 0.6deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .stretch-tile,
+    .stretch-otc__card,
+    .stretch-prd {
+      animation: stretch-sway linear both;
+      animation-timeline: view();
+    }
+
+    .stretch-tile:nth-child(even),
+    .stretch-otc__card:nth-child(even) {
+      --sway-tilt: -0.6deg;
+    }
+  }
+}
+
+/* ---- Project index: a typographic list, newest first ---- */
+
+.stretch-index {
+  margin-top: 56px;
+}
+
+.stretch-index__list {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--stretch-rule);
+}
+
+.stretch-index__row {
+  border-bottom: 1px solid var(--stretch-rule);
+}
+
+.stretch-index__link {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto 24px;
+  align-items: baseline;
+  gap: 4px 16px;
+  min-height: 44px;
+  padding: 20px 0;
+  color: var(--stretch-ink);
+  text-decoration: none;
+}
+
+.stretch-index__number {
+  color: var(--stretch-muted);
+  font-size: 13px;
+}
+
+.stretch-index__text {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.stretch-index__name {
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.stretch-index__outcome {
+  color: var(--stretch-muted);
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+.stretch-index__meta {
+  color: var(--stretch-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.stretch-index__arrow {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.stretch-index__link:is(:hover, :focus-visible) :is(.stretch-index__name, .stretch-index__arrow) {
+  color: var(--stretch-cobalt);
+}
+
+.stretch-index__all {
+  margin: 24px 0 0;
+}
+
+.stretch-index__all a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--stretch-ink);
+  font-size: 14px;
+}
+
+.stretch-index__all a:is(:hover, :focus-visible) {
+  color: var(--stretch-cobalt);
+}
+
+/* Desktop: the rows keep the left of the list and the screenshot previews on the right. */
+@media (min-width: 761px) {
+  .stretch-index__list {
+    padding-right: 38%;
+  }
+
+  .stretch-index__link {
+    grid-template-columns: 40px minmax(0, 1fr) 24px;
+  }
+
+  .stretch-index__meta {
+    grid-column: 2;
+    grid-row: 2;
+    white-space: normal;
+  }
+
+  .stretch-index__arrow {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .stretch-index__shot {
+    position: absolute;
+    top: 24px;
+    right: 0;
+    width: calc(38% - 32px);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .stretch-index__link:is(:hover, :focus-visible) .stretch-index__shot {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+.stretch-index__shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  border: 1px solid var(--stretch-rule);
+  border-radius: 12px;
+  object-fit: cover;
+  object-position: top left;
+}
+
+/* Phones have no hover: the screenshot is a small thumbnail and a row is one tap. */
+@media (max-width: 760px) {
+  .stretch-index__link {
+    grid-template-columns: 96px minmax(0, 1fr) 20px;
+    align-items: center;
+    padding: 16px 0;
+  }
+
+  .stretch-index__number {
+    display: none;
+  }
+
+  .stretch-index__text {
+    grid-column: 2;
+  }
+
+  .stretch-index__meta {
+    grid-column: 2;
+    grid-row: 2;
+    white-space: normal;
+  }
+
+  .stretch-index__arrow {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+
+  .stretch-index__shot {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  .stretch-index__name {
+    font-size: 26px;
+  }
+
+  .stretch-index__outcome {
+    font-size: 15px;
+  }
+
+  /* A row without a thumbnail uses the full width. */
+  .stretch-index__link:not(:has(.stretch-index__shot)) {
+    grid-template-columns: minmax(0, 1fr) 20px;
+  }
+
+  .stretch-index__link:not(:has(.stretch-index__shot)) :is(.stretch-index__text, .stretch-index__meta) {
+    grid-column: 1;
+  }
+
+  .stretch-index__link:not(:has(.stretch-index__shot)) .stretch-index__arrow {
+    grid-column: 2;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .stretch-index__arrow {
+    transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .stretch-index__link:focus-visible .stretch-index__arrow {
+    transform: translateX(6px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  .stretch-index__link:hover .stretch-index__arrow {
+    transform: translateX(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stretch-index__shot {
+    transition: none;
+  }
+}
+
+/* ---- How I work: three beats, the PRD card and the honest line ---- */
+
+.stretch-how {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 40px 48px;
+  margin-top: 40px;
+}
+
+.stretch-beats {
+  display: grid;
+  gap: 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stretch-beat {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  column-gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid var(--stretch-rule);
+}
+
+.stretch-beat__number {
+  grid-row: 1 / span 2;
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: 44px;
+  line-height: 1;
+}
+
+.stretch-beat__habit {
+  margin: 0;
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.stretch-beat__proof {
+  max-width: 60ch;
+  margin: 8px 0 0;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.stretch-prd {
+  position: relative;
+  align-self: start;
+  margin: 14px 0 0;
+  padding: 32px 24px 20px;
+  border: 1px solid var(--stretch-rule);
+  border-radius: 12px;
+  background-color: var(--stretch-card);
+  color: var(--stretch-ink);
+  transform: rotate(1deg);
+}
+
+.stretch-prd__quote {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.stretch-prd__caption {
+  margin-top: 16px;
+  color: var(--stretch-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.stretch-honest {
+  max-width: 60ch;
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+@media (min-width: 761px) {
+  .stretch-how {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  }
+
+  .stretch-honest {
+    grid-column: 1;
+  }
+
+  .stretch-prd {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin-top: 20px;
+  }
+}
+
+/* ---- Off the clock: the training poster, the book, the film and the clipping ---- */
+
+.stretch-otc {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  margin-top: 40px;
+}
+
+.stretch-otc__card {
+  position: relative;
+  display: grid;
+  gap: 20px;
+  padding: 28px 24px 24px;
+  border: 1px solid var(--stretch-rule);
+  border-radius: 12px;
+  background-color: var(--stretch-card);
+  color: var(--stretch-ink);
+}
+
+.stretch-otc__title {
+  margin: 0;
+  font-size: clamp(40px, 5vw, 56px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.stretch-otc__label {
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: 13px;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.stretch-otc__kicker {
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.stretch-otc__name {
+  margin: 0;
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.stretch-otc__year {
+  color: var(--stretch-muted);
+  font-weight: 500;
+}
+
+.stretch-otc__by {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.stretch-otc__note,
+.stretch-otc__asof {
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* A cover or poster, tilted a little like a print on the page, or a blank in its place. */
+.stretch-otc__print {
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  border: 1px solid var(--stretch-rule);
+  border-radius: 6px;
+  object-fit: cover;
+  transform: rotate(-1.5deg);
+}
+
+.stretch-otc__film .stretch-otc__print {
+  transform: rotate(1.5deg);
+}
+
+.stretch-otc__print--blank {
+  background-color: var(--stretch-rule);
+}
+
+.stretch-otc__book,
+.stretch-otc__film {
+  grid-template-columns: minmax(0, 40%) minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+}
+
+.stretch-otc__text {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.stretch-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  width: fit-content;
+  color: var(--stretch-ink);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  text-transform: uppercase;
+}
+
+.stretch-link:hover {
+  color: var(--stretch-cobalt);
+}
+
+/* The training poster. */
+.stretch-otc__training {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.stretch-otc__photo {
+  margin: 0;
+}
+
+.stretch-otc__photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  border-radius: 8px;
+  object-fit: cover;
+  object-position: center top;
+  transform: rotate(-1deg);
+}
+
+.stretch-otc__photo figcaption {
+  margin-top: 12px;
+  color: var(--stretch-muted);
+  font-size: 13px;
+}
+
+.stretch-otc__plan {
+  display: grid;
+  /* A bounded column: left to size itself, it grows to the longest unbreakable
+     word and pushes the page sideways when a visitor forces wider spacing. */
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 16px;
+}
+
+.stretch-week {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.stretch-week__days {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stretch-week__day {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--stretch-rule);
+}
+
+.stretch-week__short {
+  flex: none;
+  width: 3ch;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.stretch-week__session {
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.stretch-week__tag {
+  margin-left: auto;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+/* Today, in cobalt. */
+.stretch-week__day[data-today] {
+  border-radius: 8px;
+  border-bottom-color: transparent;
+  background-color: var(--stretch-cobalt);
+  color: var(--stretch-on-cobalt);
+}
+
+/* On phones, today is also a large card over the week. The space is held until today is known. */
+.stretch-week__today {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .stretch-week__today {
+    display: grid;
+    align-content: center;
+    gap: 4px;
+    min-height: 168px;
+    padding: 20px;
+    border-radius: 12px;
+    background-color: var(--stretch-cobalt);
+    color: var(--stretch-on-cobalt);
+  }
+
+  .stretch-week__today-label {
+    margin: 0;
+    font-size: 13px;
+    text-transform: uppercase;
+  }
+
+  .stretch-week__today-day {
+    margin: 0;
+    font-size: 56px;
+    line-height: 0.95;
+  }
+
+  .stretch-week__today-session {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .stretch-week:not([data-today-known]) .stretch-week__today {
+    visibility: hidden;
+  }
+}
+
+/* The clipping. */
+.stretch-otc__clipping {
+  align-content: start;
+  background-color: var(--stretch-page);
+}
+
+.stretch-story {
+  display: grid;
+  gap: 8px;
+}
+
+.stretch-story__figure {
+  margin: 0 0 4px;
+}
+
+.stretch-story__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+  border-radius: 6px;
+  background-color: var(--stretch-rule);
+  object-fit: cover;
+  filter: grayscale(0.35);
+}
+
+.stretch-story__figure figcaption {
+  margin-top: 6px;
+  color: var(--stretch-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.stretch-story__figure figcaption a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+.stretch-story__fact {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.stretch-story--lead .stretch-story__fact {
+  font-size: clamp(22px, 2.4vw, 26px);
+}
+
+.stretch-story__date {
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: 13px;
+}
+
+.stretch-more {
+  display: grid;
+  gap: 24px;
+}
+
+.stretch-more summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  text-transform: uppercase;
+}
+
+.stretch-more[open] > summary {
+  margin-bottom: 8px;
+}
+
+.stretch-more > .stretch-story {
+  padding-top: 24px;
+  border-top: 1px solid var(--stretch-rule);
+}
+
+@media (min-width: 761px) {
+  .stretch-otc {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: start;
+    gap: 40px 32px;
+  }
+
+  .stretch-otc__training {
+    grid-column: span 7;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    gap: 28px;
+  }
+
+  .stretch-otc__clipping {
+    grid-column: span 5;
+  }
+
+  .stretch-otc__book,
+  .stretch-otc__film {
+    grid-column: span 6;
+  }
+}
+
+/* ---- Now making and the GitHub year ---- */
+
+.stretch-now {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background-color: var(--stretch-cobalt);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .stretch-now {
+    animation: stretch-now-pulse 1.8s ease-in-out infinite;
+  }
+}
+
+@keyframes stretch-now-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--stretch-cobalt) 55%, transparent);
+  }
+  60% {
+    box-shadow: 0 0 0 7px transparent;
+  }
+}
+
+.stretch-gh__total {
+  margin: 0;
+}
+
+.stretch-gh__count {
+  font-size: clamp(40px, 5vw, 56px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.stretch-gh__beside {
+  color: var(--stretch-muted);
+  font-size: 16px;
+}
+
+.stretch-gh__readout {
+  margin: 0;
+  min-height: 1.4em;
+  color: var(--stretch-cobalt);
+  font-size: 13px;
+}
+
+/* The grid scrolls inside its card on phones, so the page never does. */
+.stretch-gh__scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding-bottom: 4px;
+}
+
+.stretch-gh__sheet {
+  position: relative;
+}
+
+@media (max-width: 760px) {
+  .stretch-gh__sheet {
+    min-width: 700px;
+  }
+}
+
+.stretch-gh__months,
+.stretch-gh__days {
+  display: grid;
+  grid-template-columns: repeat(var(--weeks), minmax(0, 1fr));
+  column-gap: 3px;
+}
+
+.stretch-gh__months {
+  margin-bottom: 6px;
+  color: var(--stretch-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.stretch-gh__days {
+  grid-template-rows: repeat(7, auto);
+  grid-auto-flow: column;
+  row-gap: 3px;
+}
+
+.stretch-gh__day {
+  display: block;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background-color: var(--stretch-rule);
+}
+
+.stretch-gh__day[data-level="1"] { background-color: color-mix(in srgb, var(--stretch-ink) 22%, var(--stretch-card)); }
+.stretch-gh__day[data-level="2"] { background-color: color-mix(in srgb, var(--stretch-ink) 42%, var(--stretch-card)); }
+.stretch-gh__day[data-level="3"] { background-color: color-mix(in srgb, var(--stretch-ink) 65%, var(--stretch-card)); }
+.stretch-gh__day[data-level="4"] { background-color: var(--stretch-ink); }
+.stretch-gh__day[data-today] { background-color: var(--stretch-cobalt); }
+
+button.stretch-gh__day {
+  cursor: pointer;
+}
+
+button.stretch-gh__day[data-selected] {
+  outline: 2px solid var(--stretch-cobalt);
+  outline-offset: 1px;
+}
+
+.stretch-gh__stretch {
+  position: relative;
+  height: 32px;
+  margin-top: 8px;
+}
+
+.stretch-gh__bracket {
+  position: absolute;
+  top: 0;
+  height: 8px;
+  border: 2px solid var(--stretch-cobalt);
+  border-top: 0;
+  border-radius: 0 0 4px 4px;
+}
+
+.stretch-gh__note {
+  position: absolute;
+  top: 12px;
+  color: var(--stretch-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.stretch-gh__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
+  color: var(--stretch-muted);
+  font-size: 12px;
+}
+
+.stretch-gh__swipe {
+  display: none;
+}
+
+.stretch-gh__legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stretch-gh__legend .stretch-gh__day {
+  width: 12px;
+  height: 12px;
+}
+
+.stretch-gh__legend .stretch-gh__day[data-today] {
+  margin-left: 12px;
+}
+
+@media (max-width: 760px) {
+  .stretch-gh__swipe {
+    display: inline;
+  }
+}
+
+@media (min-width: 761px) {
+  .stretch-otc__making {
+    grid-column: span 12;
+  }
+
+  .stretch-otc__github {
+    grid-column: span 12;
+  }
+}
+
+@media (min-width: 1100px) {
+  .stretch-otc__making {
+    grid-column: span 5;
+  }
+
+  .stretch-otc__github {
+    grid-column: span 7;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stretch-otc__print,
+  .stretch-otc__photo img {
+    transition: none;
+  }
+}
+
+/* ---- Where I've been: the career ruler ---- */
+
+.stretch-ruler {
+  display: grid;
+  gap: 32px;
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stretch-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 6px;
+  padding-left: 28px;
+  border-left: 2px solid var(--stretch-rule);
+}
+
+/* The node on the ruler. */
+.stretch-stage::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: -7px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--stretch-ink);
+  border-radius: 50%;
+  background-color: var(--stretch-page);
+}
+
+.stretch-stage[data-current="true"] {
+  border-left-color: var(--stretch-cobalt);
+}
+
+.stretch-stage[data-current="true"]::before {
+  border-color: var(--stretch-cobalt);
+  background-color: var(--stretch-cobalt);
+}
+
+.stretch-stage__dates {
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.stretch-stage[data-current="true"] .stretch-stage__dates,
+.stretch-stage[data-current="true"] .stretch-stage__role {
+  color: var(--stretch-cobalt);
+}
+
+.stretch-stage__role {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.stretch-stage__org {
+  margin: 4px 0 0;
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.stretch-stage__notes,
+.stretch-stage__milestones {
+  max-width: 60ch;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.stretch-stage__notes li + li {
+  margin-top: 8px;
+}
+
+.stretch-stage__when {
+  color: var(--stretch-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.stretch-milestone {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  margin-top: 8px;
+}
+
+.stretch-milestone__mark {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background-color: var(--stretch-cobalt);
+  transform: translateY(-1px) rotate(45deg);
+}
+
+@media (min-width: 761px) {
+  .stretch-stage {
+    grid-template-columns: 200px minmax(0, 1fr);
+    column-gap: 32px;
+  }
+
+  .stretch-stage__dates {
+    padding-top: 2px;
+  }
+}
+
+/* ---- Say hello: the big link, the line and the three links ---- */
+
+.stretch-hello {
+  display: grid;
+  justify-items: start;
+  gap: 24px;
+  margin-top: 40px;
+}
+
+/* The one cobalt block: a tall slab of a link with a 44 px+ target at every width. */
+.stretch-hello__big {
+  display: inline-flex;
+  align-items: center;
+  min-height: 72px;
+  padding: 12px 28px;
+  border-radius: 999px;
+  background-color: var(--stretch-cobalt);
+  color: var(--stretch-on-cobalt);
+  font-size: clamp(36px, 8vw, 72px);
+  line-height: 1;
+  text-decoration: none;
+}
+
+.stretch-hello__line {
+  max-width: 60ch;
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+.stretch-hello__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stretch-hello__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding-inline: 18px;
+  border: 1px solid var(--stretch-ink);
+  border-radius: 999px;
+  color: var(--stretch-ink);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.stretch-hello__link:hover {
+  background-color: var(--stretch-ink);
+  color: var(--stretch-page);
+}
+
+/* ---- Case study: the opening band, section links, reading column and Next project ---- */
+
+/* The project's own colours arrive as --cs-* on the element that owns them. */
+.stretch-cs-home {
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.stretch-cs-open {
+  background-color: var(--cs-field);
+  color: var(--cs-ink);
+  border-bottom: 1px solid var(--stretch-tile-edge);
+}
+
+/* Cobalt would sink into the project's dark field, so its focus ring there is the project's ink. */
+[data-stretch-shell] .stretch-cs-open :focus-visible {
+  outline-color: var(--cs-ink);
+}
+
+.stretch-cs-open__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
+  padding-block: 16px 48px;
+}
+
+.stretch-cs-back {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--cs-ink);
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.stretch-cs-open__text {
+  min-width: 0;
+}
+
+.stretch-cs-open__number {
+  margin: 0;
+  font-size: 64px;
+  line-height: 0.9;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--cs-swatch);
+}
+
+.stretch-cs-open__name {
+  margin: 10px 0 0;
+  font-size: clamp(56px, 13vw, 128px);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+
+.stretch-cs-open__outcome {
+  max-width: 28ch;
+  margin: 20px 0 0;
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.stretch-cs-open__meta {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.stretch-cs-open__meta + .stretch-cs-open__meta {
+  margin-top: 4px;
+}
+
+.stretch-cs-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.stretch-cs-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding-inline: 22px;
+  border: 2px solid var(--cs-ink);
+  border-radius: 999px;
+  color: var(--cs-ink);
+  font-size: 17px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.stretch-cs-button--solid {
+  border-color: var(--cs-swatch);
+  background-color: var(--cs-swatch);
+  color: var(--cs-field);
+}
+
+.stretch-cs-button:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.stretch-cs-open__note {
+  max-width: 44ch;
+  margin: 14px 0 0;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.stretch-cs-open__shot {
+  min-width: 0;
+  align-self: center;
+  border-radius: 12px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+}
+
+.stretch-cs-open__shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  border-radius: 12px;
+  object-fit: cover;
+  object-position: top left;
+}
+
+@media (min-width: 761px) {
+  .stretch-cs-open__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    column-gap: 56px;
+    padding-bottom: 64px;
+  }
+
+  .stretch-cs-back {
+    grid-column: 1 / -1;
+  }
+}
+
+/* The row of section links: neutral, wrapping, every target 44 px tall. */
+.stretch-cs-links-row {
+  border-bottom: 1px solid var(--stretch-rule);
+}
+
+.stretch-cs-links-row ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 8px;
+  margin: 0 auto;
+  padding-block: 8px;
+  list-style: none;
+}
+
+.stretch-cs-links-row a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding-inline: 12px;
+  border-radius: 999px;
+  color: var(--stretch-ink);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.stretch-cs-links-row a span {
+  color: var(--stretch-muted);
+  font-size: 13px;
+}
+
+.stretch-cs-links-row a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+/* The reading column is about 720 px; figures and the evidence strip use the wider box. */
+.stretch-cs-body {
+  max-width: 1080px;
+  padding-block: 24px 0;
+}
+
+.stretch-cs-section {
+  padding-top: 56px;
+}
+
+.stretch-cs-section__text {
+  max-width: 720px;
+}
+
+.stretch-cs-kicker {
+  margin: 0 0 12px;
+  color: var(--stretch-muted);
+  font-size: 13px;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.stretch-cs-h2 {
+  margin: 0;
+  font-size: clamp(30px, 4.5vw, 44px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.stretch-cs-p {
+  margin: 20px 0 0;
+  font-size: 19px;
+  line-height: 1.55;
+}
+
+.stretch-cs-points {
+  display: grid;
+  gap: 18px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stretch-cs-points li {
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+.stretch-cs-lead {
+  font-style: italic;
+  font-weight: 700;
+}
+
+/* The PRD card reuses How I work's card; here it sits in the reading column, with the evidence beside or below. */
+.stretch-cs-prd-group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  margin-top: 32px;
+}
+
+.stretch-cs-prd {
+  grid-column: auto;
+  grid-row: auto;
+  max-width: 720px;
+  margin: 14px 0 0;
+}
+
+.stretch-cs-prd__around {
+  margin: 12px 0;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.stretch-cs-prd .stretch-prd__quote {
+  margin-block: 12px;
+}
+
+.stretch-cs-evidence {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-block: 1px solid var(--stretch-rule);
+}
+
+.stretch-cs-evidence li {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 16px 20px 0;
+  border-bottom: 1px solid var(--stretch-rule);
+}
+
+.stretch-cs-evidence li:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.stretch-cs-evidence__value {
+  font-size: clamp(44px, 9vw, 72px);
+  line-height: 0.95;
+  overflow-wrap: anywhere;
+}
+
+.stretch-cs-evidence__label {
+  color: var(--stretch-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+@media (min-width: 761px) {
+  .stretch-cs-evidence {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .stretch-cs-evidence li {
+    border-bottom: 0;
+    padding-block: 24px;
+  }
+
+  .stretch-cs-evidence li + li {
+    padding-left: 24px;
+    border-left: 1px solid var(--stretch-rule);
+  }
+}
+
+/* A wide figure, framed in the project's colour. */
+.stretch-cs-figure {
+  margin: 40px 0 0;
+}
+
+.stretch-cs-figure__frame {
+  padding: 12px;
+  border: 1px solid var(--stretch-tile-edge);
+  border-radius: 20px;
+  background-color: var(--cs-field);
+}
+
+@media (min-width: 761px) {
+  .stretch-cs-figure__frame {
+    padding: 24px;
+  }
+}
+
+.stretch-cs-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.stretch-cs-figure figcaption {
+  margin-top: 12px;
+  color: var(--stretch-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* The Next-project tile: the next study in its own colours. */
+.stretch-cs-next {
+  max-width: 1080px;
+  padding-top: 80px;
+}
+
+.stretch-cs-next__tile {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  min-height: 44px;
+  padding: 28px 24px;
+  border: 1px solid var(--stretch-tile-edge);
+  border-radius: 24px;
+  background-color: var(--cs-field);
+  color: var(--cs-ink);
+  text-decoration: none;
+}
+
+.stretch-cs-next__label {
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.stretch-cs-next__number {
+  font-size: 56px;
+  line-height: 0.9;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--cs-swatch);
+}
+
+.stretch-cs-next__name {
+  font-size: clamp(36px, 6vw, 56px);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.stretch-cs-next__outcome {
+  max-width: 36ch;
+  font-size: 19px;
+  line-height: 1.3;
+}
+
+.stretch-cs-next__arrow {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.stretch-cs-next__tile:hover .stretch-cs-next__name {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 6px;
+}
+
+@media (min-width: 761px) {
+  .stretch-cs-next__tile {
+    padding: 40px;
+  }
+}
+
+/* ---- Work archive: /work, the full Project index with filters above ten projects ---- */
+
+.stretch-archive .stretch-index {
+  margin-top: 40px;
+}
+
+.stretch-archive__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 32px;
+}
+
+.stretch-archive__filter {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--stretch-rule);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--stretch-ink);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.stretch-archive__filter:is(:hover, :focus-visible) {
+  border-color: var(--stretch-ink);
+}
+
+.stretch-archive__filter[aria-pressed="true"] {
+  border-color: var(--stretch-ink);
+  background-color: var(--stretch-ink);
+  color: var(--stretch-page);
+}
+
+.stretch-archive__filters + .stretch-index {
+  margin-top: 24px;
+}
+
+/* Read out by assistive technology when a filter changes the list; never seen. */
+.stretch-archive__count {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- The 404: a heading, one line and a way home ---- */
+
+.stretch-404 {
+  padding-block: 96px 0;
+}
+
+.stretch-404__line {
+  max-width: 34rem;
+  margin: 24px 0 0;
+  color: var(--stretch-muted);
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.stretch-404__home {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-top: 24px;
+  color: var(--stretch-ink);
+  font-size: 20px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}

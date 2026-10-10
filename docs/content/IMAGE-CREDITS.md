@@ -2,6 +2,9 @@
 
 The launch imagery is bundled locally so the site does not depend on third-party image CDNs.
 
-- `public/signals/london-st-pauls.jpg` — “St Paul's Cathedral ^ The City”, photographed by The Carlisle Kid, Wikimedia Commons, [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/), [source](https://commons.wikimedia.org/wiki/File:St_Paul%27s_Cathedral_%5E_The_City_-_geograph.org.uk_-_3706689.jpg).
-- `public/signals/football-stadium.jpg` — “Clark Construction - FEDEX Field (Jack Kent Cooke Stadium) Looking NW”, photographed by Duane Lempke, Wikimedia Commons, [CC0](https://creativecommons.org/publicdomain/zero/1.0/), [source](https://commons.wikimedia.org/wiki/File:Clark_Construction_-_FEDEX_Field_(Jack_Kent_Cooke_Stadium)_Looking_NW.jpg).
-- `public/profile/elias.webp` — personal photograph of Elias Bennett, supplied by Elias.
+- `public/profile/elias.webp` and `public/profile/elias-evening.webp` — personal photographs of Elias Bennett, supplied by Elias. The second is the homepage portrait.
+- `public/signals/running-central-london.webp` — personal photograph of Elias Bennett running in central London, supplied by Elias. Shown on the training poster in Off the clock.
+- `public/work/` and `public/projects/` — screenshots of Elias's own projects (Threshold, Argus Risk, Flowtime, Home Secretary, Risk Event Tracker, Ask Professor Past), taken from the projects' own interfaces or their repositories' documentation.
+- `docs/screenshots/` and `docs/dogfood-reports/*/` — screenshots of this site, used in the README and in review reports.
+- Book covers (Goodreads) and film posters (Letterboxd) are the publishers' and distributors' artwork, loaded from the sources' own image hosts and not bundled; each links back to its source.
+- Images on the Weekly Curiosity are loaded from Wikimedia Commons and credited where they appear, with the creator and licence linked from each picture.

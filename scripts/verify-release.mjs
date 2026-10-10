@@ -4,9 +4,9 @@ import process from "node:process";
 import { setTimeout as delay } from "node:timers/promises";
 
 const compatibilityRedirects = new Map([
-  ["/about", "/#about"],
-  ["/library", "/#outside-work"],
-  ["/lab", "/#outside-work"],
+  ["/about", "/#where-ive-been"],
+  ["/library", "/#off-the-clock"],
+  ["/lab", "/#off-the-clock"],
 ]);
 
 const canonicalPages = [
@@ -36,7 +36,7 @@ const expectedWorkSocialCards = new Map([
   ["/work/flowtime", {
     title: "Flowtime · Elias Bennett",
     image: "/work/flowtime/timer.jpg",
-    alt: "Flowtime focus timer interface",
+    alt: "Flowtime focus timer showing 00:00:00 and a Start Focus Session button",
   }],
 ]);
 const expectedIndexableRobots = [
@@ -44,7 +44,7 @@ const expectedIndexableRobots = [
   ["host: https://www.eliasb.dev", "sitemap: https://www.eliasb.dev/sitemap.xml"],
 ];
 
-const requiredHomepageSections = ["work", "outside-work", "about", "contact"];
+const requiredHomepageSections = ["work", "how-i-work", "where-ive-been", "off-the-clock", "say-hello"];
 const failures = [];
 let checkCount = 0;
 
@@ -180,25 +180,20 @@ function verifyHomepage(markup) {
   const fullOpening = "I build everyday software, and make complicated things feel simple.";
   const headlineContent = markup.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? "";
   equal(plainText(headlineContent), fullOpening, "Homepage headline should be one complete, server-rendered sentence");
-  check(!/data-home-opening/.test(markup), "Homepage content should never wait for the opening");
-  check(!/Replay the opening/i.test(markup), "Homepage should not expose an opening replay control");
+  // The entrance holds the page only after its guard script has run in a browser.
+  check(!/data-entering/.test(markup), "Homepage content should never wait for the entrance in the server HTML");
+  check(/Elias\s+Bennett/.test(plainText(markup)), "Homepage should carry the name as plain text");
 
-  const top = tags(markup, "div").find((tag) => attribute(tag, "id") === "top");
-  check(top, "Homepage should expose #top as a focusable anchor target");
-  equal(attribute(top ?? "", "tabindex"), "-1", "#top should accept keyboard navigation focus");
-
-  const nav = markup.match(/<nav aria-label="Primary navigation">([\s\S]*?)<\/nav>/i)?.[1] ?? "";
+  const nav = markup.match(/<nav aria-label="Primary navigation"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] ?? "";
   const navHrefs = hrefs(nav).map(({ href }) => href);
-  equal(navHrefs.join("|"), "#work|#outside-work|#about", "Homepage primary navigation targets");
+  equal(navHrefs.join("|"), "#work|#how-i-work|#where-ive-been|#off-the-clock|#say-hello", "Homepage primary navigation targets");
   const navLabels = [...nav.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/gi)].map(([, content]) => plainText(content));
-  equal(navLabels.join("|"), "Work|Library|About", "Homepage primary navigation labels");
-  check(!/class="scroll-progress"/.test(markup), "Homepage should not render the retired scroll progress bar");
+  equal(navLabels.join("|"), "Work|How I work|Where I’ve been|Off the clock|Say hello", "Homepage primary navigation labels");
 
   const pageIds = ids(markup);
   for (const sectionId of requiredHomepageSections) {
     const section = tags(markup, "section").find((tag) => attribute(tag, "id") === sectionId);
     check(section, `Homepage should expose #${sectionId} as a semantic section`);
-    equal(attribute(section ?? "", "tabindex"), "-1", `#${sectionId} should accept keyboard navigation focus`);
     const labelledBy = attribute(section ?? "", "aria-labelledby");
     check(Boolean(labelledBy && pageIds.has(labelledBy)), `#${sectionId} should reference an existing heading`);
   }
@@ -207,132 +202,47 @@ function verifyHomepage(markup) {
     check(pageIds.has(href.slice(1)), `Homepage anchor ${href} should resolve to an element`);
   }
 
-  const outsideWorkTitle = markup.match(/<h2\b[^>]*\bid="outside-work-title"[^>]*>([\s\S]*?)<\/h2>/i)?.[1] ?? "";
-  equal(plainText(outsideWorkTitle), "Some of what I’m into lately.", "Homepage #outside-work-title rendered text");
-  const aboutStart = markup.lastIndexOf("<", markup.indexOf('id="about"'));
-  const contactStart = markup.lastIndexOf("<", markup.indexOf('id="contact"'));
-  const aboutSection = aboutStart >= 0 && contactStart > aboutStart ? markup.slice(aboutStart, contactStart) : "";
-  check(Boolean(aboutSection), "Homepage should render its About section before Contact");
-  // About: the story from the source note, five stops on the string, the grey-jumper photo.
-  const aboutText = plainText(aboutSection);
-  check(aboutText.includes("03 / About"), "About should be section 03, with Experiments gone");
-  check(aboutText.startsWith("03 / About A bit about me. I studied history at university."), "About should open with history");
-  check(aboutText.includes("a Greggs campaign"), "About should name the Greggs campaign, as approved");
-  check(!/_nology|Optegra|Joveen/i.test(aboutText), "The bootcamp and earlier employers stay unnamed in the story");
-  const stops = [...aboutSection.matchAll(/<li\b[^>]*data-stop="(\d)"[^>]*>([\s\S]*?)<\/li>/gi)].map(([, stop, body]) => `${stop} ${plainText(body)}`);
-  equal(stops.length, 5, "About should pin five stops on the string");
-  check(/^1 .*History at uni/.test(stops[0] ?? "") && /^5 .*BNP Paribas, today/.test(stops[4] ?? ""), "The stops should run from history to BNP Paribas");
-  check(aboutText.includes("“I need that feeling from what I do.”"), "The speech bubble should quote the source word for word");
-  check(tags(aboutSection, "img").some((tag) => attribute(tag, "alt") === "Elias smiling in a grey jumper outside a stone building on a sunny day"), "About should show the grey-jumper photo");
-  check(!/career-employer|about-contact-cta|Career path/.test(aboutSection), "The career timeline and About's contact shortcut are gone");
-  check(!markup.includes('id="experiments"'), "The Experiments section is gone; Making is on the Board");
-  const contactEnd = markup.indexOf("<footer", contactStart);
-  const contactSection = contactStart >= 0 && contactEnd > contactStart ? markup.slice(contactStart, contactEnd) : "";
-  check(Boolean(contactSection), "Homepage should render its Contact section before the footer");
-  check(!/<img\b/i.test(contactSection), "Contact should keep its visual focus on ways to connect");
-  // Contact: the postcard is the email link; the CV, GitHub and LinkedIn are pinned cards, in that order.
-  check(plainText(contactSection).includes("04 / Contact"), "Contact should be section 04");
-  const contactHeading = contactSection.match(/<h2\b[^>]*id="contact-title"[^>]*>([\s\S]*?)<\/h2>/i)?.[1] ?? "";
-  equal(plainText(contactHeading), "Say hello", "Contact's heading should say hello");
-  const emailAction = hrefs(contactSection).find(({ href }) => href?.startsWith("mailto:"));
-  check(emailAction, "Contact should keep the email action");
-  equal(attribute(emailAction?.tag ?? "", "aria-label"), "Email me at eliasthebennett@gmail.com", "The postcard should be named as the email link");
-  check(plainText(contactSection).includes("Wish you were here."), "The postcard should carry its message");
-  const cards = [...contactSection.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].filter(([, tag]) => attribute(tag, "target") === "_blank");
-  equal(cards.map(([, , body]) => plainText(body).split(" ")[0]).join("|"), "Résumé|GitHub|LinkedIn", "The cards should be the CV, GitHub and LinkedIn, in that order");
-  for (const [, tag, body] of cards) {
-    check((attribute(tag, "rel") ?? "").split(/\s+/).includes("noreferrer"), `${plainText(body)} should keep safe external-link attributes`);
-  }
+  const text = plainText(markup);
+  check(text.includes("Off the clock") && text.includes("Now making"), "Homepage should show Off the clock with Now making");
+
+  // Say hello: the email is the big link; the résumé, GitHub and LinkedIn follow, in that order.
+  const helloStart = markup.indexOf('id="say-hello"');
+  const helloEnd = markup.indexOf("<footer", helloStart);
+  const helloSection = helloStart >= 0 && helloEnd > helloStart ? markup.slice(helloStart, helloEnd) : "";
+  check(Boolean(helloSection), "Homepage should render Say hello before the footer");
+  const emailAction = hrefs(helloSection).find(({ href }) => href?.startsWith("mailto:"));
+  check(emailAction, "Say hello should keep the email action");
+  equal(emailAction?.href, "mailto:eliasthebennett@gmail.com", "The email action should write to Elias");
+  const cards = [...helloSection.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].filter(([, tag]) => attribute(tag, "target") === "_blank");
+  equal(cards.map(([, , body]) => plainText(body).split(" ")[0]).join("|"), "Résumé|GitHub|LinkedIn", "The links should be the résumé, GitHub and LinkedIn, in that order");
   const footer = markup.slice(markup.indexOf("<footer"), markup.indexOf("</footer>"));
-  equal(plainText(footer), "Made by Elias", "The footer should be the frame's edge and my signature");
-  check(!plainText(markup).toLowerCase().includes("science fiction"), "Homepage should omit a standalone science-fiction category");
+  equal(plainText(footer), "Made by Elias", "The footer should be my signature");
+
   check(markup.includes('href="/work"'), "Homepage should link to the complete Work archive");
   check(markup.includes('href="/work/threshold"'), "Homepage should link to the Threshold case study");
   check(markup.includes('href="/work/argus-risk"'), "Homepage should link to the Argus Risk case study");
   check(markup.includes('href="/work/flowtime"'), "Homepage should link to the Flowtime case study");
 
   const imageTags = tags(markup, "img");
-  check(imageTags.length >= 8, "Homepage should render the authored imagery and signal imagery");
+  check(imageTags.length >= 5, "Homepage should render its portrait, project and signal imagery");
   check(imageTags.every((tag) => attribute(tag, "alt") !== null), "Every homepage image should declare alternative text");
-  check(markup.includes("Threshold landing page showing rental affordability"), "Threshold imagery should have meaningful alternative text");
-  check(markup.includes("London skyline from the Thames"), "London imagery should have meaningful alternative text");
-  check(tags(markup, "img").some((tag) => (attribute(tag, "srcset") ?? "").includes("/_next/image")), "Homepage imagery should use responsive Next Image sources");
+  check(markup.includes("Threshold landing page"), "Threshold imagery should have meaningful alternative text");
+  check(imageTags.some((tag) => (attribute(tag, "srcset") ?? "").includes("/_next/image")), "Homepage imagery should use responsive Next Image sources");
 
-  // The cassette player is a facade: Spotify's player loads only when Play is pressed.
-  check(!/open\.spotify\.com\/embed/.test(markup), "Spotify's player should load only when Play is pressed");
-  check(tags(markup, "button").some((tag) => attribute(tag, "aria-label") === "Play my playlist on Spotify"), "The cassette player should have a named Play button");
-  const spotifyLink = hrefs(markup).find(({ href }) => href?.includes("open.spotify.com/playlist/"));
-  check(spotifyLink, "Homepage should expose a direct Spotify fallback link");
-  check(markup.includes("Open in Spotify"), "Spotify fallback link should be visibly labelled");
-
-  // The GitHub year is up only with a full year of data; when it is, it's 365 day buttons with tags.
-  const github = markup.match(/data-board-pin="github"([\s\S]*)$/i)?.[1] ?? "";
-  if (markup.includes('data-board-pin="github"')) {
-    equal((github.match(/class="board-github-day"/g) ?? []).length, 365, "The GitHub sheet should hold exactly 365 days");
-    check(/aria-label="(?:Nothing|\d+ contributions?) on [A-Z][a-z]{2} \d{1,2} [A-Z][a-z]{2,4}"/.test(github), "Each GitHub day should say its count and date");
-    check(/GitHub contributions over the past year: [\d,]+/.test(github), "The GitHub sheet should be named with its total");
-    check(!/\b3ixas\/[\w.-]+/.test(github), "The GitHub sheet should not expose repository details");
-  }
-  check(!/class="contribution-day"|signal-status|I couldn’t load GitHub/.test(markup), "The legacy GitHub card is gone");
-  // Making: the blueprint shows what I'm making now, or my latest public repository.
-  const making = markup.match(/data-board-pin="making"([\s\S]*?)data-board-pin=/i)?.[1] ?? "";
-  check(/(Now making|Latest on GitHub)/.test(plainText(making)), "The Making pin should say what I'm making, or show my latest repository");
-
-  const text = plainText(markup);
-  check(/Now reading/.test(text) && /(Goodreads|Between books)/.test(text), "The book pin should show the book from Goodreads, or say I'm between books");
-  check(/Admit one · Last watched/.test(text) && /(Letterboxd|Nothing logged yet)/.test(text), "The film ticket should show the film from Letterboxd, or say nothing is logged");
-  check(!/private contributions are part of the total|keep their repositories private/i.test(text), "GitHub output should omit the redundant private-repository explanation");
-  // Training: the running photo with my week as a plan, today marked once, and nothing from Strava.
-  const training = markup.match(/data-board-pin="training"([\s\S]*?)data-board-pin=/i)?.[1] ?? "";
-  check(plainText(training).includes("Out on a run, central London."), "The training pin should show the running photo's caption");
-  check(tags(training, "img").some((tag) => attribute(tag, "alt") === "Elias mid-run on a rainy street in central London"), "The running photo should describe itself");
-  check(/My training week, the plan\. Today, [A-Z][a-z]+day: /.test(plainText(training)), "The training plan should read once to screen readers, today first");
-  equal((training.match(/data-today="true"/g) ?? []).length, 1, "The training plan should mark exactly one day as today");
-  check(!/Strava|Typical week|My weekly training plan/.test(text), "Nothing on the homepage should come from Strava or the retired typical week");
-  // The Weekly Curiosity: three oddities as a clipping, sourced to readable pages.
-  // From the clipping's pin up to the next pin on the Board.
-  const clipping = markup.match(/data-board-pin="clipping"([\s\S]*?)data-board-pin=/i)?.[1] ?? "";
-  check(plainText(clipping).includes("The Weekly Curiosity"), "The clipping should carry its masthead");
-  const stories = [...clipping.matchAll(/<article\b[^>]*>([\s\S]*?)<\/article>/gi)].map(([, story]) => story);
-  equal(stories.length, 3, "The clipping should hold three oddities");
-  const storyYears = stories.map((story) => Number(plainText(story).match(/(\d{1,4})\s+Read (?:on Wikipedia|more)/)?.[1] ?? 0));
-  check(storyYears.every((year) => year > 0), "Each oddity should show its year");
-  check(new Set(storyYears.map((year) => Math.floor((year - 1) / 100))).size >= 3, "The oddities should span at least three centuries");
-  check(storyYears.some((year) => year < 1900), "The oddities should include one before 1900");
-  for (const story of stories) {
-    check(hrefs(story).some(({ href }) => href?.startsWith("https://")), "Each oddity should link directly to its source");
-    check(/Read (?:on Wikipedia|more)/.test(plainText(story)), "Each oddity's source link should have a clear label");
-    if (/<img\b/i.test(story)) {
-      const credits = hrefs(story);
-      check(/<img\b[^>]*alt="[^"]+"/i.test(story), "Each oddity's picture should have useful alternative text");
-      check(plainText(story).includes("Image:"), "Each oddity's picture should name its creator");
-      check(credits.some(({ href }) => href?.startsWith("https://commons.wikimedia.org/wiki/File:")), "Each oddity's picture should link to its Commons file record");
-      check(/(?:CC BY|CC0|Public domain|GFDL|Free Art License)/i.test(plainText(story)), "Each oddity's picture should display its reuse licence");
-    }
-  }
-  const daySource = hrefs(clipping).find(({ href }) => /^https:\/\/en\.wikipedia\.org\/wiki\/([A-Z][a-z]+_\d{1,2}|Portal:History)$/.test(href ?? ""));
-  check(daySource, "The clipping's source should be the readable Wikipedia page for the day");
-  check(!/api\/rest_v1/.test(clipping), "The clipping should never link to the feed's raw JSON");
-  check(["GitHub", "Goodreads", "Letterboxd", "Sleeper", "Wikimedia"].some((source) => text.includes(source)), "Signal cards should expose visible source wording");
+  // Nothing from the retired Board, or from the sources dropped before it.
+  check(!/data-board-|data-pin\b|board-surface|data-fixing/.test(markup), "No Board markup should remain on the homepage");
+  check(!/id="outside-work"|id="about"|id="contact"|id="experiments"/.test(markup), "The Board's section anchors are gone");
+  check(!/spotify/i.test(markup), "Nothing from Spotify should remain on the homepage");
+  check(!/sleeper|NFL fantasy/i.test(markup), "Nothing from Sleeper or fantasy football should remain on the homepage");
+  check(!/Strava|Typical week/.test(text), "Nothing on the homepage should come from Strava or the retired typical week");
   check(!/(ghp_|github_pat_|sk-[A-Za-z0-9]|STRAVA_CLIENT_SECRET)/i.test(text), "Rendered output must not contain credential-like values");
 
-
-  // The fantasy ticket is up only in season; when it is, it names my team and no one else.
-  const fantasyAt = markup.indexOf('data-board-pin="fantasy"');
-  if (fantasyAt >= 0) {
-    const nextPin = markup.indexOf("data-board-pin=", fantasyAt + 1);
-    const fantasyText = plainText(markup.slice(fantasyAt, nextPin > 0 ? nextPin : undefined));
-    check(/NFL fantasy · Week\s\d+/.test(fantasyText), "The fantasy ticket should show the NFL week");
-    check(fantasyText.includes("a rival who shall remain nameless"), "The fantasy ticket should keep the opponent anonymous");
-    check(!/\b0\.00 – 0\.00\b/.test(fantasyText), "The fantasy ticket should never show a 0.00 – 0.00 new week");
+  for (const host of ["github.com"]) {
+    check(hrefs(markup).some(({ href }) => href?.includes(host)), `Homepage should retain a ${host} link`);
   }
-  check(!hrefs(markup).some(({ href }) => href?.includes("sleeper.com")), "Nothing should link to the Sleeper league, which names the league and its teams");
-
-  const sourceHosts = ["github.com", "goodreads.com", "letterboxd.com", "wikipedia.org"];
-  for (const host of sourceHosts) {
-    check(hrefs(markup).some(({ href }) => href?.includes(host)), `Homepage should retain a ${host} source link`);
-  }
-  for (const { tag, href } of hrefs(markup).filter(({ href }) => href?.startsWith("http"))) {
+  // Every external link, the project index rows included, opens in a new tab with noreferrer.
+  const external = hrefs(markup).filter(({ href }) => href?.startsWith("http"));
+  for (const { tag, href } of external) {
     check(attribute(tag, "target") === "_blank", `External link ${href} should open in a new browsing context`);
     check((attribute(tag, "rel") ?? "").split(/\s+/).includes("noreferrer"), `External link ${href} should carry noreferrer`);
   }
@@ -350,7 +260,7 @@ async function verifyRoutes(baseUrl, pages) {
 
   const retiredConcepts = await fetch(new URL("/concepts", baseUrl), { redirect: "manual" });
   equal(retiredConcepts.status, 404, "The retired /concepts design study should no longer exist");
-  const fixtures = await fetch(new URL("/fixtures/pins", baseUrl), { redirect: "manual" });
+  const fixtures = await fetch(new URL("/fixtures/off-the-clock", baseUrl), { redirect: "manual" });
   equal(fixtures.status, 404, "Test fixtures should not exist in production");
   await verifyNotFound(baseUrl);
 
@@ -363,42 +273,42 @@ async function verifyRoutes(baseUrl, pages) {
 
 async function verifyHomeSocialMetadata(baseUrl, document) {
   const title = "Elias Bennett, software engineer in London";
-  const description = "I’m Elias, a software engineer in London. I build everyday software, and make complicated things feel simple. Here’s my work, a few things I’m into, and how I got here.";
+  const description = "I’m Elias, a software engineer in London. I build everyday software, and make complicated things feel simple. Here’s my work, how I work, and what I’m up to.";
   equal(document.match(/<title>([^<]*)<\/title>/i)?.[1], title, "Homepage title");
   equal(metaContent(document, "description", "name"), description, "Homepage description");
   equal(metaContent(document, "og:title"), title, "Homepage Open Graph title");
   equal(metaContent(document, "og:site_name"), "Elias Bennett", "Open Graph site name");
-  equal(metaContent(document, "og:image:alt"), "A card pinned to a wall reading “I build everyday software, and make complicated things feel simple.”", "Homepage social image alternative text");
+  equal(metaContent(document, "og:image:alt"), "ELIAS BENNETT. I build everyday software, and make complicated things feel simple.", "Homepage social image alternative text");
   equal(metaContent(document, "twitter:title", "name"), title, "Homepage Twitter title");
 
   const ogImage = metaContent(document, "og:image");
-  check(ogImage?.includes("/opengraph-image"), "Homepage Open Graph image should be the pinned headline card");
+  check(ogImage?.includes("/opengraph-image"), "Homepage Open Graph image should be the headline card");
   if (ogImage) {
     const image = await fetch(new URL(new URL(ogImage).pathname + new URL(ogImage).search, baseUrl));
     equal(image.status, 200, "The social image should return 200");
     equal(image.headers.get("content-type"), "image/png", "The social image content type");
   }
-  check(metaContent(document, "twitter:image", "name")?.includes("/opengraph-image"), "Homepage Twitter image should be the pinned headline card");
+  check(metaContent(document, "twitter:image", "name")?.includes("/opengraph-image"), "Homepage Twitter image should be the headline card");
 
   const icon = tags(document, "link").find((tag) => attribute(tag, "rel") === "icon");
-  check(attribute(icon ?? "", "href")?.startsWith("/icon.svg"), "The favicon should be the pushpin SVG");
+  check(attribute(icon ?? "", "href")?.startsWith("/icon.svg"), "The favicon should be the cobalt E SVG");
   const iconSvg = await fetchAsset(baseUrl, "/icon.svg");
   check(iconSvg.includes("prefers-color-scheme: dark"), "The favicon should carry a dark-tab variant");
 }
 
 async function verifyNotFound(baseUrl) {
-  const { response, document, markup } = await fetchPage(baseUrl, "/nothing-pinned-here");
+  const { response, document, markup } = await fetchPage(baseUrl, "/nothing-here-at-all");
   equal(response.status, 404, "An unknown route should return 404");
   verifyPageShell(markup, "/404");
-  equal(document.match(/<title>([^<]*)<\/title>/i)?.[1], "Nothing pinned here · Elias Bennett", "404 title");
+  equal(document.match(/<title>([^<]*)<\/title>/i)?.[1], "Nothing here · Elias Bennett", "404 title");
   const robots = tags(document, "meta").filter((tag) => attribute(tag, "name") === "robots").map((tag) => attribute(tag, "content") ?? "");
   check(robots.length > 0 && robots.every((content) => /noindex/.test(content)), `Every robots tag on the 404 should say noindex (received ${JSON.stringify(robots)})`);
-  equal(metaContent(document, "og:title"), "Nothing pinned here · Elias Bennett", "The 404 should share under its own title, not the home page's");
+  equal(metaContent(document, "og:title"), "Nothing here · Elias Bennett", "The 404 should share under its own title, not the home page's");
   equal(metaContent(document, "og:url"), null, "The 404 should not claim the home page's URL when shared");
   const heading = markup.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? "";
-  equal(plainText(heading), "Something was pinned here.", "404 heading");
-  check(plainText(markup).includes("It’s been taken down, or it was never up. The rest of the board is still here."), "404 line");
-  check(hrefs(markup).some(({ tag, href }) => href === "/" && plainText(markup.slice(markup.indexOf(tag))).startsWith("Back to the board")), "The 404 should link back to the board");
+  equal(plainText(heading), "This page doesn’t exist.", "404 heading");
+  check(plainText(markup).includes("It’s moved, or it never did. Everything else is where you left it."), "404 line");
+  check(hrefs(markup).some(({ tag, href }) => href === "/" && plainText(markup.slice(markup.indexOf(tag))).startsWith("Back to the homepage")), "The 404 should link back to the homepage");
 }
 
 async function verifyWorkSocialMetadata(baseUrl, document, route) {

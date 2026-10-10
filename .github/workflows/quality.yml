@@ -43,6 +43,12 @@ jobs:
       - name: Verify signal contracts
         run: pnpm verify:signals
 
+      - name: Verify project catalogue
+        run: pnpm verify:catalogue
+
+      - name: Verify approved copy and case studies
+        run: pnpm verify:copy
+
       - name: Verify opening lifecycle
         run: pnpm verify:opening
 

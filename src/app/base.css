@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+/*
+ * What the whole site shares beneath the Stretch stylesheets: Tailwind's reset
+ * and its sr-only utility, the font families Tailwind reads, and the page-wide
+ * motion rules. Colours, type and layout live in stretch-tokens.css,
+ * stretch-type.css and stretch-shell.css.
+ */
+@theme inline {
+  --font-display: var(--font-bricolage), system-ui, sans-serif;
+  --font-sans: var(--font-bricolage), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+@layer base {
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /*
+   * With reduced motion, nothing animates or eases. While the theme changes
+   * the transitions stand down from this rule, so the quick fade in
+   * stretch-shell.css applies. As !important rules in an earlier layer, these
+   * win over the rest of the page's own.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+
+    :root:not([data-theme-changing]),
+    :root:not([data-theme-changing]) *,
+    :root:not([data-theme-changing]) *::before,
+    :root:not([data-theme-changing]) *::after {
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

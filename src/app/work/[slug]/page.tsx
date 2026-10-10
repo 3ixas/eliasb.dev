@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { CaseFilePage } from "@/components/board/case-file";
-import { caseFiles, caseFileSlugs, isCaseFileSlug } from "@/content/case-files";
+import { CaseStudyPage } from "@/components/site/case-study";
 import { pageTitle, siteName } from "@/content/site";
+import { projects } from "@/content/projects";
+import { caseStudyFor, caseStudySlugs } from "@/content/stretch/case-studies";
+import { caseStudyOpening } from "@/content/stretch/case-study";
 
 export function generateStaticParams() {
-  return caseFileSlugs.map((slug) => ({ slug }));
+  return caseStudySlugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
@@ -14,8 +16,10 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  if (!isCaseFileSlug(slug)) return {};
-  const { name, description, screenshot: image } = caseFiles[slug];
+  const study = caseStudyFor(slug);
+  if (!study) return {};
+  const { name, screenshot: image } = caseStudyOpening(study, projects);
+  const { description } = study;
   return {
     title: name,
     description,
@@ -48,6 +52,7 @@ export default async function WorkDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  if (!isCaseFileSlug(slug)) notFound();
-  return <CaseFilePage file={caseFiles[slug]} />;
+  const study = caseStudyFor(slug);
+  if (!study) notFound();
+  return <CaseStudyPage study={study} />;
 }
