@@ -3,10 +3,8 @@ import { notFound } from "next/navigation";
 import { CaseStudyPage } from "@/components/site/case-study";
 import { pageTitle, siteName } from "@/content/site";
 import { projects } from "@/content/projects";
-import { caseStudies } from "@/content/stretch/case-studies";
+import { caseStudyFor, caseStudySlugs } from "@/content/stretch/case-studies";
 import { caseStudyOpening } from "@/content/stretch/case-study";
-
-const caseStudySlugs = Object.keys(caseStudies);
 
 export function generateStaticParams() {
   return caseStudySlugs.map((slug) => ({ slug }));
@@ -18,8 +16,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  if (!Object.hasOwn(caseStudies, slug)) return {};
-  const study = caseStudies[slug];
+  const study = caseStudyFor(slug);
+  if (!study) return {};
   const { name, screenshot: image } = caseStudyOpening(study, projects);
   const { description } = study;
   return {
@@ -54,6 +52,7 @@ export default async function WorkDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  if (!Object.hasOwn(caseStudies, slug)) notFound();
-  return <CaseStudyPage study={caseStudies[slug]} />;
+  const study = caseStudyFor(slug);
+  if (!study) notFound();
+  return <CaseStudyPage study={study} />;
 }

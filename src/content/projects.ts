@@ -2,9 +2,10 @@
  * The project catalogue behind Work (docs/specs/STRETCH-REDESIGN-SPEC.md,
  * "Content model"; copy approved in docs/content/redesign-copy.md).
  *
- * To add a project, add one entry to `projects`. To change what is featured,
- * edit `featuredSlugs`: it is the one ordered list, up to three slugs, and the
- * Project index is everything else. A featured project needs a case study, a
+ * To add a project, add one entry to `projects`; its slug becomes a
+ * `ProjectSlug` by itself. To change what is featured, edit `featuredSlugs`: it
+ * is the one ordered list, up to three slugs (a misspelling does not compile),
+ * and the Project index is everything else. A featured project needs a case study, a
  * screenshot and its colours; `assertCatalogue` fails the build when it doesn't.
  *
  * This module has no runtime imports, so Node can load it directly (the
@@ -47,7 +48,7 @@ export type Project = {
  * Ties in `year` keep this order, so list the newer of two same-year projects
  * first. The colours and fasteners come from the chosen Stretch boards.
  */
-export const projects: readonly Project[] = [
+const entries = [
   {
     slug: "threshold",
     name: "Threshold",
@@ -157,10 +158,19 @@ export const projects: readonly Project[] = [
       height: 1000,
     },
   },
-];
+] as const satisfies readonly Project[];
+
+/** Every slug in the catalogue, read from the entries so adding one adds its slug. */
+export type ProjectSlug = (typeof entries)[number]["slug"];
+
+/** The projects that have a case study: the entries that link to one. */
+export type CaseStudySlug = Extract<(typeof entries)[number], { links: { caseStudy: string } }>["slug"];
+
+/** The catalogue as the general `Project` list that pages and checks read. */
+export const projects: readonly Project[] = entries;
 
 /** The featured projects, by slug, in the order they are shown. At most three. */
-export const featuredSlugs: readonly string[] = ["threshold", "argus-risk", "flowtime"];
+export const featuredSlugs: readonly ProjectSlug[] = ["threshold", "argus-risk", "flowtime"];
 
 export const MAX_FEATURED = 3;
 

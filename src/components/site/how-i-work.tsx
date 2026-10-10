@@ -9,8 +9,7 @@ import { howIWork } from "@/content/stretch/how-i-work";
  */
 export function HowIWork() {
   const { beats, honestLine, prdCaption } = howIWork;
-  const quote = caseStudies.threshold?.prd.quote;
-  if (!quote) throw new Error("How I work needs Threshold's PRD quote from its case study.");
+  const quote = caseStudies.threshold.prd.quote;
   return (
     <div className="stretch-how">
       <ol className="stretch-beats">

@@ -5,7 +5,7 @@
  * project catalogue, so they are kept in one place. `caseStudyOpening` joins
  * the two.
  */
-import type { Project, ProjectImage } from "../projects";
+import type { CaseStudySlug, Project, ProjectImage } from "../projects";
 
 /** The six sections, in the order they are read. */
 export const caseStudySectionKeys = [
@@ -67,7 +67,7 @@ export type EvidenceItem = { value: string; label: string };
 
 export type CaseStudy = {
   /** Matches the project's slug in the catalogue. */
-  slug: string;
+  slug: CaseStudySlug;
   /** The number on the opening, "01". */
   number: string;
   stack: readonly string[];
@@ -77,8 +77,8 @@ export type CaseStudy = {
   prd: PrdCard;
   /** At most four. */
   evidence: readonly EvidenceItem[];
-  /** The slug of the project that follows this one. */
-  next: string;
+  /** The slug of the case study that follows this one. */
+  next: CaseStudySlug;
   /** The page's meta description. */
   description: string;
 };

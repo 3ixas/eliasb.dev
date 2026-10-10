@@ -74,11 +74,8 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
 
 function nextProject(study: CaseStudy): { project: Project; colours: CaseStudyOpening["colours"]; number: string } {
   const project = projects.find((entry) => entry.slug === study.next);
-  const nextStudy = caseStudies[study.next];
-  if (!project?.colours || !nextStudy) {
-    throw new Error(`Case study "${study.slug}" ends with "${study.next}", which needs a project with colours and a case study.`);
-  }
-  return { project, colours: project.colours, number: nextStudy.number };
+  if (!project?.colours) throw new Error(`Case study "${study.slug}" ends with "${study.next}", which needs a project with colours.`);
+  return { project, colours: project.colours, number: caseStudies[study.next].number };
 }
 
 function Opening({ opening }: { opening: CaseStudyOpening }) {

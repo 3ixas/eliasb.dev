@@ -1,11 +1,11 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { projects } from "../src/content/projects";
-import { caseStudies } from "../src/content/stretch/case-studies";
+import { caseStudies, caseStudySlugs } from "../src/content/stretch/case-studies";
 import { caseStudySectionKeys, caseStudySectionLabels } from "../src/content/stretch/case-study";
 import { contrastOnPaper } from "./support/contrast";
 
-const slugs = Object.keys(caseStudies);
+const slugs = caseStudySlugs;
 
 const article = (page: Page, name: string) => page.getByRole("article", { name });
 

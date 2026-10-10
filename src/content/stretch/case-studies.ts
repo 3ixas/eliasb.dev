@@ -3,9 +3,11 @@
  * docs/content/redesign-copy.md ("Case studies"); the figures and their alt
  * text and captions are carried over from the Board's old case files.
  */
+import type { CaseStudySlug } from "../projects";
 import type { CaseStudy } from "./case-study";
 
-export const caseStudies: Record<string, CaseStudy> = {
+/** One study for every project that links to one: a missing or misspelt key does not compile. */
+export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
   threshold: {
     slug: "threshold",
     number: "01",
@@ -234,3 +236,10 @@ export const caseStudies: Record<string, CaseStudy> = {
       "A focus timer that counts up, sets breaks in proportion to your focus, and keeps your history on your device.",
   },
 };
+
+export const caseStudySlugs = Object.keys(caseStudies) as CaseStudySlug[];
+
+/** The one checked lookup for a slug that comes from a URL, which is untrusted text. */
+export function caseStudyFor(slug: string): CaseStudy | undefined {
+  return Object.hasOwn(caseStudies, slug) ? caseStudies[slug as CaseStudySlug] : undefined;
+}
