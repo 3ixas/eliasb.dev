@@ -66,8 +66,8 @@ One per physical-looking object (a tile, a card, the portrait), and never more. 
 
 - Springs for movement, short fades for state; the entrance and tile timings are in the spec.
 - Scroll sway uses CSS scroll-driven animations with a still fallback.
-- Theme changes crossfade over 1.2 s with `cubic-bezier(0.42, 0, 0.58, 1)`, or 0.2 s with reduced motion.
-- Reduced motion removes all movement and keeps 0.2 s fades. Content never waits for motion, apart from the entrance's guarded hold (ADR 0005).
+- Theme changes crossfade over 0.3 s with `cubic-bezier(0, 0, 0.38, 0.9)`, or switch instantly with reduced motion.
+- Reduced motion removes all movement and keeps 0.2 s fades, except theme changes which are instant. Content never waits for motion, apart from the entrance's guarded hold (ADR 0005).
 
 ## Phones
 

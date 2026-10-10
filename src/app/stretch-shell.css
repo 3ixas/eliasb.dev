@@ -65,16 +65,16 @@ html:has([data-stretch-shell]) body {
   padding-inline: var(--stretch-gutter);
 }
 
-/* ---- Theme change: a calm crossfade, a quick fade for reduced motion ---- */
+/* ---- Theme change: a prompt crossfade, instant for reduced motion ---- */
 
 :root {
-  --stretch-room-duration: 1.2s;
-  --stretch-room-ease: cubic-bezier(0.42, 0, 0.58, 1);
+  --stretch-room-duration: 0.3s;
+  --stretch-room-ease: cubic-bezier(0, 0, 0.38, 0.9);
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --stretch-room-duration: 0.2s;
+    --stretch-room-duration: 0s;
   }
 }
 

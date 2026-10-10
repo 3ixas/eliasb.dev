@@ -5,9 +5,10 @@
  * and sets data-theme and data-lights, so the page never paints in the wrong
  * theme.
  *
- * Every change marks the document as changing (data-theme-changing) before
- * the theme flips, so the stylesheet crossfades it even when the device
- * setting causes it. The browser's toolbar colour follows the page.
+ * Changes mark the document as changing (data-theme-changing) before the
+ * theme flips, so the stylesheet crossfades even a device setting change.
+ * Reduced motion switches instantly. The browser's toolbar colour follows
+ * the page.
  *
  * No imports, and nothing runs at load, so the root layout can read the
  * constants below on the server.
@@ -34,8 +35,7 @@ export function syncToolbarColour(theme: Theme) {
   meta.content = TOOLBAR_COLOUR[theme];
 }
 
-const ROOM_CHANGE_MS = 1200;
-const REDUCED_ROOM_CHANGE_MS = 200;
+const ROOM_CHANGE_MS = 300;
 const darkQuery = "(prefers-color-scheme: dark)";
 
 /**
@@ -85,10 +85,14 @@ function markRoomChanging() {
   const root = document.documentElement;
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   window.clearTimeout(changeTimer);
+  if (reduced) {
+    delete root.dataset.themeChanging;
+    return;
+  }
   root.dataset.themeChanging = "";
   changeTimer = window.setTimeout(
     () => delete root.dataset.themeChanging,
-    (reduced ? REDUCED_ROOM_CHANGE_MS : ROOM_CHANGE_MS) + 100,
+    ROOM_CHANGE_MS + 100,
   );
 }
 

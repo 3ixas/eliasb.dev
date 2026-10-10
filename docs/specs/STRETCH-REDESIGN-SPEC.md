@@ -65,7 +65,7 @@ A from-scratch front end in the **Stretch direction**, keeping the existing data
 32. As a visitor, I want the site to follow my device's light or dark setting, so that it feels native.
 33. As a visitor, I want a "Lights on / Lights off" pill to switch the theme and remember my choice, so that I stay in control.
 34. As a visitor, I want the theme never to flash the wrong colours on load, so that the page feels solid.
-35. As a visitor, I want switching the lights to crossfade calmly over 1.2 seconds, or 0.2 seconds with reduced motion, so that it feels like light.
+35. As a visitor, I want switching the lights to crossfade promptly over 0.3 seconds, or switch instantly with reduced motion, so that it feels responsive.
 36. As a visitor in dark mode, I want project tiles to keep a visible edge, so that they don't merge into the page.
 
 **Visitors: navigation and mobile**
@@ -156,9 +156,9 @@ rest of the page  fade 0.5 s when the name and portrait settle
 - **Index rows:** cobalt plus an arrow nudge on hover or focus.
 - **Now making:** the dot pulses.
 - **The clock** just ticks.
-- **Reduced motion:** removes all movement and keeps 0.2 s fades.
+- **Reduced motion:** removes all movement and keeps 0.2 s fades, except theme changes which are instant.
 
-**Theme:** the existing controller's behaviour carries over: system or remembered preference, a pre-paint boot script, and choosing the device's theme returns to following the device. The control becomes the "Lights on / Lights off" pill: a button whose pressed state means "on". The theme crossfades over 1.2 s with `cubic-bezier(0.42,0,0.58,1)`. Registered colour tokens animate once on the root, so surfaces and inherited text use the same frame rather than cascading descendant transitions. The browser's toolbar colour follows the page background. Fastener tape is more transparent in dark.
+**Theme:** the existing controller's behaviour carries over: system or remembered preference, a pre-paint boot script, and choosing the device's theme returns to following the device. The control becomes the "Lights on / Lights off" pill: a button whose pressed state means "on". The theme crossfades over 0.3 s with `cubic-bezier(0,0,0.38,0.9)` and switches instantly with reduced motion. Registered colour tokens animate once on the root, so surfaces and inherited text use the same frame rather than cascading descendant transitions. The browser's toolbar colour follows the page background. Fastener tape is more transparent in dark.
 
 **Phones (below about 760 px)**
 - **Header:** Lights and Menu only, with a full-screen menu dialog. The clock lives in that dialog.

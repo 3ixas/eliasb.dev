@@ -130,8 +130,8 @@ test.describe("Lights and theme", () => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     await page.emulateMedia({ reducedMotion: "no-preference" });
-    // The crossfade lasts 1.2 s, and under load a round trip to the page can
-    // take as long, so read the page in the task that flips the theme.
+    // The crossfade lasts only 300 ms, so read animations in the task
+    // that flips the theme rather than after a round trip under load.
     await page.evaluate(() => {
       const root = document.documentElement;
       (window as unknown as { fading: Promise<number> }).fading = new Promise((resolve) => {
@@ -155,7 +155,7 @@ test.describe("Lights and theme", () => {
     await expect(pill(page)).toHaveCSS("outline-style", "solid");
   });
 
-  test("the page fades over 1.2 s, and settles afterwards", async ({ page }) => {
+  test("the page fades over 300 ms with a prompt start, and settles afterwards", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     await page.emulateMedia({ reducedMotion: "no-preference" });
@@ -170,21 +170,29 @@ test.describe("Lights and theme", () => {
         timing: read("html").transitionTimingFunction,
       };
     });
-    expect(during.palette).toBe("1.2s");
+    expect(during.palette).toBe("0.3s");
     expect(during.heading).toBe("0s");
-    expect(during.timing).toBe("cubic-bezier(0.42, 0, 0.58, 1)");
+    expect(during.timing).toBe("cubic-bezier(0, 0, 0.38, 0.9)");
     await expect(palette).toHaveCSS("transition-duration", "0s", { timeout: 3000 });
   });
 
-  test("with reduced motion the page crossfades in 200 ms", async ({ page }) => {
+  test("with reduced motion both theme changes are instant", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
     await page.goto("/");
-    // The window is short, so click and read in the same task.
-    const during = await page.evaluate(() => {
-      document.querySelector<HTMLButtonElement>("[data-lights-pill]")!.click();
-      return getComputedStyle(document.documentElement).transitionDuration;
-    });
-    expect(during).toBe("0.2s");
+    for (const target of ["rgb(13, 13, 18)", "rgb(251, 251, 248)"]) {
+      const during = await page.evaluate(() => {
+        document.querySelector<HTMLButtonElement>("[data-lights-pill]")!.click();
+        return {
+          duration: getComputedStyle(document.documentElement).transitionDuration,
+          background: getComputedStyle(document.body).backgroundColor,
+          animations: document.documentElement.getAnimations().length,
+        };
+      });
+      expect(during.duration).toBe("0s");
+      expect(during.background).toBe(target);
+      expect(during.animations).toBe(0);
+      await expect(page.locator("html")).not.toHaveAttribute("data-theme-changing", "");
+    }
   });
 
   test("inherited text follows the palette on every frame in both directions", async ({ page }) => {
@@ -194,9 +202,13 @@ test.describe("Lights and theme", () => {
     for (const target of ["rgb(241, 241, 244)", "rgb(17, 17, 20)"]) {
       const samples = await page.evaluate(async () => {
         document.querySelector<HTMLButtonElement>("[data-lights-pill]")!.click();
+        // Sample fixed animation times so a busy runner cannot miss the
+        // entire 300 ms fade between timer callbacks.
+        const animations = document.documentElement.getAnimations();
+        for (const animation of animations) animation.pause();
         const frames = [];
-        for (let i = 0; i < 5; i++) {
-          await new Promise<void>((resolve) => window.setTimeout(resolve, 150));
+        for (const time of [0, 75, 150, 225, 300]) {
+          for (const animation of animations) animation.currentTime = time;
           frames.push({
             ink: getComputedStyle(document.documentElement).getPropertyValue("--stretch-ink").trim(),
             colours: ["[data-stretch-shell]", "#work h2", ".stretch-beat__proof", ".stretch-prd__quote"].map(
@@ -204,6 +216,7 @@ test.describe("Lights and theme", () => {
             ),
           });
         }
+        for (const animation of animations) animation.play();
         return frames;
       });
       expect(new Set(samples.map((sample) => sample.ink)).size).toBeGreaterThan(1);
