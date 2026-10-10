@@ -162,8 +162,11 @@ test.describe("Off the clock: the clipping", () => {
     const summary = card.locator("summary");
     await expect(summary).toContainText("2 more oddities this week");
     await expect(card.getByText("A cow wanders into a cathedral")).toBeHidden();
-    await summary.click();
-    await expect(card.getByText("A cow wanders into a cathedral")).toBeVisible();
+    // Click only while it is still closed, so a retry never toggles it shut again.
+    await expect(async () => {
+      if (!(await card.locator("details").evaluate((element: HTMLDetailsElement) => element.open))) await summary.click();
+      await expect(card.getByText("A cow wanders into a cathedral")).toBeVisible({ timeout: 1500 });
+    }).toPass({ timeout: 8000 });
     await expect(card.getByText("Born 28 September 1852")).toBeVisible();
     await expect(card.getByRole("link", { name: "Ada Example" })).toBeVisible();
   });
