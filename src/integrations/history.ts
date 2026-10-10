@@ -88,18 +88,48 @@ export const HISTORY_FALLBACK_EVENTS: HistoryEvent[] = [
     kind: "event",
     text: "The first living creatures to ride in a balloon were a sheep, a duck and a rooster. All three survived the flight at Versailles.",
     sourceUrl: "https://airandspace.si.edu/collection-objects/experience-fait-versailles-le-19-sept-1783/nasm_A19680120000",
+    image: {
+      src: "/signals/history/montgolfier-balloon.webp",
+      alt: "An eighteenth-century illustration of a Montgolfier balloon, with its proportions and decoration",
+      creator: "Unknown artist",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:1783_balloonj.jpg",
+      licenseName: "Public domain",
+      licenseUrl: null,
+      width: 705,
+      height: 960,
+    },
   },
   {
     year: 1933,
     kind: "event",
     text: "Mexico’s Empresa Mexicana de Lucha Libre, now CMLL, was founded by Salvador Lutteroth.",
     sourceUrl: "https://cmll.com/historia/",
+    image: {
+      src: "/signals/history/cmll-wrestling.webp",
+      alt: "Atlantis in his blue and white mask at a CMLL event in Mexico City",
+      creator: "Alejandro Linares García",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:LuchaLibreObrera151.JPG",
+      licenseName: "CC BY-SA 3.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/",
+      width: 676,
+      height: 960,
+    },
   },
   {
     year: 2003,
     kind: "event",
     text: "NASA sent Galileo into Jupiter’s atmosphere, ending its 14-year mission and protecting Europa from a future impact.",
     sourceUrl: "https://www.jpl.nasa.gov/news/galileo-end-of-mission-status/",
+    image: {
+      src: "/signals/history/galileo.webp",
+      alt: "NASA illustration of the Galileo spacecraft passing Io, with Jupiter behind it",
+      creator: "NASA",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Artwork_Galileo-Io-Jupiter.JPG",
+      licenseName: "Public domain",
+      licenseUrl: null,
+      width: 960,
+      height: 772,
+    },
   },
 ];
 
@@ -453,6 +483,8 @@ export async function getHistorySignal(now = new Date()): Promise<HistorySignal>
       return image ? { ...event, image } : event;
     }));
     const events = withPicturedLead(illustrated);
+    // If Wikimedia has no usable pictures, show the illustrated saved facts.
+    if (!events.some((event) => event.image)) return savedHistorySignal();
 
     return {
       state: "live",

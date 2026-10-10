@@ -176,6 +176,17 @@ test.describe("Off the clock: the clipping", () => {
     await expect(card.locator(".stretch-otc__kicker")).toHaveText(offTheClock.curiosity.fallback);
     await expect(card.locator("[data-otc='clipping']")).toHaveAttribute("data-state", "archive");
     await expect(card.locator(".stretch-story--lead")).toBeVisible();
+    const leadImage = card.locator(".stretch-story--lead img");
+    await expect(leadImage).toBeVisible();
+    await leadImage.scrollIntoViewIfNeeded();
+    await expect.poll(() => leadImage.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
+    await card.locator("summary").click();
+    for (const image of await card.locator(".stretch-story img").all()) {
+      await expect(image).toBeVisible();
+      await image.scrollIntoViewIfNeeded();
+      await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
+    }
+    await expect(card.locator(".stretch-story img")).toHaveCount(3);
   });
 });
 

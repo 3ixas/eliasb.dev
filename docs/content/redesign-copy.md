@@ -68,7 +68,6 @@ The headline stays as it is (Elias, #113): the entrance is built around “*feel
 | **Write it down first.** | Before I build, I write down the problem, who it’s for, and what’s out of scope. Threshold had 57 user stories before any code. |
 | **Measure whether it works.** | I learned this in marketing, running split tests and conversion dashboards. At BNP Paribas I co-built a dashboard from users’ requirements that cut a 30–40 minute data load to under 5. |
 
-- Honest line: My own projects haven’t been launched or measured yet. The next ones I build, I’ll put in front of people.
 - PRD card caption: Threshold’s PRD, 16 April 2026
 
 ## Where I’ve been
@@ -80,8 +79,8 @@ The headline stays as it is (Elias, #113): the entrance is built around “*feel
 | --- | --- | --- |
 | Before 2021 | History at uni | Because I loved it, and I still do. |
 | Sep 2021 – Aug 2024 | Marketing Executive · Optegra Eye Healthcare & Kensington Medical | The best part was working with the engineers who built our website. · The click: a friend loved his work so much that even a hectic week sounded exciting. I wanted that from mine. *Early 2024* · Started coding in my spare time, just to see. *Early 2024* |
-| Aug 2024 – Jun 2025 | Full Stack Software Engineer · Joveen | All in: an e-commerce role, with a software engineering bootcamp alongside. |
-| Jul 2025 – now | Software Engineer · BNP Paribas CIB, through _nology | Market-data loaders and the pricing engine, as the team’s only C# engineer. ◆ Won the Early Careers digitisation competition. *Nov 2025* ◆ _nology Take Ownership award. *Q1 2026* ◆ Nominated as an AI Champion in the risk division. *Spring 2026* |
+| Aug 2024 – Jun 2025 | Full Stack Software Engineer · Joveen | Built and improved an e-commerce site across React, Java/Spring Boot and MySQL: refactoring components, lazy-loading assets and optimising database queries. · Implemented API endpoints, validation and tests, and fixed mobile layout and functionality issues with cross-browser testing. |
+| Jul 2025 – now | Software Engineer · BNP Paribas CIB | High-performance computing for pricing and risk systems. I build and ship C# equity and commodity market-data loaders, combining and validating data for pricing and risk simulations. · I integrate pricing code with quantitative developers and enable the same NUnit tests to run across CPU and GPU environments. As the team’s sole C# engineer, I own implementation and delivery. ◆ Won the Early Careers digitisation competition. *Nov 2025* ◆ Take Ownership award. *Q1 2026* ◆ Nominated as an AI Champion in the risk division. *Spring 2026* |
 
 ## Off the clock
 

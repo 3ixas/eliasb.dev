@@ -7,7 +7,6 @@ export type HowIWork = {
   note: string;
   /** Three beats, each a habit and where it shows up. */
   beats: readonly [Beat, Beat, Beat];
-  honestLine: string;
   /** Caption of the PRD card beside the beats. */
   prdCaption: string;
 };
@@ -32,7 +31,5 @@ export const howIWork: HowIWork = {
         "I learned this in marketing, running split tests and conversion dashboards. At BNP Paribas I co-built a dashboard from users’ requirements that cut a 30–40 minute data load to under 5.",
     },
   ],
-  honestLine:
-    "My own projects haven’t been launched or measured yet. The next ones I build, I’ll put in front of people.",
   prdCaption: "Threshold’s PRD, 16 April 2026",
 };

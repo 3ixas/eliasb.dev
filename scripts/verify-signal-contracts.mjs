@@ -287,12 +287,23 @@ try {
   const insufficientHistory = await getHistorySignal(historyNow);
   assert.equal(insufficientHistory.state, "curated");
 
+  globalThis.fetch = async (input) => {
+    const url = new URL(String(input));
+    if (url.hostname === "commons.wikimedia.org") return new Response("unavailable", { status: 503 });
+    const feedName = url.pathname.split("/").at(-3);
+    return new Response(JSON.stringify({ [feedName]: historyFixture[feedName] }), { status: 200 });
+  };
+  const unillustratedHistory = await getHistorySignal(historyNow);
+  assert.equal(unillustratedHistory.state, "curated", "When no live fact has a usable picture, show the illustrated archive");
+  assert.equal(unillustratedHistory.weekOf, null, "Archived facts must not be labelled as this week");
+
   globalThis.fetch = async () => { throw new Error("simulated Wikimedia outage"); };
   const savedHistory = await getHistorySignal(historyNow);
   assert.equal(savedHistory.state, "curated");
   assert.equal(savedHistory.weekOf, null);
   assert.equal(savedHistory.sourceUrl, "https://en.wikipedia.org/wiki/Portal:History");
   assert.deepEqual(savedHistory.events.map(({ year }) => year), [1783, 1933, 2003]);
+  assert.ok(savedHistory.events.every(({ image }) => image?.src.startsWith("/signals/history/") && image.creator && image.licenseName), "Every saved fact has a bundled, credited picture");
 } finally {
   globalThis.fetch = originalFetch;
 }

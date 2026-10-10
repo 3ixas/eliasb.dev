@@ -4,7 +4,9 @@ const pill = (page: Page) => page.locator("[data-lights-pill]");
 const scheme = (page: Page) => page.evaluate(() => getComputedStyle(document.documentElement).colorScheme);
 const stored = (page: Page) => page.evaluate(() => localStorage.getItem("elias-theme"));
 const token = (page: Page, name: string) =>
-  page.evaluate((property) => getComputedStyle(document.documentElement).getPropertyValue(property).trim().toLowerCase(), name);
+  page.evaluate((property) => getComputedStyle(document.documentElement).getPropertyValue(property).trim().toLowerCase()
+    .replace(/^rgb\((\d+), (\d+), (\d+)\)$/, (_, r, g, b) => `#${[r, g, b].map((channel) => Number(channel).toString(16).padStart(2, "0")).join("")}`)
+    .replace("rgba(0, 0, 0, 0)", "transparent"), name);
 /** The colours of every theme-color meta, which must all be the page background. */
 const toolbar = (page: Page) =>
   page.evaluate(() => [...document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')].map((meta) => meta.content.toLowerCase()));
@@ -72,7 +74,8 @@ test.describe("Lights and theme", () => {
       expect(paint.background).toBe(chosen === "dark" ? "rgb(13, 13, 18)" : "rgb(251, 251, 248)");
       // The toolbar colour is the page's, before the first paint.
       expect(paint.toolbar.length).toBeGreaterThan(0);
-      for (const colour of paint.toolbar) expect(colour).toBe(paint.page);
+      expect([paint.background, chosen === "dark" ? "#0d0d12" : "#fbfbf8"]).toContain(paint.page);
+      for (const colour of paint.toolbar) expect(colour).toBe(chosen === "dark" ? "#0d0d12" : "#fbfbf8");
     });
   }
 
@@ -92,6 +95,7 @@ test.describe("Lights and theme", () => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     const follows = async (label: string) => {
+      await expect(page.locator("html")).not.toHaveAttribute("data-theme-changing", "");
       const background = await token(page, "--stretch-page");
       const colours = await toolbar(page);
       expect(colours.length, label).toBeGreaterThan(0);
@@ -130,7 +134,7 @@ test.describe("Lights and theme", () => {
         new MutationObserver((_, observer) => {
           if (root.dataset.lights !== "on") return;
           observer.disconnect();
-          resolve(document.querySelector("[data-stretch-header]")!.getAnimations().length);
+          resolve(root.getAnimations().length);
         }).observe(root, { attributes: true, attributeFilter: ["data-lights"] });
       });
     });
@@ -151,21 +155,21 @@ test.describe("Lights and theme", () => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     await page.emulateMedia({ reducedMotion: "no-preference" });
-    const header = page.locator("[data-stretch-header]");
-    await expect(header).toHaveCSS("transition-duration", "0s");
+    const palette = page.locator("html");
+    await expect(palette).toHaveCSS("transition-duration", "0s");
     const during = await page.evaluate(() => {
       document.querySelector<HTMLButtonElement>("[data-lights-pill]")!.click();
       const read = (selector: string) => getComputedStyle(document.querySelector(selector)!);
       return {
-        header: read("[data-stretch-header]").transitionDuration,
+        palette: read("html").transitionDuration,
         heading: read("#work h2").transitionDuration,
-        timing: read("[data-stretch-header]").transitionTimingFunction,
+        timing: read("html").transitionTimingFunction,
       };
     });
-    expect(during.header).toBe("1.2s");
-    expect(during.heading).toMatch(/^1\.2s/);
+    expect(during.palette).toBe("1.2s");
+    expect(during.heading).toBe("0s");
     expect(during.timing).toBe("cubic-bezier(0.42, 0, 0.58, 1)");
-    await expect(header).toHaveCSS("transition-duration", "0s", { timeout: 3000 });
+    await expect(palette).toHaveCSS("transition-duration", "0s", { timeout: 3000 });
   });
 
   test("with reduced motion the page crossfades in 200 ms", async ({ page }) => {
@@ -174,8 +178,34 @@ test.describe("Lights and theme", () => {
     // The window is short, so click and read in the same task.
     const during = await page.evaluate(() => {
       document.querySelector<HTMLButtonElement>("[data-lights-pill]")!.click();
-      return getComputedStyle(document.querySelector("[data-stretch-header]")!).transitionDuration;
+      return getComputedStyle(document.documentElement).transitionDuration;
     });
     expect(during).toBe("0.2s");
+  });
+
+  test("inherited text follows the palette on every frame in both directions", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.goto("/");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    for (const target of ["rgb(241, 241, 244)", "rgb(17, 17, 20)"]) {
+      const samples = await page.evaluate(async () => {
+        document.querySelector<HTMLButtonElement>("[data-lights-pill]")!.click();
+        const frames = [];
+        for (let i = 0; i < 5; i++) {
+          await new Promise<void>((resolve) => window.setTimeout(resolve, 150));
+          frames.push({
+            ink: getComputedStyle(document.documentElement).getPropertyValue("--stretch-ink").trim(),
+            colours: ["[data-stretch-shell]", "#work h2", ".stretch-beat__proof", ".stretch-prd__quote"].map(
+              (selector) => getComputedStyle(document.querySelector(selector)!).color,
+            ),
+          });
+        }
+        return frames;
+      });
+      expect(new Set(samples.map((sample) => sample.ink)).size).toBeGreaterThan(1);
+      for (const sample of samples) for (const colour of sample.colours) expect(colour).toBe(sample.ink);
+      await expect(page.locator(".stretch-beat__proof").first()).toHaveCSS("color", target);
+      await expect(page.locator("html")).not.toHaveAttribute("data-theme-changing", "");
+    }
   });
 });

@@ -65,9 +65,23 @@ export function systemTheme(): Theme {
 }
 
 let changeTimer: number | undefined;
+let paletteRegistered = false;
+
+/** Register after boot: WebKit can briefly inherit stale colours when @property
+ * and the pre-paint preference script both run while the document is parsing. */
+function registerPalette() {
+  if (paletteRegistered || typeof CSS.registerProperty !== "function") return;
+  for (const name of ["page", "ink", "muted", "rule", "card", "cobalt", "on-cobalt", "tile-edge", "tape"]) {
+    CSS.registerProperty({ name: `--stretch-${name}`, syntax: "<color>", inherits: true, initialValue: "transparent" });
+  }
+  paletteRegistered = true;
+  // Resolve the current palette before a click or device change supplies its target.
+  getComputedStyle(document.documentElement).getPropertyValue("--stretch-page");
+}
 
 /** Marks the room as changing, so the stylesheet crossfades it. */
 function markRoomChanging() {
+  registerPalette();
   const root = document.documentElement;
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   window.clearTimeout(changeTimer);
@@ -103,6 +117,7 @@ export function flipLights() {
 
 /** Follows the device appearance while the visitor has made no choice. */
 export function watchSystemTheme() {
+  registerPalette();
   const media = window.matchMedia(darkQuery);
   const onChange = () => {
     if (readPreference() !== "system") return;

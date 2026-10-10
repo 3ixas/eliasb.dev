@@ -9,7 +9,7 @@ const getWeeklySnapshot = unstable_cache(
     if (history.state !== "live") throw new Error("Weekly history refresh unavailable");
     return history;
   },
-  ["weekly-history-snapshot-v2"],
+  ["weekly-history-snapshot-v3"],
   // Cache the selected stories and their image metadata together for the week.
   { revalidate: 604800, tags: ["history-signal"] },
 );
