@@ -13,6 +13,9 @@
     "verify:routes": "node scripts/verify-canonical-routes.mjs",
     "verify:release": "node scripts/verify-release.mjs",
     "verify:opening": "node --no-warnings --experimental-strip-types scripts/verify-opening.mjs",
+    "verify:ci-coverage": "node scripts/verify-ci-coverage.mjs",
+    "check": "pnpm lint && tsc --noEmit --incremental false && pnpm verify:signals && pnpm verify:catalogue && pnpm verify:copy && pnpm verify:opening && pnpm verify:ci-coverage",
+    "check:built": "pnpm verify:routes && pnpm verify:release",
     "test:e2e": "playwright test"
   },
   "dependencies": {

@@ -32,6 +32,10 @@ Prioritise structural regressions and meaningful "code-judo" opportunities: rede
 - Flag cases where splitting responsibilities would materially improve cohesion, navigation, testability, or readability.
 - Do not recommend splitting files solely to satisfy a line-count threshold if doing so would worsen cohesion.
 
+### End-to-end specs
+
+- Flag a spec that reads hydrated, animated or lazily laid-out state with a single `evaluate` or `getComputedStyle` right after `goto`. It passes on a fast machine and flakes on a CI runner; use `expect.poll` or a web-first assertion.
+
 ### Quality bar
 
 - Do not accept "it works and tests pass" as sufficient evidence of maintainable design.
