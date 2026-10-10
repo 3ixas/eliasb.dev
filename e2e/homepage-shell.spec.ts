@@ -4,7 +4,7 @@ import { featuredSlugs, projects } from "../src/content/projects";
 import { careerLog } from "../src/content/stretch/career";
 import { howIWork } from "../src/content/stretch/how-i-work";
 import { offTheClock } from "../src/content/stretch/off-the-clock";
-import { hero, siteCopy, workSection } from "../src/content/stretch/site-copy";
+import { hero, sayHello, siteCopy, workSection } from "../src/content/stretch/site-copy";
 import { renderedContrast } from "./support/rendered-contrast";
 
 const menuLabels = siteCopy.menu.map(({ label }) => label);
@@ -27,10 +27,10 @@ test.describe("Homepage shell", () => {
       ...sections.map((section) => section.id),
     ]);
     await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName(`${hero.headline.lead} ${hero.headline.emphasis}`);
-    await expect(page.getByRole("heading", { level: 2 })).toHaveText(sections.map((section) => section.heading));
+    await expect(page.getByRole("heading", { level: 2 })).toHaveText(sections.map((section) => section.id === "say-hello" ? sayHello.bigLink : section.heading));
   });
 
-  for (const { id, heading, note } of sections) {
+  for (const { id, heading, note } of sections.filter(({ id }) => id !== "say-hello")) {
     test(`${heading} has its giant heading${note ? ", mono note and true count" : ""}`, async ({ page }) => {
       await page.goto("/");
       const section = page.locator(`section#${id}`);

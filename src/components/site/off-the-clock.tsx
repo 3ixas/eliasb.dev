@@ -261,7 +261,7 @@ export function GitHubCard({ github, now }: { github: GitHubSignal; now: Date })
   );
 }
 
-/** The six items, in their grid. `todayAt` fixes the training week's "now" for the fixtures route. */
+/** The six items, in independent columns. `todayAt` fixes the training week's "now" for the fixtures route. */
 export function OffTheClockItems({
   history,
   reading,
@@ -281,11 +281,17 @@ export function OffTheClockItems({
 }): ReactNode {
   return (
     <div className="stretch-otc">
-      <TrainingPoster now={todayAt} />
-      <ClippingCard history={history} />
-      <BookCard reading={reading} now={now} />
-      <FilmCard film={film} now={now} />
-      <NowMakingCard latest={latest} now={now} />
+      <div className="stretch-otc__column">
+        <TrainingPoster now={todayAt} />
+        <div className="stretch-otc__media">
+          <BookCard reading={reading} now={now} />
+          <FilmCard film={film} now={now} />
+        </div>
+      </div>
+      <div className="stretch-otc__column">
+        <ClippingCard history={history} />
+        <NowMakingCard latest={latest} now={now} />
+      </div>
       <GitHubCard github={github} now={now} />
     </div>
   );

@@ -95,6 +95,39 @@ test.describe("Work: Project index with a long catalogue", () => {
     await expect(rows(page).nth(9).locator(".stretch-index__number")).toHaveText("10");
   });
 
+  test("desktop previews follow the hovered or focused row and stay inside the list", async ({ page, browserName }) => {
+    test.skip(phone(page), "Phones use inline thumbnails");
+    const list = page.locator(".stretch-index__list");
+    const tops: number[] = [];
+    for (const index of [0, 4, 9]) {
+      const row = rows(page).nth(index);
+      const link = row.getByRole("link");
+      const shot = row.locator(".stretch-index__shot");
+      await link.hover();
+      await expect(shot).toBeVisible();
+      const [rowBox, shotBox, listBox] = await Promise.all([row.boundingBox(), shot.boundingBox(), list.boundingBox()]);
+      const relativeTop = shotBox!.y - listBox!.y;
+      tops.push(relativeTop);
+      expect(relativeTop).toBeGreaterThanOrEqual(0);
+      expect(shotBox!.y + shotBox!.height).toBeLessThanOrEqual(listBox!.y + listBox!.height);
+      if (index === 0) expect(shotBox!.y - rowBox!.y).toBeCloseTo(20, 0);
+      if (index === 4) expect(shotBox!.y + shotBox!.height / 2).toBeCloseTo(rowBox!.y + rowBox!.height / 2, 0);
+      if (index === 9) expect(rowBox!.y + rowBox!.height - shotBox!.y - shotBox!.height).toBeCloseTo(20, 0);
+      if (browserName === "chromium") {
+        await page.mouse.move(0, 0);
+        await link.focus();
+        await page.keyboard.press("Shift+Tab");
+        await page.keyboard.press("Tab");
+        await expect(shot).toBeVisible();
+        const focusedBox = (await shot.boundingBox())!;
+        const focusedList = (await list.boundingBox())!;
+        expect(focusedBox.y - focusedList.y).toBeCloseTo(relativeTop, 0);
+      }
+    }
+    expect(tops[0]).toBeLessThan(tops[1]);
+    expect(tops[1]).toBeLessThan(tops[2]);
+  });
+
   test("a row with a screenshot previews it on hover or shows a thumbnail on phones", async ({ page }) => {
     const shot = rows(page).first().locator(".stretch-index__shot");
     if (phone(page)) {

@@ -121,13 +121,13 @@ All text pairs pass WCAG 2.2 AA (5.7:1–18.2:1, #108). Project colours are data
 - *Case study:* opening (number, name, outcome, metadata, stack, links, hero screenshot), six sections keyed `where-it-started`, `written-down-first`, `decisions`, `how-its-built`, `where-it-stands`, `whats-next`, and a PRD card (quote, date) plus an evidence strip of up to four `{value, label}` items. A figure can attach to any section. It ends with the next project.
 - *How I work:* three `{habit, proof}` beats, the honest line, and the PRD card's caption.
 - *Career log:* stages, each with dates, role, organisation, an `isCurrent` flag, notes (each with an optional "when" label) and milestones (text, when).
-- *Off the clock:* the training plan (an authored week, with today computed in Europe/London) plus the existing book, film, clipping, Now making and GitHub signals, each with live and fallback copy.
+- *Off the clock:* independent columns above 760px, with training and reading/film on the left and history and Now making on the right, followed by a full-width GitHub calendar. Reading and film share a row above 1100px; narrower screens stack them. Mobile follows the same column reading order. The training plan (an authored week, with today computed in Europe/London) plus the existing book, film, clipping, Now making and GitHub signals, each with live and fallback copy.
 - All copy comes from `docs/content/redesign-copy.md`.
 
 **Homepage composition**
 - **Hero:** the name at 31.5vw on phones (no wrap, capped on desktop), the headline (a real `h1`), the supporting line, two actions, and the portrait tilted 3° (2° on phones) with a cobalt "Software engineer" label. On desktop the portrait sits to the right of the name; on phones it's stacked below the actions.
-- **Work:** the featured tiles (the first spans two columns), each in its project colour, with its outline number, name, outcome and metadata, a screenshot tilted ±1–1.5°, and one fastener. Then the index rows, the preview, and *All work (n)*.
-- **Each section's header:** a giant condensed uppercase heading with a mono note and counts where true ("06 things I've built · 03 I'm proudest of").
+- **Work:** the featured tiles (the first spans two columns), each in its project colour, with its outline number, name, outcome and metadata, a screenshot tilted ±1–1.5°, and one fastener. Then the index rows, the preview, and *All work (n)*. Desktop previews follow the hovered or focused row: centre on middle rows, align to the top/bottom at the list edges. Mobile keeps inline thumbnails.
+- **Section headers (except Say hello, whose email action is its heading):** a giant condensed uppercase heading with a mono note and counts where true ("06 things I've built · 03 I'm proudest of").
 
 **The signature entrance (homepage only)**
 - **Server render:** the finished page.

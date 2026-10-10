@@ -21,6 +21,26 @@ const token = (page: Page, name: string) =>
 const links = (card: Locator) => card.getByRole("link");
 
 test.describe("Off the clock: on the homepage", () => {
+  test("reading follows training without waiting for the history card", async ({ page }) => {
+    await page.goto("/");
+    const section = page.locator("#off-the-clock");
+    const training = section.locator("[data-otc='training']");
+    const reading = section.locator("[data-otc='reading']");
+    const clipping = section.locator("[data-otc='clipping']");
+    const trainingBox = (await training.boundingBox())!;
+    const readingBox = (await reading.boundingBox())!;
+    expect(readingBox.y - trainingBox.y - trainingBox.height).toBeCloseTo(phone(page) ? 32 : 40, 0);
+    if (phone(page)) {
+      const filmBox = (await section.locator("[data-otc='film']").boundingBox())!;
+      expect((await clipping.boundingBox())!.y).toBeGreaterThan(filmBox.y + filmBox.height);
+    } else {
+      expect((await clipping.boundingBox())!.x).toBeGreaterThan(trainingBox.x + trainingBox.width);
+      const readingTop = await reading.evaluate((element) => element.getBoundingClientRect().top + scrollY);
+      await clipping.locator("summary").click();
+      expect(await reading.evaluate((element) => element.getBoundingClientRect().top + scrollY)).toBeCloseTo(readingTop, 0);
+    }
+  });
+
   test("the four items are in the server-rendered section", async ({ page }) => {
     await page.route("**/*.js", (route) => route.abort());
     await page.goto("/");
@@ -232,6 +252,20 @@ test.describe("Off the clock: Now making", () => {
 test.describe("Off the clock: the GitHub year", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
+  });
+
+  test("the composed calendar stays readable below both independent columns", async ({ page }) => {
+    const layout = fixture(page, "layout");
+    const grid = (await layout.locator(".stretch-otc").boundingBox())!;
+    const calendar = (await layout.locator("[data-otc='github']").boundingBox())!;
+    expect(calendar.x).toBeCloseTo(grid.x, 0);
+    expect(calendar.width).toBeCloseTo(grid.width, 0);
+    for (const column of await layout.locator(".stretch-otc__column").all()) {
+      const box = (await column.boundingBox())!;
+      expect(calendar.y).toBeGreaterThan(box.y + box.height);
+    }
+    const day = (await layout.locator("[data-github-days] button").first().boundingBox())!;
+    expect(day.width).toBeGreaterThanOrEqual(6);
   });
 
   test("draws the year with a total, a text alternative, a busiest stretch and a legend", async ({ page }) => {

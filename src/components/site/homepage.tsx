@@ -1,5 +1,4 @@
 import { EntranceGuard, EntrancePlayer } from "@/components/site/entrance-scripts";
-import { sectionLabel } from "@/components/site/sections";
 import { CareerRuler } from "@/components/site/career-ruler";
 import { Hero } from "@/components/site/hero";
 import { SayHello } from "@/components/site/say-hello";
@@ -14,6 +13,8 @@ import { careerLog } from "@/content/stretch/career";
 import { howIWork } from "@/content/stretch/how-i-work";
 import { offTheClock } from "@/content/stretch/off-the-clock";
 import { siteCopy, workSection } from "@/content/stretch/site-copy";
+
+const sayHelloHeadingId = "say-hello-heading";
 
 /**
  * The Stretch homepage shell: the header, the hero and five anchored sections
@@ -58,9 +59,8 @@ export function Homepage() {
           <OffTheClock />
         </section>
 
-        <section id="say-hello" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="say-hello-heading">
-          <SectionHeading id="say-hello-heading" heading={sectionLabel["say-hello"]} />
-          <SayHello />
+        <section id="say-hello" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby={sayHelloHeadingId}>
+          <SayHello headingId={sayHelloHeadingId} />
         </section>
       </main>
 

@@ -11,7 +11,11 @@ test.describe("Say hello and the footer", () => {
   });
 
   test("the copy matches the approved text", async ({ page }) => {
-    await expect(section(page).getByRole("link", { name: sayHello.bigLink, exact: true })).toBeVisible();
+    const heading = section(page).getByRole("heading", { level: 2, name: "Say hello", exact: true });
+    await expect(heading).toHaveCount(1);
+    await expect(section(page)).toHaveAttribute("aria-labelledby", (await heading.getAttribute("id"))!);
+    await expect(heading.getByRole("link", { name: sayHello.bigLink, exact: true })).toBeVisible();
+    await expect(section(page).locator(".stretch-section__head")).toHaveCount(0);
     await expect(section(page).locator(".stretch-hello__line")).toHaveText(sayHello.line);
     await expect(section(page).locator(".stretch-hello__link")).toHaveCount(sayHello.links.length);
   });

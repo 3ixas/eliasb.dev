@@ -14,7 +14,7 @@ const destination = ({ links }: Project) => links.caseStudy ?? links.live ?? lin
  * `rows` is the whole index and `total` is the catalogue's count for the link.
  * The archive passes `limit` of `Infinity` and no `total`, so it lists every
  * row and has no link to itself. Hover and focus
- * are CSS only: the screenshot is the preview beside the list on desktop and
+ * are CSS only: the screenshot follows its row on desktop (bounded by the list edges) and is
  * the thumbnail inside the row on phones, so it needs no script and a row
  * without a screenshot simply has none. The screenshot is decorative here: the
  * row's own text already names the project.
