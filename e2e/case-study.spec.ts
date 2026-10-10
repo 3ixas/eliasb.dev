@@ -107,8 +107,14 @@ for (const slug of slugs) {
     });
 
     test("cobalt is not used on the page", async ({ page }) => {
-      const cobalt = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--stretch-cobalt").trim());
-      const toRgb = (hex: string) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
+      const cobalt = await page.evaluate(() => {
+        const probe = document.createElement("span");
+        probe.style.color = "var(--stretch-cobalt)";
+        document.body.appendChild(probe);
+        const colour = getComputedStyle(probe).color;
+        probe.remove();
+        return colour;
+      });
       const used = await page.locator("[data-stretch-shell] *").evaluateAll((elements, colour) => {
         return elements.filter((element) => {
           // The skip link is cobalt, but only when focused; it waits off-screen.
@@ -116,7 +122,7 @@ for (const slug of slugs) {
           const style = getComputedStyle(element);
           return [style.color, style.backgroundColor, style.borderTopColor].includes(colour) && element.checkVisibility();
         }).length;
-      }, toRgb(cobalt));
+      }, cobalt);
       expect(used).toBe(0);
     });
 

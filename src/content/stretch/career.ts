@@ -54,18 +54,24 @@ export const careerLog = {
       role: "Full Stack Software Engineer",
       organisation: "Joveen",
       isCurrent: false,
-      notes: [{ text: "All in: an e-commerce role, with a software engineering bootcamp alongside." }],
+      notes: [
+        { text: "Built and improved an e-commerce site across React, Java/Spring Boot and MySQL: refactoring components, lazy-loading assets and optimising database queries." },
+        { text: "Implemented API endpoints, validation and tests, and fixed mobile layout and functionality issues with cross-browser testing." },
+      ],
       milestones: [],
     },
     {
       dates: "Jul 2025 – now",
       role: "Software Engineer",
-      organisation: "BNP Paribas CIB, through _nology",
+      organisation: "BNP Paribas CIB",
       isCurrent: true,
-      notes: [{ text: "Market-data loaders and the pricing engine, as the team’s only C# engineer." }],
+      notes: [
+        { text: "High-performance computing for pricing and risk systems. I build and ship C# equity and commodity market-data loaders, combining and validating data for pricing and risk simulations." },
+        { text: "I integrate pricing code with quantitative developers and enable the same NUnit tests to run across CPU and GPU environments. As the team’s sole C# engineer, I own implementation and delivery." },
+      ],
       milestones: [
         { text: "Won the Early Careers digitisation competition.", when: "Nov 2025" },
-        { text: "_nology Take Ownership award.", when: "Q1 2026" },
+        { text: "Take Ownership award.", when: "Q1 2026" },
         { text: "Nominated as an AI Champion in the risk division.", when: "Spring 2026" },
       ],
     },

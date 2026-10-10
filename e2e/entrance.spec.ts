@@ -19,13 +19,16 @@ test.describe("Signature entrance", () => {
     // Note when the hold starts and when it clears, on the page's clock (time from the start of this navigation).
     await page.addInitScript(() => {
       const marks = window as unknown as { heldFrom?: number; heldUntil?: number };
-      const watch = window.setInterval(() => {
+      const watch = new MutationObserver(() => {
         if (document.documentElement.hasAttribute("data-entering")) marks.heldFrom ??= performance.now();
-        else if (marks.heldFrom !== undefined && document.querySelector("[data-entrance]")) {
+        else if (marks.heldFrom !== undefined) {
           marks.heldUntil = performance.now();
-          window.clearInterval(watch);
+          watch.disconnect();
         }
-      }, 10);
+      });
+      // Observe the hold directly: a polling timer can miss its final tick
+      // before the test reads the release and leave heldUntil undefined.
+      watch.observe(document, { subtree: true, attributes: true, attributeFilter: ["data-entering"] });
     });
     await page.goto("/", { waitUntil: "commit" });
     await page.waitForSelector("[data-entrance-layer]");

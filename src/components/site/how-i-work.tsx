@@ -2,13 +2,12 @@ import { caseStudies } from "@/content/stretch/case-studies";
 import { howIWork } from "@/content/stretch/how-i-work";
 
 /**
- * The three habits, each with its one true proof, the honest line that Elias's
- * own projects are not launched or measured yet, and the PRD card: a line from
+ * The three habits, each with its one true proof, and the PRD card: a line from
  * Threshold's spec, with its caption. The quote comes from the Threshold case
  * study so the two pages cannot drift apart.
  */
 export function HowIWork() {
-  const { beats, honestLine, prdCaption } = howIWork;
+  const { beats, prdCaption } = howIWork;
   const quote = caseStudies.threshold.prd.quote;
   return (
     <div className="stretch-how">
@@ -29,8 +28,6 @@ export function HowIWork() {
         <blockquote className="stretch-prd__quote">{quote}</blockquote>
         <figcaption className="stretch-mono stretch-prd__caption">{prdCaption}</figcaption>
       </figure>
-
-      <p className="stretch-honest">{honestLine}</p>
     </div>
   );
 }

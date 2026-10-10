@@ -78,14 +78,10 @@ html:has([data-stretch-shell]) body {
   }
 }
 
-/* Set by the theme controller just before the theme flips, and cleared after. */
-:root[data-theme-changing],
-:root[data-theme-changing] body,
-:root[data-theme-changing] [data-stretch-shell],
-:root[data-theme-changing] [data-stretch-shell] *,
-:root[data-theme-changing] [data-stretch-shell] *::before,
-:root[data-theme-changing] [data-stretch-shell] *::after {
-  transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke;
+/* Animate the palette once. Descendant colour transitions would repeatedly
+ * chase their parent's inherited colour and make text lag behind the surface. */
+:root[data-theme-changing] {
+  transition-property: --stretch-page, --stretch-ink, --stretch-muted, --stretch-rule, --stretch-card, --stretch-cobalt, --stretch-on-cobalt, --stretch-tile-edge, --stretch-tape;
   transition-duration: var(--stretch-room-duration);
   transition-timing-function: var(--stretch-room-ease);
   transition-delay: 0s;
@@ -753,6 +749,7 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   top: -22px;
   right: 40px;
   transform-origin: 50% 80%;
+  filter: drop-shadow(1px 2px 1px rgba(0, 0, 0, 0.3));
 }
 
 .stretch-fastener--pin {
@@ -1101,7 +1098,7 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   }
 }
 
-/* ---- How I work: three beats, the PRD card and the honest line ---- */
+/* ---- How I work: three beats and the PRD card ---- */
 
 .stretch-how {
   display: grid;
@@ -1174,25 +1171,14 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   line-height: 1.4;
 }
 
-.stretch-honest {
-  max-width: 60ch;
-  margin: 0;
-  font-size: 17px;
-  line-height: 1.5;
-}
-
 @media (min-width: 761px) {
   .stretch-how {
     grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   }
 
-  .stretch-honest {
-    grid-column: 1;
-  }
-
   .stretch-prd {
     grid-column: 2;
-    grid-row: 1 / span 2;
+    grid-row: 1;
     margin-top: 20px;
   }
 }
@@ -1445,6 +1431,23 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   background-color: var(--stretch-page);
 }
 
+.stretch-otc__clipping .stretch-otc__label {
+  color: var(--stretch-ink);
+  font-size: clamp(20px, 2vw, 24px);
+  font-weight: 700;
+  line-height: 1.35;
+  border-bottom: 2px solid var(--stretch-cobalt);
+  padding-bottom: 16px;
+}
+
+.stretch-otc__clipping .stretch-otc__kicker {
+  justify-self: start;
+  padding: 6px 10px;
+  border: 1px solid var(--stretch-rule);
+  border-radius: 4px;
+  background-color: var(--stretch-card);
+}
+
 .stretch-story {
   display: grid;
   gap: 8px;
@@ -1461,7 +1464,7 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   max-height: 320px;
   border-radius: 6px;
   background-color: var(--stretch-rule);
-  object-fit: cover;
+  object-fit: contain;
   filter: grayscale(0.35);
 }
 

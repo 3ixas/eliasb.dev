@@ -54,7 +54,9 @@ const readTokens = (page: Page) =>
           .getPropertyValue(`--stretch-${name}`)
           .trim()
           .toLowerCase()
-          .replace(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/, "#$1$1$2$2$3$3"),
+          .replace(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/, "#$1$1$2$2$3$3")
+          .replace(/^rgb\((\d+), (\d+), (\d+)\)$/, (_, r, g, b) => `#${[r, g, b].map((channel) => Number(channel).toString(16).padStart(2, "0")).join("")}`)
+          .replace("rgba(0, 0, 0, 0)", "transparent"),
       ]),
     );
   });

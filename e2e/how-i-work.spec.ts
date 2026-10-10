@@ -19,8 +19,7 @@ test.describe("How I work", () => {
     }
   });
 
-  test("the honest line and the PRD card with its caption are there", async ({ page }) => {
-    await expect(section(page).locator(".stretch-honest")).toHaveText(howIWork.honestLine);
+  test("the PRD card and its caption are there", async ({ page }) => {
     const card = section(page).locator("figure.stretch-prd");
     await expect(card.locator("blockquote")).toHaveText(caseStudies.threshold.prd.quote);
     await expect(card.locator("figcaption")).toHaveText(howIWork.prdCaption);
@@ -41,7 +40,7 @@ test.describe("How I work", () => {
   });
 
   test("text passes WCAG 2.2 AA contrast", async ({ page }) => {
-    for (const selector of [".stretch-beat__habit", ".stretch-beat__proof", ".stretch-honest", ".stretch-prd__quote", ".stretch-prd__caption"]) {
+    for (const selector of [".stretch-beat__habit", ".stretch-beat__proof", ".stretch-prd__quote", ".stretch-prd__caption"]) {
       const readings = await contrastOnPaper(page, `#how-i-work ${selector}`);
       expect(readings.length, selector).toBeGreaterThan(0);
       for (const reading of readings) expect(reading.ratio, `${selector}: ${reading.text}`).toBeGreaterThanOrEqual(4.5);
@@ -50,7 +49,7 @@ test.describe("How I work", () => {
 
   test("nothing in the section overflows, and the page does not scroll sideways", async ({ page }) => {
     const width = page.viewportSize()?.width ?? 0;
-    for (const selector of [".stretch-beat", ".stretch-prd", ".stretch-honest"]) {
+    for (const selector of [".stretch-beat", ".stretch-prd"]) {
       for (const box of await Promise.all((await section(page).locator(selector).all()).map((item) => item.boundingBox()))) {
         expect(box!.x, selector).toBeGreaterThanOrEqual(0);
         expect(box!.x + box!.width, selector).toBeLessThanOrEqual(width);

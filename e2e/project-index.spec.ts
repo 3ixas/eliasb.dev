@@ -5,7 +5,6 @@ import { workSection } from "../src/content/stretch/site-copy";
 const phone = (page: Page) => (page.viewportSize()?.width ?? 0) < 761;
 const rows = (page: Page) => page.locator(".stretch-index__row");
 const expected = projectIndex(projects, featuredSlugs);
-const rgb = (hex: string) => `rgb(${[1, 3, 5].map((start) => parseInt(hex.slice(start, start + 2), 16)).join(", ")})`;
 
 test.describe("Work: Project index on the homepage", () => {
   test.beforeEach(async ({ page }) => {
@@ -35,20 +34,27 @@ test.describe("Work: Project index on the homepage", () => {
   });
 
   test("a row turns cobalt and nudges its arrow on hover and on focus", async ({ page, browserName }) => {
-    const cobalt = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--stretch-cobalt").trim());
+    const cobalt = await page.evaluate(() => {
+      const probe = document.createElement("span");
+      probe.style.color = "var(--stretch-cobalt)";
+      document.body.appendChild(probe);
+      const colour = getComputedStyle(probe).color;
+      probe.remove();
+      return colour;
+    });
     const link = rows(page).first().getByRole("link");
     const name = rows(page).first().locator(".stretch-index__name");
-    await expect(name).not.toHaveCSS("color", rgb(cobalt));
+    await expect(name).not.toHaveCSS("color", cobalt);
     await link.hover();
-    await expect(name).toHaveCSS("color", rgb(cobalt));
-    await expect(rows(page).first().locator(".stretch-index__arrow")).toHaveCSS("color", rgb(cobalt));
+    await expect(name).toHaveCSS("color", cobalt);
+    await expect(rows(page).first().locator(".stretch-index__arrow")).toHaveCSS("color", cobalt);
     await page.mouse.move(0, 0);
-    await expect(name).not.toHaveCSS("color", rgb(cobalt));
+    await expect(name).not.toHaveCSS("color", cobalt);
     test.skip(browserName !== "chromium", "WebKit does not Tab to links");
     await link.focus();
     await page.keyboard.press("Shift+Tab");
     await page.keyboard.press("Tab");
-    await expect(name).toHaveCSS("color", rgb(cobalt));
+    await expect(name).toHaveCSS("color", cobalt);
   });
 
   test("rows without a screenshot render cleanly and with no preview", async ({ page }) => {
