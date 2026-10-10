@@ -94,23 +94,27 @@ test.describe("Lights and theme", () => {
   test("the toolbar colour follows the page background through every change", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
-    const follows = async (label: string) => {
+    const follows = async (label: string, theme: "light" | "dark") => {
       await expect(page.locator("html")).not.toHaveAttribute("data-theme-changing", "");
-      const background = await token(page, "--stretch-page");
+      const background = theme === "dark" ? "#0d0d12" : "#fbfbf8";
+      // WebKit may resolve a registered colour on the next rendering frame
+      // after the timer clears. Wait for the palette's actual target as well.
+      await expect.poll(() => token(page, "--stretch-page"), { message: label }).toBe(background);
+      await expect(page.locator("body")).toHaveCSS("background-color", theme === "dark" ? "rgb(13, 13, 18)" : "rgb(251, 251, 248)");
       const colours = await toolbar(page);
       expect(colours.length, label).toBeGreaterThan(0);
       for (const colour of colours) expect(colour, label).toBe(background);
     };
-    await follows("light device");
+    await follows("light device", "light");
     await pill(page).click();
     await expect.poll(() => scheme(page)).toBe("dark");
-    await follows("chose dark on a light device");
+    await follows("chose dark on a light device", "dark");
     await pill(page).click();
     await expect.poll(() => scheme(page)).toBe("light");
-    await follows("back on the device");
+    await follows("back on the device", "light");
     await page.emulateMedia({ colorScheme: "dark" });
     await expect.poll(() => scheme(page)).toBe("dark");
-    await follows("the device went dark");
+    await follows("the device went dark", "dark");
   });
 
   test("dark mode shows the tile-edge hairline", async ({ page }) => {
