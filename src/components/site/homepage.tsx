@@ -14,6 +14,8 @@ import { howIWork } from "@/content/stretch/how-i-work";
 import { offTheClock } from "@/content/stretch/off-the-clock";
 import { siteCopy, workSection } from "@/content/stretch/site-copy";
 
+const sayHelloHeadingId = "say-hello-heading";
+
 /**
  * The Stretch homepage shell: the header, the hero and five anchored sections
  * with their headings, notes and true counts, and the footer. The signature
@@ -57,8 +59,8 @@ export function Homepage() {
           <OffTheClock />
         </section>
 
-        <section id="say-hello" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="say-hello-heading">
-          <SayHello />
+        <section id="say-hello" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby={sayHelloHeadingId}>
+          <SayHello headingId={sayHelloHeadingId} />
         </section>
       </main>
 

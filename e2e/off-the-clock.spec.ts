@@ -254,6 +254,20 @@ test.describe("Off the clock: the GitHub year", () => {
     await page.goto("/fixtures/off-the-clock");
   });
 
+  test("the composed calendar stays readable below both independent columns", async ({ page }) => {
+    const layout = fixture(page, "layout");
+    const grid = (await layout.locator(".stretch-otc").boundingBox())!;
+    const calendar = (await layout.locator("[data-otc='github']").boundingBox())!;
+    expect(calendar.x).toBeCloseTo(grid.x, 0);
+    expect(calendar.width).toBeCloseTo(grid.width, 0);
+    for (const column of await layout.locator(".stretch-otc__column").all()) {
+      const box = (await column.boundingBox())!;
+      expect(calendar.y).toBeGreaterThan(box.y + box.height);
+    }
+    const day = (await layout.locator("[data-github-days] button").first().boundingBox())!;
+    expect(day.width).toBeGreaterThanOrEqual(6);
+  });
+
   test("draws the year with a total, a text alternative, a busiest stretch and a legend", async ({ page }) => {
     const card = fixture(page, "github");
     const days = card.locator("[data-github-days]");

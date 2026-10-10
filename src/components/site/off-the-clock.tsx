@@ -291,8 +291,8 @@ export function OffTheClockItems({
       <div className="stretch-otc__column">
         <ClippingCard history={history} />
         <NowMakingCard latest={latest} now={now} />
-        <GitHubCard github={github} now={now} />
       </div>
+      <GitHubCard github={github} now={now} />
     </div>
   );
 }

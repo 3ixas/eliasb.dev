@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
-import { BookCard, ClippingCard, FilmCard, GitHubCard, NowMakingCard, TrainingPoster } from "@/components/site/off-the-clock";
+import { BookCard, ClippingCard, FilmCard, GitHubCard, NowMakingCard, OffTheClockItems, TrainingPoster } from "@/components/site/off-the-clock";
 import { savedHistorySignal } from "@/integrations/history";
 import type { ActivityDay, Book, Film, FilmSignal, GitHubSignal, HistorySignal, LatestRepositorySignal, ReadingSignal } from "@/integrations/types";
 
@@ -158,6 +158,9 @@ export default async function OffTheClockFixtures() {
             {item}
           </div>
         ))}
+        <div data-fixture="layout" className="stretch-section">
+          <OffTheClockItems history={savedHistorySignal()} reading={reading({})} film={diary({})} latest={latest({})} github={github({})} now={now} />
+        </div>
       </main>
     </div>
   );

@@ -6,10 +6,10 @@ import { sayHello } from "@/content/stretch/site-copy";
  * The closing section: the one cobalt action (an email to Elias), the approved
  * line, and the Résumé, GitHub and LinkedIn links.
  */
-export function SayHello() {
+export function SayHello({ headingId }: { headingId: string }) {
   return (
     <div className="stretch-hello">
-      <h2 id="say-hello-heading" aria-label={sectionLabel["say-hello"]} className="stretch-display stretch-hello__heading">
+      <h2 id={headingId} aria-label={sectionLabel["say-hello"]} className="stretch-display stretch-hello__heading">
         <a className="stretch-hello__big" href={profile.links.email}>
           {sayHello.bigLink}
         </a>

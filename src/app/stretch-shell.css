@@ -1552,7 +1552,11 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   .stretch-otc {
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     align-items: start;
-    gap: 32px;
+    gap: 40px 32px;
+  }
+
+  .stretch-otc__github {
+    grid-column: 1 / -1;
   }
 
   .stretch-otc__column,
