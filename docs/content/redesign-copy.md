@@ -104,9 +104,11 @@ Strings added while building, shipped, and recorded here on 2026-10-09 so `verif
 
 ## Say hello
 
+- The email action is also the section heading; no separate repeated heading.
 - Big link: Say hello ↗
 - Line: Got an idea, a project, or just want to talk about building things? Email’s the best way to reach me.
 - Links: Résumé · GitHub · LinkedIn
+- Résumé opens the current publicly shared PDF: https://drive.google.com/file/d/1Yv_oB-sNMXQhyY9K_EJbQ4CV11hM2ZY7/view?usp=drivesdk
 
 ## Work archive (`/work`)
 

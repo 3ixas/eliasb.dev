@@ -21,6 +21,26 @@ const token = (page: Page, name: string) =>
 const links = (card: Locator) => card.getByRole("link");
 
 test.describe("Off the clock: on the homepage", () => {
+  test("reading follows training without waiting for the history card", async ({ page }) => {
+    await page.goto("/");
+    const section = page.locator("#off-the-clock");
+    const training = section.locator("[data-otc='training']");
+    const reading = section.locator("[data-otc='reading']");
+    const clipping = section.locator("[data-otc='clipping']");
+    const trainingBox = (await training.boundingBox())!;
+    const readingBox = (await reading.boundingBox())!;
+    expect(readingBox.y - trainingBox.y - trainingBox.height).toBeCloseTo(phone(page) ? 32 : 40, 0);
+    if (phone(page)) {
+      const filmBox = (await section.locator("[data-otc='film']").boundingBox())!;
+      expect((await clipping.boundingBox())!.y).toBeGreaterThan(filmBox.y + filmBox.height);
+    } else {
+      expect((await clipping.boundingBox())!.x).toBeGreaterThan(trainingBox.x + trainingBox.width);
+      const readingTop = await reading.evaluate((element) => element.getBoundingClientRect().top + scrollY);
+      await clipping.locator("summary").click();
+      expect(await reading.evaluate((element) => element.getBoundingClientRect().top + scrollY)).toBeCloseTo(readingTop, 0);
+    }
+  });
+
   test("the four items are in the server-rendered section", async ({ page }) => {
     await page.route("**/*.js", (route) => route.abort());
     await page.goto("/");

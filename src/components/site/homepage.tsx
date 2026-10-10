@@ -1,5 +1,4 @@
 import { EntranceGuard, EntrancePlayer } from "@/components/site/entrance-scripts";
-import { sectionLabel } from "@/components/site/sections";
 import { CareerRuler } from "@/components/site/career-ruler";
 import { Hero } from "@/components/site/hero";
 import { SayHello } from "@/components/site/say-hello";
@@ -59,7 +58,6 @@ export function Homepage() {
         </section>
 
         <section id="say-hello" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="say-hello-heading">
-          <SectionHeading id="say-hello-heading" heading={sectionLabel["say-hello"]} />
           <SayHello />
         </section>
       </main>

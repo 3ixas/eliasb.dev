@@ -1,3 +1,4 @@
+import { sectionLabel } from "@/components/site/sections";
 import { profile } from "@/content/site";
 import { sayHello } from "@/content/stretch/site-copy";
 
@@ -8,9 +9,11 @@ import { sayHello } from "@/content/stretch/site-copy";
 export function SayHello() {
   return (
     <div className="stretch-hello">
-      <a className="stretch-display stretch-hello__big" href={profile.links.email}>
-        {sayHello.bigLink}
-      </a>
+      <h2 id="say-hello-heading" aria-label={sectionLabel["say-hello"]} className="stretch-display stretch-hello__heading">
+        <a className="stretch-hello__big" href={profile.links.email}>
+          {sayHello.bigLink}
+        </a>
+      </h2>
       <p className="stretch-hello__line">{sayHello.line}</p>
       <ul className="stretch-hello__links">
         {sayHello.links.map(({ id, label }) => (

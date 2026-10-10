@@ -1192,6 +1192,14 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   margin-top: 40px;
 }
 
+.stretch-otc__column,
+.stretch-otc__media {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  gap: 32px;
+}
+
 .stretch-otc__card {
   position: relative;
   display: grid;
@@ -1526,24 +1534,25 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
 
 @media (min-width: 761px) {
   .stretch-otc {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     align-items: start;
+    gap: 32px;
+  }
+
+  .stretch-otc__column,
+  .stretch-otc__media {
     gap: 40px 32px;
   }
 
   .stretch-otc__training {
-    grid-column: span 7;
     grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
     gap: 28px;
   }
+}
 
-  .stretch-otc__clipping {
-    grid-column: span 5;
-  }
-
-  .stretch-otc__book,
-  .stretch-otc__film {
-    grid-column: span 6;
+@media (min-width: 1100px) {
+  .stretch-otc__media {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -1715,26 +1724,6 @@ button.stretch-gh__day[data-selected] {
   }
 }
 
-@media (min-width: 761px) {
-  .stretch-otc__making {
-    grid-column: span 12;
-  }
-
-  .stretch-otc__github {
-    grid-column: span 12;
-  }
-}
-
-@media (min-width: 1100px) {
-  .stretch-otc__making {
-    grid-column: span 5;
-  }
-
-  .stretch-otc__github {
-    grid-column: span 7;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .stretch-otc__print,
   .stretch-otc__photo img {
@@ -1875,6 +1864,10 @@ button.stretch-gh__day[data-selected] {
   font-size: clamp(36px, 8vw, 72px);
   line-height: 1;
   text-decoration: none;
+}
+
+.stretch-hello__heading {
+  margin: 0;
 }
 
 .stretch-hello__line {

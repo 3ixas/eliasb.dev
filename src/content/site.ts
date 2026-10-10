@@ -20,6 +20,6 @@ export const profile = {
     github: "https://github.com/3ixas",
     linkedin: "https://linkedin.com/in/elias-t-bennett/",
     resume:
-      "https://docs.google.com/document/d/1LhawgweUl1_f85CSVY_CpOkBtZ6NC-PXMrH4jSxSUio/edit?usp=drivesdk",
+      "https://drive.google.com/file/d/1Yv_oB-sNMXQhyY9K_EJbQ4CV11hM2ZY7/view?usp=drivesdk",
   },
 } as const;
