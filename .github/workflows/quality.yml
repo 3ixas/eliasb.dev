@@ -1,9 +1,10 @@
 name: Quality
 
+# Every branch push, not only pull requests: a branch gets Linux CI as soon as it is
+# pushed, instead of when its pull request opens at the end.
 on:
   push:
-    branches: [main]
-  pull_request:
+    branches: ["**"]
 
 permissions:
   contents: read
@@ -34,32 +35,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint
-        run: pnpm lint
-
-      - name: Typecheck
-        run: pnpm exec tsc --noEmit --incremental false
-
-      - name: Verify signal contracts
-        run: pnpm verify:signals
-
-      - name: Verify project catalogue
-        run: pnpm verify:catalogue
-
-      - name: Verify approved copy and case studies
-        run: pnpm verify:copy
-
-      - name: Verify opening lifecycle
-        run: pnpm verify:opening
+      # Lint, typecheck and every verify script that needs no build (see package.json).
+      - name: Check
+        run: pnpm check
 
       - name: Build with webpack
         run: SITE_INDEXABLE=true pnpm build --webpack
 
-      - name: Verify canonical routes
-        run: pnpm verify:routes
-
-      - name: Verify release surface
-        run: pnpm verify:release
+      # The verify scripts that read the build.
+      - name: Check the build
+        run: pnpm check:built
 
       - name: Check diff whitespace
         run: git diff --check
