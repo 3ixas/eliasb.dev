@@ -37,7 +37,7 @@ The homepage section straight after the hero, led by employment, in three parts:
 _Avoid_: Experience, CV, calling Elias's own projects "Work"
 
 **Things I make**:
-The homepage section for Elias's own projects: **Featured work** above the **Project index**, with a count of what he has built, introduced by the line that was the hero's supporting line (taking ideas all the way through, [#159](https://github.com/3ixas/eliasb.dev/issues/159)). It follows **Work**: reordered, not reduced, and keeping its product edge. The **Work archive** and every **Case study** live under `/things-i-make`, and `/work/*` redirects there permanently ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
+The homepage section for Elias's own projects: **Featured work** above the **Project index**, with a count of what he has built, introduced by what the hero used to say: making complicated things feel simple, and taking ideas all the way through ([#159](https://github.com/3ixas/eliasb.dev/issues/159)). It follows **Work**: reordered, not reduced, and keeping its product edge. The **Work archive** and every **Case study** live under `/things-i-make`, and `/work/*` redirects there permanently ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
 _Avoid_: Work (that means employment), On my own
 
 **How I got here**:
@@ -96,7 +96,7 @@ The middle part of **Work**, between the current role and **How I got here**: wh
 _Avoid_: Timeline, CV in chronological order, level or job titles ("aspiring Staff"), signals of looking for work
 
 **First glance**:
-What a skimming recruiter takes from the first screen in about a second: who Elias is, what he does now, and his strongest proof. It reuses the hero's slots ([#159](https://github.com/3ixas/eliasb.dev/issues/159)): under the headline and the name, the role line "Software Engineer at BNP Paribas CIB", then one sentence in the supporting line's slot giving the technical scope and both awards, and the portrait label "Based in London". It serves a second audience alongside the **Primary audience** without replacing it, and never repeats the proofs that lead Work's Now.
+What a skimming recruiter takes from the first screen in about a second: who Elias is, what he does now, and his strongest proof. It reuses the hero's slots ([#159](https://github.com/3ixas/eliasb.dev/issues/159)): the headline "I build pricing and risk engines at BNP Paribas, and *products of my own.*", so it lands in the entrance's first beat; under the name, the role line "Software Engineer at BNP Paribas CIB"; a supporting line with the stack and both awards; and the portrait label "Based in London". It serves a second audience alongside the **Primary audience** without replacing it, and never repeats the proofs that lead Work's Now.
 _Avoid_: Treating the whole site as a CV for skimmers, a separate Now section
 
 **Signature entrance**:
@@ -120,7 +120,7 @@ This week's history Pin: one surprising, source-linked fact shown like a newspap
 _Avoid_: History widget, history panel
 
 **Maker of clarity**:
-Elias's positioning. He builds everyday software, end to end, that makes complicated things simple, useful, and beautiful. It is an aspiration, never a claim of adoption or impact.
+Elias's positioning. He builds everyday software, end to end, that makes complicated things simple, useful, and beautiful. It is an aspiration, never a claim of adoption or impact. Since [#159](https://github.com/3ixas/eliasb.dev/issues/159) it introduces **Things I make** rather than heading the hero.
 _Avoid_: Claims of users, traction, or "can't live without" as a fact
 
 **Experiments section** (retired):
