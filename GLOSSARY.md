@@ -37,7 +37,7 @@ The homepage section straight after the hero, led by employment, in three parts:
 _Avoid_: Experience, CV, calling Elias's own projects "Work"
 
 **Things I make**:
-The homepage section for Elias's own projects: **Featured work** above the **Project index**, with a count of what he has built. It follows **Work**: reordered, not reduced, and keeping its product edge. The **Work archive** and every **Case study** live under `/things-i-make`, and `/work/*` redirects there permanently ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
+The homepage section for Elias's own projects: **Featured work** above the **Project index**, with a count of what he has built, introduced by the line that was the hero's supporting line (taking ideas all the way through, [#159](https://github.com/3ixas/eliasb.dev/issues/159)). It follows **Work**: reordered, not reduced, and keeping its product edge. The **Work archive** and every **Case study** live under `/things-i-make`, and `/work/*` redirects there permanently ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
 _Avoid_: Work (that means employment), On my own
 
 **How I got here**:
@@ -96,8 +96,8 @@ The middle part of **Work**, between the current role and **How I got here**: wh
 _Avoid_: Timeline, CV in chronological order, level or job titles ("aspiring Staff"), signals of looking for work
 
 **First glance**:
-What a skimming recruiter takes from the first screen in about a second: who Elias is, what he does now (Software engineer at BNP Paribas), and his strongest proof. It serves a second audience alongside the **Primary audience** without replacing it.
-_Avoid_: Treating the whole site as a CV for skimmers
+What a skimming recruiter takes from the first screen in about a second: who Elias is, what he does now, and his strongest proof. It reuses the hero's slots ([#159](https://github.com/3ixas/eliasb.dev/issues/159)): under the headline and the name, the role line "Software Engineer at BNP Paribas CIB", then one sentence in the supporting line's slot giving the technical scope and both awards, and the portrait label "Based in London". It serves a second audience alongside the **Primary audience** without replacing it, and never repeats the proofs that lead Work's Now.
+_Avoid_: Treating the whole site as a CV for skimmers, a separate Now section
 
 **Signature entrance**:
 The Commissioner-style opening on every load and reload ([#109](https://github.com/3ixas/eliasb.dev/issues/109)): the headline types alone on a blank page, moves up into the hero, then the name settles, the portrait swings in, the label presses on, and the rest of the page arrives, in about 5 s. It can't be skipped, it doesn't replay on back-navigation, and reduced motion gets the finished page. The content is in the HTML throughout.
