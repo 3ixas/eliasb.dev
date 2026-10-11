@@ -2,8 +2,10 @@ name: Codex review
 
 # Merges into main wait for Codex. Codex reviews a pull request when it opens,
 # when a draft is marked ready, or on an "@codex review" comment, and keeps a
-# summary comment whose Code Review row reads "Completed" once it has finished.
-# This check passes only then, so its comments exist before anything merges;
+# summary comment whose Code Review row names the commit it reviewed and reads
+# "Completed" once it has finished. This check passes only when that row is for
+# the pull request's head commit, so a review of an earlier push never stands in
+# for the code being merged, and its comments exist before anything merges;
 # the main ruleset's conversation-resolution rule then makes sure each one is
 # resolved.
 
@@ -30,7 +32,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
+          # The summary's Commit column shows the reviewed commit's short SHA.
+          head="\`${HEAD_SHA:0:7}\`"
           # Every 20 seconds for up to 25 minutes; a review usually takes about three.
           for attempt in $(seq 1 75); do
             bodies=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
@@ -40,6 +45,11 @@ jobs:
             if [ -z "$row" ] && [[ "$bodies" == *"create an environment"* ]]; then
               echo "::error::Codex replied that it needs an environment for this repo instead of reviewing. Check the Codex cloud settings, comment \"@codex review\", then re-run this check."
               exit 1
+            fi
+            if [[ "$row" != *"$head"* ]]; then
+              echo "Waiting for Codex to review $head; comment \"@codex review\" if it does not start (${row:-no summary yet})"
+              sleep 20
+              continue
             fi
             case "$row" in
               *Completed*)
