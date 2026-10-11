@@ -16,6 +16,10 @@ _Avoid_: Board, playful theme (its play comes from scale and colour, not from ad
 The site's one accent colour (`#2340ff` in light, `#8b9cff` in dark). It may be used large, and marks Elias's name, today and now, and the way to say hello. It never colours a project.
 _Avoid_: Using it for project tiles or as decoration
 
+**Eclipse**:
+The theme toggle in the header: an icon-only sun while the page is light and a crescent moon while it is dark. Pressing it eclipses one into the other as the page changes ([#156](https://github.com/3ixas/eliasb.dev/issues/156)). It shows the current theme, is announced as "Dark theme", pressed while dark, and has no outline, because the theme isn't the focus and the control should be understood at a glance and then ignored. It replaces the "Lights on / Lights off" pill.
+_Avoid_: Lights pill, "Lights on / Lights off" (retired wording), a metaphor that needs a second look
+
 **Project colour**:
 The colours a project already has in its own interface, carried by its **Featured work** tile and swatches: Threshold gold, Argus Risk blue, Flowtime copper. The work carries the colour; the page stays neutral.
 _Avoid_: Recolouring projects in the Cobalt accent
