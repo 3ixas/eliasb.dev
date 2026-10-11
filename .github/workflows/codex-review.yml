@@ -38,11 +38,18 @@ jobs:
           head="\`${HEAD_SHA:0:7}\`"
           # Every 20 seconds for up to 25 minutes; a review usually takes about three.
           for attempt in $(seq 1 75); do
-            bodies=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
-              --jq '.[] | select(.user.login == "chatgpt-codex-connector[bot]") | .body')
-            row=$(printf '%s\n' "$bodies" | grep -F '**Code Review**' | tail -n 1 || true)
+            comments=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+              --jq '.[] | {codex: (.user.login == "chatgpt-codex-connector[bot]"), created_at, updated_at, body}' | jq -s .)
+            row=$(jq -r '.[] | select(.codex) | .body' <<<"$comments" | grep -F '**Code Review**' | tail -n 1 || true)
             # Instead of reviewing, Codex can reply that it has no environment for the repo.
-            if [ -z "$row" ] && [[ "$bodies" == *"create an environment"* ]]; then
+            # Codex edits its summary in place but posts other replies as new comments, so
+            # its latest word is the comment it touched last; that reply counts only if it
+            # answers the latest "@codex review" request rather than an earlier one.
+            needs_environment=$(jq -r '
+              ([.[] | select((.codex | not) and (.body | contains("@codex review"))) | .created_at] | max // "") as $requested
+              | [.[] | select(.codex)] | max_by(.updated_at) // empty
+              | select((.body | contains("create an environment")) and .created_at > $requested) | "yes"' <<<"$comments")
+            if [ -n "$needs_environment" ]; then
               echo "::error::Codex replied that it needs an environment for this repo instead of reviewing. Check the Codex cloud settings, comment \"@codex review\", then re-run this check."
               exit 1
             fi
