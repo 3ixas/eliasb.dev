@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PROTOTYPE · Two-act entrance (#160)</title>
+<!--
+  PROTOTYPE, throwaway (#160 Two-act entrance). Not production code.
+  Five variants of the Signature entrance with the #159 First glance copy,
+  switchable via ?variant= (control, a, b, c, d) and the bottom bar.
+  ?slow=1 plays at half speed. R replays, ← → switch variant, H hides the bar.
+  The bar reports measured times: when "BNP Paribas" is first readable, and when
+  the First glance (name, role line, what-and-awards line) is fully readable.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root { --page:#fbfbf8; --ink:#111114; --muted:#5a5a63; --cobalt:#2340ff; --on-cobalt:#fff; --gutter:16px; }
+@media (prefers-color-scheme: dark) { :root { --page:#0d0d12; --ink:#f1f1f4; --muted:#a2a2ad; --cobalt:#8b9cff; --on-cobalt:#0d0d12; } }
+* { box-sizing: border-box; }
+html, body { margin:0; background:var(--page); color:var(--ink); font-family:'Bricolage Grotesque', system-ui, sans-serif; }
+.wrap { max-width:1400px; margin-inline:auto; padding-inline:var(--gutter); }
+@media (min-width:761px) { :root { --gutter:32px; } }
+
+header { display:flex; justify-content:space-between; align-items:center; min-height:72px; }
+header .brand { font-weight:800; font-stretch:75%; text-transform:uppercase; font-size:22px; }
+header nav { display:flex; gap:18px; font-weight:600; font-size:16px; }
+header nav span:not(:first-child) { display:none; }
+@media (min-width:761px) { header nav span:not(:first-child) { display:inline; } }
+
+.hero { display:grid; grid-template-columns:minmax(0,1fr); padding-block:12px 48px; }
+.name, .ov-name { margin:0; color:var(--cobalt); font-weight:800; font-stretch:75%; text-transform:uppercase; font-size:31.5vw; line-height:.8; letter-spacing:.005em; white-space:nowrap; }
+.name span, .ov-name span { display:block; }
+.role { margin:16px 0 0; font-size:clamp(20px, 1.9vw, 27px); font-weight:650; letter-spacing:-.01em; }
+.lede { margin-top:28px; }
+h1, .line { max-width:17em; margin:0; font-size:clamp(30px,3.6vw,52px); font-weight:600; line-height:1.08; letter-spacing:-.025em; }
+h1 em, .line em { position:relative; display:inline-block; color:var(--cobalt); font-style:normal; }
+h1 em svg, .line em svg { position:absolute; left:0; right:0; bottom:-.12em; width:100%; height:.3em; overflow:visible; }
+h1 em path, .line em path { fill:none; stroke:var(--cobalt); stroke-width:6; stroke-linecap:round; }
+.support { max-width:26em; margin:14px 0 0; color:var(--muted); font-size:17px; line-height:1.5; }
+.actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:20px; }
+.btn { display:inline-flex; align-items:center; min-height:48px; padding-inline:20px; border:1px solid var(--ink); border-radius:999px; color:var(--ink); font-size:16px; font-weight:600; text-decoration:none; }
+.btn.primary { border-color:var(--cobalt); background:var(--cobalt); color:var(--on-cobalt); }
+.portrait { position:relative; justify-self:start; width:min(100% - 16px, 360px); margin:28px 0 0 8px; transform:rotate(2deg); transform-origin:50% 0; }
+.portrait img { display:block; width:100%; aspect-ratio:4/5; border-radius:18px; object-fit:cover; }
+.portrait figcaption { position:absolute; left:-8px; bottom:20px; padding:9px 14px; border-radius:999px; background:var(--cobalt); color:var(--on-cobalt); font-size:16px; font-weight:700; transform:rotate(-6deg); }
+@media (min-width:761px) {
+  .hero { grid-template-columns:minmax(0,1fr) 290px; column-gap:48px; padding-block:24px 80px; }
+  .name, .ov-name { font-size:clamp(88px,18vw,280px); }
+  .lede { margin-top:40px; }
+  .support { font-size:19px; }
+  .portrait { grid-column:2; grid-row:1 / span 2; align-self:start; justify-self:stretch; width:auto; margin:16px 0 0; transform:rotate(3deg); }
+  .portrait figcaption { left:-28px; bottom:28px; padding:10px 16px; font-size:17px; transform:rotate(-7deg); }
+}
+.rest h2 { margin:0; font-weight:800; font-stretch:75%; text-transform:uppercase; font-size:clamp(64px, 9vw, 120px); line-height:.9; }
+.rest p { font-size:19px; color:var(--muted); max-width:34em; }
+.rest .now { font:13px 'JetBrains Mono', monospace; color:var(--ink); }
+
+/* Hold and release, as in production: opacity only, so everything stays in the accessibility tree. */
+[data-p] { transition:opacity calc(var(--fade, .5s) * var(--slow, 1)) cubic-bezier(.23,1,.32,1); }
+[data-p~="name"], [data-p~="headline"] { transition:none; }
+.held { opacity:0; }
+
+/* The decorative layer. */
+.layer { position:fixed; inset:0; z-index:30; pointer-events:none; }
+.line { position:fixed; color:var(--ink); }
+.line .u { color:transparent; }
+.line .u svg path { stroke:transparent; }
+.caret { display:inline-block; position:relative; width:0; }
+.caret > span { position:absolute; left:.02em; top:-.82em; width:.07em; height:.95em; background:var(--cobalt); border-radius:2px; }
+.caret.blink > span { animation:blink .42s steps(1) infinite; }
+@keyframes blink { 50% { opacity:0; } }
+.ov-name { position:fixed; }
+.ov-name i { display:inline-block; font-style:normal; }
+
+/* Prototype bar: obviously not part of the design. */
+.bar { position:fixed; left:12px; right:12px; bottom:12px; z-index:50; display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center; padding:10px 14px; border-radius:14px; background:#111114; color:#f1f1f4; font:12px 'JetBrains Mono', monospace; box-shadow:0 8px 30px rgba(0,0,0,.3); }
+.bar button { min-height:32px; padding:0 10px; border-radius:8px; border:1px solid #3a3a44; background:transparent; color:#f1f1f4; font:inherit; cursor:pointer; }
+.bar .k { color:#8b9cff; }
+.bar .desc { flex-basis:100%; color:#b8b8c2; line-height:1.4; }
+.bar[hidden] { display:none; }
+.bar .on { background:#2340ff; border-color:#2340ff; }
+</style>
+</head>
+<body>
+<header class="wrap" data-p="header"><span class="brand">EB</span><nav><span>Menu</span><span>Work</span><span>Things I make</span><span>Say hello</span></nav></header>
+<main>
+  <section class="wrap hero" aria-label="Introduction">
+    <div>
+      <p class="name" data-p="name"><span>Elias</span> <span>Bennett</span></p>
+      <p class="role" data-p="role">Software Engineer at BNP Paribas CIB</p>
+    </div>
+    <div class="lede">
+      <h1 data-p="headline">I build pricing and risk engines at BNP Paribas, and <em>products of my own.<svg viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden="true"><path d="M6 26 C 80 17, 170 31, 250 21 S 360 15, 394 25"/></svg></em></h1>
+      <p class="support" data-p="support">In C# and Java, on CPU and GPU. I’ve won BNP’s Early Careers digitisation competition and a Take Ownership award.</p>
+      <div class="actions" data-p="support"><a class="btn" href="#work">See my work ↓</a><a class="btn primary" href="#hello">Say hello</a></div>
+    </div>
+    <figure class="portrait" data-p="portrait"><img src="assets/portrait.webp" alt="Elias in a white tuxedo, smiling" width="1200" height="1500"><figcaption>Based in London</figcaption></figure>
+  </section>
+  <section class="wrap rest" id="work" data-p="rest" style="padding-bottom:200px">
+    <h2>Work</h2>
+    <p class="now">● Now · BNP Paribas CIB</p>
+    <p>(Placeholder for Work: Now, Where I’m headed, How I got here.)</p>
+  </section>
+</main>
+
+<div class="bar" role="toolbar" aria-label="Prototype controls">
+  <button id="prev" aria-label="Previous variant">←</button>
+  <span id="label"></span>
+  <button id="next" aria-label="Next variant">→</button>
+  <button id="replay">Replay (R)</button>
+  <button id="slow">½ speed</button>
+  <span>H hides this bar</span>
+  <span>BNP readable <span class="k" id="m-bnp">…</span></span>
+  <span>First glance <span class="k" id="m-glance">…</span></span>
+  <span>Settled <span class="k" id="m-done">…</span></span>
+  <span class="desc" id="desc"></span>
+</div>
+
+<script>
+const LEAD = "I build pricing and risk engines at BNP Paribas, and ";
+const COMMA = LEAD.indexOf(",");
+const BNP_END = LEAD.indexOf("Paribas") + "Paribas".length - 1;
+
+const VARIANTS = {
+  control: { name: "Control", desc: "Today’s choreography with the #159 words: the whole lead types alone at 38 ms a character, “products of my own.” lands, the line moves up, then name, portrait, role and support. The baseline the others have to beat." },
+  a: { name: "Quick typist", desc: "Same order as today, typed about twice as fast, with the comma pause as the act break. The role line arrives with the name, not the support. Smallest change to what exists." },
+  b: { name: "Hero first", desc: "Act 1 is the First glance itself: the name settles, then the role line and the awards line arrive at once. Act 2 is the headline typing in place in the h1, ending on “products of my own.”, with the portrait swinging in as it lands. Loses the typing on a blank page." },
+  c: { name: "Stated, then typed", desc: "On the blank page Act 1 is stated, not typed: “I build pricing and risk engines at BNP Paribas,” appears word by word. A beat, then the caret types Act 2 by hand, “and products of my own.” lands, and the hero assembles as today. The work is fact; the products are personal." },
+  d: { name: "Interleaved acts", desc: "Act 1 types fast on the blank page up to the comma, then the half-typed line moves straight up into place as the name, role line and awards line arrive around it: the First glance is complete. Act 2: the caret carries on in place, at today’s pace, “products of my own.” lands, and the portrait swings in with “Based in London”." },
+};
+const KEYS = Object.keys(VARIANTS);
+const params = new URLSearchParams(location.search);
+const key = KEYS.includes(params.get("variant")) ? params.get("variant") : "control";
+const SLOW = params.get("slow") === "1" ? 2 : 1;
+document.documentElement.style.setProperty("--slow", SLOW);
+
+// ---- Bar ----
+const go = (k, slow = SLOW === 2) => { const p = new URLSearchParams({ variant: k }); if (slow) p.set("slow", "1"); location.search = p.toString(); };
+const idx = KEYS.indexOf(key);
+document.getElementById("label").textContent = `${key.toUpperCase()} · ${VARIANTS[key].name}`;
+document.getElementById("desc").textContent = VARIANTS[key].desc;
+document.getElementById("prev").onclick = () => go(KEYS[(idx + KEYS.length - 1) % KEYS.length]);
+document.getElementById("next").onclick = () => go(KEYS[(idx + 1) % KEYS.length]);
+document.getElementById("replay").onclick = () => location.reload();
+const slowBtn = document.getElementById("slow");
+if (SLOW === 2) slowBtn.classList.add("on");
+slowBtn.onclick = () => go(key, SLOW !== 2);
+addEventListener("keydown", (e) => {
+  if (e.target.closest("input, textarea, [contenteditable]")) return;
+  if (e.key === "ArrowLeft") document.getElementById("prev").click();
+  if (e.key === "ArrowRight") document.getElementById("next").click();
+  if (e.key === "r" || e.key === "R") location.reload();
+  if (e.key === "h" || e.key === "H") document.querySelector(".bar").hidden = !document.querySelector(".bar").hidden;
+});
+
+// ---- Engine (same springs and handover as entrance.ts) ----
+function spring(bounce, visualDuration) {
+  const zeta = Math.max(1 - bounce, 0.05), omega = (2 * Math.PI) / (visualDuration * 1.2);
+  const settle = Math.min(2, Math.log(5000) / (zeta * omega)), steps = 40, pts = [];
+  const at = (t) => { if (zeta < 1) { const d = omega * Math.sqrt(1 - zeta * zeta); return 1 - Math.exp(-zeta * omega * t) * (Math.cos(d * t) + (zeta * omega / d) * Math.sin(d * t)); } return 1 - Math.exp(-omega * t) * (1 + omega * t); };
+  for (let s = 0; s <= steps; s++) pts.push(s === steps ? 1 : Math.round(at(settle * s / steps) * 1000) / 1000);
+  let settled = Math.round(settle * 1000);
+  for (let ms = 0; ms <= settle * 1000; ms++) { const t = ms / 1000; if (Math.abs(1 - at(t)) <= 0.005 && Math.abs(at(t + 0.001) - at(t)) * 1000 <= 0.01) { settled = ms; break; } }
+  return { easing: `linear(${pts.join(",")})`, duration: Math.round(settle * 1000), settled };
+}
+const $ = (s) => document.querySelector(s);
+const parts = (p) => document.querySelectorAll(`[data-p~="${p}"]`);
+let t0 = 0;
+const later = (fn, ms) => setTimeout(fn, ms * SLOW);
+const animate = (el, kf, o) => el.animate(kf, { ...o, duration: o.duration * SLOW, delay: (o.delay || 0) * SLOW, fill: "both" });
+const now = () => Math.round((performance.now() - t0) / SLOW);
+const fmt = (ms) => (ms / 1000).toFixed(2) + " s";
+const marks = {};
+const mark = (k) => { if (marks[k] != null) return; marks[k] = now(); document.getElementById("m-" + k).textContent = fmt(marks[k]); };
+const visible = {};
+const seen = (p) => { visible[p] = true; if (visible.name && visible.role && visible.support) mark("glance"); if (p === "role") mark("bnp"); };
+function release(p, at, fadeMs = 500) {
+  later(() => { parts(p).forEach((el) => el.classList.remove("held")); }, at);
+  later(() => seen(p), at + (p === "name" || p === "headline" ? 0 : fadeMs * 0.6));
+}
+
+let layer, line, chars, caret, land, path, pathLen, display, letters;
+function buildLayer(atHeadline) {
+  const h1 = $("h1").getBoundingClientRect();
+  layer = document.createElement("div"); layer.className = "layer"; layer.setAttribute("aria-hidden", "true");
+  line = document.createElement("p"); line.className = "line";
+  line.style.width = h1.width + "px";
+  line.style.left = (atHeadline ? h1.left : Math.max(0, (innerWidth - h1.width) / 2)) + "px";
+  line.style.top = (atHeadline ? h1.top : Math.max(0, (innerHeight - h1.height) / 2 - 40)) + "px";
+  caret = document.createElement("span"); caret.className = "caret"; caret.append(document.createElement("span"));
+  chars = [...LEAD].map((ch) => { const s = document.createElement("span"); s.className = "u"; s.textContent = ch; return s; });
+  land = $("h1 em").cloneNode(true); land.style.opacity = "0";
+  path = land.querySelector("path"); pathLen = path.getTotalLength();
+  path.style.strokeDasharray = pathLen; path.style.strokeDashoffset = pathLen;
+  line.append(caret, ...chars, land);
+  // The name's letters, lower and wider, over the held real one.
+  const nb = $(".name").getBoundingClientRect();
+  display = document.createElement("p"); display.className = "ov-name";
+  Object.assign(display.style, { left: nb.left + "px", top: nb.top + "px", width: nb.width + "px", visibility: "hidden" });
+  letters = [];
+  for (const word of ["Elias", "Bennett"]) { const row = document.createElement("span"); for (const c of word) { const i = document.createElement("i"); i.textContent = c; row.append(i); letters.push(i); } display.append(row); }
+  layer.append(line, display); document.body.append(layer);
+}
+function type(from, to, start, { c = 38, s = 28, comma = 420 } = {}) {
+  let t = start;
+  for (let i = from; i <= to; i++) {
+    const el = chars[i];
+    later(() => { el.classList.remove("u"); el.after(caret); if (i === BNP_END) mark("bnp"); }, t);
+    t += chars[i].textContent === " " ? s : c;
+    if (i === COMMA && comma) { later(() => caret.classList.add("blink"), t); t += comma; later(() => caret.classList.remove("blink"), t); }
+  }
+  return t;
+}
+function words(from, to, start, stagger = 70) {
+  let t = start, i = from, word = [];
+  const flush = (at, group) => later(() => { group.forEach((el) => { el.classList.remove("u"); animate(el, [{ opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0)" }], { duration: 380, easing: "cubic-bezier(.23,1,.32,1)" }); }); if (group.includes(chars[BNP_END])) later(() => mark("bnp"), 200 / SLOW); }, at);
+  for (; i <= to; i++) { word.push(chars[i]); if (chars[i].textContent === " " || i === to) { flush(t, word); word = []; t += stagger; } }
+  later(() => chars[to].after(caret), t);
+  return t + 380;
+}
+function landEmphasis(t) {
+  const sp = spring(0.3, 0.45);
+  later(() => {
+    caret.remove(); land.style.opacity = "";
+    animate(land, [{ opacity: 0, transform: "translateY(14px) rotate(-2deg)" }, { opacity: 1, transform: "none" }], sp);
+    animate(path, [{ strokeDashoffset: pathLen }, { strokeDashoffset: 0 }], { duration: 520, easing: "cubic-bezier(.23,1,.32,1)", delay: 200 });
+  }, t);
+  return t + Math.max(sp.settled, 720);
+}
+function moveLine(t) {
+  const sp = spring(0.15, 0.7);
+  later(() => {
+    const from = line.getBoundingClientRect(), to = $("h1").getBoundingClientRect();
+    animate(line, [{ transform: "translate(0,0)" }, { transform: `translate(${to.left - from.left}px, ${to.top - from.top}px)` }], sp);
+  }, t);
+  return t + sp.settled;
+}
+function handOver(t) { release("headline", t); later(() => line.remove(), t); }
+function nameIn(t) {
+  const sp = spring(0.35, 0.55);
+  later(() => {
+    display.style.visibility = "";
+    letters.forEach((l, i) => animate(l, [{ transform: "translateY(0.18em)", fontStretch: "100%" }, { transform: "none", fontStretch: "75%" }], { ...sp, delay: i * 35 }));
+  }, t);
+  const end = t + (letters.length - 1) * 35 + sp.settled;
+  later(() => { visible.name = true; seen("name"); }, t + 250); // legible while still settling
+  later(() => { display.remove(); parts("name").forEach((el) => el.classList.remove("held")); }, end);
+  return end;
+}
+const label = () => $(".portrait figcaption");
+const labelAngle = () => (innerWidth >= 761 ? -7 : -6);
+function portraitIn(t) {
+  const sp = spring(0.4, 0.6), angle = innerWidth >= 761 ? 3 : 2;
+  later(() => {
+    animate($(".portrait"), [{ transform: `rotate(${angle + 6}deg) translateY(-14px)` }, { transform: `rotate(${angle}deg)` }], sp);
+    animate(label(), [{ transform: `rotate(${labelAngle()}deg) scale(1.25)` }], { duration: 0, easing: "linear" });
+  }, t);
+  release("portrait", t, 300);
+  return t + sp.settled;
+}
+function labelPress(t) {
+  const sp = spring(0.45, 0.3);
+  later(() => animate(label(), [{ transform: `rotate(${labelAngle()}deg) scale(1.25)` }, { transform: `rotate(${labelAngle()}deg) scale(1)` }], sp), t);
+  return t + sp.settled;
+}
+function finish(t) { later(() => { mark("done"); layer.remove(); }, t + 500); }
+
+// ---- The variants ----
+const play = {
+  control() {
+    buildLayer(false);
+    let t = type(0, chars.length - 1, 200);
+    t = landEmphasis(t);
+    const moveEnd = moveLine(t), nameStart = t + 100;
+    const nameEnd = nameIn(nameStart), portraitEnd = portraitIn(nameStart + 200);
+    handOver(moveEnd); release("header", moveEnd); release("role", moveEnd); release("support", moveEnd); labelPress(moveEnd);
+    const rest = Math.max(nameEnd, portraitEnd, moveEnd); release("rest", rest); finish(rest);
+  },
+  a() {
+    buildLayer(false);
+    let t = type(0, chars.length - 1, 120, { c: 20, s: 14, comma: 260 });
+    t = landEmphasis(t);
+    const moveEnd = moveLine(t), nameStart = t + 100;
+    const nameEnd = nameIn(nameStart); release("role", nameStart + 250);
+    const portraitEnd = portraitIn(nameStart + 200);
+    handOver(moveEnd); release("header", moveEnd); release("support", moveEnd); labelPress(moveEnd);
+    const rest = Math.max(nameEnd, portraitEnd, moveEnd); release("rest", rest); finish(rest);
+  },
+  b() {
+    buildLayer(true);
+    line.style.visibility = "hidden";
+    const nameEnd = nameIn(150);
+    release("role", 380, 400); release("support", 620, 400);
+    let t = Math.max(nameEnd, 1100);
+    later(() => line.style.visibility = "", t);
+    t = type(0, chars.length - 1, t, { c: 30, s: 22, comma: 320 });
+    const portraitEnd = portraitIn(t);
+    t = landEmphasis(t);
+    handOver(t); release("header", t); labelPress(t);
+    const rest = Math.max(t, portraitEnd); release("rest", rest); finish(rest);
+  },
+  c() {
+    buildLayer(false);
+    let t = words(0, COMMA, 200, 75);
+    later(() => caret.classList.add("blink"), t); t += 450; later(() => caret.classList.remove("blink"), t);
+    t = type(COMMA + 1, chars.length - 1, t);
+    t = landEmphasis(t);
+    const moveEnd = moveLine(t), nameStart = t + 100;
+    const nameEnd = nameIn(nameStart), portraitEnd = portraitIn(nameStart + 200);
+    handOver(moveEnd); release("header", moveEnd); release("role", moveEnd); release("support", moveEnd); labelPress(moveEnd);
+    const rest = Math.max(nameEnd, portraitEnd, moveEnd); release("rest", rest); finish(rest);
+  },
+  d() {
+    buildLayer(false);
+    let t = type(0, COMMA - 1, 120, { c: 20, s: 14, comma: 0 });
+    t = type(COMMA, COMMA, t, { c: 20, s: 14, comma: 0 });
+    later(() => caret.classList.add("blink"), t);
+    const moveStart = t + 120, moveEnd = moveLine(moveStart), nameStart = moveStart + 100;
+    const nameEnd = nameIn(nameStart);
+    release("role", nameStart + 250); release("support", moveEnd); release("header", moveEnd);
+    t = Math.max(nameEnd, moveEnd) + 250;
+    later(() => caret.classList.remove("blink"), t);
+    t = type(COMMA + 1, chars.length - 1, t);
+    const portraitEnd = portraitIn(t);
+    t = landEmphasis(t);
+    handOver(t); labelPress(t);
+    const rest = Math.max(t, portraitEnd); release("rest", rest); finish(rest);
+  },
+};
+
+// Hold before first paint, then wait for fonts (max 1 s) as production does.
+document.querySelectorAll("[data-p]").forEach((el) => el.classList.add("held"));
+let started = false;
+const start = () => { if (started) return; started = true; scrollTo(0, 0); requestAnimationFrame(() => requestAnimationFrame(() => { t0 = performance.now(); play[key](); })); };
+setTimeout(start, 1000);
+document.fonts.ready.then(() => $(".portrait img").decode().catch(() => {})).then(start, start);
+</script>
+</body>
+</html>
