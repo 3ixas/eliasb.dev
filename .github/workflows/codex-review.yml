@@ -33,9 +33,14 @@ jobs:
         run: |
           # Every 20 seconds for up to 25 minutes; a review usually takes about three.
           for attempt in $(seq 1 75); do
-            row=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
-              --jq '.[] | select(.user.login == "chatgpt-codex-connector[bot]") | .body' \
-              | grep -F '**Code Review**' | tail -n 1 || true)
+            bodies=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+              --jq '.[] | select(.user.login == "chatgpt-codex-connector[bot]") | .body')
+            row=$(printf '%s\n' "$bodies" | grep -F '**Code Review**' | tail -n 1 || true)
+            # Instead of reviewing, Codex can reply that it has no environment for the repo.
+            if [ -z "$row" ] && [[ "$bodies" == *"create an environment"* ]]; then
+              echo "::error::Codex replied that it needs an environment for this repo instead of reviewing. Check the Codex cloud settings, comment \"@codex review\", then re-run this check."
+              exit 1
+            fi
             case "$row" in
               *Completed*)
                 echo "Codex has finished reviewing: $row"
