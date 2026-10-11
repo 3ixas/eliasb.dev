@@ -7,7 +7,7 @@
 <!--
   PROTOTYPE, throwaway (#160 Two-act entrance). Not production code.
   Five variants of the Signature entrance with the #159 First glance copy,
-  switchable via ?variant= (control, a, b, c, d) and the bottom bar.
+  switchable via ?variant= (control, a, a2, b, c, d) and the bottom bar.
   ?slow=1 plays at half speed. R replays, ← → switch variant, H hides the bar.
   The bar reports measured times: when "BNP Paribas" is first readable, and when
   the First glance (name, role line, what-and-awards line) is fully readable.
@@ -42,7 +42,7 @@ h1 em path, .line em path { fill:none; stroke:var(--cobalt); stroke-width:6; str
 .btn { display:inline-flex; align-items:center; min-height:48px; padding-inline:20px; border:1px solid var(--ink); border-radius:999px; color:var(--ink); font-size:16px; font-weight:600; text-decoration:none; }
 .btn.primary { border-color:var(--cobalt); background:var(--cobalt); color:var(--on-cobalt); }
 .portrait { position:relative; justify-self:start; width:min(100% - 16px, 360px); margin:28px 0 0 8px; transform:rotate(2deg); transform-origin:50% 0; }
-.portrait img { display:block; width:100%; aspect-ratio:4/5; border-radius:18px; object-fit:cover; }
+.portrait img { display:block; width:100%; height:auto; aspect-ratio:4/5; border-radius:18px; object-fit:cover; }
 .portrait figcaption { position:absolute; left:-8px; bottom:20px; padding:9px 14px; border-radius:999px; background:var(--cobalt); color:var(--on-cobalt); font-size:16px; font-weight:700; transform:rotate(-6deg); }
 @media (min-width:761px) {
   .hero { grid-template-columns:minmax(0,1fr) 290px; column-gap:48px; padding-block:24px 80px; }
@@ -52,6 +52,9 @@ h1 em path, .line em path { fill:none; stroke:var(--cobalt); stroke-width:6; str
   .portrait { grid-column:2; grid-row:1 / span 2; align-self:start; justify-self:stretch; width:auto; margin:16px 0 0; transform:rotate(3deg); }
   .portrait figcaption { left:-28px; bottom:28px; padding:10px 16px; font-size:17px; transform:rotate(-7deg); }
 }
+/* a2: the name never takes more than about 45% of the screen's height (two lines at 0.8). */
+html.cap .name, html.cap .ov-name { font-size:min(31.5vw, 28svh); }
+@media (min-width:761px) { html.cap .name, html.cap .ov-name { font-size:clamp(88px, min(18vw, 28svh), 280px); } }
 .rest h2 { margin:0; font-weight:800; font-stretch:75%; text-transform:uppercase; font-size:clamp(64px, 9vw, 120px); line-height:.9; }
 .rest p { font-size:19px; color:var(--muted); max-width:34em; }
 .rest .now { font:13px 'JetBrains Mono', monospace; color:var(--ink); }
@@ -125,6 +128,7 @@ const BNP_END = LEAD.indexOf("Paribas") + "Paribas".length - 1;
 const VARIANTS = {
   control: { name: "Control", desc: "Today’s choreography with the #159 words: the whole lead types alone at 38 ms a character, “products of my own.” lands, the line moves up, then name, portrait, role and support. The baseline the others have to beat." },
   a: { name: "Quick typist", desc: "Same order as today, typed about twice as fast, with the comma pause as the act break. The role line arrives with the name, not the support. Smallest change to what exists." },
+  a2: { name: "A, tuned", desc: "Round 2 of A: still 20 ms a character, but a 400 ms comma beat between the acts; the line and name start moving as the underline starts drawing rather than after it settles; and the name is capped at about 45% of the screen’s height so the role, headline and awards line always fit on the first screen." },
   b: { name: "Hero first", desc: "Act 1 is the First glance itself: the name settles, then the role line and the awards line arrive at once. Act 2 is the headline typing in place in the h1, ending on “products of my own.”, with the portrait swinging in as it lands. Loses the typing on a blank page." },
   c: { name: "Stated, then typed", desc: "On the blank page Act 1 is stated, not typed: “I build pricing and risk engines at BNP Paribas,” appears word by word. A beat, then the caret types Act 2 by hand, “and products of my own.” lands, and the hero assembles as today. The work is fact; the products are personal." },
   d: { name: "Interleaved acts", desc: "Act 1 types fast on the blank page up to the comma, then the half-typed line moves straight up into place as the name, role line and awards line arrive around it: the First glance is complete. Act 2: the caret carries on in place, at today’s pace, “products of my own.” lands, and the portrait swings in with “Based in London”." },
@@ -281,6 +285,18 @@ const play = {
     buildLayer(false);
     let t = type(0, chars.length - 1, 120, { c: 20, s: 14, comma: 260 });
     t = landEmphasis(t);
+    const moveEnd = moveLine(t), nameStart = t + 100;
+    const nameEnd = nameIn(nameStart); release("role", nameStart + 250);
+    const portraitEnd = portraitIn(nameStart + 200);
+    handOver(moveEnd); release("header", moveEnd); release("support", moveEnd); labelPress(moveEnd);
+    const rest = Math.max(nameEnd, portraitEnd, moveEnd); release("rest", rest); finish(rest);
+  },
+  a2() {
+    document.documentElement.classList.add("cap");
+    buildLayer(false);
+    let t = type(0, chars.length - 1, 120, { c: 20, s: 14, comma: 400 });
+    landEmphasis(t);
+    t += 200; // the underline starts drawing
     const moveEnd = moveLine(t), nameStart = t + 100;
     const nameEnd = nameIn(nameStart); release("role", nameStart + 250);
     const portraitEnd = portraitIn(nameStart + 200);
