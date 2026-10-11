@@ -33,6 +33,7 @@ jobs:
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          TRIGGERED_AT: ${{ github.event.pull_request.updated_at }}
         run: |
           # The summary's Commit column shows the reviewed commit's short SHA.
           head="\`${HEAD_SHA:0:7}\`"
@@ -43,12 +44,13 @@ jobs:
             row=$(jq -r '.[] | select(.codex) | .body' <<<"$comments" | grep -F '**Code Review**' | tail -n 1 || true)
             # Instead of reviewing, Codex can reply that it has no environment for the repo.
             # Codex edits its summary in place but posts other replies as new comments, so
-            # its latest word is the comment it touched last; that reply counts only if it
-            # answers the latest "@codex review" request rather than an earlier one.
-            needs_environment=$(jq -r '
-              ([.[] | select((.codex | not) and (.body | contains("@codex review"))) | .created_at] | max // "") as $requested
+            # its latest word is the comment it touched last. That reply counts only if it
+            # answers this attempt: the event that started this check, or a later
+            # "@codex review" request. A re-run keeps its event, so it keeps that boundary.
+            needs_environment=$(jq -r --arg triggered "$TRIGGERED_AT" '
+              ([$triggered] + [.[] | select((.codex | not) and (.body | contains("@codex review"))) | .created_at] | max) as $attempt
               | [.[] | select(.codex)] | max_by(.updated_at) // empty
-              | select((.body | contains("create an environment")) and .created_at > $requested) | "yes"' <<<"$comments")
+              | select((.body | contains("create an environment")) and .created_at > $attempt) | "yes"' <<<"$comments")
             if [ -n "$needs_environment" ]; then
               echo "::error::Codex replied that it needs an environment for this repo instead of reviewing. Check the Codex cloud settings, comment \"@codex review\", then re-run this check."
               exit 1
