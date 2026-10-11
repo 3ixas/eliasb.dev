@@ -13,6 +13,7 @@
     "verify:routes": "node scripts/verify-canonical-routes.mjs",
     "verify:release": "node scripts/verify-release.mjs",
     "verify:opening": "node --no-warnings --experimental-strip-types scripts/verify-opening.mjs",
+    "verify:codex-gate": "node scripts/verify-codex-gate.mjs",
     "test:e2e": "playwright test"
   },
   "dependencies": {

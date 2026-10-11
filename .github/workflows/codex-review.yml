@@ -1,19 +1,17 @@
 name: Codex review
 
-# Merges into main wait for Codex. Codex reviews a pull request when it opens,
-# when a draft is marked ready, or on an "@codex review" comment, and keeps a
-# summary comment whose Code Review row names the commit it reviewed and reads
-# "Completed" once it has finished. This check passes only when that row is for
-# the pull request's head commit, so a review of an earlier push never stands in
-# for the code being merged, and its comments exist before anything merges;
-# the main ruleset's conversation-resolution rule then makes sure each one is
-# resolved.
+# Merges into main wait for Codex to finish reviewing the pull request's head
+# commit, so its comments exist before anything merges and the main ruleset's
+# conversation-resolution rule can hold each one to an answer.
+# scripts/codex-review-gate.mjs decides; docs/runbooks/merging.md explains how
+# to drive it.
 
 on:
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
 
 permissions:
+  contents: read
   pull-requests: read
   issues: read
 
@@ -27,6 +25,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
       - name: Wait for Codex to finish reviewing
         env:
           GH_TOKEN: ${{ github.token }}
@@ -34,42 +35,4 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           TRIGGERED_AT: ${{ github.event.pull_request.updated_at }}
-        run: |
-          # The summary's Commit column shows the reviewed commit's short SHA.
-          head="\`${HEAD_SHA:0:7}\`"
-          # Every 20 seconds for up to 25 minutes; a review usually takes about three.
-          for attempt in $(seq 1 75); do
-            comments=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
-              --jq '.[] | {codex: (.user.login == "chatgpt-codex-connector[bot]"), created_at, updated_at, body}' | jq -s .)
-            row=$(jq -r '.[] | select(.codex) | .body' <<<"$comments" | grep -F '**Code Review**' | tail -n 1 || true)
-            # Instead of reviewing, Codex can reply that it has no environment for the repo.
-            # Codex edits its summary in place but posts other replies as new comments, so
-            # its latest word is the comment it touched last. That reply counts only if it
-            # answers this attempt: the event that started this check, or a later
-            # "@codex review" request. A re-run keeps its event, so it keeps that boundary.
-            needs_environment=$(jq -r --arg triggered "$TRIGGERED_AT" '
-              ([$triggered] + [.[] | select((.codex | not) and (.body | contains("@codex review"))) | .created_at] | max) as $attempt
-              | [.[] | select(.codex)] | max_by(.updated_at) // empty
-              | select((.body | contains("create an environment")) and .created_at > $attempt) | "yes"' <<<"$comments")
-            if [ -n "$needs_environment" ]; then
-              echo "::error::Codex replied that it needs an environment for this repo instead of reviewing. Check the Codex cloud settings, comment \"@codex review\", then re-run this check."
-              exit 1
-            fi
-            if [[ "$row" != *"$head"* ]]; then
-              echo "Waiting for Codex to review $head; comment \"@codex review\" if it does not start (${row:-no summary yet})"
-              sleep 20
-              continue
-            fi
-            case "$row" in
-              *Completed*)
-                echo "Codex has finished reviewing: $row"
-                exit 0 ;;
-              *Failed*|*Error*|*Cancelled*)
-                echo "::error::Codex's review did not complete: $row. Comment \"@codex review\", then re-run this check."
-                exit 1 ;;
-            esac
-            echo "Waiting for Codex (${row:-no summary yet})"
-            sleep 20
-          done
-          echo "::error::Codex has not finished a review after 25 minutes. Comment \"@codex review\", then re-run this check."
-          exit 1
+        run: node scripts/codex-review-gate.mjs
