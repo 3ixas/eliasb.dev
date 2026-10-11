@@ -1,0 +1,51 @@
+name: Codex review
+
+# Merges into main wait for Codex. Codex reviews a pull request when it opens,
+# when a draft is marked ready, or on an "@codex review" comment, and keeps a
+# summary comment whose Code Review row reads "Completed" once it has finished.
+# This check passes only then, so its comments exist before anything merges;
+# the main ruleset's conversation-resolution rule then makes sure each one is
+# resolved.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions:
+  pull-requests: read
+  issues: read
+
+concurrency:
+  group: codex-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  codex-review:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Wait for Codex to finish reviewing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          # Every 20 seconds for up to 25 minutes; a review usually takes about three.
+          for attempt in $(seq 1 75); do
+            row=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+              --jq '.[] | select(.user.login == "chatgpt-codex-connector[bot]") | .body' \
+              | grep -F '**Code Review**' | tail -n 1 || true)
+            case "$row" in
+              *Completed*)
+                echo "Codex has finished reviewing: $row"
+                exit 0 ;;
+              *Failed*|*Error*|*Cancelled*)
+                echo "::error::Codex's review did not complete: $row. Comment \"@codex review\", then re-run this check."
+                exit 1 ;;
+            esac
+            echo "Waiting for Codex (${row:-no summary yet})"
+            sleep 20
+          done
+          echo "::error::Codex has not finished a review after 25 minutes. Comment \"@codex review\", then re-run this check."
+          exit 1
