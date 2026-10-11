@@ -1,0 +1,83 @@
+diff --git a/dist/esm/server/image-optimizer.js b/dist/esm/server/image-optimizer.js
+index 4d686b24971db8f02c9ac5f8a2b86e844d377473..d44c7f308201ed0be64a23fe1f7c56932d160319 100644
+--- a/dist/esm/server/image-optimizer.js
++++ b/dist/esm/server/image-optimizer.js
+@@ -11,7 +11,7 @@ import { join } from 'path';
+ import { getImageBlurSvg } from '../shared/lib/image-blur-svg';
+ import { hasLocalMatch } from '../shared/lib/match-local-pattern';
+ import { hasRemoteMatch } from '../shared/lib/match-remote-pattern';
+-import { createRequestResponseMocks } from './lib/mock-request';
++import { MockedRequest, MockedResponse } from './lib/mock-request';
+ import { CachedRouteKind, IncrementalCacheKind } from './response-cache';
+ import { sendEtagResponse } from './send-payload';
+ import { getContentType, getExtension } from './serve-static';
+@@ -1135,12 +1135,26 @@ export async function fetchInternalImage(href, _req, _res, maximumResponseBody,
+     try {
+         // Coerce HEAD to GET to avoid issues with the image optimizer
+         const method = !_req.method || _req.method === 'HEAD' ? 'GET' : _req.method;
+-        const mocked = createRequestResponseMocks({
+-            url: href,
+-            method,
+-            socket: _req.socket,
+-            maximumResponseBody
+-        });
++        // The mocked request keeps the requester's socket so that protocol and
++        // remote address detection keep working, but the mocked response must not
++        // reference it. `send` (used by `serveStatic`) watches `res.socket` through
++        // `on-finished` and treats the response as finished as soon as that socket
++        // stops being writable. When the requester disconnected mid-transfer this
++        // tore down the file stream without ever ending the mocked response, and
++        // since `ResponseCache` coalesces every request for the same cache key onto
++        // this single fetch, the key stayed pending for every later requester until
++        // the server restarted. Backport of vercel/next.js#98168 (in 16.4.0).
++        const mocked = {
++            req: new MockedRequest({
++                url: href,
++                method,
++                headers: {},
++                socket: _req.socket
++            }),
++            res: new MockedResponse({
++                maximumResponseBody
++            })
++        };
+         await handleRequest(mocked.req, mocked.res, parseReqUrl(href));
+         await mocked.res.hasStreamed;
+         if (!mocked.res.statusCode) {
+diff --git a/dist/server/image-optimizer.js b/dist/server/image-optimizer.js
+index 7c827e0056adc336964fe1d6f8e45c8868dbf78f..9ec05e6546a4ba50927b53f9953f70d466e83beb 100644
+--- a/dist/server/image-optimizer.js
++++ b/dist/server/image-optimizer.js
+@@ -1247,12 +1247,26 @@ async function fetchInternalImage(href, _req, _res, maximumResponseBody, handleR
+     try {
+         // Coerce HEAD to GET to avoid issues with the image optimizer
+         const method = !_req.method || _req.method === 'HEAD' ? 'GET' : _req.method;
+-        const mocked = (0, _mockrequest.createRequestResponseMocks)({
+-            url: href,
+-            method,
+-            socket: _req.socket,
+-            maximumResponseBody
+-        });
++        // The mocked request keeps the requester's socket so that protocol and
++        // remote address detection keep working, but the mocked response must not
++        // reference it. `send` (used by `serveStatic`) watches `res.socket` through
++        // `on-finished` and treats the response as finished as soon as that socket
++        // stops being writable. When the requester disconnected mid-transfer this
++        // tore down the file stream without ever ending the mocked response, and
++        // since `ResponseCache` coalesces every request for the same cache key onto
++        // this single fetch, the key stayed pending for every later requester until
++        // the server restarted. Backport of vercel/next.js#98168 (in 16.4.0).
++        const mocked = {
++            req: new _mockrequest.MockedRequest({
++                url: href,
++                method,
++                headers: {},
++                socket: _req.socket
++            }),
++            res: new _mockrequest.MockedResponse({
++                maximumResponseBody
++            })
++        };
+         await handleRequest(mocked.req, mocked.res, (0, _url.parseReqUrl)(href));
+         await mocked.res.hasStreamed;
+         if (!mocked.res.statusCode) {
