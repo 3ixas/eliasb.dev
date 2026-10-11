@@ -80,8 +80,8 @@ An employer's own page, telling what Elias did and achieved there, as a **Case s
 _Avoid_: Job description, CV entry
 
 **Where I'm headed**:
-The forward-facing successor to **Where I've been**: who Elias is now, who he wants to become as an engineer (a direction of growth, not a target job or company), and then, with less emphasis, the path that got him here.
-_Avoid_: Timeline, CV in chronological order
+The forward-facing successor to **Where I've been**: who Elias is now, who he wants to become as an engineer (a direction of growth, not a target job or company), and then, with less emphasis, the path that got him here. The direction covers the next two or three years and names his work and his own products as one craft practised in two places. Each of its strands rests on one proof. It sits alongside **Maker of clarity** and never replaces it.
+_Avoid_: Timeline, CV in chronological order, level or job titles ("aspiring Staff"), signals of looking for work
 
 **First glance**:
 What a skimming recruiter takes from the first screen in about a second: who Elias is, what he does now (Software engineer at BNP Paribas), and his strongest proof. It serves a second audience alongside the **Primary audience** without replacing it.
