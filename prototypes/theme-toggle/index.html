@@ -10,7 +10,7 @@
   real header, switchable via ?variant= (control, cord, eclipse, rocker, disc)
   and the bottom bar. ← → switch variant, T flips the theme, H hides the bar.
   ?theme=dark|light pins a theme before first paint, as the boot script does.
-  ?ring=0 drops the outline. ?rm=1 simulates reduced motion.
+  ?ring=1 restores the outline (round 2 dropped it). ?rm=1 simulates reduced motion.
   Every icon's state comes from CSS on :root, so it is right from first paint;
   script only flips the attribute and sets aria-pressed, as production does.
 -->
@@ -20,7 +20,7 @@
   const pinned = q.get("theme");
   if (pinned === "light" || pinned === "dark") document.documentElement.dataset.theme = pinned;
   if (q.get("rm") === "1") document.documentElement.classList.add("rm");
-  if (q.get("ring") === "0") document.documentElement.classList.add("no-ring");
+  if (q.get("ring") !== "1") document.documentElement.classList.add("no-ring");
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -64,6 +64,7 @@ nav a.cta { background:var(--cobalt); color:var(--on-cobalt); }
 .toggle { position:relative; display:inline-grid; place-items:center; margin:0; padding:0; border:1px solid var(--ink); background:transparent; color:var(--ink); cursor:pointer; -webkit-tap-highlight-color:transparent; }
 .toggle.icon { width:44px; height:44px; border-radius:50%; }
 .no-ring .toggle.icon { border-color:transparent; }
+.no-ring .toggle.icon:hover { background:color-mix(in srgb, var(--ink) 8%, transparent); }
 .toggle:focus-visible { outline:2px solid var(--cobalt); outline-offset:3px; }
 .toggle svg { display:block; width:24px; height:24px; overflow:visible; }
 .toggle svg * { transform-box:fill-box; }
@@ -137,7 +138,7 @@ h1 em { color:var(--cobalt); font-style:normal; }
       <!-- control -->
       <button type="button" class="toggle pill" data-v="control"><span class="lbl-on">Lights on</span><span class="lbl-off">Lights off</span></button>
       <!-- A, cord -->
-      <button type="button" class="toggle icon cord" data-v="cord" aria-label="Lights">
+      <button type="button" class="toggle icon cord" data-v="cord" aria-label="Dark theme">
         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <g class="rays"><line x1="12" y1="0.5" x2="12" y2="2.5"/><line x1="3.6" y1="4" x2="5" y2="5.4"/><line x1="20.4" y1="4" x2="19" y2="5.4"/><line x1="1" y1="11" x2="3" y2="11"/><line x1="23" y1="11" x2="21" y2="11"/></g>
           <path class="glass" d="M8.6 15.2c-1.7-1.2-2.8-3-2.8-5.1a6.2 6.2 0 0 1 12.4 0c0 2.1-1.1 3.9-2.8 5.1v1.3H8.6z"/>
@@ -146,7 +147,7 @@ h1 em { color:var(--cobalt); font-style:normal; }
         </svg>
       </button>
       <!-- B, eclipse -->
-      <button type="button" class="toggle icon eclipse" data-v="eclipse" aria-label="Lights">
+      <button type="button" class="toggle icon eclipse" data-v="eclipse" aria-label="Dark theme">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <mask id="bite"><rect x="-4" y="-4" width="32" height="32" fill="#fff"/><circle class="shadow" cx="12" cy="12" r="6.8" fill="#000"/></mask>
           <circle class="disc" cx="12" cy="12" r="8.2" fill="currentColor" mask="url(#bite)"/>
@@ -157,7 +158,7 @@ h1 em { color:var(--cobalt); font-style:normal; }
         </svg>
       </button>
       <!-- C, rocker -->
-      <button type="button" class="toggle icon rocker" data-v="rocker" aria-label="Lights">
+      <button type="button" class="toggle icon rocker" data-v="rocker" aria-label="Dark theme">
         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6">
           <rect x="5" y="2" width="14" height="20" rx="3"/>
           <rect x="9" y="6" width="6" height="12" rx="2" stroke-width="1.3"/>
@@ -166,7 +167,7 @@ h1 em { color:var(--cobalt); font-style:normal; }
         </svg>
       </button>
       <!-- D, disc -->
-      <button type="button" class="toggle icon disc-v" data-v="disc" aria-label="Lights">
+      <button type="button" class="toggle icon disc-v" data-v="disc" aria-label="Dark theme">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="12" cy="12" r="8.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
           <path class="half" d="M12 3.8a8.2 8.2 0 0 0 0 16.4z" fill="currentColor"/>
@@ -203,7 +204,7 @@ h1 em { color:var(--cobalt); font-style:normal; }
 const VARIANTS = {
   control: { name: "Control", desc: "Today: the “Lights on / Lights off” text pill, naming the state it is in. Reads as words, so the eye stops on it." },
   cord: { name: "A · Pull cord", desc: "A bulb, filled and rayed while the lights are on, hollow while they are off, with a pull chain hanging from it, down to the outline, that tugs and springs back on every press. The most literal fit with “Lights”." },
-  eclipse: { name: "B · Eclipse", desc: "A sun while the lights are on. Press, and the rays draw in and turn away as a second disc slides over to leave a crescent moon. The familiar sun/moon idea, made to move." },
+  eclipse: { name: "B · Eclipse (chosen)", desc: "Chosen in round 1, with round 2 applied: no ring, a soft hover tint, named “Dark theme” and pressed when dark, showing the current theme, 420 ms spring. A sun while the lights are on. Press, and the rays draw in and turn away as a second disc slides over to leave a crescent moon. The familiar sun/moon idea, made to move." },
   rocker: { name: "C · Rocker switch", desc: "A tiny wall switch. British, so the rocker sits down when the lights are on, and the little indicator dot goes out with them. It clicks over with a small overshoot." },
   disc: { name: "D · Half-disc", desc: "An abstract contrast mark: a circle, half filled. Press, and the filled half turns over. The quietest of the four, with the least metaphor." },
 };
@@ -225,7 +226,7 @@ function show() {
 
 function report() {
   const b = current();
-  b.setAttribute("aria-pressed", String(!dark())); // pressed means lights on, the light theme
+  b.setAttribute("aria-pressed", key === "control" ? String(!dark()) : String(dark())); // icons: "Dark theme", pressed when dark; the pill keeps today's semantics
   $("#m-name").textContent = b.getAttribute("aria-label") ?? b.textContent.trim().replace(/\s+/g, " ").slice(0, 10);
   $("#m-pressed").textContent = b.getAttribute("aria-pressed");
   $("#m-theme").textContent = dark() ? "dark" : "light";
