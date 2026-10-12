@@ -6,7 +6,7 @@ export const siteName = "Elias Bennett";
 /** A route's title: "(page) · Elias Bennett". */
 export const pageTitle = (page: string) => `${page} · ${siteName}`;
 
-export const homeTitle = `${siteName}, software engineer in London`;
+export const homeTitle = siteCopy.titleHome;
 
 export const siteDescription = siteCopy.description;
 

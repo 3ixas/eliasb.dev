@@ -21,7 +21,7 @@ test.describe("Signature entrance", () => {
 
     // Held: every part but the typed layer is invisible, yet still in the accessibility tree.
     expect(await isEntering(page)).toBe(true);
-    for (const part of ["header", "name", "headline", "support", "portrait", "rest"]) {
+    for (const part of ["header", "name", "role", "headline", "support", "portrait", "rest"]) {
       expect(await opacityOf(page, `[data-entrance="${part}"]`), `${part} is held`).toBe(0);
     }
     await expect(heading).toHaveAccessibleName(headline);
@@ -35,7 +35,7 @@ test.describe("Signature entrance", () => {
 
     await finished(page);
     // The hold clears as the last fade ends; a slow runner can read the tail of it (0.9999).
-    for (const part of ["header", "name", "headline", "support", "portrait", "rest"]) {
+    for (const part of ["header", "name", "role", "headline", "support", "portrait", "rest"]) {
       await expect.poll(() => opacityOf(page, `[data-entrance="${part}"]`), { message: `${part} is released` }).toBe(1);
     }
     await expect(page.locator("[data-entrance-layer]")).toHaveCount(0);
@@ -176,7 +176,7 @@ test.describe("Signature entrance", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     expect(await isEntering(page)).toBe(false);
-    for (const part of ["header", "name", "headline", "support", "portrait", "rest"]) {
+    for (const part of ["header", "name", "role", "headline", "support", "portrait", "rest"]) {
       expect(await opacityOf(page, `[data-entrance="${part}"]`), `${part} is shown`).toBe(1);
     }
     await expect(page.locator("[data-entrance-layer]")).toHaveCount(0);
@@ -257,7 +257,7 @@ test.describe("Signature entrance with JavaScript blocked", () => {
   test("shows the complete page", async ({ page }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName(headline);
-    for (const part of ["header", "name", "headline", "support", "portrait", "rest"]) {
+    for (const part of ["header", "name", "role", "headline", "support", "portrait", "rest"]) {
       expect(await opacityOf(page, `[data-entrance="${part}"]`), `${part} is shown`).toBe(1);
     }
     await expect(page.locator("[data-entrance-layer]")).toHaveCount(0);

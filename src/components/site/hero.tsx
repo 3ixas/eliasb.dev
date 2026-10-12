@@ -3,8 +3,9 @@ import { heroPortrait } from "@/content/stretch/media";
 import { hero } from "@/content/stretch/site-copy";
 
 /**
- * The first screen: the name at display size in cobalt, the real h1 headline,
- * the supporting line and two actions, and the portrait with its label. On
+ * The first screen: the name at display size in cobalt with the role line
+ * under it, the real h1 headline, the supporting line and two actions, and
+ * the portrait with its label. On
  * desktop the portrait sits right of the name; on phones it is stacked below
  * the actions (stretch-shell.css). The name is plain text, so it reads as
  * "Elias Bennett" whatever the layout. The data-entrance marks are the parts
@@ -14,10 +15,14 @@ import { hero } from "@/content/stretch/site-copy";
 export function Hero() {
   return (
     <section className="stretch-wrap stretch-hero" aria-label="Introduction">
-      <p className="stretch-display stretch-name" data-entrance="name">
-        <span>{hero.name.first}</span> <span>{hero.name.last}</span>
-      </p>
-
+      <div>
+        <p className="stretch-display stretch-name" data-entrance="name">
+          <span>{hero.name.first}</span> <span>{hero.name.last}</span>
+        </p>
+        <p className="stretch-hero__role" data-entrance="role">
+          {hero.role}
+        </p>
+      </div>
       <div className="stretch-hero__lede">
         <h1 data-entrance="headline">
           {hero.headline.lead}{" "}

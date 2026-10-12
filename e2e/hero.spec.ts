@@ -40,6 +40,40 @@ test.describe("Hero", () => {
     for (const height of lines) expect(height, "each name stays on one line").toBeLessThanOrEqual(Math.round(font * 0.8) + 1);
   });
 
+  test("the role line is plain text directly under the name, above the headline", async ({ page }) => {
+    const role = page.locator(".stretch-hero__role");
+    await expect(role).toHaveText(hero.role);
+    await expect(role).toBeVisible();
+    const [nameBox, roleBox, headingBox] = await Promise.all(
+      [name(page), role, page.getByRole("heading", { level: 1 })].map(async (locator) => (await locator.boundingBox())!),
+    );
+    expect(roleBox.y, "under the name").toBeGreaterThanOrEqual(nameBox.y + nameBox.height - 1);
+    expect(roleBox.y + roleBox.height, "above the headline").toBeLessThanOrEqual(headingBox.y);
+    // Real text in the page, not an image or something hidden from readers.
+    expect(await role.evaluate((element) => element.closest("[aria-hidden='true']"))).toBeNull();
+  });
+
+  test("the name takes no more than 28svh, so the whole First glance fits on the first screen", async ({ page }) => {
+    // A short laptop screen on desktop, the project's own height on phones.
+    if (!phone(page)) await page.setViewportSize({ width: page.viewportSize()!.width, height: 760 });
+    await page.evaluate(() => document.fonts.ready);
+    const { font, height, support, heading, role, nameBottom } = await page.evaluate(() => {
+      const bottom = (selector: string) => document.querySelector(selector)!.getBoundingClientRect().bottom;
+      return {
+        font: parseFloat(getComputedStyle(document.querySelector(".stretch-name")!).fontSize),
+        height: innerHeight,
+        nameBottom: bottom(".stretch-name"),
+        role: bottom(".stretch-hero__role"),
+        heading: bottom(".stretch-hero h1"),
+        support: bottom(".stretch-hero__support"),
+      };
+    });
+    expect(font, "the name is capped at 28svh").toBeLessThanOrEqual(height * 0.28 + 0.5);
+    for (const [part, bottom] of Object.entries({ name: nameBottom, role, headline: heading, "supporting line": support })) {
+      expect(bottom, `the ${part} ends above the fold`).toBeLessThanOrEqual(height);
+    }
+  });
+
   test("a visitor's wider letter spacing does not push the page sideways", async ({ page }) => {
     test.skip(!phone(page), "Phone layout");
     // WCAG 1.4.12: letter spacing 0.12em, word spacing 0.16em, line height 1.5, paragraph spacing 2em.
@@ -90,7 +124,7 @@ test.describe("Hero", () => {
     expect(portrait.y).toBeGreaterThan(actions.y + actions.height);
   });
 
-  test("the portrait is tilted 3° (2° on phones) with a cobalt Software engineer label", async ({ page }) => {
+  test("the portrait is tilted 3° (2° on phones) with a cobalt Based in London label", async ({ page }) => {
     expect(await rotation(page, ".stretch-portrait")).toBe(phone(page) ? 2 : 3);
     const label = page.locator(".stretch-portrait__label");
     await expect(label).toHaveText(hero.portraitLabel);

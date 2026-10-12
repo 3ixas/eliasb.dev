@@ -52,7 +52,7 @@ One per physical-looking object (a tile, a card, the portrait), and never more. 
 
 | Component | Notes |
 |---|---|
-| Hero | Name, real `h1`, supporting line, *See my work* and *Say hello*, portrait tilted 3° (2° on phones) with a cobalt "Software engineer" label |
+| Hero | Name (capped at 28svh) with the role line under it, real `h1`, supporting line, *See my work* and *Say hello*, portrait tilted 3° (2° on phones) with a cobalt "Based in London" label |
 | Featured tile | Up to three, in the project's colours; the first spans two columns; outline number, name, outcome, metadata, tilted screenshot (±1–1.5°), one Fastener |
 | Project index row | Number, name, outcome, type, year; turns cobalt with an arrow nudge on hover or focus and previews its screenshot; thumbnail and single tap on phones |
 | How I work | Three habit and proof beats, the honest line, the PRD card |

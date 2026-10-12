@@ -42,6 +42,8 @@ export const entranceTimings = {
   nameLift: "0.18em",
   nameStretchFrom: "100%",
   nameStretchTo: "75%",
+  /** The role line under the name is released this long after the name starts. */
+  roleDelayMs: 250,
   /** The portrait starts this long after the name, swinging in from this much further round. */
   portraitDelayMs: 200,
   portrait: { bounce: 0.4, visualDuration: 0.6 },
@@ -387,6 +389,8 @@ export function runEntrance(spring: (bounce: number, visualDuration: number) => 
       display.remove();
       release("name");
     }, nameEnd);
+    // The role line fades in while the letters are still settling.
+    later(() => release("role"), nameStart + timing.roleDelayMs);
 
     const portraitStart = nameStart + timing.portraitDelayMs;
     const portraitSettle = spring(timing.portrait.bounce, timing.portrait.visualDuration);
