@@ -73,7 +73,8 @@ function readComments(repo, pr) {
       '--jq',
       '.[] | {login: .user.login, created_at, updated_at, body}',
     ],
-    { encoding: 'utf8' },
+    // The default 1 MiB buffer would throw on a long discussion with verbose bot summaries.
+    { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 },
   );
   return lines
     .split('\n')
