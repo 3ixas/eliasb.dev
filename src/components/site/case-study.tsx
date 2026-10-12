@@ -1,6 +1,13 @@
-import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  Arrowed,
+  StoryEvidence,
+  StoryOpening,
+  StorySection,
+  StorySectionLinks,
+  storyColours,
+} from "@/components/site/story";
 import { SubpageHeader } from "@/components/site/subpage-header";
 import { projects, type Project } from "@/content/projects";
 import { caseStudies } from "@/content/stretch/case-studies";
@@ -14,25 +21,6 @@ import {
   type CaseStudySectionKey,
 } from "@/content/stretch/case-study";
 import { siteCopy } from "@/content/stretch/site-copy";
-
-const number = (position: number) => String(position + 1).padStart(2, "0");
-
-/** "Live site ↗" as a visible label and a decorative arrow: the link's name is the words. */
-function Arrowed({ label }: { label: string }) {
-  const arrow = label.match(/^(?:([←↗]) )?(.*?)(?: ([←↗]))?$/);
-  const [, before, words, after] = arrow ?? [];
-  return (
-    <>
-      {before && <span aria-hidden="true">{before} </span>}
-      {words}
-      {after && <span aria-hidden="true"> {after}</span>}
-    </>
-  );
-}
-
-/** The project's own colours arrive as --cs-* on the element that owns them. */
-const projectColours = ({ field, ink, swatch }: CaseStudyOpening["colours"]) =>
-  ({ "--cs-field": field, "--cs-ink": ink, "--cs-swatch": swatch }) as CSSProperties;
 
 /**
  * A case study (docs/specs/STRETCH-REDESIGN-SPEC.md, "Case studies and the
@@ -55,10 +43,10 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
       <main id="main-content" tabIndex={-1}>
         <article aria-labelledby="case-study-title">
           <Opening opening={opening} />
-          <SectionLinks />
+          <StorySectionLinks sections={caseStudySections} />
           <div className="stretch-cs-body stretch-wrap">
             {caseStudySectionKeys.map((key, position) => (
-              <Section key={key} study={study} sectionKey={key} position={position} colours={opening.colours} />
+              <CaseStudySectionBlock key={key} study={study} sectionKey={key} position={position} colours={opening.colours} />
             ))}
           </div>
         </article>
@@ -81,35 +69,18 @@ function nextProject(study: CaseStudy): { project: Project; colours: CaseStudyOp
 function Opening({ opening }: { opening: CaseStudyOpening }) {
   const { links, screenshot } = opening;
   return (
-    <section className="stretch-cs-open" style={projectColours(opening.colours)} aria-label="Overview">
-      <div className="stretch-wrap stretch-cs-open__inner">
+    <StoryOpening
+      colours={opening.colours}
+      back={
         <Link className="stretch-cs-back" href="/work">
           <Arrowed label={caseStudyCopy.back} />
         </Link>
-        <div className="stretch-cs-open__text">
-          <p className="stretch-display stretch-cs-open__number" aria-hidden="true">
-            {opening.number}
-          </p>
-          <h1 id="case-study-title" className="stretch-display stretch-cs-open__name">
-            {opening.name}
-          </h1>
-          <p className="stretch-cs-open__outcome">{opening.outcome}</p>
-          <p className="stretch-mono stretch-cs-open__meta">{opening.metadata}</p>
-          <p className="stretch-mono stretch-cs-open__meta">{opening.stack}</p>
-          <div className="stretch-cs-links">
-            {links.live && (
-              <a className="stretch-cs-button stretch-cs-button--solid" href={links.live} target="_blank" rel="noreferrer">
-                <Arrowed label={caseStudyCopy.live} />
-              </a>
-            )}
-            {links.code && (
-              <a className="stretch-cs-button" href={links.code} target="_blank" rel="noreferrer">
-                <Arrowed label={caseStudyCopy.code} />
-              </a>
-            )}
-          </div>
-          {opening.note && <p className="stretch-cs-open__note">{opening.note}</p>}
-        </div>
+      }
+      number={opening.number}
+      titleId="case-study-title"
+      name={opening.name}
+      lead={opening.outcome}
+      aside={
         <div className="stretch-cs-open__shot">
           <Image
             src={screenshot.src}
@@ -120,31 +91,30 @@ function Opening({ opening }: { opening: CaseStudyOpening }) {
             preload
           />
         </div>
+      }
+    >
+      <p className="stretch-mono stretch-cs-open__meta">{opening.metadata}</p>
+      <p className="stretch-mono stretch-cs-open__meta">{opening.stack}</p>
+      <div className="stretch-cs-links">
+        {links.live && (
+          <a className="stretch-cs-button stretch-cs-button--solid" href={links.live} target="_blank" rel="noreferrer">
+            <Arrowed label={caseStudyCopy.live} />
+          </a>
+        )}
+        {links.code && (
+          <a className="stretch-cs-button" href={links.code} target="_blank" rel="noreferrer">
+            <Arrowed label={caseStudyCopy.code} />
+          </a>
+        )}
       </div>
-    </section>
+      {opening.note && <p className="stretch-cs-open__note">{opening.note}</p>}
+    </StoryOpening>
   );
 }
 
-function SectionLinks() {
-  return (
-    <nav aria-label="Sections" className="stretch-cs-links-row">
-      <ul className="stretch-wrap">
-        {caseStudySectionKeys.map((key, position) => (
-          <li key={key}>
-            <a href={`#${key}`}>
-              <span className="stretch-mono" aria-hidden="true">
-                {number(position)}
-              </span>{" "}
-              {caseStudySectionLabels[key]}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  );
-}
+const caseStudySections = caseStudySectionKeys.map((key) => ({ key, label: caseStudySectionLabels[key] }));
 
-function Section({
+function CaseStudySectionBlock({
   study,
   sectionKey,
   position,
@@ -156,42 +126,13 @@ function Section({
   colours: CaseStudyOpening["colours"];
 }) {
   const section = study.sections[sectionKey];
-  const label = caseStudySectionLabels[sectionKey];
-  // The bold line is the heading; a section without one is headed by its label.
-  const heading = section.heading ?? label;
-  const titleId = `${sectionKey}-title`;
 
   return (
-    <section id={sectionKey} aria-labelledby={titleId} className="stretch-cs-section">
-      <div className="stretch-cs-section__text">
-        {section.heading && (
-          <p className="stretch-mono stretch-cs-kicker" aria-hidden="true">
-            {number(position)} · {label}
-          </p>
-        )}
-        <h2 id={titleId} className="stretch-cs-h2">
-          {heading}
-        </h2>
-        {section.paragraphs?.map((paragraph) => (
-          <p key={paragraph} className="stretch-cs-p">
-            {paragraph}
-          </p>
-        ))}
-        {section.points && (
-          <ul className="stretch-cs-points">
-            {section.points.map((point) => (
-              <li key={point.lead}>
-                <span className="stretch-cs-lead">{point.lead}</span> {point.text}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
+    <StorySection id={sectionKey} label={caseStudySectionLabels[sectionKey]} position={position} section={section}>
       {sectionKey === "written-down-first" && <Prd study={study} />}
 
       {section.figure && (
-        <figure className="stretch-cs-figure" style={projectColours(colours)}>
+        <figure className="stretch-cs-figure" style={storyColours(colours)}>
           <div className="stretch-cs-figure__frame">
             <Image
               src={section.figure.src}
@@ -204,7 +145,7 @@ function Section({
           <figcaption className="stretch-mono">{section.figure.caption}</figcaption>
         </figure>
       )}
-    </section>
+    </StorySection>
   );
 }
 
@@ -220,16 +161,7 @@ function Prd({ study }: { study: CaseStudy }) {
         {prd.after && <p className="stretch-cs-prd__around">{prd.after}</p>}
         {prd.date && <figcaption className="stretch-mono stretch-prd__caption">The spec, {prd.date}</figcaption>}
       </figure>
-      {evidence.length > 0 && (
-        <ul className="stretch-cs-evidence" aria-label="Evidence">
-          {evidence.map(({ value, label }) => (
-            <li key={label}>
-              <span className="stretch-display stretch-cs-evidence__value">{value}</span>
-              <span className="stretch-mono stretch-cs-evidence__label">{label}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+      {evidence.length > 0 && <StoryEvidence evidence={evidence} />}
     </div>
   );
 }
@@ -238,7 +170,7 @@ function NextProject({ next }: { next: ReturnType<typeof nextProject> }) {
   const { project, colours } = next;
   return (
     <section className="stretch-wrap stretch-cs-next" aria-label={caseStudyCopy.nextProject}>
-      <Link className="stretch-cs-next__tile" href={`/work/${project.slug}`} style={projectColours(colours)}>
+      <Link className="stretch-cs-next__tile" href={`/work/${project.slug}`} style={storyColours(colours)}>
         <span className="stretch-mono stretch-cs-next__label">{caseStudyCopy.nextProject}</span>
         <span className="stretch-display stretch-cs-next__number" aria-hidden="true">
           {next.number}
