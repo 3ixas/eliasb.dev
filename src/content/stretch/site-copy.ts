@@ -31,8 +31,7 @@ export const siteCopy = {
     { id: "say-hello", label: "Say hello" },
   ],
   header: {
-    lightsOn: "Lights on",
-    lightsOff: "Lights off",
+    darkTheme: "Dark theme",
     menu: "Menu",
     close: "Close",
     backToWork: "← Work",

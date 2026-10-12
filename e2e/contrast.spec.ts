@@ -19,7 +19,8 @@ test.describe("Contrast, measured from the rendered page", () => {
     test(`every text run on ${route} meets WCAG 2.2 AA`, async ({ page }) => {
       await page.goto(route);
       const readings = await renderedContrast(page);
-      expect(readings.length).toBeGreaterThan(5);
+      // The 404 has five text runs now that the theme button carries no text.
+      expect(readings.length).toBeGreaterThan(4);
       // A blend mode on the text would make its reading meaningless.
       expect(readings.filter((reading) => reading.blended)).toEqual([]);
       expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);

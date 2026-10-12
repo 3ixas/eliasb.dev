@@ -13,7 +13,7 @@ Approved by Elias on 8 October 2026 for [#113](https://github.com/3ixas/eliasb.d
 | Meta description | I’m Elias, a software engineer in London. I build everyday software, and make complicated things feel simple. Here’s my work, how I work, and what I’m up to. |
 | Social image | ELIAS BENNETT · I build everyday software, and make complicated things *feel simple.* |
 | Menu | Work · How I work · Where I’ve been · Off the clock · Say hello |
-| Header | Lights on / Lights off · Menu · Close · ← Work |
+| Header | Dark theme · Menu · Close · ← Work |
 | Clock | London {14:05} (read aloud as “The time in London: {14:05}”) |
 | Footer | Made by Elias |
 

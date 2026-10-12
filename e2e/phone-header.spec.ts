@@ -24,11 +24,15 @@ test.describe("Phone header and menu", () => {
     await page.goto("/");
   });
 
-  test("the header shows Lights and Menu only, with no clock", async ({ page }) => {
+  test("the header shows the theme button and Menu only, with no clock", async ({ page }) => {
     const visible = await header(page).locator("a, button, p, nav").evaluateAll((elements) =>
-      elements.filter((element) => element.checkVisibility() && !element.matches(".stretch-skip")).map((element) => (element as HTMLElement).innerText.trim()),
+      elements
+        .filter((element) => element.checkVisibility() && !element.matches(".stretch-skip"))
+        .map((element) => (element as HTMLElement).innerText.trim() || element.getAttribute("aria-label")),
     );
-    expect(visible).toEqual([expect.stringMatching(/^Lights o(n|ff)$/), "Menu"]);
+    expect(visible).toEqual(["Dark theme", "Menu"]);
+    const box = (await page.getByRole("button", { name: "Dark theme" }).boundingBox())!;
+    expect([box.width, box.height]).toEqual([44, 44]);
     await expect(page.locator("[data-london-clock]:visible")).toHaveCount(0);
     await expect(page.getByRole("navigation", { name: "Primary navigation" })).toHaveCount(0);
   });
@@ -118,11 +122,11 @@ test.describe("Phone header and menu", () => {
     expect(names, "the big names fit the screen").toEqual(names.map(() => true));
   });
 
-  test("Lights works from the phone header, and the open menu follows the theme", async ({ page }) => {
+  test("the theme button works from the phone header, and the open menu follows the theme", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.reload();
-    await page.getByRole("button", { name: "Lights on" }).click();
-    await expect(page.getByRole("button", { name: "Lights off" })).toBeVisible();
+    await page.getByRole("button", { name: "Dark theme", pressed: false }).click();
+    await expect(page.getByRole("button", { name: "Dark theme", pressed: true })).toBeVisible();
     await menuButton(page).click();
     await expect(dialog(page)).toHaveCSS("background-color", "rgb(13, 13, 18)");
   });

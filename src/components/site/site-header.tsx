@@ -1,4 +1,4 @@
-import { LightsPill } from "@/components/site/lights-pill";
+import { EclipseToggle } from "@/components/site/eclipse-toggle";
 import { MenuDialog } from "@/components/site/menu-dialog";
 import { sectionLinks } from "@/components/site/sections";
 import { SiteClock } from "@/components/site/site-clock";
@@ -21,7 +21,7 @@ export function SiteHeader() {
       <div className="stretch-wrap stretch-header__inner">
         <SiteClock className="stretch-header__clock" />
         <div className="stretch-header__right">
-          <LightsPill />
+          <EclipseToggle />
           <nav aria-label="Primary navigation" className="stretch-nav">
             <ul>
               {sectionLinks.map(({ id, label }, index) => (
