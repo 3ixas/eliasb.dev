@@ -20,6 +20,11 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Lint workflows
+        uses: docker://rhysd/actionlint:1.7.12
+        with:
+          args: -color
+
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -51,6 +56,9 @@ jobs:
 
       - name: Verify opening lifecycle
         run: pnpm verify:opening
+
+      - name: Verify Codex review gate
+        run: pnpm verify:codex-gate
 
       - name: Build with webpack
         run: SITE_INDEXABLE=true pnpm build --webpack

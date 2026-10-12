@@ -8,6 +8,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
+Before pushing to, re-running checks on, or merging a pull request, read `docs/runbooks/merging.md`.
+
 ## Code Review Rules
 
 ### Thermo-Nuclear Maintainability Review
