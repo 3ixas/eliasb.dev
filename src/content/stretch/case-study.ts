@@ -6,6 +6,13 @@
  * the two.
  */
 import type { CaseStudySlug, Project, ProjectImage } from "../projects";
+import {
+  MAX_EVIDENCE,
+  storySectionHasContent,
+  type EvidenceItem,
+  type StoryColours,
+  type StorySectionBody,
+} from "./story.ts";
 
 /** The six sections, in the order they are read. */
 export const caseStudySectionKeys = [
@@ -37,17 +44,10 @@ export const caseStudyCopy = {
   nextProject: "Next project",
 } as const;
 
-export type SectionPoint = { lead: string; text: string };
-
 /** A screenshot placed in a section. Alt text and caption carry over from the Board's case files. */
 export type SectionFigure = ProjectImage & { caption: string };
 
-export type CaseStudySection = {
-  /** The bold line that opens the section. Absent where the section label is the heading. */
-  heading?: string;
-  paragraphs?: readonly string[];
-  /** Points that open with an italic lead, such as decisions. */
-  points?: readonly SectionPoint[];
+export type CaseStudySection = StorySectionBody & {
   /** A figure can attach to any section. */
   figure?: SectionFigure;
 };
@@ -62,8 +62,6 @@ export type PrdCard = {
   /** "16 April 2026". */
   date?: string;
 };
-
-export type EvidenceItem = { value: string; label: string };
 
 export type CaseStudy = {
   /** Matches the project's slug in the catalogue. */
@@ -83,8 +81,6 @@ export type CaseStudy = {
   description: string;
 };
 
-export const MAX_EVIDENCE = 4;
-
 /** What the opening band shows: the study's own fields joined with its catalogue entry. */
 export type CaseStudyOpening = {
   number: string;
@@ -96,7 +92,7 @@ export type CaseStudyOpening = {
   note?: string;
   links: Project["links"];
   screenshot: ProjectImage;
-  colours: { field: string; ink: string; swatch: string };
+  colours: StoryColours;
 };
 
 export function caseStudyOpening(study: CaseStudy, catalogue: readonly Project[]): CaseStudyOpening {
@@ -134,7 +130,7 @@ export function caseStudyProblems(studies: readonly CaseStudy[], catalogue: read
     }
     for (const key of caseStudySectionKeys) {
       const section = study.sections[key];
-      if (!section || !(section.heading || section.paragraphs?.length || section.points?.length)) {
+      if (!storySectionHasContent(section)) {
         problems.push(`Case study "${study.slug}" has an empty "${key}" section.`);
       }
     }
