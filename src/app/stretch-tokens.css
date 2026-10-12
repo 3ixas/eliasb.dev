@@ -12,6 +12,10 @@
  * 3. The device setting alone, when script has not run.
  * CSS cannot share one block between a media query and attribute selectors,
  * so the dark block appears three times; keep the copies identical.
+ *
+ * --stretch-dark is 1 in the dark theme and 0 in the light one, for what
+ * cannot take a colour (the Eclipse icon). It is not registered, so it flips
+ * at once rather than crossfading with the palette.
  */
 :root {
   --stretch-page: #fbfbf8;
@@ -23,6 +27,7 @@
   --stretch-on-cobalt: #ffffff;
   --stretch-tile-edge: transparent;
   --stretch-tape: rgba(232, 222, 188, 0.85);
+  --stretch-dark: 0;
   color-scheme: light;
 }
 
@@ -37,6 +42,7 @@
     --stretch-on-cobalt: #0d0d12;
     --stretch-tile-edge: #2a2a33;
     --stretch-tape: rgba(232, 222, 188, 0.6);
+    --stretch-dark: 1;
     color-scheme: dark;
   }
 }
@@ -51,6 +57,7 @@
   --stretch-on-cobalt: #0d0d12;
   --stretch-tile-edge: #2a2a33;
   --stretch-tape: rgba(232, 222, 188, 0.6);
+  --stretch-dark: 1;
   color-scheme: dark;
 }
 
@@ -64,5 +71,6 @@
   --stretch-on-cobalt: #0d0d12;
   --stretch-tile-edge: #2a2a33;
   --stretch-tape: rgba(232, 222, 188, 0.6);
+  --stretch-dark: 1;
   color-scheme: dark;
 }

@@ -17,7 +17,7 @@ A from-scratch front end in the **Stretch direction**, keeping the existing data
 - **Work:** up to three hand-picked featured tiles, then a newest-first **Project index** that scales to any number of projects.
 - **Case studies:** short and evidence-led.
 - **Signature entrance:** a Commissioner-style opening that plays on every load.
-- **Theme:** light and dark through a "Lights" pill.
+- **Theme:** light and dark through the Eclipse, an icon-only sun or crescent moon.
 - **Throughout:** a phone layout designed at 320–390 px, and copy that is short and true throughout.
 
 ## User Stories
@@ -63,14 +63,14 @@ A from-scratch front end in the **Stretch direction**, keeping the existing data
 
 **Visitors: theme**
 32. As a visitor, I want the site to follow my device's light or dark setting, so that it feels native.
-33. As a visitor, I want a "Lights on / Lights off" pill to switch the theme and remember my choice, so that I stay in control.
+33. As a visitor, I want an icon button named "Dark theme" to switch the theme and remember my choice, so that I stay in control.
 34. As a visitor, I want the theme never to flash the wrong colours on load, so that the page feels solid.
 35. As a visitor, I want switching the lights to crossfade promptly over 0.3 seconds, or switch instantly with reduced motion, so that it feels responsive.
 36. As a visitor in dark mode, I want project tiles to keep a visible edge, so that they don't merge into the page.
 
 **Visitors: navigation and mobile**
-37. As a desktop visitor, I want the London clock, Lights and the section links in the header, so that I can move around and see the live state.
-38. As a phone visitor, I want only Lights and Menu in the header, with a full-screen menu of big section names and the clock inside it, so that the header stays clean.
+37. As a desktop visitor, I want the London clock, the theme button and the section links in the header, so that I can move around and see the live state.
+38. As a phone visitor, I want only the theme button and Menu in the header, with a full-screen menu of big section names and the clock inside it, so that the header stays clean.
 39. As a keyboard user, I want the menu to move focus to Close and return it to Menu on Escape or Close, so that I never lose my place.
 40. As a phone user, I want the name to fill the screen width without breaking, and every target at least 44 px tall, so that the layout feels designed rather than shrunk.
 
@@ -158,10 +158,10 @@ rest of the page  fade 0.5 s when the name and portrait settle
 - **The clock** just ticks.
 - **Reduced motion:** removes all movement and keeps 0.2 s fades, except theme changes which are instant.
 
-**Theme:** the existing controller's behaviour carries over: system or remembered preference, a pre-paint boot script, and choosing the device's theme returns to following the device. The control becomes the "Lights on / Lights off" pill: a button whose pressed state means "on". The theme crossfades over 0.3 s with `cubic-bezier(0,0,0.38,0.9)` and switches instantly with reduced motion. Registered colour tokens animate once on the root, so surfaces and inherited text use the same frame rather than cascading descendant transitions. The browser's toolbar colour follows the page background. Fastener tape is more transparent in dark.
+**Theme:** the existing controller's behaviour carries over: system or remembered preference, a pre-paint boot script, and choosing the device's theme returns to following the device. The control is the Eclipse (#156, #167): an icon-only sun or crescent moon, a button named "Dark theme" whose pressed state means the dark theme is in force. The theme crossfades over 0.3 s with `cubic-bezier(0,0,0.38,0.9)` and switches instantly with reduced motion. Registered colour tokens animate once on the root, so surfaces and inherited text use the same frame rather than cascading descendant transitions. The browser's toolbar colour follows the page background. Fastener tape is more transparent in dark.
 
 **Phones (below about 760 px)**
-- **Header:** Lights and Menu only, with a full-screen menu dialog. The clock lives in that dialog.
+- **Header:** the theme button and Menu only, with a full-screen menu dialog. The clock lives in that dialog.
 - **Layout:** single-column cards, 16 px gutters, targets at least 44 px, and no page-level horizontal scroll.
 - **Contained scrolling:** only the GitHub grid scrolls sideways, inside its card, opening on today and reachable by keyboard.
 - **Where I've been:** dates sit above each role.
@@ -192,7 +192,7 @@ rest of the page  fade 0.5 s when the name and portrait settle
   - a blocked script still shows everything
 - **Homepage sections:** order, anchors, headings and counts; featured tiles from the curated list; index order and its ten-row cap; *All work (n)*.
 - **Off the clock:** each item live and in fallback, via fixtures; the GitHub grid's text alternative; today marked.
-- **Theme:** device preference, a remembered choice, no wrong-theme flash, the Lights pill's state and name, and the dark tile edge.
+- **Theme:** device preference, a remembered choice, no wrong-theme flash, the Eclipse's icon state, name and pressed state, and the dark tile edge.
 - **Contrast:** every token pair, and text over project colours.
 - **Phones (390 and 320):** no page-level horizontal scroll, the name doesn't wrap, the menu dialog's focus behaviour, targets of at least 44 px, and the GitHub grid scrolls within its card.
 - **Case studies:** six sections in order, the evidence strip, Next project, and no entrance.
