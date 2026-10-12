@@ -41,10 +41,13 @@ runInNewContext(code, {
     return require(name);
   },
 });
-const getHistory = (date) => workAsyncStorage.run(
-  { incrementalCache, isStaticGeneration: true, route: "/" },
-  () => loadedModule.exports.getCachedHistorySignal(new Date(date)),
-);
+// Each call gets its own store so a stale read's background revalidation,
+// which Next tracks in `pendingRevalidates`, can be awaited.
+let workStore;
+const getHistory = (date) => {
+  workStore = { incrementalCache, isStaticGeneration: true, route: "/" };
+  return workAsyncStorage.run(workStore, () => loadedModule.exports.getCachedHistorySignal(new Date(date)));
+};
 
 const first = await getHistory("2026-09-21T10:00:00Z");
 assert.equal(first.state, "live");
@@ -62,6 +65,8 @@ console.error = (...args) => errors.push(args);
 try {
   const stale = await getHistory("2026-09-27T12:00:00Z");
   assert.deepEqual(stale, first, "A failed revalidation must retain the illustrated snapshot");
+  // The stale value is returned at once; Next reports the failed refresh when the background revalidation settles.
+  await Promise.all(Object.values(workStore.pendingRevalidates ?? {}));
   assert.equal(JSON.parse([...entries.values()][0].value.data.body).state, "live");
   assert.equal(errors.length, 1, "Next should report the failed revalidation");
 } finally {
