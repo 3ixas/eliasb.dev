@@ -58,7 +58,7 @@ One per physical-looking object (a tile, a card, the portrait), and never more. 
 | How I work | Three habit and proof beats, the honest line, the PRD card |
 | Career ruler | Vertical, oldest first; dates, bar (cobalt for the current role), role, organisation; notes and milestone markers |
 | Off the clock | Training poster (today in cobalt), book, film, history clipping, **Now making** (pulsing cobalt "now"), GitHub year grid (today in cobalt) |
-| Lights | "Lights on / Lights off" pill: a button whose pressed state means on |
+| Theme | The Eclipse: an icon-only sun (light) or crescent moon (dark), named "Dark theme", pressed while the dark theme is in force |
 | Case study | Opening band in the project colour, section links, a neutral reading column about 720 px wide, framed figures, PRD card with evidence strip, Next-project tile |
 | Signature entrance | Homepage only; timings in the spec |
 
@@ -71,7 +71,7 @@ One per physical-looking object (a tile, a card, the portrait), and never more. 
 
 ## Phones
 
-Designed at 320 to 390 px, below about 760 px: single-column cards, 16 px gutters, targets at least 44 px, no page-level horizontal scroll. The header shows Lights and Menu only, with the clock inside a full-screen menu dialog. The GitHub grid scrolls inside its card and opens on today. Tablets use the desktop layout with a narrower grid.
+Designed at 320 to 390 px, below about 760 px: single-column cards, 16 px gutters, targets at least 44 px, no page-level horizontal scroll. The header shows the theme button and Menu only, with the clock inside a full-screen menu dialog. The GitHub grid scrolls inside its card and opens on today. Tablets use the desktop layout with a narrower grid.
 
 ## Accessibility
 

@@ -1,6 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const pill = (page: Page) => page.locator("[data-lights-pill]");
+const eclipse = (page: Page) => page.locator("[data-eclipse]");
+/** How far the icon has gone from sun (0) to moon (1), read from the rays it draws in. */
+const moon = (page: Page) =>
+  page.evaluate(() => 1 - Number(getComputedStyle(document.querySelector("[data-eclipse] .stretch-eclipse__rays")!).opacity));
 const scheme = (page: Page) => page.evaluate(() => getComputedStyle(document.documentElement).colorScheme);
 const stored = (page: Page) => page.evaluate(() => localStorage.getItem("elias-theme"));
 const token = (page: Page, name: string) =>
@@ -16,37 +19,37 @@ test.describe("Lights and theme", () => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     expect(await scheme(page)).toBe("light");
-    await expect(pill(page)).toHaveAccessibleName("Lights on");
-    await expect(pill(page)).toHaveAttribute("aria-pressed", "true");
+    await expect(eclipse(page)).toHaveAccessibleName("Dark theme");
+    await expect(eclipse(page)).toHaveAttribute("aria-pressed", "false");
     await page.emulateMedia({ colorScheme: "dark" });
     await expect.poll(() => scheme(page)).toBe("dark");
-    await expect(pill(page)).toHaveAccessibleName("Lights off");
-    await expect(pill(page)).toHaveAttribute("aria-pressed", "false");
+    await expect(eclipse(page)).toHaveAccessibleName("Dark theme");
+    await expect(eclipse(page)).toHaveAttribute("aria-pressed", "true");
   });
 
-  test("the pill is a button: pressed means the lights are on, and it flips them", async ({ page }) => {
+  test("the Eclipse is a button: pressed means the dark theme is in force, and it flips the theme", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
-    await expect(page.getByRole("button", { name: "Lights on", pressed: true })).toBeVisible();
-    await pill(page).click();
+    await expect(page.getByRole("button", { name: "Dark theme", pressed: false })).toBeVisible();
+    await eclipse(page).click();
     await expect.poll(() => scheme(page)).toBe("dark");
-    await expect(page.getByRole("button", { name: "Lights off", pressed: false })).toBeVisible();
-    await pill(page).click();
+    await expect(page.getByRole("button", { name: "Dark theme", pressed: true })).toBeVisible();
+    await eclipse(page).click();
     await expect.poll(() => scheme(page)).toBe("light");
-    await expect(page.getByRole("button", { name: "Lights on", pressed: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Dark theme", pressed: false })).toBeVisible();
   });
 
   test("a choice persists until the visitor is back on their device setting", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
-    await pill(page).click();
+    await eclipse(page).click();
     expect(await stored(page)).toBe("dark");
     await page.reload();
     expect(await scheme(page)).toBe("dark");
-    await expect(pill(page)).toHaveAccessibleName("Lights off");
+    await expect(eclipse(page)).toHaveAttribute("aria-pressed", "true");
 
     // Choosing what the device already shows returns to following the device.
-    await pill(page).click();
+    await eclipse(page).click();
     await expect.poll(() => scheme(page)).toBe("light");
     expect(await stored(page)).toBeNull();
     await page.emulateMedia({ colorScheme: "dark" });
@@ -79,14 +82,36 @@ test.describe("Lights and theme", () => {
     });
   }
 
-  for (const [device, label, background] of [["dark", "Lights off", "rgb(13, 13, 18)"], ["light", "Lights on", "rgb(251, 251, 248)"]] as const) {
-    test(`with script off, a ${device} device still gets the ${device} page and its label`, async ({ browser }) => {
+  for (const [device, expected, background] of [["dark", 1, "rgb(13, 13, 18)"], ["light", 0, "rgb(251, 251, 248)"]] as const) {
+    test(`with script off, a ${device} device still gets the ${device} page and its icon`, async ({ browser }) => {
       const context = await browser.newContext({ javaScriptEnabled: false, colorScheme: device });
       const page = await context.newPage();
       await page.goto("/");
-      // innerText, so the label hidden by CSS is not counted.
-      await expect(pill(page)).toHaveText(label, { useInnerText: true });
+      expect(await moon(page)).toBe(expected);
       expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(background);
+      await context.close();
+    });
+  }
+
+  // The icon is decided by CSS on the root, in the palette's order: a remembered choice, then the
+  // applied theme, then the device setting alone. Each is read before script has set anything.
+  for (const [name, device, root, expected] of [
+    ["a remembered dark choice on a light device", "light", { "data-theme": "dark" }, 1],
+    ["a remembered light choice on a dark device", "dark", { "data-theme": "light" }, 0],
+    ["the applied dark theme on a light device", "light", { "data-lights": "on" }, 1],
+    ["the device setting alone, dark", "dark", {}, 1],
+    ["the device setting alone, light", "light", {}, 0],
+  ] as const) {
+    test(`the icon is right at first paint from ${name}`, async ({ browser }) => {
+      const context = await browser.newContext({ javaScriptEnabled: false, colorScheme: device });
+      const page = await context.newPage();
+      await page.route("**/", async (route) => {
+        const response = await route.fetch();
+        const attributes = Object.entries(root).map(([key, value]) => `${key}="${value}"`).join(" ");
+        await route.fulfill({ response, body: (await response.text()).replace(/<html\b/, `<html ${attributes}`) });
+      });
+      await page.goto("/");
+      expect(await moon(page)).toBe(expected);
       await context.close();
     });
   }
@@ -106,10 +131,10 @@ test.describe("Lights and theme", () => {
       for (const colour of colours) expect(colour, label).toBe(background);
     };
     await follows("light device", "light");
-    await pill(page).click();
+    await eclipse(page).click();
     await expect.poll(() => scheme(page)).toBe("dark");
     await follows("chose dark on a light device", "dark");
-    await pill(page).click();
+    await eclipse(page).click();
     await expect.poll(() => scheme(page)).toBe("light");
     await follows("back on the device", "light");
     await page.emulateMedia({ colorScheme: "dark" });
@@ -146,13 +171,58 @@ test.describe("Lights and theme", () => {
     expect(await page.evaluate(() => (window as unknown as { fading: Promise<number> }).fading)).toBeGreaterThan(0);
   });
 
-  test("the pill is a 44 px target with a solid focus outline", async ({ page }) => {
+  test("the Eclipse is a quiet 44 px target: no outline at rest, a hover tint, a solid focus ring", async ({ page }) => {
     await page.goto("/");
-    const box = await pill(page).boundingBox();
-    expect(box?.width).toBeGreaterThanOrEqual(44);
-    expect(box?.height).toBeGreaterThanOrEqual(44);
-    await pill(page).focus();
-    await expect(pill(page)).toHaveCSS("outline-style", "solid");
+    const box = await eclipse(page).boundingBox();
+    expect(box?.width).toBe(44);
+    expect(box?.height).toBe(44);
+    await expect(eclipse(page)).toHaveCSS("border-top-width", "0px");
+    await expect(eclipse(page)).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await eclipse(page).hover();
+    await expect(eclipse(page)).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await page.keyboard.press("Tab");
+    await eclipse(page).focus();
+    await expect(eclipse(page)).toHaveCSS("outline-style", "solid");
+  });
+
+  test("the icon settles in 420 ms, and in 0 ms with reduced motion", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "light", reducedMotion: "no-preference" });
+    await page.goto("/");
+    const durations = () =>
+      page.evaluate(() =>
+        [".stretch-eclipse__disc", ".stretch-eclipse__shadow", ".stretch-eclipse__rays"].map(
+          (selector) => getComputedStyle(document.querySelector(selector)!).transitionDuration.split(", ")[0],
+        ),
+      );
+    expect(await durations()).toEqual(["0.42s", "0.42s", "0.42s"]);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    expect(await durations()).toEqual(["0s", "0s", "0s"]);
+  });
+
+  test("pressing it again part-way turns the icon back from where it is", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "light", reducedMotion: "no-preference" });
+    await page.goto("/");
+    const path = await page.evaluate(() => {
+      const button = document.querySelector<HTMLButtonElement>("[data-eclipse]")!;
+      const disc = document.querySelector(".stretch-eclipse__disc")!;
+      const scale = () => new DOMMatrix(getComputedStyle(disc).transform).a;
+      const discTransitions = () =>
+        document.getAnimations().filter((animation) => (animation as CSSTransition).transitionProperty === "transform" && (animation.effect as KeyframeEffect).target === disc);
+      button.click();
+      // Fixed animation time, so a busy runner cannot miss the 420 ms.
+      for (const animation of discTransitions()) {
+        animation.pause();
+        animation.currentTime = 210;
+      }
+      const middle = scale();
+      button.click();
+      return { middle, reversed: scale() };
+    });
+    // Half-way is neither the sun (0.56) nor the moon (1): the spring is in flight.
+    expect(Math.abs(path.middle - 0.56)).toBeGreaterThan(0.1);
+    expect(Math.abs(path.middle - 1)).toBeGreaterThan(0.01);
+    // The reversal starts from there, not from either end.
+    expect(path.reversed).toBeCloseTo(path.middle, 1);
   });
 
   test("the page fades over 300 ms with a prompt start, and settles afterwards", async ({ page }) => {
@@ -162,7 +232,7 @@ test.describe("Lights and theme", () => {
     const palette = page.locator("html");
     await expect(palette).toHaveCSS("transition-duration", "0s");
     const during = await page.evaluate(() => {
-      document.querySelector<HTMLButtonElement>("[data-lights-pill]")!.click();
+      document.querySelector<HTMLButtonElement>("[data-eclipse]")!.click();
       const read = (selector: string) => getComputedStyle(document.querySelector(selector)!);
       return {
         palette: read("html").transitionDuration,
@@ -181,7 +251,7 @@ test.describe("Lights and theme", () => {
     await page.goto("/");
     for (const target of ["rgb(13, 13, 18)", "rgb(251, 251, 248)"]) {
       const during = await page.evaluate(() => {
-        document.querySelector<HTMLButtonElement>("[data-lights-pill]")!.click();
+        document.querySelector<HTMLButtonElement>("[data-eclipse]")!.click();
         return {
           duration: getComputedStyle(document.documentElement).transitionDuration,
           background: getComputedStyle(document.body).backgroundColor,
@@ -201,7 +271,7 @@ test.describe("Lights and theme", () => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     for (const target of ["rgb(241, 241, 244)", "rgb(17, 17, 20)"]) {
       const samples = await page.evaluate(async () => {
-        document.querySelector<HTMLButtonElement>("[data-lights-pill]")!.click();
+        document.querySelector<HTMLButtonElement>("[data-eclipse]")!.click();
         // Sample fixed animation times so a busy runner cannot miss the
         // entire 300 ms fade between timer callbacks.
         const animations = document.documentElement.getAnimations();

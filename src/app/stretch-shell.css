@@ -1,6 +1,6 @@
 /*
  * The Stretch homepage shell (docs/design/STRETCH.md): page surface, header,
- * Lights pill, section headings and footer. Everything is scoped to
+ * theme button, section headings and footer. Everything is scoped to
  * [data-stretch-shell]; only the page surface reaches up to html and body,
  * through :has().
  */
@@ -188,35 +188,87 @@ button.stretch-pill {
 }
 
 /*
- * The Lights pill names the state it is in, from the first paint: "Lights on"
- * while the page is light, "Lights off" while it is dark. Which theme is in
- * force is decided as in stretch-tokens.css.
+ * The Eclipse: an icon-only sun while the page is light, a crescent moon while
+ * it is dark, in a borderless 44 px target. Its state is --stretch-dark (0 in
+ * the light theme, 1 in the dark one), which stretch-tokens.css sets with the
+ * palette, so it is right from the first paint. The parts move with
+ * transitions, so a press that reverses mid-flip turns back from where the
+ * icon is.
  */
-.stretch-lights-off {
-  display: none;
+.stretch-eclipse {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: transparent;
+  color: var(--stretch-ink);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-lights]):not([data-theme]) .stretch-lights-on {
-    display: none;
+/* Only where there is a hover: on touch a tap would leave the tint behind. */
+@media (hover: hover) {
+  .stretch-eclipse:hover {
+    background-color: color-mix(in srgb, var(--stretch-ink) 8%, transparent);
   }
+}
 
-  :root:not([data-lights]):not([data-theme]) .stretch-lights-off {
-    display: inline;
+.stretch-eclipse svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+  overflow: visible;
+}
+
+.stretch-eclipse svg * {
+  transform-box: fill-box;
+}
+
+/* A small disc is the sun; the full disc, bitten by the shadow, is the moon. */
+.stretch-eclipse__disc {
+  transform-origin: center;
+  transform: scale(calc(0.56 + 0.44 * var(--stretch-dark)));
+  transition: transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.stretch-eclipse__shadow {
+  transform: translate(calc(13px - 8.5px * var(--stretch-dark)), calc(-13px + 8.5px * var(--stretch-dark)));
+  transition: transform 420ms cubic-bezier(0, 0, 0.38, 0.9);
+}
+
+.stretch-eclipse__rays {
+  transform-origin: center;
+  transform: rotate(calc(-60deg * var(--stretch-dark))) scale(calc(1 - 0.6 * var(--stretch-dark)));
+  opacity: calc(1 - var(--stretch-dark));
+  transition:
+    transform 420ms cubic-bezier(0, 0, 0.38, 0.9),
+    opacity 252ms cubic-bezier(0, 0, 0.38, 0.9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stretch-eclipse__disc,
+  .stretch-eclipse__shadow,
+  .stretch-eclipse__rays {
+    transition-duration: 0ms;
   }
 }
 
-:root[data-lights="on"]:not([data-theme="light"]) .stretch-lights-on,
-:root[data-theme="dark"] .stretch-lights-on {
-  display: none;
+/*
+ * Below about 900 px the header is two rows: the clock, then the nav and the
+ * theme button. The icon is narrow enough that one row would nearly fit at
+ * 820 px, and whether it did would depend on the font, so the wrap is set here.
+ */
+@media (max-width: 899px) {
+  .stretch-header__right {
+    width: 100%;
+  }
 }
 
-:root[data-lights="on"]:not([data-theme="light"]) .stretch-lights-off,
-:root[data-theme="dark"] .stretch-lights-off {
-  display: inline;
-}
-
-/* ---- Phones: Lights and Menu only, the rest in the menu dialog ---- */
+/* ---- Phones: the theme button and Menu only, the rest in the menu dialog ---- */
 
 .stretch-menu-button {
   display: none;

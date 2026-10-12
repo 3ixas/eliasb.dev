@@ -9,6 +9,8 @@ import { renderedContrast } from "./support/rendered-contrast";
 test.use({ reducedMotion: "reduce" });
 
 const routes = ["/", "/work", ...Object.keys(caseStudies).map((slug) => `/work/${slug}`), "/nothing-pinned-here"];
+/** Fewest text runs a page shows; the 404 has five now that the theme button carries no text. */
+const minimumRuns = (route: string) => (route === "/nothing-pinned-here" ? 5 : 6);
 
 test.describe("Contrast, measured from the rendered page", () => {
   test.beforeEach(({ browserName }) => {
@@ -19,7 +21,7 @@ test.describe("Contrast, measured from the rendered page", () => {
     test(`every text run on ${route} meets WCAG 2.2 AA`, async ({ page }) => {
       await page.goto(route);
       const readings = await renderedContrast(page);
-      expect(readings.length).toBeGreaterThan(5);
+      expect(readings.length).toBeGreaterThanOrEqual(minimumRuns(route));
       // A blend mode on the text would make its reading meaningless.
       expect(readings.filter((reading) => reading.blended)).toEqual([]);
       expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);

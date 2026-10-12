@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { LightsPill } from "@/components/site/lights-pill";
+import { EclipseToggle } from "@/components/site/eclipse-toggle";
 
-/** The slim header on pages that aren't the homepage: a way home and Lights. */
+/** The slim header on pages that aren't the homepage: a way home and the theme button. */
 export function SubpageHeader() {
   return (
     <header className="stretch-header">
@@ -12,7 +12,7 @@ export function SubpageHeader() {
         <Link className="stretch-pill stretch-cs-home" href="/" aria-label="Elias Bennett, home">
           Elias Bennett
         </Link>
-        <LightsPill />
+        <EclipseToggle />
       </div>
     </header>
   );
