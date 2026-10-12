@@ -49,7 +49,7 @@ export function StoryOpening({
   titleId: string;
   name: string;
   lead: string;
-  aside?: ReactNode;
+  aside: ReactNode;
   children?: ReactNode;
 }) {
   return (
