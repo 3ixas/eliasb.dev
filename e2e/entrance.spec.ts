@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { entranceTimings } from "../src/components/site/entrance";
 import { hero } from "../src/content/stretch/site-copy";
 
 const headline = `${hero.headline.lead} ${hero.headline.emphasis}`;
@@ -43,11 +44,12 @@ test.describe("Signature entrance", () => {
   });
 
   test("shows the whole page within 6 s of holding it", async ({ page }) => {
-    // Timed on the page's own clock, paused, so only the entrance's schedule counts. Wall-clock time
-    // cannot be held to it: a CI runner that freezes the browser for a second (seen in WebKit) delays
-    // every timer, the safety release's too. A stalled page is covered by its own spec below.
+    // Timed on the page's own clock, which stops once the entrance has begun, so only its schedule
+    // counts. Wall-clock time cannot be held to it: a CI runner that freezes the browser for a second
+    // (seen in WebKit) delays every timer, the safety release's too. A stalled page is covered by its
+    // own spec below. The clock runs until the layer exists, so a slow font request still reaches
+    // the page's font fallback instead of freezing it.
     await page.clock.install({ time: 0 });
-    await page.clock.pauseAt(1000);
     await page.addInitScript(() => {
       const marks = window as unknown as { heldFrom?: number; heldUntil?: number };
       const watch = new MutationObserver(() => {
@@ -62,15 +64,18 @@ test.describe("Signature entrance", () => {
     await page.goto("/", { waitUntil: "commit" });
     await page.waitForSelector("[data-entrance-layer]");
     expect(await isEntering(page)).toBe(true);
-
-    // Short of the safety release, so only the entrance itself can let go in time.
-    await page.clock.runFor(6000);
+    // The pause lands well ahead of the read (a round trip), then the run ends past the sequence's
+    // 5.4 s and short of the safety release, so only the entrance itself can let go in time.
+    await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 600);
+    await page.clock.runFor(5400);
     expect(await isEntering(page), "the whole page is there within 6 s of being held").toBe(false);
     const { heldFrom, heldUntil } = await page.evaluate(() => {
       const marks = window as unknown as { heldFrom: number; heldUntil: number };
       return { heldFrom: marks.heldFrom, heldUntil: marks.heldUntil };
     });
     const held = heldUntil - heldFrom;
+    // The safety release sits above the promise, so only the sequence can pass the bound below.
+    expect(entranceTimings.safetyMs, "the safety release is later than 6 s").toBeGreaterThan(6000);
     // About five seconds: a give-up or a script error would have released the page at once.
     expect(held, "released as the sequence ends").toBeGreaterThan(4000);
     expect(held, "released within 6 s of being held").toBeLessThan(6000);
