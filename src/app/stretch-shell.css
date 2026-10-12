@@ -257,6 +257,17 @@ button.stretch-pill {
   }
 }
 
+/*
+ * Below about 900 px the header is two rows: the clock, then the nav and the
+ * theme button. The icon is narrow enough that one row would nearly fit at
+ * 820 px, and whether it did would depend on the font, so the wrap is set here.
+ */
+@media (max-width: 899px) {
+  .stretch-header__right {
+    width: 100%;
+  }
+}
+
 /* ---- Phones: the theme button and Menu only, the rest in the menu dialog ---- */
 
 .stretch-menu-button {
