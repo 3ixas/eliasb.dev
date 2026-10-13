@@ -24,7 +24,7 @@ A from-scratch front end in the **Stretch direction**, keeping the existing data
 
 **Visitors: first impression**
 1. As a visitor, I want the homepage to open with Elias's headline typing on its own and the page assembling around it, so that the site feels crafted and memorable.
-2. As a visitor, I want the whole opening to finish in about 5 seconds, so that I'm never kept waiting long.
+2. As a visitor, I want the whole opening to finish in about 4.6 seconds, so that I'm never kept waiting long.
 3. As a visitor who reloads the homepage, I want the opening to play again, so that the site behaves consistently, like Commissioner.
 4. As a visitor going back to the homepage from a case study, I want the finished page immediately, without the opening, so that navigating doesn't punish me.
 5. As a visitor with reduced motion turned on, I want the finished homepage at once, with no opening and no movement, so that the site respects my setting.
@@ -134,12 +134,13 @@ All text pairs pass WCAG 2.2 AA (5.7:1–18.2:1, #108). Project colours are data
 - **Holding the page:** a pre-paint inline script marks the document as "entering" only when reduced motion is off and the page wasn't restored from the back-forward cache. While entering, every section except the typed overlay is visually held. It stays in the accessibility tree, and the real `h1` is complete throughout. The typed text is an `aria-hidden` overlay, as today.
 - **Failure:** a safety timeout releases the hold if the sequence hasn't finished within 7 seconds, and any script error releases it at once.
 - **Client-side return:** navigating back to `/` from another page never re-enters.
-- **Timings,** taken from the prototype (`prototypes/stretch-motion`, tip `ff0d834`), to the whole page in about 5 s:
+- **Timings,** variant A3 of the two-act entrance (#160, `prototype/two-act-entrance`), to the whole page in about 4.6 s. BNP Paribas is readable at about 1.0 s and the whole First glance (name, role line, headline, supporting line) at about 3.9 s:
 
 ```
-start             200 ms
-type              38 ms/char · 28 ms/space · 420 ms pause after the comma
+start             120 ms
+type              20 ms/char · 14 ms/space · 400 ms pause after the comma (caret blinking)
 "products of my own."    spring(bounce 0.3, visualDuration 0.45); underline starts at +200 ms, 0.52 s cubic-bezier(0.23,1,0.32,1)
+hold              the finished sentence holds alone for 250 ms
 move into place   spring(0.15, 0.7)   (fade 0.3 s instead if the h1's slot is below the fold)
 name settle       +100 ms into the move; per letter translateY(0.18em→0) and font-stretch 100%→75%, spring(0.35, 0.55), 35 ms stagger
 role line         fades in 250 ms after the name starts
