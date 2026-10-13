@@ -100,7 +100,9 @@ test.describe("Work archive: a catalogue above ten (fixtures)", () => {
 });
 
 test.describe("Things I make: moved from /work", () => {
-  const moved = [["/work", "/things-i-make"], ...Object.keys(caseStudies).map((slug) => [`/work/${slug}`, `/things-i-make/${slug}`])];
+  // The three case studies that were published at /work/<slug>. Frozen: a later one never lived there.
+  const legacySlugs = ["threshold", "argus-risk", "flowtime"];
+  const moved = [["/work", "/things-i-make"], ...legacySlugs.map((slug) => [`/work/${slug}`, `/things-i-make/${slug}`])];
 
   test("the archive and each case study redirect permanently, one path at a time", async ({ request }) => {
     for (const [from, to] of moved) {
@@ -114,8 +116,10 @@ test.describe("Things I make: moved from /work", () => {
     const image = await request.get(projects[0].screenshot!.src, { maxRedirects: 0 });
     expect(image.status(), "a screenshot is still served from its published address").toBe(200);
     // Role stories will live under /work/ (#172), so nothing else there may be sent anywhere.
-    const other = await request.get("/work/bnp-paribas", { maxRedirects: 0 });
-    expect(other.status(), "/work/bnp-paribas is not redirected").not.toBe(308);
+    for (const path of ["/work/bnp-paribas", "/work/ask-professor-past"]) {
+      const other = await request.get(path, { maxRedirects: 0 });
+      expect(other.status(), `${path} is not redirected`).not.toBe(308);
+    }
   });
 
   test("the archive and case studies use /things-i-make for their canonical and Open Graph URLs", async ({ page }) => {

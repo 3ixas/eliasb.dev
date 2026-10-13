@@ -7,12 +7,15 @@ import { assertCatalogue, featuredSlugs, projects } from "./src/content/projects
 assertCatalogue(projects, featuredSlugs, Object.keys(caseStudies));
 
 // The projects moved from /work to /things-i-make (#157), so /work can mean
-// employment. Permanent redirects, one path at a time: the archive and each
-// case study. Nothing else under /work/ moves: the Role stories live there, and
-// so do the projects' screenshots, which stay at their published addresses.
+// employment. Permanent redirects, one path at a time: the archive and the three
+// case studies that were published at /work/<slug>. The list is frozen: a case
+// study added later never lived under /work/, and nothing else there moves (the
+// Role stories live there, and so do the projects' screenshots, at their
+// published addresses).
+const legacyCaseStudySlugs = ["threshold", "argus-risk", "flowtime"];
 const movedProjectPaths = [
   { source: "/work", destination: "/things-i-make" },
-  ...Object.keys(caseStudies).map((slug) => ({ source: `/work/${slug}`, destination: `/things-i-make/${slug}` })),
+  ...legacyCaseStudySlugs.map((slug) => ({ source: `/work/${slug}`, destination: `/things-i-make/${slug}` })),
 ];
 
 const securityHeaders = [
