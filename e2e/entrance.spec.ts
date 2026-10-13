@@ -81,7 +81,7 @@ test.describe("Signature entrance", () => {
     expect(held, "released within 6 s of being held").toBeLessThan(6000);
   });
 
-  test("lands its beats at fixed times: BNP at 1 s, the First glance by 3.9 s, settled at 4.6 s", async ({ page }) => {
+  test("lands its beats at fixed times: BNP Paribas at 1 s, the First glance by 3.9 s, settled at 4.6 s", async ({ page }) => {
     // Sampled on the page's own clock, which a busy runner cannot stretch. Timers set the typed text and
     // the released parts, so those are read: CSS transitions run on real time and would not be steady.
     await page.clock.install({ time: 0 });
@@ -107,9 +107,9 @@ test.describe("Signature entrance", () => {
       }));
     };
 
-    // Act 1: BNP Paribas is typed by about a second.
-    let beat = await sample(1000);
-    expect(beat.typed, "BNP Paribas is readable at 1 s").toContain("I build pricing and risk engines at BNP");
+    // Act 1: the full phrase "BNP Paribas" is typed by about a second.
+    let beat = await sample(1100);
+    expect(beat.typed, "BNP Paribas is readable at about 1 s").toContain("I build pricing and risk engines at BNP Paribas");
     expect(beat.released, "nothing else has arrived").toEqual([]);
 
     // The comma is a beat, then the sentence finishes and holds alone.

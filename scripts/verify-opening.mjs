@@ -167,8 +167,10 @@ for (const [name, expected] of [
 }
 {
   const beats = schedule();
-  const bnpTyped = beats.typeAt[leadText.indexOf('BNP') + 2] + timings.characterMs;
-  assert.ok(bnpTyped >= 800 && bnpTyped <= 1100, `BNP Paribas is typed at about 1.0 s, not ${bnpTyped} ms`);
+  const employer = 'BNP Paribas';
+  assert.ok(leadText.includes(employer), 'The typed line names the employer');
+  const employerTyped = beats.typeAt[leadText.indexOf(employer) + employer.length - 1] + timings.characterMs;
+  assert.ok(employerTyped >= 900 && employerTyped <= 1100, `BNP Paribas is typed at about 1.0 s, not ${employerTyped} ms`);
   // The supporting line is readable once it is 60% of the way through its fade.
   const glance = beats.moveEnd + timings.fadeMs * 0.6;
   assert.ok(glance >= 3800 && glance <= 4000, `The whole First glance is readable at about 3.9 s, not ${Math.round(glance)} ms`);
