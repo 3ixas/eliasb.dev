@@ -31,7 +31,7 @@ A from-scratch front end in the **Stretch direction**, keeping the existing data
 6. As a screen-reader user, I want the full homepage content available from the start, so that the visual opening never delays what I can read.
 7. As a search engine, I want all homepage content in the server-rendered HTML, so that the site is indexed completely.
 8. As a visitor whose script fails or is blocked, I want the finished page rather than a blank one, so that a failure never hides the site.
-9. As a visitor, I want to see Elias's name at display size in cobalt, his title "Software engineer", his headline and his supporting line on the first screen, so that I know who he is straight away.
+9. As a visitor, I want to see Elias's name at display size in cobalt, his role "Software Engineer at BNP Paribas CIB" under it, his headline and his supporting line on the first screen, so that I know who he is straight away.
 10. As a visitor, I want *See my work* and *Say hello* in the hero, so that I can act immediately.
 
 **Visitors: Work**
@@ -125,7 +125,7 @@ All text pairs pass WCAG 2.2 AA (5.7:1–18.2:1, #108). Project colours are data
 - All copy comes from `docs/content/redesign-copy.md`.
 
 **Homepage composition**
-- **Hero:** the name at 31.5vw on phones (no wrap, capped on desktop), the headline (a real `h1`), the supporting line, two actions, and the portrait tilted 3° (2° on phones) with a cobalt "Software engineer" label. On desktop the portrait sits to the right of the name; on phones it's stacked below the actions.
+- **Hero:** the name at `min(31.5vw, 28svh)` on phones (no wrap) and `clamp(88px, min(18vw, 28svh), 280px)` on desktop, so two lines take about 45% of the screen's height and the whole First glance fits on the first screen; the role line in plain text directly under it; the headline (a real `h1`); the supporting line; two actions; and the portrait tilted 3° (2° on phones) with a cobalt "Based in London" label. On desktop the portrait sits to the right of the name; on phones it's stacked below the actions.
 - **Work:** the featured tiles (the first spans two columns), each in its project colour, with its outline number, name, outcome and metadata, a screenshot tilted ±1–1.5°, and one fastener. Then the index rows, the preview, and *All work (n)*. Desktop previews follow the hovered or focused row: centre on middle rows, align to the top/bottom at the list edges. Mobile keeps inline thumbnails.
 - **Section headers (except Say hello, whose email action is its heading):** a giant condensed uppercase heading with a mono note and counts where true ("06 things I've built · 03 I'm proudest of").
 
@@ -139,9 +139,10 @@ All text pairs pass WCAG 2.2 AA (5.7:1–18.2:1, #108). Project colours are data
 ```
 start             200 ms
 type              38 ms/char · 28 ms/space · 420 ms pause after the comma
-"feel simple."    spring(bounce 0.3, visualDuration 0.45); underline starts at +200 ms, 0.52 s cubic-bezier(0.23,1,0.32,1)
+"products of my own."    spring(bounce 0.3, visualDuration 0.45); underline starts at +200 ms, 0.52 s cubic-bezier(0.23,1,0.32,1)
 move into place   spring(0.15, 0.7)   (fade 0.3 s instead if the h1's slot is below the fold)
 name settle       +100 ms into the move; per letter translateY(0.18em→0) and font-stretch 100%→75%, spring(0.35, 0.55), 35 ms stagger
+role line         fades in 250 ms after the name starts
 portrait swing    +200 ms after the name starts; rotate 9°→3°, translateY(−14px→0), spring(0.4, 0.6)
 label press       when the move ends; scale 1.25→1, spring(0.45, 0.3)
 header + support  fade 0.5 s when the move ends

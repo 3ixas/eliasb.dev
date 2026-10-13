@@ -8,10 +8,10 @@ Approved by Elias on 8 October 2026 for [#113](https://github.com/3ixas/eliasb.d
 
 | Where | Copy |
 | --- | --- |
-| Page title (home) | Elias Bennett, software engineer in London |
+| Page title (home) | Elias Bennett, software engineer at BNP Paribas |
 | Page title (others) | {Page} · Elias Bennett |
-| Meta description | I’m Elias, a software engineer in London. I build everyday software, and make complicated things feel simple. Here’s my work, how I work, and what I’m up to. |
-| Social image | ELIAS BENNETT · I build everyday software, and make complicated things *feel simple.* |
+| Meta description | I’m Elias, a software engineer in London. I build pricing and risk engines at BNP Paribas in C# and Java, and products of my own. |
+| Social image | ELIAS BENNETT · I build pricing and risk engines at BNP Paribas, and *products of my own.* |
 | Menu | Work · How I work · Where I’ve been · Off the clock · Say hello |
 | Header | Dark theme · Menu · Close · ← Work |
 | Clock | London {14:05} (read aloud as “The time in London: {14:05}”) |
@@ -26,12 +26,13 @@ Approved by Elias on 8 October 2026 for [#113](https://github.com/3ixas/eliasb.d
 
 ## Hero
 
-- Label on the portrait: Software engineer
-- Headline: I build everyday software, and make complicated things *feel simple.*
-- Supporting line: I take ideas all the way through: deciding what’s worth making, designing it, building it across the stack, and finding out whether it actually works.
+- Role line, plain text under the name: Software Engineer at BNP Paribas CIB
+- Label on the portrait: Based in London
+- Headline: I build pricing and risk engines at BNP Paribas, and *products of my own.*
+- Supporting line: In C# and Java, on CPU and GPU. I’ve won BNP’s Early Careers digitisation competition and a Take Ownership award.
 - Buttons: See my work ↓ · Say hello
 
-The headline stays as it is (Elias, #113): the entrance is built around “*feel simple.*” landing.
+The First glance changed for the forward-facing redesign ([#159](https://github.com/3ixas/eliasb.dev/issues/159), [#162](https://github.com/3ixas/eliasb.dev/issues/162), [#168](https://github.com/3ixas/eliasb.dev/issues/168)): the entrance is built around “*products of my own.*” landing.
 
 ## Work
 

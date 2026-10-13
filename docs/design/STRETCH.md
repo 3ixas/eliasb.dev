@@ -36,7 +36,7 @@ Every text pair passes WCAG 2.2 AA (5.7:1 to 18.2:1, [#108](https://github.com/3
 
 - **Bricolage Grotesque** (variable `opsz`, `wdth`, `wght`), self-hosted through `next/font`. Display text is at 75% width, weight 800, uppercase. Body copy uses the same family at normal width.
 - **JetBrains Mono** for metadata, counts, dates and section notes.
-- The name fills the screen on phones (31.5vw, no wrap) and is capped on desktop. Section headings are giant, condensed and uppercase, with a mono note and true counts ("06 things I've built · 03 I'm proudest of").
+- The name fills the screen's width on phones (31.5vw, no wrap) and is capped at 28svh everywhere, so it never takes more than about 45% of the screen's height. Section headings are giant, condensed and uppercase, with a mono note and true counts ("06 things I've built · 03 I'm proudest of").
 - Newsreader is retired.
 
 ## Fasteners
@@ -52,7 +52,7 @@ One per physical-looking object (a tile, a card, the portrait), and never more. 
 
 | Component | Notes |
 |---|---|
-| Hero | Name, real `h1`, supporting line, *See my work* and *Say hello*, portrait tilted 3° (2° on phones) with a cobalt "Software engineer" label |
+| Hero | Name (capped at 28svh) with the role line under it, real `h1`, supporting line, *See my work* and *Say hello*, portrait tilted 3° (2° on phones) with a cobalt "Based in London" label |
 | Featured tile | Up to three, in the project's colours; the first spans two columns; outline number, name, outcome, metadata, tilted screenshot (±1–1.5°), one Fastener |
 | Project index row | Number, name, outcome, type, year; turns cobalt with an arrow nudge on hover or focus and previews its screenshot; thumbnail and single tap on phones |
 | How I work | Three habit and proof beats, the honest line, the PRD card |

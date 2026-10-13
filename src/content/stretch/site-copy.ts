@@ -12,15 +12,15 @@ import type { ProjectCategory } from "../projects";
 const pad = (n: number) => String(n).padStart(2, "0");
 
 export const siteCopy = {
-  titleHome: "Elias Bennett, software engineer in London",
+  titleHome: "Elias Bennett, software engineer at BNP Paribas",
   /** Other pages: "{Page} · Elias Bennett". */
   title: (page: string) => `${page} · Elias Bennett`,
   description:
-    "I’m Elias, a software engineer in London. I build everyday software, and make complicated things feel simple. Here’s my work, how I work, and what I’m up to.",
+    "I’m Elias, a software engineer in London. I build pricing and risk engines at BNP Paribas in C# and Java, and products of my own.",
   socialImage: {
     name: "ELIAS BENNETT",
-    lead: "I build everyday software, and make complicated things",
-    emphasis: "feel simple.",
+    lead: "I build pricing and risk engines at BNP Paribas, and",
+    emphasis: "products of my own.",
   },
   /** The homepage's anchored sections after the hero, in order: each section's anchor with its label. */
   menu: [
@@ -53,10 +53,11 @@ export const notFound = {
 
 export const hero = {
   name: { first: "Elias", last: "Bennett" },
-  portraitLabel: "Software engineer",
-  headline: { lead: "I build everyday software, and make complicated things", emphasis: "feel simple." },
-  support:
-    "I take ideas all the way through: deciding what’s worth making, designing it, building it across the stack, and finding out whether it actually works.",
+  /** Plain text directly under the name. */
+  role: "Software Engineer at BNP Paribas CIB",
+  portraitLabel: "Based in London",
+  headline: { lead: "I build pricing and risk engines at BNP Paribas, and", emphasis: "products of my own." },
+  support: "In C# and Java, on CPU and GPU. I’ve won BNP’s Early Careers digitisation competition and a Take Ownership award.",
   actions: { work: "See my work ↓", hello: "Say hello" },
 } as const;
 

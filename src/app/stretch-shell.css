@@ -395,12 +395,16 @@ html:has(.stretch-menu[open]) {
   padding-block: 12px 48px;
 }
 
-/* The name: 31.5vw on phones so "Bennett" fills the width without wrapping. */
+/*
+ * The name: 31.5vw on phones so "Bennett" fills the width without wrapping,
+ * and never more than 28svh, so two lines take about 45% of the screen's
+ * height and the whole First glance fits on the first screen.
+ */
 .stretch-name,
 .stretch-entrance__name {
   margin: 0;
   color: var(--stretch-cobalt);
-  font-size: 31.5vw;
+  font-size: min(31.5vw, 28svh);
   line-height: 0.8;
   letter-spacing: 0.005em;
   white-space: nowrap;
@@ -419,6 +423,14 @@ html:has(.stretch-menu[open]) {
 .stretch-name span,
 .stretch-entrance__name span {
   display: block;
+}
+
+/* The role line sits plainly under the name, in plain ink. */
+.stretch-hero__role {
+  margin: 16px 0 0;
+  font-size: clamp(20px, 1.9vw, 27px);
+  font-weight: 650;
+  letter-spacing: -0.01em;
 }
 
 .stretch-hero__lede {
@@ -538,11 +550,11 @@ html:has(.stretch-menu[open]) {
 
   .stretch-name,
   .stretch-entrance__name {
-    font-size: clamp(88px, 18vw, 280px);
+    font-size: clamp(88px, min(18vw, 28svh), 280px);
   }
 
   .stretch-hero__lede {
-    margin-top: 48px;
+    margin-top: 40px;
   }
 
   .stretch-hero__support {
@@ -592,6 +604,7 @@ html[data-entering] [data-entrance="portrait"] {
 
 html[data-entering]:not([data-released~="header"]) [data-entrance="header"],
 html[data-entering]:not([data-released~="name"]) [data-entrance="name"],
+html[data-entering]:not([data-released~="role"]) [data-entrance="role"],
 html[data-entering]:not([data-released~="headline"]) [data-entrance="headline"],
 html[data-entering]:not([data-released~="support"]) [data-entrance="support"],
 html[data-entering]:not([data-released~="portrait"]) [data-entrance="portrait"],

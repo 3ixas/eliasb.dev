@@ -177,7 +177,7 @@ function verifyPageShell(markup, route) {
 
 function verifyHomepage(markup) {
   verifyPageShell(markup, "/");
-  const fullOpening = "I build everyday software, and make complicated things feel simple.";
+  const fullOpening = "I build pricing and risk engines at BNP Paribas, and products of my own.";
   const headlineContent = markup.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? "";
   equal(plainText(headlineContent), fullOpening, "Homepage headline should be one complete, server-rendered sentence");
   // The entrance holds the page only after its guard script has run in a browser.
@@ -272,13 +272,13 @@ async function verifyRoutes(baseUrl, pages) {
 }
 
 async function verifyHomeSocialMetadata(baseUrl, document) {
-  const title = "Elias Bennett, software engineer in London";
-  const description = "I’m Elias, a software engineer in London. I build everyday software, and make complicated things feel simple. Here’s my work, how I work, and what I’m up to.";
+  const title = "Elias Bennett, software engineer at BNP Paribas";
+  const description = "I’m Elias, a software engineer in London. I build pricing and risk engines at BNP Paribas in C# and Java, and products of my own.";
   equal(document.match(/<title>([^<]*)<\/title>/i)?.[1], title, "Homepage title");
   equal(metaContent(document, "description", "name"), description, "Homepage description");
   equal(metaContent(document, "og:title"), title, "Homepage Open Graph title");
   equal(metaContent(document, "og:site_name"), "Elias Bennett", "Open Graph site name");
-  equal(metaContent(document, "og:image:alt"), "ELIAS BENNETT. I build everyday software, and make complicated things feel simple.", "Homepage social image alternative text");
+  equal(metaContent(document, "og:image:alt"), "ELIAS BENNETT. I build pricing and risk engines at BNP Paribas, and products of my own.", "Homepage social image alternative text");
   equal(metaContent(document, "twitter:title", "name"), title, "Homepage Twitter title");
 
   const ogImage = metaContent(document, "og:image");
