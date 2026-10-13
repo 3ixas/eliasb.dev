@@ -1,7 +1,7 @@
 /**
  * The signature entrance (homepage only): the headline types on a blank page,
  * moves up into its place, and the hero and then the rest of the page arrive
- * around it, in about five seconds. The server renders the finished page.
+ * around it, in about 4.6 seconds. The server renders the finished page.
  *
  * Two inline scripts do the work, so nothing waits for React:
  *
@@ -21,17 +21,24 @@
  * This module has no imports so `scripts/verify-opening.mjs` can load it.
  */
 
-/** The approved timings from the motion prototype (`prototype/stretch-motion`, tip ff0d834). */
+/**
+ * The approved timings: variant A3 of the two-act entrance (#160,
+ * `prototype/two-act-entrance`). Act 1 types alone up to the comma, which is a
+ * beat with the caret blinking; act 2 finishes the sentence, and the finished
+ * sentence holds alone before the line moves into place.
+ */
 export const entranceTimings = {
-  startMs: 200,
-  characterMs: 38,
-  spaceMs: 28,
-  commaPauseMs: 420,
-  /** "feel simple." landing, with its underline starting a little after. */
+  startMs: 120,
+  characterMs: 20,
+  spaceMs: 14,
+  commaPauseMs: 400,
+  /** "products of my own." landing, with its underline starting a little after. */
   land: { bounce: 0.3, visualDuration: 0.45 },
   underlineDelayMs: 200,
   underlineMs: 520,
   underlineEase: "cubic-bezier(0.23, 1, 0.32, 1)",
+  /** The finished sentence holds alone this long before it moves. */
+  holdMs: 250,
   /** The typed line moving into the h1's place; a fade when that place is below the fold. */
   move: { bounce: 0.15, visualDuration: 0.7 },
   fadeMoveMs: 300,
@@ -58,7 +65,7 @@ export const entranceTimings = {
   /**
    * The entrance waits at most this long for the page's fonts, so the spots it
    * measures are those of the real typeface. It must leave room under
-   * `safetyMs` for the five seconds of the sequence itself.
+   * `safetyMs` for the 4.6 seconds of the sequence itself.
    */
   fontWaitMs: 1000,
   /** A timer this much later than planned means the page stalled; the entrance gives up. */
@@ -335,7 +342,7 @@ export function runEntrance(spring: (bounce: number, visualDuration: number) => 
       }
     });
 
-    // "feel simple." lands while its underline is already drawing.
+    // "products of my own." lands while its underline is already drawing.
     const landing = spring(timing.land.bounce, timing.land.visualDuration);
     later(() => {
       caret.remove();
@@ -349,7 +356,7 @@ export function runEntrance(spring: (bounce: number, visualDuration: number) => 
         });
       }
     }, elapsed);
-    elapsed += Math.max(landing.settled, timing.underlineDelayMs + timing.underlineMs);
+    elapsed += Math.max(landing.settled, timing.underlineDelayMs + timing.underlineMs) + timing.holdMs;
 
     // The line moves up into the headline's place, and the hero arrives around it.
     const moveStart = elapsed;

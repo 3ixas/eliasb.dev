@@ -65,7 +65,7 @@ test.describe("Signature entrance", () => {
     await page.waitForSelector("[data-entrance-layer]");
     expect(await isEntering(page)).toBe(true);
     // The pause lands well ahead of the read (a round trip), then the run ends past the sequence's
-    // 5.4 s and short of the safety release, so only the entrance itself can let go in time.
+    // 4.6 s and short of the safety release, so only the entrance itself can let go in time.
     await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 600);
     await page.clock.runFor(5400);
     expect(await isEntering(page), "the whole page is there within 6 s of being held").toBe(false);
@@ -76,9 +76,68 @@ test.describe("Signature entrance", () => {
     const held = heldUntil - heldFrom;
     // The safety release sits above the promise, so only the sequence can pass the bound below.
     expect(entranceTimings.safetyMs, "the safety release is later than 6 s").toBeGreaterThan(6000);
-    // About five seconds: a give-up or a script error would have released the page at once.
+    // About 4.6 seconds: a give-up or a script error would have released the page at once.
     expect(held, "released as the sequence ends").toBeGreaterThan(4000);
     expect(held, "released within 6 s of being held").toBeLessThan(6000);
+  });
+
+  test("lands its beats at fixed times: BNP at 1 s, the First glance by 3.9 s, settled at 4.6 s", async ({ page }) => {
+    // Sampled on the page's own clock, which a busy runner cannot stretch. Timers set the typed text and
+    // the released parts, so those are read: CSS transitions run on real time and would not be steady.
+    await page.clock.install({ time: 0 });
+    await page.addInitScript(() => {
+      const marks = window as unknown as { began?: number };
+      new MutationObserver((_, watch) => {
+        if (!document.querySelector("[data-entrance-layer]")) return;
+        marks.began = performance.now();
+        watch.disconnect();
+      }).observe(document, { subtree: true, childList: true });
+    });
+    await page.goto("/", { waitUntil: "commit" });
+    await page.waitForSelector("[data-entrance-layer]");
+    await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 300);
+    const sample = async (atMs: number) => {
+      const sinceBegin = await page.evaluate(() => performance.now() - (window as unknown as { began: number }).began);
+      await page.clock.runFor(Math.max(0, Math.round(atMs - sinceBegin)));
+      return page.evaluate(() => ({
+        typed: document.querySelector("[data-entrance-typed]")?.textContent ?? "",
+        released: (document.documentElement.getAttribute("data-released") ?? "").split(/\s+/).filter(Boolean),
+        entering: document.documentElement.hasAttribute("data-entering"),
+        nameLayerHidden: getComputedStyle(document.querySelector(".stretch-entrance__name") ?? document.body).visibility === "hidden",
+      }));
+    };
+
+    // Act 1: BNP Paribas is typed by about a second.
+    let beat = await sample(1000);
+    expect(beat.typed, "BNP Paribas is readable at 1 s").toContain("I build pricing and risk engines at BNP");
+    expect(beat.released, "nothing else has arrived").toEqual([]);
+
+    // The comma is a beat, then the sentence finishes and holds alone.
+    beat = await sample(1300);
+    expect(beat.typed, "the comma holds the caret").toBe(`${hero.headline.lead.slice(0, hero.headline.lead.indexOf(",") + 1)}`);
+    beat = await sample(2400);
+    expect(beat.typed, "the sentence is typed").toBe(`${hero.headline.lead} `);
+    expect(beat.released, "the finished sentence holds alone for a beat").toEqual([]);
+    expect(beat.nameLayerHidden, "the name has not started").toBe(true);
+
+    // Act 2: the name settles, the role line follows it, and the hero arrives around the line.
+    beat = await sample(2700);
+    expect(beat.nameLayerHidden, "the name is settling").toBe(false);
+    expect(beat.released, "the role line is not out yet").not.toContain("role");
+    beat = await sample(3000);
+    expect(beat.released, "the role line comes out with the name").toContain("role");
+    expect(beat.released, "the headline has not been handed over").not.toContain("headline");
+    beat = await sample(3900);
+    for (const part of ["name", "role", "headline", "support", "header"]) {
+      expect(beat.released, `${part} is out by 3.9 s: the whole First glance`).toContain(part);
+    }
+    expect(beat.entering, "the rest of the page is still arriving").toBe(true);
+
+    // Settled.
+    beat = await sample(4300);
+    expect(beat.entering, "still settling at 4.3 s").toBe(true);
+    beat = await sample(4800);
+    expect(beat.entering, "settled by 4.8 s").toBe(false);
   });
 
   test("the first Tab shows the page, so focus never lands on a held control", async ({ page, browserName }) => {

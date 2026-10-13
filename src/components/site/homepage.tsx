@@ -19,7 +19,7 @@ const sayHelloHeadingId = "say-hello-heading";
 /**
  * The Stretch homepage shell: the header, the hero and five anchored sections
  * with their headings, notes and true counts, and the footer. The signature
- * entrance (entrance.ts) holds all of it for about five seconds on a fresh
+ * entrance (entrance.ts) holds all of it for about 4.6 seconds on a fresh
  * load; the server renders the finished page.
  */
 export function Homepage() {

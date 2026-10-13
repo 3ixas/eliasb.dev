@@ -3,6 +3,34 @@ import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import { spring } from 'motion';
 import { entranceGuardScript, entranceScript, entranceTimings as timings, springCurve } from '../src/components/site/entrance.ts';
+import { hero } from '../src/content/stretch/site-copy.ts';
+
+/**
+ * When each beat of the entrance happens, from the timings alone. It mirrors the
+ * order in `runEntrance`: the lead types (with the comma beat), the last words land,
+ * the finished sentence holds, then the line moves and the name, role line, portrait
+ * and the rest follow. The Playwright entrance spec checks the page against these beats.
+ */
+function schedule() {
+  const lead = `${hero.headline.lead} `;
+  let elapsed = timings.startMs;
+  let bnpTyped = 0;
+  [...lead].forEach((character, index) => {
+    elapsed += character === ' ' ? timings.spaceMs : timings.characterMs;
+    if (lead.slice(0, index + 1).endsWith('BNP')) bnpTyped = elapsed;
+    if (character === ',') elapsed += timings.commaPauseMs;
+  });
+  const typed = elapsed;
+  const landing = springCurve(timings.land.bounce, timings.land.visualDuration).settled;
+  const moveStart = typed + Math.max(landing, timings.underlineDelayMs + timings.underlineMs) + timings.holdMs;
+  const moveEnd = moveStart + springCurve(timings.move.bounce, timings.move.visualDuration).settled;
+  const nameStart = moveStart + timings.nameDelayMs;
+  const letters = `${hero.name.first}${hero.name.last}`.length;
+  const nameEnd = nameStart + (letters - 1) * timings.nameStaggerMs + springCurve(timings.name.bounce, timings.name.visualDuration).settled;
+  const portraitEnd = nameStart + timings.portraitDelayMs + springCurve(timings.portrait.bounce, timings.portrait.visualDuration).settled;
+  const restStart = Math.max(nameEnd, portraitEnd, moveEnd);
+  return { bnpTyped, typed, moveStart, roleRelease: nameStart + timings.roleDelayMs, moveEnd, restStart, finish: restStart + timings.fadeMs };
+}
 
 // The signature entrance (#130) holds the homepage by opacity only after its
 // guard script has marked the document, and only when motion is welcome. The
@@ -118,7 +146,7 @@ for (const [what, settle] of [['the fonts arriving', 'fonts'], ['the cap running
   assert.ok(attributes.has('data-entering'), 'The entrance must not start while fonts are loading');
   assert.equal(timers.length, 1, 'The font wait must be capped by one timer');
   assert.equal(timers[0].delay, timings.fontWaitMs, 'The font wait must use the approved cap');
-  assert.ok(timings.fontWaitMs + 5500 < timings.safetyMs, 'The font wait plus the sequence must fit inside the safety timeout');
+  assert.ok(timings.fontWaitMs + schedule().finish < timings.safetyMs, 'The font wait plus the sequence must fit inside the safety timeout');
   if (settle === 'fonts') {
     resolveFonts();
     await Promise.resolve();
@@ -146,4 +174,28 @@ for (const { bounce, visualDuration } of [timings.land, timings.move, timings.na
   assert.ok(Math.abs(curve.settled - restsAt) <= 2, `spring(${bounce}, ${visualDuration}) should settle when Motion does: ${curve.settled} vs ${restsAt} ms`);
 }
 
-console.log('Entrance checks passed: the page is held only when motion is welcome, every failure releases it, and the springs match Motion.');
+// The two-act sequence (variant A3, #160): the timings are the approved ones, and they put the beats where
+// the ticket says: BNP Paribas readable at about 1.0 s, the whole First glance at about 3.9 s, settled at about 4.6 s.
+for (const [name, expected] of [
+  ['startMs', 120],
+  ['characterMs', 20],
+  ['spaceMs', 14],
+  ['commaPauseMs', 400],
+  ['holdMs', 250],
+  ['nameDelayMs', 100],
+  ['roleDelayMs', 250],
+  ['portraitDelayMs', 200],
+]) {
+  assert.equal(timings[name], expected, `${name} is the A3 value`);
+}
+{
+  const beats = schedule();
+  assert.ok(beats.bnpTyped >= 800 && beats.bnpTyped <= 1100, `BNP Paribas is typed at about 1.0 s, not ${beats.bnpTyped} ms`);
+  // The supporting line is readable once it is 60% of the way through its fade.
+  const glance = beats.moveEnd + timings.fadeMs * 0.6;
+  assert.ok(glance >= 3800 && glance <= 4000, `The whole First glance is readable at about 3.9 s, not ${Math.round(glance)} ms`);
+  assert.ok(beats.finish >= 4500 && beats.finish <= 4700, `The entrance settles at about 4.6 s, not ${beats.finish} ms`);
+  assert.ok(beats.roleRelease < beats.moveEnd, 'The role line arrives while the line is still moving');
+}
+
+console.log('Entrance checks passed: the page is held only when motion is welcome, every failure releases it, the springs match Motion, and the two-act sequence lands its beats at about 1.0, 3.9 and 4.6 s.');
