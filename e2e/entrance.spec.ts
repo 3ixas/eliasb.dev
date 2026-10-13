@@ -197,7 +197,7 @@ test.describe("Signature entrance", () => {
   test("does not play when coming back with the browser's Back button", async ({ page }) => {
     await page.goto("/");
     await finished(page);
-    await page.goto("/work");
+    await page.goto("/things-i-make");
     await page.goBack();
     await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName(headline);
     expect(await isEntering(page)).toBe(false);
@@ -205,9 +205,9 @@ test.describe("Signature entrance", () => {
   });
 
   test("does not play when arriving at a section", async ({ page }) => {
-    await page.goto("/#work");
+    await page.goto("/#things-i-make");
     expect(await isEntering(page)).toBe(false);
-    expect(await opacityOf(page, "#work")).toBe(1);
+    expect(await opacityOf(page, "#things-i-make")).toBe(1);
   });
 
   test("does not play on a client-side return to the homepage", async ({ page }) => {
@@ -217,18 +217,18 @@ test.describe("Signature entrance", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName(headline);
     expect(await isEntering(page)).toBe(false);
     await expect(page.locator("[data-entrance-layer]")).toHaveCount(0);
-    expect(await opacityOf(page, "#work")).toBe(1);
+    expect(await opacityOf(page, "#things-i-make")).toBe(1);
   });
 
   test("a quick round trip mid-entrance never leaves the page held", async ({ page }) => {
     await page.goto("/");
     expect(await isEntering(page)).toBe(true);
-    await page.goto("/work", { waitUntil: "commit" });
+    await page.goto("/things-i-make", { waitUntil: "commit" });
     await page.getByRole("link", { name: /Elias Bennett, home/ }).first().click();
     await expect(page).toHaveURL(/\/$/);
     await finished(page);
     await expect(page.locator("[data-entrance-layer]")).toHaveCount(0);
-    expect(await opacityOf(page, "#work")).toBe(1);
+    expect(await opacityOf(page, "#things-i-make")).toBe(1);
   });
 
   test("shows the finished page at once with reduced motion", async ({ page }) => {
@@ -248,7 +248,7 @@ test.describe("Signature entrance", () => {
     await expect.poll(() => isEntering(page)).toBe(false);
     await expect(page.locator("[data-entrance-layer]")).toHaveCount(0);
     // Reduced motion shortens transitions to a frame, so opacity lands on 1 a frame after the hold lifts.
-    await expect.poll(() => opacityOf(page, "#work")).toBe(1);
+    await expect.poll(() => opacityOf(page, "#things-i-make")).toBe(1);
   });
 
   test("gives up and shows the finished page if the page stalls", async ({ page }) => {
@@ -262,7 +262,7 @@ test.describe("Signature entrance", () => {
       }
     });
     await expect.poll(() => isEntering(page), { timeout: 1500 }).toBe(false);
-    expect(await opacityOf(page, "#work")).toBe(1);
+    expect(await opacityOf(page, "#things-i-make")).toBe(1);
   });
 
   test("a script error releases the hold at once", async ({ page }) => {
@@ -273,7 +273,7 @@ test.describe("Signature entrance", () => {
     });
     await page.goto("/");
     await expect.poll(() => isEntering(page), { timeout: 4000 }).toBe(false);
-    expect(await opacityOf(page, "#work")).toBe(1);
+    expect(await opacityOf(page, "#things-i-make")).toBe(1);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
@@ -290,7 +290,7 @@ test.describe("Signature entrance", () => {
     await page.waitForTimeout(3000);
     expect(await isEntering(page), "still held before the limit").toBe(true);
     await expect.poll(() => isEntering(page), { timeout: 6000 }).toBe(false);
-    expect(await opacityOf(page, "#work")).toBe(1);
+    expect(await opacityOf(page, "#things-i-make")).toBe(1);
   });
 
   test("a late-arriving bundle does not disturb the entrance", async ({ page }) => {
@@ -305,7 +305,7 @@ test.describe("Signature entrance", () => {
     await expect.poll(() => typedText(page)).toMatch(/^I build/);
     await finished(page);
     expect(errors, "no hydration or script errors").toEqual([]);
-    expect(await opacityOf(page, "#work")).toBe(1);
+    expect(await opacityOf(page, "#things-i-make")).toBe(1);
     await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName(headline);
   });
 });

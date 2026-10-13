@@ -15,7 +15,7 @@ const caseStudySlugs = Object.keys(caseStudies);
 const base = (slug, year = 2025, overrides = {}) => ({ slug, name: slug, outcome: "o", type: "t", year, category: "products", links: {}, ...overrides });
 const featurable = (slug) =>
   base(slug, 2026, {
-    links: { caseStudy: `/work/${slug}` },
+    links: { caseStudy: `/things-i-make/${slug}` },
     screenshot: { src: "/x.webp", alt: "x", width: 1, height: 1 },
     colours: { field: "#000000", ink: "#ffffff", swatch: "#808080" },
   });

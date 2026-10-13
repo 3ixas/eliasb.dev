@@ -13,7 +13,7 @@ Elias's site was built around the **Board**, a studio-wall metaphor of pins, sti
 A from-scratch front end in the **Stretch direction**, keeping the existing data layer: integrations, snapshots and fallbacks, routes, and case-study facts.
 
 - **Look:** a clean neutral page; Elias's **Cobalt accent** used large for his name, "today/now" and "Say hello"; each project in its own **Project colour**; Bricolage Grotesque condensed at display size with JetBrains Mono for metadata; one **Fastener** per physical-looking object.
-- **Homepage sections:** Hero, Work, How I work, Where I've been, Off the clock, Say hello.
+- **Homepage sections:** Hero, Things I make, How I work, Where I've been, Off the clock, Say hello. (Work, led by employment, joins them in [#175](https://github.com/3ixas/eliasb.dev/issues/175).)
 - **Work:** up to three hand-picked featured tiles, then a newest-first **Project index** that scales to any number of projects.
 - **Case studies:** short and evidence-led.
 - **Signature entrance:** a Commissioner-style opening that plays on every load.
@@ -40,7 +40,7 @@ A from-scratch front end in the **Stretch direction**, keeping the existing data
 13. As a hiring manager, I want every other project listed newest-first in a typographic index, so that I can see the breadth of the work.
 14. As a mouse or keyboard user, I want hovering or focusing an index row to turn it cobalt and preview its screenshot beside the list, so that I can browse quickly.
 15. As a phone user, I want a small screenshot beside each index row and a single tap to open it, so that I can browse without hover.
-16. As a visitor, I want the homepage index to stop at about ten rows with *All work (n)*, so that the homepage stays a homepage as projects grow.
+16. As a visitor, I want the homepage index to stop at about ten rows with *Everything I’ve built (n)*, so that the homepage stays a homepage as projects grow.
 17. As a visitor, I want a featured tile's tilted screenshot to straighten when I hover or focus it, so that the work invites a closer look.
 18. As a phone user, I want screenshots to straighten as they pass the middle of the screen, so that the same idea works without hover.
 19. As a visitor, I want the tape, paperclip and pin fasteners to react subtly on hover, so that the props feel physical.
@@ -79,7 +79,7 @@ A from-scratch front end in the **Stretch direction**, keeping the existing data
 42. As a hiring manager, I want an evidence strip of real numbers from the project's own records, so that the claims are concrete.
 43. As a reader, I want short copy, wide screenshots in the project's colour and a link to the next project, so that I can read quickly and keep going.
 44. As a reader, I want case studies to open immediately with no opening sequence, so that I get straight to the content.
-45. As a visitor, I want `/work` to list every project as index rows, newest first, with filters (Products, Systems, Experiments) once there are more than ten, so that I can browse everything.
+45. As a visitor, I want `/things-i-make` to list every project as index rows, newest first, with filters (Products, Systems, Experiments) once there are more than ten, so that I can browse everything.
 46. As a visitor on an old link, I want `/about`, `/library` and `/lab` to land on the matching homepage section, so that old links still work.
 47. As a visitor who lands on a missing page, I want a short 404 with a way back to the homepage, so that I'm not stuck.
 48. As someone sharing a link, I want the social image to show Elias's name and headline in the new type, so that shares look like the site.
@@ -96,7 +96,7 @@ A from-scratch front end in the **Stretch direction**, keeping the existing data
 - The data layer stays: integrations, snapshots and fallbacks, case-study facts and routes (ADR 0001). The presentation layer is rebuilt on Motion and design tokens (ADR 0004).
 - **A new ADR 0005 records the Stretch redesign.** It supersedes ADR 0003's section list and navigation, the Library label, and the About section. It also amends ADR 0004's first-paint constraint to: "content is in the server HTML from first paint; visually, only the homepage's signature entrance may hold the page, for about 5 seconds; nothing else ever gates content." The Board-era `docs/design/DESIGN.md` becomes history, and a new design document records the Stretch tokens and the components below.
 - **Fantasy football is removed:** its pin, fixtures, Sleeper fetching and copy. The Spotify playlist and the London photo also leave the page. Their integration modules are deleted, not just hidden, so no unused secret or refresh remains.
-- **Routes:** `/`, `/work`, `/work/[slug]` (stable URLs), and the 404. `/about` redirects permanently to `/#where-ive-been`; `/lab` and `/library` to `/#off-the-clock`. Homepage anchors: `#work`, `#how-i-work`, `#where-ive-been`, `#off-the-clock`, `#say-hello`.
+- **Routes:** `/`, `/things-i-make`, `/things-i-make/[slug]` (stable URLs), and the 404. `/work` and `/work/threshold|argus-risk|flowtime` redirect permanently, one path at a time, to `/things-i-make` and `/things-i-make/<slug>` (#157, #170); nothing else under `/work/` redirects. `/about` redirects permanently to `/#where-ive-been`; `/lab` and `/library` to `/#off-the-clock`. Homepage anchors: `#things-i-make`, `#how-i-work`, `#where-ive-been`, `#off-the-clock`, `#say-hello`.
 
 **Design tokens**
 
@@ -126,7 +126,7 @@ All text pairs pass WCAG 2.2 AA (5.7:1–18.2:1, #108). Project colours are data
 
 **Homepage composition**
 - **Hero:** the name at `min(31.5vw, 28svh)` on phones (no wrap) and `clamp(88px, min(18vw, 28svh), 280px)` on desktop, so two lines take about 45% of the screen's height and the whole First glance fits on the first screen; the role line in plain text directly under it; the headline (a real `h1`); the supporting line; two actions; and the portrait tilted 3° (2° on phones) with a cobalt "Based in London" label. On desktop the portrait sits to the right of the name; on phones it's stacked below the actions.
-- **Work:** the featured tiles (the first spans two columns), each in its project colour, with its outline number, name, outcome and metadata, a screenshot tilted ±1–1.5°, and one fastener. Then the index rows, the preview, and *All work (n)*. Desktop previews follow the hovered or focused row: centre on middle rows, align to the top/bottom at the list edges. Mobile keeps inline thumbnails.
+- **Things I make:** the heading and an intro (the Maker of clarity line, then taking ideas all the way through), then the featured tiles (the first spans two columns), each in its project colour, with its outline number, name, outcome and metadata, a screenshot tilted ±1–1.5°, and one fastener. Then the index rows, the preview, and *Everything I’ve built (n)*. Desktop previews follow the hovered or focused row: centre on middle rows, align to the top/bottom at the list edges. Mobile keeps inline thumbnails.
 - **Section headers (except Say hello, whose email action is its heading):** a giant condensed uppercase heading with a mono note and counts where true ("06 things I've built · 03 I'm proudest of").
 
 **The signature entrance (homepage only)**
@@ -192,7 +192,7 @@ rest of the page  fade 0.5 s when the name and portrait settle
   - the opening replays on reload but not on a back-forward-cache restore or a client-side return
   - reduced motion shows the finished page immediately
   - a blocked script still shows everything
-- **Homepage sections:** order, anchors, headings and counts; featured tiles from the curated list; index order and its ten-row cap; *All work (n)*.
+- **Homepage sections:** order, anchors, headings and counts; featured tiles from the curated list; index order and its ten-row cap; *Everything I’ve built (n)*.
 - **Off the clock:** each item live and in fallback, via fixtures; the GitHub grid's text alternative; today marked.
 - **Theme:** device preference, a remembered choice, no wrong-theme flash, the Eclipse's icon state, name and pressed state, and the dark tile edge.
 - **Contrast:** every token pair, and text over project colours.

@@ -7,25 +7,25 @@ import { workArchive } from "@/content/stretch/site-copy";
 const image = projects[0].screenshot!;
 
 export const metadata: Metadata = {
-  title: "Work",
+  title: "Things I make",
   description: workArchive.description,
-  alternates: { canonical: "/work" },
+  alternates: { canonical: "/things-i-make" },
   openGraph: {
     type: "website",
     siteName,
-    url: "/work",
-    title: pageTitle("Work"),
+    url: "/things-i-make",
+    title: pageTitle("Things I make"),
     description: workArchive.description,
     images: [{ url: image.src, width: image.width, height: image.height, alt: image.alt }],
   },
   twitter: {
     card: "summary_large_image",
-    title: pageTitle("Work"),
+    title: pageTitle("Things I make"),
     description: workArchive.description,
     images: [{ url: image.src, alt: image.alt }],
   },
 };
 
-export default function WorkPage() {
+export default function ThingsIMakePage() {
   return <WorkArchivePage catalogue={projects} />;
 }

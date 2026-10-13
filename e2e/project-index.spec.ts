@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { featuredSlugs, projectIndex, projects } from "../src/content/projects";
-import { workSection } from "../src/content/stretch/site-copy";
+import { thingsIMake } from "../src/content/stretch/site-copy";
 
 const phone = (page: Page) => (page.viewportSize()?.width ?? 0) < 761;
 const rows = (page: Page) => page.locator(".stretch-index__row");
@@ -25,12 +25,12 @@ test.describe("Work: Project index on the homepage", () => {
     expect(sorted).toEqual([...sorted].sort((a, b) => b - a));
   });
 
-  test("the index is in the server-rendered page and All work links to /work", async ({ page }) => {
+  test("the index is in the server-rendered page and the archive link goes to /things-i-make", async ({ page }) => {
     await page.route("**/*.js", (route) => route.abort());
     await page.reload();
     await expect(rows(page)).toHaveCount(expected.length);
-    const all = page.locator("#work").getByRole("link", { name: workSection.allWork(projects.length) });
-    await expect(all).toHaveAttribute("href", "/work");
+    const all = page.locator("#things-i-make").getByRole("link", { name: thingsIMake.allThings(projects.length) });
+    await expect(all).toHaveAttribute("href", "/things-i-make");
   });
 
   test("a row turns cobalt and nudges its arrow on hover and on focus", async ({ page, browserName }) => {
@@ -88,9 +88,9 @@ test.describe("Work: Project index with a long catalogue", () => {
     await page.goto("/fixtures/project-index");
   });
 
-  test("stops at ten rows and All work shows the true count", async ({ page }) => {
+  test("stops at ten rows and the archive link shows the true count", async ({ page }) => {
     await expect(rows(page)).toHaveCount(10);
-    await expect(page.getByRole("link", { name: workSection.allWork(14) })).toHaveAttribute("href", "/work");
+    await expect(page.getByRole("link", { name: thingsIMake.allThings(14) })).toHaveAttribute("href", "/things-i-make");
     await expect(rows(page).first().locator(".stretch-index__number")).toHaveText("01");
     await expect(rows(page).nth(9).locator(".stretch-index__number")).toHaveText("10");
   });

@@ -23,7 +23,7 @@ const catalogue: Project[] = Array.from({ length: 12 }, (_, position) => ({
 }));
 
 /**
- * The /work archive fed a catalogue longer than ten, for the end-to-end suite.
+ * The /things-i-make archive fed a catalogue longer than ten, for the end-to-end suite.
  * It exists only when the server is started with BOARD_FIXTURES=1.
  */
 export default async function WorkArchiveFixtures() {

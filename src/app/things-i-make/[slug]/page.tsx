@@ -23,11 +23,11 @@ export async function generateMetadata({
   return {
     title: name,
     description,
-    alternates: { canonical: `/work/${slug}` },
+    alternates: { canonical: `/things-i-make/${slug}` },
     openGraph: {
       type: "website",
       siteName,
-      url: `/work/${slug}`,
+      url: `/things-i-make/${slug}`,
       title: pageTitle(name),
       description,
       images: [{
@@ -46,7 +46,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function WorkDetailPage({
+export default async function CaseStudyRoute({
   params,
 }: {
   params: Promise<{ slug: string }>;

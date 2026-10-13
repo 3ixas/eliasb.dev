@@ -48,7 +48,7 @@ test.describe("Phone header and menu", () => {
     await expect(menu.locator("[data-london-clock]")).toHaveAttribute("data-london-clock", /^\d\d:\d\d$/);
     await expect(menu.locator("[data-london-clock]")).toContainText("London");
     await expect(menu.getByRole("navigation", { name: "Primary navigation" }).getByRole("link")).toHaveText(menuLabels);
-    await expect(menu.getByRole("link", { name: "Work", exact: true })).toHaveCSS("text-transform", "uppercase");
+    await expect(menu.getByRole("link", { name: "Things I make", exact: true })).toHaveCSS("text-transform", "uppercase");
   });
 
   test("focus moves to Close on open, and back to Menu on Close", async ({ page }) => {

@@ -236,7 +236,7 @@ test.describe("Lights and theme", () => {
       const read = (selector: string) => getComputedStyle(document.querySelector(selector)!);
       return {
         palette: read("html").transitionDuration,
-        heading: read("#work h2").transitionDuration,
+        heading: read("#things-i-make h2").transitionDuration,
         timing: read("html").transitionTimingFunction,
       };
     });
@@ -281,7 +281,7 @@ test.describe("Lights and theme", () => {
           for (const animation of animations) animation.currentTime = time;
           frames.push({
             ink: getComputedStyle(document.documentElement).getPropertyValue("--stretch-ink").trim(),
-            colours: ["[data-stretch-shell]", "#work h2", ".stretch-beat__proof", ".stretch-prd__quote"].map(
+            colours: ["[data-stretch-shell]", "#things-i-make h2", ".stretch-beat__proof", ".stretch-prd__quote"].map(
               (selector) => getComputedStyle(document.querySelector(selector)!).color,
             ),
           });

@@ -142,7 +142,7 @@ test.describe("Hero", () => {
   test("both actions work and are at least 44 px tall", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     const headerBottom = await page.locator("[data-stretch-header]").evaluate((element) => element.getBoundingClientRect().bottom);
-    for (const [label, anchor, heading] of [[hero.actions.work, "work", "Work"], [hero.actions.hello, "say-hello", "Say hello"]]) {
+    for (const [label, anchor, heading] of [[hero.actions.work, "things-i-make", "Things I make"], [hero.actions.hello, "say-hello", "Say hello"]]) {
       const link = page.locator(".stretch-hero").getByRole("link", { name: label, exact: true });
       const box = (await link.boundingBox())!;
       expect(box.height, label).toBeGreaterThanOrEqual(44);

@@ -38,7 +38,7 @@ export const caseStudySectionLabels: Record<CaseStudySectionKey, string> = {
 
 /** The labels every case study shares. */
 export const caseStudyCopy = {
-  back: "← Work",
+  back: "← Things I make",
   live: "Live site ↗",
   code: "Code ↗",
   nextProject: "Next project",
