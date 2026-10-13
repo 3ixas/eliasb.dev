@@ -72,7 +72,7 @@ function Opening({ opening }: { opening: CaseStudyOpening }) {
     <StoryOpening
       colours={opening.colours}
       back={
-        <Link className="stretch-cs-back" href="/work">
+        <Link className="stretch-cs-back" href="/things-i-make">
           <Arrowed label={caseStudyCopy.back} />
         </Link>
       }
@@ -170,7 +170,7 @@ function NextProject({ next }: { next: ReturnType<typeof nextProject> }) {
   const { project, colours } = next;
   return (
     <section className="stretch-wrap stretch-cs-next" aria-label={caseStudyCopy.nextProject}>
-      <Link className="stretch-cs-next__tile" href={`/work/${project.slug}`} style={storyColours(colours)}>
+      <Link className="stretch-cs-next__tile" href={`/things-i-make/${project.slug}`} style={storyColours(colours)}>
         <span className="stretch-mono stretch-cs-next__label">{caseStudyCopy.nextProject}</span>
         <span className="stretch-display stretch-cs-next__number" aria-hidden="true">
           {next.number}

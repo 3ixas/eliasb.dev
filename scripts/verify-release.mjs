@@ -11,29 +11,29 @@ const compatibilityRedirects = new Map([
 
 const canonicalPages = [
   "/",
-  "/work",
-  "/work/threshold",
-  "/work/argus-risk",
-  "/work/flowtime",
+  "/things-i-make",
+  "/things-i-make/threshold",
+  "/things-i-make/argus-risk",
+  "/things-i-make/flowtime",
 ];
 const expectedSitemapUrls = new Set(canonicalPages.map((route) => route === "/" ? "https://www.eliasb.dev" : `https://www.eliasb.dev${route}`));
 const expectedWorkSocialCards = new Map([
-  ["/work", {
-    title: "Work · Elias Bennett",
+  ["/things-i-make", {
+    title: "Things I make · Elias Bennett",
     image: "/work/threshold/landing.webp",
     alt: "Threshold landing page introducing the real cost of moving out",
   }],
-  ["/work/threshold", {
+  ["/things-i-make/threshold", {
     title: "Threshold · Elias Bennett",
     image: "/work/threshold/landing.webp",
     alt: "Threshold landing page introducing the real cost of moving out",
   }],
-  ["/work/argus-risk", {
+  ["/things-i-make/argus-risk", {
     title: "Argus Risk · Elias Bennett",
     image: "/work/argus/overview.webp",
     alt: "Argus Risk dashboard showing portfolio value, profit and loss, exposure, and system status",
   }],
-  ["/work/flowtime", {
+  ["/things-i-make/flowtime", {
     title: "Flowtime · Elias Bennett",
     image: "/work/flowtime/timer.jpg",
     alt: "Flowtime focus timer showing 00:00:00 and a Start Focus Session button",
@@ -44,7 +44,7 @@ const expectedIndexableRobots = [
   ["host: https://www.eliasb.dev", "sitemap: https://www.eliasb.dev/sitemap.xml"],
 ];
 
-const requiredHomepageSections = ["work", "how-i-work", "where-ive-been", "off-the-clock", "say-hello"];
+const requiredHomepageSections = ["things-i-make", "how-i-work", "where-ive-been", "off-the-clock", "say-hello"];
 const failures = [];
 let checkCount = 0;
 
@@ -186,9 +186,9 @@ function verifyHomepage(markup) {
 
   const nav = markup.match(/<nav aria-label="Primary navigation"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] ?? "";
   const navHrefs = hrefs(nav).map(({ href }) => href);
-  equal(navHrefs.join("|"), "#work|#how-i-work|#where-ive-been|#off-the-clock|#say-hello", "Homepage primary navigation targets");
+  equal(navHrefs.join("|"), "#things-i-make|#how-i-work|#where-ive-been|#off-the-clock|#say-hello", "Homepage primary navigation targets");
   const navLabels = [...nav.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/gi)].map(([, content]) => plainText(content));
-  equal(navLabels.join("|"), "Work|How I work|Where I’ve been|Off the clock|Say hello", "Homepage primary navigation labels");
+  equal(navLabels.join("|"), "Things I make|How I work|Where I’ve been|Off the clock|Say hello", "Homepage primary navigation labels");
 
   const pageIds = ids(markup);
   for (const sectionId of requiredHomepageSections) {
@@ -218,10 +218,10 @@ function verifyHomepage(markup) {
   const footer = markup.slice(markup.indexOf("<footer"), markup.indexOf("</footer>"));
   equal(plainText(footer), "Made by Elias", "The footer should be my signature");
 
-  check(markup.includes('href="/work"'), "Homepage should link to the complete Work archive");
-  check(markup.includes('href="/work/threshold"'), "Homepage should link to the Threshold case study");
-  check(markup.includes('href="/work/argus-risk"'), "Homepage should link to the Argus Risk case study");
-  check(markup.includes('href="/work/flowtime"'), "Homepage should link to the Flowtime case study");
+  check(markup.includes('href="/things-i-make"'), "Homepage should link to the complete Things I make archive");
+  check(markup.includes('href="/things-i-make/threshold"'), "Homepage should link to the Threshold case study");
+  check(markup.includes('href="/things-i-make/argus-risk"'), "Homepage should link to the Argus Risk case study");
+  check(markup.includes('href="/things-i-make/flowtime"'), "Homepage should link to the Flowtime case study");
 
   const imageTags = tags(markup, "img");
   check(imageTags.length >= 5, "Homepage should render its portrait, project and signal imagery");
@@ -255,7 +255,7 @@ async function verifyRoutes(baseUrl, pages) {
     equal(page.response.status, 200, `${route} should render successfully`);
     verifyPageShell(page.markup, route);
     if (route === "/") await verifyHomeSocialMetadata(baseUrl, page.document);
-    if (route.startsWith("/work")) await verifyWorkSocialMetadata(baseUrl, page.document, route);
+    if (route.startsWith("/things-i-make")) await verifyWorkSocialMetadata(baseUrl, page.document, route);
   }
 
   const retiredConcepts = await fetch(new URL("/concepts", baseUrl), { redirect: "manual" });

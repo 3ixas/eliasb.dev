@@ -380,6 +380,38 @@ html:has(.stretch-menu[open]) {
   letter-spacing: -0.015em;
 }
 
+/* The Things I make intro: the Maker of clarity line, then taking ideas all the way through. */
+.stretch-intro {
+  max-width: 34em;
+  margin: 0 0 40px;
+}
+
+.stretch-intro p {
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.stretch-intro .stretch-intro__lead {
+  margin-bottom: 8px;
+  color: var(--stretch-ink);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+@media (min-width: 761px) {
+  .stretch-intro p {
+    font-size: 19px;
+  }
+
+  .stretch-intro .stretch-intro__lead {
+    font-size: 28px;
+  }
+}
+
 .stretch-note {
   margin: 0;
   color: var(--stretch-muted);
@@ -2398,7 +2430,7 @@ button.stretch-gh__day[data-selected] {
   }
 }
 
-/* ---- Work archive: /work, the full Project index with filters above ten projects ---- */
+/* ---- Work archive: /things-i-make, the full Project index with filters above ten projects ---- */
 
 .stretch-archive .stretch-index {
   margin-top: 40px;

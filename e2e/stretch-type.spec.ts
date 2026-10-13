@@ -6,7 +6,7 @@ test.beforeEach(({}, testInfo) => {
   test.skip(!/-1440-light$/.test(testInfo.project.name), "Measured once per engine");
 });
 
-const routes = ["/", "/work", "/work/threshold", "/nothing-pinned-here"];
+const routes = ["/", "/things-i-make", "/things-i-make/threshold", "/nothing-pinned-here"];
 
 for (const route of routes) {
   test(`${route} renders its body and mono text in the new faces, from this origin`, async ({ page }) => {

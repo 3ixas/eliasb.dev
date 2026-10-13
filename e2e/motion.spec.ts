@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 // Motion that is not the entrance: scroll sway, and hover that only moves things where there is a hover.
-const tile = (page: Page) => page.locator("#work .stretch-tile").first();
+const tile = (page: Page) => page.locator("#things-i-make .stretch-tile").first();
 const released = (page: Page) => expect.poll(() => page.evaluate(() => !document.documentElement.hasAttribute("data-entering")), { timeout: 8000 }).toBe(true);
 const sway = (page: Page) =>
   tile(page).evaluate((element) => {

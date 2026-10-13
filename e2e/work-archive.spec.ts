@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { projectIndex, projects } from "../src/content/projects";
+import { caseStudies } from "../src/content/stretch/case-studies";
 import { workArchive } from "../src/content/stretch/site-copy";
 
 const rows = (page: Page) => page.locator(".stretch-index__row");
@@ -12,7 +13,7 @@ const newestFirst = (list: number[]) => expect(list).toEqual([...list].sort((a, 
 
 test.describe("Work archive: the catalogue", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/work");
+    await page.goto("/things-i-make");
   });
 
   test("names the page and lists every catalogue project, newest first", async ({ page }) => {
@@ -95,5 +96,42 @@ test.describe("Work archive: a catalogue above ten (fixtures)", () => {
     expect(overflow).toBeLessThanOrEqual(0);
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);
+  });
+});
+
+test.describe("Things I make: moved from /work", () => {
+  const moved = [["/work", "/things-i-make"], ...Object.keys(caseStudies).map((slug) => [`/work/${slug}`, `/things-i-make/${slug}`])];
+
+  test("the archive and each case study redirect permanently, one path at a time", async ({ request }) => {
+    for (const [from, to] of moved) {
+      const response = await request.get(from, { maxRedirects: 0 });
+      expect(response.status(), `${from} is a permanent redirect`).toBe(308);
+      expect(new URL(response.headers().location, "http://localhost").pathname, `${from} goes to ${to}`).toBe(to);
+    }
+  });
+
+  test("nothing else under /work/ moves: screenshots stay put and other paths are not redirected", async ({ request }) => {
+    const image = await request.get(projects[0].screenshot!.src, { maxRedirects: 0 });
+    expect(image.status(), "a screenshot is still served from its published address").toBe(200);
+    // Role stories will live under /work/ (#172), so nothing else there may be sent anywhere.
+    const other = await request.get("/work/bnp-paribas", { maxRedirects: 0 });
+    expect(other.status(), "/work/bnp-paribas is not redirected").not.toBe(308);
+  });
+
+  test("the archive and case studies use /things-i-make for their canonical and Open Graph URLs", async ({ page }) => {
+    for (const path of ["/things-i-make", "/things-i-make/threshold"]) {
+      await page.goto(path);
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", new RegExp(`${path}$`));
+      await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", new RegExp(`${path}$`));
+    }
+    await page.goto("/things-i-make");
+    await expect(page).toHaveTitle(/^Things I make · Elias Bennett$/);
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", workArchive.description);
+  });
+
+  test("the sitemap lists home, the archive and the case studies at their new paths, and no /work paths", async ({ request }) => {
+    const xml = await (await request.get("/sitemap.xml")).text();
+    const paths = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, loc]) => new URL(loc).pathname);
+    expect(paths.sort()).toEqual(["/", "/things-i-make", ...Object.keys(caseStudies).map((slug) => `/things-i-make/${slug}`)].sort());
   });
 });

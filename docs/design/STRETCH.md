@@ -29,7 +29,7 @@ Every text pair passes WCAG 2.2 AA (5.7:1 to 18.2:1, [#108](https://github.com/3
 ## Colour rules
 
 - **Cobalt** marks Elias's name, "today" and "now", and the way to say hello. It never colours a project, a tile or decoration. Case studies use it only for *Say hello*.
-- **Project colours** appear on a project's Work tile, its case study's opening band and framing, and its swatches. The page behind stays neutral.
+- **Project colours** appear on a project's Things I make tile, its case study's opening band and framing, and its swatches. The page behind stays neutral.
 - Colour never carries meaning alone.
 
 ## Type

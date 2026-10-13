@@ -8,13 +8,20 @@ const redirectContracts = [
   ["/about", "/#where-ive-been"],
   ["/library", "/#off-the-clock"],
   ["/lab", "/#off-the-clock"],
+  // The projects moved from /work to /things-i-make (#157, #170), one permanent redirect per path.
+  ["/work", "/things-i-make"],
+  ["/work/threshold", "/things-i-make/threshold"],
+  ["/work/argus-risk", "/things-i-make/argus-risk"],
+  ["/work/flowtime", "/things-i-make/flowtime"],
 ];
+// Role stories will live under /work/ (#172), so nothing else there is redirected.
+const notRedirected = ["/work/bnp-paribas", "/work/joveen", "/work/optegra"];
 const expectedSitemapUrls = new Set([
   "https://www.eliasb.dev",
-  "https://www.eliasb.dev/work",
-  "https://www.eliasb.dev/work/threshold",
-  "https://www.eliasb.dev/work/argus-risk",
-  "https://www.eliasb.dev/work/flowtime",
+  "https://www.eliasb.dev/things-i-make",
+  "https://www.eliasb.dev/things-i-make/threshold",
+  "https://www.eliasb.dev/things-i-make/argus-risk",
+  "https://www.eliasb.dev/things-i-make/flowtime",
 ]);
 
 function configuredBaseUrl() {
@@ -72,7 +79,12 @@ async function verifyRoutes(baseUrl) {
     assert.equal(response.headers.get("location"), expectedLocation, `${route} has the wrong Location`);
   }
 
-  for (const [route, expectedCanonical] of [["/work", "https://www.eliasb.dev/work"], ["/work/threshold", "https://www.eliasb.dev/work/threshold"]]) {
+  for (const route of notRedirected) {
+    const response = await fetch(new URL(route, baseUrl), { redirect: "manual" });
+    assert.notEqual(response.status, 308, `${route} must not be redirected`);
+  }
+
+  for (const [route, expectedCanonical] of [["/things-i-make", "https://www.eliasb.dev/things-i-make"], ["/things-i-make/threshold", "https://www.eliasb.dev/things-i-make/threshold"]]) {
     const response = await fetch(new URL(route, baseUrl), { redirect: "manual" });
     assert.equal(response.status, 200, `${route} should render successfully`);
     const document = await response.text();
@@ -85,7 +97,7 @@ async function verifyRoutes(baseUrl) {
   const sitemap = await sitemapResponse.text();
   const sitemapUrls = new Set([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, url]) => url));
   assert.deepEqual(sitemapUrls, expectedSitemapUrls, "Sitemap URLs do not match the canonical route set");
-  for (const route of ["/about", "/library", "/lab"]) {
+  for (const route of ["/about", "/library", "/lab", "/work", "/work/threshold", "/work/argus-risk", "/work/flowtime"]) {
     assert.equal([...sitemapUrls].some((url) => new URL(url).pathname === route), false, `${route} must be excluded from the sitemap`);
   }
 }

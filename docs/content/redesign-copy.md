@@ -12,7 +12,7 @@ Approved by Elias on 8 October 2026 for [#113](https://github.com/3ixas/eliasb.d
 | Page title (others) | {Page} · Elias Bennett |
 | Meta description | I’m Elias, a software engineer in London. I build pricing and risk engines at BNP Paribas in C# and Java, and products of my own. |
 | Social image | ELIAS BENNETT · I build pricing and risk engines at BNP Paribas, and *products of my own.* |
-| Menu | Work · How I work · Where I’ve been · Off the clock · Say hello |
+| Menu | Things I make · How I work · Where I’ve been · Off the clock · Say hello |
 | Header | Dark theme · Menu · Close · ← Work |
 | Clock | London {14:05} (read aloud as “The time in London: {14:05}”) |
 | Footer | Made by Elias |
@@ -34,9 +34,12 @@ Approved by Elias on 8 October 2026 for [#113](https://github.com/3ixas/eliasb.d
 
 The First glance changed for the forward-facing redesign ([#159](https://github.com/3ixas/eliasb.dev/issues/159), [#162](https://github.com/3ixas/eliasb.dev/issues/162), [#168](https://github.com/3ixas/eliasb.dev/issues/168)): the entrance is built around “*products of my own.*” landing.
 
-## Work
+## Things I make
 
-- Heading: Work
+The homepage section for my own projects ([#157](https://github.com/3ixas/eliasb.dev/issues/157), [#170](https://github.com/3ixas/eliasb.dev/issues/170)).
+
+- Heading: Things I make
+- Intro: I build everyday software, and make complicated things feel simple. I take ideas all the way through: deciding what’s worth making, designing it, building it across the stack, and finding out whether it actually works.
 - Note: 06 things I’ve built · 03 I’m proudest of
 
 **Featured tiles** (outcome · metadata)
@@ -55,7 +58,7 @@ The First glance changed for the forward-facing redesign ([#159](https://github.
 | Home Secretary | A household coordination prototype, built for my software engineering coursework. | Prototype | 2026 |
 | Risk Event Tracker | A tested C# Web API for managing risk events. | Systems · API | 2025 |
 
-- Button: All work ({06}) →
+- Link to the archive: Everything I’ve built ({06}) →
 - Connect Four is left out (the interview rule from #106).
 
 ## How I work
@@ -111,16 +114,16 @@ Strings added while building, shipped, and recorded here on 2026-10-09 so `verif
 - Links: Résumé · GitHub · LinkedIn
 - Résumé opens the current publicly shared PDF: https://drive.google.com/file/d/1Yv_oB-sNMXQhyY9K_EJbQ4CV11hM2ZY7/view?usp=drivesdk
 
-## Work archive (`/work`)
+## Work archive (`/things-i-make`)
 
-- Heading: Work
+- Heading: Things I make
 - Note: Everything I’ve built that I’d happily talk through.
 - Filters, after 10 projects: All · Products · Systems · Experiments
-- Meta description: Projects I’ve built, from a rental calculator to a risk simulator, with the thinking behind the main ones.
+- Meta description: Products of my own, from a rental calculator to a risk simulator, with the thinking behind the main ones.
 
 ## Case studies
 
-Shared labels: ← Work · Live site ↗ · Code ↗ · Next project · {02} · section numbers 01–06.
+Shared labels: ← Things I make · Live site ↗ · Code ↗ · Next project · {02} · section numbers 01–06.
 
 ### Threshold
 

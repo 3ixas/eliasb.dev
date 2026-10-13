@@ -12,7 +12,7 @@ import { featuredProjects, featuredSlugs, projectIndex, projects } from "@/conte
 import { careerLog } from "@/content/stretch/career";
 import { howIWork } from "@/content/stretch/how-i-work";
 import { offTheClock } from "@/content/stretch/off-the-clock";
-import { siteCopy, workSection } from "@/content/stretch/site-copy";
+import { siteCopy, thingsIMake } from "@/content/stretch/site-copy";
 
 const sayHelloHeadingId = "say-hello-heading";
 
@@ -30,12 +30,16 @@ export function Homepage() {
       <main id="main-content" tabIndex={-1}>
         <Hero />
 
-        <section id="work" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="work-heading">
+        <section id="things-i-make" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="things-i-make-heading">
           <SectionHeading
-            id="work-heading"
-            heading={workSection.heading}
-            note={workSection.note(projects.length, featuredSlugs.length)}
+            id="things-i-make-heading"
+            heading={thingsIMake.heading}
+            note={thingsIMake.note(projects.length, featuredSlugs.length)}
           />
+          <div className="stretch-intro">
+            <p className="stretch-intro__lead">{thingsIMake.intro.lead}</p>
+            <p>{thingsIMake.intro.support}</p>
+          </div>
           <FeaturedTiles projects={featuredProjects(projects, featuredSlugs)} />
           <ProjectIndex
             rows={projectIndex(projects, featuredSlugs)}

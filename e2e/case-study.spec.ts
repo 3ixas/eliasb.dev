@@ -15,7 +15,7 @@ for (const slug of slugs) {
 
   test.describe(`Case study: ${project.name}`, () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto(`/work/${slug}`);
+      await page.goto(`/things-i-make/${slug}`);
     });
 
     test("the opening band carries the number, name, outcome, metadata, stack and links", async ({ page }) => {
@@ -31,7 +31,7 @@ for (const slug of slugs) {
       if (project.links.live) await expect(live).toHaveAttribute("href", project.links.live);
       else await expect(live).toHaveCount(0);
       await expect(band.getByRole("link", { name: "Code", exact: true })).toHaveAttribute("href", project.links.code!);
-      await expect(band.getByRole("link", { name: "Work", exact: true })).toHaveAttribute("href", "/work");
+      await expect(band.getByRole("link", { name: "Things I make", exact: true })).toHaveAttribute("href", "/things-i-make");
       await expect(band.locator("img")).toHaveAttribute("alt", project.screenshot!.alt);
     });
 
@@ -97,12 +97,12 @@ for (const slug of slugs) {
     test("the Next project tile links to the next case study", async ({ page }) => {
       const tile = page.getByRole("region", { name: "Next project" }).getByRole("link");
       const next = projects.find((entry) => entry.slug === study.next)!;
-      await expect(tile).toHaveAttribute("href", `/work/${study.next}`);
+      await expect(tile).toHaveAttribute("href", `/things-i-make/${study.next}`);
       await expect(tile).toContainText(next.name);
       await expect(tile).toContainText(caseStudies[study.next].number);
       expect((await tile.boundingBox())!.height).toBeGreaterThanOrEqual(44);
       await tile.click();
-      await expect(page).toHaveURL(new RegExp(`/work/${study.next}$`));
+      await expect(page).toHaveURL(new RegExp(`/things-i-make/${study.next}$`));
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(next.name);
     });
 
@@ -128,7 +128,7 @@ for (const slug of slugs) {
 
     test("opens at once: no entrance holds the page, even with motion on", async ({ page }) => {
       await page.emulateMedia({ reducedMotion: "no-preference" });
-      await page.goto(`/work/${slug}`);
+      await page.goto(`/things-i-make/${slug}`);
       expect(await page.evaluate(() => document.documentElement.hasAttribute("data-entering"))).toBe(false);
       await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
       expect(await page.evaluate(() => Number(getComputedStyle(document.querySelector("main")!).opacity))).toBe(1);
@@ -180,11 +180,11 @@ for (const slug of slugs) {
 for (const slug of slugs) {
   test.describe(`Case study layout: ${slug}`, () => {
     test("renders all six sections, the evidence and a different Next project, without sideways scroll", async ({ page }) => {
-      const response = await page.goto(`/work/${slug}`);
+      const response = await page.goto(`/things-i-make/${slug}`);
       expect(response?.status()).toBe(200);
       await expect(page.locator("article section[id]")).toHaveCount(6);
       await expect(page.getByRole("list", { name: "Evidence" }).getByRole("listitem")).toHaveCount(caseStudies[slug].evidence.length);
-      await expect(page.getByRole("region", { name: "Next project" }).getByRole("link")).toHaveAttribute("href", `/work/${caseStudies[slug].next}`);
+      await expect(page.getByRole("region", { name: "Next project" }).getByRole("link")).toHaveAttribute("href", `/things-i-make/${caseStudies[slug].next}`);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       const width = page.viewportSize()?.width ?? 0;
       for (const box of await Promise.all((await page.locator("[data-case-study] main *").all()).map((item) => item.boundingBox()))) {
@@ -193,7 +193,7 @@ for (const slug of slugs) {
     });
 
     test("every link and button is at least 44 px tall", async ({ page }) => {
-      await page.goto(`/work/${slug}`);
+      await page.goto(`/things-i-make/${slug}`);
       for (const target of await page.locator("[data-case-study] a:visible, [data-case-study] button:visible").all()) {
         if (await target.evaluate((element) => element.classList.contains("stretch-skip"))) continue;
         const box = await target.boundingBox();
@@ -206,6 +206,6 @@ for (const slug of slugs) {
 test("a slug with no case study is a 404", async ({ page }) => {
   expect(caseStudies).not.toHaveProperty("ask-professor-past");
   expect(projects.find((project) => project.slug === "ask-professor-past")?.links.caseStudy).toBeUndefined();
-  expect((await page.goto("/work/ask-professor-past"))?.status()).toBe(404);
-  expect((await page.goto("/work/constructor"))?.status()).toBe(404);
+  expect((await page.goto("/things-i-make/ask-professor-past"))?.status()).toBe(404);
+  expect((await page.goto("/things-i-make/constructor"))?.status()).toBe(404);
 });

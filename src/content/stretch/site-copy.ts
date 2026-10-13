@@ -24,7 +24,7 @@ export const siteCopy = {
   },
   /** The homepage's anchored sections after the hero, in order: each section's anchor with its label. */
   menu: [
-    { id: "work", label: "Work" },
+    { id: "things-i-make", label: "Things I make" },
     { id: "how-i-work", label: "How I work" },
     { id: "where-ive-been", label: "Where I’ve been" },
     { id: "off-the-clock", label: "Off the clock" },
@@ -61,11 +61,18 @@ export const hero = {
   actions: { work: "See my work ↓", hello: "Say hello" },
 } as const;
 
-export const workSection = {
-  heading: "Work",
+/** The homepage section for Elias's own projects, at #things-i-make. */
+export const thingsIMake = {
+  heading: "Things I make",
+  /** What the hero used to say: the Maker of clarity line, then taking ideas all the way through. */
+  intro: {
+    lead: "I build everyday software, and make complicated things feel simple.",
+    support: "I take ideas all the way through: deciding what’s worth making, designing it, building it across the stack, and finding out whether it actually works.",
+  },
   /** "06 things I’ve built · 03 I’m proudest of", from the catalogue's counts. */
   note: (built: number, proudest: number) => `${pad(built)} things I’ve built · ${pad(proudest)} I’m proudest of`,
-  allWork: (built: number) => `All work (${pad(built)}) →`,
+  /** The link to the archive, with the true count. */
+  allThings: (built: number) => `Everything I’ve built (${pad(built)}) →`,
 } as const;
 
 export const sayHello = {
@@ -79,9 +86,9 @@ export const sayHello = {
   ],
 } as const;
 
-/** The archive at /work. */
+/** The archive at /things-i-make. */
 export const workArchive = {
-  heading: "Work",
+  heading: "Things I make",
   note: "Everything I’ve built that I’d happily talk through.",
   /** Filters appear only once the archive has more than this many projects. */
   filtersAfter: 10,
@@ -94,5 +101,5 @@ export const workArchive = {
   ] satisfies readonly { label: string; category: ProjectCategory | null }[],
   /** Read out to assistive technology when a filter changes the list; not shown. */
   count: (shown: number) => `Showing ${shown} ${shown === 1 ? "project" : "projects"}`,
-  description: "Projects I’ve built, from a rental calculator to a risk simulator, with the thinking behind the main ones.",
+  description: "Products of my own, from a rental calculator to a risk simulator, with the thinking behind the main ones.",
 } as const;

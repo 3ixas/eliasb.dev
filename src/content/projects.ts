@@ -15,7 +15,7 @@
 /** The single small prop on a card's edge (see the Fastener in GLOSSARY.md). */
 export type Fastener = "tape" | "paperclip" | "pin";
 
-/** What the /work filters group by: Products, Systems or Experiments. */
+/** What the /things-i-make filters group by: Products, Systems or Experiments. */
 export const PROJECT_CATEGORIES = ["products", "systems", "experiments"] as const;
 export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number];
 
@@ -29,10 +29,10 @@ export type Project = {
   /** Shown beside the year: "Product · Data visualisation". */
   type: string;
   year: number;
-  /** Which /work filter it falls under. */
+  /** Which /things-i-make filter it falls under. */
   category: ProjectCategory;
   links: {
-    /** Its case study's path, `/work/<slug>`. Only projects that have one. */
+    /** Its case study's path, `/things-i-make/<slug>`. Only projects that have one. */
     caseStudy?: string;
     live?: string;
     code?: string;
@@ -57,7 +57,7 @@ const entries = [
     year: 2026,
     category: "products",
     links: {
-      caseStudy: "/work/threshold",
+      caseStudy: "/things-i-make/threshold",
       live: "https://threshold-beta.vercel.app",
       code: "https://github.com/3ixas/threshold",
     },
@@ -78,7 +78,7 @@ const entries = [
     year: 2026,
     category: "systems",
     links: {
-      caseStudy: "/work/argus-risk",
+      caseStudy: "/things-i-make/argus-risk",
       code: "https://github.com/3ixas/argus-risk",
     },
     screenshot: {
@@ -98,7 +98,7 @@ const entries = [
     year: 2026,
     category: "products",
     links: {
-      caseStudy: "/work/flowtime",
+      caseStudy: "/things-i-make/flowtime",
       live: "https://flowtime-focus-timer.vercel.app",
       code: "https://github.com/3ixas/flowtime-focus-timer",
     },
@@ -174,7 +174,7 @@ export const featuredSlugs: readonly ProjectSlug[] = ["threshold", "argus-risk",
 
 export const MAX_FEATURED = 3;
 
-/** The homepage Project index stops here; the rest is on /work behind "All work". */
+/** The homepage Project index stops here; the rest is on /things-i-make behind "Everything I’ve built". */
 export const HOMEPAGE_INDEX_ROWS = 10;
 
 /** The featured projects, in the order of `featured`. Slugs not in the catalogue are skipped. */
@@ -228,8 +228,8 @@ export function catalogueProblems(
       problems.push(`Featured project "${slug}" is not in the catalogue.`);
       continue;
     }
-    if (project.links.caseStudy !== `/work/${slug}` || !caseStudies.has(slug)) {
-      problems.push(`Featured project "${slug}" needs a case study (a link to /work/${slug} and the case study itself).`);
+    if (project.links.caseStudy !== `/things-i-make/${slug}` || !caseStudies.has(slug)) {
+      problems.push(`Featured project "${slug}" needs a case study (a link to /things-i-make/${slug} and the case study itself).`);
     }
     if (!project.screenshot) problems.push(`Featured project "${slug}" needs a screenshot.`);
     const { colours } = project;

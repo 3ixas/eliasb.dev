@@ -4,13 +4,13 @@ import { featuredSlugs, projects } from "../src/content/projects";
 import { careerLog } from "../src/content/stretch/career";
 import { howIWork } from "../src/content/stretch/how-i-work";
 import { offTheClock } from "../src/content/stretch/off-the-clock";
-import { hero, sayHello, siteCopy, workSection } from "../src/content/stretch/site-copy";
+import { hero, sayHello, siteCopy, thingsIMake } from "../src/content/stretch/site-copy";
 import { renderedContrast } from "./support/rendered-contrast";
 
 const menuLabels = siteCopy.menu.map(({ label }) => label);
 
 const sections = [
-  { id: "work", heading: "Work", note: workSection.note(projects.length, featuredSlugs.length) },
+  { id: "things-i-make", heading: thingsIMake.heading, note: thingsIMake.note(projects.length, featuredSlugs.length) },
   { id: "how-i-work", heading: howIWork.heading, note: howIWork.note },
   { id: "where-ive-been", heading: careerLog.heading, note: careerLog.note },
   { id: "off-the-clock", heading: offTheClock.heading, note: offTheClock.note },
@@ -43,9 +43,24 @@ test.describe("Homepage shell", () => {
     });
   }
 
+  test("Things I make is introduced by what the hero used to say", async ({ page }) => {
+    await page.goto("/");
+    const section = page.locator("#things-i-make");
+    await expect(section.getByRole("heading", { level: 2, name: thingsIMake.heading })).toBeVisible();
+    const intro = section.locator(".stretch-intro");
+    await expect(intro).toContainText(thingsIMake.intro.lead);
+    await expect(intro).toContainText(thingsIMake.intro.support);
+    // The intro sits between the heading and the Featured work tiles.
+    const [head, introBox, tiles] = await Promise.all(
+      [section.locator(".stretch-section__head"), intro, section.locator(".stretch-tile").first()].map(async (locator) => (await locator.boundingBox())!),
+    );
+    expect(introBox.y).toBeGreaterThanOrEqual(head.y + head.height - 1);
+    expect(introBox.y + introBox.height).toBeLessThanOrEqual(tiles.y);
+  });
+
   test("the counts are the catalogue's: 06 built, 03 featured", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("#work .stretch-note")).toHaveText("06 things I’ve built · 03 I’m proudest of");
+    await expect(page.locator("#things-i-make .stretch-note")).toHaveText("06 things I’ve built · 03 I’m proudest of");
   });
 
   test("the header links jump to each section, below the sticky header", async ({ page }) => {
@@ -133,7 +148,7 @@ test.describe("Accessibility and contrast", () => {
       const readings = await renderedContrast(page);
       const texts = readings.map((reading) => reading.text);
       // The clock is hydrated by now, and the pill, nav, headings and notes were measured.
-      for (const expected of [siteCopy.menu[0].label, siteCopy.menu[4].label, "Work", workSection.note(projects.length, featuredSlugs.length)]) {
+      for (const expected of [siteCopy.menu[0].label, siteCopy.menu[4].label, thingsIMake.heading, thingsIMake.note(projects.length, featuredSlugs.length)]) {
         expect(texts.some((text) => text.includes(expected)), expected).toBe(true);
       }
       expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);

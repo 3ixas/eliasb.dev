@@ -4,7 +4,7 @@ import type { Project } from "@/content/projects";
 import { siteCopy, workArchive } from "@/content/stretch/site-copy";
 
 /**
- * The /work page (docs/specs/STRETCH-REDESIGN-SPEC.md, "Case studies and the
+ * The /things-i-make page (docs/specs/STRETCH-REDESIGN-SPEC.md, "Case studies and the
  * archive"): the slim header, the heading and note, and every project in the
  * catalogue as Project index rows, newest first. Like a case study it has no
  * entrance and no cobalt beyond focus, selection and hover.

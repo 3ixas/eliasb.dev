@@ -8,7 +8,7 @@ import { renderedContrast } from "./support/rendered-contrast";
 // by day and by night (the project's colour scheme sets the lights).
 test.use({ reducedMotion: "reduce" });
 
-const routes = ["/", "/work", ...Object.keys(caseStudies).map((slug) => `/work/${slug}`), "/nothing-pinned-here"];
+const routes = ["/", "/things-i-make", ...Object.keys(caseStudies).map((slug) => `/things-i-make/${slug}`), "/nothing-pinned-here"];
 /** Fewest text runs a page shows; the 404 has five now that the theme button carries no text. */
 const minimumRuns = (route: string) => (route === "/nothing-pinned-here" ? 5 : 6);
 

@@ -12,9 +12,9 @@ The visual direction is called **Stretch**: a clean neutral page, one cobalt acc
 
 | Route | What it is |
 | --- | --- |
-| `/` | The homepage: a signature entrance, then Work, How I work, Where I've been, Off the clock and Say hello. |
-| `/work` | The archive: every project, newest first. Filters appear only once there are more than ten. |
-| `/work/threshold`, `/work/argus-risk`, `/work/flowtime` | Case studies, each with a short visual story, a six-section write-up and a PRD card. |
+| `/` | The homepage: a signature entrance, then Things I make, How I work, Where I've been, Off the clock and Say hello. |
+| `/things-i-make` | The archive: every project, newest first. Filters appear only once there are more than ten. `/work` redirects here. |
+| `/things-i-make/threshold`, `/things-i-make/argus-risk`, `/things-i-make/flowtime` | Case studies, each with a short visual story, a six-section write-up and a PRD card. |
 | 404 | A custom not-found page. |
 
 `/about`, `/lab` and `/library` redirect to the matching homepage anchors, so old links keep working.

@@ -1,11 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
 import { featuredProjects, featuredSlugs, projects } from "../src/content/projects";
-import { workSection } from "../src/content/stretch/site-copy";
+import { thingsIMake } from "../src/content/stretch/site-copy";
 import { contrastOnPaper } from "./support/contrast";
 
 const phone = (page: Page) => (page.viewportSize()?.width ?? 0) < 761;
 const featured = featuredProjects(projects, featuredSlugs);
-const tiles = (page: Page) => page.locator("#work .stretch-tile");
+const tiles = (page: Page) => page.locator("#things-i-make .stretch-tile");
 const shotRotation = (page: Page, index: number) =>
   tiles(page).nth(index).locator(".stretch-tile__shot").evaluate((element) => {
     const [a, b] = getComputedStyle(element).transform.match(/-?[\d.]+/g)!.map(Number);
@@ -19,7 +19,7 @@ test.describe("Work: featured tiles", () => {
 
   test("tiles come from the featured list in its order and the count reads true", async ({ page }) => {
     await expect(tiles(page)).toHaveCount(featured.length);
-    await expect(page.locator("#work .stretch-note")).toHaveText(workSection.note(projects.length, featured.length));
+    await expect(page.locator("#things-i-make .stretch-note")).toHaveText(thingsIMake.note(projects.length, featured.length));
     for (const [index, project] of featured.entries()) {
       const tile = tiles(page).nth(index);
       await expect(tile.getByRole("heading", { level: 3 })).toHaveText(project.name);
@@ -162,7 +162,7 @@ test.describe("Work: featured tiles", () => {
 
   test("text over every project colour passes WCAG 2.2 AA", async ({ page }) => {
     for (const selector of [".stretch-tile__name", ".stretch-tile__outcome", ".stretch-tile__meta"]) {
-      const readings = await contrastOnPaper(page, `#work ${selector}`);
+      const readings = await contrastOnPaper(page, `#things-i-make ${selector}`);
       expect(readings).toHaveLength(featured.length);
       for (const reading of readings) expect(reading.ratio, `${selector}: ${reading.text}`).toBeGreaterThanOrEqual(4.5);
     }

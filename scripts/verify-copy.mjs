@@ -12,7 +12,7 @@ import {
 } from "../src/content/stretch/case-study.ts";
 import { howIWork } from "../src/content/stretch/how-i-work.ts";
 import { offTheClock } from "../src/content/stretch/off-the-clock.ts";
-import { hero, notFound, sayHello, siteCopy, workArchive, workSection } from "../src/content/stretch/site-copy.ts";
+import { hero, notFound, sayHello, siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy.ts";
 
 const raw = readFileSync(new URL("../docs/content/redesign-copy.md", import.meta.url), "utf8");
 // Emphasis stars and the {braces} around live values are markup, not words.
@@ -31,7 +31,7 @@ const modules = {
   siteCopy,
   notFound,
   hero,
-  workSection,
+  thingsIMake,
   sayHello,
   workArchive,
   howIWork,
@@ -51,8 +51,8 @@ const built = [
   siteCopy.title("Page"),
   siteCopy.clock.label("14:05"),
   siteCopy.clock.spoken("14:05"),
-  workSection.note(6, 3),
-  workSection.allWork(6),
+  thingsIMake.note(6, 3),
+  thingsIMake.allThings(6),
   offTheClock.curiosity.more("n"),
   offTheClock.nowMaking.fallback.latest("repo", "date"),
   offTheClock.github.contributions("1,221"),
@@ -60,8 +60,8 @@ const built = [
   offTheClock.github.asOf("date"),
 ];
 for (const text of built) assert.ok(plain.includes(text), `Built string is not in the approved copy: "${text}"`);
-assert.equal(workSection.note(6, 3), "06 things I’ve built · 03 I’m proudest of");
-assert.equal(workSection.allWork(projects.length), "All work (06) →");
+assert.equal(thingsIMake.note(6, 3), "06 things I’ve built · 03 I’m proudest of");
+assert.equal(thingsIMake.allThings(projects.length), "Everything I’ve built (06) →");
 
 // ---- Tables and sections, word for word --------------------------------------------------
 

@@ -1,16 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HOMEPAGE_INDEX_ROWS, type Project } from "@/content/projects";
-import { workSection } from "@/content/stretch/site-copy";
+import { thingsIMake } from "@/content/stretch/site-copy";
 
 const number = (position: number) => String(position).padStart(2, "0");
 
 /** A project opens at its case study, else its live site, else its code. */
-const destination = ({ links }: Project) => links.caseStudy ?? links.live ?? links.code ?? "/work";
+const destination = ({ links }: Project) => links.caseStudy ?? links.live ?? links.code ?? "/things-i-make";
 
 /**
  * The Project index: every non-featured project as a typographic row, newest
- * first. On the homepage it is capped at ten with "All work (n)" after it:
+ * first. On the homepage it is capped at ten with "Everything I’ve built (n)" after it:
  * `rows` is the whole index and `total` is the catalogue's count for the link.
  * The archive passes `limit` of `Infinity` and no `total`, so it lists every
  * row and has no link to itself. Hover and focus
@@ -83,8 +83,8 @@ export function ProjectIndex({
       </ol>
       {total !== undefined && (
         <p className="stretch-index__all">
-          <Link className="stretch-mono" href="/work">
-            {workSection.allWork(total)}
+          <Link className="stretch-mono" href="/things-i-make">
+            {thingsIMake.allThings(total)}
           </Link>
         </p>
       )}
