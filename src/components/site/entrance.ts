@@ -126,6 +126,97 @@ export function springCurve(bounce: number, visualDuration: number): SpringCurve
   return { easing: `linear(${points.join(", ")})`, duration: Math.round(settle * 1000), settled: settled || Math.round(settle * 1000) };
 }
 
+/** When each beat of the entrance happens, in ms from its start, and the springs that drive them. */
+export type EntranceSchedule = {
+  /** When each character of the typed line appears. */
+  typeAt: number[];
+  /** The caret blinks through the comma beat, between these two times. */
+  blinkOn: number;
+  blinkOff: number;
+  /** "products of my own." lands. */
+  landAt: number;
+  /** The line moves into the headline's place; `moveEnd` is when it is home. */
+  moveStart: number;
+  moveEnd: number;
+  nameStart: number;
+  nameEnd: number;
+  roleAt: number;
+  portraitStart: number;
+  portraitEnd: number;
+  restStart: number;
+  finishAt: number;
+  landing: SpringCurve;
+  moving: SpringCurve;
+  nameSettle: SpringCurve;
+  portraitSettle: SpringCurve;
+  labelPress: SpringCurve;
+};
+
+/**
+ * The entrance's schedule, from the timings alone: the line types (with the comma
+ * beat), the last words land, the finished sentence holds, then the line moves and
+ * the name, role line, portrait and the rest follow. `runEntrance` plays it and
+ * `scripts/verify-opening.mjs` checks it, so the two cannot drift apart.
+ * `fits` is whether the headline's place is on the screen to move into, and
+ * `letters` is the number of letters in the name. Self-contained: it is serialised
+ * into the inline script beside `springCurve`, which it takes as `spring`.
+ */
+export function entranceSchedule(
+  spring: (bounce: number, visualDuration: number) => SpringCurve,
+  timing: EntranceTimings,
+  text: string,
+  letters: number,
+  fits: boolean,
+): EntranceSchedule {
+  const characters = [...text];
+  const commaAt = characters.indexOf(",");
+  const typeAt: number[] = [];
+  let blinkOn = 0;
+  let blinkOff = 0;
+  let elapsed = timing.startMs;
+  characters.forEach((character, index) => {
+    typeAt.push(elapsed);
+    elapsed += character === " " ? timing.spaceMs : timing.characterMs;
+    if (index === commaAt) {
+      blinkOn = elapsed;
+      elapsed += timing.commaPauseMs;
+      blinkOff = elapsed;
+    }
+  });
+  const landing = spring(timing.land.bounce, timing.land.visualDuration);
+  const landAt = elapsed;
+  const moveStart = landAt + Math.max(landing.settled, timing.underlineDelayMs + timing.underlineMs) + timing.holdMs;
+  const moving = spring(timing.move.bounce, timing.move.visualDuration);
+  const moveEnd = moveStart + (fits ? moving.settled : timing.fadeMoveMs);
+  const nameStart = moveStart + timing.nameDelayMs;
+  const nameSettle = spring(timing.name.bounce, timing.name.visualDuration);
+  const nameEnd = nameStart + (letters - 1) * timing.nameStaggerMs + nameSettle.settled;
+  const portraitStart = nameStart + timing.portraitDelayMs;
+  const portraitSettle = spring(timing.portrait.bounce, timing.portrait.visualDuration);
+  const portraitEnd = portraitStart + portraitSettle.settled;
+  const restStart = Math.max(nameEnd, portraitEnd, moveEnd);
+  return {
+    typeAt,
+    blinkOn,
+    blinkOff,
+    landAt,
+    moveStart,
+    moveEnd,
+    nameStart,
+    nameEnd,
+    roleAt: nameStart + timing.roleDelayMs,
+    portraitStart,
+    portraitEnd,
+    restStart,
+    finishAt: restStart + timing.fadeMs,
+    landing,
+    moving,
+    nameSettle,
+    portraitSettle,
+    labelPress: spring(timing.label.bounce, timing.label.visualDuration),
+  };
+}
+
 /**
  * Marks the document as entering, or does nothing. Self-contained: it is
  * serialised into an inline script, so it takes everything it needs as
@@ -185,7 +276,11 @@ export function whenFontsReady(play: () => void, waitMs: number) {
 }
 
 /** Plays the entrance. Self-contained: it is serialised into an inline script. */
-export function runEntrance(spring: (bounce: number, visualDuration: number) => SpringCurve, timing: EntranceTimings) {
+export function runEntrance(
+  spring: (bounce: number, visualDuration: number) => SpringCurve,
+  schedule: typeof entranceSchedule,
+  timing: EntranceTimings,
+) {
   const root = document.documentElement;
   // Nothing was held, so there is nothing to play.
   if (!root.hasAttribute("data-entering")) return;
@@ -326,28 +421,27 @@ export function runEntrance(spring: (bounce: number, visualDuration: number) => 
     reducedMotion.addEventListener("change", finish);
     document.addEventListener("visibilitychange", onVisibility);
 
+    const fits = target.top >= 0 && target.bottom <= innerHeight - 24;
+    const plan = schedule(spring, timing, rest.textContent!, letters.length, fits);
+
     const characters = [...rest.textContent!];
     const commaAt = characters.indexOf(",");
-    let elapsed = timing.startMs;
     characters.forEach((character, index) => {
       later(() => {
         typed.textContent += character;
         rest.textContent = rest.textContent!.slice(character.length);
-      }, elapsed);
-      elapsed += character === " " ? timing.spaceMs : timing.characterMs;
+      }, plan.typeAt[index]);
       if (index === commaAt) {
-        later(() => caret.classList.add("stretch-entrance__caret--blink"), elapsed);
-        elapsed += timing.commaPauseMs;
-        later(() => caret.classList.remove("stretch-entrance__caret--blink"), elapsed);
+        later(() => caret.classList.add("stretch-entrance__caret--blink"), plan.blinkOn);
+        later(() => caret.classList.remove("stretch-entrance__caret--blink"), plan.blinkOff);
       }
     });
 
     // "products of my own." lands while its underline is already drawing.
-    const landing = spring(timing.land.bounce, timing.land.visualDuration);
     later(() => {
       caret.remove();
       land.style.opacity = "";
-      animate(land, [{ opacity: 0, transform: "translateY(14px) rotate(-2deg)" }, { opacity: 1, transform: "translateY(0) rotate(0deg)" }], landing);
+      animate(land, [{ opacity: 0, transform: "translateY(14px) rotate(-2deg)" }, { opacity: 1, transform: "translateY(0) rotate(0deg)" }], plan.landing);
       if (path) {
         animate(path, [{ strokeDashoffset: length }, { strokeDashoffset: 0 }], {
           duration: timing.underlineMs,
@@ -355,28 +449,20 @@ export function runEntrance(spring: (bounce: number, visualDuration: number) => 
           delay: timing.underlineDelayMs,
         });
       }
-    }, elapsed);
-    elapsed += Math.max(landing.settled, timing.underlineDelayMs + timing.underlineMs) + timing.holdMs;
+    }, plan.landAt);
 
     // The line moves up into the headline's place, and the hero arrives around it.
-    const moveStart = elapsed;
-    const fits = target.top >= 0 && target.bottom <= innerHeight - 24;
-    const moving = spring(timing.move.bounce, timing.move.visualDuration);
-    const moveMs = fits ? moving.settled : timing.fadeMoveMs;
     later(() => {
       if (fits) {
         // Measured now, in case the visitor has scrolled since the entrance began.
         const from = line.getBoundingClientRect();
         const place = heading.getBoundingClientRect();
-        animate(line, [{ transform: "translate(0, 0)" }, { transform: `translate(${place.left - from.left}px, ${place.top - from.top}px)` }], moving);
+        animate(line, [{ transform: "translate(0, 0)" }, { transform: `translate(${place.left - from.left}px, ${place.top - from.top}px)` }], plan.moving);
       } else {
         animate(line, [{ opacity: 1 }, { opacity: 0 }], { duration: timing.fadeMoveMs, easing: "ease-out" });
       }
-    }, moveStart);
+    }, plan.moveStart);
 
-    const nameStart = moveStart + timing.nameDelayMs;
-    const nameSettle = spring(timing.name.bounce, timing.name.visualDuration);
-    const nameEnd = nameStart + (letters.length - 1) * timing.nameStaggerMs + nameSettle.settled;
     later(() => {
       display.style.visibility = "";
       letters.forEach((letter, index) => {
@@ -386,22 +472,19 @@ export function runEntrance(spring: (bounce: number, visualDuration: number) => 
             { transform: `translateY(${timing.nameLift})`, fontStretch: timing.nameStretchFrom },
             { transform: "translateY(0)", fontStretch: timing.nameStretchTo },
           ],
-          { ...nameSettle, delay: index * timing.nameStaggerMs },
+          { ...plan.nameSettle, delay: index * timing.nameStaggerMs },
         );
       });
       // The layer shows the name from its first frame; the real one is released
       // when the letters are home, with no fade, so the hand-over does not blink.
-    }, nameStart);
+    }, plan.nameStart);
     later(() => {
       display.remove();
       release("name");
-    }, nameEnd);
+    }, plan.nameEnd);
     // The role line fades in while the letters are still settling.
-    later(() => release("role"), nameStart + timing.roleDelayMs);
+    later(() => release("role"), plan.roleAt);
 
-    const portraitStart = nameStart + timing.portraitDelayMs;
-    const portraitSettle = spring(timing.portrait.bounce, timing.portrait.visualDuration);
-    const portraitEnd = portraitStart + portraitSettle.settled;
     later(() => {
       animate(
         portrait,
@@ -409,16 +492,14 @@ export function runEntrance(spring: (bounce: number, visualDuration: number) => 
           { transform: `rotate(${portraitAngle + timing.portraitSwingDegrees}deg) translateY(-${timing.portraitLiftPx}px)` },
           { transform: `rotate(${portraitAngle}deg) translateY(0)` },
         ],
-        portraitSettle,
+        plan.portraitSettle,
       );
       animate(label, [{ transform: `rotate(${labelAngle}deg) scale(${timing.labelScaleFrom})` }], { duration: 0, easing: "linear" });
       release("portrait");
-    }, portraitStart);
+    }, plan.portraitStart);
 
     // When the line is home the real headline takes over from it, the label presses on,
     // and the header and support line fade in.
-    const moveEnd = moveStart + moveMs;
-    const labelPress = spring(timing.label.bounce, timing.label.visualDuration);
     later(() => {
       release("headline", "header", "support");
       line.remove();
@@ -428,14 +509,13 @@ export function runEntrance(spring: (bounce: number, visualDuration: number) => 
           { transform: `rotate(${labelAngle}deg) scale(${timing.labelScaleFrom})` },
           { transform: `rotate(${labelAngle}deg) scale(1)` },
         ],
-        labelPress,
+        plan.labelPress,
       );
-    }, moveEnd);
+    }, plan.moveEnd);
 
     // The rest of the page follows once the name and portrait have settled.
-    const restStart = Math.max(nameEnd, portraitEnd, moveEnd);
-    later(() => release("rest"), restStart);
-    later(finish, restStart + timing.fadeMs);
+    later(() => release("rest"), plan.restStart);
+    later(finish, plan.finishAt);
   } catch {
     finish();
   }
@@ -445,4 +525,4 @@ export function runEntrance(spring: (bounce: number, visualDuration: number) => 
 export const entranceGuardScript = `try{(${holdPage.toString()})(${entranceTimings.safetyMs})}catch(_){document.documentElement.removeAttribute("data-entering")}`;
 
 /** The inline script that plays the entrance. */
-export const entranceScript = `try{(${whenFontsReady.toString()})(function(){try{(${runEntrance.toString()})(${springCurve.toString()},${JSON.stringify(entranceTimings)})}catch(_){document.documentElement.removeAttribute("data-entering")}},${entranceTimings.fontWaitMs})}catch(_){document.documentElement.removeAttribute("data-entering")}`;
+export const entranceScript = `try{(${whenFontsReady.toString()})(function(){try{(${runEntrance.toString()})(${springCurve.toString()},${entranceSchedule.toString()},${JSON.stringify(entranceTimings)})}catch(_){document.documentElement.removeAttribute("data-entering")}},${entranceTimings.fontWaitMs})}catch(_){document.documentElement.removeAttribute("data-entering")}`;
