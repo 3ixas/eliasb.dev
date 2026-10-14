@@ -1529,16 +1529,19 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
     text-transform: uppercase;
   }
 
+  /* A visitor's wider letter spacing (WCAG 1.4.12) can make "Wednesday" wider than the card; it breaks rather than pushing the page sideways. */
   .stretch-week__today-day {
     margin: 0;
     font-size: 56px;
     line-height: 0.95;
+    overflow-wrap: anywhere;
   }
 
   .stretch-week__today-session {
     margin: 0;
     font-size: 22px;
     font-weight: 600;
+    overflow-wrap: anywhere;
   }
 
   .stretch-week:not([data-today-known]) .stretch-week__today {

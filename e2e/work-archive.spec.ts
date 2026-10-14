@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { projectIndex, projects } from "../src/content/projects";
 import { caseStudies } from "../src/content/stretch/case-studies";
+import { roleStorySlugs } from "../src/content/stretch/role-stories";
 import { workArchive } from "../src/content/stretch/site-copy";
 
 const rows = (page: Page) => page.locator(".stretch-index__row");
@@ -133,9 +134,10 @@ test.describe("Things I make: moved from /work", () => {
     await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", workArchive.description);
   });
 
-  test("the sitemap lists home, the archive and the case studies at their new paths, and no /work paths", async ({ request }) => {
+  test("the sitemap lists home, the archive, the case studies at their new paths and the Role stories, and no moved /work paths", async ({ request }) => {
     const xml = await (await request.get("/sitemap.xml")).text();
     const paths = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, loc]) => new URL(loc).pathname);
-    expect(paths.sort()).toEqual(["/", "/things-i-make", ...Object.keys(caseStudies).map((slug) => `/things-i-make/${slug}`)].sort());
+    const expected = ["/", "/things-i-make", ...Object.keys(caseStudies).map((slug) => `/things-i-make/${slug}`), ...roleStorySlugs.map((slug) => `/work/${slug}`)];
+    expect(paths.sort()).toEqual(expected.sort());
   });
 });
