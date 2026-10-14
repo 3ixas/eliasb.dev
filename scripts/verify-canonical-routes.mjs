@@ -14,7 +14,8 @@ const redirectContracts = [
   ["/work/argus-risk", "/things-i-make/argus-risk"],
   ["/work/flowtime", "/things-i-make/flowtime"],
 ];
-// Role stories will live under /work/ (#172), so nothing else there is redirected.
+// Role stories live under /work/ (#172), so nothing else there is redirected.
+// Joveen and Optegra have no story yet (#174), so they are not redirected and not found.
 const notRedirected = ["/work/bnp-paribas", "/work/joveen", "/work/optegra"];
 const expectedSitemapUrls = new Set([
   "https://www.eliasb.dev",
@@ -22,6 +23,7 @@ const expectedSitemapUrls = new Set([
   "https://www.eliasb.dev/things-i-make/threshold",
   "https://www.eliasb.dev/things-i-make/argus-risk",
   "https://www.eliasb.dev/things-i-make/flowtime",
+  "https://www.eliasb.dev/work/bnp-paribas",
 ]);
 
 function configuredBaseUrl() {
@@ -84,12 +86,18 @@ async function verifyRoutes(baseUrl) {
     assert.notEqual(response.status, 308, `${route} must not be redirected`);
   }
 
-  for (const [route, expectedCanonical] of [["/things-i-make", "https://www.eliasb.dev/things-i-make"], ["/things-i-make/threshold", "https://www.eliasb.dev/things-i-make/threshold"]]) {
+  for (const [route, expectedCanonical] of [["/things-i-make", "https://www.eliasb.dev/things-i-make"], ["/things-i-make/threshold", "https://www.eliasb.dev/things-i-make/threshold"], ["/work/bnp-paribas", "https://www.eliasb.dev/work/bnp-paribas"]]) {
     const response = await fetch(new URL(route, baseUrl), { redirect: "manual" });
     assert.equal(response.status, 200, `${route} should render successfully`);
     const document = await response.text();
     const canonical = document.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
     assert.equal(canonical, expectedCanonical, `${route} has the wrong canonical URL`);
+  }
+
+  // Only a Role story is served under /work/<slug>; any other slug is a 404.
+  for (const route of ["/work/joveen", "/work/optegra", "/work/not-a-story"]) {
+    const response = await fetch(new URL(route, baseUrl), { redirect: "manual" });
+    assert.equal(response.status, 404, `${route} has no Role story, so it should be a 404`);
   }
 
   const sitemapResponse = await fetch(new URL("/sitemap.xml", baseUrl), { redirect: "manual" });
