@@ -149,11 +149,10 @@ for (const study of studies) {
 }
 
 // Role stories.
-const roleNames = { "bnp-paribas": "BNP Paribas" };
 const roles = Object.values(roleStories);
 
 for (const story of roles) {
-  const table = Object.fromEntries(rows(copyFor(roleNames[story.slug]), "### ").map(([label, text]) => [label, text]));
+  const table = Object.fromEntries(rows(copyFor(story.employer), "### ").map(([label, text]) => [label, text]));
   assert.equal([story.role, story.metadata].join(" · "), table.Opening, `${story.slug}: opening`);
   assert.equal(siteCopy.title(roleStoryName(story)), table.Title, `${story.slug}: title`);
   assert.equal(roleStoryDescription(story), table["Meta description"], `${story.slug}: meta description`);
