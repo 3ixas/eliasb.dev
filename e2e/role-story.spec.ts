@@ -1,0 +1,188 @@
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test } from "@playwright/test";
+import { roleStories, roleStorySlugs } from "../src/content/stretch/role-stories";
+import {
+  roleStoryBack,
+  roleStoryDescription,
+  roleStoryName,
+  roleStorySectionKeys,
+  roleStorySectionLabels,
+} from "../src/content/stretch/role-story";
+import { pageTitle } from "../src/content/site";
+import { contrastOnPaper } from "./support/contrast";
+
+const rgb = (hex: string) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
+const schemes = ["light", "dark"] as const;
+
+for (const slug of roleStorySlugs) {
+  const story = roleStories[slug]!;
+
+  test.describe(`Role story: ${story.employer}`, () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto(`/work/${slug}`);
+    });
+
+    test("the opening band carries the number, employer, role, metadata and back link", async ({ page }) => {
+      await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(story.employer);
+      const band = page.getByRole("region", { name: "Overview" });
+      await expect(band.locator(".stretch-cs-open__number")).toHaveText(story.number);
+      await expect(band).toContainText(story.role);
+      await expect(band).toContainText(story.metadata);
+      await expect(band.getByRole("link", { name: "Work", exact: true })).toHaveAttribute("href", roleStoryBack.href);
+      await expect(band.locator("img")).toHaveCount(0);
+    });
+
+    test("it is titled and described for search and sharing", async ({ page }) => {
+      await expect(page).toHaveTitle(pageTitle(roleStoryName(story)));
+      await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", roleStoryDescription(story));
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://www.eliasb.dev/work/${slug}`);
+      await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", pageTitle(roleStoryName(story)));
+      const card = await page.locator('meta[property="og:image"]').getAttribute("content");
+      const response = await page.request.get(new URL(card!).pathname);
+      expect(response.status()).toBe(200);
+      expect(response.headers()["content-type"]).toBe("image/png");
+    });
+
+    for (const scheme of schemes) {
+      test(`the band is in the employer's ${scheme} colours`, async ({ page }) => {
+        await page.emulateMedia({ colorScheme: scheme });
+        const colours = story.colours[scheme];
+        const band = page.locator(".stretch-cs-open");
+        await expect(band).toHaveCSS("background-color", rgb(colours.field));
+        await expect(band).toHaveCSS("color", rgb(colours.ink));
+        await expect(page.locator(".stretch-cs-evidence__value").first()).toHaveCSS("color", rgb(colours.swatch));
+      });
+    }
+
+    test("a remembered theme beats the device setting for the band", async ({ page }) => {
+      await page.emulateMedia({ colorScheme: "light" });
+      await page.evaluate(() => document.documentElement.setAttribute("data-theme", "dark"));
+      await expect(page.locator(".stretch-cs-open")).toHaveCSS("background-color", rgb(story.colours.dark.field));
+      await page.evaluate(() => document.documentElement.setAttribute("data-theme", "light"));
+      await page.emulateMedia({ colorScheme: "dark" });
+      await expect(page.locator(".stretch-cs-open")).toHaveCSS("background-color", rgb(story.colours.light.field));
+    });
+
+    test("six sections in the keyed order, each reachable from the row of section links", async ({ page }) => {
+      const links = page.getByRole("navigation", { name: "Sections" }).getByRole("link");
+      await expect(links).toHaveText(roleStorySectionKeys.map((key, index) => `0${index + 1} ${roleStorySectionLabels[key]}`));
+      const ids = await page.locator("article section[id]").evaluateAll((sections) => sections.map((section) => section.id));
+      expect(ids).toEqual([...roleStorySectionKeys]);
+      for (const key of roleStorySectionKeys) {
+        await expect(page.locator(`section#${key} h2`)).toHaveCount(1);
+        await expect(links.filter({ hasText: roleStorySectionLabels[key] })).toHaveAttribute("href", `#${key}`);
+      }
+      await links.last().click();
+      await expect(page).toHaveURL(/#what-i-took-with-me$/);
+      await expect(page.locator("section#what-i-took-with-me")).toBeInViewport();
+    });
+
+    test("section copy is the approved copy", async ({ page }) => {
+      for (const key of roleStorySectionKeys) {
+        const { heading, paragraphs, points } = story.sections[key];
+        const section = page.locator(`section#${key}`);
+        await expect(section.getByRole("heading", { level: 2 })).toHaveText(heading ?? roleStorySectionLabels[key]);
+        for (const paragraph of paragraphs ?? []) await expect(section).toContainText(paragraph);
+        for (const { lead, text } of points ?? []) await expect(section).toContainText(`${lead} ${text}`);
+      }
+    });
+
+    test("the evidence strip, at most four, sits under What changed", async ({ page }) => {
+      expect(story.evidence.length).toBeLessThanOrEqual(4);
+      await expect(page.getByRole("list", { name: "Evidence" })).toHaveCount(1);
+      const items = page.locator("section#what-changed").getByRole("list", { name: "Evidence" }).getByRole("listitem");
+      await expect(items).toHaveText(story.evidence.map(({ value, label }) => `${value}${label}`));
+    });
+
+    test("it ends on the way back to Work", async ({ page }) => {
+      const end = page.getByRole("navigation", { name: "More" }).getByRole("link", { name: "Work", exact: true });
+      await expect(end).toHaveAttribute("href", roleStoryBack.href);
+      expect((await end.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    });
+
+    test("cobalt is not used on the page", async ({ page }) => {
+      const cobalt = await page.evaluate(() => {
+        const probe = document.createElement("span");
+        probe.style.color = "var(--stretch-cobalt)";
+        document.body.appendChild(probe);
+        const colour = getComputedStyle(probe).color;
+        probe.remove();
+        return colour;
+      });
+      const used = await page.locator("[data-stretch-shell] *").evaluateAll((elements, colour) => {
+        return elements.filter((element) => {
+          // The skip link is cobalt, but only when focused; it waits off-screen.
+          if (element.classList.contains("stretch-skip")) return false;
+          const style = getComputedStyle(element);
+          return [style.color, style.backgroundColor, style.borderTopColor].includes(colour) && element.checkVisibility();
+        }).length;
+      }, cobalt);
+      expect(used).toBe(0);
+    });
+
+    test("opens at once: no entrance holds the page, even with motion on", async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await page.goto(`/work/${slug}`);
+      expect(await page.evaluate(() => document.documentElement.hasAttribute("data-entering"))).toBe(false);
+      await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
+      expect(await page.evaluate(() => Number(getComputedStyle(document.querySelector("main")!).opacity))).toBe(1);
+    });
+
+    test("it is in the server-rendered page", async ({ page }) => {
+      await page.route("**/*.js", (route) => route.abort());
+      await page.reload();
+      await expect(page.locator("article section[id]")).toHaveCount(6);
+      await expect(page.getByRole("list", { name: "Evidence" }).getByRole("listitem")).toHaveCount(story.evidence.length);
+    });
+
+    for (const scheme of schemes) {
+      test(`text passes WCAG 2.2 AA contrast over the employer's colours and the page, ${scheme}`, async ({ page }) => {
+        await page.emulateMedia({ colorScheme: scheme });
+        const selectors = [
+          ".stretch-cs-back",
+          ".stretch-cs-open__name",
+          ".stretch-cs-open__outcome",
+          ".stretch-cs-open__meta",
+          ".stretch-cs-links-row a",
+          ".stretch-cs-h2",
+          ".stretch-cs-p",
+          ".stretch-cs-lead",
+          ".stretch-cs-evidence__value",
+          ".stretch-cs-evidence__label",
+        ];
+        for (const selector of selectors) {
+          const readings = await contrastOnPaper(page, selector);
+          expect(readings.length, selector).toBeGreaterThan(0);
+          for (const reading of readings) expect(reading.ratio, `${selector}: ${reading.text}`).toBeGreaterThanOrEqual(4.5);
+        }
+      });
+
+      test(`has no axe violations, ${scheme}`, async ({ page }) => {
+        await page.emulateMedia({ colorScheme: scheme });
+        const results = await new AxeBuilder({ page }).analyze();
+        expect(results.violations).toEqual([]);
+      });
+    }
+
+    test("renders without sideways scroll, and every link is at least 44 px tall", async ({ page }) => {
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      const width = page.viewportSize()?.width ?? 0;
+      for (const box of await Promise.all((await page.locator("[data-role-story] main *").all()).map((item) => item.boundingBox()))) {
+        if (box) expect(box.x + box.width).toBeLessThanOrEqual(width + 1);
+      }
+      for (const target of await page.locator("[data-role-story] a:visible, [data-role-story] button:visible").all()) {
+        if (await target.evaluate((element) => element.classList.contains("stretch-skip"))) continue;
+        expect((await target.boundingBox())!.height, (await target.textContent()) ?? "").toBeGreaterThanOrEqual(44);
+      }
+    });
+  });
+}
+
+test("a slug that is not a Role story is a 404, and Role stories are not redirected", async ({ page }) => {
+  expect(roleStorySlugs).toEqual(["bnp-paribas"]);
+  for (const slug of ["joveen", "optegra", "constructor"]) {
+    expect((await page.goto(`/work/${slug}`))?.status(), slug).toBe(404);
+  }
+  expect((await page.goto("/work/bnp-paribas"))?.url()).toMatch(/\/work\/bnp-paribas$/);
+});

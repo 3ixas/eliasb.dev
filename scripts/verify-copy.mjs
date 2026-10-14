@@ -10,6 +10,15 @@ import {
   caseStudySectionKeys,
   caseStudySectionLabels,
 } from "../src/content/stretch/case-study.ts";
+import { roleStories } from "../src/content/stretch/role-stories.ts";
+import {
+  roleStoryBack,
+  roleStoryDescription,
+  roleStoryName,
+  roleStoryProblems,
+  roleStorySectionKeys,
+  roleStorySectionLabels,
+} from "../src/content/stretch/role-story.ts";
 import { howIWork } from "../src/content/stretch/how-i-work.ts";
 import { offTheClock } from "../src/content/stretch/off-the-clock.ts";
 import { hero, notFound, sayHello, siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy.ts";
@@ -39,6 +48,8 @@ const modules = {
   offTheClock,
   caseStudyCopy,
   caseStudySectionLabels,
+  roleStoryBack,
+  roleStorySectionLabels,
 };
 for (const [name, module] of Object.entries(modules)) {
   for (const [path, text] of leaves(module, name)) {
@@ -137,6 +148,27 @@ for (const study of studies) {
   });
 }
 
+// Role stories.
+const roleNames = { "bnp-paribas": "BNP Paribas" };
+const roles = Object.values(roleStories);
+
+for (const story of roles) {
+  const table = Object.fromEntries(rows(copyFor(roleNames[story.slug]), "### ").map(([label, text]) => [label, text]));
+  assert.equal([story.role, story.metadata].join(" · "), table.Opening, `${story.slug}: opening`);
+  assert.equal(siteCopy.title(roleStoryName(story)), table.Title, `${story.slug}: title`);
+  assert.equal(roleStoryDescription(story), table["Meta description"], `${story.slug}: meta description`);
+  assert.equal([story.employer, story.role, siteCopy.socialImage.name].join(" · "), table["Social card"], `${story.slug}: social card`);
+
+  const points = (section) => section.points?.map((point) => `*${point.lead}* ${point.text}`).join(" ") ?? "";
+  const prose = (section) => [section.paragraphs?.join(" "), points(section)].filter(Boolean).join(" ");
+  const evidence = story.evidence.map((item) => `${item.value} ${item.label}`).join(" · ");
+  roleStorySectionKeys.forEach((key, index) => {
+    const label = `${String(index + 1).padStart(2, "0")} ${roleStorySectionLabels[key]}`;
+    const expected = key === "what-changed" ? `${prose(story.sections[key])} · Evidence: ${evidence}` : prose(story.sections[key]);
+    assert.equal(expected, table[label], `${story.slug}: ${label}`);
+  });
+}
+
 // ---- Shape and the catalogue ----------------------------------------------------------------
 
 assert.deepEqual(caseStudyProblems(studies, projects), []);
@@ -154,6 +186,12 @@ assert.match(
   /empty "decisions" section/,
 );
 assert.throws(() => caseStudyOpening({ ...threshold, slug: "home-secretary" }, projects), /needs its project's screenshot and colours/);
+
+assert.deepEqual(roleStoryProblems(roles), []);
+const [bnp] = roles;
+assert.match(roleStoryProblems([{ ...bnp, evidence: [...bnp.evidence, bnp.evidence[0]] }])[0], /more than 4 evidence/);
+assert.match(roleStoryProblems([{ ...bnp, next: "bnp-paribas" }])[0], /different Role story or none/);
+assert.match(roleStoryProblems([{ ...bnp, sections: { ...bnp.sections, decisions: {} } }])[0], /empty "decisions" section/);
 
 // Each entry owns its pairing, so reordering the copy cannot redirect a link or a filter.
 assert.deepEqual(workArchive.filters.map(({ category }) => category), [null, ...PROJECT_CATEGORIES], "the filters are All, then every category once, in the catalogue's order");

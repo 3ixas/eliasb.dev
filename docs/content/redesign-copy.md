@@ -164,6 +164,25 @@ Shared labels: ← Things I make · Live site ↗ · Code ↗ · Next project ·
 | 06 What I’d do next | *Move between devices,* keeping local storage as the default. *Show when you focus best,* like the time of day you tend to focus longest. |
 | Meta description | A focus timer that counts up, sets breaks in proportion to your focus, and keeps your history on your device. |
 
+## Role stories
+
+Shared labels: ← Work · Evidence · section numbers 01–06 ([#172](https://github.com/3ixas/eliasb.dev/issues/172)). Prose approved by Elias on 14 October 2026.
+
+### BNP Paribas
+
+| Part | Copy |
+| --- | --- |
+| Opening | Software engineer · Risk division · London · Jul 2025 – now |
+| 01 Summary | I’m a software engineer in BNP Paribas’s risk division in London. I work in C# on the engines that price and risk-manage trades on CPU and GPU, and I’m the team’s only C# engineer. |
+| 02 The role | The engines run large simulation-based calculations across several asset classes. It’s a big codebase, around 70 projects, and some of the C# is translated to run on the GPU. I joined in July 2025 having never written C#. Today I own implementation and delivery on the C# side, from planning through review. |
+| 03 The problems | *Market data.* Loaders written in Java had to be ported to C#, pulling data from several sources into one place and checking it on the way. *A stale dependency.* The live pricing pipeline relied on a data file that was no longer reliably available in production. *Quant code.* Pricing code written by quantitative developers had to be integrated into the engine. *Two execution paths.* The same tests had to run on both CPU and GPU. |
+| 04 Decisions | *Ship the risky change behind a flag, switched off.* Removing the dependency touched live pricing, so I put the new path behind a feature flag that defaults to off, added caching, and wrote an end-to-end test nobody had asked for. The architect’s view was that the thing to protect was the blast radius, not only correctness. I’d have called that a nice-to-have before; now it’s how I start. *Validate the data before trusting it.* The commodity loader was the harder one: ten file types, correlation groups, unit conversions, and records linked to each other. I checked the links, so an orphaned record gets caught on load rather than showing up as a strange number in a simulation. *Give AI work phases.* I built a workflow where each stage has its own scoped agent: grill the problem, plan, build test-first, self-review, then a health review. Each agent only sees what that stage needs, which keeps it from skipping ahead. |
+| 05 What changed | I used that workflow to integrate a pricer into the calculation engine in a couple of days. For an experienced integration engineer it takes about two weeks, and I was new to it. I went from no C# to shipping production code independently in six months. The Early Careers digitisation competition is the other half of this. I led a team of four and co-built a dashboard from our users’ requirements, which cut a 30–40 minute data load to under 5. We won, out of five groups, and presented it to the Head of Risk Systems. · Evidence: Nov 2025 won the Early Careers digitisation competition · Q1 2026 Take Ownership award · Spring 2026 nominated AI Champion · 6 months from zero C# to production code |
+| 06 What I took with me | I was nominated as an AI Champion in the risk division, and the workflow is now used by several teams across the department. I also won a Take Ownership award. The habit underneath all of it is simple: write down what you’re doing before you build it, and ship it so it’s safe to undo. |
+| Title | Software engineer at BNP Paribas · Elias Bennett |
+| Meta description | I’m a software engineer in BNP Paribas’s risk division in London. I work in C# on the engines that price and risk-manage trades on CPU and GPU, and I’m the team’s only C# engineer. |
+| Social card | BNP Paribas · Software engineer · ELIAS BENNETT |
+
 ## Checks
 
 - **Facts:** every claim traces to #103, the CV, `src/content/case-files.ts`, or the project specs (Argus `project-spec.md`; Flowtime `project-spec.md`, added 3 January 2026). Threshold’s figures come from the evidence note.
