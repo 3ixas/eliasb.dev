@@ -14,7 +14,7 @@ Approved by Elias on 8 October 2026 for [#113](https://github.com/3ixas/eliasb.d
 | Social image | ELIAS BENNETT · I build pricing and risk engines at BNP Paribas, and *products of my own.* |
 | Menu | Work · Things I make · How I work · Off the clock · Say hello |
 | Header | Dark theme · Menu · Close · ← Work |
-| Clock | London {14:05} (read aloud as “The time in London: {14:05}”) |
+| Greeting (header, and the menu dialog on phones) | Good morning (05:00 to 11:59) · Good afternoon (12:00 to 17:59) · Good evening (18:00 to 21:59) · Still up? (22:00 to 04:59), by the visitor’s own clock. Hello before the browser has read it, and without script. Approved by Elias on 15 October 2026 for [#180](https://github.com/3ixas/eliasb.dev/issues/180) |
 | Footer | Made by Elias |
 
 **404**

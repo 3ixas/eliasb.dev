@@ -187,6 +187,22 @@ button.stretch-pill {
   cursor: pointer;
 }
 
+/* The longest greeting is laid out unseen in the same cell as the shown one, so the pill is the same width whichever shows. */
+.stretch-greeting {
+  display: inline-grid;
+}
+
+/* Both sit in the one cell: the shown text in its own element, since a bare text node cannot be placed. */
+.stretch-greeting > span,
+.stretch-greeting::after {
+  grid-area: 1 / 1;
+}
+
+.stretch-greeting::after {
+  content: attr(data-longest);
+  visibility: hidden;
+}
+
 /*
  * The Eclipse: an icon-only sun while the page is light, a crescent moon while
  * it is dark, in a borderless 44 px target. Its state is --stretch-dark (0 in
@@ -258,7 +274,7 @@ button.stretch-pill {
 }
 
 /*
- * Below about 900 px the header is two rows: the clock, then the nav and the
+ * Below about 900 px the header is two rows: the greeting, then the nav and the
  * theme button. The icon is narrow enough that one row would nearly fit at
  * 820 px, and whether it did would depend on the font, so the wrap is set here.
  */
@@ -275,7 +291,7 @@ button.stretch-pill {
 }
 
 @media (max-width: 760px) {
-  .stretch-header__clock,
+  .stretch-header__greeting,
   .stretch-header .stretch-nav {
     display: none;
   }

@@ -36,10 +36,13 @@ export const siteCopy = {
     close: "Close",
     backToWork: "← Work",
   },
-  clock: {
-    label: (time: string) => `London ${time}`,
-    /** Read aloud in place of the visible label. */
-    spoken: (time: string) => `The time in London: ${time}`,
+  /** The header's greeting, by the visitor's own time of day. `hello` is the line before the browser has read it, and without script. */
+  greeting: {
+    hello: "Hello",
+    morning: "Good morning",
+    afternoon: "Good afternoon",
+    evening: "Good evening",
+    late: "Still up?",
   },
   footer: "Made by Elias",
 } as const;
