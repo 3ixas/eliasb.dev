@@ -1,18 +1,18 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { featuredSlugs, projects } from "../src/content/projects";
-import { careerLog } from "../src/content/stretch/career";
 import { howIWork } from "../src/content/stretch/how-i-work";
 import { offTheClock } from "../src/content/stretch/off-the-clock";
 import { hero, sayHello, siteCopy, thingsIMake } from "../src/content/stretch/site-copy";
+import { work } from "../src/content/stretch/work";
 import { renderedContrast } from "./support/rendered-contrast";
 
 const menuLabels = siteCopy.menu.map(({ label }) => label);
 
 const sections = [
+  { id: "work", heading: work.heading, note: null },
   { id: "things-i-make", heading: thingsIMake.heading, note: thingsIMake.note(projects.length, featuredSlugs.length) },
   { id: "how-i-work", heading: howIWork.heading, note: howIWork.note },
-  { id: "where-ive-been", heading: careerLog.heading, note: careerLog.note },
   { id: "off-the-clock", heading: offTheClock.heading, note: offTheClock.note },
   { id: "say-hello", heading: "Say hello", note: null },
 ];

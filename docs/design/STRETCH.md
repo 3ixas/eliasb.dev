@@ -56,7 +56,7 @@ One per physical-looking object (a tile, a card, the portrait), and never more. 
 | Featured tile | Up to three, in the project's colours; the first spans two columns; outline number, name, outcome, metadata, tilted screenshot (±1–1.5°), one Fastener |
 | Project index row | Number, name, outcome, type, year; turns cobalt with an arrow nudge on hover or focus and previews its screenshot; thumbnail and single tap on phones |
 | How I work | Three habit and proof beats, the honest line, the PRD card |
-| Career ruler | Vertical, oldest first; dates, bar (cobalt for the current role), role, organisation; notes and milestone markers |
+| Work | Now (role line, three proofs, a link to the Role story), Where I'm headed (a line and three strands, each with a proof and a link) and How I got here: rows in the Project index's style, newest first, dates, role, organisation and a one-line note, a whole-row link to the Role story and History with none |
 | Off the clock | Training poster (today in cobalt), book, film, history clipping, **Now making** (pulsing cobalt "now"), GitHub year grid (today in cobalt) |
 | Theme | The Eclipse: an icon-only sun (light) or crescent moon (dark), named "Dark theme", pressed while the dark theme is in force |
 | Case study | Opening band in the project colour, section links, a neutral reading column about 720 px wide, framed figures, PRD card with evidence strip, Next-project tile |

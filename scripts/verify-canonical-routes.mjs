@@ -5,7 +5,7 @@ import process from "node:process";
 import { setTimeout as delay } from "node:timers/promises";
 
 const redirectContracts = [
-  ["/about", "/#where-ive-been"],
+  ["/about", "/#work"],
   ["/library", "/#off-the-clock"],
   ["/lab", "/#off-the-clock"],
   // The projects moved from /work to /things-i-make (#157, #170), one permanent redirect per path.

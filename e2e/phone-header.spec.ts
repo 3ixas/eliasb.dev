@@ -94,11 +94,11 @@ test.describe("Phone header and menu", () => {
   test("a section name closes the menu and jumps to its section", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await menuButton(page).click();
-    await dialog(page).getByRole("link", { name: "Where I’ve been" }).click();
+    await dialog(page).getByRole("link", { name: "Work", exact: true }).click();
     await expect(dialog(page)).toBeHidden();
-    await expect(page).toHaveURL(/#where-ive-been$/);
+    await expect(page).toHaveURL(/#work$/);
     const headerBottom = await header(page).evaluate((element) => element.getBoundingClientRect().bottom);
-    const top = await page.locator("#where-ive-been h2").evaluate((element) => element.getBoundingClientRect().top);
+    const top = await page.locator("#work h2").evaluate((element) => element.getBoundingClientRect().top);
     expect(top).toBeGreaterThanOrEqual(headerBottom - 1);
     await expect(page.locator("html")).not.toHaveCSS("overflow", "hidden");
   });

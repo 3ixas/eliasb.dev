@@ -5,6 +5,7 @@ import {
   roleStoryBack,
   roleStoryCopy,
   roleStoryDescription,
+  roleStoryMetadata,
   roleStoryName,
   roleStorySectionKeys,
   roleStorySectionLabels,
@@ -30,7 +31,7 @@ for (const slug of roleStorySlugs) {
       const band = page.getByRole("region", { name: "Overview" });
       await expect(band.locator(".stretch-cs-open__number")).toHaveText(story.number);
       await expect(band).toContainText(story.role);
-      await expect(band).toContainText(story.metadata);
+      await expect(band).toContainText(roleStoryMetadata(story));
       await expect(band.getByRole("link", { name: "Work", exact: true })).toHaveAttribute("href", roleStoryBack.href);
       await expect(band.locator("img")).toHaveCount(0);
     });

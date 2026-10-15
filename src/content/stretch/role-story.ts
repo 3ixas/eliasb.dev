@@ -52,8 +52,10 @@ export type RoleStory = {
   role: string;
   /** The number on the opening, "01". */
   number: string;
-  /** "Risk division · London · Jul 2025 – now". */
-  metadata: string;
+  /** The years there, "Aug 2024 – Jun 2025": the band, and the Work row that opens this story. */
+  dates: string;
+  /** Where, when it is worth saying: "Risk division · London". */
+  setting?: string;
   /** The summary is also the page's description. */
   sections: Record<RoleStorySectionKey, StorySectionBody> & { summary: { paragraphs: readonly [string] } };
   /** At most four, shown under What changed. */
@@ -63,6 +65,9 @@ export type RoleStory = {
   /** The Role story that follows this one (newest to oldest), or null on the last. */
   next: RoleStorySlug | null;
 };
+
+/** The band's metadata line: the setting, then the dates. */
+export const roleStoryMetadata = ({ setting, dates }: RoleStory) => [setting, dates].filter(Boolean).join(" · ");
 
 /** "Software engineer at BNP Paribas": the page's name, which the title adds "· Elias Bennett" to. */
 export const roleStoryName = ({ role, employer }: RoleStory) => `${role} at ${employer}`;

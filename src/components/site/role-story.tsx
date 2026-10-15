@@ -15,6 +15,7 @@ import {
   roleStoryBack,
   roleStoryColours,
   roleStoryCopy,
+  roleStoryMetadata,
   roleStorySectionKeys,
   roleStorySectionLabels,
   type RoleStory,
@@ -52,7 +53,7 @@ export function RoleStoryPage({ story }: { story: RoleStory }) {
             lead={story.role}
             aside={null}
           >
-            <p className="stretch-mono stretch-cs-open__meta">{story.metadata}</p>
+            <p className="stretch-mono stretch-cs-open__meta">{roleStoryMetadata(story)}</p>
           </StoryOpening>
           <StorySectionLinks sections={roleStorySections} />
           <div className="stretch-cs-body stretch-wrap">

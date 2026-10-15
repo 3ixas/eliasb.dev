@@ -12,7 +12,7 @@ Approved by Elias on 8 October 2026 for [#113](https://github.com/3ixas/eliasb.d
 | Page title (others) | {Page} · Elias Bennett |
 | Meta description | I’m Elias, a software engineer in London. I build pricing and risk engines at BNP Paribas in C# and Java, and products of my own. |
 | Social image | ELIAS BENNETT · I build pricing and risk engines at BNP Paribas, and *products of my own.* |
-| Menu | Things I make · How I work · Where I’ve been · Off the clock · Say hello |
+| Menu | Work · Things I make · How I work · Off the clock · Say hello |
 | Header | Dark theme · Menu · Close · ← Work |
 | Clock | London {14:05} (read aloud as “The time in London: {14:05}”) |
 | Footer | Made by Elias |
@@ -33,6 +33,42 @@ Approved by Elias on 8 October 2026 for [#113](https://github.com/3ixas/eliasb.d
 - Buttons: See my work ↓ · Say hello
 
 The First glance changed for the forward-facing redesign ([#159](https://github.com/3ixas/eliasb.dev/issues/159), [#162](https://github.com/3ixas/eliasb.dev/issues/162), [#168](https://github.com/3ixas/eliasb.dev/issues/168)): the entrance is built around “*products of my own.*” landing.
+
+## Work
+
+The homepage section straight after the hero, led by employment ([#157](https://github.com/3ixas/eliasb.dev/issues/157), [#175](https://github.com/3ixas/eliasb.dev/issues/175)). Proof copy approved by Elias on 16 October 2026. Nothing here repeats the First glance’s wording.
+
+- Heading: Work
+
+### Now
+
+| Part | Copy |
+| --- | --- |
+| Role line | Software engineer · BNP Paribas CIB · Jul 2025 – now |
+| Proofs | I’m the team’s only C# engineer, so I own the C# side from planning through review. · I was nominated as an AI Champion, and the workflow I built is now used by several teams across the department. · With that workflow I integrated a pricer in a couple of days, a job that takes an experienced engineer about two weeks. |
+| Link | The BNP Paribas story → |
+
+### Where I’m headed
+
+- Heading: Where I’m headed
+- Line: At work, I’m learning to build systems that hold up. On my own products, I’m learning what’s worth building. I want to be genuinely good at both.
+
+| Strand | Proof | Link |
+| --- | --- | --- |
+| Systems that hold up. | I shipped a change to live pricing behind a flag, switched off by default, with an end-to-end test nobody asked for. | The BNP Paribas story → |
+| Deciding what’s worth building. | Before I built Threshold, I wrote 57 user stories and what was out of scope. | Things I make ↓ |
+| Building with AI, and bringing people with me. | I built a phase-gated workflow, from grilling the problem to a health review, and showed it to teams across the department. Several now use it. | The BNP Paribas story → |
+
+### How I got here
+
+- Heading: How I got here
+- Note: History, then marketing, then code. Each move was towards the work I liked most.
+
+| Dates | Role and organisation | Note |
+| --- | --- | --- |
+| Aug 2024 – Jun 2025 | Full stack software engineer · Joveen | Cut page load by 40% and deploys from 10 minutes to under 2. |
+| Sep 2021 – Aug 2024 | Marketing executive · Optegra Eye Healthcare & Kensington Medical | Raised the Core Web Vitals pass rate from 62% to 88%. |
+| Before 2021 | History at uni | Because I loved it, and I still do. |
 
 ## Things I make
 
@@ -73,18 +109,6 @@ The homepage section for my own projects ([#157](https://github.com/3ixas/eliasb
 | **Measure whether it works.** | I learned this in marketing, running split tests and conversion dashboards. At BNP Paribas I co-built a dashboard from users’ requirements that cut a 30–40 minute data load to under 5. |
 
 - PRD card caption: Threshold’s PRD, 16 April 2026
-
-## Where I’ve been
-
-- Heading: Where I’ve been
-- Note: History, then marketing, then code.
-
-| Dates | Role and organisation | Notes and milestones |
-| --- | --- | --- |
-| Before 2021 | History at uni | Because I loved it, and I still do. |
-| Sep 2021 – Aug 2024 | Marketing Executive · Optegra Eye Healthcare & Kensington Medical | The best part was working with the engineers who built our website. · The click: a friend loved his work so much that even a hectic week sounded exciting. I wanted that from mine. *Early 2024* · Started coding in my spare time, just to see. *Early 2024* |
-| Aug 2024 – Jun 2025 | Full Stack Software Engineer · Joveen | Built and improved an e-commerce site across React, Java/Spring Boot and MySQL: refactoring components, lazy-loading assets and optimising database queries. · Implemented API endpoints, validation and tests, and fixed mobile layout and functionality issues with cross-browser testing. |
-| Jul 2025 – now | Software Engineer · BNP Paribas CIB | High-performance computing for pricing and risk systems. I build and ship C# equity and commodity market-data loaders, combining and validating data for pricing and risk simulations. · I integrate pricing code with quantitative developers and enable the same NUnit tests to run across CPU and GPU environments. As the team’s sole C# engineer, I own implementation and delivery. ◆ Won the Early Careers digitisation competition. *Nov 2025* ◆ Take Ownership award. *Q1 2026* ◆ Nominated as an AI Champion in the risk division. *Spring 2026* |
 
 ## Off the clock
 

@@ -3,6 +3,7 @@ status: accepted
 date: 2026-10-08
 supersedes: 0003-one-page-personal-surface.md (section list, navigation, Library label, About section)
 amends: 0004-motion-library-and-token-styling.md (first-paint constraint)
+amended: 2026-10-15 (#157, #175): Work leads the homepage and replaces Where I've been and the Career ruler; see "Amended in October 2026" below
 ---
 
 # Rebuild the front end in the Stretch direction
@@ -16,6 +17,14 @@ The site's front end is rebuilt from scratch in the **Stretch direction**: a cle
 - **The About section.** It is replaced by **Where I've been**, a vertical **Career ruler** with one-line notes. There is no long biography.
 - **Compatibility routes.** `/about` redirects permanently to `/#where-ive-been`; `/lab` and `/library` redirect permanently to `/#off-the-clock`.
 - **Removed content.** Fantasy football, the Spotify playlist and the London photo leave the page. Their integration modules are deleted, so no unused secret or refresh remains.
+
+## Amended in October 2026 (#157, #175)
+
+The forward-facing redesign changed three of the decisions above. The text above is kept as the record of what was decided on 8 October; this section is what holds now.
+
+- **Section list.** The homepage runs Hero, **Work**, Things I make, How I work, Off the clock and Say hello. Work leads with employment (Now, Where I'm headed, How I got here). The anchors are `#work`, `#things-i-make`, `#how-i-work`, `#off-the-clock` and `#say-hello`.
+- **Where I've been and the Career ruler are gone.** How I got here replaces them: earlier roles as rows, newest first, each linking to its Role story at `/work/[employer]`, with History as a row that has none.
+- **Compatibility routes.** `/about` redirects permanently to `/#work`; `/lab` and `/library` still redirect to `/#off-the-clock`. The projects moved from `/work` to `/things-i-make`, with `/work/[employer]` now holding the Role stories.
 
 ## What stays from ADR 0003
 

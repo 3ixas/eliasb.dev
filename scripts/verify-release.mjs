@@ -4,7 +4,7 @@ import process from "node:process";
 import { setTimeout as delay } from "node:timers/promises";
 
 const compatibilityRedirects = new Map([
-  ["/about", "/#where-ive-been"],
+  ["/about", "/#work"],
   ["/library", "/#off-the-clock"],
   ["/lab", "/#off-the-clock"],
 ]);
@@ -65,7 +65,7 @@ const expectedIndexableRobots = [
   ["host: https://www.eliasb.dev", "sitemap: https://www.eliasb.dev/sitemap.xml"],
 ];
 
-const requiredHomepageSections = ["things-i-make", "how-i-work", "where-ive-been", "off-the-clock", "say-hello"];
+const requiredHomepageSections = ["work", "things-i-make", "how-i-work", "off-the-clock", "say-hello"];
 const failures = [];
 let checkCount = 0;
 
@@ -210,9 +210,9 @@ function verifyHomepage(markup) {
 
   const nav = markup.match(/<nav aria-label="Primary navigation"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] ?? "";
   const navHrefs = hrefs(nav).map(({ href }) => href);
-  equal(navHrefs.join("|"), "#things-i-make|#how-i-work|#where-ive-been|#off-the-clock|#say-hello", "Homepage primary navigation targets");
+  equal(navHrefs.join("|"), "#work|#things-i-make|#how-i-work|#off-the-clock|#say-hello", "Homepage primary navigation targets");
   const navLabels = [...nav.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/gi)].map(([, content]) => plainText(content));
-  equal(navLabels.join("|"), "Things I make|How I work|Where I’ve been|Off the clock|Say hello", "Homepage primary navigation labels");
+  equal(navLabels.join("|"), "Work|Things I make|How I work|Off the clock|Say hello", "Homepage primary navigation labels");
 
   const pageIds = ids(markup);
   for (const sectionId of requiredHomepageSections) {
@@ -225,6 +225,13 @@ function verifyHomepage(markup) {
   for (const { href } of hrefs(markup).filter(({ href }) => href?.startsWith("#"))) {
     check(pageIds.has(href.slice(1)), `Homepage anchor ${href} should resolve to an element`);
   }
+
+  // Work leads, and links into every Role story; the retired anchor is gone.
+  check(!markup.includes("where-ive-been"), "Homepage should not mention the retired #where-ive-been anchor");
+  for (const story of ["bnp-paribas", "joveen", "optegra"]) {
+    check(markup.includes(`href="/work/${story}"`), `Homepage Work should link to the ${story} Role story`);
+  }
+  check(markup.indexOf('id="work"') < markup.indexOf('id="things-i-make"'), "Work should come before Things I make");
 
   const text = plainText(markup);
   check(text.includes("Off the clock") && text.includes("Now making"), "Homepage should show Off the clock with Now making");

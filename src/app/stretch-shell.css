@@ -1851,115 +1851,166 @@ button.stretch-gh__day[data-selected] {
   }
 }
 
-/* ---- Where I've been: the career ruler ---- */
+/* ---- Work: Now, Where I'm headed and How I got here ---- */
 
-.stretch-ruler {
+.stretch-work {
   display: grid;
-  gap: 32px;
-  margin: 40px 0 0;
-  padding: 0;
-  list-style: none;
+  gap: 56px;
+  margin-top: 40px;
 }
 
-.stretch-stage {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  row-gap: 6px;
-  padding-left: 28px;
-  border-left: 2px solid var(--stretch-rule);
+.stretch-work__h3 {
+  margin: 0 0 12px;
+  font-size: clamp(28px, 3.4vw, 40px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
-/* The node on the ruler. */
-.stretch-stage::before {
-  content: "";
-  position: absolute;
-  top: 4px;
-  left: -7px;
-  width: 12px;
-  height: 12px;
-  border: 2px solid var(--stretch-ink);
-  border-radius: 50%;
-  background-color: var(--stretch-page);
-}
-
-.stretch-stage[data-current="true"] {
-  border-left-color: var(--stretch-cobalt);
-}
-
-.stretch-stage[data-current="true"]::before {
-  border-color: var(--stretch-cobalt);
-  background-color: var(--stretch-cobalt);
-}
-
-.stretch-stage__dates {
-  margin: 0;
+.stretch-work__role,
+.stretch-work__note {
+  margin: 0 0 20px;
   color: var(--stretch-muted);
   font-size: 13px;
   line-height: 1.4;
 }
 
-.stretch-stage[data-current="true"] .stretch-stage__dates,
-.stretch-stage[data-current="true"] .stretch-stage__role {
-  color: var(--stretch-cobalt);
-}
-
-.stretch-stage__role {
+.stretch-work__proofs,
+.stretch-work__strands {
+  display: grid;
+  gap: 14px;
   margin: 0;
-  font-size: clamp(22px, 3vw, 30px);
-  font-weight: 700;
-  line-height: 1.15;
-}
-
-.stretch-stage__org {
-  margin: 4px 0 0;
-  font-size: 17px;
-  line-height: 1.4;
-}
-
-.stretch-stage__notes,
-.stretch-stage__milestones {
-  max-width: 60ch;
-  margin: 12px 0 0;
   padding: 0;
   list-style: none;
-  font-size: 17px;
+}
+
+.stretch-work__proofs {
+  max-width: 40em;
+}
+
+.stretch-work__proofs li {
+  font-size: 19px;
   line-height: 1.5;
 }
 
-.stretch-stage__notes li + li {
-  margin-top: 8px;
+.stretch-work__line {
+  max-width: 34em;
+  margin: 0 0 28px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
 }
 
-.stretch-stage__when {
+.stretch-work__strands {
+  gap: 32px;
+}
+
+.stretch-work__strand {
+  margin: 0 0 6px;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.stretch-work__proof {
+  margin: 0 0 8px;
+  color: var(--stretch-muted);
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.stretch-work__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--stretch-ink);
+  font-size: 14px;
+  text-underline-offset: 4px;
+}
+
+.stretch-work__link:is(:hover, :focus-visible) {
+  color: var(--stretch-cobalt);
+}
+
+/* How I got here: the Project index's rows, with the dates where its numbers are. */
+.stretch-work__rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--stretch-rule);
+}
+
+.stretch-work__row {
+  border-bottom: 1px solid var(--stretch-rule);
+}
+
+.stretch-work__row-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 24px;
+  grid-template-areas:
+    "dates dates"
+    "text arrow"
+    "org org";
+  align-items: baseline;
+  gap: 4px 16px;
+  min-height: 44px;
+  padding: 20px 0;
+  color: var(--stretch-ink);
+  text-decoration: none;
+}
+
+.stretch-work__dates {
+  grid-area: dates;
   color: var(--stretch-muted);
   font-size: 13px;
-  white-space: nowrap;
 }
 
-.stretch-milestone {
-  display: flex;
-  gap: 10px;
-  align-items: baseline;
-  margin-top: 8px;
+.stretch-work__text {
+  grid-area: text;
+  display: grid;
+  gap: 4px;
+  min-width: 0;
 }
 
-.stretch-milestone__mark {
-  flex: none;
-  width: 8px;
-  height: 8px;
-  background-color: var(--stretch-cobalt);
-  transform: translateY(-1px) rotate(45deg);
+.stretch-work__name {
+  font-size: clamp(24px, 2.6vw, 32px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.stretch-work__outcome {
+  color: var(--stretch-muted);
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+.stretch-work__org {
+  grid-area: org;
+  color: var(--stretch-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.stretch-work__arrow {
+  grid-area: arrow;
+  font-size: 22px;
+  line-height: 1;
+}
+
+a.stretch-work__row-link:is(:hover, :focus-visible) :is(.stretch-work__name, .stretch-work__arrow) {
+  color: var(--stretch-cobalt);
 }
 
 @media (min-width: 761px) {
-  .stretch-stage {
-    grid-template-columns: 200px minmax(0, 1fr);
-    column-gap: 32px;
+  .stretch-work__strands {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .stretch-stage__dates {
-    padding-top: 2px;
+  .stretch-work__row-link {
+    grid-template-columns: 168px minmax(0, 1fr) minmax(0, 15em) 24px;
+    grid-template-areas: "dates text org arrow";
   }
 }
 

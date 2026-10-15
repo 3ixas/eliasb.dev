@@ -1,0 +1,102 @@
+/*
+ * Work, the homepage section straight after the hero (see Work in GLOSSARY.md):
+ * Now, Where I'm headed and How I got here. Copy is from
+ * docs/content/redesign-copy.md ("Work"), approved by Elias; scripts/verify-copy.mjs
+ * checks it. BNP Paribas detail stays at CV level: no colleague names, internal
+ * system names or review context.
+ *
+ * Its runtime imports carry a .ts extension, so Node can load it directly as well as Next.
+ */
+import { roleStories } from "./role-stories.ts";
+import type { RoleStorySlug } from "./role-story";
+
+/**
+ * Where a link in Work leads: a Role story, named by its slug so the label and
+ * the route come from the story and cannot disagree, or a section of the
+ * homepage, with the label it needs.
+ */
+export type WorkLink = { story: RoleStorySlug } | { section: string; label: string };
+
+/** A link as it is shown. */
+export type ShownLink = { label: string; href: string };
+
+export function shownLink(link: WorkLink): ShownLink {
+  if ("story" in link) return { label: `The ${roleStories[link.story].employer} story →`, href: `/work/${link.story}` };
+  return { label: link.label, href: `#${link.section}` };
+}
+
+/** A line of "Where I'm headed": the strand, one proof, and where it leads. */
+export type HeadedStrand = { title: string; proof: string; link: WorkLink };
+
+/**
+ * A row of "How I got here". A row that opens a Role story names it and keeps
+ * only its own note: the dates, role and employer come from the story, so the
+ * row cannot say one thing while linking to another. History has no story, so
+ * it carries its own.
+ */
+export type GotHereRow =
+  | { story: RoleStorySlug; note: string }
+  | { story: null; dates: string; role: string; note: string };
+
+/** A row as it is shown. */
+export type ShownRow = { story: RoleStorySlug | null; dates: string; role: string; organisation?: string; note: string };
+
+export function shownRow(row: GotHereRow): ShownRow {
+  if (row.story === null) return row;
+  const { dates, role, employer } = roleStories[row.story];
+  return { story: row.story, dates, role, organisation: employer, note: row.note };
+}
+
+/** Now as it is shown: the role and dates are the Role story's, and so is the route its link opens. */
+export function shownNow() {
+  const { story, organisation } = work.now;
+  const { role, dates } = roleStories[story];
+  return { role, organisation, dates, link: shownLink({ story }) };
+}
+
+export const work = {
+  heading: "Work",
+  now: {
+    heading: "Now",
+    /** The Role story Now is about: its role and dates, and the route of its link, come from there. */
+    story: "bnp-paribas",
+    /** How Now names the employer, as the First glance does; the story's own name is "BNP Paribas". */
+    organisation: "BNP Paribas CIB",
+    proofs: [
+      "I’m the team’s only C# engineer, so I own the C# side from planning through review.",
+      "I was nominated as an AI Champion, and the workflow I built is now used by several teams across the department.",
+      "With that workflow I integrated a pricer in a couple of days, a job that takes an experienced engineer about two weeks.",
+    ],
+  },
+  headed: {
+    heading: "Where I’m headed",
+    line: "At work, I’m learning to build systems that hold up. On my own products, I’m learning what’s worth building. I want to be genuinely good at both.",
+    strands: [
+      {
+        title: "Systems that hold up.",
+        proof: "I shipped a change to live pricing behind a flag, switched off by default, with an end-to-end test nobody asked for.",
+        link: { story: "bnp-paribas" },
+      },
+      {
+        title: "Deciding what’s worth building.",
+        proof: "Before I built Threshold, I wrote 57 user stories and what was out of scope.",
+        link: { section: "things-i-make", label: "Things I make ↓" },
+      },
+      {
+        title: "Building with AI, and bringing people with me.",
+        proof: "I built a phase-gated workflow, from grilling the problem to a health review, and showed it to teams across the department. Several now use it.",
+        link: { story: "bnp-paribas" },
+      },
+    ] satisfies readonly HeadedStrand[],
+  },
+  gotHere: {
+    heading: "How I got here",
+    note: "History, then marketing, then code. Each move was towards the work I liked most.",
+    /** Newest first. */
+    rows: [
+      { story: "joveen", note: "Cut page load by 40% and deploys from 10 minutes to under 2." },
+      { story: "optegra", note: "Raised the Core Web Vitals pass rate from 62% to 88%." },
+      { story: null, dates: "Before 2021", role: "History at uni", note: "Because I loved it, and I still do." },
+    ] satisfies readonly GotHereRow[],
+  },
+} as const;
