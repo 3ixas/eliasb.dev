@@ -285,6 +285,7 @@ async function verifyRoutes(baseUrl, pages) {
     pages.set(route, page);
     equal(page.response.status, 200, `${route} should render successfully`);
     verifyPageShell(page.markup, route);
+    if (route === "/") check(!(page.response.headers.get("content-security-policy") ?? "").includes("unsafe-eval"), "Production must not allow 'unsafe-eval' in its Content-Security-Policy");
     if (route === "/") await verifyHomeSocialMetadata(baseUrl, page.document);
     if (route.startsWith("/things-i-make")) await verifyWorkSocialMetadata(baseUrl, page.document, route);
     if (route.startsWith("/work/")) await verifyRoleStorySocialMetadata(baseUrl, page.document, route);

@@ -18,8 +18,14 @@ const movedProjectPaths = [
   ...legacyCaseStudySlugs.map((slug) => ({ source: `/work/${slug}`, destination: `/things-i-make/${slug}` })),
 ];
 
+// React's development build rebuilds call stacks with eval(). Without this the
+// dev server logs a console error on every page, and Next's dev badge becomes a
+// red "Issues" pill that floats over page controls and fails the contrast specs.
+// Production never allows eval: scripts/verify-release.mjs checks the header.
+const devScriptEval = process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
+
 const securityHeaders = [
-  { key: "Content-Security-Policy", value: "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://i.gr-assets.com https://a.ltrbxd.com; font-src 'self' data:; connect-src 'self'; frame-src 'none'; media-src 'self';" },
+  { key: "Content-Security-Policy", value: `default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'${devScriptEval}; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://i.gr-assets.com https://a.ltrbxd.com; font-src 'self' data:; connect-src 'self'; frame-src 'none'; media-src 'self';` },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
@@ -27,6 +33,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // The dev badge is a tab stop and floats over page controls, so the focus and
+  // contrast specs would measure it instead of the page. Errors still show.
+  devIndicators: false,
   poweredByHeader: false,
   images: {
     remotePatterns: [

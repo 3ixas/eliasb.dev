@@ -16,6 +16,14 @@ A pull request merges into `main` only when the main ruleset is satisfied: `qual
 2. Never write `@codex` in a thread reply, even in quotes or backticks. Codex treats it as a request and answers in the thread, usually "create an environment".
 3. Each round of fixes is a push, so it needs another `@codex review`. When later rounds only narrow edge cases that do not change what merges, decline them with a reason rather than adding logic.
 
+## Blocked with every check green
+
+`mergeStateStatus` can read `BLOCKED` when the required checks all show as passing. Two `codex-review` runs can start for the same head commit, and the workflow's `cancel-in-progress` cancels one. GitHub still counts the cancelled run as a failed required check, so the commit's rollup reads `FAILURE`.
+
+1. Confirm: `gh api graphql` on the pull request's last commit, reading `statusCheckRollup.contexts` with `isRequired(pullRequestNumber: N)`, shows a required `codex-review` that is `CANCELLED` beside a `SUCCESS`.
+2. Find the cancelled run with `gh run list --branch <branch> --json databaseId,name,conclusion,headSha` and re-run it with `gh run rerun <run-id> --failed`. Its gate passes at once because Codex's review of the head commit has already finished.
+3. Wait for `mergeStateStatus` to read `CLEAN`. Do not use `--admin`.
+
 ## Failing end-to-end shards
 
 Playwright runs with no retries, so a timing flake fails its shard.
@@ -27,3 +35,8 @@ Playwright runs with no retries, so a timing flake fails its shard.
 ## Requiring a new check
 
 The ruleset can require only a check that `main` already reports. Merge the workflow that adds the check first, then add it to the ruleset's `required_status_checks` with integration_id `15368` (GitHub Actions). Read the ruleset with `gh api repos/3ixas/eliasb.dev/rulesets/<id>` and PUT it back whole, so the other rules are kept.
+
+## After merging
+
+1. Squash-merge with `gh pr merge <number> --squash`, then delete the branch on the remote and locally.
+2. Check out `main` and pull with `--ff-only`. If local `main` has the same work as an unpushed commit (committed before branching), `git diff` it against the merged head first; only when the trees match, `git reset --hard origin/main`. Start from a feature branch next time so this does not arise.

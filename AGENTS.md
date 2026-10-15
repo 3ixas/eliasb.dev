@@ -10,6 +10,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 Before pushing to, re-running checks on, or merging a pull request, read `docs/runbooks/merging.md`.
 
+Before running Playwright, a verify script or a build locally, read `docs/runbooks/local-testing.md`.
+
 ## Code Review Rules
 
 ### Thermo-Nuclear Maintainability Review
