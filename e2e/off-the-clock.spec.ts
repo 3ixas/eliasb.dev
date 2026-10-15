@@ -217,14 +217,37 @@ test.describe("Off the clock: Now making", () => {
 
   const { nowMaking } = offTheClock;
 
-  test("shows the written entry with a cobalt mark and a Code link", async ({ page }) => {
+  test("shows a repository that is not a project by name and description, linked to GitHub", async ({ page }) => {
     const card = fixture(page, "making");
     await expect(card.getByRole("heading", { level: 3 })).toHaveText(nowMaking.label);
-    await expect(card.getByText(nowMaking.line)).toBeVisible();
-    await expect(card.getByText(nowMaking.note)).toBeVisible();
-    await expect(links(card)).toHaveText(nowMaking.code);
-    await expect(links(card)).toHaveAttribute("href", nowMaking.href);
+    await expect(card.getByText("eliasb.dev", { exact: true })).toBeVisible();
+    await expect(card.getByText("Personal site for Elias B.")).toBeVisible();
+    await expect(links(card)).toHaveText(nowMaking.link);
+    await expect(links(card)).toHaveAttribute("href", "https://github.com/3ixas/eliasb.dev");
     await expect(card.locator("[data-now-mark]")).toHaveCSS("background-color", await token(page, "--stretch-cobalt"));
+  });
+
+  test("with no description it shows the name alone", async ({ page }) => {
+    const card = fixture(page, "making-no-description");
+    await expect(card.getByText("eliasb.dev", { exact: true })).toBeVisible();
+    await expect(card.locator(".stretch-otc__by")).toHaveCount(0);
+    await expect(links(card)).toHaveAttribute("href", "https://github.com/3ixas/eliasb.dev");
+  });
+
+  test("a project with a case study shows the project's name, linked to the case study", async ({ page }) => {
+    const card = fixture(page, "making-project");
+    await expect(links(card)).toHaveCount(1);
+    await expect(links(card)).toHaveText("Threshold");
+    await expect(links(card)).toHaveAttribute("href", "/things-i-make/threshold");
+    await expect(links(card)).not.toHaveAttribute("target", /.+/);
+    await expect(card.getByText("A repository description")).toHaveCount(0);
+  });
+
+  test("a project without a case study shows the project's name, linked to GitHub", async ({ page }) => {
+    const card = fixture(page, "making-project-code");
+    await expect(card.getByText("Risk Event Tracker", { exact: true })).toBeVisible();
+    await expect(links(card)).toHaveText(nowMaking.link);
+    await expect(links(card)).toHaveAttribute("href", "https://github.com/3ixas/risk-event-tracker");
   });
 
   test("the mark pulses, and stops for reduced motion", async ({ page }) => {
@@ -235,16 +258,7 @@ test.describe("Off the clock: Now making", () => {
     await expect(mark).toHaveCSS("animation-name", "none");
   });
 
-  test("after eight weeks it falls back to the latest repository, without the mark", async ({ page }) => {
-    const card = fixture(page, "making-fallback");
-    await expect(card.getByRole("heading", { level: 3 })).toHaveText(nowMaking.fallback.label);
-    await expect(card.getByText(nowMaking.fallback.latest("ask-professor-past", "20 Sept"), { exact: true })).toBeVisible();
-    await expect(links(card)).toHaveText(nowMaking.fallback.link);
-    await expect(links(card)).toHaveAttribute("href", /github\.com\/3ixas\/ask-professor-past/);
-    await expect(card.locator("[data-now-mark]")).toHaveCount(0);
-  });
-
-  test("with no entry and no repository the card is gone", async ({ page }) => {
+  test("with no repository the card is gone", async ({ page }) => {
     await expect(fixture(page, "making-none").locator("[data-otc]")).toHaveCount(0);
   });
 });

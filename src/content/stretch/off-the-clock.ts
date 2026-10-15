@@ -58,18 +58,8 @@ export const offTheClock = {
   },
   nowMaking: {
     label: "Now making",
-    line: "Rebuilding Professor Past from scratch.",
-    note: "v1 is on GitHub if you want to meet the professor.",
-    code: "Code ↗",
-    href: "https://github.com/3ixas/ask-professor-past",
-    /** The entry counts as "now" for 8 weeks from the day it was written (Elias, 3 October 2026). */
-    writtenOn: "2026-10-03",
-    currentDays: 56,
-    fallback: {
-      label: "Latest on GitHub",
-      latest: (repo: string, updated: string) => `${repo}, updated ${updated}`,
-      link: "View on GitHub ↗",
-    },
+    /** For a repository that is not a project with a case study. */
+    link: "View on GitHub ↗",
   },
   github: {
     /** Heard by screen readers only; the visible card leads with the total. */
@@ -87,14 +77,21 @@ export const offTheClock = {
   },
 } as const;
 
-export type NowMakingNote =
-  | { kind: "authored" }
-  | { kind: "latest"; repository: { name: string; href: string; pushedAt: string } };
+/** What Now making shows: a name, GitHub's description of it, and where it links. */
+export type NowMakingEntry = { name: string; description: string | null; href: string; internal: boolean };
 
-/** What Now making shows: the written entry while it counts as now, else the latest public repository, else nothing. */
-export function nowMakingNote(now: Date, latest: { name: string; href: string; pushedAt: string } | null): NowMakingNote | null {
-  const { writtenOn, currentDays } = offTheClock.nowMaking;
-  const expires = new Date(`${writtenOn}T00:00:00Z`).getTime() + currentDays * 86_400_000;
-  if (now.getTime() < expires) return { kind: "authored" };
-  return latest ? { kind: "latest", repository: latest } : null;
+/**
+ * The latest public repository as the card shows it. A repository that is one
+ * of my projects takes the project's name and, when it has one, links to its
+ * case study; any other keeps its own name and description and links to GitHub.
+ */
+export function nowMakingEntry(
+  latest: { name: string; description: string | null; href: string } | null,
+  projects: readonly { name: string; links: { caseStudy?: string; code?: string } }[],
+): NowMakingEntry | null {
+  if (!latest) return null;
+  const project = projects.find(({ links }) => links.code?.toLowerCase() === latest.href.toLowerCase());
+  if (!project) return { name: latest.name, description: latest.description, href: latest.href, internal: false };
+  const caseStudy = project.links.caseStudy;
+  return { name: project.name, description: null, href: caseStudy ?? latest.href, internal: Boolean(caseStudy) };
 }

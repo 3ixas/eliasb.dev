@@ -22,7 +22,7 @@ export type GitHubRepository = {
   pushedAt: string;
 };
 
-/** My latest public repository, for the Making pin's fallback. */
+/** My latest public repository, for Now making. */
 export type LatestRepositorySignal = {
   state: SignalState;
   repository: GitHubRepository | null;

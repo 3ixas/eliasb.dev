@@ -57,7 +57,7 @@ The homepage section for Elias's own time: his training week, what he is reading
 _Avoid_: Library, Personal signals, Board
 
 **Now making**:
-The **Off the clock** item showing the project Elias is building in his own time, in one line. It replaces the **Making pin**.
+The **Off the clock** item that follows Elias's latest pushed public GitHub repository (not forks, archives, the profile repository or `personal-portfolio-v1`), refreshed with the page and cached for six hours. A repository that is one of his projects shows the project's name and links to its case study; any other shows its name and GitHub description and links to GitHub. Hidden when GitHub can't be reached. It replaces the **Making pin**.
 _Avoid_: Experiments, Lab
 
 **Fastener**:
@@ -155,5 +155,5 @@ A focused interactive component inside an otherwise pre-rendered page, used for 
 _Avoid_: Making an entire page client-rendered for one interaction
 
 **Authored content**:
-Project stories, the **Now making** entry, the training week, status, and other material Elias maintains directly in version-controlled typed data.
+Project stories, the training week, status, and other material Elias maintains directly in version-controlled typed data.
 _Avoid_: CMS content
