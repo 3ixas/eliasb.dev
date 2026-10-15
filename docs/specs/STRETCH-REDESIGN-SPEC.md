@@ -14,7 +14,7 @@ A from-scratch front end in the **Stretch direction**, keeping the existing data
 
 - **Look:** a clean neutral page; Elias's **Cobalt accent** used large for his name, "today/now" and "Say hello"; each project in its own **Project colour**; Bricolage Grotesque condensed at display size with JetBrains Mono for metadata; one **Fastener** per physical-looking object.
 - **Homepage sections:** Hero, Work, Things I make, How I work, Off the clock, Say hello. Work leads with employment and replaced Where I've been and the Career ruler ([#157](https://github.com/3ixas/eliasb.dev/issues/157), [#175](https://github.com/3ixas/eliasb.dev/issues/175)).
-- **Work:** up to three hand-picked featured tiles, then a newest-first **Project index** that scales to any number of projects.
+- **Things I make:** up to three hand-picked featured tiles, then a newest-first **Project index** that scales to any number of projects.
 - **Case studies:** short and evidence-led.
 - **Signature entrance:** a Commissioner-style opening that plays on every load.
 - **Theme:** light and dark through the Eclipse, an icon-only sun or crescent moon.
@@ -34,7 +34,7 @@ A from-scratch front end in the **Stretch direction**, keeping the existing data
 9. As a visitor, I want to see Elias's name at display size in cobalt, his role "Software Engineer at BNP Paribas CIB" under it, his headline and his supporting line on the first screen, so that I know who he is straight away.
 10. As a visitor, I want *See my work* and *Say hello* in the hero, so that I can act immediately.
 
-**Visitors: Work**
+**Visitors: Things I make**
 11. As a hiring manager, I want up to three featured projects shown as large tiles in each project's own colours, so that I see the best work first.
 12. As a hiring manager, I want each featured tile to show its number, name, one-line outcome, type and year, so that I can choose one to open.
 13. As a hiring manager, I want every other project listed newest-first in a typographic index, so that I can see the breadth of the work.
@@ -85,8 +85,8 @@ A from-scratch front end in the **Stretch direction**, keeping the existing data
 48. As someone sharing a link, I want the social image to show Elias's name and headline in the new type, so that shares look like the site.
 
 **Elias: maintaining the site**
-49. As Elias, I want to choose the featured projects by editing one ordered list, so that curating Work stays deliberate.
-50. As Elias, I want to add a project by adding one catalogue entry (name, outcome, type, year, links, screenshot, colours), so that Work grows without design work.
+49. As Elias, I want to choose the featured projects by editing one ordered list, so that curating Things I make stays deliberate.
+50. As Elias, I want to add a project by adding one catalogue entry (name, outcome, type, year, links, screenshot, colours), so that Things I make grows without design work.
 51. As Elias, I want case-study content held as typed data in the new section structure, so that writing a case study is filling in fields.
 52. As Elias, I want all approved copy kept in the repository's content modules, so that copy changes are reviewable diffs.
 

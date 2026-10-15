@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { shownNow, shownRow, work, type ShownRow, type WorkLink } from "@/content/stretch/work";
+import { shownLink, shownNow, shownRow, work, type ShownLink, type ShownRow } from "@/content/stretch/work";
 
 /**
  * The body of the Work section (GLOSSARY.md): Now, Where I'm headed, and
@@ -36,7 +36,7 @@ export function Work() {
             <li key={strand.title}>
               <p className="stretch-work__strand">{strand.title}</p>
               <p className="stretch-work__proof">{strand.proof}</p>
-              <TextLink link={strand.link} />
+              <TextLink link={shownLink(strand.link)} />
             </li>
           ))}
         </ul>
@@ -67,7 +67,7 @@ export function Work() {
   );
 }
 
-function TextLink({ link }: { link: WorkLink }) {
+function TextLink({ link }: { link: ShownLink }) {
   return (
     <Link className="stretch-mono stretch-work__link" href={link.href}>
       {link.label}

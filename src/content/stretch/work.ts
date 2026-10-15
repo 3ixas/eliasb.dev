@@ -10,7 +10,20 @@
 import { roleStories } from "./role-stories.ts";
 import type { RoleStorySlug } from "./role-story";
 
-export type WorkLink = { label: string; href: string };
+/**
+ * Where a link in Work leads: a Role story, named by its slug so the label and
+ * the route come from the story and cannot disagree, or a section of the
+ * homepage, with the label it needs.
+ */
+export type WorkLink = { story: RoleStorySlug } | { section: string; label: string };
+
+/** A link as it is shown. */
+export type ShownLink = { label: string; href: string };
+
+export function shownLink(link: WorkLink): ShownLink {
+  if ("story" in link) return { label: `The ${roleStories[link.story].employer} story →`, href: `/work/${link.story}` };
+  return { label: link.label, href: `#${link.section}` };
+}
 
 /** A line of "Where I'm headed": the strand, one proof, and where it leads. */
 export type HeadedStrand = { title: string; proof: string; link: WorkLink };
@@ -36,9 +49,9 @@ export function shownRow(row: GotHereRow): ShownRow {
 
 /** Now as it is shown: the role and dates are the Role story's, and so is the route its link opens. */
 export function shownNow() {
-  const { story, organisation, linkLabel } = work.now;
+  const { story, organisation } = work.now;
   const { role, dates } = roleStories[story];
-  return { role, organisation, dates, link: { label: linkLabel, href: `/work/${story}` } satisfies WorkLink };
+  return { role, organisation, dates, link: shownLink({ story }) };
 }
 
 export const work = {
@@ -54,7 +67,6 @@ export const work = {
       "I was nominated as an AI Champion, and the workflow I built is now used by several teams across the department.",
       "With that workflow I integrated a pricer in a couple of days, a job that takes an experienced engineer about two weeks.",
     ],
-    linkLabel: "The BNP Paribas story →",
   },
   headed: {
     heading: "Where I’m headed",
@@ -63,17 +75,17 @@ export const work = {
       {
         title: "Systems that hold up.",
         proof: "I shipped a change to live pricing behind a flag, switched off by default, with an end-to-end test nobody asked for.",
-        link: { label: "The BNP Paribas story →", href: "/work/bnp-paribas" },
+        link: { story: "bnp-paribas" },
       },
       {
         title: "Deciding what’s worth building.",
         proof: "Before I built Threshold, I wrote 57 user stories and what was out of scope.",
-        link: { label: "Things I make ↓", href: "#things-i-make" },
+        link: { section: "things-i-make", label: "Things I make ↓" },
       },
       {
         title: "Building with AI, and bringing people with me.",
         proof: "I built a phase-gated workflow, from grilling the problem to a health review, and showed it to teams across the department. Several now use it.",
-        link: { label: "The BNP Paribas story →", href: "/work/bnp-paribas" },
+        link: { story: "bnp-paribas" },
       },
     ] satisfies readonly HeadedStrand[],
   },

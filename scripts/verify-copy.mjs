@@ -23,7 +23,7 @@ import {
 import { howIWork } from "../src/content/stretch/how-i-work.ts";
 import { offTheClock } from "../src/content/stretch/off-the-clock.ts";
 import { hero, notFound, sayHello, siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy.ts";
-import { shownNow, shownRow, work } from "../src/content/stretch/work.ts";
+import { shownLink, shownNow, shownRow, work } from "../src/content/stretch/work.ts";
 
 const raw = readFileSync(new URL("../docs/content/redesign-copy.md", import.meta.url), "utf8");
 // Emphasis stars and the {braces} around live values are markup, not words.
@@ -119,7 +119,7 @@ const headedCopy = copyFor("Where I’m headed");
 assert.equal(headed.heading, bullet(headedCopy, "Heading"), "Where I’m headed: heading");
 assert.equal(headed.line, bullet(headedCopy, "Line"), "Where I’m headed: line");
 assert.deepEqual(
-  headed.strands.map((strand) => [strand.title, strand.proof, strand.link.label]),
+  headed.strands.map((strand) => [strand.title, strand.proof, shownLink(strand.link).label]),
   rows(headedCopy, "### "),
   "Where I’m headed: strands",
 );
@@ -135,7 +135,7 @@ assert.deepEqual(
 assert.equal(work.heading, bullet(raw.slice(raw.indexOf("## Work\n")), "Heading"), "Work: heading");
 
 // Every link goes somewhere that exists: a Role story, or a section of the homepage. Rows run newest first.
-const links = [shown.link, ...headed.strands.map((strand) => strand.link)];
+const links = [shown.link, ...headed.strands.map((strand) => shownLink(strand.link))];
 for (const { href } of links) {
   assert.ok(href.startsWith("#") ? siteCopy.menu.some(({ id }) => `#${id}` === href) : roleStorySlugs.some((slug) => href === `/work/${slug}`), `Work links to "${href}", which does not exist`);
 }

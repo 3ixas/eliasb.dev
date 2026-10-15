@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { hero } from "../src/content/stretch/site-copy";
-import { shownNow, shownRow, work } from "../src/content/stretch/work";
+import { shownLink, shownNow, shownRow, work } from "../src/content/stretch/work";
 import { contrastOnPaper } from "./support/contrast";
 
 const section = (page: Page) => page.locator("section#work");
@@ -29,10 +29,11 @@ test.describe("Work", () => {
       const item = strands.nth(index);
       await expect(item.locator(".stretch-work__strand")).toHaveText(strand.title);
       await expect(item.locator(".stretch-work__proof")).toHaveText(strand.proof);
-      await expect(item.getByRole("link")).toHaveText(strand.link.label);
-      await expect(item.getByRole("link")).toHaveAttribute("href", strand.link.href);
+      const link = shownLink(strand.link);
+      await expect(item.getByRole("link")).toHaveText(link.label);
+      await expect(item.getByRole("link")).toHaveAttribute("href", link.href);
     }
-    expect(work.headed.strands.map((strand) => strand.link.href)).toEqual(["/work/bnp-paribas", "#things-i-make", "/work/bnp-paribas"]);
+    expect(work.headed.strands.map((strand) => shownLink(strand.link).href)).toEqual(["/work/bnp-paribas", "#things-i-make", "/work/bnp-paribas"]);
   });
 
   test("How I got here runs newest first: whole-row links to the Role stories, and History with no link", async ({ page }) => {
@@ -70,7 +71,7 @@ test.describe("Work", () => {
 
   test("the Things I make strand scrolls to that section", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await section(page).getByRole("link", { name: work.headed.strands[1].link.label }).click();
+    await section(page).getByRole("link", { name: shownLink(work.headed.strands[1].link).label }).click();
     await expect(page).toHaveURL(/#things-i-make$/);
     await expect(page.locator("#things-i-make h2")).toBeInViewport();
   });
