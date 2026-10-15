@@ -33,7 +33,7 @@ test.describe("The 404", () => {
 
 test.describe("Redirects from the old routes", () => {
   for (const [from, anchor] of [
-    ["/about", "#where-ive-been"],
+    ["/about", "#work"],
     ["/lab", "#off-the-clock"],
     ["/library", "#off-the-clock"],
   ] as const) {

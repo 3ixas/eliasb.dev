@@ -37,7 +37,7 @@ export function Hero() {
           {hero.support}
         </p>
         <div className="stretch-hero__actions" data-entrance="support">
-          <a className="stretch-button" href="#things-i-make">
+          <a className="stretch-button" href="#work">
             {hero.actions.work}
           </a>
           <a className="stretch-button stretch-button--primary" href="#say-hello">

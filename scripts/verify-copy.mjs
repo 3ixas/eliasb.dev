@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { PROJECT_CATEGORIES, projects, featuredSlugs } from "../src/content/projects.ts";
-import { careerLog } from "../src/content/stretch/career.ts";
 import { caseStudies } from "../src/content/stretch/case-studies.ts";
 import {
   caseStudyCopy,
@@ -10,7 +9,7 @@ import {
   caseStudySectionKeys,
   caseStudySectionLabels,
 } from "../src/content/stretch/case-study.ts";
-import { roleStories } from "../src/content/stretch/role-stories.ts";
+import { roleStories, roleStorySlugs } from "../src/content/stretch/role-stories.ts";
 import {
   roleStoryBack,
   roleStoryCopy,
@@ -23,6 +22,7 @@ import {
 import { howIWork } from "../src/content/stretch/how-i-work.ts";
 import { offTheClock } from "../src/content/stretch/off-the-clock.ts";
 import { hero, notFound, sayHello, siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy.ts";
+import { work } from "../src/content/stretch/work.ts";
 
 const raw = readFileSync(new URL("../docs/content/redesign-copy.md", import.meta.url), "utf8");
 // Emphasis stars and the {braces} around live values are markup, not words.
@@ -31,8 +31,8 @@ const plain = raw.replace(/\*/g, "").replace(/[{}]/g, "");
 // ---- Every string in the typed modules is in the approved copy ----------------------------
 
 const leaves = (value, path = "") => {
-  // Links, image paths, dates, anchors and category keys are addresses and data, not words, so the approved copy does not list them.
-  if (typeof value === "string") return /(href|src|writtenOn|\.id|\.category)$/.test(path) ? [] : [[path, value]];
+  // Links, image paths, dates, anchors, category keys and Role story slugs are addresses and data, not words, so the approved copy does not list them.
+  if (typeof value === "string") return /(href|src|writtenOn|\.id|\.category|\.story)$/.test(path) ? [] : [[path, value]];
   if (Array.isArray(value)) return value.flatMap((item, index) => leaves(item, `${path}[${index}]`));
   if (value && typeof value === "object") return Object.entries(value).flatMap(([key, item]) => leaves(item, `${path}.${key}`));
   return [];
@@ -45,7 +45,7 @@ const modules = {
   sayHello,
   workArchive,
   howIWork,
-  careerLog,
+  work,
   offTheClock,
   caseStudyCopy,
   caseStudySectionLabels,
@@ -96,25 +96,51 @@ assert.deepEqual(
   beats,
 );
 
-// The career log: dates, role and organisation, then notes and milestones.
-const stages = rows(raw, "## Where I’ve been");
-assert.equal(stages.length, careerLog.stages.length);
-careerLog.stages.forEach((stage, index) => {
-  const [dates, role, rest] = stages[index];
-  assert.equal(stage.dates, dates);
-  assert.equal(stage.organisation ? `${stage.role} · ${stage.organisation}` : stage.role, role);
-  const notes = stage.notes.map((note) => (note.when ? `${note.text} *${note.when}*` : note.text)).join(" · ");
-  const milestones = stage.milestones.map((milestone) => ` ◆ ${milestone.text} *${milestone.when}*`).join("");
-  assert.equal(notes + milestones, rest, `${dates}: notes and milestones`);
-});
-assert.deepEqual(careerLog.stages.map((stage) => stage.isCurrent), [false, false, false, true], "Only the BNP Paribas stage is current");
-
-// Case studies.
+// The approved copy under a `### name` heading, for the sections that follow.
 const copyFor = (name) => {
   const start = raw.indexOf(`### ${name}`);
   const end = raw.slice(start + 1).search(/\n##+ /);
   return raw.slice(start, end === -1 ? undefined : start + 1 + end);
 };
+
+// Work: Now, Where I'm headed and How I got here, word for word.
+const bullet = (text, label) => text.match(new RegExp(`^- ${label}: (.+)$`, "m"))?.[1];
+const { now, headed, gotHere } = work;
+
+const nowRows = Object.fromEntries(rows(copyFor("Now"), "### ").map(([part, copy]) => [part, copy]));
+assert.equal([now.role, now.organisation, now.dates].join(" · "), nowRows["Role line"], "Now: role line");
+assert.equal(now.proofs.join(" · "), nowRows.Proofs, "Now: proofs");
+assert.equal(now.link.label, nowRows.Link, "Now: link");
+
+const headedCopy = copyFor("Where I’m headed");
+assert.equal(headed.heading, bullet(headedCopy, "Heading"), "Where I’m headed: heading");
+assert.equal(headed.line, bullet(headedCopy, "Line"), "Where I’m headed: line");
+assert.deepEqual(
+  headed.strands.map((strand) => [strand.title, strand.proof, strand.link.label]),
+  rows(headedCopy, "### "),
+  "Where I’m headed: strands",
+);
+
+const gotHereCopy = copyFor("How I got here");
+assert.equal(gotHere.heading, bullet(gotHereCopy, "Heading"), "How I got here: heading");
+assert.equal(gotHere.note, bullet(gotHereCopy, "Note"), "How I got here: note");
+assert.deepEqual(
+  gotHere.rows.map((row) => [row.dates, row.organisation ? `${row.role} · ${row.organisation}` : row.role, row.note]),
+  rows(gotHereCopy, "### "),
+  "How I got here: rows",
+);
+assert.equal(work.heading, bullet(raw.slice(raw.indexOf("## Work\n")), "Heading"), "Work: heading");
+
+// Every link goes somewhere that exists: a Role story, or a section of the homepage. Rows run newest first.
+const links = [now.link, ...headed.strands.map((strand) => strand.link)];
+for (const { href } of links) {
+  assert.ok(href.startsWith("#") ? siteCopy.menu.some(({ id }) => `#${id}` === href) : roleStorySlugs.some((slug) => href === `/work/${slug}`), `Work links to "${href}", which does not exist`);
+}
+for (const row of gotHere.rows) assert.ok(row.story === null || roleStorySlugs.includes(row.story), `${row.dates} opens a Role story that does not exist`);
+assert.deepEqual(gotHere.rows.map((row) => row.story), ["joveen", "optegra", null], "How I got here runs newest first, and History has no story");
+assert.deepEqual(siteCopy.menu.map(({ id }) => id), ["work", "things-i-make", "how-i-work", "off-the-clock", "say-hello"], "The menu follows the page");
+
+// Case studies.
 const names = { threshold: "Threshold", "argus-risk": "Argus Risk", flowtime: "Flowtime" };
 const studies = Object.values(caseStudies);
 

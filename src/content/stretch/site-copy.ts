@@ -24,9 +24,9 @@ export const siteCopy = {
   },
   /** The homepage's anchored sections after the hero, in order: each section's anchor with its label. */
   menu: [
+    { id: "work", label: "Work" },
     { id: "things-i-make", label: "Things I make" },
     { id: "how-i-work", label: "How I work" },
-    { id: "where-ive-been", label: "Where I’ve been" },
     { id: "off-the-clock", label: "Off the clock" },
     { id: "say-hello", label: "Say hello" },
   ],
