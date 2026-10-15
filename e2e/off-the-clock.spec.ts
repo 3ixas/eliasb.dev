@@ -240,6 +240,14 @@ test.describe("Off the clock: Now making", () => {
     await expect(links(card)).toHaveText("Threshold");
     await expect(links(card)).toHaveAttribute("href", "/things-i-make/threshold");
     await expect(links(card)).not.toHaveAttribute("target", /.+/);
+    // The name keeps the card's name type rather than the small uppercase link type.
+    const [linkSize, nameSize, linkTransform] = await Promise.all([
+      links(card).evaluate((element) => getComputedStyle(element).fontSize),
+      card.locator(".stretch-otc__name").evaluate((element) => getComputedStyle(element).fontSize),
+      links(card).evaluate((element) => getComputedStyle(element).textTransform),
+    ]);
+    expect(linkSize).toBe(nameSize);
+    expect(linkTransform).toBe("none");
     await expect(card.getByText("A repository description")).toHaveCount(0);
   });
 

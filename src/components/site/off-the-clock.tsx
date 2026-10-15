@@ -225,7 +225,7 @@ export function NowMakingCard({ latest }: { latest: LatestRepositorySignal }) {
       </h3>
       <p className="stretch-otc__name">
         {entry.internal ? (
-          <Link className="stretch-link" href={entry.href}>
+          <Link className="stretch-otc__name-link" href={entry.href}>
             {entry.name}
           </Link>
         ) : (
