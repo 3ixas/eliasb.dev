@@ -234,7 +234,9 @@ function verifyHomepage(markup) {
   check(markup.indexOf('id="work"') < markup.indexOf('id="things-i-make"'), "Work should come before Things I make");
 
   const text = plainText(markup);
-  check(text.includes("Off the clock") && text.includes("Now making"), "Homepage should show Off the clock with Now making");
+  // Now making follows my latest GitHub repository and is hidden when GitHub can't be reached,
+  // so the release check cannot depend on it; its states are covered by the Off the clock fixtures.
+  check(text.includes("Off the clock"), "Homepage should show Off the clock");
 
   // Say hello: the email is the big link; the résumé, GitHub and LinkedIn follow, in that order.
   const helloStart = markup.indexOf('id="say-hello"');
