@@ -4,13 +4,17 @@ import {
   StoryEvidence,
   StoryOpening,
   StorySection,
+  StoryNext,
   StorySectionLinks,
   storyColours,
 } from "@/components/site/story";
 import { SubpageHeader } from "@/components/site/subpage-header";
+import { roleStories } from "@/content/stretch/role-stories";
 import {
+  hasLongEmployer,
   roleStoryBack,
   roleStoryColours,
+  roleStoryCopy,
   roleStorySectionKeys,
   roleStorySectionLabels,
   type RoleStory,
@@ -21,8 +25,9 @@ import { siteCopy } from "@/content/stretch/site-copy";
  * A Role story (GLOSSARY.md): the same shape as a case study, for an employer.
  * An opening band in the employer's colour, the row of section links, a neutral
  * reading column with the six sections in their fixed order, and the evidence
- * strip under What changed. It has no entrance, the server renders all of it,
- * and the only cobalt on the page is the focus ring and selection.
+ * strip under What changed, and it ends on the Next role tile or, on the last
+ * story, "← Work". It has no entrance, the server renders all of it, and the
+ * only cobalt on the page is the focus ring and selection.
  */
 export function RoleStoryPage({ story }: { story: RoleStory }) {
   const colours = roleStoryColours(story.colours);
@@ -43,6 +48,7 @@ export function RoleStoryPage({ story }: { story: RoleStory }) {
             number={story.number}
             titleId="role-story-title"
             name={story.employer}
+            nameClassName={hasLongEmployer(story) ? "stretch-role-name--long" : undefined}
             lead={story.role}
             aside={null}
           >
@@ -61,11 +67,15 @@ export function RoleStoryPage({ story }: { story: RoleStory }) {
             ))}
           </div>
         </article>
-        <nav className="stretch-wrap stretch-role-end" aria-label="More">
-          <Link className="stretch-cs-back" href={roleStoryBack.href}>
-            <Arrowed label={roleStoryBack.label} />
-          </Link>
-        </nav>
+        {story.next ? (
+          <NextRole next={roleStories[story.next]} />
+        ) : (
+          <nav className="stretch-wrap stretch-role-end" aria-label="More">
+            <Link className="stretch-cs-back" href={roleStoryBack.href}>
+              <Arrowed label={roleStoryBack.label} />
+            </Link>
+          </nav>
+        )}
       </main>
 
       <footer className="stretch-wrap stretch-footer">
@@ -76,3 +86,16 @@ export function RoleStoryPage({ story }: { story: RoleStory }) {
 }
 
 const roleStorySections = roleStorySectionKeys.map((key) => ({ key, label: roleStorySectionLabels[key] }));
+
+function NextRole({ next }: { next: RoleStory }) {
+  return (
+    <StoryNext
+      label={roleStoryCopy.nextRole}
+      href={`/work/${next.slug}`}
+      colours={roleStoryColours(next.colours)}
+      number={next.number}
+      name={next.employer}
+      outcome={next.role}
+    />
+  );
+}

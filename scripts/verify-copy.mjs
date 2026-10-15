@@ -13,6 +13,7 @@ import {
 import { roleStories } from "../src/content/stretch/role-stories.ts";
 import {
   roleStoryBack,
+  roleStoryCopy,
   roleStoryDescription,
   roleStoryName,
   roleStoryProblems,
@@ -49,6 +50,7 @@ const modules = {
   caseStudyCopy,
   caseStudySectionLabels,
   roleStoryBack,
+  roleStoryCopy,
   roleStorySectionLabels,
 };
 for (const [name, module] of Object.entries(modules)) {
@@ -187,10 +189,14 @@ assert.match(
 assert.throws(() => caseStudyOpening({ ...threshold, slug: "home-secretary" }, projects), /needs its project's screenshot and colours/);
 
 assert.deepEqual(roleStoryProblems(roles), []);
-const [bnp] = roles;
-assert.match(roleStoryProblems([{ ...bnp, evidence: [...bnp.evidence, bnp.evidence[0]] }])[0], /more than 4 evidence/);
-assert.match(roleStoryProblems([{ ...bnp, next: "bnp-paribas" }])[0], /different Role story or none/);
-assert.match(roleStoryProblems([{ ...bnp, sections: { ...bnp.sections, decisions: {} } }])[0], /empty "decisions" section/);
+assert.deepEqual(roles.map((story) => story.slug), ["bnp-paribas", "joveen", "optegra"], "Role stories run newest to oldest");
+assert.deepEqual(roles.map((story) => story.next), ["joveen", "optegra", null], "Next role follows the order, and Optegra ends on ← Work");
+assert.deepEqual(roles.map((story) => story.number), ["01", "02", "03"]);
+const [bnp, ...rest] = roles;
+assert.match(roleStoryProblems([{ ...bnp, evidence: [...bnp.evidence, bnp.evidence[0]] }, ...rest])[0], /more than 4 evidence/);
+assert.match(roleStoryProblems([{ ...bnp, next: "bnp-paribas" }, ...rest])[0], /different Role story or none/);
+assert.match(roleStoryProblems([{ ...bnp, next: "ghost" }, ...rest])[0], /different Role story or none/);
+assert.match(roleStoryProblems([{ ...bnp, sections: { ...bnp.sections, decisions: {} } }, ...rest])[0], /empty "decisions" section/);
 
 // Each entry owns its pairing, so reordering the copy cannot redirect a link or a filter.
 assert.deepEqual(workArchive.filters.map(({ category }) => category), [null, ...PROJECT_CATEGORIES], "the filters are All, then every category once, in the catalogue's order");

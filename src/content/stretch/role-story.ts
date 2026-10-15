@@ -13,7 +13,7 @@ import {
   type StorySectionBody,
 } from "./story.ts";
 
-/** Every employer that gets a Role story. Joveen and Optegra arrive with #174. */
+/** Every employer that gets a Role story. */
 export type RoleStorySlug = "bnp-paribas" | "joveen" | "optegra";
 
 /** The six sections, in the order they are read. */
@@ -38,6 +38,9 @@ export const roleStorySectionLabels: Record<RoleStorySectionKey, string> = {
   "what-i-took-with-me": "What I took with me",
 };
 
+/** The label every Role story shares for the link to the next one. */
+export const roleStoryCopy = { nextRole: "Next role" } as const;
+
 /** The one back link every Role story shares: the homepage's Work section. */
 export const roleStoryBack = { label: siteCopy.header.backToWork, href: "/#work" } as const;
 
@@ -57,12 +60,15 @@ export type RoleStory = {
   evidence: readonly EvidenceItem[];
   /** The employer's colour in each theme. */
   colours: { light: StoryColours; dark: StoryColours };
-  /** The Role story that follows this one, or null on the last. */
+  /** The Role story that follows this one (newest to oldest), or null on the last. */
   next: RoleStorySlug | null;
 };
 
 /** "Software engineer at BNP Paribas": the page's name, which the title adds "· Elias Bennett" to. */
 export const roleStoryName = ({ role, employer }: RoleStory) => `${role} at ${employer}`;
+
+/** An employer name too long for the display size: the band and the card both set it smaller. */
+export const hasLongEmployer = ({ employer }: RoleStory) => employer.length > 24;
 
 export const roleStoryDescription = (story: RoleStory) => story.sections.summary.paragraphs[0];
 

@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 import { roleStories, roleStorySlugs } from "../src/content/stretch/role-stories";
 import {
   roleStoryBack,
+  roleStoryCopy,
   roleStoryDescription,
   roleStoryName,
   roleStorySectionKeys,
@@ -15,7 +16,8 @@ const rgb = (hex: string) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i
 const schemes = ["light", "dark"] as const;
 
 for (const slug of roleStorySlugs) {
-  const story = roleStories[slug]!;
+  const story = roleStories[slug];
+  const next = story.next ? roleStories[story.next] : null;
 
   test.describe(`Role story: ${story.employer}`, () => {
     test.beforeEach(async ({ page }) => {
@@ -95,7 +97,25 @@ for (const slug of roleStorySlugs) {
       await expect(items).toHaveText(story.evidence.map(({ value, label }) => `${value}${label}`));
     });
 
-    test("it ends on the way back to Work", async ({ page }) => {
+    test(next ? "it ends on the next role, in that role's colours" : "it ends on the way back to Work", async ({ page }) => {
+      if (next) {
+        const tile = page.getByRole("region", { name: roleStoryCopy.nextRole }).getByRole("link");
+        await expect(tile).toHaveAttribute("href", `/work/${next.slug}`);
+        await expect(tile).toContainText(next.employer);
+        await expect(tile).toContainText(next.role);
+        await expect(tile).toContainText(next.number);
+        for (const scheme of schemes) {
+          await page.emulateMedia({ colorScheme: scheme });
+          await expect(tile, scheme).toHaveCSS("background-color", rgb(next.colours[scheme].field));
+          await expect(tile, scheme).toHaveCSS("color", rgb(next.colours[scheme].ink));
+        }
+        expect((await tile.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+        await tile.click();
+        await expect(page).toHaveURL(new RegExp(`/work/${next.slug}$`));
+        await expect(page.getByRole("heading", { level: 1 })).toHaveText(next.employer);
+        return;
+      }
+      await expect(page.getByRole("region", { name: roleStoryCopy.nextRole })).toHaveCount(0);
       const end = page.getByRole("navigation", { name: "More" }).getByRole("link", { name: "Work", exact: true });
       await expect(end).toHaveAttribute("href", roleStoryBack.href);
       expect((await end.boundingBox())!.height).toBeGreaterThanOrEqual(44);
@@ -150,6 +170,7 @@ for (const slug of roleStorySlugs) {
           ".stretch-cs-lead",
           ".stretch-cs-evidence__value",
           ".stretch-cs-evidence__label",
+          ...(next ? [".stretch-cs-next__label", ".stretch-cs-next__name", ".stretch-cs-next__outcome"] : []),
         ];
         for (const selector of selectors) {
           const readings = await contrastOnPaper(page, selector);
@@ -179,10 +200,12 @@ for (const slug of roleStorySlugs) {
   });
 }
 
-test("a slug that is not a Role story is a 404, and Role stories are not redirected", async ({ page }) => {
-  expect(roleStorySlugs).toEqual(["bnp-paribas"]);
-  for (const slug of ["joveen", "optegra", "constructor"]) {
+test("a slug that is not a Role story is a 404, and no Role story is redirected", async ({ page }) => {
+  expect(roleStorySlugs).toEqual(["bnp-paribas", "joveen", "optegra"]);
+  for (const slug of ["constructor", "not-a-story"]) {
     expect((await page.goto(`/work/${slug}`))?.status(), slug).toBe(404);
   }
-  expect((await page.goto("/work/bnp-paribas"))?.url()).toMatch(/\/work\/bnp-paribas$/);
+  for (const slug of roleStorySlugs) {
+    expect((await page.goto(`/work/${slug}`))?.url()).toMatch(new RegExp(`/work/${slug}$`));
+  }
 });

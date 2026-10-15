@@ -1,5 +1,6 @@
 import { bricolage } from "@/app/og-font";
 import { roleStoryFor, roleStorySlugs } from "@/content/stretch/role-stories";
+import { hasLongEmployer } from "@/content/stretch/role-story";
 import { siteCopy } from "@/content/stretch/site-copy";
 import { ImageResponse } from "next/og";
 import { notFound } from "next/navigation";
@@ -22,6 +23,8 @@ export default async function RoleStoryImage({ params }: { params: Promise<{ slu
   const story = roleStoryFor(slug);
   if (!story) notFound();
   const { field, ink } = story.colours.light;
+  // A long employer wraps onto a second line rather than running off the card.
+  const employerSize = hasLongEmployer(story) ? 84 : story.employer.length > 12 ? 120 : 168;
 
   return new ImageResponse(
     <div
@@ -39,7 +42,7 @@ export default async function RoleStoryImage({ params }: { params: Promise<{ slu
       }}
     >
       <div style={{ display: "flex", flexDirection: "column", rowGap: 12 }}>
-        <div style={{ display: "flex", fontSize: 168, lineHeight: 0.95, letterSpacing: -2, textTransform: "uppercase" }}>
+        <div style={{ display: "flex", fontSize: employerSize, lineHeight: 0.95, letterSpacing: -2, textTransform: "uppercase" }}>
           {story.employer}
         </div>
         <div style={{ display: "flex", fontSize: 56 }}>{story.role}</div>

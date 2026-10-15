@@ -16,6 +16,8 @@ const canonicalPages = [
   "/things-i-make/argus-risk",
   "/things-i-make/flowtime",
   "/work/bnp-paribas",
+  "/work/joveen",
+  "/work/optegra",
 ];
 const expectedSitemapUrls = new Set(canonicalPages.map((route) => route === "/" ? "https://www.eliasb.dev" : `https://www.eliasb.dev${route}`));
 const expectedWorkSocialCards = new Map([
@@ -47,6 +49,16 @@ const expectedRoleStoryCards = new Map([
     description: "I’m a software engineer in BNP Paribas’s risk division in London. I work in C# on the engines that price and risk-manage trades on CPU and GPU, and I’m the team’s only C# engineer.",
     image: "/work/bnp-paribas/opengraph-image",
   }],
+  ["/work/joveen", {
+    title: "Full stack software engineer at Joveen · Elias Bennett",
+    description: "I was a full stack software engineer at Joveen, working on its e-commerce site in React, Java with Spring Boot and MySQL.",
+    image: "/work/joveen/opengraph-image",
+  }],
+  ["/work/optegra", {
+    title: "Marketing executive at Optegra Eye Healthcare & Kensington Medical · Elias Bennett",
+    description: "I was a marketing executive across two healthcare providers: private, at Kensington Medical, and NHS work through Optegra Eye Healthcare. The best part of the job was working with the engineers who built our website.",
+    image: "/work/optegra/opengraph-image",
+  }],
 ]);
 const expectedIndexableRobots = [
   ["user-agent: *", "allow: /"],
@@ -70,10 +82,13 @@ function tags(markup, name) {
   return [...markup.matchAll(new RegExp(`<${name}\\b[^>]*>`, "gi"))].map(([tag]) => tag);
 }
 
+// An attribute as a browser reads it: the markup writes "&" as "&amp;", for example.
+const decodeEntities = (value) => value.replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'").replace(/&amp;/g, "&");
+
 function attribute(tag, name) {
-  return tag.match(new RegExp(`\\s${name}=(?:"([^"]*)"|'([^']*)')`, "i"))?.[1]
-    ?? tag.match(new RegExp(`\\s${name}=(?:"([^"]*)"|'([^']*)')`, "i"))?.[2]
-    ?? null;
+  const value = tag.match(new RegExp(`\\s${name}=(?:"([^"]*)"|'([^']*)')`, "i"))?.[1]
+    ?? tag.match(new RegExp(`\\s${name}=(?:"([^"]*)"|'([^']*)')`, "i"))?.[2];
+  return value === undefined ? null : decodeEntities(value);
 }
 
 function metaContent(document, key, attributeName = "property") {
