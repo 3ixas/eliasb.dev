@@ -2340,6 +2340,12 @@ button.stretch-gh__day[data-selected] {
   }
 }
 
+/* A long employer name (Optegra's) is set smaller, so the band is not five lines of display type. */
+.stretch-cs-open__name.stretch-role-name--long {
+  font-size: clamp(36px, 7.5vw, 76px);
+  line-height: 0.95;
+}
+
 /* A Role story's evidence strip wears the employer's colour: its rules and figures, in the swatch. */
 .stretch-role-evidence {
   margin-top: 32px;

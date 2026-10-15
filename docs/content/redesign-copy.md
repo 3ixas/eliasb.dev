@@ -166,7 +166,7 @@ Shared labels: ← Things I make · Live site ↗ · Code ↗ · Next project ·
 
 ## Role stories
 
-Shared labels: ← Work · Evidence · section numbers 01–06 ([#172](https://github.com/3ixas/eliasb.dev/issues/172)). Prose approved by Elias on 14 October 2026.
+Shared labels: ← Work · Next role · Evidence · section numbers 01–06 ([#172](https://github.com/3ixas/eliasb.dev/issues/172)). BNP Paribas prose approved by Elias on 14 October 2026; Joveen and Optegra on 15 October 2026 ([#174](https://github.com/3ixas/eliasb.dev/issues/174)). The stories run newest to oldest: BNP Paribas → Joveen → Optegra, which ends on ← Work.
 
 ### BNP Paribas
 
@@ -182,6 +182,36 @@ Shared labels: ← Work · Evidence · section numbers 01–06 ([#172](https://g
 | Title | Software engineer at BNP Paribas · Elias Bennett |
 | Meta description | I’m a software engineer in BNP Paribas’s risk division in London. I work in C# on the engines that price and risk-manage trades on CPU and GPU, and I’m the team’s only C# engineer. |
 | Social card | BNP Paribas · Software engineer · ELIAS BENNETT |
+
+### Joveen
+
+| Part | Copy |
+| --- | --- |
+| Opening | Full stack software engineer · Aug 2024 – Jun 2025 |
+| 01 Summary | I was a full stack software engineer at Joveen, working on its e-commerce site in React, Java with Spring Boot and MySQL. |
+| 02 The role | I worked across the React front end, the Java API behind it and the MySQL database underneath. I was also on a coding bootcamp alongside the job. |
+| 03 The problems | *A slow site.* Pages took too long to load. *A codebase on its way out.* Some modules were still in PHP and had to move to Spring Boot. *Mobile and browser bugs.* Layouts and features broke on some phones and browsers. *Slow queries.* A key API was slower than it needed to be. |
+| 04 Decisions | *Make the front end do less up front.* We refactored React components and lazy-loaded assets, so a page loads what it needs first. *Move PHP to Spring Boot in pieces.* Migrating module by module let us release in smaller steps. I wrote endpoints, validation and tests, and fixed defects along the way. *Test across browsers, then fix.* A cross-browser testing pipeline caught the mobile layout and functionality bugs, and I fixed them. *Measure the database.* We added indexes and rewrote slow queries, starting with the API that mattered most. |
+| 05 What changed | Page load fell by 40%. Deploys went from 10 minutes to under 2. Mobile retention rose by 30%. The key API’s p95 dropped from 520 ms to 230 ms, and cloud costs fell by 18%. · Evidence: −40% page load · Under 2 minutes to deploy, down from 10 · +30% mobile retention · 230 ms key API p95, down from 520 ms |
+| 06 What I took with me | Alongside the job I did freelance AI training, reviewing 1,000 code items across TypeScript, Python, Java, C# and SQL at 97% QA precision. It was my first sustained work with AI on code, and the start of the thread that leads to the workflow I built at BNP Paribas. |
+| Title | Full stack software engineer at Joveen · Elias Bennett |
+| Meta description | I was a full stack software engineer at Joveen, working on its e-commerce site in React, Java with Spring Boot and MySQL. |
+| Social card | Joveen · Full stack software engineer · ELIAS BENNETT |
+
+### Optegra Eye Healthcare & Kensington Medical
+
+| Part | Copy |
+| --- | --- |
+| Opening | Marketing executive · Sep 2021 – Aug 2024 |
+| 01 Summary | I was a marketing executive across two healthcare providers: private, at Kensington Medical, and NHS work through Optegra Eye Healthcare. The best part of the job was working with the engineers who built our website. |
+| 02 The role | From September 2021 at Kensington Medical, and from October 2022 at Optegra, I did digital marketing: campaign analysis, split tests and analytics dashboards. I also worked with the engineers on the company website, scoping and ticketing fixes. |
+| 03 The problems | *Slow, uneven pages.* The Core Web Vitals pass rate was 62%, and page loads were slower than they needed to be. *No clear view of what worked.* We couldn’t easily tell which changes brought in consultations. |
+| 04 Decisions | *Scope the fix so it can be built.* I scoped performance fixes with the engineers and ticketed them, so each one was something they could build and I could measure. *Test, then build.* Split tests and analytics dashboards showed which changes helped, and that guided what the engineers worked on next. |
+| 05 What changed | The Core Web Vitals pass rate went from 62% to 88%. The p95 page-load time fell by 30%. Consultation conversion rose by 15%. · Evidence: 88% Core Web Vitals pass rate, up from 62% · −30% p95 page load · +15% consultation conversion |
+| 06 What I took with me | The click came in early 2024. A friend loved his work so much that even a hectic week sounded exciting, and I wanted that from mine. I started coding in my spare time, just to see, and by August 2024 I was doing it for a living. |
+| Title | Marketing executive at Optegra Eye Healthcare & Kensington Medical · Elias Bennett |
+| Meta description | I was a marketing executive across two healthcare providers: private, at Kensington Medical, and NHS work through Optegra Eye Healthcare. The best part of the job was working with the engineers who built our website. |
+| Social card | Optegra Eye Healthcare & Kensington Medical · Marketing executive · ELIAS BENNETT |
 
 ## Checks
 

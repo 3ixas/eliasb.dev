@@ -1,12 +1,13 @@
+import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import type { EvidenceItem, StoryColours, StorySectionBody } from "@/content/stretch/story";
 
 /*
  * The parts of a story page that a Case study and a Role story share: the
  * opening band in a colour pair, the section links, a numbered section and the
- * evidence strip. What belongs to one page (the screenshot, links, back link,
- * Next project) is passed in or rendered by the page itself. Nothing here
- * knows about a project.
+ * evidence strip, and the tile that ends a story. What belongs to one page (the
+ * screenshot, links, back link) is passed in or rendered by the page itself.
+ * Nothing here knows about a project.
  */
 
 export const storyNumber = (position: number) => String(position + 1).padStart(2, "0");
@@ -39,6 +40,7 @@ export function StoryOpening({
   number,
   titleId,
   name,
+  nameClassName,
   lead,
   aside,
   children,
@@ -48,6 +50,8 @@ export function StoryOpening({
   number: string;
   titleId: string;
   name: string;
+  /** An extra class on the name, for a page whose name needs a different size. */
+  nameClassName?: string;
   lead: string;
   aside: ReactNode;
   children?: ReactNode;
@@ -60,7 +64,7 @@ export function StoryOpening({
           <p className="stretch-display stretch-cs-open__number" aria-hidden="true">
             {number}
           </p>
-          <h1 id={titleId} className="stretch-display stretch-cs-open__name">
+          <h1 id={titleId} className={`stretch-display stretch-cs-open__name${nameClassName ? ` ${nameClassName}` : ""}`}>
             {name}
           </h1>
           <p className="stretch-cs-open__outcome">{lead}</p>
@@ -150,5 +154,38 @@ export function StoryEvidence({ evidence }: { evidence: readonly EvidenceItem[] 
         </li>
       ))}
     </ul>
+  );
+}
+
+/** The tile that ends a story, in the next story's colours: a number, a name, a one-line outcome and an arrow. */
+export function StoryNext({
+  label,
+  href,
+  colours,
+  number,
+  name,
+  outcome,
+}: {
+  label: string;
+  href: string;
+  colours: StoryColours;
+  number: string;
+  name: string;
+  outcome: string;
+}) {
+  return (
+    <section className="stretch-wrap stretch-cs-next" aria-label={label}>
+      <Link className="stretch-cs-next__tile" href={href} style={storyColours(colours)}>
+        <span className="stretch-mono stretch-cs-next__label">{label}</span>
+        <span className="stretch-display stretch-cs-next__number" aria-hidden="true">
+          {number}
+        </span>
+        <span className="stretch-cs-next__name">{name}</span>
+        <span className="stretch-cs-next__outcome">{outcome}</span>
+        <span className="stretch-cs-next__arrow" aria-hidden="true">
+          →
+        </span>
+      </Link>
+    </section>
   );
 }

@@ -3,6 +3,7 @@ import Link from "next/link";
 import {
   Arrowed,
   StoryEvidence,
+  StoryNext,
   StoryOpening,
   StorySection,
   StorySectionLinks,
@@ -169,18 +170,13 @@ function Prd({ study }: { study: CaseStudy }) {
 function NextProject({ next }: { next: ReturnType<typeof nextProject> }) {
   const { project, colours } = next;
   return (
-    <section className="stretch-wrap stretch-cs-next" aria-label={caseStudyCopy.nextProject}>
-      <Link className="stretch-cs-next__tile" href={`/things-i-make/${project.slug}`} style={storyColours(colours)}>
-        <span className="stretch-mono stretch-cs-next__label">{caseStudyCopy.nextProject}</span>
-        <span className="stretch-display stretch-cs-next__number" aria-hidden="true">
-          {next.number}
-        </span>
-        <span className="stretch-cs-next__name">{project.name}</span>
-        <span className="stretch-cs-next__outcome">{project.outcome}</span>
-        <span className="stretch-cs-next__arrow" aria-hidden="true">
-          →
-        </span>
-      </Link>
-    </section>
+    <StoryNext
+      label={caseStudyCopy.nextProject}
+      href={`/things-i-make/${project.slug}`}
+      colours={colours}
+      number={next.number}
+      name={project.name}
+      outcome={project.outcome}
+    />
   );
 }
