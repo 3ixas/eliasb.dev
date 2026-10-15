@@ -24,7 +24,7 @@ test.describe("Phone header and menu", () => {
     await page.goto("/");
   });
 
-  test("the header shows the theme button and Menu only, with no clock", async ({ page }) => {
+  test("the header shows the theme button and Menu only, with no greeting", async ({ page }) => {
     const visible = await header(page).locator("a, button, p, nav").evaluateAll((elements) =>
       elements
         .filter((element) => element.checkVisibility() && !element.matches(".stretch-skip"))
@@ -33,11 +33,11 @@ test.describe("Phone header and menu", () => {
     expect(visible).toEqual(["Dark theme", "Menu"]);
     const box = (await page.getByRole("button", { name: "Dark theme" }).boundingBox())!;
     expect([box.width, box.height]).toEqual([44, 44]);
-    await expect(page.locator("[data-london-clock]:visible")).toHaveCount(0);
+    await expect(page.locator("[data-greeting]:visible")).toHaveCount(0);
     await expect(page.getByRole("navigation", { name: "Primary navigation" })).toHaveCount(0);
   });
 
-  test("Menu opens a full-screen dialog with the clock and the section names", async ({ page }) => {
+  test("Menu opens a full-screen dialog with the greeting and the section names", async ({ page }) => {
     await menuButton(page).click();
     const menu = dialog(page);
     await expect(menu).toBeVisible();
@@ -45,8 +45,7 @@ test.describe("Phone header and menu", () => {
     const viewport = page.viewportSize()!;
     expect(box.width).toBe(viewport.width);
     expect(box.height).toBe(viewport.height);
-    await expect(menu.locator("[data-london-clock]")).toHaveAttribute("data-london-clock", /^\d\d:\d\d$/);
-    await expect(menu.locator("[data-london-clock]")).toContainText("London");
+    await expect(menu.locator("[data-greeting]")).toHaveAttribute("data-greeting", /^(morning|afternoon|evening|late)$/);
     await expect(menu.getByRole("navigation", { name: "Primary navigation" }).getByRole("link")).toHaveText(menuLabels);
     await expect(menu.getByRole("link", { name: "Things I make", exact: true })).toHaveCSS("text-transform", "uppercase");
   });
@@ -158,11 +157,11 @@ test("without script the section links stay on the phone header", async ({ brows
 });
 
 test.describe("Desktop", () => {
-  test("there is no Menu button, and the clock and links are in the header", async ({ page }) => {
+  test("there is no Menu button, and the greeting and links are in the header", async ({ page }) => {
     test.skip(phone(page), "Desktop layout");
     await page.goto("/");
     await expect(menuButton(page)).toBeHidden();
-    await expect(page.locator("[data-london-clock]:visible")).toHaveCount(1);
+    await expect(page.locator("[data-greeting]:visible")).toHaveCount(1);
     await expect(page.getByRole("navigation", { name: "Primary navigation" }).getByRole("link")).toHaveText(menuLabels);
   });
 });

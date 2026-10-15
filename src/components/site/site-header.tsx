@@ -1,11 +1,11 @@
 import { EclipseToggle } from "@/components/site/eclipse-toggle";
 import { MenuDialog } from "@/components/site/menu-dialog";
 import { sectionLinks } from "@/components/site/sections";
-import { SiteClock } from "@/components/site/site-clock";
+import { SiteGreeting } from "@/components/site/site-greeting";
 
 /**
- * The header. On desktop: the London clock, Lights and the section links.
- * Below about 760 px: Lights and Menu only, with the clock and the section
+ * The header. On desktop: the greeting, Lights and the section links.
+ * Below about 760 px: Lights and Menu only, with the greeting and the section
  * names in the menu dialog. CSS switches between the two (stretch-shell.css).
  */
 export function SiteHeader() {
@@ -16,10 +16,10 @@ export function SiteHeader() {
       </a>
       {/* Without script the menu cannot open, so the section links stay on the page. */}
       <noscript>
-        <style>{".stretch-header__clock{display:inline-flex!important}.stretch-header .stretch-nav{display:block!important}.stretch-menu-button{display:none!important}"}</style>
+        <style>{".stretch-header__greeting{display:inline-flex!important}.stretch-header .stretch-nav{display:block!important}.stretch-menu-button{display:none!important}"}</style>
       </noscript>
       <div className="stretch-wrap stretch-header__inner">
-        <SiteClock className="stretch-header__clock" />
+        <SiteGreeting className="stretch-header__greeting" />
         <div className="stretch-header__right">
           <EclipseToggle />
           <nav aria-label="Primary navigation" className="stretch-nav">

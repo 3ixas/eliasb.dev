@@ -69,8 +69,8 @@ A from-scratch front end in the **Stretch direction**, keeping the existing data
 36. As a visitor in dark mode, I want project tiles to keep a visible edge, so that they don't merge into the page.
 
 **Visitors: navigation and mobile**
-37. As a desktop visitor, I want the London clock, the theme button and the section links in the header, so that I can move around and see the live state.
-38. As a phone visitor, I want only the theme button and Menu in the header, with a full-screen menu of big section names and the clock inside it, so that the header stays clean.
+37. As a desktop visitor, I want a greeting for my own time of day, the theme button and the section links in the header, so that I can move around and the page feels friendly from the first look.
+38. As a phone visitor, I want only the theme button and Menu in the header, with a full-screen menu of big section names and the greeting inside it, so that the header stays clean.
 39. As a keyboard user, I want the menu to move focus to Close and return it to Menu on Escape or Close, so that I never lose my place.
 40. As a phone user, I want the name to fill the screen width without breaking, and every target at least 44 px tall, so that the layout feels designed rather than shrunk.
 
@@ -157,13 +157,13 @@ rest of the page  fade 0.5 s when the name and portrait settle
 - **Phones:** screenshots straighten when centred, scroll-driven.
 - **Index rows:** cobalt plus an arrow nudge on hover or focus.
 - **Now making:** the dot pulses.
-- **The clock** just ticks.
+- **The greeting** changes only when the visitor's time of day does, and is never announced.
 - **Reduced motion:** removes all movement and keeps 0.2 s fades, except theme changes which are instant.
 
 **Theme:** the existing controller's behaviour carries over: system or remembered preference, a pre-paint boot script, and choosing the device's theme returns to following the device. The control is the Eclipse (#156, #167): an icon-only sun or crescent moon, a button named "Dark theme" whose pressed state means the dark theme is in force. The theme crossfades over 0.3 s with `cubic-bezier(0,0,0.38,0.9)` and switches instantly with reduced motion. Registered colour tokens animate once on the root, so surfaces and inherited text use the same frame rather than cascading descendant transitions. The browser's toolbar colour follows the page background. Fastener tape is more transparent in dark.
 
 **Phones (below about 760 px)**
-- **Header:** the theme button and Menu only, with a full-screen menu dialog. The clock lives in that dialog.
+- **Header:** the theme button and Menu only, with a full-screen menu dialog. The greeting lives in that dialog.
 - **Layout:** single-column cards, 16 px gutters, targets at least 44 px, and no page-level horizontal scroll.
 - **Contained scrolling:** only the GitHub grid scrolls sideways, inside its card, opening on today and reachable by keyboard.
 - **Work:** in How I got here, dates sit above each role.

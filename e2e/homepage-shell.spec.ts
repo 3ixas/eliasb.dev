@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { featuredSlugs, projects } from "../src/content/projects";
 import { howIWork } from "../src/content/stretch/how-i-work";
 import { offTheClock } from "../src/content/stretch/off-the-clock";
@@ -102,30 +102,74 @@ test.describe("Homepage shell", () => {
   });
 });
 
-test.describe("The London clock", () => {
-  // Far from London in both directions, so the clock can't be reading the device.
-  for (const timezoneId of ["Pacific/Auckland", "America/Los_Angeles"]) {
-    test(`shows London's time from ${timezoneId}`, async ({ browser }) => {
-      const context = await browser.newContext({ timezoneId });
+test.describe("The header greeting", () => {
+  // Phones keep it in the menu dialog (phone-header.spec.ts); the header itself shows it from 761 px.
+  test.beforeEach(({ viewport }) => {
+    test.skip((viewport?.width ?? 0) < 761, "Header layout");
+  });
+
+  const greeting = (page: Page) => page.locator("[data-greeting]:visible");
+  const shownText = (page: Page) => greeting(page).locator(".stretch-greeting");
+
+  // Whole hours in a zone with no daylight saving, so the visitor's hour is exactly the hour asked for.
+  for (const [hour, key] of [
+    [4, "late"], [5, "morning"], [11, "morning"], [12, "afternoon"], [17, "afternoon"], [18, "evening"], [21, "evening"], [22, "late"],
+  ] as const) {
+    test(`${String(hour).padStart(2, "0")}:30 on the visitor's clock says "${siteCopy.greeting[key]}"`, async ({ browser }) => {
+      const context = await browser.newContext({ timezoneId: "Etc/GMT" });
       const page = await context.newPage();
+      await page.clock.setFixedTime(new Date(Date.UTC(2026, 9, 15, hour, 30)));
       await page.goto("/");
-      const clock = page.locator("[data-london-clock]");
-      await expect(clock).toHaveAttribute("data-london-clock", /^\d\d:\d\d$/);
-      const shown = (await clock.getAttribute("data-london-clock"))!;
-      const london = (date: Date) =>
-        new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(date);
-      // The minute may tick between the page's read and ours.
-      expect([london(new Date()), london(new Date(Date.now() - 60_000))]).toContain(shown);
-      await expect(clock).toContainText(`London ${shown}`);
-      await expect(clock.locator(".sr-only")).toHaveText(`The time in London: ${shown}`);
+      await expect(greeting(page)).toHaveAttribute("data-greeting", key);
+      await expect(shownText(page)).toHaveText(siteCopy.greeting[key]);
       await context.close();
     });
   }
 
-  test("the server-rendered page shows 'London' with no time, so hydration matches", async ({ page }) => {
+  test("follows the visitor's time zone, not London's", async ({ browser }) => {
+    const at = new Date("2026-10-15T20:00:00Z");
+    // 09:00 in Auckland, 13:00 in Los Angeles, 21:00 in London.
+    for (const [timezoneId, key] of [["Pacific/Auckland", "morning"], ["America/Los_Angeles", "afternoon"], ["Europe/London", "evening"]] as const) {
+      const context = await browser.newContext({ timezoneId });
+      const page = await context.newPage();
+      await page.clock.setFixedTime(at);
+      await page.goto("/");
+      await expect(greeting(page), timezoneId).toHaveAttribute("data-greeting", key);
+      await context.close();
+    }
+  });
+
+  test("the server-rendered page says Hello, so hydration matches", async ({ page }) => {
     await page.route("**/*.js", (route) => route.abort());
     await page.goto("/");
-    await expect(page.locator("[data-london-clock]")).toHaveText("London");
+    await expect(page.locator("[data-greeting]").first()).toHaveAttribute("data-greeting", "hello");
+    await expect(page.locator("[data-greeting]").first().locator(".stretch-greeting")).toHaveText(siteCopy.greeting.hello);
+  });
+
+  test("the pill is the same width before and after the greeting appears", async ({ browser }) => {
+    const context = await browser.newContext({ timezoneId: "Etc/GMT" });
+    const without = await context.newPage();
+    await without.route("**/*.js", (route) => route.abort());
+    await without.goto("/");
+    const before = await greeting(without).boundingBox();
+    const page = await context.newPage();
+    await page.clock.setFixedTime(new Date("2026-10-15T14:00:00Z"));
+    await page.goto("/");
+    await expect(greeting(page)).toHaveAttribute("data-greeting", "afternoon");
+    const after = await greeting(page).boundingBox();
+    expect(after!.width).toBeCloseTo(before!.width, 1);
+    expect(after!.height).toBeCloseTo(before!.height, 1);
+    await context.close();
+  });
+
+  test("is not a live region, and does not animate", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/");
+    const pill = greeting(page);
+    expect(await pill.evaluate((element) => element.closest("[aria-live], [role=status], [role=alert], [role=log]") === null)).toBe(true);
+    expect(await pill.evaluate((element) => getComputedStyle(element).transitionDuration)).toBe("0s");
+    // The text the page holds is the one greeting; the width reservation is not in the document.
+    await expect(pill).toHaveText(/^(Hello|Good morning|Good afternoon|Good evening|Still up\?)$/);
   });
 });
 
@@ -147,7 +191,7 @@ test.describe("Accessibility and contrast", () => {
       await page.goto("/");
       const readings = await renderedContrast(page);
       const texts = readings.map((reading) => reading.text);
-      // The clock is hydrated by now, and the pill, nav, headings and notes were measured.
+      // The greeting is hydrated by now, and the pill, nav, headings and notes were measured.
       for (const expected of [siteCopy.menu[0].label, siteCopy.menu[4].label, thingsIMake.heading, thingsIMake.note(projects.length, featuredSlugs.length)]) {
         expect(texts.some((text) => text.includes(expected)), expected).toBe(true);
       }

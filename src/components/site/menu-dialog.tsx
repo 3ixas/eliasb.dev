@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { sectionLinks } from "@/components/site/sections";
-import { SiteClock } from "@/components/site/site-clock";
+import { SiteGreeting } from "@/components/site/site-greeting";
 import { siteCopy } from "@/content/stretch/site-copy";
 
 /** Where the phone header gives way to the desktop one; stretch-shell.css uses the same width. */
@@ -80,7 +80,7 @@ export function MenuDialog() {
         }}
       >
         <div className="stretch-menu__top">
-          {open && <SiteClock />}
+          {open && <SiteGreeting />}
           <button ref={closer} type="button" className="stretch-pill stretch-menu__close" onClick={close}>
             {siteCopy.header.close}
           </button>

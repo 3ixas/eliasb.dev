@@ -21,6 +21,7 @@ import {
   roleStorySectionLabels,
 } from "../src/content/stretch/role-story.ts";
 import { howIWork } from "../src/content/stretch/how-i-work.ts";
+import { greetingKey } from "../src/content/stretch/greeting.ts";
 import { offTheClock } from "../src/content/stretch/off-the-clock.ts";
 import { hero, notFound, sayHello, siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy.ts";
 import { shownLink, shownNow, shownRow, work } from "../src/content/stretch/work.ts";
@@ -63,8 +64,6 @@ for (const [name, module] of Object.entries(modules)) {
 // Strings built from live values, filled with the copy's own placeholders.
 const built = [
   siteCopy.title("Page"),
-  siteCopy.clock.label("14:05"),
-  siteCopy.clock.spoken("14:05"),
   thingsIMake.note(6, 3),
   thingsIMake.allThings(6),
   offTheClock.curiosity.more("n"),
@@ -75,6 +74,17 @@ const built = [
 for (const text of built) assert.ok(plain.includes(text), `Built string is not in the approved copy: "${text}"`);
 assert.equal(thingsIMake.note(6, 3), "06 things I’ve built · 03 I’m proudest of");
 assert.equal(thingsIMake.allThings(projects.length), "Everything I’ve built (06) →");
+
+// The header greeting follows the visitor's own hour, with the approved edges.
+const greetingAt = (hour) => siteCopy.greeting[greetingKey(hour)];
+for (const [hour, line] of [
+  [0, "Still up?"], [4, "Still up?"], [5, "Good morning"], [11, "Good morning"], [12, "Good afternoon"],
+  [17, "Good afternoon"], [18, "Good evening"], [21, "Good evening"], [22, "Still up?"], [23, "Still up?"],
+]) {
+  assert.equal(greetingAt(hour), line, `The greeting at ${hour}:00 to ${hour}:59`);
+}
+assert.equal(siteCopy.greeting.hello, "Hello");
+for (let hour = 0; hour < 24; hour += 1) assert.notEqual(greetingKey(hour), "hello", "Only the browser's clock picks a greeting; hello is the line before it");
 
 // ---- Tables and sections, word for word --------------------------------------------------
 
