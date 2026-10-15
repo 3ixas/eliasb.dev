@@ -109,7 +109,7 @@ const fetchLatestRepository = unstable_cache(
   { revalidate: 21600, tags: ["github-signal"] },
 );
 
-/** My most recently pushed public repository, for the Making pin's fallback. */
+/** My most recently pushed public repository, for Now making. */
 export async function getLatestRepositorySignal(): Promise<LatestRepositorySignal> {
   try {
     return await fetchLatestRepository();

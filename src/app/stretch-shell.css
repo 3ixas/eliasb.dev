@@ -1424,6 +1424,21 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   color: var(--stretch-cobalt);
 }
 
+/* A name that is also a link keeps the name's own type, with the link's underline and 44px target. */
+.stretch-otc__name-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.stretch-otc__name-link:hover {
+  color: var(--stretch-cobalt);
+}
+
 /* The training poster. */
 .stretch-otc__training {
   grid-template-columns: minmax(0, 1fr);

@@ -71,7 +71,7 @@ Each signal is fetched on the server, never in the browser, with a short timeout
 | Reading | Goodreads RSS | 30 minutes | "Between books." |
 | Last watched | Letterboxd RSS | 15 minutes | "Nothing logged yet." |
 | Weekly Curiosity | Wikipedia "On this day" and Commons image metadata | 7 days | Saved examples, labelled as such |
-| Now making | Authored entry, then the latest public GitHub repository | with the page | Latest repository, or nothing |
+| Now making | The latest public GitHub repository | with the page | Nothing: the card is hidden |
 
 The homepage itself revalidates every 15 minutes. The contracts are in [`docs/integrations/SIGNALS.md`](docs/integrations/SIGNALS.md) and the troubleshooting steps in [`docs/runbooks/integration-fallbacks.md`](docs/runbooks/integration-fallbacks.md).
 

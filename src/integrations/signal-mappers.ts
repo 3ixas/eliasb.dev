@@ -110,15 +110,19 @@ export type RepositoryShape = {
   archived?: unknown;
 };
 
+/** Public repositories that are never "now": the first version of this site. */
+const EXCLUDED_REPOSITORIES = ["personal-portfolio-v1"];
+
 /**
  * The most recently pushed public repository from a listing sorted by push
- * date, skipping forks, archives and the profile repository; null if none.
+ * date, skipping forks, archives, the profile repository and the first
+ * version of this site; null if none.
  */
 export function latestRepository(repositories: RepositoryShape[], profile: string): GitHubRepository | null {
   for (const repository of repositories) {
     const { name, description, html_url: href, pushed_at: pushedAt } = repository;
     if (typeof name !== "string" || typeof href !== "string" || typeof pushedAt !== "string") continue;
-    if (repository.fork === true || repository.archived === true || name.toLowerCase() === profile.toLowerCase()) continue;
+    if (repository.fork === true || repository.archived === true || [profile.toLowerCase(), ...EXCLUDED_REPOSITORIES].includes(name.toLowerCase())) continue;
     return { name, description: typeof description === "string" && description.trim() ? description.trim() : null, href, pushedAt };
   }
   return null;

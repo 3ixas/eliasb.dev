@@ -68,7 +68,6 @@ const built = [
   thingsIMake.note(6, 3),
   thingsIMake.allThings(6),
   offTheClock.curiosity.more("n"),
-  offTheClock.nowMaking.fallback.latest("repo", "date"),
   offTheClock.github.contributions("1,221"),
   offTheClock.github.busiest("September–October"),
   offTheClock.github.asOf("date"),

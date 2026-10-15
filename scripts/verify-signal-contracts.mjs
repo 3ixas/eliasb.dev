@@ -12,7 +12,7 @@ import {
 import { integrationConfig } from "../src/content/integration-config.ts";
 import { asOfDate, pinStatus, staleAfterDays } from "../src/integrations/pin-rules.ts";
 import { filmLine } from "../src/content/stretch/film-line.ts";
-import { nowMakingNote, offTheClock } from "../src/content/stretch/off-the-clock.ts";
+import { nowMakingEntry } from "../src/content/stretch/off-the-clock.ts";
 import { getHistorySignal, historyWeekStart, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "../src/integrations/history.ts";
 import {
   busiestStretch,
@@ -440,25 +440,36 @@ assert.equal(contributionTag({ date: "2026-01-15", count: 0 }), "Nothing on Thu 
 assert.deepEqual([0, 1, 2, 3, 4, 40].map(contributionLevel), [0, 1, 2, 3, 4, 4]);
 assert.deepEqual(createContributionCalendar(quietYear).monthLabels.map(({ label }) => label).filter((label) => /June|July/.test(label)), ["June", "July"]);
 
-// Making: the authored entry for eight weeks, then my latest public repository, then nothing.
+// Making: my latest public repository, or nothing.
 const repositories = [
   { name: "3ixas", html_url: "https://github.com/3ixas/3ixas", pushed_at: "2026-10-04T00:00:00Z" },
   { name: "a-fork", html_url: "https://github.com/3ixas/a-fork", pushed_at: "2026-10-03T12:00:00Z", fork: true },
   { name: "old-thing", html_url: "https://github.com/3ixas/old-thing", pushed_at: "2026-10-03T11:00:00Z", archived: true },
+  { name: "personal-portfolio-v1", html_url: "https://github.com/3ixas/personal-portfolio-v1", pushed_at: "2026-10-03T08:00:00Z" },
   { name: "eliasb.dev", description: "  The site  ", html_url: "https://github.com/3ixas/eliasb.dev", pushed_at: "2026-10-03T05:36:51Z" },
 ];
 assert.deepEqual(latestRepository(repositories, "3ixas"), {
   name: "eliasb.dev", description: "The site", href: "https://github.com/3ixas/eliasb.dev", pushedAt: "2026-10-03T05:36:51Z",
-}, "The profile repository, forks and archives are skipped");
+}, "The profile repository, forks, archives and personal-portfolio-v1 are skipped");
 assert.equal(latestRepository([{ name: "x", description: "", html_url: "https://github.com/3ixas/x", pushed_at: "2026-01-01T00:00:00Z" }], "3ixas").description, null);
 assert.equal(latestRepository([], "3ixas"), null);
-const { writtenOn, currentDays } = offTheClock.nowMaking;
-assert.equal(currentDays, 56);
-const written = new Date(`${writtenOn}T00:00:00Z`).getTime();
 const repo = latestRepository(repositories, "3ixas");
-assert.equal(nowMakingNote(new Date(written + (currentDays - 1) * 86_400_000), repo).kind, "authored");
-assert.equal(nowMakingNote(new Date(written + currentDays * 86_400_000), repo).kind, "latest", "After eight weeks the entry is no longer now");
-assert.equal(nowMakingNote(new Date(written + currentDays * 86_400_000), null), null, "With no entry and no repository, there's nothing to show");
+const siteProjects = [
+  { name: "Threshold", links: { caseStudy: "/things-i-make/threshold", code: "https://github.com/3ixas/Threshold" } },
+  { name: "Tracker", links: { code: "https://github.com/3ixas/tracker" } },
+];
+assert.deepEqual(nowMakingEntry(repo, siteProjects), { name: "eliasb.dev", description: "The site", href: "https://github.com/3ixas/eliasb.dev", internal: false }, "A repository that is not a project keeps its name and description");
+assert.deepEqual(
+  nowMakingEntry({ name: "threshold", description: "x", href: "https://github.com/3ixas/threshold" }, siteProjects),
+  { name: "Threshold", description: null, href: "/things-i-make/threshold", internal: true },
+  "A project with a case study links to it, matched on its code link regardless of case",
+);
+assert.deepEqual(
+  nowMakingEntry({ name: "tracker", description: "x", href: "https://github.com/3ixas/tracker" }, siteProjects),
+  { name: "Tracker", description: null, href: "https://github.com/3ixas/tracker", internal: false },
+  "A project without a case study links to GitHub",
+);
+assert.equal(nowMakingEntry(null, siteProjects), null, "With no repository there is nothing to show");
 
 // The running photo carries no embedded metadata: its WebP has image data only, no EXIF or XMP.
 const runningPhoto = readFileSync(new URL("../public/signals/running-central-london.webp", import.meta.url));

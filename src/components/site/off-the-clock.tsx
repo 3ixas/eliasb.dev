@@ -1,8 +1,10 @@
 import Image from "next/image";
+import Link from "next/link";
 import { useId, type ReactNode } from "react";
 import { TrainingWeek } from "@/components/site/training-week";
 import { GitHubYear } from "@/components/site/github-year";
-import { nowMakingNote, offTheClock } from "@/content/stretch/off-the-clock";
+import { nowMakingEntry, offTheClock } from "@/content/stretch/off-the-clock";
+import { projects } from "@/content/projects";
 import { filmLine } from "@/content/stretch/film-line";
 import { getGitHubSignal, getLatestRepositorySignal } from "@/integrations/github";
 import { getReadingSignal } from "@/integrations/goodreads";
@@ -204,42 +206,34 @@ export function ClippingCard({ history }: { history: HistorySignal }) {
 }
 
 /**
- * What I'm making now: the written entry while it counts as now (8 weeks), with
- * a pulsing cobalt mark; after that my latest public repository; with neither,
- * the card comes down.
+ * What I'm making now: my latest public repository, with a pulsing cobalt
+ * mark. A project of mine shows its name (linked to its case study when it has
+ * one); any other repository shows GitHub's name and description. With no
+ * repository to show, the card comes down.
  */
-export function NowMakingCard({ latest, now }: { latest: LatestRepositorySignal; now: Date }) {
+export function NowMakingCard({ latest }: { latest: LatestRepositorySignal }) {
   const headingId = useId();
-  const note = nowMakingNote(now, latest.repository);
-  if (!note) return null;
+  const entry = nowMakingEntry(latest.repository, projects);
+  if (!entry) return null;
   const making = copy.nowMaking;
-  const pushed = note.kind === "latest" ? asOfDate(new Date(note.repository.pushedAt)) : null;
   return (
-    <article className="stretch-otc__card stretch-otc__making" data-otc="making" data-state={note.kind} aria-labelledby={headingId}>
+    <article className="stretch-otc__card stretch-otc__making" data-otc="making" aria-labelledby={headingId}>
       <span className="stretch-fastener stretch-fastener--pin" aria-hidden="true" />
       <h3 id={headingId} className="stretch-mono stretch-otc__label">
-        {note.kind === "authored" && <span className="stretch-now" data-now-mark aria-hidden="true" />}
-        {note.kind === "authored" ? making.label : making.fallback.label}
+        <span className="stretch-now" data-now-mark aria-hidden="true" />
+        {making.label}
       </h3>
-      {note.kind === "authored" ? (
-        <>
-          <p className="stretch-otc__name">{making.line}</p>
-          <p className="stretch-otc__by">{making.note}</p>
-          <ExternalLink href={making.href}>{making.code}</ExternalLink>
-        </>
-      ) : (
-        <>
-          <p className="stretch-otc__name">
-            {pushed && (
-              <time dateTime={pushed.iso}>
-                <span aria-hidden="true">{making.fallback.latest(note.repository.name, pushed.short)}</span>
-                <span className="sr-only">{making.fallback.latest(note.repository.name, pushed.long)}</span>
-              </time>
-            )}
-          </p>
-          <ExternalLink href={note.repository.href}>{making.fallback.link}</ExternalLink>
-        </>
-      )}
+      <p className="stretch-otc__name">
+        {entry.internal ? (
+          <Link className="stretch-otc__name-link" href={entry.href}>
+            {entry.name}
+          </Link>
+        ) : (
+          entry.name
+        )}
+      </p>
+      {entry.description && <p className="stretch-otc__by">{entry.description}</p>}
+      {!entry.internal && <ExternalLink href={entry.href}>{making.link}</ExternalLink>}
     </article>
   );
 }
@@ -290,7 +284,7 @@ export function OffTheClockItems({
       </div>
       <div className="stretch-otc__column">
         <ClippingCard history={history} />
-        <NowMakingCard latest={latest} now={now} />
+        <NowMakingCard latest={latest} />
       </div>
       <GitHubCard github={github} now={now} />
     </div>

@@ -121,7 +121,7 @@ The homepage section for my own projects ([#157](https://github.com/3ixas/eliasb
 | Now reading | Now reading · {title} · {author} · Goodreads ↗ | Between books. |
 | Last watched | Admit one · Last watched · {title} · {year} · Letterboxd ↗ | Nothing logged yet. |
 | The Weekly Curiosity | Odd but true, from this week in history · {fact} · {year} · {n} more oddities this week ↓ · Read on Wikipedia ↗ | From the archive |
-| Now making | ● Now making · Rebuilding Professor Past from scratch. · v1 is on GitHub if you want to meet the professor. · Code ↗ | Latest on GitHub · {repo}, updated {date} · View on GitHub ↗ |
+| Now making | ● Now making · {project or repository name} · {GitHub description, when it has one} · View on GitHub ↗ (a project with a case study links its name to the case study instead) | Hidden when GitHub can’t be reached |
 | GitHub | {1,221} contributions in the past year · busiest stretch, {September–October} → · ← swipe for the whole year · Quiet / Busy / today | as of {date} |
 
 Strings added while building, shipped, and recorded here on 2026-10-09 so `verify:copy` covers them. They were not in the original approved copy; Elias signed them off on 2026-10-09.

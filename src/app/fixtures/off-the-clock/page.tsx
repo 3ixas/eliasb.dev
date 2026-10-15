@@ -55,10 +55,12 @@ const github = (overrides: Partial<GitHubSignal>): GitHubSignal => ({
   href: "https://github.com/3ixas",
   ...overrides,
 });
-const repository = { name: "ask-professor-past", description: null, href: "https://github.com/3ixas/ask-professor-past", pushedAt: "2026-09-20T09:00:00.000Z" };
+const pushedAt = "2026-09-20T09:00:00.000Z";
+// A repository that is not one of my projects, a project with a case study, and one without.
+const repository = { name: "eliasb.dev", description: "Personal site for Elias B.", href: "https://github.com/3ixas/eliasb.dev", pushedAt };
+const projectWithCaseStudy = { name: "threshold", description: "A repository description", href: "https://github.com/3ixas/threshold", pushedAt };
+const projectWithoutCaseStudy = { name: "risk-event-tracker", description: "A repository description", href: "https://github.com/3ixas/risk-event-tracker", pushedAt };
 const latest = (overrides: Partial<LatestRepositorySignal>): LatestRepositorySignal => ({ state: "live", repository, updatedAt: daysAgo(0), ...overrides });
-/** Past the eight weeks the written entry counts as now. */
-const later = new Date("2026-12-15T12:00:00.000Z");
 
 // A live week: a pictured lead, a text-only event, and a pictured birth.
 const week: HistorySignal = {
@@ -128,9 +130,11 @@ const items = [
   { name: "film-empty", item: <FilmCard film={diary({ film: null })} now={now} /> },
   { name: "film-stale", item: <FilmCard film={diary({ updatedAt: daysAgo(61) })} now={now} /> },
   { name: "film-unrated", item: <FilmCard film={diary({ film: { ...film, rating: null, posterUrl: null } })} now={now} /> },
-  { name: "making", item: <NowMakingCard latest={latest({})} now={now} /> },
-  { name: "making-fallback", item: <NowMakingCard latest={latest({})} now={later} /> },
-  { name: "making-none", item: <NowMakingCard latest={latest({ state: "unavailable", repository: null })} now={later} /> },
+  { name: "making", item: <NowMakingCard latest={latest({})} /> },
+  { name: "making-no-description", item: <NowMakingCard latest={latest({ repository: { ...repository, description: null } })} /> },
+  { name: "making-project", item: <NowMakingCard latest={latest({ repository: projectWithCaseStudy })} /> },
+  { name: "making-project-code", item: <NowMakingCard latest={latest({ repository: projectWithoutCaseStudy })} /> },
+  { name: "making-none", item: <NowMakingCard latest={latest({ state: "unavailable", repository: null })} /> },
   { name: "github", item: <GitHubCard github={github({})} now={now} /> },
   { name: "github-stale", item: <GitHubCard github={github({ updatedAt: daysAgo(4) })} now={now} /> },
   { name: "github-unavailable", item: <GitHubCard github={github({ state: "unavailable", activity: [], total: 0, updatedAt: null })} now={now} /> },
