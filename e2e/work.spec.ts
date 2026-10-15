@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { hero } from "../src/content/stretch/site-copy";
-import { work } from "../src/content/stretch/work";
+import { shownRow, work } from "../src/content/stretch/work";
 import { contrastOnPaper } from "./support/contrast";
 
 const section = (page: Page) => page.locator("section#work");
@@ -39,7 +39,7 @@ test.describe("Work", () => {
     await expect(part.locator(".stretch-work__note")).toHaveText(work.gotHere.note);
     const rows = part.locator(".stretch-work__row");
     await expect(rows).toHaveCount(3);
-    for (const [index, row] of work.gotHere.rows.entries()) {
+    for (const [index, row] of work.gotHere.rows.map(shownRow).entries()) {
       const item = rows.nth(index);
       await expect(item.locator(".stretch-work__dates")).toHaveText(row.dates);
       await expect(item.locator(".stretch-work__name")).toHaveText(row.role);
@@ -61,9 +61,10 @@ test.describe("Work", () => {
   });
 
   test("a row opens its Role story", async ({ page }) => {
-    await section(page).getByRole("link", { name: new RegExp(work.gotHere.rows[1].role) }).click();
+    const optegra = shownRow(work.gotHere.rows[1]);
+    await section(page).getByRole("link", { name: new RegExp(optegra.role) }).click();
     await expect(page).toHaveURL(/\/work\/optegra$/);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(work.gotHere.rows[1].organisation!);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(optegra.organisation!);
   });
 
   test("the Things I make strand scrolls to that section", async ({ page }) => {

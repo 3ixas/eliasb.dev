@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { work, type GotHereRow, type WorkLink } from "@/content/stretch/work";
+import { shownRow, work, type ShownRow, type WorkLink } from "@/content/stretch/work";
 
 /**
  * The body of the Work section (GLOSSARY.md): Now, Where I'm headed, and
@@ -47,7 +47,7 @@ export function Work() {
         </h3>
         <p className="stretch-mono stretch-work__note">{gotHere.note}</p>
         <ol className="stretch-work__rows">
-          {gotHere.rows.map((row) => (
+          {gotHere.rows.map(shownRow).map((row) => (
             <li key={row.dates} className="stretch-work__row">
               {row.story ? (
                 <Link className="stretch-work__row-link" href={`/work/${row.story}`}>
@@ -74,7 +74,7 @@ function TextLink({ link }: { link: WorkLink }) {
   );
 }
 
-function RowContent({ row, linked = false }: { row: GotHereRow; linked?: boolean }) {
+function RowContent({ row, linked = false }: { row: ShownRow; linked?: boolean }) {
   return (
     <>
       <span className="stretch-mono stretch-work__dates">{row.dates}</span>

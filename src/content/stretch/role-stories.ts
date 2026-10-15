@@ -13,7 +13,8 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
     employer: "BNP Paribas",
     role: "Software engineer",
     number: "01",
-    metadata: "Risk division · London · Jul 2025 – now",
+    dates: "Jul 2025 – now",
+    setting: "Risk division · London",
     sections: {
       summary: {
         paragraphs: [
@@ -92,7 +93,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
     employer: "Joveen",
     role: "Full stack software engineer",
     number: "02",
-    metadata: "Aug 2024 – Jun 2025",
+    dates: "Aug 2024 – Jun 2025",
     sections: {
       summary: {
         paragraphs: [
@@ -162,7 +163,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
     employer: "Optegra Eye Healthcare & Kensington Medical",
     role: "Marketing executive",
     number: "03",
-    metadata: "Sep 2021 – Aug 2024",
+    dates: "Sep 2021 – Aug 2024",
     sections: {
       summary: {
         paragraphs: [

@@ -13,7 +13,7 @@ Elias's site was built around the **Board**, a studio-wall metaphor of pins, sti
 A from-scratch front end in the **Stretch direction**, keeping the existing data layer: integrations, snapshots and fallbacks, routes, and case-study facts.
 
 - **Look:** a clean neutral page; Elias's **Cobalt accent** used large for his name, "today/now" and "Say hello"; each project in its own **Project colour**; Bricolage Grotesque condensed at display size with JetBrains Mono for metadata; one **Fastener** per physical-looking object.
-- **Homepage sections:** Hero, Things I make, How I work, Where I've been, Off the clock, Say hello. (Work, led by employment, joins them in [#175](https://github.com/3ixas/eliasb.dev/issues/175).)
+- **Homepage sections:** Hero, Work, Things I make, How I work, Off the clock, Say hello. Work leads with employment and replaced Where I've been and the Career ruler ([#157](https://github.com/3ixas/eliasb.dev/issues/157), [#175](https://github.com/3ixas/eliasb.dev/issues/175)).
 - **Work:** up to three hand-picked featured tiles, then a newest-first **Project index** that scales to any number of projects.
 - **Case studies:** short and evidence-led.
 - **Signature entrance:** a Commissioner-style opening that plays on every load.
@@ -45,11 +45,11 @@ A from-scratch front end in the **Stretch direction**, keeping the existing data
 18. As a phone user, I want screenshots to straighten as they pass the middle of the screen, so that the same idea works without hover.
 19. As a visitor, I want the tape, paperclip and pin fasteners to react subtly on hover, so that the props feel physical.
 
-**Visitors: How I work and Where I've been**
+**Visitors: How I work and Work**
 20. As a hiring manager, I want three short habits, each with one true proof, so that I understand how Elias decides what to build and checks whether it works.
 21. As a hiring manager, I want an honest line that his own projects aren't launched or measured yet, so that I can trust the rest.
-22. As a visitor, I want Where I've been shown as a vertical log, oldest first, with dates, roles, organisations, one-line story notes and milestone markers, so that I can follow his path at a glance.
-23. As a visitor, I want the current role marked in cobalt, so that I can see where he is now.
+22. As a visitor, I want Work to lead the homepage with Now, Where I'm headed and How I got here (earlier roles newest first, each opening its Role story, with History as a row that has none), so that I can follow his path at a glance.
+23. As a visitor, I want Now to show what he does today with proofs the First glance doesn't repeat, so that I can see where he is now.
 
 **Visitors: Off the clock**
 24. As a visitor, I want this week's training as a poster with today marked in cobalt, so that I get a sense of his life outside work.
@@ -96,7 +96,7 @@ A from-scratch front end in the **Stretch direction**, keeping the existing data
 - The data layer stays: integrations, snapshots and fallbacks, case-study facts and routes (ADR 0001). The presentation layer is rebuilt on Motion and design tokens (ADR 0004).
 - **A new ADR 0005 records the Stretch redesign.** It supersedes ADR 0003's section list and navigation, the Library label, and the About section. It also amends ADR 0004's first-paint constraint to: "content is in the server HTML from first paint; visually, only the homepage's signature entrance may hold the page, for about 5 seconds; nothing else ever gates content." The Board-era `docs/design/DESIGN.md` becomes history, and a new design document records the Stretch tokens and the components below.
 - **Fantasy football is removed:** its pin, fixtures, Sleeper fetching and copy. The Spotify playlist and the London photo also leave the page. Their integration modules are deleted, not just hidden, so no unused secret or refresh remains.
-- **Routes:** `/`, `/things-i-make`, `/things-i-make/[slug]` (stable URLs), and the 404. `/work` and `/work/threshold|argus-risk|flowtime` redirect permanently, one path at a time, to `/things-i-make` and `/things-i-make/<slug>` (#157, #170); nothing else under `/work/` redirects. `/about` redirects permanently to `/#where-ive-been`; `/lab` and `/library` to `/#off-the-clock`. Homepage anchors: `#things-i-make`, `#how-i-work`, `#where-ive-been`, `#off-the-clock`, `#say-hello`.
+- **Routes:** `/`, `/things-i-make`, `/things-i-make/[slug]` (stable URLs), and the 404. `/work` and `/work/threshold|argus-risk|flowtime` redirect permanently, one path at a time, to `/things-i-make` and `/things-i-make/<slug>` (#157, #170); nothing else under `/work/` redirects. `/about` redirects permanently to `/#work`; `/lab` and `/library` to `/#off-the-clock`. Homepage anchors: `#work`, `#things-i-make`, `#how-i-work`, `#off-the-clock`, `#say-hello`.
 
 **Design tokens**
 
@@ -120,7 +120,7 @@ All text pairs pass WCAG 2.2 AA (5.7:1–18.2:1, #108). Project colours are data
 - *Index:* the catalogue minus the featured projects, newest first. Inclusion is editorial: only work Elias would talk through in an interview. Today that's Ask Professor Past v1 (linking to its live site), Home Secretary and Risk Event Tracker. Connect Four is out.
 - *Case study:* opening (number, name, outcome, metadata, stack, links, hero screenshot), six sections keyed `where-it-started`, `written-down-first`, `decisions`, `how-its-built`, `where-it-stands`, `whats-next`, and a PRD card (quote, date) plus an evidence strip of up to four `{value, label}` items. A figure can attach to any section. It ends with the next project.
 - *How I work:* three `{habit, proof}` beats, the honest line, and the PRD card's caption.
-- *Career log:* stages, each with dates, role, organisation, an `isCurrent` flag, notes (each with an optional "when" label) and milestones (text, when).
+- *Work module:* Now (role, organisation, dates, proofs and a link), Where I'm headed (a line and strands, each with a proof and a link), and How I got here (rows newest first, each with a note and either the Role story it opens or none for History; the role, organisation and dates of a story's row come from that Role story).
 - *Off the clock:* independent columns above 760px, with training and reading/film on the left and history and Now making on the right, followed by a full-width GitHub calendar. Reading and film share a row above 1100px; narrower screens stack them. Mobile follows the same column reading order. The training plan (an authored week, with today computed in Europe/London) plus the existing book, film, clipping, Now making and GitHub signals, each with live and fallback copy.
 - All copy comes from `docs/content/redesign-copy.md`.
 
@@ -166,7 +166,7 @@ rest of the page  fade 0.5 s when the name and portrait settle
 - **Header:** the theme button and Menu only, with a full-screen menu dialog. The clock lives in that dialog.
 - **Layout:** single-column cards, 16 px gutters, targets at least 44 px, and no page-level horizontal scroll.
 - **Contained scrolling:** only the GitHub grid scrolls sideways, inside its card, opening on today and reachable by keyboard.
-- **Where I've been:** dates sit above each role.
+- **Work:** in How I got here, dates sit above each role.
 - **Tablets:** use the desktop layout with a narrower grid.
 
 **Case studies and the archive**

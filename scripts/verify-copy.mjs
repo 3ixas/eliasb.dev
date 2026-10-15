@@ -14,6 +14,7 @@ import {
   roleStoryBack,
   roleStoryCopy,
   roleStoryDescription,
+  roleStoryMetadata,
   roleStoryName,
   roleStoryProblems,
   roleStorySectionKeys,
@@ -22,7 +23,7 @@ import {
 import { howIWork } from "../src/content/stretch/how-i-work.ts";
 import { offTheClock } from "../src/content/stretch/off-the-clock.ts";
 import { hero, notFound, sayHello, siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy.ts";
-import { work } from "../src/content/stretch/work.ts";
+import { shownRow, work } from "../src/content/stretch/work.ts";
 
 const raw = readFileSync(new URL("../docs/content/redesign-copy.md", import.meta.url), "utf8");
 // Emphasis stars and the {braces} around live values are markup, not words.
@@ -125,7 +126,7 @@ const gotHereCopy = copyFor("How I got here");
 assert.equal(gotHere.heading, bullet(gotHereCopy, "Heading"), "How I got here: heading");
 assert.equal(gotHere.note, bullet(gotHereCopy, "Note"), "How I got here: note");
 assert.deepEqual(
-  gotHere.rows.map((row) => [row.dates, row.organisation ? `${row.role} · ${row.organisation}` : row.role, row.note]),
+  gotHere.rows.map(shownRow).map((row) => [row.dates, row.organisation ? `${row.role} · ${row.organisation}` : row.role, row.note]),
   rows(gotHereCopy, "### "),
   "How I got here: rows",
 );
@@ -136,7 +137,7 @@ const links = [now.link, ...headed.strands.map((strand) => strand.link)];
 for (const { href } of links) {
   assert.ok(href.startsWith("#") ? siteCopy.menu.some(({ id }) => `#${id}` === href) : roleStorySlugs.some((slug) => href === `/work/${slug}`), `Work links to "${href}", which does not exist`);
 }
-for (const row of gotHere.rows) assert.ok(row.story === null || roleStorySlugs.includes(row.story), `${row.dates} opens a Role story that does not exist`);
+for (const row of gotHere.rows) assert.ok(row.story === null || roleStorySlugs.includes(row.story), `The row for "${row.story}" opens a Role story that does not exist`);
 assert.deepEqual(gotHere.rows.map((row) => row.story), ["joveen", "optegra", null], "How I got here runs newest first, and History has no story");
 assert.deepEqual(siteCopy.menu.map(({ id }) => id), ["work", "things-i-make", "how-i-work", "off-the-clock", "say-hello"], "The menu follows the page");
 
@@ -181,7 +182,7 @@ const roles = Object.values(roleStories);
 
 for (const story of roles) {
   const table = Object.fromEntries(rows(copyFor(story.employer), "### ").map(([label, text]) => [label, text]));
-  assert.equal([story.role, story.metadata].join(" · "), table.Opening, `${story.slug}: opening`);
+  assert.equal([story.role, roleStoryMetadata(story)].join(" · "), table.Opening, `${story.slug}: opening`);
   assert.equal(siteCopy.title(roleStoryName(story)), table.Title, `${story.slug}: title`);
   assert.equal(roleStoryDescription(story), table["Meta description"], `${story.slug}: meta description`);
   assert.equal([story.employer, story.role, siteCopy.socialImage.name].join(" · "), table["Social card"], `${story.slug}: social card`);

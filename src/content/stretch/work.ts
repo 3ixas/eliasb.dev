@@ -5,8 +5,9 @@
  * checks it. BNP Paribas detail stays at CV level: no colleague names, internal
  * system names or review context.
  *
- * Type imports only, so Node can load it directly as well as Next.
+ * Its runtime imports carry a .ts extension, so Node can load it directly as well as Next.
  */
+import { roleStories } from "./role-stories.ts";
 import type { RoleStorySlug } from "./role-story";
 
 export type WorkLink = { label: string; href: string };
@@ -14,15 +15,24 @@ export type WorkLink = { label: string; href: string };
 /** A line of "Where I'm headed": the strand, one proof, and where it leads. */
 export type HeadedStrand = { title: string; proof: string; link: WorkLink };
 
-/** A row of "How I got here". `story` is the Role story it opens; `null` is History, which has none. */
-export type GotHereRow = {
-  /** "Sep 2021 – Aug 2024". */
-  dates: string;
-  role: string;
-  organisation?: string;
-  note: string;
-  story: RoleStorySlug | null;
-};
+/**
+ * A row of "How I got here". A row that opens a Role story names it and keeps
+ * only its own note: the dates, role and employer come from the story, so the
+ * row cannot say one thing while linking to another. History has no story, so
+ * it carries its own.
+ */
+export type GotHereRow =
+  | { story: RoleStorySlug; note: string }
+  | { story: null; dates: string; role: string; note: string };
+
+/** A row as it is shown. */
+export type ShownRow = { story: RoleStorySlug | null; dates: string; role: string; organisation?: string; note: string };
+
+export function shownRow(row: GotHereRow): ShownRow {
+  if (row.story === null) return row;
+  const { dates, role, employer } = roleStories[row.story];
+  return { story: row.story, dates, role, organisation: employer, note: row.note };
+}
 
 export const work = {
   heading: "Work",
@@ -64,21 +74,9 @@ export const work = {
     note: "History, then marketing, then code. Each move was towards the work I liked most.",
     /** Newest first. */
     rows: [
-      {
-        dates: "Aug 2024 – Jun 2025",
-        role: "Full stack software engineer",
-        organisation: "Joveen",
-        note: "Cut page load by 40% and deploys from 10 minutes to under 2.",
-        story: "joveen",
-      },
-      {
-        dates: "Sep 2021 – Aug 2024",
-        role: "Marketing executive",
-        organisation: "Optegra Eye Healthcare & Kensington Medical",
-        note: "Raised the Core Web Vitals pass rate from 62% to 88%.",
-        story: "optegra",
-      },
-      { dates: "Before 2021", role: "History at uni", note: "Because I loved it, and I still do.", story: null },
+      { story: "joveen", note: "Cut page load by 40% and deploys from 10 minutes to under 2." },
+      { story: "optegra", note: "Raised the Core Web Vitals pass rate from 62% to 88%." },
+      { story: null, dates: "Before 2021", role: "History at uni", note: "Because I loved it, and I still do." },
     ] satisfies readonly GotHereRow[],
   },
 } as const;
