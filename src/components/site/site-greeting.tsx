@@ -28,7 +28,7 @@ export function SiteGreeting({ className = "" }: { className?: string }) {
   return (
     <p className={`stretch-pill stretch-mono ${className}`.trim()} data-greeting={key}>
       <span className="stretch-greeting" data-longest={longest}>
-        {siteCopy.greeting[key]}
+        <span>{siteCopy.greeting[key]}</span>
       </span>
     </p>
   );

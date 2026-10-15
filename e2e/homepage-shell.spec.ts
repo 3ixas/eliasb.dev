@@ -159,6 +159,9 @@ test.describe("The header greeting", () => {
     const after = await greeting(page).boundingBox();
     expect(after!.width).toBeCloseTo(before!.width, 1);
     expect(after!.height).toBeCloseTo(before!.height, 1);
+    // The shown text shares the reservation's cell, so it sits in the pill's middle, not a row below.
+    const text = (await shownText(page).locator("span").boundingBox())!;
+    expect(text.y + text.height / 2).toBeCloseTo(after!.y + after!.height / 2, 0);
     await context.close();
   });
 

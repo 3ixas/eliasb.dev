@@ -192,9 +192,14 @@ button.stretch-pill {
   display: inline-grid;
 }
 
+/* Both sit in the one cell: the shown text in its own element, since a bare text node cannot be placed. */
+.stretch-greeting > span,
+.stretch-greeting::after {
+  grid-area: 1 / 1;
+}
+
 .stretch-greeting::after {
   content: attr(data-longest);
-  grid-area: 1 / 1;
   visibility: hidden;
 }
 
