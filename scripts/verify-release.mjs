@@ -82,10 +82,13 @@ function tags(markup, name) {
   return [...markup.matchAll(new RegExp(`<${name}\\b[^>]*>`, "gi"))].map(([tag]) => tag);
 }
 
+// An attribute as a browser reads it: the markup writes "&" as "&amp;", for example.
+const decodeEntities = (value) => value.replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'").replace(/&amp;/g, "&");
+
 function attribute(tag, name) {
-  return tag.match(new RegExp(`\\s${name}=(?:"([^"]*)"|'([^']*)')`, "i"))?.[1]
-    ?? tag.match(new RegExp(`\\s${name}=(?:"([^"]*)"|'([^']*)')`, "i"))?.[2]
-    ?? null;
+  const value = tag.match(new RegExp(`\\s${name}=(?:"([^"]*)"|'([^']*)')`, "i"))?.[1]
+    ?? tag.match(new RegExp(`\\s${name}=(?:"([^"]*)"|'([^']*)')`, "i"))?.[2];
+  return value === undefined ? null : decodeEntities(value);
 }
 
 function metaContent(document, key, attributeName = "property") {
