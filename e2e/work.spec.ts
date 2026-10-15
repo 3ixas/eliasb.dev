@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { hero } from "../src/content/stretch/site-copy";
-import { shownRow, work } from "../src/content/stretch/work";
+import { shownNow, shownRow, work } from "../src/content/stretch/work";
 import { contrastOnPaper } from "./support/contrast";
 
 const section = (page: Page) => page.locator("section#work");
@@ -14,9 +14,10 @@ test.describe("Work", () => {
   test("Now names the role and carries its three proofs, ending on the BNP Paribas story", async ({ page }) => {
     const now = section(page).getByRole("article", { name: work.now.heading });
     await expect(now.getByRole("heading", { level: 3 })).toHaveText(work.now.heading);
-    await expect(now).toContainText([work.now.role, work.now.organisation, work.now.dates].join(" · "));
+    const shown = shownNow();
+    await expect(now).toContainText([shown.role, shown.organisation, shown.dates].join(" · "));
     await expect(now.getByRole("listitem")).toHaveText(work.now.proofs);
-    await expect(now.getByRole("link", { name: work.now.link.label })).toHaveAttribute("href", "/work/bnp-paribas");
+    await expect(now.getByRole("link", { name: shown.link.label })).toHaveAttribute("href", "/work/bnp-paribas");
   });
 
   test("Where I'm headed has its line and three strands, each with one proof and its link", async ({ page }) => {

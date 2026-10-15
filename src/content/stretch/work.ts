@@ -34,19 +34,27 @@ export function shownRow(row: GotHereRow): ShownRow {
   return { story: row.story, dates, role, organisation: employer, note: row.note };
 }
 
+/** Now as it is shown: the role and dates are the Role story's, and so is the route its link opens. */
+export function shownNow() {
+  const { story, organisation, linkLabel } = work.now;
+  const { role, dates } = roleStories[story];
+  return { role, organisation, dates, link: { label: linkLabel, href: `/work/${story}` } satisfies WorkLink };
+}
+
 export const work = {
   heading: "Work",
   now: {
     heading: "Now",
-    role: "Software engineer",
+    /** The Role story Now is about: its role and dates, and the route of its link, come from there. */
+    story: "bnp-paribas",
+    /** How Now names the employer, as the First glance does; the story's own name is "BNP Paribas". */
     organisation: "BNP Paribas CIB",
-    dates: "Jul 2025 – now",
     proofs: [
       "I’m the team’s only C# engineer, so I own the C# side from planning through review.",
       "I was nominated as an AI Champion, and the workflow I built is now used by several teams across the department.",
       "With that workflow I integrated a pricer in a couple of days, a job that takes an experienced engineer about two weeks.",
     ],
-    link: { label: "The BNP Paribas story →", href: "/work/bnp-paribas" },
+    linkLabel: "The BNP Paribas story →",
   },
   headed: {
     heading: "Where I’m headed",

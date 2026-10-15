@@ -23,7 +23,7 @@ import {
 import { howIWork } from "../src/content/stretch/how-i-work.ts";
 import { offTheClock } from "../src/content/stretch/off-the-clock.ts";
 import { hero, notFound, sayHello, siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy.ts";
-import { shownRow, work } from "../src/content/stretch/work.ts";
+import { shownNow, shownRow, work } from "../src/content/stretch/work.ts";
 
 const raw = readFileSync(new URL("../docs/content/redesign-copy.md", import.meta.url), "utf8");
 // Emphasis stars and the {braces} around live values are markup, not words.
@@ -109,9 +109,11 @@ const bullet = (text, label) => text.match(new RegExp(`^- ${label}: (.+)$`, "m")
 const { now, headed, gotHere } = work;
 
 const nowRows = Object.fromEntries(rows(copyFor("Now"), "### ").map(([part, copy]) => [part, copy]));
-assert.equal([now.role, now.organisation, now.dates].join(" · "), nowRows["Role line"], "Now: role line");
+const shown = shownNow();
+assert.equal([shown.role, shown.organisation, shown.dates].join(" · "), nowRows["Role line"], "Now: role line");
 assert.equal(now.proofs.join(" · "), nowRows.Proofs, "Now: proofs");
-assert.equal(now.link.label, nowRows.Link, "Now: link");
+assert.equal(shown.link.label, nowRows.Link, "Now: link");
+assert.equal(shown.link.href, "/work/bnp-paribas", "Now opens the BNP Paribas Role story");
 
 const headedCopy = copyFor("Where I’m headed");
 assert.equal(headed.heading, bullet(headedCopy, "Heading"), "Where I’m headed: heading");
@@ -133,7 +135,7 @@ assert.deepEqual(
 assert.equal(work.heading, bullet(raw.slice(raw.indexOf("## Work\n")), "Heading"), "Work: heading");
 
 // Every link goes somewhere that exists: a Role story, or a section of the homepage. Rows run newest first.
-const links = [now.link, ...headed.strands.map((strand) => strand.link)];
+const links = [shown.link, ...headed.strands.map((strand) => strand.link)];
 for (const { href } of links) {
   assert.ok(href.startsWith("#") ? siteCopy.menu.some(({ id }) => `#${id}` === href) : roleStorySlugs.some((slug) => href === `/work/${slug}`), `Work links to "${href}", which does not exist`);
 }

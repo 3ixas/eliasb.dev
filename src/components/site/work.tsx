@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { shownRow, work, type ShownRow, type WorkLink } from "@/content/stretch/work";
+import { shownNow, shownRow, work, type ShownRow, type WorkLink } from "@/content/stretch/work";
 
 /**
  * The body of the Work section (GLOSSARY.md): Now, Where I'm headed, and
@@ -10,19 +10,20 @@ import { shownRow, work, type ShownRow, type WorkLink } from "@/content/stretch/
  */
 export function Work() {
   const { now, headed, gotHere } = work;
+  const shown = shownNow();
   return (
     <div className="stretch-work">
       <article className="stretch-work__part stretch-work__now" aria-labelledby="work-now-heading">
         <h3 id="work-now-heading" className="stretch-work__h3">
           {now.heading}
         </h3>
-        <p className="stretch-mono stretch-work__role">{[now.role, now.organisation, now.dates].join(" · ")}</p>
+        <p className="stretch-mono stretch-work__role">{[shown.role, shown.organisation, shown.dates].join(" · ")}</p>
         <ul className="stretch-work__proofs">
           {now.proofs.map((proof) => (
             <li key={proof}>{proof}</li>
           ))}
         </ul>
-        <TextLink link={now.link} />
+        <TextLink link={shown.link} />
       </article>
 
       <article className="stretch-work__part" aria-labelledby="work-headed-heading">
