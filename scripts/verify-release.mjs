@@ -189,6 +189,14 @@ async function fetchAsset(baseUrl, route) {
   return response.text();
 }
 
+/** Production sends a Content-Security-Policy whose script-src never allows eval (development adds it in next.config.ts). */
+function verifyScriptPolicy(policy) {
+  check(policy !== null, "The homepage should send a Content-Security-Policy");
+  const scriptSrc = (policy ?? "").split(";").map((directive) => directive.trim()).find((directive) => directive.startsWith("script-src "));
+  check(Boolean(scriptSrc), "The Content-Security-Policy should set script-src");
+  check(!scriptSrc?.includes("'unsafe-eval'"), "Production must not allow 'unsafe-eval' in script-src");
+}
+
 function verifyPageShell(markup, route) {
   const main = tags(markup, "main")[0];
   check(main, `${route} should have a main landmark`);
@@ -287,7 +295,7 @@ async function verifyRoutes(baseUrl, pages) {
     pages.set(route, page);
     equal(page.response.status, 200, `${route} should render successfully`);
     verifyPageShell(page.markup, route);
-    if (route === "/") check(!(page.response.headers.get("content-security-policy") ?? "").includes("unsafe-eval"), "Production must not allow 'unsafe-eval' in its Content-Security-Policy");
+    if (route === "/") verifyScriptPolicy(page.response.headers.get("content-security-policy"));
     if (route === "/") await verifyHomeSocialMetadata(baseUrl, page.document);
     if (route.startsWith("/things-i-make")) await verifyWorkSocialMetadata(baseUrl, page.document, route);
     if (route.startsWith("/work/")) await verifyRoleStorySocialMetadata(baseUrl, page.document, route);
