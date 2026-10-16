@@ -13,7 +13,7 @@ The visual direction chosen for the from-scratch redesign on 8 October 2026 ([#1
 _Avoid_: Board, playful theme (its play comes from scale and colour, not from added objects)
 
 **Cobalt accent**:
-The site's one accent colour (`#2340ff` in light, `#8b9cff` in dark). It may be used large, and marks Elias's name, today and now, and the way to say hello. It never colours a project.
+The site's one accent colour (`#2340ff` in light, `#8b9cff` in dark). It may be used large, and marks Elias's name, today and now, and the way to say hello. It also colours the award pins on a **Staff pass**, wherever the pass appears, as Elias's own achievements ([#198](https://github.com/3ixas/eliasb.dev/issues/198)). It never colours a project.
 _Avoid_: Using it for project tiles or as decoration
 
 **Eclipse**:
