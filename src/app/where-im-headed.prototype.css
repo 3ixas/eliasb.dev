@@ -239,3 +239,65 @@
     height: 64px;
   }
 }
+
+/* ---------- D · Self-issued pass, threaded ---------- */
+
+.wh-d .wh-c__pass {
+  border-style: solid;
+}
+
+.wh-d__photo {
+  box-shadow: 0 0 0 3px var(--stretch-rule);
+}
+
+.wh-d .wh-c__fields {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.wh-d__field {
+  padding-top: 12px;
+  border-top: 4px solid var(--thread);
+}
+
+.wh-d__sofar {
+  margin: 8px 0 0;
+  color: var(--stretch-muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.wh-d__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 8px;
+  color: var(--stretch-ink);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.wh-d__tag .wh-b__swatch {
+  background: var(--thread);
+}
+
+.wh-d .wh-c__line {
+  max-width: 30em;
+}
+
+@media (max-width: 760px) {
+  .wh-d .wh-c__fields {
+    gap: 18px;
+  }
+
+  .wh-d__field {
+    padding: 2px 0 0 14px;
+    border-top: 0;
+    border-left: 4px solid var(--thread);
+  }
+
+  .wh-d__photo {
+    width: 52px;
+    height: 64px;
+  }
+}

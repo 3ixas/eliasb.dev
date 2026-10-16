@@ -7,6 +7,8 @@
  *   A  Tight     – restraint: trimmed copy as Project index rows, no new material.
  *   B  Threads   – wayfinding: each strand keyed in the hue of where its proof lives.
  *   C  Unissued  – the object: the direction as a blank pass (stretch).
+ *   D  Self-issued – C's pass with B's threads and the new copy (grilled 16 Oct):
+ *                  the strands are the bar, the proofs are "So far" small print.
  *
  * A, B and C share one trimmed copy (facts unchanged), so the comparison is
  * about the visual layer, not the word count.
@@ -19,11 +21,12 @@ import { roleStoryColours } from "@/content/stretch/role-story";
 import { shownLink, work } from "@/content/stretch/work";
 import "../../app/where-im-headed.prototype.css";
 
-export const HEADED_VARIANTS = ["A", "B", "C"] as const;
+export const HEADED_VARIANTS = ["A", "B", "C", "D"] as const;
 export type HeadedVariant = (typeof HEADED_VARIANTS)[number];
-export const headedVariantNames: Record<HeadedVariant, string> = { A: "Tight", B: "Threads", C: "Unissued pass" };
+export const headedVariantNames: Record<HeadedVariant, string> = { A: "Tight", B: "Threads", C: "Unissued pass", D: "Self-issued" };
 
 const bnp = roleStoryColours(roleStories["bnp-paribas"].colours).swatch;
+const optegra = roleStoryColours(roleStories.optegra.colours).swatch;
 const threshold = projects.find((project) => project.slug === "threshold")?.colours?.swatch ?? "currentColor";
 
 /** Trimmed copy: same facts and proofs, fewer words. */
@@ -163,8 +166,88 @@ function Unissued() {
   );
 }
 
+/* ---------------- D · Self-issued pass, threaded ---------------- */
+/** The copy grilled on 16 Oct: forward-looking strands, existing facts as "So far". */
+const selfIssued = {
+  line: "I want to be really good at this. Here’s what that means to me, and how far I’ve got.",
+  strands: [
+    {
+      label: "Judgement",
+      title: "Knowing what’s worth building.",
+      soFar: "At Optegra, split tests and dashboards decided what the engineers built next.",
+      source: { name: "Optegra", hue: optegra },
+      link: { href: "/work/optegra", label: "The Optegra story →" },
+    },
+    {
+      label: "Depth",
+      title: "Knowing why it works, not just that it does.",
+      soFar: "Six months from zero C# to production code, in a pricing engine of around 70 projects.",
+      source: { name: "BNP Paribas", hue: bnp },
+      link: { href: "/work/bnp-paribas", label: "The BNP Paribas story →" },
+    },
+    {
+      label: "Range",
+      title: "The whole way, from idea to running in production.",
+      soFar: "Threshold, from 57 user stories to a live site.",
+      source: { name: "Threshold", hue: threshold },
+      link: { href: "/things-i-make/threshold", label: "The Threshold case study →" },
+    },
+  ],
+};
+
+function SelfIssued() {
+  return (
+    <article className="wh wh-c wh-d" aria-labelledby="wp-headed-heading">
+      <div className="wh-c__hang">
+        <span className="wh-c__strap" aria-hidden="true" />
+        <span className="wp-clip" aria-hidden="true" />
+        <div className="wh-c__pass">
+          <span className="wp-slot" aria-hidden="true" />
+          <div className="wh-c__top stretch-mono">
+            <span>Staff pass</span>
+            <span>Self-issued</span>
+          </div>
+          <div className="wh-c__id">
+            {/* eslint-disable-next-line @next/next/no-img-element -- prototype */}
+            <img className="wp-pass__photo wh-d__photo" src="/profile/elias.webp" alt="" width={968} height={968} />
+            <div>
+              <h3 id="wp-headed-heading" className="wh-c__title">
+                {work.headed.heading}
+              </h3>
+              <p className="wh-c__line">{selfIssued.line}</p>
+            </div>
+          </div>
+          <ol className="wh-c__fields">
+            {selfIssued.strands.map((strand) => (
+              <li key={strand.label} className="wh-d__field" style={{ "--thread": strand.source.hue } as CSSProperties}>
+                <span className="wh-c__label stretch-mono">{strand.label}</span>
+                <p className="wh-c__strand">{strand.title}</p>
+                <p className="wh-d__sofar">
+                  <span className="wh-d__tag stretch-mono">
+                    <span className="wh-b__swatch" aria-hidden="true" />
+                    So far
+                  </span>
+                  {strand.soFar}
+                </p>
+                <Link className="stretch-mono wh-c__link" href={strand.link.href}>
+                  {strand.link.label}
+                </Link>
+              </li>
+            ))}
+          </ol>
+          <div className="wh-c__foot stretch-mono">
+            <span>Issued by: Elias Bennett</span>
+            <span className="wp-barcode" aria-hidden="true" />
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export function HeadedPrototype({ variant }: { variant: HeadedVariant }) {
   if (variant === "A") return <Tight />;
   if (variant === "B") return <Threads />;
-  return <Unissued />;
+  if (variant === "C") return <Unissued />;
+  return <SelfIssued />;
 }
