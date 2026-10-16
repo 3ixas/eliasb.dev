@@ -24,6 +24,10 @@ _Avoid_: Lights pill, "Lights on / Lights off" (retired wording), a metaphor tha
 The colours a project already has in its own interface, carried by its **Featured work** tile and swatches: Threshold gold, Argus Risk blue, Flowtime copper. The work carries the colour; the page stays neutral.
 _Avoid_: Recolouring projects in the Cobalt accent
 
+**Employer colour**:
+An employer's own hue (BNP Paribas green, Joveen black, Optegra teal), worn the way a **Project colour** is: by its **Role story** and, on the homepage, by its part of **Work**. A hue only, never a logo. The page stays neutral and the Cobalt accent stays Elias's own.
+_Avoid_: Employer logos, recolouring employers in the Cobalt accent
+
 **Case study**:
 A project's own page at `/things-i-make/[slug]`, short and in its **Project colour**: Where it started, What I wrote down first, Decisions, How it's built, Where it stands, What I'd do next, then the next project. Every number comes from the project's own records, and "Where it stands" says plainly what isn't launched or measured ([#112](https://github.com/3ixas/eliasb.dev/issues/112)).
 _Avoid_: Case file, long write-up
@@ -33,19 +37,27 @@ The newest-first list under **Featured work** that holds every other project wor
 _Avoid_: Grid of every project, filters on the homepage
 
 **How I work**:
-The homepage section with three beats (start from a real problem, write it down first, measure whether it works), each with one true proof, and an honest line that Elias's own projects are not yet launched or measured.
-_Avoid_: Claims of users or impact
+The homepage section with three beats (start from a real problem, write it down first, measure whether it works), each with one true proof, and the PRD card beside them. Its identity is **Margin notes**: the beats in reading order, marked up in ink that draws as it scrolls into view, with the PRD as the evidence for writing it down first ([#195](https://github.com/3ixas/eliasb.dev/issues/195)). Honesty about what isn't launched or measured lives in each **Case study**'s "Where it stands", not here.
+_Avoid_: Claims of users or impact, colour fields (colour belongs to Work and Things I make)
+
+**Margin notes**:
+How I work's hand-drawn layer: a circled number for each beat, an arrow from each beat to the next, one underline under the strongest phrase of each proof, and an arrow to the PRD. Ink only, and it marks what's already there rather than adding words ([#195](https://github.com/3ixas/eliasb.dev/issues/195)).
+_Avoid_: Doodles, decoration that marks nothing, highlighting in the Cobalt accent
 
 **Work**:
-The homepage section straight after the hero, led by employment, in three parts: Now (the current role, linking to its **Role story**), **Where I'm headed**, then **How I got here**. Employment leads, so it comes before **Things I make** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
+The homepage section straight after the hero, led by employment. Every employer is a **Staff pass** hanging from one rail, the current one largest, with History as a plain note; **Where I'm headed** follows below. The passes replaced Now and **How I got here** as text ([#194](https://github.com/3ixas/eliasb.dev/issues/194)). Employment leads, so it comes before **Things I make** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
 _Avoid_: Experience, CV, calling Elias's own projects "Work"
+
+**Staff pass**:
+An employer's pass on its lanyard in **Work**, in its **Employer colour**: Elias's portrait as the ID photo, the employer, role and dates, one headline number, and a link to its **Role story**. The current pass is the largest and reads "Valid · present"; a past one is stamped "Returned". Awards are pins on the current pass's lanyard. It carries facts, not decoration: a pass's content is the employment history ([#194](https://github.com/3ixas/eliasb.dev/issues/194)).
+_Avoid_: Badge, ID card, "Expired" (it can read as "let go"), employer logos
 
 **Things I make**:
 The homepage section for Elias's own projects: **Featured work** above the **Project index**, with a count of what he has built, introduced by what the hero used to say: making complicated things feel simple, and taking ideas all the way through ([#159](https://github.com/3ixas/eliasb.dev/issues/159)). It follows **Work**: reordered, not reduced, and keeping its product edge. The **Work archive** and every **Case study** live under `/things-i-make`, and `/work` and the old case-study paths redirect there permanently, one path at a time, since `/work/[employer]` now holds the **Role story** pages ([#157](https://github.com/3ixas/eliasb.dev/issues/157), [#158](https://github.com/3ixas/eliasb.dev/issues/158)).
 _Avoid_: Work (that means employment), On my own
 
-**How I got here**:
-The last part of **Work**: the earlier roles as compact rows, newest first, in the **Project index** style (dates, role, organisation, a one-line note), each linking to its **Role story**. History has a row but no link. A one-line note frames the changes of craft as evidence for the direction rather than as a record. It replaces the **Career ruler** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
+**How I got here** (superseded):
+Superseded by the **Staff passes** ([#194](https://github.com/3ixas/eliasb.dev/issues/194)); its note survives under the Work heading. Was the last part of **Work**: the earlier roles as compact rows, newest first, in the **Project index** style (dates, role, organisation, a one-line note), each linking to its **Role story**. History has a row but no link. A one-line note frames the changes of craft as evidence for the direction rather than as a record. It replaces the **Career ruler** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
 _Avoid_: Timeline, oldest first, the full CV
 
 **Where I've been** (superseded):
@@ -96,7 +108,7 @@ An employer's own page at `/work/[employer]` (`bnp-paribas`, `joveen`, `optegra`
 _Avoid_: Job description, CV entry, a confidentiality disclaimer, employer logos
 
 **Where I'm headed**:
-The middle part of **Work**, between the current role and **How I got here**: who Elias wants to become as an engineer (a direction of growth, not a target job or company). It names the direction, not the section, because the section leads with what he does now ([#157](https://github.com/3ixas/eliasb.dev/issues/157)). The direction covers the next two or three years and names his work and his own products as one craft practised in two places. Each of its strands rests on one proof. It sits alongside **Maker of clarity** and never replaces it.
+The last part of **Work**, full width below the **Staff passes** ([#194](https://github.com/3ixas/eliasb.dev/issues/194)): who Elias wants to become as an engineer (a direction of growth, not a target job or company). It names the direction, not the section, because the section leads with what he does now ([#157](https://github.com/3ixas/eliasb.dev/issues/157)). The direction covers the next two or three years and names his work and his own products as one craft practised in two places. Each of its strands rests on one proof. It sits alongside **Maker of clarity** and never replaces it.
 _Avoid_: Timeline, CV in chronological order, level or job titles ("aspiring Staff"), signals of looking for work
 
 **First glance**:

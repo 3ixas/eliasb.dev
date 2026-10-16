@@ -50,6 +50,8 @@ One per physical-looking object (a tile, a card, the portrait), and never more. 
 
 ## Components
 
+> **Approved, not yet built** (the design review, [#190](https://github.com/3ixas/eliasb.dev/issues/190)). Work becomes **Staff passes** on one rail, replacing Now and How I got here ([#194](https://github.com/3ixas/eliasb.dev/issues/194)), and How I work gains **Margin notes**, with the honest line moving to each Case study's "Where it stands" ([#195](https://github.com/3ixas/eliasb.dev/issues/195)). Until they're built, the Work and How I work rows below describe the live site. When building those two sections, the tickets win over the spec, and `GLOSSARY.md` already uses the new terms.
+
 | Component | Notes |
 |---|---|
 | Hero | Name (capped at 28svh) with the role line under it, real `h1`, supporting line, *See my work* and *Say hello*, portrait tilted 3° (2° on phones) with a cobalt "Based in London" label |
