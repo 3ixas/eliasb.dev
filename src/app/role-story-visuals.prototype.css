@@ -1,0 +1,488 @@
+/* PROTOTYPE, throwaway (#198): visual material for a Role story. prototype/role-story-visuals only. */
+
+.rsv-cap {
+  margin: 10px 0 0;
+  color: var(--stretch-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* ---------- A · the pass in the band ---------- */
+
+.rsv-passhang {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* The strap runs up out of the band's top edge. */
+  margin-top: -16px;
+}
+
+.rsv-a-open .stretch-cs-open__inner,
+.rsv-c-open .stretch-cs-open__inner {
+  overflow: visible;
+}
+
+.rsv-a-open .wp-hang--lg {
+  width: min(100%, 380px);
+}
+
+.rsv-a-open .wp-hang[data-strap="lg"] {
+  --strap-h: 96px;
+}
+
+/* The pass sits on its own colour, so it needs an edge to read as an object. */
+.rsv-pass {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--pass-ink) 22%, transparent),
+    0 24px 48px -16px rgb(0 0 0 / 0.5);
+}
+
+.rsv-pass .wp-pass__employer {
+  font-size: 40px;
+}
+
+.rsv-pins {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rsv-pin {
+  display: inline-flex;
+  flex-direction: column;
+  min-height: 44px;
+  justify-content: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--stretch-cobalt);
+  color: var(--stretch-on-cobalt);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.3);
+  font-size: 13px;
+  line-height: 1.15;
+  text-decoration: none;
+}
+
+.rsv-pins li:nth-child(1) .rsv-pin { transform: rotate(-3deg); }
+.rsv-pins li:nth-child(3) .rsv-pin { transform: rotate(2deg); }
+
+a.rsv-pin:hover .rsv-pin__label {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.rsv-pin__label { font-weight: 700; }
+.rsv-pin__detail { font-size: 11px; opacity: 0.85; }
+
+@media (min-width: 761px) {
+  .rsv-a-open .stretch-cs-open__inner {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  }
+}
+
+/* ---------- before / after, drawn to scale ---------- */
+
+.rsv-ba {
+  display: grid;
+  gap: 28px;
+  max-width: 720px;
+  margin: 36px 0 0;
+}
+
+.rsv-ba__what {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.rsv-ba__bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: max(var(--w), 6px);
+  min-height: 36px;
+  margin-top: 6px;
+  border-radius: 6px;
+}
+
+.rsv-ba__bar span {
+  position: absolute;
+  left: 12px;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.rsv-ba__bar--before {
+  background: repeating-linear-gradient(-45deg, var(--stretch-card) 0 6px, transparent 6px 12px);
+  box-shadow: inset 0 0 0 1px var(--stretch-rule);
+  color: var(--stretch-muted);
+}
+
+.rsv-ba__bar--after {
+  background: var(--cs-swatch, var(--stretch-ink));
+}
+
+/* The after bar is short, so its label sits outside it, in ink. */
+.rsv-ba__bar--after span {
+  left: calc(100% + 12px);
+  color: var(--stretch-ink);
+  font-weight: 700;
+}
+
+[data-role-story] .rsv-ba {
+  --cs-swatch: light-dark(#053824, #3ecf8e);
+}
+
+/* ---------- the certificate ---------- */
+
+.rsv-cert {
+  max-width: 720px;
+  margin: 40px 0 0;
+  scroll-margin-top: 96px;
+}
+
+.rsv-cert__frame {
+  position: relative;
+  padding: 10px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12), 0 18px 36px -16px rgb(0 0 0 / 0.35);
+  transform: rotate(-0.6deg);
+}
+
+.rsv-cert__frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+}
+
+.rsv-cert--compact {
+  max-width: 420px;
+}
+
+/* ---------- B · exhibits ---------- */
+
+.rsv-b-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.rsv-b-exhibit {
+  margin-top: 28px;
+}
+
+@media (min-width: 1100px) {
+  .rsv-b-body {
+    max-width: 1240px;
+  }
+
+  .rsv-b-row[data-has-exhibit] {
+    grid-template-columns: minmax(0, 680px) minmax(0, 1fr);
+    column-gap: 56px;
+    align-items: start;
+  }
+
+  .rsv-b-exhibit {
+    position: sticky;
+    top: 96px;
+    margin-top: 112px;
+  }
+
+  .rsv-b-exhibit .rsv-ba,
+  .rsv-b-exhibit .rsv-cert {
+    margin-top: 0;
+  }
+}
+
+.rsv-ex {
+  margin: 0;
+  padding: 20px;
+  border: 1.5px solid var(--stretch-ink);
+  border-radius: 12px;
+  background: var(--stretch-page);
+}
+
+.rsv-engine__box {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--cs-field);
+  color: var(--cs-ink);
+}
+
+.rsv-engine__n {
+  font-size: 56px;
+  line-height: 0.9;
+}
+
+.rsv-engine__paths {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.rsv-engine__path {
+  padding: 10px 12px;
+  border: 1.5px dashed var(--stretch-ink);
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.rsv-loader {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 14px;
+}
+
+.rsv-loader .rsv-cap { grid-column: 1 / -1; }
+
+.rsv-loader__sources {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+
+.rsv-loader__sources li {
+  padding: 6px 10px;
+  border: 1.5px solid var(--stretch-rule);
+  border-radius: 6px;
+  color: var(--stretch-muted);
+}
+
+.rsv-loader__arrow { font-size: 28px; }
+
+.rsv-loader__one {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--cs-field);
+  color: var(--cs-ink);
+  font-weight: 700;
+}
+
+.rsv-loader__gate {
+  justify-self: start;
+  padding: 2px 8px;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.rsv-flag__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--stretch-rule);
+  font-size: 15px;
+}
+
+.rsv-flag__path {
+  flex: 1 1 180px;
+  font-weight: 600;
+}
+
+.rsv-flag__on {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--cs-field);
+  color: var(--cs-ink);
+}
+
+.rsv-flag__toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--stretch-rule);
+}
+
+.rsv-flag__toggle span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--stretch-page);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+}
+
+.rsv-b-pins {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rsv-b-pin {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--cs-field);
+  color: var(--cs-ink);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 0.2), inset 0 1px 0 rgb(255 255 255 / 0.25);
+}
+
+.rsv-b-pin:nth-child(odd) { transform: rotate(-1.5deg); }
+.rsv-b-pin:nth-child(even) { transform: rotate(1.2deg); }
+
+.rsv-b-pin__value {
+  font-size: 32px;
+  line-height: 0.95;
+}
+
+.rsv-b-pin__label {
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+/* Exhibits fade up as they arrive. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .rsv-b-exhibit > * {
+      animation: rsv-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+
+@keyframes rsv-rise {
+  from { opacity: 0; transform: translateY(16px); }
+}
+
+/* ---------- C · timeline in the band ---------- */
+
+.rsv-c-line {
+  --track: color-mix(in srgb, var(--cs-ink) 35%, transparent);
+  position: relative;
+  display: grid;
+  gap: 0;
+  margin: 0 auto;
+  padding: 8px 20px 56px;
+  list-style: none;
+}
+
+.rsv-c-stop {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  padding: 0 0 26px 28px;
+  border-left: 2px solid var(--track);
+}
+
+.rsv-c-stop:last-child { border-left-color: transparent; }
+
+.rsv-c-dot {
+  position: absolute;
+  top: 2px;
+  left: -8px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--cs-ink);
+  border-radius: 50%;
+  background: var(--cs-field);
+}
+
+.rsv-c-stop[data-now] .rsv-c-dot {
+  background: var(--cs-ink);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--cs-ink) 25%, transparent);
+}
+
+.rsv-c-when { font-size: 13px; }
+
+.rsv-c-what {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.rsv-c-detail {
+  max-width: 40ch;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.rsv-c-cert {
+  display: grid;
+  gap: 6px;
+  width: 180px;
+  margin-top: 8px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.rsv-c-cert img {
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 4px;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 10px 20px -8px rgb(0 0 0 / 0.5);
+  transform: rotate(-2deg);
+}
+
+.rsv-c-cert span { font-size: 12px; text-decoration: underline; }
+
+@media (min-width: 900px) {
+  .rsv-c-line {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    column-gap: 18px;
+    padding-top: 24px;
+  }
+
+  .rsv-c-stop {
+    align-content: start;
+    padding: 26px 0 0;
+    border-left: 0;
+    border-top: 2px solid var(--track);
+  }
+
+  .rsv-c-stop:last-child { border-top-style: dashed; }
+
+  .rsv-c-dot {
+    top: -8px;
+    left: 0;
+  }
+
+  .rsv-c-what { font-size: 17px; }
+  .rsv-c-detail { font-size: 14px; }
+  .rsv-c-cert { width: 150px; }
+}
+
+/* The line lights stop by stop as it scrolls through. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .rsv-c-stop {
+      animation: rsv-light linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 40%;
+    }
+  }
+}
+
+@keyframes rsv-light {
+  from { opacity: 0.35; }
+}
