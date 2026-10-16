@@ -6,6 +6,7 @@
  *
  *   A  Scale      – axis: type. "404" at display size in outline numerals; the 0 lands tilted, like a dropped tile.
  *   B  Object     – axis: a physical thing. A lost-property tag on a string, stamped "Not on file", carrying the address asked for.
+ *                   CHOSEN (#197), with A's five section rows under the copy and no hover nudge.
  *   C  Directory  – axis: wayfinding (stretch). A "you are here" sign with every real destination on the site, case studies in their colours.
  *
  * The approved heading, line and link stay in every variant; anything else is
@@ -95,6 +96,10 @@ function Tag({ path }: { path: string }) {
     <div className="nf-b">
       <div className="nf-b__copy">
         <Basics />
+        <nav aria-label="Somewhere else" className="nf-b__rows">
+          <p className="stretch-mono nf-kicker">Or try</p>
+          <SectionRows />
+        </nav>
       </div>
       <div className="nf-b__hang">
         <svg className="nf-b__string" viewBox="0 0 120 90" aria-hidden="true">
