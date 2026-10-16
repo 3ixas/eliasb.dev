@@ -37,8 +37,12 @@ The newest-first list under **Featured work** that holds every other project wor
 _Avoid_: Grid of every project, filters on the homepage
 
 **How I work**:
-The homepage section with three beats (start from a real problem, write it down first, measure whether it works), each with one true proof, and an honest line that Elias's own projects are not yet launched or measured.
-_Avoid_: Claims of users or impact
+The homepage section with three beats (start from a real problem, write it down first, measure whether it works), each with one true proof, and the PRD card beside them. Its identity is **Margin notes**: the beats in reading order, marked up in ink that draws as it scrolls into view, with the PRD as the evidence for writing it down first ([#195](https://github.com/3ixas/eliasb.dev/issues/195)). Honesty about what isn't launched or measured lives in each **Case study**'s "Where it stands", not here.
+_Avoid_: Claims of users or impact, colour fields (colour belongs to Work and Things I make)
+
+**Margin notes**:
+How I work's hand-drawn layer: a circled number for each beat, an arrow from each beat to the next, one underline under the strongest phrase of each proof, and an arrow to the PRD. Ink only, and it marks what's already there rather than adding words ([#195](https://github.com/3ixas/eliasb.dev/issues/195)).
+_Avoid_: Doodles, decoration that marks nothing, highlighting in the Cobalt accent
 
 **Work**:
 The homepage section straight after the hero, led by employment. Every employer is a **Staff pass** hanging from one rail, the current one largest, with History as a plain note; **Where I'm headed** follows below. The passes replaced Now and **How I got here** as text ([#194](https://github.com/3ixas/eliasb.dev/issues/194)). Employment leads, so it comes before **Things I make** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
