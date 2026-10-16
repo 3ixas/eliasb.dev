@@ -201,12 +201,14 @@ for (const slug of roleStorySlugs) {
   });
 }
 
-test("a slug that is not a Role story is a 404, and no Role story is redirected", async ({ page }) => {
+// Status codes, so no browser: back-to-back page.goto calls raced each page's
+// RSC prefetch of "/", and WebKit sometimes aborted the next navigation.
+test("a slug that is not a Role story is a 404, and no Role story is redirected", async ({ request }) => {
   expect(roleStorySlugs).toEqual(["bnp-paribas", "joveen", "optegra"]);
   for (const slug of ["constructor", "not-a-story"]) {
-    expect((await page.goto(`/work/${slug}`))?.status(), slug).toBe(404);
+    expect((await request.get(`/work/${slug}`, { maxRedirects: 0 })).status(), slug).toBe(404);
   }
   for (const slug of roleStorySlugs) {
-    expect((await page.goto(`/work/${slug}`))?.url()).toMatch(new RegExp(`/work/${slug}$`));
+    expect((await request.get(`/work/${slug}`, { maxRedirects: 0 })).status(), `${slug} is served, not redirected`).toBe(200);
   }
 });
