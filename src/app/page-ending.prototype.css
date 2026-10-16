@@ -427,6 +427,53 @@
   }
 }
 
+/* ---------- D and E: C with Say hello the biggest thing in the ending ---------- */
+
+/* D: A's headline without its stretch, since the footer's fill is the ending's one signature. */
+.pe-a__big--still .pe-a__word,
+.pe-a__big--still .pe-a__arrow {
+  transition: none;
+}
+
+.pe-a__big--still:hover .pe-a__word,
+.pe-a__big--still:focus-visible .pe-a__word {
+  font-stretch: 75%;
+}
+
+.pe-a__big--still:hover .pe-a__arrow,
+.pe-a__big--still:focus-visible .pe-a__arrow {
+  transform: none;
+}
+
+/* E: today's pill at display size. */
+.pe-e__big {
+  min-height: 0;
+  padding: 0.14em 0.36em;
+  font-size: clamp(56px, 11vw, 160px);
+  line-height: 0.9;
+}
+
+/* The footer drops to well under Say hello: about 100 px at 1440 against 160 to 236 px. */
+.pe-c__footer--quiet {
+  margin-top: 96px;
+}
+
+.pe-c__footer--quiet .pe-c__sign {
+  font-size: clamp(44px, 7vw, 104px);
+  white-space: nowrap;
+}
+
+@media (max-width: 759px) {
+  .pe-c__footer--quiet .pe-c__sign {
+    font-size: 12vw;
+  }
+
+  .pe-c__footer--quiet .pe-c__made,
+  .pe-c__footer--quiet .pe-c__name {
+    display: inline;
+  }
+}
+
 /* ---------- reduced motion: every signature shown at rest, no movement ---------- */
 
 @media (prefers-reduced-motion: reduce) {

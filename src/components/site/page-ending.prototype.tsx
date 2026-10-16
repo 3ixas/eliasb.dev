@@ -20,9 +20,17 @@ import { sectionLabel } from "@/components/site/sections";
 import { profile } from "@/content/site";
 import { sayHello, siteCopy } from "@/content/stretch/site-copy";
 
-export const ENDING_VARIANTS = ["A", "B", "C"] as const;
+export const ENDING_VARIANTS = ["A", "B", "C", "D", "E"] as const;
 export type EndingVariant = (typeof ENDING_VARIANTS)[number];
-const names: Record<EndingVariant, string> = { A: "Headline", B: "Envelope", C: "Bookend" };
+const names: Record<EndingVariant, string> = {
+  A: "Headline",
+  B: "Envelope",
+  C: "Bookend",
+  D: "Bookend, Say hello as the headline",
+  E: "Bookend, Say hello as a big pill",
+};
+/** D and E: C with the hierarchy fixed, Say hello bigger than the footer (Elias, after choosing C). */
+const quietFooter = (variant: EndingVariant) => variant === "D" || variant === "E";
 
 const address = profile.links.email.replace(/^mailto:/, "");
 
@@ -102,14 +110,22 @@ function Envelope({ headingId }: { headingId: string }) {
   );
 }
 
-function Bookend({ headingId }: { headingId: string }) {
+function Bookend({ headingId, say }: { headingId: string; say: "pill" | "headline" | "big-pill" }) {
   return (
     <div className="pe-c">
-      <h2 id={headingId} aria-label={sectionLabel["say-hello"]} className="stretch-display stretch-hello__heading">
-        <a className="stretch-hello__big" href={profile.links.email}>
-          {sayHello.bigLink}
-        </a>
-      </h2>
+      {say === "headline" ? (
+        <h2 id={headingId} aria-label={sectionLabel["say-hello"]} className="stretch-display pe-a__heading">
+          <a className="pe-a__big pe-a__big--still" href={profile.links.email}>
+            <span className="pe-a__word">Say hello</span> <span className="pe-a__arrow" aria-hidden="true">↗</span>
+          </a>
+        </h2>
+      ) : (
+        <h2 id={headingId} aria-label={sectionLabel["say-hello"]} className="stretch-display stretch-hello__heading">
+          <a className={say === "big-pill" ? "stretch-hello__big pe-e__big" : "stretch-hello__big"} href={profile.links.email}>
+            {sayHello.bigLink}
+          </a>
+        </h2>
+      )}
       <div className="pe-c__row">
         <p className="pe-line">{sayHello.line}</p>
         <a className="stretch-mono pe-address" href={profile.links.email}>
@@ -125,11 +141,13 @@ function Bookend({ headingId }: { headingId: string }) {
 export function EndingPrototype({ variant, headingId }: { variant: EndingVariant; headingId: string }) {
   if (variant === "A") return <Headline headingId={headingId} />;
   if (variant === "B") return <Envelope headingId={headingId} />;
-  return <Bookend headingId={headingId} />;
+  if (variant === "D") return <Bookend headingId={headingId} say="headline" />;
+  if (variant === "E") return <Bookend headingId={headingId} say="big-pill" />;
+  return <Bookend headingId={headingId} say="pill" />;
 }
 
 export function EndingFooter({ variant }: { variant: EndingVariant }) {
-  if (variant !== "C") {
+  if (variant === "A" || variant === "B") {
     return (
       <footer className="stretch-wrap stretch-footer pe-footer" data-entrance="rest">
         <p className="stretch-mono">{siteCopy.footer}</p>
@@ -139,7 +157,7 @@ export function EndingFooter({ variant }: { variant: EndingVariant }) {
   // "Made by Elias", at the hero name's scale. The words stay the footer's text.
   // It fills on hover, or while keyboard focus is on a Say hello link (CSS :has).
   return (
-    <footer className="stretch-wrap pe-c__footer" data-entrance="rest">
+    <footer className={quietFooter(variant) ? "stretch-wrap pe-c__footer pe-c__footer--quiet" : "stretch-wrap pe-c__footer"} data-entrance="rest">
       <p className="stretch-display pe-c__sign">
         <span className="pe-c__made">Made by</span> <span className="pe-c__name">Elias</span>
       </p>
