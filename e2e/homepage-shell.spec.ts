@@ -10,7 +10,7 @@ import { renderedContrast } from "./support/rendered-contrast";
 const menuLabels = siteCopy.menu.map(({ label }) => label);
 
 const sections = [
-  { id: "work", heading: work.heading, note: null },
+  { id: "work", heading: work.heading, note: work.note },
   { id: "things-i-make", heading: thingsIMake.heading, note: thingsIMake.note(projects.length, featuredSlugs.length) },
   { id: "how-i-work", heading: howIWork.heading, note: howIWork.note },
   { id: "off-the-clock", heading: offTheClock.heading, note: offTheClock.note },

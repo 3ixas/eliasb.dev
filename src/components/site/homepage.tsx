@@ -31,7 +31,7 @@ export function Homepage() {
         <Hero />
 
         <section id="work" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="work-heading">
-          <SectionHeading id="work-heading" heading={work.heading} />
+          <SectionHeading id="work-heading" heading={work.heading} note={work.note} />
           <Work />
         </section>
 

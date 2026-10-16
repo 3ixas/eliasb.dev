@@ -78,12 +78,13 @@ test.describe("Staff pass", () => {
       ["returned-optegra", "optegra"],
     ] as const) {
       const pass = hang(page, name);
-      await expect(pass.getByRole("link")).toHaveCount(1);
-      await expect(pass.getByRole("link")).toHaveAttribute("href", `/work/${slug}`);
+      // The pass is one link to its story; the only other link on a pass is a pin that leads to its evidence.
+      await expect(pass.locator(`a[href="/work/${slug}"]`)).toHaveCount(1);
+      await expect(pass.getByRole("link")).toHaveCount(name === "current" ? 2 : 1);
     }
 
     const pass = hang(page, "current");
-    const link = pass.getByRole("link");
+    const link = pass.locator('a[href="/work/bnp-paribas"]');
     expect(await tilt(pass), "it hangs at its resting tilt").toBeCloseTo(-1, 1);
     await page.keyboard.press("Tab");
     await link.focus();
@@ -96,8 +97,10 @@ test.describe("Staff pass", () => {
     await expect.poll(() => tilt(pass), { timeout: 4000 }).toBeCloseTo(0, 1);
   });
 
-  test("an opening pass and the self-issued pass are not links", async ({ page }) => {
-    await expect(hang(page, "opening").getByRole("link")).toHaveCount(0);
+  test("an opening pass and the self-issued pass are not links to a story", async ({ page }) => {
+    // The opening pass's pin still leads to its evidence, inside the story it opens.
+    await expect(hang(page, "opening").locator('a[href="/work/bnp-paribas"]')).toHaveCount(0);
+    await expect(hang(page, "opening").getByRole("link")).toHaveCount(1);
     await expect(hang(page, "opening").locator(".stretch-pass__foot")).not.toContainText("story");
     await expect(hang(page, "self-issued").getByRole("link")).toHaveCount(0);
   });

@@ -42,11 +42,11 @@ The homepage section straight after the hero, led by employment ([#157](https://
 
 ### Now
 
+The current Staff pass. Its role, dates and link come from its Role story, and its headline number from `src/content/stretch/staff-pass.ts`: the first approved proof, “I’m the team’s only C# engineer, so I own the C# side from planning through review”, became that headline (“Only · C# engineer on the team”). The other two stay on the pass as lines (#210).
+
 | Part | Copy |
 | --- | --- |
-| Role line | Software engineer · BNP Paribas CIB · Jul 2025 – now |
-| Proofs | I’m the team’s only C# engineer, so I own the C# side from planning through review. · I was nominated as an AI Champion, and the workflow I built is now used by several teams across the department. · With that workflow I integrated a pricer in a couple of days, a job that takes an experienced engineer about two weeks. |
-| Link | The BNP Paribas story → |
+| Proofs | I was nominated as an AI Champion, and the workflow I built is now used by several teams across the department. · With that workflow I integrated a pricer in a couple of days, a job that takes an experienced engineer about two weeks. |
 
 ### Where I’m headed
 
@@ -61,13 +61,12 @@ The homepage section straight after the hero, led by employment ([#157](https://
 
 ### How I got here
 
-- Heading: How I got here
+Joveen and Optegra are now Staff passes (role, dates and headline number from their Role stories, stamped “Returned”). What remains as text is the note under the Work heading and History, a dashed note under the rail (#210).
+
 - Note: History, then marketing, then code. Each move was towards the work I liked most.
 
-| Dates | Role and organisation | Note |
+| Dates | Role | Note |
 | --- | --- | --- |
-| Aug 2024 – Jun 2025 | Full stack software engineer · Joveen | Cut page load by 40% and deploys from 10 minutes to under 2. |
-| Sep 2021 – Aug 2024 | Marketing executive · Optegra Eye Healthcare & Kensington Medical | Raised the Core Web Vitals pass rate from 62% to 88%. |
 | Before 2021 | History at uni | Because I loved it, and I still do. |
 
 ## Things I make

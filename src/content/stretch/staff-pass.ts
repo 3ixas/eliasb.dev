@@ -7,8 +7,12 @@
 import type { RoleStory, RoleStorySlug } from "./role-story.ts";
 import type { EvidenceItem } from "./story.ts";
 
-/** An award worn as a pin on the current pass's lanyard. */
-export type PassPin = { label: string; detail: string };
+/**
+ * An award worn as a pin on the current pass's lanyard. `href` is the evidence
+ * the pin leads to inside the Role story, as an absolute path so it works from
+ * Work and from the story itself; a pin with none is text only.
+ */
+export type PassPin = { label: string; detail: string; href?: string };
 
 /**
  * The number a pass leads with. It is one of its story's evidence items (the
@@ -34,7 +38,7 @@ export const passRecords: Record<RoleStorySlug, PassRecord> = {
     headline: { value: "Only", label: "C# engineer on the team", quote: "only C# engineer" },
     pins: [
       { label: "Winner", detail: "Digitisation · 2025" },
-      { label: "Take Ownership", detail: "Q1 2026" },
+      { label: "Take Ownership", detail: "Q1 2026", href: "/work/bnp-paribas#take-ownership-certificate" },
       { label: "AI Champion", detail: "2026" },
     ],
   },

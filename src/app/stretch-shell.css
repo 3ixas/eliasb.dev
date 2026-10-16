@@ -1882,12 +1882,105 @@ button.stretch-gh__day[data-selected] {
   }
 }
 
-/* ---- Work: Now, Where I'm headed and How I got here ---- */
+/* ---- Work: the Staff passes on one rail, then Where I'm headed ---- */
 
 .stretch-work {
   display: grid;
   gap: 56px;
   margin-top: 40px;
+}
+
+/*
+ * The rail: a metal bar the lanyards hang from, newest first. On a phone the
+ * current pass is the full width and the two past passes sit side by side.
+ * From 761 px the current pass stands at the left and the past passes at the
+ * right (stacked, then in a row from 1100 px), spread so the row ends on
+ * Optegra with nothing empty beside it. History is a dashed note under the
+ * past passes.
+ */
+.stretch-work__rail {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px 16px;
+  align-items: start;
+  padding-top: 10px;
+}
+
+.stretch-work__rail::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #d9dbe0, #8f949c);
+  box-shadow: 0 3px 5px rgb(0 0 0 / 0.2);
+}
+
+.stretch-work__hang {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.stretch-work__hang[data-hang="bnp-paribas"] {
+  grid-column: 1 / -1;
+}
+
+/* Past passes hang on straps of different lengths. */
+.stretch-work__hang[data-hang="joveen"] .stretch-pass--sm {
+  --pass-strap: 84px;
+}
+
+.stretch-work__history {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px dashed var(--stretch-rule);
+  border-radius: 10px;
+  color: var(--stretch-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.stretch-work__history-dates {
+  color: var(--stretch-ink);
+}
+
+@media (min-width: 761px) {
+  .stretch-work__rail {
+    grid-template-columns: minmax(0, 440px) minmax(0, 250px);
+    column-gap: 32px;
+    justify-content: space-between;
+  }
+
+  .stretch-work__hang[data-hang="bnp-paribas"] {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+  }
+
+  .stretch-work__hang:not([data-hang="bnp-paribas"]),
+  .stretch-work__history {
+    grid-column: 2;
+  }
+}
+
+@media (min-width: 1100px) {
+  .stretch-work__rail {
+    grid-template-columns: minmax(0, 440px) repeat(2, minmax(0, 250px));
+  }
+
+  .stretch-work__hang[data-hang="bnp-paribas"] {
+    grid-row: 1 / span 2;
+  }
+
+  .stretch-work__hang[data-hang="optegra"] {
+    grid-column: 3;
+  }
+
+  .stretch-work__history {
+    grid-column: 2 / -1;
+  }
 }
 
 .stretch-work__h3 {
@@ -1896,32 +1989,6 @@ button.stretch-gh__day[data-selected] {
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.02em;
-}
-
-.stretch-work__role,
-.stretch-work__note {
-  margin: 0 0 20px;
-  color: var(--stretch-muted);
-  font-size: 13px;
-  line-height: 1.4;
-}
-
-.stretch-work__proofs,
-.stretch-work__strands {
-  display: grid;
-  gap: 14px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.stretch-work__proofs {
-  max-width: 40em;
-}
-
-.stretch-work__proofs li {
-  font-size: 19px;
-  line-height: 1.5;
 }
 
 .stretch-work__line {
@@ -1934,7 +2001,11 @@ button.stretch-gh__day[data-selected] {
 }
 
 .stretch-work__strands {
+  display: grid;
   gap: 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .stretch-work__strand {
@@ -1964,84 +2035,9 @@ button.stretch-gh__day[data-selected] {
   color: var(--stretch-cobalt);
 }
 
-/* How I got here: the Project index's rows, with the dates where its numbers are. */
-.stretch-work__rows {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid var(--stretch-rule);
-}
-
-.stretch-work__row {
-  border-bottom: 1px solid var(--stretch-rule);
-}
-
-.stretch-work__row-link {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 24px;
-  grid-template-areas:
-    "dates dates"
-    "text arrow"
-    "org org";
-  align-items: baseline;
-  gap: 4px 16px;
-  min-height: 44px;
-  padding: 20px 0;
-  color: var(--stretch-ink);
-  text-decoration: none;
-}
-
-.stretch-work__dates {
-  grid-area: dates;
-  color: var(--stretch-muted);
-  font-size: 13px;
-}
-
-.stretch-work__text {
-  grid-area: text;
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-}
-
-.stretch-work__name {
-  font-size: clamp(24px, 2.6vw, 32px);
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-}
-
-.stretch-work__outcome {
-  color: var(--stretch-muted);
-  font-size: 17px;
-  line-height: 1.35;
-}
-
-.stretch-work__org {
-  grid-area: org;
-  color: var(--stretch-muted);
-  font-size: 13px;
-  line-height: 1.4;
-}
-
-.stretch-work__arrow {
-  grid-area: arrow;
-  font-size: 22px;
-  line-height: 1;
-}
-
-a.stretch-work__row-link:is(:hover, :focus-visible) :is(.stretch-work__name, .stretch-work__arrow) {
-  color: var(--stretch-cobalt);
-}
-
 @media (min-width: 761px) {
   .stretch-work__strands {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .stretch-work__row-link {
-    grid-template-columns: 168px minmax(0, 1fr) minmax(0, 15em) 24px;
-    grid-template-areas: "dates text org arrow";
   }
 }
 

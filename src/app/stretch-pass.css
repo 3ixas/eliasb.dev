@@ -258,6 +258,22 @@
   font-size: 11px;
 }
 
+/* The current pass's remaining proofs: lines under the headline number. */
+.stretch-pass__proofs {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1.4;
+  list-style: none;
+}
+
+.stretch-pass__proofs li {
+  padding-left: 14px;
+  border-left: 2px solid color-mix(in srgb, var(--pass-ink) 40%, transparent);
+}
+
 /* ---------- the awards, worn as pins on the lanyard ---------- */
 
 .stretch-pass__pins {
@@ -265,36 +281,55 @@
   inset: 18px 0 auto;
   z-index: 3;
   display: grid;
-  gap: 10px;
+  gap: 6px;
+  pointer-events: none;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-/* Pins sit beside the strap, alternately left and right, and never over it. */
+/*
+ * Pins sit beside the strap, alternately left and right, and never over it. The
+ * list item places the pin; its body is the cobalt pill, which is the link when
+ * the pin leads to its evidence and is 44 px tall either way, so the pins are
+ * one size.
+ */
 .stretch-pass__pin {
   position: relative;
   left: 50%;
-  display: flex;
-  flex-direction: column;
   width: max-content;
   max-width: 44vw;
-  padding: 4px 10px;
+  pointer-events: auto;
+}
+
+/* The strap is 22 px wide, so a pin starts past its edge (11 px) with room to spare. */
+.stretch-pass__pin:nth-child(odd) {
+  transform: translateX(calc(-100% - 20px)) rotate(-4deg);
+}
+
+.stretch-pass__pin:nth-child(even) {
+  transform: translateX(20px) rotate(3deg);
+}
+
+.stretch-pass__pin-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 44px;
+  padding: 4px 12px;
   border-radius: 999px;
   background: var(--stretch-cobalt);
   color: var(--stretch-on-cobalt);
+  text-decoration: none;
   box-shadow:
     0 2px 4px rgb(0 0 0 / 0.3),
     inset 0 1px 0 rgb(255 255 255 / 0.3);
   line-height: 1.15;
 }
 
-.stretch-pass__pin:nth-child(odd) {
-  transform: translateX(calc(-100% - 6px)) rotate(-4deg);
-}
-
-.stretch-pass__pin:nth-child(even) {
-  transform: translateX(6px) rotate(3deg);
+a.stretch-pass__pin-body:focus-visible {
+  outline: 3px solid var(--stretch-ink);
+  outline-offset: 3px;
 }
 
 .stretch-pass__pin-label {
@@ -326,6 +361,12 @@
   .stretch-pass--sm .stretch-pass__photo,
   .stretch-pass--sm .stretch-pass__barcode {
     display: none;
+  }
+
+  /* Two short lines instead of one row that would wrap mid-label in half the width. */
+  .stretch-pass--sm .stretch-pass__top {
+    flex-direction: column;
+    gap: 3px;
   }
 
   .stretch-pass--sm .stretch-pass__title {
