@@ -1,7 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
 // Runs against a production build (`pnpm build` first), at the four widths the
-// design is accepted at, in Chromium and WebKit, in both colour schemes.
+// design is accepted at, in Chromium and WebKit, in both colour schemes. A
+// `next dev` server already on the port is reused; see docs/runbooks/local-testing.md.
 const port = Number(process.env.E2E_PORT ?? 3100);
 const widths = [320, 390, 820, 1440] as const;
 const browsers = [
