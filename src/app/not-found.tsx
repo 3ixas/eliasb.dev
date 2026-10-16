@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
+import { NotFoundPrototype } from "@/components/site/not-found.prototype";
 import { SubpageHeader } from "@/components/site/subpage-header";
 import { pageTitle } from "@/content/site";
 import { notFound as copy, siteCopy } from "@/content/stretch/site-copy";
@@ -22,16 +24,31 @@ export const metadata: Metadata = {
  * selection and hover.
  */
 export default function NotFound() {
+  const today = (
+    <>
+      <h1 className="stretch-display stretch-h2">{copy.heading}</h1>
+      <p className="stretch-404__line">{copy.line}</p>
+      <Link className="stretch-404__home" href="/">
+        {copy.button.replace(/ →$/, "")} <span aria-hidden="true">→</span>
+      </Link>
+    </>
+  );
+  const todayMain = (
+    <main id="main-content" tabIndex={-1} className="stretch-wrap stretch-404">
+      {today}
+    </main>
+  );
   return (
     <div data-stretch-shell data-not-found>
       <SubpageHeader />
-      <main id="main-content" tabIndex={-1} className="stretch-wrap stretch-404">
-        <h1 className="stretch-display stretch-h2">{copy.heading}</h1>
-        <p className="stretch-404__line">{copy.line}</p>
-        <Link className="stretch-404__home" href="/">
-          {copy.button.replace(/ →$/, "")} <span aria-hidden="true">→</span>
-        </Link>
-      </main>
+      {/* PROTOTYPE (#197): ?variant= picks a 404 variant; outside production only. */}
+      {process.env.NODE_ENV === "production" ? (
+        todayMain
+      ) : (
+        <Suspense fallback={todayMain}>
+          <NotFoundPrototype today={today} />
+        </Suspense>
+      )}
       <footer className="stretch-wrap stretch-footer">
         <p className="stretch-mono">{siteCopy.footer}</p>
       </footer>
