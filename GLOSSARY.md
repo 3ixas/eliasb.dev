@@ -24,6 +24,10 @@ _Avoid_: Lights pill, "Lights on / Lights off" (retired wording), a metaphor tha
 The colours a project already has in its own interface, carried by its **Featured work** tile and swatches: Threshold gold, Argus Risk blue, Flowtime copper. The work carries the colour; the page stays neutral.
 _Avoid_: Recolouring projects in the Cobalt accent
 
+**Employer colour**:
+An employer's own hue (BNP Paribas green, Joveen black, Optegra teal), worn the way a **Project colour** is: by its **Role story** and, on the homepage, by its part of **Work**. A hue only, never a logo. The page stays neutral and the Cobalt accent stays Elias's own.
+_Avoid_: Employer logos, recolouring employers in the Cobalt accent
+
 **Case study**:
 A project's own page at `/things-i-make/[slug]`, short and in its **Project colour**: Where it started, What I wrote down first, Decisions, How it's built, Where it stands, What I'd do next, then the next project. Every number comes from the project's own records, and "Where it stands" says plainly what isn't launched or measured ([#112](https://github.com/3ixas/eliasb.dev/issues/112)).
 _Avoid_: Case file, long write-up
