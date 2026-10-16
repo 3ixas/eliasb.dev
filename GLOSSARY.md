@@ -41,15 +41,19 @@ The homepage section with three beats (start from a real problem, write it down 
 _Avoid_: Claims of users or impact
 
 **Work**:
-The homepage section straight after the hero, led by employment, in three parts: Now (the current role, linking to its **Role story**), **Where I'm headed**, then **How I got here**. Employment leads, so it comes before **Things I make** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
+The homepage section straight after the hero, led by employment. Every employer is a **Staff pass** hanging from one rail, the current one largest, with History as a plain note; **Where I'm headed** follows below. The passes replaced Now and **How I got here** as text ([#194](https://github.com/3ixas/eliasb.dev/issues/194)). Employment leads, so it comes before **Things I make** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
 _Avoid_: Experience, CV, calling Elias's own projects "Work"
+
+**Staff pass**:
+An employer's pass on its lanyard in **Work**, in its **Employer colour**: Elias's portrait as the ID photo, the employer, role and dates, one headline number, and a link to its **Role story**. The current pass is the largest and reads "Valid · present"; a past one is stamped "Returned". Awards are pins on the current pass's lanyard. It carries facts, not decoration: a pass's content is the employment history ([#194](https://github.com/3ixas/eliasb.dev/issues/194)).
+_Avoid_: Badge, ID card, "Expired" (it can read as "let go"), employer logos
 
 **Things I make**:
 The homepage section for Elias's own projects: **Featured work** above the **Project index**, with a count of what he has built, introduced by what the hero used to say: making complicated things feel simple, and taking ideas all the way through ([#159](https://github.com/3ixas/eliasb.dev/issues/159)). It follows **Work**: reordered, not reduced, and keeping its product edge. The **Work archive** and every **Case study** live under `/things-i-make`, and `/work` and the old case-study paths redirect there permanently, one path at a time, since `/work/[employer]` now holds the **Role story** pages ([#157](https://github.com/3ixas/eliasb.dev/issues/157), [#158](https://github.com/3ixas/eliasb.dev/issues/158)).
 _Avoid_: Work (that means employment), On my own
 
-**How I got here**:
-The last part of **Work**: the earlier roles as compact rows, newest first, in the **Project index** style (dates, role, organisation, a one-line note), each linking to its **Role story**. History has a row but no link. A one-line note frames the changes of craft as evidence for the direction rather than as a record. It replaces the **Career ruler** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
+**How I got here** (superseded):
+Superseded by the **Staff passes** ([#194](https://github.com/3ixas/eliasb.dev/issues/194)); its note survives under the Work heading. Was the last part of **Work**: the earlier roles as compact rows, newest first, in the **Project index** style (dates, role, organisation, a one-line note), each linking to its **Role story**. History has a row but no link. A one-line note frames the changes of craft as evidence for the direction rather than as a record. It replaces the **Career ruler** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
 _Avoid_: Timeline, oldest first, the full CV
 
 **Where I've been** (superseded):
