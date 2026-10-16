@@ -28,7 +28,7 @@ Every text pair passes WCAG 2.2 AA (5.7:1 to 18.2:1, [#108](https://github.com/3
 
 ## Colour rules
 
-- **Cobalt** marks Elias's name, "today" and "now", and the way to say hello. It never colours a project, a tile or decoration. Case studies use it only for *Say hello*.
+- **Cobalt** marks Elias's name, "today" and "now", and the way to say hello. It never colours a project, a tile or decoration. Case studies use it only for *Say hello*. One approved exception: the award pins on a **Staff pass** are cobalt, on Work and on the pass that opens a Role story, so the two read as one object ([#194](https://github.com/3ixas/eliasb.dev/issues/194), [#198](https://github.com/3ixas/eliasb.dev/issues/198)).
 - **Project colours** appear on a project's Things I make tile, its case study's opening band and framing, and its swatches. The page behind stays neutral.
 - Colour never carries meaning alone.
 
@@ -50,7 +50,7 @@ One per physical-looking object (a tile, a card, the portrait), and never more. 
 
 ## Components
 
-> **Approved, not yet built** (the design review, [#190](https://github.com/3ixas/eliasb.dev/issues/190)). Work becomes **Staff passes** on one rail, replacing Now and How I got here ([#194](https://github.com/3ixas/eliasb.dev/issues/194)), and How I work gains **Margin notes**, with the honest line moving to each Case study's "Where it stands" ([#195](https://github.com/3ixas/eliasb.dev/issues/195)). Until they're built, the Work and How I work rows below describe the live site. When building those two sections, the tickets win over the spec, and `GLOSSARY.md` already uses the new terms.
+> **Approved, not yet built** (the design review, [#190](https://github.com/3ixas/eliasb.dev/issues/190)). Work becomes **Staff passes** on one rail, replacing Now and How I got here ([#194](https://github.com/3ixas/eliasb.dev/issues/194)), and How I work gains **Margin notes**, with the honest line moving to each Case study's "Where it stands" ([#195](https://github.com/3ixas/eliasb.dev/issues/195)). Each Role story opens on its Staff pass and gains figures ([#198](https://github.com/3ixas/eliasb.dev/issues/198)). Until they're built, the Work and How I work rows below describe the live site. When building these, the tickets win over the spec, and `GLOSSARY.md` already uses the new terms.
 
 | Component | Notes |
 |---|---|
