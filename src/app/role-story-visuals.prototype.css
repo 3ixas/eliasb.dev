@@ -486,3 +486,17 @@ a.rsv-pin:hover .rsv-pin__label {
 @keyframes rsv-light {
   from { opacity: 0.35; }
 }
+
+/* ---------- A, as chosen: the flag figure and a two-cell strip ---------- */
+
+.rsv-a-figure {
+  max-width: 560px;
+  margin-top: 32px;
+}
+
+@media (min-width: 761px) {
+  .rsv-a-evidence .stretch-cs-evidence {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 720px;
+  }
+}

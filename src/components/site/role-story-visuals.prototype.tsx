@@ -194,7 +194,10 @@ function Certificate({ compact = false }: { compact?: boolean }) {
   );
 }
 
-/* ---------------- A · Pass ---------------- */
+/* ---------------- A · Pass (chosen) ---------------- */
+
+/** Evidence the award pins already carry, left out of A's strip. */
+const pinned = new Set(["Q1 2026", "Spring 2026"]);
 
 function VariantA({ story }: { story: RoleStory }) {
   const colours = roleStoryColours(story.colours);
@@ -221,11 +224,17 @@ function VariantA({ story }: { story: RoleStory }) {
         <div className="stretch-cs-body stretch-wrap">
           {roleStorySectionKeys.map((key, position) => (
             <StorySection key={key} id={key} label={roleStorySectionLabels[key]} position={position} section={story.sections[key]}>
+              {/* Chosen (#198): B's flag figure joins A, and the strip drops the awards the pins already show. */}
+              {key === "decisions" && (
+                <div className="rsv-a-figure" style={storyColours(colours)}>
+                  <FlagSketch />
+                </div>
+              )}
               {key === "what-changed" && (
                 <>
                   <BeforeAfter />
-                  <div className="stretch-role-evidence" style={storyColours(colours)}>
-                    <StoryEvidence evidence={story.evidence} />
+                  <div className="stretch-role-evidence rsv-a-evidence" style={storyColours(colours)}>
+                    <StoryEvidence evidence={story.evidence.filter((item) => !pinned.has(item.value))} />
                   </div>
                 </>
               )}
