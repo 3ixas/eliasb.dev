@@ -225,7 +225,7 @@ function SelfIssued() {
                 <p className="wh-d__sofar">
                   <span className="wh-d__tag stretch-mono">
                     <span className="wh-b__swatch" aria-hidden="true" />
-                    So far
+                    So far · {strand.source.name}
                   </span>
                   {strand.soFar}
                 </p>
