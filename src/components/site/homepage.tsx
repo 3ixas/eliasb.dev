@@ -5,6 +5,7 @@ import { SectionHeading } from "@/components/site/section-heading";
 import { SiteHeader } from "@/components/site/site-header";
 import { FeaturedTiles } from "@/components/site/featured-tiles";
 import { HowIWork } from "@/components/site/how-i-work";
+import { EndingFooter, EndingPrototype, EndingSwitcher, type EndingVariant } from "@/components/site/page-ending.prototype";
 import { OffTheClock } from "@/components/site/off-the-clock";
 import { ProjectIndex } from "@/components/site/project-index";
 import { Work } from "@/components/site/work";
@@ -22,7 +23,7 @@ const sayHelloHeadingId = "say-hello-heading";
  * entrance (entrance.ts) holds all of it for about 4.6 seconds on a fresh
  * load; the server renders the finished page.
  */
-export function Homepage() {
+export function Homepage({ endingVariant }: { endingVariant?: EndingVariant | null }) {
   return (
     <div data-stretch-shell>
       <EntranceGuard />
@@ -64,13 +65,18 @@ export function Homepage() {
         </section>
 
         <section id="say-hello" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby={sayHelloHeadingId}>
-          <SayHello headingId={sayHelloHeadingId} />
+          {endingVariant ? <EndingPrototype variant={endingVariant} headingId={sayHelloHeadingId} /> : <SayHello headingId={sayHelloHeadingId} />}
         </section>
       </main>
 
-      <footer className="stretch-wrap stretch-footer" data-entrance="rest">
-        <p className="stretch-mono">{siteCopy.footer}</p>
-      </footer>
+      {endingVariant ? (
+        <EndingFooter variant={endingVariant} />
+      ) : (
+        <footer className="stretch-wrap stretch-footer" data-entrance="rest">
+          <p className="stretch-mono">{siteCopy.footer}</p>
+        </footer>
+      )}
+      {endingVariant !== undefined && <EndingSwitcher current={endingVariant} />}
       <EntrancePlayer />
     </div>
   );
