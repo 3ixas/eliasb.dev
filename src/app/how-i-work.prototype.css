@@ -1,0 +1,384 @@
+/* PROTOTYPE, throwaway (#195): How I work as a process diagram. prototype/how-i-work-diagram only. */
+
+.hp {
+  margin-top: 40px;
+}
+
+.hp-habit {
+  margin: 0;
+  font-size: clamp(22px, 2.4vw, 30px);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.hp-proof {
+  max-width: 60ch;
+  margin: 8px 0 0;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.hp-prd {
+  margin: 0;
+}
+
+@keyframes hp-draw-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes hp-draw-y { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes hp-fill {
+  from { background-color: var(--stretch-page); color: var(--stretch-ink); }
+  to { background-color: var(--stretch-ink); color: var(--stretch-page); }
+}
+@keyframes hp-ink { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+/* ---------- A · Route ---------- */
+
+.hp-a {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 48px;
+  padding: 0;
+  list-style: none;
+  view-timeline-name: --hp;
+}
+
+.hp-a__track {
+  position: absolute;
+  top: 31px;
+  left: 32px;
+  right: calc((100% - 96px) / 3 - 32px);
+  height: 4px;
+  background: var(--stretch-rule);
+}
+
+.hp-a__drawn {
+  position: absolute;
+  inset: 0;
+  background: var(--stretch-ink);
+  transform-origin: 0 50%;
+}
+
+.hp-a__stop {
+  position: relative;
+}
+
+.hp-a__dot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+  margin-bottom: 22px;
+  border: 3px solid var(--stretch-ink);
+  border-radius: 50%;
+  background: var(--stretch-ink);
+  color: var(--stretch-page);
+  font-size: 28px;
+}
+
+.hp-a__prd {
+  margin-top: 28px;
+  transform: rotate(1.2deg);
+}
+
+/* ---------- B · Margin notes ---------- */
+
+.hp-b {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 48px 72px;
+  align-items: start;
+}
+
+.hp-b__list {
+  display: grid;
+  gap: 44px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hp-b__beat {
+  position: relative;
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  column-gap: 18px;
+}
+
+.hp-b__num {
+  position: relative;
+  grid-row: 1 / span 2;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  font-size: 30px;
+}
+
+.hp-b__ink {
+  overflow: visible;
+  fill: none;
+  stroke: var(--stretch-ink);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.hp-b__ink path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+.hp-b__circle {
+  position: absolute;
+  inset: -6px;
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
+  transform: rotate(-8deg);
+}
+
+.hp-b__arrow {
+  position: absolute;
+  top: 78px;
+  left: 14px;
+  width: 36px;
+  height: calc(100% - 50px);
+}
+
+.hp-b__to-prd {
+  position: absolute;
+  top: 10px;
+  right: -110px;
+  width: 140px;
+  height: 52px;
+}
+
+.hp-b__mark {
+  position: relative;
+  white-space: nowrap;
+}
+
+.hp-b__under {
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  bottom: -6px;
+  width: calc(100% + 4px);
+  height: 8px;
+}
+
+.hp-b__prd {
+  margin-top: 120px;
+  transform: rotate(-1deg);
+}
+
+/* ---------- C · Loop ---------- */
+
+.hp-c {
+  position: relative;
+  min-height: 700px;
+}
+
+.hp-c__loop {
+  position: absolute;
+  inset: 40px 0 0;
+  width: 100%;
+  height: calc(100% - 40px);
+  overflow: visible;
+  fill: none;
+  stroke: var(--stretch-muted);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+
+
+.hp-c__stations {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hp-c__station {
+  position: absolute;
+  width: 30%;
+}
+
+.hp-c__station--1 { top: 0; left: 0; }
+.hp-c__station--2 { top: 0; right: 0; }
+.hp-c__station--3 { bottom: 0; left: 35%; }
+
+.hp-c__n {
+  display: inline-grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 12px;
+  border-radius: 50%;
+  background: var(--stretch-ink);
+  color: var(--stretch-page);
+  font-size: 24px;
+}
+
+.hp-c__prd {
+  position: absolute;
+  top: 200px;
+  left: 50%;
+  width: 30%;
+  transform: translateX(-50%) rotate(1deg);
+}
+
+.hp-c__return { display: none; }
+
+/* ---------- phones ---------- */
+
+@media (max-width: 760px) {
+  .hp-a {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+    padding-left: 70px;
+  }
+
+  .hp-a__track {
+    top: 20px;
+    bottom: 40px;
+    left: 26px;
+    right: auto;
+    width: 4px;
+    height: auto;
+  }
+
+  .hp-a__drawn { transform-origin: 50% 0; }
+
+  .hp-a__dot {
+    position: absolute;
+    left: -70px;
+    top: -6px;
+    width: 54px;
+    height: 54px;
+    margin: 0;
+    font-size: 22px;
+  }
+
+  .hp-b {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hp-b__beat { grid-template-columns: 58px minmax(0, 1fr); column-gap: 12px; }
+  .hp-b__num { width: 50px; height: 50px; font-size: 24px; }
+  .hp-b__arrow { top: 62px; left: 7px; }
+  .hp-b__to-prd { display: none; }
+  .hp-b__prd { margin-top: 8px; }
+
+  .hp-c {
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+    min-height: 0;
+    padding-left: 34px;
+  }
+
+  .hp-c__loop { display: none; }
+
+  .hp-c__stations { display: contents; }
+
+  .hp-c__station,
+  .hp-c__prd {
+    position: static;
+    width: auto;
+    transform: none;
+  }
+
+  .hp-c__station--1 { order: 1; }
+  .hp-c__station--2 { order: 2; }
+  .hp-c__prd { order: 3; transform: rotate(1deg); }
+  .hp-c__station--3 { order: 4; }
+
+  .hp-c__return {
+    display: block;
+    position: absolute;
+    top: 26px;
+    bottom: 40px;
+    left: 4px;
+    width: 18px;
+    border: 2px dashed var(--stretch-muted);
+    border-right: 0;
+    border-radius: 14px 0 0 14px;
+  }
+
+  .hp-c__return::after {
+    content: "";
+    position: absolute;
+    top: -7px;
+    right: -8px;
+    border: 6px solid transparent;
+    border-left-color: var(--stretch-muted);
+  }
+}
+
+/* ---------- motion: drawn by scroll, finished without it ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .hp-a__drawn {
+      animation: hp-draw-x linear both;
+      animation-timeline: --hp;
+      animation-range: entry 70% cover 55%;
+    }
+
+    .hp-a__dot {
+      animation: hp-fill linear both;
+      animation-timeline: --hp;
+      animation-range: cover calc(28% + var(--i) * 12%) cover calc(31% + var(--i) * 12%);
+    }
+
+    .hp-b__ink path,
+    .hp-c__arc {
+      animation: hp-ink linear both;
+      animation-timeline: view();
+      animation-range: entry 50% cover 45%;
+    }
+
+    @media (max-width: 760px) {
+      .hp-a__drawn { animation-name: hp-draw-y; animation-range: entry 40% exit 60%; }
+      .hp-a__dot { animation-range: cover calc(18% + var(--i) * 18%) cover calc(22% + var(--i) * 18%); }
+    }
+  }
+}
+
+/* ---------- prototype switcher ---------- */
+
+.hp-switcher {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 999px;
+  background: #ff3d7f;
+  color: #fff;
+  font: 600 14px/1 system-ui, sans-serif;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+  transform: translateX(-50%);
+}
+
+.hp-switcher span { padding: 0 10px; white-space: nowrap; }
+
+.hp-switcher button {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.2);
+  color: inherit;
+  font-size: 18px;
+  cursor: pointer;
+}
