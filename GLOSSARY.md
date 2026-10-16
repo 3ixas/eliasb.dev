@@ -108,7 +108,7 @@ An employer's own page at `/work/[employer]` (`bnp-paribas`, `joveen`, `optegra`
 _Avoid_: Job description, CV entry, a confidentiality disclaimer, employer logos
 
 **Where I'm headed**:
-The middle part of **Work**, between the current role and **How I got here**: who Elias wants to become as an engineer (a direction of growth, not a target job or company). It names the direction, not the section, because the section leads with what he does now ([#157](https://github.com/3ixas/eliasb.dev/issues/157)). The direction covers the next two or three years and names his work and his own products as one craft practised in two places. Each of its strands rests on one proof. It sits alongside **Maker of clarity** and never replaces it.
+The last part of **Work**, full width below the **Staff passes** ([#194](https://github.com/3ixas/eliasb.dev/issues/194)): who Elias wants to become as an engineer (a direction of growth, not a target job or company). It names the direction, not the section, because the section leads with what he does now ([#157](https://github.com/3ixas/eliasb.dev/issues/157)). The direction covers the next two or three years and names his work and his own products as one craft practised in two places. Each of its strands rests on one proof. It sits alongside **Maker of clarity** and never replaces it.
 _Avoid_: Timeline, CV in chronological order, level or job titles ("aspiring Staff"), signals of looking for work
 
 **First glance**:
