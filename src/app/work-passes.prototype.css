@@ -1,0 +1,607 @@
+/* PROTOTYPE, throwaway (#194): Work as staff passes on lanyards. prototype/work-passes only. */
+
+/* ---------- the pass and its lanyard ---------- */
+
+.wp-hang {
+  --pass-swing: 0deg;
+  --strap-h: 72px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: rotate(calc(var(--pass-tilt, 0deg) + var(--pass-swing)));
+  transform-origin: 50% 0;
+  transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.wp-hang[data-strap="sm"] { --strap-h: 40px; }
+.wp-hang[data-strap="md"] { --strap-h: 84px; }
+.wp-hang[data-strap="lg"] { --strap-h: 156px; }
+
+.wp-hang:focus-within {
+  --pass-tilt: 0deg;
+}
+
+.wp-strap {
+  position: relative;
+  width: 22px;
+  height: var(--strap-h);
+  background:
+    repeating-linear-gradient(0deg, transparent 0 6px, rgb(255 255 255 / 0.12) 6px 7px),
+    var(--pass-swatch);
+  box-shadow: inset 2px 0 0 rgb(255 255 255 / 0.18), inset -2px 0 0 rgb(0 0 0 / 0.2);
+}
+
+.wp-hang--sm .wp-strap,
+.wp-hang--xs .wp-strap {
+  width: 16px;
+}
+
+.wp-clip {
+  width: 30px;
+  height: 22px;
+  margin-top: -4px;
+  margin-bottom: -10px;
+  z-index: 2;
+  border-radius: 6px 6px 10px 10px;
+  background: linear-gradient(180deg, #d6d8dc, #9da1a8);
+  box-shadow: 0 2px 3px rgb(0 0 0 / 0.3);
+}
+
+.wp-pass {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  padding: 26px 22px 18px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--pass-field);
+  color: var(--pass-ink);
+  text-decoration: none;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.15) inset, 0 18px 36px -12px rgb(0 0 0 / 0.35), 0 2px 6px rgb(0 0 0 / 0.12);
+}
+
+:root[data-lights="on"]:not([data-theme="light"]) .wp-pass {
+  box-shadow: 0 18px 40px -10px rgb(0 0 0 / 0.7), 0 0 0 1px var(--stretch-tile-edge);
+}
+
+.wp-pass:focus-visible {
+  outline: 3px solid var(--stretch-cobalt);
+  outline-offset: 5px;
+}
+
+.wp-hang--lg { width: min(100%, 440px); }
+.wp-hang--sm { width: min(100%, 250px); }
+.wp-hang--xs { width: 150px; }
+
+.wp-slot {
+  align-self: center;
+  width: 46px;
+  height: 9px;
+  margin: -12px 0 -2px;
+  border-radius: 5px;
+  background: var(--stretch-page);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.35);
+}
+
+.wp-pass__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.wp-pass__status {
+  white-space: nowrap;
+}
+
+.wp-pass__status[data-current]::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  vertical-align: 1px;
+}
+
+.wp-pass__id {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.wp-pass__photo {
+  flex: none;
+  width: 72px;
+  height: 88px;
+  border-radius: 8px;
+  object-fit: cover;
+  object-position: 42% 18%;
+  box-shadow: 0 0 0 3px rgb(255 255 255 / 0.35);
+}
+
+.wp-hang--sm .wp-pass__photo {
+  width: 52px;
+  height: 64px;
+}
+
+.wp-pass__who {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.wp-pass__employer {
+  font-size: 52px;
+  line-height: 0.88;
+  overflow-wrap: anywhere;
+}
+
+.wp-hang--sm .wp-pass__employer { font-size: 34px; }
+.wp-hang--xs .wp-pass__employer { font-size: 24px; }
+
+.wp-pass__role {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.wp-hang--sm .wp-pass__role,
+.wp-hang--xs .wp-pass__role {
+  font-size: 13px;
+}
+
+.wp-pass__dates {
+  font-size: 12px;
+}
+
+.wp-pass__stat {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--pass-ink) 30%, transparent);
+}
+
+.wp-pass__value {
+  font-size: 44px;
+  line-height: 0.9;
+}
+
+.wp-hang--sm .wp-pass__value { font-size: 34px; }
+
+.wp-pass__label {
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.wp-pass__proofs {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.wp-pass__proofs li {
+  padding-left: 14px;
+  border-left: 2px solid color-mix(in srgb, var(--pass-ink) 40%, transparent);
+}
+
+.wp-pass__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: auto;
+  font-size: 12px;
+}
+
+.wp-barcode {
+  width: 84px;
+  height: 22px;
+  opacity: 0.75;
+  background: repeating-linear-gradient(
+    90deg,
+    currentColor 0 2px,
+    transparent 2px 4px,
+    currentColor 4px 5px,
+    transparent 5px 8px,
+    currentColor 8px 11px,
+    transparent 11px 13px
+  );
+}
+
+.wp-hang--xs .wp-barcode { display: none; }
+.wp-hang--sm .wp-barcode { width: 40px; }
+.wp-hang--sm .wp-pass__top { flex-direction: column; gap: 3px; }
+.wp-hang--sm .wp-pass__foot { font-size: 11px; }
+.wp-hang--sm .wp-stamp { top: 86px; left: 10px; font-size: 11px; }
+
+.wp-stamp {
+  position: absolute;
+  left: 12px;
+  top: 98px;
+  padding: 3px 8px;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  transform: rotate(-12deg);
+}
+
+/* Award pins on the BNP strap. */
+.wp-pins {
+  position: absolute;
+  inset: 18px 0 auto;
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wp-pin {
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--stretch-cobalt);
+  color: var(--stretch-on-cobalt);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.3);
+  font-size: 11px;
+  line-height: 1.15;
+}
+
+.wp-pin:nth-child(odd) { transform: translateX(-62%) rotate(-4deg); }
+.wp-pin:nth-child(even) { transform: translateX(-4px) rotate(3deg); }
+
+.wp-pin__label { font-weight: 700; }
+.wp-pin__detail { font-family: var(--font-mono, monospace); font-size: 10px; opacity: 0.85; }
+
+/* Flat passes (B): no lanyard, lying on the desk. */
+.wp-hang[data-flat] .wp-pass {
+  gap: 8px;
+  padding: 18px 12px 10px;
+  border-radius: 10px;
+}
+
+.wp-hang[data-flat] .wp-pass__top { font-size: 9px; }
+.wp-hang[data-flat] .wp-pass__top span:first-child { display: none; }
+
+/* ---------- shared Work text ---------- */
+
+.wp-headed__strands {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wp-headed--compact .wp-headed__strands {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+}
+
+.wp-headed__n {
+  font-size: 12px;
+  color: var(--stretch-muted);
+}
+
+.wp-history {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px dashed var(--stretch-rule);
+  border-radius: 10px;
+  color: var(--stretch-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.wp-history span { color: var(--stretch-ink); }
+
+/* ---------- A · Rail ---------- */
+
+.wp-a__note,
+.wp-c__note {
+  margin: 0 0 18px;
+  color: var(--stretch-muted);
+}
+
+.wp-a__rail {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 440px) minmax(0, 1fr);
+  gap: 48px;
+  padding-top: 10px;
+  margin-bottom: 72px;
+}
+
+.wp-a__bar {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #d9dbe0, #8f949c);
+  box-shadow: 0 3px 5px rgb(0 0 0 / 0.2);
+}
+
+.wp-a__past {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 250px));
+  gap: 32px;
+  align-items: start;
+  align-content: start;
+}
+
+.wp-a__past .wp-history {
+  grid-column: 1 / -1;
+  margin-top: 8px;
+}
+
+/* ---------- B · Desk ---------- */
+
+.wp-b__now {
+  display: grid;
+  grid-template-columns: minmax(0, 440px) minmax(0, 1fr);
+  gap: 64px;
+  align-items: start;
+  margin-bottom: 72px;
+}
+
+.wp-b__now .wp-headed {
+  padding-top: 40px;
+}
+
+.wp-b__rows {
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wp-b__row {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+  padding: 22px 0;
+  border-top: 1px solid var(--stretch-rule);
+}
+
+.wp-b__nopass {
+  display: block;
+}
+
+.wp-b__row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wp-b__row-text > * {
+  grid-column: auto;
+  margin: 0;
+}
+
+.wp-hang--xs .wp-pass__role,
+.wp-hang--xs .wp-pass__foot { display: none; }
+.wp-hang--xs .wp-pass__top { font-size: 9px; }
+.wp-hang--xs .wp-pass__dates { font-size: 10px; }
+
+/* ---------- C · Strap ---------- */
+
+.wp-c__line {
+  position: relative;
+  display: grid;
+  grid-template-columns: 140px 210px 210px minmax(0, 400px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  padding-top: 0;
+}
+
+.wp-c__strap {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 18px;
+  border-radius: 9px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 6px, rgb(255 255 255 / 0.1) 6px 7px),
+    linear-gradient(90deg, var(--stretch-muted) 0 78%, transparent 78%);
+}
+
+.wp-c__strap::after {
+  content: "";
+  position: absolute;
+  inset: 7px 0 auto 78%;
+  border-top: 3px dashed var(--stretch-muted);
+}
+
+.wp-c .wp-hang--sm { width: 210px; }
+.wp-c .wp-hang--lg { width: 100%; }
+.wp-c .wp-hang--sm .wp-pass__employer { font-size: 32px; overflow-wrap: normal; }
+.wp-c .wp-hang--sm .wp-pass__photo { display: none; }
+.wp-c .wp-hang--sm .wp-stamp { top: 22px; left: auto; right: 10px; }
+.wp-c .wp-history { font-size: 12px; }
+
+.wp-c__stop--history {
+  padding-top: 36px;
+}
+
+.wp-c__stop--next {
+  padding-top: 40px;
+}
+
+.wp-c__next {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--stretch-cobalt);
+  color: var(--stretch-on-cobalt);
+  font-size: 12px;
+}
+
+.wp-c .wp-headed .stretch-work__line {
+  font-size: 17px;
+}
+
+/* ---------- phones ---------- */
+
+@media (max-width: 760px) {
+  .wp-a__rail,
+  .wp-b__now {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+  }
+
+  .wp-a__past {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .wp-a__past .wp-hang--sm { width: 100%; }
+  .wp-pass { padding: 24px 16px 14px; }
+  .wp-pass__employer { font-size: 44px; }
+  .wp-hang--sm .wp-pass__employer { font-size: 26px; }
+  .wp-hang--sm .wp-pass__photo { display: none; }
+  .wp-hang--sm .wp-pass__value { font-size: 28px; }
+  .wp-hang--sm .wp-pass__label { font-size: 12px; }
+  .wp-hang--sm .wp-barcode { display: none; }
+  .wp-hang--sm .wp-stamp { top: 64px; font-size: 11px; }
+  .wp-hang[data-strap="lg"] { --strap-h: 120px; }
+  .wp-hang--lg { width: 100%; }
+
+  .wp-headed__strands {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  .wp-b__now .wp-headed { padding-top: 0; }
+
+  .wp-b__row {
+    grid-template-columns: 112px minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .wp-b .wp-hang--xs { width: 112px; }
+  .wp-b .wp-hang--xs .wp-pass__employer { font-size: 18px; }
+
+  /* C on a phone: the strap runs down the left, future at the top. */
+  .wp-c__stop--now { order: 1; }
+  .wp-c__stop--next { order: 2; }
+  .wp-c__stop:nth-child(4) { order: 3; }
+  .wp-c__stop:nth-child(3) { order: 4; }
+  .wp-c__stop--history { order: 5; }
+
+  .wp-c__line {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding-left: 34px;
+  }
+
+  .wp-c__strap {
+    inset: 0 auto 0 4px;
+    width: 14px;
+    height: auto;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 6px, rgb(255 255 255 / 0.1) 6px 7px),
+      var(--stretch-muted);
+  }
+
+  .wp-c__strap::after { display: none; }
+
+  .wp-c .wp-hang--sm,
+  .wp-c .wp-hang--lg { width: 100%; }
+  .wp-c .wp-hang--sm .wp-pass__photo { display: block; }
+  .wp-c .wp-hang--sm .wp-stamp { top: 86px; left: 10px; right: auto; }
+
+  .wp-c .wp-strap,
+  .wp-c .wp-clip { display: none; }
+
+  .wp-c .wp-hang { transform: none; }
+  .wp-c .wp-pins { display: none; }
+
+  .wp-c__stop { position: relative; }
+
+  .wp-c__stop::before {
+    content: "";
+    position: absolute;
+    top: 30px;
+    left: -26px;
+    width: 26px;
+    height: 4px;
+    background: var(--stretch-muted);
+  }
+
+  .wp-c__stop--history,
+  .wp-c__stop--next { padding-top: 0; }
+
+  .wp-c__stop--history::before,
+  .wp-c__stop--next::before { top: 14px; }
+}
+
+/* ---------- motion gates ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .wp-hang {
+    transition: none;
+  }
+}
+
+@media (max-width: 760px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .wp-a .wp-hang,
+    .wp-b__now .wp-hang {
+      animation: stretch-sway linear both;
+      animation-timeline: view();
+      --sway-tilt: 1.2deg;
+    }
+  }
+}
+
+/* ---------- prototype switcher ---------- */
+
+.wp-switcher {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 999px;
+  background: #ff3d7f;
+  color: #fff;
+  font: 600 14px/1 system-ui, sans-serif;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+  transform: translateX(-50%);
+}
+
+.wp-switcher span { padding: 0 10px; white-space: nowrap; }
+
+.wp-switcher button {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.2);
+  color: inherit;
+  font-size: 18px;
+  cursor: pointer;
+}

@@ -8,6 +8,7 @@ import { HowIWork } from "@/components/site/how-i-work";
 import { OffTheClock } from "@/components/site/off-the-clock";
 import { ProjectIndex } from "@/components/site/project-index";
 import { Work } from "@/components/site/work";
+import { WorkPassesPrototype, type WorkVariant } from "@/components/site/work-passes.prototype";
 import { featuredProjects, featuredSlugs, projectIndex, projects } from "@/content/projects";
 import { howIWork } from "@/content/stretch/how-i-work";
 import { offTheClock } from "@/content/stretch/off-the-clock";
@@ -22,7 +23,7 @@ const sayHelloHeadingId = "say-hello-heading";
  * entrance (entrance.ts) holds all of it for about 4.6 seconds on a fresh
  * load; the server renders the finished page.
  */
-export function Homepage() {
+export function Homepage({ workVariant }: { workVariant?: WorkVariant | null }) {
   return (
     <div data-stretch-shell>
       <EntranceGuard />
@@ -32,7 +33,8 @@ export function Homepage() {
 
         <section id="work" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="work-heading">
           <SectionHeading id="work-heading" heading={work.heading} />
-          <Work />
+          {workVariant ? null : <Work />}
+          {workVariant !== undefined && <WorkPassesPrototype variant={workVariant} />}
         </section>
 
         <section id="things-i-make" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="things-i-make-heading">
