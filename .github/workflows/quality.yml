@@ -1,10 +1,14 @@
 name: Quality
 
 # Every branch push, not only pull requests: a branch gets Linux CI as soon as it is
-# pushed, instead of when its pull request opens at the end.
+# pushed, instead of when its pull request opens at the end. A pull request from a fork
+# has no push in this repository (workflows are off in forks), so its pull_request event
+# runs the jobs; for a same-repository branch that event skips them, because the push
+# already ran.
 on:
   push:
     branches: ["**"]
+  pull_request:
 
 permissions:
   contents: read
@@ -15,6 +19,7 @@ concurrency:
 
 jobs:
   quality:
+    if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -61,6 +66,7 @@ jobs:
   # minutes on one runner, and WebKit at large sizes is slowest, so it runs
   # as eight shards in parallel.
   e2e:
+    if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
