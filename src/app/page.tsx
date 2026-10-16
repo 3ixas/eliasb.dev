@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Homepage } from "@/components/site/homepage";
-import { WORK_VARIANTS } from "@/components/site/work-passes.prototype";
+import { HEADED_VARIANTS } from "@/components/site/where-im-headed.prototype";
 import { siteCopy } from "@/content/stretch/site-copy";
 
 export const metadata: Metadata = {
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default async function Home({ searchParams }: { searchParams: Promise<{ variant?: string }> }) {
   if (process.env.NODE_ENV === "production") return <Homepage />;
   const { variant } = await searchParams;
-  const workVariant = WORK_VARIANTS.find((key) => key === variant?.toUpperCase()) ?? null;
+  const workVariant = HEADED_VARIANTS.find((key) => key === variant?.toUpperCase()) ?? null;
   return <Homepage workVariant={workVariant} />;
 }
 

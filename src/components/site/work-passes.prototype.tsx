@@ -15,6 +15,7 @@ import { roleStories } from "@/content/stretch/role-stories";
 import { roleStoryColours, type RoleStorySlug } from "@/content/stretch/role-story";
 import { shownLink, work } from "@/content/stretch/work";
 import { PassSwing, PrototypeSwitcher } from "./work-passes-switcher.prototype";
+import { HEADED_VARIANTS, HeadedPrototype, headedVariantNames, type HeadedVariant } from "./where-im-headed.prototype";
 import "../../app/work-passes.prototype.css";
 
 export const WORK_VARIANTS = ["A", "B", "C"] as const;
@@ -180,7 +181,7 @@ function HistoryTag() {
 }
 
 /* ---------------- A · Rail ---------------- */
-function VariantA() {
+function VariantA({ headed }: { headed: HeadedVariant | null }) {
   return (
     <div className="wp wp-a">
       <p className="wp-a__note stretch-mono">{work.gotHere.note}</p>
@@ -195,7 +196,7 @@ function VariantA() {
           <HistoryTag />
         </div>
       </div>
-      <Headed />
+      {headed ? <HeadedPrototype variant={headed} /> : <Headed />}
     </div>
   );
 }
@@ -273,14 +274,13 @@ function VariantC() {
   );
 }
 
-export function WorkPassesPrototype({ variant }: { variant: WorkVariant | null }) {
+/** On prototype/where-im-headed the Rail is fixed (A won #194) and ?variant= picks Where I'm headed. */
+export function WorkPassesPrototype({ variant }: { variant: HeadedVariant | null }) {
   return (
     <>
-      {variant === "A" && <VariantA />}
-      {variant === "B" && <VariantB />}
-      {variant === "C" && <VariantC />}
+      <VariantA headed={variant} />
       <PassSwing />
-      <PrototypeSwitcher current={variant} variants={WORK_VARIANTS} names={workVariantNames} />
+      <PrototypeSwitcher current={variant} variants={HEADED_VARIANTS} names={headedVariantNames} />
     </>
   );
 }
