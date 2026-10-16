@@ -6,7 +6,8 @@ Read this before running Playwright, the verify scripts or a build on a laptop. 
 
 1. Run only the specs the change can affect, and one project at a time: `pnpm exec playwright test e2e/<spec>.ts --workers=1 --project=chromium-1440-light`. Project names are `<chromium|webkit>-<320|390|820|1440>-<light|dark>`.
 2. Run WebKit in its own invocation, never alongside Chromium. Parallel runs froze an 8 GB laptop, which is why `playwright.config.ts` sets one worker locally.
-3. Do not run the full suite or a full `pnpm build` without Elias's approval. A full build crashed this laptop before; if one is approved, cap its memory.
+3. To run several projects, use `scripts/e2e-matrix.sh` (build first). It runs one project at a time, waits for a low load average and swap, and stops a project early when the machine is struggling. `PROJECTS="chromium-390-dark webkit-820-light" scripts/e2e-matrix.sh hero` runs the named projects, and spec filters pass through to Playwright. Free memory is not a safe signal: it read 45% while the machine was thrashing.
+4. Do not run the full suite or a full `pnpm build` without Elias's approval. A full build crashed this laptop before; if one is approved, cap its memory.
 
 ## The server the specs run against
 
