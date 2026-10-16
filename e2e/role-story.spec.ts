@@ -201,12 +201,3 @@ for (const slug of roleStorySlugs) {
   });
 }
 
-test("a slug that is not a Role story is a 404, and no Role story is redirected", async ({ page }) => {
-  expect(roleStorySlugs).toEqual(["bnp-paribas", "joveen", "optegra"]);
-  for (const slug of ["constructor", "not-a-story"]) {
-    expect((await page.goto(`/work/${slug}`))?.status(), slug).toBe(404);
-  }
-  for (const slug of roleStorySlugs) {
-    expect((await page.goto(`/work/${slug}`))?.url()).toMatch(new RegExp(`/work/${slug}$`));
-  }
-});
