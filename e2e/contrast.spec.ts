@@ -9,15 +9,17 @@ import { renderedContrast } from "./support/rendered-contrast";
 test.use({ reducedMotion: "reduce" });
 
 const routes = ["/", "/things-i-make", ...Object.keys(caseStudies).map((slug) => `/things-i-make/${slug}`), "/nothing-pinned-here"];
-/** Fewest text runs a page shows; the 404 has five now that the theme button carries no text. */
-const minimumRuns = (route: string) => (route === "/nothing-pinned-here" ? 5 : 6);
+/** Pages that are not the site's own routes but must meet the same bar: every state of the Staff pass. */
+const fixtureRoutes = ["/fixtures/staff-pass"];
+/** Fewest text runs a page shows; the 404 has five now that the theme button carries no text, and the Staff pass fixture dozens. */
+const minimumRuns = (route: string) => (route === "/nothing-pinned-here" ? 5 : fixtureRoutes.includes(route) ? 30 : 6);
 
 test.describe("Contrast, measured from the rendered page", () => {
   test.beforeEach(({ browserName }) => {
     test.skip(browserName !== "chromium", "Measured in Chromium");
   });
 
-  for (const route of routes) {
+  for (const route of [...routes, ...fixtureRoutes]) {
     test(`every text run on ${route} meets WCAG 2.2 AA`, async ({ page }) => {
       await page.goto(route);
       const readings = await renderedContrast(page);
@@ -26,7 +28,9 @@ test.describe("Contrast, measured from the rendered page", () => {
       expect(readings.filter((reading) => reading.blended)).toEqual([]);
       expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);
     });
+  }
 
+  for (const route of routes) {
     test(`every focus ring on ${route} stands out at 3:1`, async ({ page }) => {
       await page.goto(route);
       const { readings, complete } = await focusContrast(page);

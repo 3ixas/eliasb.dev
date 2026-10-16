@@ -5,3 +5,6 @@ export const heroPortrait = {
   width: 1200,
   height: 1500,
 } as const;
+
+/** The portrait on a Staff pass, as an ID photo. It is decorative: the pass names who it is for. */
+export const passPhoto = { src: "/profile/elias.webp", width: 968, height: 968 } as const;
