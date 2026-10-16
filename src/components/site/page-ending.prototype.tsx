@@ -116,7 +116,8 @@ function Bookend({ headingId }: { headingId: string }) {
           {address}
         </a>
       </div>
-      <Links />
+      {/* Chosen with A's plain link row (#200). */}
+      <Links plain />
     </div>
   );
 }
