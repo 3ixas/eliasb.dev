@@ -1570,7 +1570,19 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
 .stretch-otc__film {
   grid-template-columns: minmax(0, 40%) minmax(0, 1fr);
   align-items: start;
+  /* Size to content: side by side, the shorter card doesn't stretch to the taller one's height. */
+  align-self: start;
   gap: 20px;
+}
+
+/* A film title stops at three lines; the whole title stays in the link. */
+.stretch-otc__film .stretch-otc__name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 .stretch-otc__text {
@@ -1744,10 +1756,6 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
 }
 
 .stretch-otc__clipping .stretch-otc__label {
-  color: var(--stretch-ink);
-  font-size: clamp(20px, 2vw, 24px);
-  font-weight: 700;
-  line-height: 1.35;
   border-bottom: 2px solid var(--stretch-cobalt);
   padding-bottom: 16px;
 }
