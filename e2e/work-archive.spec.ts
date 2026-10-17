@@ -47,6 +47,21 @@ test.describe("Work archive: the catalogue", () => {
     }
   });
 
+  test("desktop fills the right column at rest with the first screenshot and swaps it on hover", async ({ page }) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 761, "Phones use inline thumbnails");
+    const resting = page.locator(".stretch-index__shot[data-resting]");
+    await expect(resting).toHaveCount(1);
+    await expect(resting).toBeVisible();
+    const [list, box] = await Promise.all([page.locator(".stretch-index__list").boundingBox(), resting.boundingBox()]);
+    expect(box!.x).toBeGreaterThan(list!.x + list!.width * 0.55);
+    const second = rows(page).nth(1).locator(".stretch-index__shot");
+    await rows(page).nth(1).getByRole("link").hover();
+    await expect(second).toBeVisible();
+    await expect(resting).toBeHidden();
+    await page.mouse.move(0, 0);
+    await expect(resting).toBeVisible();
+  });
+
   test("has no sideways scroll, 44 px rows, and passes axe", async ({ page }) => {
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(0);

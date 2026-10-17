@@ -1140,6 +1140,20 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   }
 }
 
+/* Resting preview: until a row is hovered or focused, the first screenshot fills the stage. */
+@media (min-width: 761px) {
+  .stretch-index__shot[data-resting] {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  /* A selector list, not :is(), inside :has(): WebKit does not restyle on :is() there. */
+  :where(.stretch-index__list:has(.stretch-index__link:hover, .stretch-index__link:focus-visible)) .stretch-index__shot[data-resting] {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+
 .stretch-index__shot img {
   display: block;
   width: 100%;
