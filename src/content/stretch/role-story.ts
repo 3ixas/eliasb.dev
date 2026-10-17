@@ -72,6 +72,15 @@ export type RoleStoryFigure =
       width: number;
       height: number;
       caption: string;
+    }
+  | {
+      kind: "screens";
+      /** Side by side, in this order: a desktop shot is wide, a phone shot is narrow. */
+      images: readonly { src: string; alt: string; width: number; height: number; device: "desktop" | "phone" }[];
+      /** What it is and when it was captured. */
+      caption: string;
+      /** Where it came from, shown at the end of the caption as a link. */
+      source: { href: string; label: string };
     };
 
 export type RoleStory = {
