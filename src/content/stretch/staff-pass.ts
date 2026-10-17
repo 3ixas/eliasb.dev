@@ -38,7 +38,8 @@ export const passRecords: Record<RoleStorySlug, PassRecord> = {
     headline: { value: "Only", label: "C# engineer on the team", quote: "only C# engineer" },
     pins: [
       { label: "Winner", detail: "Digitisation · 2025", href: "/work/bnp-paribas#what-changed" },
-      { label: "Take Ownership", detail: "Q1 2026", href: "/work/bnp-paribas#take-ownership-certificate" },
+      // No href until the certificate section exists (#213 adds #take-ownership-certificate).
+      { label: "Take Ownership", detail: "Q1 2026" },
       { label: "AI Champion", detail: "2026", href: "/work/bnp-paribas#what-i-took-with-me" },
     ],
   },
