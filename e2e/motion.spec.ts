@@ -51,12 +51,13 @@ test.describe("Scroll sway", () => {
     await released(page);
     const prd = page.locator(".stretch-prd");
     await prd.scrollIntoViewIfNeeded();
-    const { rotate, transform } = await prd.evaluate((element) => ({ rotate: getComputedStyle(element).rotate, transform: getComputedStyle(element).transform }));
-    expect(rotate).not.toBe("none");
-    expect(transform, "the resting 1 degree tilt is still there").not.toBe("none");
+    await expect.poll(() => prd.evaluate((element) => getComputedStyle(element).rotate)).not.toBe("none");
+    await expect.poll(() => prd.evaluate((element) => getComputedStyle(element).transform), { message: "the resting 1 degree tilt is still there" }).not.toBe("none");
     await page.goto("/");
+    await released(page);
     const card = page.locator("#off-the-clock .stretch-otc__card").first();
-    expect(await card.evaluate((element) => getComputedStyle(element).translate)).not.toBe("none");
+    await card.scrollIntoViewIfNeeded();
+    await expect.poll(() => card.evaluate((element) => getComputedStyle(element).translate)).not.toBe("none");
   });
 
   test("with reduced motion nothing sways", async ({ page }) => {
