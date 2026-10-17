@@ -66,6 +66,13 @@ test.describe("The 404", () => {
       .toBe(true);
   });
 
+  test("shortening never splits an emoji at the cut", async ({ page }) => {
+    // The 23rd character is an emoji: two UTF-16 units that must stay together.
+    const address = `/${"a".repeat(21)}😀${"b".repeat(60)}`;
+    await page.goto(encodeURI(address));
+    await expect(page.locator("[data-lost-property] .stretch-404__address")).toHaveText(`/${"a".repeat(21)}😀…${"b".repeat(23)}`);
+  });
+
   test("five rows lead to the homepage's sections, in the page's order", async ({ page }) => {
     await page.goto("/nothing-here");
     const rows = page.getByRole("navigation", { name: notFound.orTry }).getByRole("link");

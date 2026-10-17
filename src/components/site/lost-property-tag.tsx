@@ -25,9 +25,11 @@ function shortened(path: string) {
       return path;
     }
   })();
-  if (address.length <= SHORTEN_AT) return address;
+  // Count code points, not UTF-16 units, so an emoji at a cut is never split in two.
+  const characters = Array.from(address);
+  if (characters.length <= SHORTEN_AT) return address;
   const half = Math.floor((SHORTEN_AT - 1) / 2);
-  return `${address.slice(0, half)}…${address.slice(-half)}`;
+  return `${characters.slice(0, half).join("")}…${characters.slice(-half).join("")}`;
 }
 
 /**
