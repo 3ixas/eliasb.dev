@@ -10,6 +10,9 @@ import type { EvidenceItem, StoryColours, StorySectionBody } from "@/content/str
  * Nothing here knows about a project.
  */
 
+/** The characters in a name's longest word: the opening band sizes the title so that word fits its column. */
+const longestWord = (name: string) => Math.max(...name.split(/\s+/).map((word) => word.length));
+
 export const storyNumber = (position: number) => String(position + 1).padStart(2, "0");
 
 /** "Live site ↗" as a visible label and a decorative arrow: the link's name is the words. */
@@ -60,7 +63,7 @@ export function StoryOpening({
     <section className="stretch-cs-open" style={storyColours(colours)} aria-label="Overview">
       <div className="stretch-wrap stretch-cs-open__inner">
         {back}
-        <div className="stretch-cs-open__text">
+        <div className="stretch-cs-open__text" style={{ "--cs-name-chars": longestWord(name) } as CSSProperties}>
           <p className="stretch-display stretch-cs-open__number" aria-hidden="true">
             {number}
           </p>
@@ -157,7 +160,11 @@ export function StoryEvidence({ evidence }: { evidence: readonly EvidenceItem[] 
   );
 }
 
-/** The tile that ends a story, in the next story's colours: a number, a name, a one-line outcome and an arrow. */
+/**
+ * The tile that ends a story, in the next story's colours: a number, a name, a
+ * one-line outcome and an arrow. A story whose next has a picture passes it as
+ * `shot`, with its one `fastener`; the page owns both, as it owns the opening's aside.
+ */
 export function StoryNext({
   label,
   href,
@@ -165,6 +172,8 @@ export function StoryNext({
   number,
   name,
   outcome,
+  shot,
+  fastener,
 }: {
   label: string;
   href: string;
@@ -172,19 +181,25 @@ export function StoryNext({
   number: string;
   name: string;
   outcome: string;
+  shot?: ReactNode;
+  fastener?: ReactNode;
 }) {
   return (
     <section className="stretch-wrap stretch-cs-next" aria-label={label}>
       <Link className="stretch-cs-next__tile" href={href} style={storyColours(colours)}>
-        <span className="stretch-mono stretch-cs-next__label">{label}</span>
-        <span className="stretch-display stretch-cs-next__number" aria-hidden="true">
-          {number}
+        {fastener}
+        <span className="stretch-cs-next__text">
+          <span className="stretch-mono stretch-cs-next__label">{label}</span>
+          <span className="stretch-display stretch-cs-next__number" aria-hidden="true">
+            {number}
+          </span>
+          <span className="stretch-cs-next__name">{name}</span>
+          <span className="stretch-cs-next__outcome">{outcome}</span>
+          <span className="stretch-cs-next__arrow" aria-hidden="true">
+            →
+          </span>
         </span>
-        <span className="stretch-cs-next__name">{name}</span>
-        <span className="stretch-cs-next__outcome">{outcome}</span>
-        <span className="stretch-cs-next__arrow" aria-hidden="true">
-          →
-        </span>
+        {shot}
       </Link>
     </section>
   );
