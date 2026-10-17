@@ -25,7 +25,7 @@ import { howIWork } from "../src/content/stretch/how-i-work.ts";
 import { greetingKey } from "../src/content/stretch/greeting.ts";
 import { offTheClock } from "../src/content/stretch/off-the-clock.ts";
 import { hero, notFound, sayHello, siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy.ts";
-import { shownLink, work } from "../src/content/stretch/work.ts";
+import { headedProblems, shownSource, work } from "../src/content/stretch/work.ts";
 
 const raw = readFileSync(new URL("../docs/content/redesign-copy.md", import.meta.url), "utf8");
 // Emphasis stars and the {braces} around live values are markup, not words.
@@ -35,7 +35,7 @@ const plain = raw.replace(/\*/g, "").replace(/[{}]/g, "");
 
 const leaves = (value, path = "") => {
   // Links, image paths, dates, anchors, category keys and Role story slugs are addresses and data, not words, so the approved copy does not list them.
-  if (typeof value === "string") return /(href|src|writtenOn|\.id|\.category|\.story)$/.test(path) ? [] : [[path, value]];
+  if (typeof value === "string") return /(href|src|writtenOn|\.id|\.category|\.story|\.project|\.restates\[\d+\])$/.test(path) ? [] : [[path, value]];
   if (Array.isArray(value)) return value.flatMap((item, index) => leaves(item, `${path}[${index}]`));
   if (value && typeof value === "object") return Object.entries(value).flatMap(([key, item]) => leaves(item, `${path}.${key}`));
   return [];
@@ -127,10 +127,11 @@ assert.ok(returned.every((pass) => !("proofs" in pass)), "Only the current pass 
 const headedCopy = copyFor("Where I’m headed");
 assert.equal(headed.heading, bullet(headedCopy, "Heading"), "Where I’m headed: heading");
 assert.equal(headed.line, bullet(headedCopy, "Line"), "Where I’m headed: line");
+assert.equal(headed.soFar, bullet(headedCopy, "Tag"), "Where I’m headed: tag");
 assert.deepEqual(
-  headed.strands.map((strand) => [strand.title, strand.proof, shownLink(strand.link).label]),
+  headed.bars.map((bar) => [bar.label, bar.title, bar.soFar.text, shownSource(bar.source).link.label]),
   rows(headedCopy, "### "),
-  "Where I’m headed: strands",
+  "Where I’m headed: bars",
 );
 
 const gotHereCopy = copyFor("How I got here");
@@ -138,10 +139,15 @@ assert.equal(work.note, bullet(gotHereCopy, "Note"), "Work: note");
 assert.deepEqual([[history.dates, history.role, history.note]], rows(gotHereCopy, "### "), "History");
 assert.equal(work.heading, bullet(raw.slice(raw.indexOf("## Work\n")), "Heading"), "Work: heading");
 
-// Every link goes somewhere that exists: a Role story, or a section of the homepage.
-for (const { href } of headed.strands.map((strand) => shownLink(strand.link))) {
-  assert.ok(href.startsWith("#") ? siteCopy.menu.some(({ id }) => `#${id}` === href) : roleStorySlugs.some((slug) => href === `/work/${slug}`), `Work links to "${href}", which does not exist`);
+// Every link goes to a Role story or Case study that exists, and every "So far" restates a fact its source tells.
+for (const { source } of headed.bars) {
+  const { href } = shownSource(source).link;
+  assert.ok(roleStorySlugs.some((slug) => href === `/work/${slug}`) || Object.keys(caseStudies).some((slug) => href === `/things-i-make/${slug}`), `Work links to "${href}", which does not exist`);
 }
+assert.deepEqual(headedProblems(headed.bars), []);
+assert.match(headedProblems([{ ...headed.bars[0], soFar: { ...headed.bars[0].soFar, restates: ["decided what the engineers built next"] } }])[0], /Judgement bar.*decided what the engineers built next/);
+assert.match(headedProblems([{ ...headed.bars[2], soFar: { ...headed.bars[2].soFar, restates: ["58 user stories"] } }])[0], /Range bar.*58 user stories/);
+assert.match(headedProblems([{ ...headed.bars[2], soFar: { ...headed.bars[2].soFar, text: "Threshold, a live site." } }])[0], /Range bar.*no longer shows "57 user stories"/);
 // The rail hangs every Role story once, the current one first and the rest returned.
 assert.deepEqual([...work.rail.map((pass) => pass.slug)].sort(), [...roleStorySlugs].sort(), "The Work rail hangs every Role story exactly once");
 assert.deepEqual(work.rail.map((pass) => pass.state), ["current", ...work.rail.slice(1).map(() => "returned")], "The Work rail starts with the one current pass, then the returned ones");

@@ -50,14 +50,17 @@ The current Staff pass. Its role, dates and link come from its Role story, and i
 
 ### Where I’m headed
 
-- Heading: Where I’m headed
-- Line: At work, I’m learning to build systems that hold up. On my own products, I’m learning what’s worth building. I want to be genuinely good at both.
+The self-issued Staff pass (#211, settled on the map on 16 October 2026). Each bar says what “good” means; its “So far” restates a fact already in a Role story or Case study, checked by `verify:copy`. The Optegra line says “guided”, as the Optegra Role story does (the prototype said “decided”).
 
-| Strand | Proof | Link |
-| --- | --- | --- |
-| Systems that hold up. | I shipped a change to live pricing behind a flag, switched off by default, with an end-to-end test nobody asked for. | The BNP Paribas story → |
-| Deciding what’s worth building. | Before I built Threshold, I wrote 57 user stories and what was out of scope. | Things I make ↓ |
-| Building with AI, and bringing people with me. | I built a phase-gated workflow, from grilling the problem to a health review, and showed it to teams across the department. Several now use it. | The BNP Paribas story → |
+- Heading: Where I’m headed
+- Line: I want to be really good at this. Here’s what that means to me, and how far I’ve got.
+- Tag: So far
+
+| Bar | Title | So far | Link |
+| --- | --- | --- | --- |
+| Judgement | Knowing what’s worth building. | At Optegra, split tests and dashboards guided what the engineers built next. | The Optegra story → |
+| Depth | Knowing why it works, not just that it does. | Six months from zero C# to production code, in a pricing engine of around 70 projects. | The BNP Paribas story → |
+| Range | The whole way, from idea to running in production. | Threshold, from 57 user stories to a live site. | The Threshold case study → |
 
 ### How I got here
 

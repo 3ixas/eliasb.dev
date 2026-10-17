@@ -25,6 +25,15 @@
   --pass-swatch: var(--stretch-muted);
 }
 
+/*
+ * The self-issued pass is wider than an employer's, up to the content measure,
+ * and hangs from a short strap: nothing is pinned to it, so a long one would be bare.
+ */
+.stretch-pass[data-pass="self-issued"] {
+  --pass-strap: 56px;
+  width: min(100%, 920px);
+}
+
 .stretch-pass--sm {
   /* A section may hang a past pass lower: --pass-strap-rest, set on an ancestor. */
   --pass-strap: var(--pass-strap-rest, 40px);
@@ -85,6 +94,7 @@
 }
 
 .stretch-pass[data-pass="self-issued"] .stretch-pass__card {
+  gap: 18px;
   box-shadow: 0 0 0 1px var(--stretch-rule);
 }
 
@@ -93,6 +103,26 @@
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--pass-ink) 22%, transparent),
     0 24px 48px -16px rgb(0 0 0 / 0.5);
+}
+
+.stretch-pass[data-pass="self-issued"] .stretch-pass__photo {
+  box-shadow: 0 0 0 3px var(--stretch-rule);
+}
+
+/* Its heading is a section's, not a name's: smaller than an employer's, with the line under it. */
+.stretch-pass[data-pass="self-issued"] .stretch-pass__title {
+  margin: 0;
+  font-size: clamp(28px, 3.4vw, 40px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.stretch-pass__line {
+  max-width: 30em;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
 /* The page's own focus ring (cobalt), kept clear of the card. Focus also straightens the pass. */

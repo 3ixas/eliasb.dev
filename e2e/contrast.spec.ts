@@ -38,7 +38,7 @@ test.describe("Contrast, measured from the rendered page", () => {
     // A long run is recorded by its opening words, so match each long line by its first 30 characters.
     const normal = (text: string) => text.toLowerCase().replace(/\s+/g, " ").trim();
     const measured = normal(readings.map((reading) => reading.text).join(" "));
-    const targets = [...currentProofs.map((proof) => proof.slice(0, 30)), "Valid · present", "Returned", "Take Ownership", "Q1 2026", "AI Champion", "The Joveen story", "The Optegra story", work.history.note.slice(0, 30)];
+    const targets = [...currentProofs.map((proof) => proof.slice(0, 30)), "Valid · present", "Returned", "Take Ownership", "Q1 2026", "AI Champion", "The Joveen story", "The Optegra story", work.history.note.slice(0, 30), work.headed.line.slice(0, 30), ...work.headed.bars.flatMap((bar) => [bar.title.slice(0, 30), bar.soFar.text.slice(0, 30)])];
     for (const text of targets) expect(measured, `"${text}" is measured`).toContain(normal(text));
     const ofTargets = readings.filter((reading) => targets.some((text) => normal(reading.text).includes(normal(text)) || normal(text).includes(normal(reading.text))));
     expect(ofTargets.length).toBeGreaterThan(targets.length);

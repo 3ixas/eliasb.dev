@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { CSSProperties, ReactNode } from "react";
+import { useId, type CSSProperties, type ReactNode } from "react";
 import { PassHang } from "@/components/site/staff-pass-hang";
 import { passLean } from "@/components/site/signature-springs";
 import { passPhoto } from "@/content/stretch/media";
@@ -42,6 +42,9 @@ export type SelfIssuedPassProps = {
   state: "self-issued";
   /** The pass's heading, in the employer's place. */
   title: string;
+  /** The line under the heading. */
+  line: string;
+  /** The pass's fields, between the ID row and the foot. */
   children?: ReactNode;
 };
 
@@ -132,9 +135,10 @@ function EmployerPass({ slug, state, size, tilt, linked, pins, lean, onBand = fa
   );
 }
 
-function SelfIssuedPass({ title, children }: SelfIssuedPassProps) {
+function SelfIssuedPass({ title, line, children }: SelfIssuedPassProps) {
+  const titleId = useId();
   return (
-    <div className="stretch-pass stretch-pass--lg" data-pass="self-issued" style={springStyle as CSSProperties}>
+    <article className="stretch-pass" data-pass="self-issued" style={springStyle as CSSProperties} aria-labelledby={titleId}>
       <span className="stretch-pass__strap" aria-hidden="true" />
       <span className="stretch-pass__clip" aria-hidden="true" />
       <div className="stretch-pass__card">
@@ -143,19 +147,22 @@ function SelfIssuedPass({ title, children }: SelfIssuedPassProps) {
           <span>Staff pass</span>
           <span className="stretch-pass__status">Self-issued</span>
         </span>
-        <span className="stretch-pass__id">
+        <div className="stretch-pass__id">
           <PassPhoto />
-          <span className="stretch-pass__who">
-            <span className="stretch-pass__title stretch-display">{title}</span>
-          </span>
-        </span>
+          <div className="stretch-pass__who">
+            <h3 id={titleId} className="stretch-pass__title stretch-display">
+              {title}
+            </h3>
+            <p className="stretch-pass__line">{line}</p>
+          </div>
+        </div>
         {children}
         <span className="stretch-pass__foot stretch-mono">
-          <span className="stretch-pass__barcode" aria-hidden="true" />
           <span>Issued by: Elias Bennett</span>
+          <span className="stretch-pass__barcode" aria-hidden="true" />
         </span>
       </div>
-    </div>
+    </article>
   );
 }
 

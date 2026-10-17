@@ -3,7 +3,7 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { roleStories } from "../src/content/stretch/role-stories";
 import { hero } from "../src/content/stretch/site-copy";
 import { passLinkLabel, passRecords, passStatus } from "../src/content/stretch/staff-pass";
-import { shownLink, work } from "../src/content/stretch/work";
+import { shownSource, work } from "../src/content/stretch/work";
 import { contrastOnPaper } from "./support/contrast";
 
 /** BNP's award pins that lead into its Role story. */
@@ -24,8 +24,8 @@ test.describe("Work", () => {
   });
 
   test("three Staff passes hang from the rail, newest first, each with its fields in order", async ({ page }) => {
-    await expect(section(page).locator(".stretch-pass")).toHaveCount(3);
-    expect(await section(page).locator(".stretch-pass").evaluateAll((all) => all.map((element) => element.closest("[data-slug]")?.getAttribute("data-slug")))).toEqual([...slugs]);
+    await expect(section(page).locator("[data-slug] .stretch-pass")).toHaveCount(3);
+    expect(await section(page).locator("[data-slug] .stretch-pass").evaluateAll((all) => all.map((element) => element.closest("[data-slug]")?.getAttribute("data-slug")))).toEqual([...slugs]);
     for (const slug of slugs) {
       const story = roleStories[slug];
       const record = passRecords[slug];
@@ -139,27 +139,73 @@ test.describe("Work", () => {
     expect(joveen.x, "Joveen is not on top of BNP").toBeGreaterThanOrEqual(current.x + current.width);
   });
 
-  test("Where I'm headed has its line and three strands, each with one proof and its link", async ({ page }) => {
+  test("Where I'm headed is a self-issued pass: the line, three bars and three links, word for word", async ({ page }) => {
     const headed = section(page).getByRole("article", { name: work.headed.heading });
-    await expect(headed.locator(".stretch-work__line")).toHaveText(work.headed.line);
-    const strands = headed.getByRole("listitem");
-    await expect(strands).toHaveCount(3);
-    for (const [index, strand] of work.headed.strands.entries()) {
-      const item = strands.nth(index);
-      await expect(item.locator(".stretch-work__strand")).toHaveText(strand.title);
-      await expect(item.locator(".stretch-work__proof")).toHaveText(strand.proof);
-      const link = shownLink(strand.link);
-      await expect(item.getByRole("link")).toHaveText(link.label);
-      await expect(item.getByRole("link")).toHaveAttribute("href", link.href);
+    await expect(headed).toHaveAttribute("data-pass", "self-issued");
+    await expect(headed.getByRole("heading", { level: 3 })).toHaveText(work.headed.heading);
+    await expect(headed.locator(".stretch-pass__line")).toHaveText(work.headed.line);
+    await expect(headed.locator(".stretch-pass__top")).toHaveText("Staff passSelf-issued");
+    await expect(headed.locator(".stretch-pass__foot")).toHaveText("Issued by: Elias Bennett");
+    await expect(headed.locator(".stretch-pass__photo")).toBeVisible();
+    await expect(headed.locator(".stretch-pass__barcode")).toBeVisible();
+    const bars = headed.locator(".stretch-work__bar");
+    await expect(bars).toHaveCount(3);
+    for (const [index, bar] of work.headed.bars.entries()) {
+      const item = bars.nth(index);
+      const source = shownSource(bar.source);
+      await expect(item.locator(".stretch-work__bar-label")).toHaveText(bar.label);
+      await expect(item.locator(".stretch-work__bar-title")).toHaveText(bar.title);
+      await expect(item.locator(".stretch-work__so-far")).toHaveText(`${work.headed.soFar} · ${source.name}${bar.soFar.text}`);
+      await expect(item.getByRole("link")).toHaveText(source.link.label);
+      await expect(item.getByRole("link")).toHaveAttribute("href", source.link.href);
     }
-    expect(work.headed.strands.map((strand) => shownLink(strand.link).href)).toEqual(["/work/bnp-paribas", "#things-i-make", "/work/bnp-paribas"]);
+    expect(work.headed.bars.map((bar) => shownSource(bar.source).link.href)).toEqual(["/work/optegra", "/work/bnp-paribas", "/things-i-make/threshold"]);
+    expect(work.headed.bars[0].soFar.text, "Optegra's So far says guided, as its Role story does").toContain("guided");
   });
 
-  test("the Things I make strand scrolls to that section", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await section(page).getByRole("link", { name: shownLink(work.headed.strands[1].link).label }).click();
-    await expect(page).toHaveURL(/#things-i-make$/);
-    await expect(page.locator("#things-i-make h2")).toBeInViewport();
+  test("each bar's thread is 4 px in its source's colour: above the bar on a wide screen, down its left edge on a phone", async ({ page }) => {
+    const bars = section(page).locator(".stretch-work__bar");
+    const phone = viewportWidth(page) <= 760;
+    for (const [index, bar] of work.headed.bars.entries()) {
+      const item = bars.nth(index);
+      const expected = await page.evaluate((thread) => {
+        const probe = document.createElement("i");
+        probe.style.color = thread;
+        document.body.append(probe);
+        const resolved = getComputedStyle(probe).color;
+        probe.remove();
+        return resolved;
+      }, shownSource(bar.source).thread);
+      const side = phone ? "left" : "top";
+      await expect(item).toHaveCSS(`border-${side}-width`, "4px");
+      await expect(item).toHaveCSS(`border-${side}-color`, expected);
+      await expect(item).toHaveCSS(`border-${phone ? "top" : "left"}-width`, "0px");
+    }
+    const colours = await Promise.all(work.headed.bars.map((_, index) => bars.nth(index).evaluate((element) => getComputedStyle(element).getPropertyValue("--thread"))));
+    expect(new Set(colours).size, "three different threads").toBe(3);
+  });
+
+  test("the self-issued pass shows no sign of being unissued and holds level at every width", async ({ page }) => {
+    const headed = section(page).locator('.stretch-pass[data-pass="self-issued"]');
+    const shown = (await headed.innerText()).replace(/\s+/g, " ");
+    for (const absent of ["Not yet issued", "Valid from", "Valid", "Returned", "Field "]) expect(shown, absent).not.toContain(absent);
+    await expect(headed.locator(".stretch-pass__pins")).toHaveCount(0);
+    await expect(headed).not.toHaveAttribute("data-lean");
+    expect(await headed.evaluate((element) => new DOMMatrixReadOnly(getComputedStyle(element).transform).b)).toBe(0);
+  });
+
+  test("the flag-and-test and AI-workflow proofs have left the homepage and are still in the BNP Role story", async ({ page }) => {
+    const retired = ["behind a flag", "end-to-end test nobody asked for", "phase-gated workflow", "Systems that hold up", "Building with AI, and bringing people with me"];
+    const home = (await page.locator("main").innerText()).replace(/\s+/g, " ");
+    for (const phrase of retired) expect(home, phrase).not.toContain(phrase);
+    const story = roleStories["bnp-paribas"].sections;
+    const told = JSON.stringify(story);
+    expect(told, "the flag proof").toContain("feature flag that defaults to off");
+    expect(told, "the end-to-end test").toContain("end-to-end test");
+    expect(told, "the AI workflow").toContain("the workflow");
+    await page.goto("/work/bnp-paribas");
+    await expect(page.locator("main")).toContainText("feature flag that defaults to off");
+    await expect(page.locator("main")).toContainText("AI Champion");
   });
 
   test("a Role story's ← Work lands on this section, below the header", async ({ page }) => {
@@ -191,19 +237,39 @@ test.describe("Work", () => {
   test("it is in the server-rendered page", async ({ page }) => {
     await page.route("**/*.js", (route) => route.abort());
     await page.reload();
-    // Three passes, the three award pins, and the three strands.
-    await expect(section(page).getByRole("link")).toHaveCount(3 + pinLinks.length + work.headed.strands.length);
+    // Three passes, the three award pins, and the three bars.
+    await expect(section(page).getByRole("link")).toHaveCount(3 + pinLinks.length + work.headed.bars.length);
     await expect(section(page)).toContainText(currentProofs[0]);
   });
 
   for (const scheme of ["light", "dark"] as const) {
     test(`text passes WCAG 2.2 AA contrast (${scheme})`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
-      for (const selector of [".stretch-work__h3", ".stretch-work__line", ".stretch-work__strand", ".stretch-work__proof", ".stretch-work__link", ".stretch-work__history"]) {
+      for (const selector of [".stretch-pass__line", ".stretch-work__bar-label", ".stretch-work__bar-title", ".stretch-work__tag", ".stretch-work__so-far", ".stretch-work__link", ".stretch-work__history"]) {
         const readings = await contrastOnPaper(page, `#work ${selector}`);
         expect(readings.length, selector).toBeGreaterThan(0);
         for (const reading of readings) expect(reading.ratio, `${selector}: ${reading.text}`).toBeGreaterThanOrEqual(4.5);
       }
+    });
+
+    test(`each thread stands out from the pass at 3:1 (${scheme})`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
+      const ratios = await section(page).locator(".stretch-work__bar").evaluateAll((bars) => {
+        const parse = (colour: string) => colour.match(/[\d.]+/g)!.slice(0, 3).map(Number);
+        const luminance = (rgb: number[]) => {
+          const [r, g, b] = rgb.map((channel) => ((channel / 255) <= 0.03928 ? channel / 255 / 12.92 : (((channel / 255) + 0.055) / 1.055) ** 2.4));
+          return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        };
+        return bars.map((bar) => {
+          const style = getComputedStyle(bar);
+          const side = style.borderTopWidth === "4px" ? style.borderTopColor : style.borderLeftColor;
+          const card = getComputedStyle(bar.closest(".stretch-pass__card")!).backgroundColor;
+          const [a, b] = [luminance(parse(side)), luminance(parse(card))];
+          return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+        });
+      });
+      expect(ratios).toHaveLength(3);
+      for (const ratio of ratios) expect(ratio).toBeGreaterThanOrEqual(3);
     });
 
     test(`has no axe violations (${scheme})`, async ({ page }) => {
