@@ -27,9 +27,11 @@ function Label({ text }: { text: string }) {
   );
 }
 
-function ExternalLink({ href, children }: { href: string; children: string }) {
+/** `about` names what the link is for when the visible label is generic; it joins the link's accessible name and tooltip. */
+function ExternalLink({ href, children, about }: { href: string; children: string; about?: string }) {
+  const name = about && `${children.replace(/ [↗↓→]$/, "")}: ${about}`;
   return (
-    <a className="stretch-link stretch-mono" href={href} target="_blank" rel="noreferrer">
+    <a className="stretch-link stretch-mono" href={href} target="_blank" rel="noreferrer" aria-label={name} title={about}>
       <span>
         <Label text={children} />
       </span>
@@ -133,7 +135,9 @@ export function FilmCard({ film: signal, now }: { film: FilmSignal; now: Date })
                 <span className="sr-only">{line.spoken}</span>
               </p>
             )}
-            <ExternalLink href={film.href}>{copy.watched.source}</ExternalLink>
+            <ExternalLink href={film.href} about={film.year ? `${film.title} (${film.year})` : film.title}>
+              {copy.watched.source}
+            </ExternalLink>
           </>
         ) : (
           <p className="stretch-otc__name">{copy.watched.fallback}</p>
