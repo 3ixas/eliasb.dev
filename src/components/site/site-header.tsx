@@ -5,7 +5,7 @@ import { SiteGreeting } from "@/components/site/site-greeting";
 
 /**
  * The header. On desktop: the greeting, Lights and the section links.
- * Below about 760 px: Lights and Menu only, with the greeting and the section
+ * Below 900 px: Lights and Menu only, with the greeting and the section
  * names in the menu dialog. CSS switches between the two (stretch-shell.css).
  */
 export function SiteHeader() {
