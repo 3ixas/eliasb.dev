@@ -9,7 +9,6 @@ import {
   StorySectionLinks,
   storyColours,
 } from "@/components/site/story";
-import { FastenerProp, TileShot } from "@/components/site/featured-tiles";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SubpageHeader } from "@/components/site/subpage-header";
 import { projects, type Project } from "@/content/projects";
@@ -178,8 +177,7 @@ function NextProject({ next }: { next: ReturnType<typeof nextProject> }) {
       number={next.number}
       name={project.name}
       outcome={project.outcome}
-      fastener={fastener && <FastenerProp kind={fastener} />}
-      shot={<TileShot screenshot={screenshot} sizes="(max-width: 760px) calc(100vw - 80px), 520px" />}
+      media={{ screenshot, fastener }}
     />
   );
 }
