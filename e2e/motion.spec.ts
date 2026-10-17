@@ -397,3 +397,57 @@ test.describe("404 lost-property tag", () => {
     });
   });
 });
+
+test.describe("Footer name fill", () => {
+  const fill = (page: Page) => page.locator(".stretch-footer__name").evaluate((el) => getComputedStyle(el, "::after").clipPath);
+  const filled = (page: Page) => expect.poll(() => fill(page), { timeout: 5000 });
+
+  test.describe("with motion", () => {
+    test.use({ reducedMotion: "no-preference" });
+
+    test("Elias fills on footer hover and drains when the pointer leaves", async ({ page }) => {
+      await page.goto("/");
+      await released(page);
+      await page.locator(".stretch-footer").scrollIntoViewIfNeeded();
+      await expect.poll(() => fill(page)).toContain("100%");
+      await page.locator(".stretch-footer p").hover();
+      await filled(page).not.toContain("100%");
+      await page.mouse.move(2, 2);
+      await filled(page).toContain("100%");
+    });
+
+    test("it runs on the nameFill spring over about 0.7 s", async ({ page }) => {
+      await page.goto("/");
+      const timing = await page.locator(".stretch-footer__name").evaluate((el) => {
+        const style = getComputedStyle(el, "::after");
+        return { duration: style.transitionDuration, easing: style.transitionTimingFunction };
+      });
+      expect(parseFloat(timing.duration) * 1000).toBeGreaterThan(600);
+      expect(timing.easing).toContain("linear(");
+    });
+
+    test("it fills while a Say hello link has keyboard focus, and not for the footer text itself", async ({ page, browserName }) => {
+      test.skip(browserName === "webkit", "Safari does not Tab to links by default");
+      await page.goto("/");
+      await released(page);
+      await page.locator("#say-hello .stretch-hello__big").focus();
+      await page.keyboard.press("Shift+Tab");
+      await page.keyboard.press("Tab");
+      await filled(page).not.toContain("100%");
+      await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+      await filled(page).toContain("100%");
+      expect(await page.locator(".stretch-footer, .stretch-footer *").evaluateAll((els) => els.filter((el) => el.hasAttribute("tabindex")).length)).toBe(0);
+    });
+  });
+
+  test.describe("with reduced motion", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("the fill is a cut: no transition", async ({ page }) => {
+      await page.goto("/");
+      await expect.poll(() => page.locator(".stretch-footer__name").evaluate((el) => getComputedStyle(el, "::after").transitionDuration)).toBe("0s");
+      await page.locator(".stretch-footer p").hover();
+      await filled(page).not.toContain("100%");
+    });
+  });
+});

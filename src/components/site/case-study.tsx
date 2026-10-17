@@ -9,6 +9,7 @@ import {
   StorySectionLinks,
   storyColours,
 } from "@/components/site/story";
+import { SiteFooter } from "@/components/site/site-footer";
 import { SubpageHeader } from "@/components/site/subpage-header";
 import { projects, type Project } from "@/content/projects";
 import { caseStudies } from "@/content/stretch/case-studies";
@@ -21,7 +22,6 @@ import {
   type CaseStudyOpening,
   type CaseStudySectionKey,
 } from "@/content/stretch/case-study";
-import { siteCopy } from "@/content/stretch/site-copy";
 
 /**
  * A case study (docs/specs/STRETCH-REDESIGN-SPEC.md, "Case studies and the
@@ -54,9 +54,7 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
         <NextProject next={next} />
       </main>
 
-      <footer className="stretch-wrap stretch-footer">
-        <p className="stretch-mono">{siteCopy.footer}</p>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

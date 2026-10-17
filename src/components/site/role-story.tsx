@@ -11,6 +11,7 @@ import {
 import { FocusHashTarget } from "@/components/site/focus-hash-target";
 import { RoleStoryFigureBlock } from "@/components/site/role-story-figures";
 import { StaffPass } from "@/components/site/staff-pass";
+import { SiteFooter } from "@/components/site/site-footer";
 import { SubpageHeader } from "@/components/site/subpage-header";
 import { roleStories } from "@/content/stretch/role-stories";
 import {
@@ -23,7 +24,6 @@ import {
   roleStorySectionLabels,
   type RoleStory,
 } from "@/content/stretch/role-story";
-import { siteCopy } from "@/content/stretch/site-copy";
 import { railPass } from "@/content/stretch/work";
 
 /**
@@ -95,9 +95,7 @@ export function RoleStoryPage({ story }: { story: RoleStory }) {
         )}
       </main>
 
-      <footer className="stretch-wrap stretch-footer">
-        <p className="stretch-mono">{siteCopy.footer}</p>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

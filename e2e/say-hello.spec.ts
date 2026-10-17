@@ -78,7 +78,48 @@ test.describe("Say hello and the footer", () => {
       expect(readings.length, selector).toBeGreaterThan(0);
       for (const reading of readings) expect(reading.ratio, `${selector}: ${reading.text}`).toBeGreaterThanOrEqual(4.5);
     }
-    const footer = await contrastOnPaper(page, ".stretch-footer p");
-    for (const reading of footer) expect(reading.ratio).toBeGreaterThanOrEqual(4.5);
+    for (const selector of [".stretch-footer__made", ".stretch-footer__name", ".stretch-hello__address"]) {
+      const readings = await contrastOnPaper(page, selector);
+      expect(readings.length, selector).toBeGreaterThan(0);
+      for (const reading of readings) expect(reading.ratio, `${selector}: ${reading.text}`).toBeGreaterThanOrEqual(4.5);
+    }
   });
+
+  test("the address appears in words, as a link that emails Elias", async ({ page }) => {
+    const address = profile.links.email.replace(/^mailto:/, "");
+    const link = section(page).getByRole("link", { name: address, exact: true });
+    await expect(link).toHaveAttribute("href", profile.links.email);
+    await expect(link).toHaveText(address);
+  });
+
+  test("Say hello is larger than the footer, and the link row stays on one line", async ({ page }) => {
+    const size = (selector: string) => page.locator(selector).first().evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+    const [hello, footer] = await Promise.all([size(".stretch-hello__big"), size(".stretch-footer p")]);
+    expect(hello).toBeGreaterThan(footer);
+    const boxes = await Promise.all((await section(page).locator(".stretch-hello__link").all()).map((link) => link.boundingBox()));
+    expect(new Set(boxes.map((box) => Math.round(box!.y))).size, "the three links share a row").toBe(1);
+  });
+});
+
+// The invariant (#216): Say hello renders larger than the footer at every width, across the breakpoint too.
+test.describe("Say hello against the footer at every width", () => {
+  for (const width of [320, 390, 600, 759, 760, 820, 1100, 1440, 1920]) {
+    test(`at ${width} px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/");
+      const sizes = () =>
+        page.evaluate(() => [".stretch-hello__big", ".stretch-footer p"].map((selector) => parseFloat(getComputedStyle(document.querySelector(selector)!).fontSize)));
+      await expect.poll(async () => { const [hello, footer] = await sizes(); return hello > footer; }).toBe(true);
+      const [hello, footer] = await sizes();
+      if (width === 390) {
+        expect(hello).toBeCloseTo(56, 0);
+        expect(footer).toBeCloseTo(46.8, 0);
+      }
+      if (width === 1440) {
+        expect(hello).toBeGreaterThan(150);
+        expect(footer).toBeCloseTo(100.8, 0);
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    });
+  }
 });

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LostPropertyTag } from "@/components/site/lost-property-tag";
+import { SiteFooter } from "@/components/site/site-footer";
 import { SubpageHeader } from "@/components/site/subpage-header";
 import { pageTitle } from "@/content/site";
 import { notFound as copy, siteCopy } from "@/content/stretch/site-copy";
@@ -55,9 +56,7 @@ export default function NotFound() {
           </ol>
         </nav>
       </main>
-      <footer className="stretch-wrap stretch-footer">
-        <p className="stretch-mono">{siteCopy.footer}</p>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

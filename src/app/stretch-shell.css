@@ -701,18 +701,68 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   font-style: normal;
 }
 
-/* ---- Footer ---- */
+/* ---- Footer: "Made by Elias", with Elias filling on hover or Say hello focus (#216) ---- */
 
+/*
+ * The invariant: Say hello is always larger than this. --say-hello-size is
+ * the pill's text size (set in the Say hello block); the footer is the smaller
+ * of its own scale (12vw on phones, about 100 px at 1440) and 85% of that.
+ */
 .stretch-footer {
   margin-top: 96px;
-  padding-block: 32px;
+  padding-block: 28px 32px;
   border-top: 1px solid var(--stretch-rule);
+  --footer-size: 12vw;
+}
+
+@media (min-width: 760px) {
+  .stretch-footer {
+    --footer-size: clamp(44px, 7vw, 104px);
+  }
 }
 
 .stretch-footer p {
   margin: 0;
+  font-size: min(var(--footer-size), calc(var(--say-hello-size) * 0.85));
+  line-height: 0.9;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.stretch-footer__made {
   color: var(--stretch-muted);
-  font-size: 14px;
+}
+
+.stretch-footer__name {
+  position: relative;
+  display: inline-block;
+  color: var(--stretch-ink);
+}
+
+/* The fill is a cobalt copy of the word, revealed from the baseline up (a clip, so the glyphs stay solid text). */
+.stretch-footer__name::after {
+  content: attr(data-text) / "";
+  position: absolute;
+  inset: 0;
+  color: var(--stretch-cobalt);
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path var(--fill-ms) var(--fill-ease);
+}
+
+[data-stretch-shell]:has(a[href="#say-hello"]:focus-visible, #say-hello a:focus-visible) .stretch-footer__name::after {
+  clip-path: inset(0);
+}
+
+@media (hover: hover) {
+  .stretch-footer:hover .stretch-footer__name::after {
+    clip-path: inset(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stretch-footer__name::after {
+    transition: none;
+  }
 }
 
 /* ---- Work: featured tiles ---- */
@@ -2220,7 +2270,19 @@ button.stretch-gh__day[data-selected] {
   }
 }
 
-/* ---- Say hello: the big link, the line and the three links ---- */
+/* ---- Say hello: the big pill, the line, the address and a plain row of links (#216) ---- */
+
+/* The pill's text size, 56 px at 390 to about 160 px at 1440. On the shell because the footer, on every page, is sized against it. */
+[data-stretch-shell] {
+  --say-hello-size: clamp(56px, 11vw, 160px);
+}
+
+/* On the narrowest phones 56 px would push the pill past the edge: it eases down to 46 px at 320. */
+@media (max-width: 389px) {
+  [data-stretch-shell] {
+    --say-hello-size: clamp(46px, 14.4vw, 56px);
+  }
+}
 
 .stretch-hello {
   display: grid;
@@ -2229,22 +2291,26 @@ button.stretch-gh__day[data-selected] {
   margin-top: 40px;
 }
 
-/* The one cobalt block: a tall slab of a link with a 44 px+ target at every width. */
+/* Today's cobalt pill at display size, and the hero's Say hello button's twin. */
 .stretch-hello__big {
   display: inline-flex;
   align-items: center;
-  min-height: 72px;
-  padding: 12px 28px;
+  padding: 0.14em 0.36em;
   border-radius: 999px;
   background-color: var(--stretch-cobalt);
   color: var(--stretch-on-cobalt);
-  font-size: clamp(36px, 8vw, 72px);
-  line-height: 1;
+  font-size: var(--say-hello-size);
+  line-height: 0.9;
   text-decoration: none;
 }
 
 .stretch-hello__heading {
   margin: 0;
+}
+
+.stretch-hello__reach {
+  display: grid;
+  gap: 4px;
 }
 
 .stretch-hello__line {
@@ -2254,13 +2320,28 @@ button.stretch-gh__day[data-selected] {
   line-height: 1.5;
 }
 
+.stretch-hello__address {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--stretch-cobalt);
+  font-size: 17px;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+  overflow-wrap: anywhere;
+}
+
+/* One plain row of text links divided by hairlines. */
 .stretch-hello__links {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px 12px;
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.stretch-hello__links li + li {
+  border-left: 1px solid var(--stretch-rule);
 }
 
 .stretch-hello__link {
@@ -2268,18 +2349,30 @@ button.stretch-gh__day[data-selected] {
   align-items: center;
   gap: 6px;
   min-height: 44px;
-  padding-inline: 18px;
-  border: 1px solid var(--stretch-ink);
-  border-radius: 999px;
+  padding-inline: 14px;
   color: var(--stretch-ink);
   font-size: 16px;
   font-weight: 600;
   text-decoration: none;
+  white-space: nowrap;
 }
 
-.stretch-hello__link:hover {
-  background-color: var(--stretch-ink);
-  color: var(--stretch-page);
+/* The narrowest phones tighten the row so all three still fit on one line. */
+@media (max-width: 389px) {
+  .stretch-hello__link {
+    padding-inline: 9px;
+    font-size: 15px;
+  }
+}
+
+.stretch-hello__links li:first-child .stretch-hello__link {
+  padding-left: 0;
+}
+
+@media (hover: hover) {
+  .stretch-hello__link:hover {
+    color: var(--stretch-cobalt);
+  }
 }
 
 /* ---- Case study: the opening band, section links, reading column and Next project ---- */

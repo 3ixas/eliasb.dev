@@ -1,7 +1,8 @@
+import { SiteFooter } from "@/components/site/site-footer";
 import { SubpageHeader } from "@/components/site/subpage-header";
 import { WorkArchive } from "@/components/site/work-archive";
 import type { Project } from "@/content/projects";
-import { siteCopy, workArchive } from "@/content/stretch/site-copy";
+import { workArchive } from "@/content/stretch/site-copy";
 
 /**
  * The /things-i-make page (docs/specs/STRETCH-REDESIGN-SPEC.md, "Case studies and the
@@ -24,9 +25,7 @@ export function WorkArchivePage({ catalogue }: { catalogue: readonly Project[] }
           <WorkArchive catalogue={catalogue} />
         </section>
       </main>
-      <footer className="stretch-wrap stretch-footer">
-        <p className="stretch-mono">{siteCopy.footer}</p>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

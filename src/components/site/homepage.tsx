@@ -2,6 +2,7 @@ import { EntranceGuard, EntrancePlayer } from "@/components/site/entrance-script
 import { Hero } from "@/components/site/hero";
 import { SayHello } from "@/components/site/say-hello";
 import { SectionHeading } from "@/components/site/section-heading";
+import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { FeaturedTiles } from "@/components/site/featured-tiles";
 import { HowIWork } from "@/components/site/how-i-work";
@@ -11,7 +12,7 @@ import { Work } from "@/components/site/work";
 import { featuredProjects, featuredSlugs, projectIndex, projects } from "@/content/projects";
 import { howIWork } from "@/content/stretch/how-i-work";
 import { offTheClock } from "@/content/stretch/off-the-clock";
-import { siteCopy, thingsIMake } from "@/content/stretch/site-copy";
+import { thingsIMake } from "@/content/stretch/site-copy";
 import { work } from "@/content/stretch/work";
 
 const sayHelloHeadingId = "say-hello-heading";
@@ -68,9 +69,7 @@ export function Homepage() {
         </section>
       </main>
 
-      <footer className="stretch-wrap stretch-footer" data-entrance="rest">
-        <p className="stretch-mono">{siteCopy.footer}</p>
-      </footer>
+      <SiteFooter entrance="rest" />
       <EntrancePlayer />
     </div>
   );
