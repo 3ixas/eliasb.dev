@@ -1312,6 +1312,149 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   }
 }
 
+/*
+ * ---- How I work: Margin notes ----
+ * Ink only, no colour: a circled number for each habit, an arrow to the next, a
+ * line under the strongest phrase of each proof and an arrow to the PRD card.
+ * Each stroke is a path normalised with pathLength, so one dash offset (1 to 0)
+ * draws it whatever its length. Never vector-effect: non-scaling-stroke on these:
+ * it would make the dashes measure in screen pixels, not in pathLength units.
+ * The PRD card holds still here, at every width; case studies keep its sway.
+ */
+
+.stretch-how .stretch-beats {
+  gap: 44px;
+}
+
+.stretch-how .stretch-beat {
+  position: relative;
+  grid-template-columns: 58px minmax(0, 1fr);
+  column-gap: 12px;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.stretch-how .stretch-beat__number {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  color: var(--stretch-ink);
+  font-size: 24px;
+}
+
+.stretch-how .stretch-prd {
+  animation: none;
+  transform: rotate(-1deg);
+}
+
+.stretch-ink {
+  overflow: visible;
+  fill: none;
+  stroke: var(--stretch-ink);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: 0;
+  pointer-events: none;
+}
+
+.stretch-ink--circle {
+  position: absolute;
+  inset: -6px;
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
+  stroke-width: 4;
+  transform: rotate(-8deg);
+}
+
+.stretch-ink--next {
+  position: absolute;
+  top: 62px;
+  left: 7px;
+  width: 36px;
+  height: calc(100% - 50px);
+}
+
+.stretch-ink--to-prd {
+  display: none;
+}
+
+.stretch-mark {
+  position: relative;
+  white-space: nowrap;
+}
+
+.stretch-ink--under {
+  position: absolute;
+  left: -2px;
+  bottom: -6px;
+  width: calc(100% + 4px);
+  height: 8px;
+  stroke-width: 2;
+}
+
+@keyframes stretch-ink-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (min-width: 761px) {
+  .stretch-how {
+    gap: 48px 72px;
+  }
+
+  .stretch-how .stretch-beat {
+    grid-template-columns: 76px minmax(0, 1fr);
+    column-gap: 18px;
+  }
+
+  .stretch-how .stretch-beat__number {
+    width: 64px;
+    height: 64px;
+    font-size: 30px;
+  }
+
+  .stretch-how .stretch-prd {
+    margin-top: 120px;
+  }
+
+  .stretch-ink--circle {
+    stroke-width: 3;
+  }
+
+  .stretch-ink--next {
+    top: 78px;
+    left: 14px;
+  }
+
+  .stretch-ink--to-prd {
+    position: absolute;
+    top: -15px;
+    right: -62px;
+    display: block;
+    width: 130px;
+    height: 49px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .stretch-ink {
+      animation: stretch-ink-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 40% cover 40%;
+    }
+  }
+}
+
 /* ---- Off the clock: the training poster, the book, the film and the clipping ---- */
 
 .stretch-otc {

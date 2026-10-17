@@ -45,13 +45,15 @@ test.describe("Scroll sway", () => {
 
   test("cards sway too, the PRD card keeping its own resting tilt", async ({ page, browserName }) => {
     test.skip(browserName !== "chromium", "Scroll-driven animation, Chromium");
-    await page.goto("/");
+    // How I work's PRD card holds still (see Margin notes below), so the sway is read on the case study's.
+    await page.goto("/things-i-make/threshold");
     await released(page);
     const prd = page.locator(".stretch-prd");
     await prd.scrollIntoViewIfNeeded();
     const { rotate, transform } = await prd.evaluate((element) => ({ rotate: getComputedStyle(element).rotate, transform: getComputedStyle(element).transform }));
     expect(rotate).not.toBe("none");
     expect(transform, "the resting 1 degree tilt is still there").not.toBe("none");
+    await page.goto("/");
     const card = page.locator("#off-the-clock .stretch-otc__card").first();
     expect(await card.evaluate((element) => getComputedStyle(element).translate)).not.toBe("none");
   });
@@ -64,6 +66,58 @@ test.describe("Scroll sway", () => {
     expect(translate).toBe("none");
     expect(rotate).toBe("none");
     expect(await page.locator(".stretch-prd").evaluate((element) => getComputedStyle(element).rotate)).toBe("none");
+  });
+});
+
+test.describe("Margin notes", () => {
+  const strokes = (page: Page) => page.locator("#how-i-work path[pathLength]");
+  // The first habit's circle, a stroke that is on screen at every width.
+  const circle = (page: Page) => page.locator("#how-i-work .stretch-ink--circle").first();
+  const offset = (page: Page) => circle(page).locator("path").evaluate((path) => parseFloat(getComputedStyle(path).strokeDashoffset));
+  // Scrolls so the circle's middle sits this far down the visible area (0 is its top, 1 its bottom edge).
+  const scrollCircleTo = (page: Page, down: number) =>
+    circle(page).evaluate((element, at) => {
+      const padding = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+      const { top, height } = element.getBoundingClientRect();
+      scrollBy(0, top + height / 2 - (padding + (innerHeight - padding) * at));
+    }, down);
+
+  test.describe("with motion", () => {
+    test.use({ reducedMotion: "no-preference" });
+
+    test("a stroke draws as it scrolls up the screen and un-draws on the way back", async ({ page, browserName }) => {
+      test.skip(browserName !== "chromium", "Scroll-driven animation, Chromium");
+      await page.goto("/");
+      await released(page);
+      expect(await page.evaluate(() => CSS.supports("animation-timeline", "view()"))).toBe(true);
+      await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
+      await circle(page).scrollIntoViewIfNeeded();
+
+      await scrollCircleTo(page, 0.97);
+      await expect.poll(() => offset(page)).toBeGreaterThan(0.5);
+      await scrollCircleTo(page, 0.3);
+      await expect.poll(() => offset(page)).toBe(0);
+      await scrollCircleTo(page, 0.97);
+      await expect.poll(() => offset(page), "scrolling back up takes the ink out again").toBeGreaterThan(0.5);
+    });
+  });
+
+  test.describe("with reduced motion", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("every stroke is simply drawn, wherever the page is scrolled", async ({ page }) => {
+      await page.goto("/");
+      await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
+      await expect(strokes(page)).toHaveCount(9);
+      await circle(page).scrollIntoViewIfNeeded();
+      for (const at of [0.97, 0.3]) {
+        await scrollCircleTo(page, at);
+        const state = await strokes(page).evaluateAll((paths) =>
+          paths.map((path) => ({ offset: getComputedStyle(path).strokeDashoffset, animation: getComputedStyle(path.closest("svg")!).animationName })),
+        );
+        for (const stroke of state) expect(stroke).toEqual({ offset: "0px", animation: "none" });
+      }
+    });
   });
 });
 
