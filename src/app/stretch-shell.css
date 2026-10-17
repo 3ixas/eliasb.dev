@@ -1989,43 +1989,52 @@ button.stretch-gh__day[data-selected] {
   }
 }
 
-.stretch-work__h3 {
-  margin: 0 0 12px;
-  font-size: clamp(28px, 3.4vw, 40px);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-
-.stretch-work__line {
-  max-width: 34em;
-  margin: 0 0 28px;
-  font-size: 22px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: 1.25;
-}
-
-.stretch-work__strands {
+/*
+ * Where I'm headed: the self-issued pass's three bars. Each hangs a 4 px thread
+ * in its source's colour: above the bar on a wide screen, down its left edge on
+ * a phone, where the rules carry the pass's class so they win over the
+ * shell's phone rules, which load later.
+ */
+.stretch-work__bars {
   display: grid;
-  gap: 32px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.stretch-work__strand {
-  margin: 0 0 6px;
-  font-size: 19px;
+.stretch-work__bar {
+  padding-top: 12px;
+  border-top: 4px solid var(--thread);
+}
+
+.stretch-work__bar-label {
+  color: var(--stretch-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.stretch-work__bar-title {
+  margin: 4px 0 0;
+  font-size: 17px;
   font-weight: 700;
   line-height: 1.25;
 }
 
-.stretch-work__proof {
-  margin: 0 0 8px;
+.stretch-work__so-far {
+  margin: 8px 0 0;
   color: var(--stretch-muted);
-  font-size: 17px;
-  line-height: 1.45;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.stretch-work__tag {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--stretch-ink);
+  font-size: 12px;
+  text-transform: uppercase;
 }
 
 .stretch-work__link {
@@ -2041,9 +2050,16 @@ button.stretch-gh__day[data-selected] {
   color: var(--stretch-cobalt);
 }
 
-@media (min-width: 761px) {
-  .stretch-work__strands {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+@media (max-width: 760px) {
+  .stretch-pass .stretch-work__bars {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .stretch-pass .stretch-work__bar {
+    padding: 2px 0 0 14px;
+    border-top: 0;
+    border-left: 4px solid var(--thread);
   }
 }
 

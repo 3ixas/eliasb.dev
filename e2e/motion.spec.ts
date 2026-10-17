@@ -175,6 +175,22 @@ test.describe("Staff pass lean", () => {
   });
 });
 
+test.describe("Where I'm headed on the homepage", () => {
+  test.use({ reducedMotion: "no-preference" });
+
+  test("its self-issued pass never leans, while Work's employer passes still do", async ({ page, browserName }) => {
+    test.skip(browserName !== "chromium", "Pointer sampling, Chromium");
+    await page.goto("/");
+    const headed = page.locator('#work .stretch-pass[data-pass="self-issued"]');
+    const samples = await leanSamples(page, headed, 1200);
+    expect(samples.length, "it was sampled").toBeGreaterThan(20);
+    expect(Math.max(...samples.map(([, angle]) => Math.abs(angle))), "it never rotates").toBe(0);
+    expect(await resting(headed), "and rests level").toBe(0);
+    const lean = await leanSamples(page, page.locator('#work [data-slug="bnp-paribas"] .stretch-pass'), 600);
+    expect(Math.max(...lean.map(([, angle]) => Math.abs(angle))), "while BNP's pass does").toBeGreaterThan(2);
+  });
+});
+
 test.describe("Staff pass pendulum on touch", () => {
   test.use({ reducedMotion: "no-preference", hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } });
 

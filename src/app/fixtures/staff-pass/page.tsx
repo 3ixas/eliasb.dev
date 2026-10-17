@@ -35,9 +35,7 @@ export default async function StaffPassFixtures() {
             <StaffPass slug="bnp-paribas" state="current" size="lg" tilt={-1} linked={false} pins lean={false} />
           </div>
           <div data-fixture="self-issued" style={{ width: "100%", maxWidth: 440 }}>
-            <StaffPass state="self-issued" title={work.headed.heading}>
-              <p>{work.headed.line}</p>
-            </StaffPass>
+            <StaffPass state="self-issued" title={work.headed.heading} line={work.headed.line} />
           </div>
         </div>
       </main>

@@ -7,27 +7,76 @@
  *
  * Its runtime imports carry a .ts extension, so Node can load it directly as well as Next.
  */
+import { projects, type CaseStudySlug } from "../projects.ts";
+import { caseStudies } from "./case-studies.ts";
 import { roleStories } from "./role-stories.ts";
-import type { RoleStorySlug } from "./role-story";
-import type { PassState } from "./staff-pass.ts";
+import { roleStoryColours, type RoleStorySlug } from "./role-story.ts";
+import { passLinkLabel, passRecords, type PassState } from "./staff-pass.ts";
+import type { EvidenceItem, StorySectionBody } from "./story.ts";
 
 /**
- * Where a link in Work leads: a Role story, named by its slug so the label and
- * the route come from the story and cannot disagree, or a section of the
- * homepage, with the label it needs.
+ * Where a "So far" fact comes from: a Role story (an employer) or a Case study
+ * (a project). The tag, the thread colour and the link all follow from it, so
+ * none of them can name a different source than the fact does.
  */
-export type WorkLink = { story: RoleStorySlug } | { section: string; label: string };
+export type HeadedSource = { story: RoleStorySlug } | { project: CaseStudySlug };
 
-/** A link as it is shown. */
-export type ShownLink = { label: string; href: string };
+/**
+ * A bar of the self-issued pass: a label, what "good" means as a title, and one
+ * fact already in a Role story or Case study as its "So far". `restates` lists
+ * the phrases of that fact which the source must contain word for word; the
+ * content check fails when one is missing, so a "So far" cannot drift from its
+ * source.
+ */
+export type HeadedBar = {
+  label: string;
+  title: string;
+  soFar: { text: string; restates: readonly string[] };
+  source: HeadedSource;
+};
 
-export function shownLink(link: WorkLink): ShownLink {
-  if ("story" in link) return { label: `The ${roleStories[link.story].employer} story →`, href: `/work/${link.story}` };
-  return { label: link.label, href: `#${link.section}` };
+/** A bar's source as it is shown: its name for the "So far" tag, the link, the thread colour and the text a "So far" must restate. */
+export type ShownSource = { name: string; link: { label: string; href: string }; thread: string; text: string };
+
+/** Everything a story or study says, as plain text: its sections and its evidence strip. */
+const textOf = ({ sections, evidence }: { sections: Record<string, StorySectionBody>; evidence: readonly EvidenceItem[] }) =>
+  [
+    ...Object.values(sections).flatMap((section) => [section.heading, ...(section.paragraphs ?? []), ...(section.points ?? []).flatMap((point) => [point.lead, point.text])]),
+    ...evidence.map((item) => `${item.value} ${item.label}`),
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+export function shownSource(source: HeadedSource): ShownSource {
+  if ("story" in source) {
+    const story = roleStories[source.story];
+    const { short } = passRecords[source.story];
+    return {
+      name: short,
+      link: { label: passLinkLabel(passRecords[source.story]), href: `/work/${source.story}` },
+      thread: roleStoryColours(story.colours).swatch,
+      text: textOf(story),
+    };
+  }
+  const project = projects.find((entry) => entry.slug === source.project);
+  const study = caseStudies[source.project];
+  if (!project?.colours) throw new Error(`Where I'm headed names "${source.project}", which has no Project colour.`);
+  return {
+    name: project.name,
+    link: { label: `The ${project.name} case study →`, href: `/things-i-make/${source.project}` },
+    // A project's swatch is one colour for both themes; on the light card it falls short of 3:1 (Threshold's is 2.6), so light takes it deepened, as the Role stories' light swatches are.
+    thread: `light-dark(color-mix(in srgb, ${project.colours.swatch} 80%, black), ${project.colours.swatch})`,
+    text: textOf(study),
+  };
 }
 
-/** A line of "Where I'm headed": the strand, one proof, and where it leads. */
-export type HeadedStrand = { title: string; proof: string; link: WorkLink };
+/** Bars whose "So far" does not restate a fact in their source, as messages naming the bar; empty when valid. */
+export function headedProblems(bars: readonly HeadedBar[]): string[] {
+  return bars.flatMap((bar) => {
+    const text = shownSource(bar.source).text.toLowerCase();
+    return bar.soFar.restates.filter((phrase) => !text.includes(phrase.toLowerCase())).map((phrase) => `Where I’m headed: the ${bar.label} bar’s "So far" restates "${phrase}", which its source does not say.`);
+  });
+}
 
 /**
  * A pass on the rail: whose it is, how it hangs (its resting tilt, in degrees,
@@ -67,24 +116,34 @@ export const work = {
   ] satisfies readonly RailPass[],
   headed: {
     heading: "Where I’m headed",
-    line: "At work, I’m learning to build systems that hold up. On my own products, I’m learning what’s worth building. I want to be genuinely good at both.",
-    strands: [
+    line: "I want to be really good at this. Here’s what that means to me, and how far I’ve got.",
+    soFar: "So far",
+    bars: [
       {
-        title: "Systems that hold up.",
-        proof: "I shipped a change to live pricing behind a flag, switched off by default, with an end-to-end test nobody asked for.",
-        link: { story: "bnp-paribas" },
+        label: "Judgement",
+        title: "Knowing what’s worth building.",
+        soFar: {
+          text: "At Optegra, split tests and dashboards guided what the engineers built next.",
+          restates: ["split tests and analytics dashboards", "guided what the engineers worked on next"],
+        },
+        source: { story: "optegra" },
       },
       {
-        title: "Deciding what’s worth building.",
-        proof: "Before I built Threshold, I wrote 57 user stories and what was out of scope.",
-        link: { section: "things-i-make", label: "Things I make ↓" },
+        label: "Depth",
+        title: "Knowing why it works, not just that it does.",
+        soFar: {
+          text: "Six months from zero C# to production code, in a pricing engine of around 70 projects.",
+          restates: ["from zero C# to production code", "around 70 projects"],
+        },
+        source: { story: "bnp-paribas" },
       },
       {
-        title: "Building with AI, and bringing people with me.",
-        proof: "I built a phase-gated workflow, from grilling the problem to a health review, and showed it to teams across the department. Several now use it.",
-        link: { story: "bnp-paribas" },
+        label: "Range",
+        title: "The whole way, from idea to running in production.",
+        soFar: { text: "Threshold, from 57 user stories to a live site.", restates: ["57 user stories"] },
+        source: { project: "threshold" },
       },
-    ] satisfies readonly HeadedStrand[],
+    ] satisfies readonly HeadedBar[],
   },
   /** History is a dashed note under the rail, not a pass: it has no Role story to open. */
   history: { dates: "Before 2021", role: "History at uni", note: "Because I loved it, and I still do." },
