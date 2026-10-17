@@ -8,6 +8,7 @@ import {
   StorySectionLinks,
   storyColours,
 } from "@/components/site/story";
+import { FocusHashTarget } from "@/components/site/focus-hash-target";
 import { RoleStoryFigureBlock } from "@/components/site/role-story-figures";
 import { StaffPass } from "@/components/site/staff-pass";
 import { SubpageHeader } from "@/components/site/subpage-header";
@@ -41,6 +42,7 @@ export function RoleStoryPage({ story }: { story: RoleStory }) {
   return (
     <div data-stretch-shell data-role-story={story.slug}>
       <SubpageHeader />
+      <FocusHashTarget />
 
       <main id="main-content" tabIndex={-1}>
         <article aria-labelledby="role-story-title">
