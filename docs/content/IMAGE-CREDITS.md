@@ -5,6 +5,7 @@ The launch imagery is bundled locally so the site does not depend on third-party
 - `public/profile/elias.webp` and `public/profile/elias-evening.webp` — personal photographs of Elias Bennett, supplied by Elias. The second is the homepage portrait.
 - `public/signals/running-central-london.webp` — personal photograph of Elias Bennett running in central London, supplied by Elias. Shown on the training poster in Off the clock.
 - `public/work/` and `public/projects/` — screenshots of Elias's own projects (Threshold, Argus Risk, Flowtime, Home Secretary, Risk Event Tracker, Ask Professor Past), taken from the projects' own interfaces or their repositories' documentation.
+- `public/work/bnp-paribas/take-ownership.png` — the Take Ownership award certificate _nology awarded to Elias Bennett (Q1 2026, awarded May 2026), which _nology posted publicly on LinkedIn. Shown whole and unedited on the BNP Paribas Role story; committed so the build is reproducible.
 - `docs/screenshots/` and `docs/dogfood-reports/*/` — screenshots of this site, used in the README and in review reports.
 - Book covers (Goodreads) and film posters (Letterboxd) are the publishers' and distributors' artwork, loaded from the sources' own image hosts and not bundled; each links back to its source.
 - Live images on the Weekly Curiosity come from Wikimedia Commons and are credited where they appear, with the creator and licence linked from each picture. Saved examples bundle these images locally (resized and converted to WebP; no crop):

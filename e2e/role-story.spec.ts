@@ -62,6 +62,49 @@ for (const slug of roleStorySlugs) {
     }
 
     if (slug === "bnp-paribas") {
+      test("its three figures sit under their sections with their captions", async ({ page }) => {
+        const flag = page.locator("section#decisions figure");
+        await expect(flag.locator(".stretch-role-flag__on")).toHaveText("on");
+        await expect(flag.locator(".stretch-role-flag__toggle")).toHaveCount(1);
+        await expect(flag).toContainText("off by default");
+        await expect(flag.locator("figcaption")).toHaveText("Protect the blast radius");
+        const scale = page.locator("section#what-changed figure");
+        await expect(scale.locator("figcaption")).toHaveText("Bars to scale. Two weeks is taken as ten working days.");
+        await expect(scale).toContainText("Before · about two weeks, experienced");
+        await expect(scale).toContainText("After · under 5 min");
+        const certificate = page.locator("section#what-i-took-with-me figure");
+        await expect(certificate.locator("figcaption")).toHaveText("Take Ownership · _nology · Q1 2026 · awarded May 2026");
+        await expect(certificate).toHaveAttribute("id", "take-ownership-certificate");
+      });
+
+      test("the before-and-after bars are to scale", async ({ page }) => {
+        const rows = page.locator("section#what-changed .stretch-role-scale__row");
+        await expect(rows).toHaveCount(2);
+        // About ten working days against a couple (2 in 10); 30–40 min drawn at 40 against under 5 (5 in 40).
+        for (const [index, ratio] of [0.2, 0.125].entries()) {
+          const before = rows.nth(index).locator(".stretch-role-scale__bar--before .stretch-role-scale__fill");
+          const after = rows.nth(index).locator(".stretch-role-scale__bar--after .stretch-role-scale__fill");
+          await expect.poll(async () => (await after.boundingBox())!.width / (await before.boundingBox())!.width).toBeCloseTo(ratio, 2);
+        }
+      });
+
+      test("the certificate is shown whole and untinted, from a committed asset", async ({ page }) => {
+        const figure = story.figures!["what-i-took-with-me"];
+        if (figure?.kind !== "certificate") throw new Error("BNP's last figure is the certificate");
+        const image = page.locator("#take-ownership-certificate img");
+        await image.scrollIntoViewIfNeeded();
+        await expect(image).toBeVisible();
+        // The optimiser may resize it for the screen, but the picture stays whole: the same 16:9 at any size.
+        await expect.poll(() => image.evaluate((img: HTMLImageElement) => (img.complete ? img.naturalWidth / img.naturalHeight : 0))).toBeCloseTo(16 / 9, 2);
+        // Layout size, which the frame's slight tilt does not change: shown at its own proportions, so not cropped.
+        await expect.poll(() => image.evaluate((img: HTMLImageElement) => img.offsetWidth / img.offsetHeight)).toBeCloseTo(16 / 9, 1);
+        await expect(image).toHaveCSS("filter", "none");
+        await expect(image).toHaveCSS("object-fit", "fill");
+        await expect(image).toHaveCSS("opacity", "1");
+        await expect(image).toHaveCSS("mix-blend-mode", "normal");
+        expect((await page.request.get(figure.src)).status()).toBe(200);
+      });
+
       test("BNP's three award pins hang on its pass, and the ones that lead into this story arrive there", async ({ page }) => {
         const pins = page.getByRole("region", { name: "Overview" }).getByRole("list", { name: "Awards" });
         const items = pins.getByRole("listitem");
@@ -71,13 +114,29 @@ for (const slug of roleStorySlugs) {
           await expect(items.nth(index)).toContainText(pin.detail);
           if (pin.href) await expect(items.nth(index).getByRole("link")).toHaveAttribute("href", pin.href);
         }
-        // Take Ownership's certificate arrives with #213; the other two lead to sections that exist now.
-        for (const [index, section] of [[0, "what-changed"], [2, "what-i-took-with-me"]] as const) {
+        // Each pin that has a target takes focus and scroll to its evidence.
+        for (const [index, id] of [[0, "what-changed"], [1, "take-ownership-certificate"], [2, "what-i-took-with-me"]] as const) {
           await page.goto(`/work/${slug}`);
-          await items.nth(index).getByRole("link").click();
-          await expect(page).toHaveURL(new RegExp(`#${section}$`));
-          await expect(page.locator(`section#${section}`)).toBeInViewport();
+          const pin = items.nth(index).getByRole("link");
+          // The certificate pin by keyboard, the others by pointer: both land focus on the evidence.
+          if (index === 1) {
+            await pin.focus();
+            await page.keyboard.press("Enter");
+          } else await pin.click();
+          await expect(page).toHaveURL(new RegExp(`#${id}$`));
+          await expect(page.locator(`#${id}`)).toBeInViewport();
+          await expect(page.locator(`#${id}`)).toBeFocused();
         }
+      });
+
+      test("Back and Forward between pin targets carry focus with them", async ({ page }) => {
+        const links = page.getByRole("region", { name: "Overview" }).getByRole("list", { name: "Awards" }).getByRole("link");
+        await links.first().click();
+        await expect(page.locator("#what-changed")).toBeFocused();
+        await links.last().click();
+        await expect(page.locator("#what-i-took-with-me")).toBeFocused();
+        await page.goBack();
+        await expect(page.locator("#what-changed")).toBeFocused();
       });
     } else {
       test("the pass wears no pins", async ({ page }) => {

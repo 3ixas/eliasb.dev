@@ -2487,6 +2487,141 @@ button.stretch-gh__day[data-selected] {
   color: var(--cs-swatch);
 }
 
+/* A Role story's figures: drawn from its own facts, in the employer's colour, with a plain caption. */
+.stretch-role-figures {
+  margin-top: 36px;
+}
+
+.stretch-role-figure {
+  max-width: 720px;
+  margin: 0;
+  scroll-margin-top: 96px;
+}
+
+.stretch-role-figure__caption {
+  margin-top: 12px;
+  color: var(--stretch-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.stretch-role-flag {
+  max-width: 560px;
+}
+
+.stretch-role-flag__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--stretch-rule);
+  font-size: 15px;
+}
+
+.stretch-role-flag__path {
+  flex: 1 1 180px;
+  font-weight: 600;
+}
+
+.stretch-role-flag__on {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--cs-field);
+  color: var(--cs-ink);
+}
+
+/* A switch in the off position: the knob sits at the left. */
+.stretch-role-flag__toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--stretch-rule);
+}
+
+.stretch-role-flag__toggle::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--stretch-page);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+}
+
+.stretch-role-scale {
+  display: grid;
+  gap: 28px;
+}
+
+.stretch-role-scale__what {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+/* A bar's fill is its share of the row's full width; a sliver stays visible. */
+.stretch-role-scale__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin-top: 6px;
+}
+
+.stretch-role-scale__fill {
+  display: flex;
+  align-items: center;
+  width: max(calc(var(--share) * 100%), 6px);
+  min-height: 36px;
+  border-radius: 6px;
+}
+
+.stretch-role-scale__label {
+  font-size: 13px;
+}
+
+.stretch-role-scale__bar--before .stretch-role-scale__fill {
+  background: repeating-linear-gradient(-45deg, var(--stretch-card) 0 6px, transparent 6px 12px);
+  box-shadow: inset 0 0 0 1px var(--stretch-rule);
+  color: var(--stretch-muted);
+}
+
+.stretch-role-scale__bar--before .stretch-role-scale__label {
+  padding-inline: 12px;
+}
+
+.stretch-role-scale__bar--after .stretch-role-scale__fill {
+  background: var(--cs-swatch);
+}
+
+/* The after fill is short, so its label sits beside it, in ink. */
+.stretch-role-scale__bar--after .stretch-role-scale__label {
+  color: var(--stretch-ink);
+  font-weight: 700;
+}
+
+.stretch-role-cert__frame {
+  position: relative;
+  padding: 10px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.12),
+    0 18px 36px -16px rgb(0 0 0 / 0.35);
+  transform: rotate(-0.6deg);
+}
+
+.stretch-role-cert__frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+}
+
 /* The Role story ends on its back link, on the page, not in the band. */
 .stretch-role-end {
   padding-block: 56px 0;

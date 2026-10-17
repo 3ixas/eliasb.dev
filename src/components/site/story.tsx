@@ -114,7 +114,7 @@ export function StorySection({
   const titleId = `${id}-title`;
 
   return (
-    <section id={id} aria-labelledby={titleId} className="stretch-cs-section">
+    <section id={id} aria-labelledby={titleId} className="stretch-cs-section" tabIndex={-1}>
       <div className="stretch-cs-section__text">
         {section.heading && (
           <p className="stretch-mono stretch-cs-kicker" aria-hidden="true">
