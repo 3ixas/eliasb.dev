@@ -98,7 +98,7 @@ function ScreensFigure({ figure }: { figure: Extract<RoleStoryFigure, { kind: "s
         ))}
       </div>
       <figcaption className="stretch-mono stretch-role-figure__caption">
-        {figure.caption}
+        {figure.caption} ·{" "}
         <a className="stretch-role-screens__source" href={figure.source.href}>
           {figure.source.label}
         </a>
