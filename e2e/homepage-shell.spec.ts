@@ -64,8 +64,8 @@ test.describe("Homepage shell", () => {
   });
 
   test("the header links jump to each section, below the sticky header", async ({ page }) => {
-    // The phone header, with its menu dialog, is its own ticket (#121).
-    test.skip((page.viewportSize()?.width ?? 0) < 761, "Desktop header");
+    // Below 900 px the header is the phone one, with its menu dialog (phone-header.spec.ts).
+    test.skip((page.viewportSize()?.width ?? 0) < 900, "Desktop header");
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     const nav = page.getByRole("navigation", { name: "Primary navigation" });
@@ -103,9 +103,9 @@ test.describe("Homepage shell", () => {
 });
 
 test.describe("The header greeting", () => {
-  // Phones keep it in the menu dialog (phone-header.spec.ts); the header itself shows it from 761 px.
+  // Phones keep it in the menu dialog (phone-header.spec.ts); the header itself shows it from 900 px.
   test.beforeEach(({ viewport }) => {
-    test.skip((viewport?.width ?? 0) < 761, "Header layout");
+    test.skip((viewport?.width ?? 0) < 900, "Header layout");
   });
 
   const greeting = (page: Page) => page.locator("[data-greeting]:visible");

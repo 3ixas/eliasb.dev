@@ -128,6 +128,24 @@ test.describe("Work: Project index with a long catalogue", () => {
     expect(tops[1]).toBeLessThan(tops[2]);
   });
 
+  test("the resting screenshot sits at the top of the right column even when the first rows have none", async ({ page }) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 761, "Phones use inline thumbnails");
+    // Make a later row the first with a screenshot, as a catalogue whose leading rows lack one would.
+    await page.evaluate(() => {
+      document.querySelectorAll(".stretch-index__shot[data-resting]").forEach((shot) => shot.removeAttribute("data-resting"));
+      const later = document.querySelectorAll(".stretch-index__row")[4].querySelector(".stretch-index__shot");
+      later?.setAttribute("data-resting", "");
+    });
+    const resting = page.locator(".stretch-index__shot[data-resting]");
+    await expect(resting).toBeVisible();
+    await expect
+      .poll(async () => {
+        const [list, box] = await Promise.all([page.locator(".stretch-index__list").boundingBox(), resting.boundingBox()]);
+        return box!.y - list!.y;
+      })
+      .toBeLessThan(40);
+  });
+
   test("a row with a screenshot previews it on hover or shows a thumbnail on phones", async ({ page }) => {
     const shot = rows(page).first().locator(".stretch-index__shot");
     if (phone(page)) {
@@ -135,6 +153,7 @@ test.describe("Work: Project index with a long catalogue", () => {
       const box = await shot.boundingBox();
       expect(box!.width).toBeLessThanOrEqual(100);
     } else {
+      await rows(page).nth(1).getByRole("link").hover();
       await expect(shot).toBeHidden();
       await rows(page).first().getByRole("link").hover();
       await expect(shot).toBeVisible();
@@ -142,5 +161,27 @@ test.describe("Work: Project index with a long catalogue", () => {
       const box = await shot.boundingBox();
       expect(box!.x).toBeGreaterThan(list!.x + list!.width * 0.55);
     }
+  });
+
+  test("desktop shows the first screenshot at rest, hands over to a hovered or focused row and returns", async ({ page, browserName }) => {
+    test.skip(phone(page), "Phones use inline thumbnails");
+    const resting = page.locator(".stretch-index__shot[data-resting]");
+    const other = rows(page).nth(4).locator(".stretch-index__shot");
+    await expect(resting).toHaveCount(1);
+    await expect(rows(page).first().locator(".stretch-index__shot")).toHaveAttribute("data-resting", "");
+    await expect(resting).toBeVisible();
+    await rows(page).nth(4).getByRole("link").hover();
+    await expect(other).toBeVisible();
+    await expect(resting).toBeHidden();
+    await page.mouse.move(0, 0);
+    await expect(other).toBeHidden();
+    await expect(resting).toBeVisible();
+    test.skip(browserName !== "chromium", "WebKit does not Tab to links");
+    const link = rows(page).nth(4).getByRole("link");
+    await link.focus();
+    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press("Tab");
+    await expect(other).toBeVisible();
+    await expect(resting).toBeHidden();
   });
 });

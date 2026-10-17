@@ -52,6 +52,18 @@ export const notFound = {
   heading: "This page doesn’t exist.",
   line: "It’s moved, or it never did. Everything else is where you left it.",
   button: "Back to the homepage →",
+  /** The lost-property tag hung beside the heading (#217): the address asked for, stamped. */
+  tag: {
+    title: "Lost property",
+    item: "Item",
+    foundAt: "Found at",
+    foundAtValue: "eliasb.dev",
+    returnTo: "Return to",
+    returnToValue: "the homepage",
+    stamp: "Not on file",
+  },
+  /** The lead-in to the five homepage sections, listed under the line. */
+  orTry: "Or try",
 } as const;
 
 export const hero = {

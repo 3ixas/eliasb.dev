@@ -1,4 +1,5 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { tagSwing } from "../src/components/site/signature-springs";
 
 // Motion that is not the entrance: scroll sway, and hover that only moves things where there is a hover.
 const tile = (page: Page) => page.locator("#things-i-make .stretch-tile").first();
@@ -45,15 +46,18 @@ test.describe("Scroll sway", () => {
 
   test("cards sway too, the PRD card keeping its own resting tilt", async ({ page, browserName }) => {
     test.skip(browserName !== "chromium", "Scroll-driven animation, Chromium");
-    await page.goto("/");
+    // How I work's PRD card holds still (see Margin notes below), so the sway is read on the case study's.
+    await page.goto("/things-i-make/threshold");
     await released(page);
     const prd = page.locator(".stretch-prd");
     await prd.scrollIntoViewIfNeeded();
-    const { rotate, transform } = await prd.evaluate((element) => ({ rotate: getComputedStyle(element).rotate, transform: getComputedStyle(element).transform }));
-    expect(rotate).not.toBe("none");
-    expect(transform, "the resting 1 degree tilt is still there").not.toBe("none");
+    await expect.poll(() => prd.evaluate((element) => getComputedStyle(element).rotate)).not.toBe("none");
+    await expect.poll(() => prd.evaluate((element) => getComputedStyle(element).transform), { message: "the resting 1 degree tilt is still there" }).not.toBe("none");
+    await page.goto("/");
+    await released(page);
     const card = page.locator("#off-the-clock .stretch-otc__card").first();
-    expect(await card.evaluate((element) => getComputedStyle(element).translate)).not.toBe("none");
+    await card.scrollIntoViewIfNeeded();
+    await expect.poll(() => card.evaluate((element) => getComputedStyle(element).translate)).not.toBe("none");
   });
 
   test("with reduced motion nothing sways", async ({ page }) => {
@@ -64,6 +68,58 @@ test.describe("Scroll sway", () => {
     expect(translate).toBe("none");
     expect(rotate).toBe("none");
     expect(await page.locator(".stretch-prd").evaluate((element) => getComputedStyle(element).rotate)).toBe("none");
+  });
+});
+
+test.describe("Margin notes", () => {
+  const strokes = (page: Page) => page.locator("#how-i-work path[pathLength]");
+  // The first habit's circle, a stroke that is on screen at every width.
+  const circle = (page: Page) => page.locator("#how-i-work .stretch-ink--circle").first();
+  const offset = (page: Page) => circle(page).locator("path").evaluate((path) => parseFloat(getComputedStyle(path).strokeDashoffset));
+  // Scrolls so the circle's middle sits this far down the visible area (0 is its top, 1 its bottom edge).
+  const scrollCircleTo = (page: Page, down: number) =>
+    circle(page).evaluate((element, at) => {
+      const padding = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+      const { top, height } = element.getBoundingClientRect();
+      scrollBy(0, top + height / 2 - (padding + (innerHeight - padding) * at));
+    }, down);
+
+  test.describe("with motion", () => {
+    test.use({ reducedMotion: "no-preference" });
+
+    test("a stroke draws as it scrolls up the screen and un-draws on the way back", async ({ page, browserName }) => {
+      test.skip(browserName !== "chromium", "Scroll-driven animation, Chromium");
+      await page.goto("/");
+      await released(page);
+      expect(await page.evaluate(() => CSS.supports("animation-timeline", "view()"))).toBe(true);
+      await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
+      await circle(page).scrollIntoViewIfNeeded();
+
+      await scrollCircleTo(page, 0.97);
+      await expect.poll(() => offset(page)).toBeGreaterThan(0.5);
+      await scrollCircleTo(page, 0.3);
+      await expect.poll(() => offset(page)).toBe(0);
+      await scrollCircleTo(page, 0.97);
+      await expect.poll(() => offset(page), "scrolling back up takes the ink out again").toBeGreaterThan(0.5);
+    });
+  });
+
+  test.describe("with reduced motion", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("every stroke is simply drawn, wherever the page is scrolled", async ({ page }) => {
+      await page.goto("/");
+      await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
+      await expect(strokes(page)).toHaveCount(9);
+      await circle(page).scrollIntoViewIfNeeded();
+      for (const at of [0.97, 0.3]) {
+        await scrollCircleTo(page, at);
+        const state = await strokes(page).evaluateAll((paths) =>
+          paths.map((path) => ({ offset: getComputedStyle(path).strokeDashoffset, animation: getComputedStyle(path.closest("svg")!).animationName })),
+        );
+        for (const stroke of state) expect(stroke).toEqual({ offset: "0px", animation: "none" });
+      }
+    });
   });
 });
 
@@ -258,6 +314,86 @@ test.describe("Staff pass with reduced motion", () => {
       await page.mouse.wheel(0, 120);
       expect(await rotation(pass)).toBe(0);
       expect(await resting(pass)).toBeCloseTo(-1, 1);
+    });
+  });
+});
+
+// The 404's lost-property tag (#217): it swings in on spring(0.4, 0.6), from 14° to a resting -4°, from the first
+// paint; reduced motion shows it at rest. The swing is CSS, so none of this waits for hydration.
+type TagSample = [time: number, angle: number];
+
+/** Samples the tag's CSS animation clock and `rotate` (degrees) every frame from the start of the page, for `ms`. */
+async function tagSamples(page: Page, ms: number) {
+  await page.addInitScript((duration) => {
+    const store = window as unknown as { __tag: TagSample[]; __tagDone?: boolean };
+    store.__tag = [];
+    const start = performance.now();
+    const tick = () => {
+      const tag = document.querySelector("[data-lost-property]");
+      const swing = tag?.getAnimations()[0];
+      if (tag && swing) store.__tag.push([Number(swing.currentTime), Number.parseFloat(getComputedStyle(tag).rotate)]);
+      if (performance.now() - start < duration) requestAnimationFrame(tick);
+      else store.__tagDone = true;
+    };
+    requestAnimationFrame(tick);
+  }, ms);
+  await page.goto("/nothing-here");
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __tagDone?: boolean }).__tagDone === true), { timeout: ms + 8000 }).toBe(true);
+  return page.evaluate(() => (window as unknown as { __tag: TagSample[] }).__tag);
+}
+
+/** The tag's spring at `time` ms: its `linear()` easing, read back as the angle it should show between 14° and -4°. */
+function swingAngle(time: number) {
+  const points = tagSwing.easing.slice("linear(".length, -1).split(",").map(Number);
+  const at = Math.min(Math.max(time / tagSwing.duration, 0), 1) * (points.length - 1);
+  const low = Math.floor(at);
+  const progress = points[low] + ((points[Math.min(low + 1, points.length - 1)] - points[low]) * (at - low));
+  return 14 + (-4 - 14) * progress;
+}
+
+test.describe("404 lost-property tag", () => {
+  test.describe("with motion", () => {
+    test.use({ reducedMotion: "no-preference" });
+
+    test("swings in from 14 degrees on its spring, overshoots and settles at -4 degrees", async ({ page, browserName }) => {
+      test.skip(browserName !== "chromium", "Frame sampling, Chromium");
+      const samples = await tagSamples(page, 1600);
+      expect(samples.length).toBeGreaterThan(20);
+      // It starts swung out, every frame follows the spring's own curve, it passes -4 to the far side, and it rests at -4.
+      expect(samples[0][1]).toBeGreaterThan(10);
+      for (const [time, angle] of samples) expect(Math.abs(angle - swingAngle(time)), `at ${Math.round(time)} ms`).toBeLessThan(1);
+      expect(Math.min(...samples.map(([, angle]) => angle)), "the spring overshoots -4°").toBeLessThan(-5);
+      expect(samples.at(-1)![1]).toBeCloseTo(-4, 1);
+      const timing = await page.locator("[data-lost-property]").evaluate((element) => element.getAnimations()[0]?.effect?.getComputedTiming().duration);
+      // After the swing ends nothing animates, so the animation is gone; before then its length is the spring's.
+      expect([undefined, tagSwing.duration]).toContain(timing);
+      await expect(page.locator("[data-lost-property]")).toHaveCSS("rotate", "-4deg");
+    });
+  });
+
+  test.describe("with reduced motion", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("shows the tag at rest at -4 degrees and never swings", async ({ page, browserName }) => {
+      test.skip(browserName !== "chromium", "Frame sampling, Chromium");
+      await page.addInitScript(() => {
+        const store = window as unknown as { __rest: string[]; __restDone?: boolean };
+        store.__rest = [];
+        const start = performance.now();
+        const tick = () => {
+          const tag = document.querySelector("[data-lost-property]");
+          if (tag) store.__rest.push(`${getComputedStyle(tag).rotate}/${tag.getAnimations().length}`);
+          if (performance.now() - start < 1200) requestAnimationFrame(tick);
+          else store.__restDone = true;
+        };
+        requestAnimationFrame(tick);
+      });
+      await page.goto("/nothing-here");
+      await expect.poll(() => page.evaluate(() => (window as unknown as { __restDone?: boolean }).__restDone === true), { timeout: 9000 }).toBe(true);
+      const rest = await page.evaluate(() => (window as unknown as { __rest: string[] }).__rest);
+      expect(rest.length).toBeGreaterThan(10);
+      // Every frame: rotated -4deg, with nothing animating it.
+      expect(new Set(rest)).toEqual(new Set(["-4deg/0"]));
     });
   });
 });

@@ -8,3 +8,6 @@ import { spring } from "./spring.ts";
 
 /** The employer Staff pass leaning away from the pointer and settling. */
 export const passLean = spring(0.4, 0.7);
+
+/** The 404's lost-property tag swinging in on its string and settling (#217). */
+export const tagSwing = spring(0.4, 0.6);

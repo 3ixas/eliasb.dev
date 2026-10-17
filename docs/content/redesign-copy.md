@@ -24,6 +24,14 @@ Approved by Elias on 8 October 2026 for [#113](https://github.com/3ixas/eliasb.d
 - Line: It’s moved, or it never did. Everything else is where you left it.
 - Button: Back to the homepage →
 
+The lost-property tag hung beside the heading, and the five sections under the line ([#217](https://github.com/3ixas/eliasb.dev/issues/217), from the prototype B chosen for [#197](https://github.com/3ixas/eliasb.dev/issues/197)):
+
+- Tag title: Lost property
+- Tag fields: Item (the address asked for, shortened in the middle at about 48 characters) · Found at eliasb.dev · Return to the homepage
+- Tag stamp: Not on file
+- Lead-in to the section rows: Or try
+- Rows: the five Menu entries, numbered 01–05, each linking to its homepage section
+
 ## Hero
 
 - Role line, plain text under the name: Software Engineer at BNP Paribas CIB

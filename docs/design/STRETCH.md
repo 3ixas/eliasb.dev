@@ -73,7 +73,7 @@ One per physical-looking object (a tile, a card, the portrait), and never more. 
 
 ## Phones
 
-Designed at 320 to 390 px, below about 760 px: single-column cards, 16 px gutters, targets at least 44 px, no page-level horizontal scroll. The header shows the theme button and Menu only, with the greeting inside a full-screen menu dialog. The GitHub grid scrolls inside its card and opens on today. Tablets use the desktop layout with a narrower grid.
+Designed at 320 to 390 px, below about 760 px: single-column cards, 16 px gutters, targets at least 44 px, no page-level horizontal scroll. Below 900 px the header shows the theme button and Menu only, with the greeting inside a full-screen menu dialog, so a tablet never gets a two-row header. The GitHub grid scrolls inside its card and opens on today. Tablets use the desktop page layout with a narrower grid, under the phone header until 900 px.
 
 ## Accessibility
 
