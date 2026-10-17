@@ -77,6 +77,15 @@ for (const text of built) assert.ok(plain.includes(text), `Built string is not i
 assert.equal(thingsIMake.note(6, 3), "06 things I’ve built · 03 I’m proudest of");
 assert.equal(thingsIMake.allThings(projects.length), "Everything I’ve built (06) →");
 
+// The 404's lost-property tag and section rows are listed field by field, not just as stray words.
+const tag = notFound.tag;
+for (const line of [
+  `- Tag title: ${tag.title}`,
+  `- Tag fields: ${tag.item} (the address asked for, shortened in the middle at about 48 characters) · ${tag.foundAt} ${tag.foundAtValue} · ${tag.returnTo} ${tag.returnToValue}`,
+  `- Tag stamp: ${tag.stamp}`,
+  `- Lead-in to the section rows: ${notFound.orTry}`,
+]) assert.ok(raw.includes(line), `The 404 copy lacks the line "${line}"`);
+
 // The header greeting follows the visitor's own hour, with the approved edges.
 const greetingAt = (hour) => siteCopy.greeting[greetingKey(hour)];
 for (const [hour, line] of [

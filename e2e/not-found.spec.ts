@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { notFound } from "../src/content/stretch/site-copy";
+import { notFound, siteCopy } from "../src/content/stretch/site-copy";
 
 test.describe("The 404", () => {
   test("shows the approved copy with a 404 status and no indexing", async ({ page }) => {
@@ -20,6 +20,61 @@ test.describe("The 404", () => {
     expect((await back.boundingBox())?.height).toBeGreaterThanOrEqual(44);
     await back.click();
     await expect(page).toHaveURL(/\/$/);
+  });
+
+  test("the lost-property tag shows the address asked for", async ({ page }) => {
+    await page.goto("/nothing-here/at-all");
+    const tag = page.locator("[data-lost-property]");
+    await expect(tag.getByText(notFound.tag.title)).toBeVisible();
+    await expect(tag.locator("dt", { hasText: notFound.tag.item })).toBeVisible();
+    await expect(tag.locator(".stretch-404__address")).toHaveText("/nothing-here/at-all");
+    await expect(tag.getByText(notFound.tag.foundAtValue)).toBeVisible();
+    await expect(tag.getByText(notFound.tag.returnToValue)).toBeVisible();
+    await expect(tag.getByText(notFound.tag.stamp)).toBeVisible();
+    // It hangs beside the text on a wide screen and below it on a phone.
+    const phone = (page.viewportSize()?.width ?? 0) <= 760;
+    await expect
+      .poll(async () => {
+        const copy = (await page.locator(".stretch-404__copy").boundingBox())!;
+        const hang = (await page.locator(".stretch-404__hang").boundingBox())!;
+        return phone ? hang.y >= copy.y + copy.height : hang.x >= copy.x + copy.width - 1;
+      })
+      .toBe(true);
+  });
+
+  test("the address is in the HTML the server sends, before any script runs", async ({ request }) => {
+    const html = await (await request.get("/nothing-here/at-all")).text();
+    expect(html).toContain('<dd class="stretch-404__address">/nothing-here/at-all</dd>');
+  });
+
+  test("a 100-character address is shortened in the middle and stays readable", async ({ page }) => {
+    const long = `/${"a-very-long-lost-address-".repeat(5)}end`.slice(0, 100);
+    expect(long).toHaveLength(100);
+    await page.goto(long);
+    const address = page.locator("[data-lost-property] .stretch-404__address");
+    // The first 23 and last 23 characters around one ellipsis.
+    await expect(address).toHaveText(`${long.slice(0, 23)}…${long.slice(-23)}`);
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+    // The whole tag stays on screen, so no part of the address is cut off.
+    await expect
+      .poll(async () => {
+        const box = (await page.locator("[data-lost-property]").boundingBox())!;
+        return box.x >= 0 && box.x + box.width <= page.viewportSize()!.width;
+      })
+      .toBe(true);
+  });
+
+  test("five rows lead to the homepage's sections, in the page's order", async ({ page }) => {
+    await page.goto("/nothing-here");
+    const rows = page.getByRole("navigation", { name: notFound.orTry }).getByRole("link");
+    await expect(rows).toHaveText(siteCopy.menu.map(({ label }, index) => `${String(index + 1).padStart(2, "0")}${label}→`));
+    await expect(rows).toHaveCount(5);
+    for (const [index, { id }] of siteCopy.menu.entries()) await expect(rows.nth(index)).toHaveAttribute("href", `/#${id}`);
+    for (const index of [0, 4]) await expect.poll(async () => (await rows.nth(index).boundingBox())?.height).toBeGreaterThanOrEqual(44);
+    // The phone rules share a class with the Project index; the rows still lay out as a number, a name and an arrow.
+    await expect(rows.first()).toHaveCSS("grid-template-columns", /^\S+ \S+ \S+$/);
+    await rows.nth(2).click();
+    await expect(page).toHaveURL(/\/#how-i-work$/);
   });
 
   test("has no entrance, no sideways scroll and no axe violations", async ({ page }) => {
