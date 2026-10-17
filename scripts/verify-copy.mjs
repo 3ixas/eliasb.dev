@@ -20,6 +20,7 @@ import {
   roleStorySectionKeys,
   roleStorySectionLabels,
 } from "../src/content/stretch/role-story.ts";
+import { passLinkLabel, passProblems, passRecords, passStatus } from "../src/content/stretch/staff-pass.ts";
 import { howIWork } from "../src/content/stretch/how-i-work.ts";
 import { greetingKey } from "../src/content/stretch/greeting.ts";
 import { offTheClock } from "../src/content/stretch/off-the-clock.ts";
@@ -235,6 +236,26 @@ assert.match(roleStoryProblems([{ ...bnp, evidence: [...bnp.evidence, bnp.eviden
 assert.match(roleStoryProblems([{ ...bnp, next: "bnp-paribas" }, ...rest])[0], /different Role story or none/);
 assert.match(roleStoryProblems([{ ...bnp, next: "ghost" }, ...rest])[0], /different Role story or none/);
 assert.match(roleStoryProblems([{ ...bnp, sections: { ...bnp.sections, decisions: {} } }, ...rest])[0], /empty "decisions" section/);
+
+// A Staff pass's headline number is one of its Role story's evidence items or a fact the story states in words
+// (#209), so a pass never claims more than its story does. Each failure names the pass.
+assert.deepEqual(passProblems(passRecords, roles), []);
+assert.deepEqual(roleStorySlugs.map((slug) => passRecords[slug].short), ["BNP Paribas", "Joveen", "Optegra"]);
+assert.deepEqual(passRecords["bnp-paribas"].pins?.map((pin) => pin.label), ["Winner", "Take Ownership", "AI Champion"]);
+assert.equal(passRecords.joveen.pins, undefined, "Only the current pass wears the awards");
+{
+  const claim = (slug, headline) => passProblems({ ...passRecords, [slug]: { ...passRecords[slug], headline } }, roles);
+  assert.match(claim("joveen", { value: "−90%", label: "page load" })[0], /Staff pass "joveen": the headline "−90% · page load" is not one of its Role story's evidence items or stated facts/);
+  assert.match(claim("joveen", { value: "−40%", label: "latency" })[0], /"joveen"/, "A real number under a different label is not the story's fact");
+  assert.match(claim("optegra", { value: "88%", label: "Core Web" })[0], /"optegra"/, "A label may stop at a comma, not mid-phrase");
+  assert.deepEqual(claim("optegra", { value: "88%", label: "Core Web Vitals pass rate, up from 62%" }), [], "The whole evidence label is the story's fact too");
+  assert.match(claim("bnp-paribas", { value: "Only", label: "C# engineer on the team" })[0], /"bnp-paribas"/, "A stated fact needs the sentence that states it");
+  assert.match(claim("bnp-paribas", { value: "Only", label: "C# engineer on the team", quote: "only Rust engineer" })[0], /"bnp-paribas"/, "...and the story must say it");
+}
+assert.equal(passStatus(roleStories["bnp-paribas"], "current"), "Valid · present");
+assert.equal(passStatus(roleStories.joveen, "returned"), "Jun 2025", "A returned pass shows the month it ended");
+assert.equal(passStatus(roleStories.optegra, "returned"), "Aug 2024");
+assert.equal(passLinkLabel(passRecords.optegra), "The Optegra story →", "The link names the short employer, not Optegra Eye Healthcare & Kensington Medical");
 
 // Each entry owns its pairing, so reordering the copy cannot redirect a link or a filter.
 assert.deepEqual(workArchive.filters.map(({ category }) => category), [null, ...PROJECT_CATEGORIES], "the filters are All, then every category once, in the catalogue's order");
