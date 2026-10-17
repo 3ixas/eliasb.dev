@@ -28,7 +28,7 @@ Every text pair passes WCAG 2.2 AA (5.7:1 to 18.2:1, [#108](https://github.com/3
 
 ## Colour rules
 
-- **Cobalt** marks Elias's name, "today" and "now", and the way to say hello. It never colours a project, a tile or decoration. Case studies use it only for *Say hello*. One approved exception: the award pins on a **Staff pass** are cobalt, on Work and on the pass that opens a Role story, so the two read as one object ([#194](https://github.com/3ixas/eliasb.dev/issues/194), [#198](https://github.com/3ixas/eliasb.dev/issues/198)).
+- **Cobalt** marks Elias's name, "today" and "now", and the way to say hello. It never colours a project, a tile or decoration. Case studies use it only for *Say hello*. One approved exception: the award pins on a **Staff pass** are cobalt, on Work and on the pass that opens a Role story, so the two read as one object. A Role story uses cobalt for nothing else but focus, selection and these pins; the pass opening it wears its Employer colour's other-theme pair, so it stands off the band ([#212](https://github.com/3ixas/eliasb.dev/issues/212), [#194](https://github.com/3ixas/eliasb.dev/issues/194), [#198](https://github.com/3ixas/eliasb.dev/issues/198)).
 - **Project colours** appear on a project's Things I make tile, its case study's opening band and framing, and its swatches. The page behind stays neutral.
 - Colour never carries meaning alone.
 

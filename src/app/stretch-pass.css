@@ -88,6 +88,13 @@
   box-shadow: 0 0 0 1px var(--stretch-rule);
 }
 
+/* Hung in a band of its own colour, the pass takes a faint ink edge so it reads as an object. */
+.stretch-pass--on-band .stretch-pass__card {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--pass-ink) 22%, transparent),
+    0 24px 48px -16px rgb(0 0 0 / 0.5);
+}
+
 /* The page's own focus ring (cobalt), kept clear of the card. Focus also straightens the pass. */
 .stretch-pass__card:focus-visible {
   outline: 3px solid var(--stretch-cobalt);

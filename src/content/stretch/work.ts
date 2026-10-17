@@ -89,3 +89,10 @@ export const work = {
   /** History is a dashed note under the rail, not a pass: it has no Role story to open. */
   history: { dates: "Before 2021", role: "History at uni", note: "Because I loved it, and I still do." },
 } as const;
+
+/** How a Role story's pass hangs on Work (its state and resting tilt), so the story opens on the same pass. */
+export function railPass(slug: RoleStorySlug): RailPass {
+  const pass = work.rail.find((item) => item.slug === slug);
+  if (!pass) throw new Error(`Work's rail has no pass for the Role story "${slug}".`);
+  return pass;
+}

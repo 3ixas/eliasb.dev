@@ -10,6 +10,7 @@ import {
   roleStorySectionKeys,
   roleStorySectionLabels,
 } from "../src/content/stretch/role-story";
+import { passRecords } from "../src/content/stretch/staff-pass";
 import { pageTitle } from "../src/content/site";
 import { contrastOnPaper } from "./support/contrast";
 
@@ -33,7 +34,62 @@ for (const slug of roleStorySlugs) {
       await expect(band).toContainText(story.role);
       await expect(band).toContainText(roleStoryMetadata(story));
       await expect(band.getByRole("link", { name: "Work", exact: true })).toHaveAttribute("href", roleStoryBack.href);
-      await expect(band.locator("img")).toHaveCount(0);
+      // The only picture in the band is the pass's ID photo, never a screenshot as on a Case study.
+      await expect(band.locator("img")).toHaveCount(1);
+      await expect(band.locator(".stretch-pass img")).toHaveCount(1);
+    });
+
+    for (const scheme of schemes) {
+      test(`the band's Staff pass is not a link and wears the other theme's pair, ${scheme}`, async ({ page }) => {
+        await page.emulateMedia({ colorScheme: scheme });
+        const other = story.colours[scheme === "light" ? "dark" : "light"];
+        const band = page.getByRole("region", { name: "Overview" });
+        const pass = band.locator(".stretch-pass");
+        await expect(pass).toHaveCount(1);
+        await expect(pass.locator(".stretch-pass__card")).toHaveJSProperty("tagName", "DIV");
+        await expect(pass.locator(".stretch-pass__card")).toHaveCSS("background-color", rgb(other.field));
+        await expect(pass.locator(".stretch-pass__card")).toHaveCSS("color", rgb(other.ink));
+        await expect(pass.locator(".stretch-pass__strap")).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+        // A faint edge: the on-band shadow is a 1 px ring (spread, no blur) and then a deep drop, which no other pass has.
+        await expect
+          .poll(() => pass.locator(".stretch-pass__card").evaluate((card) => getComputedStyle(card).boxShadow))
+          .toMatch(/0px 0px 0px 1px.*0px 24px 48px -16px/);
+        // It is the same pass as on Work: this employer's, and not a link to the page it opens.
+        await expect(pass.locator(".stretch-pass__title")).toHaveText(passRecords[slug].short);
+        await expect(pass.locator(`a[href="/work/${slug}"]`)).toHaveCount(0);
+        await expect(pass.locator(".stretch-pass__foot")).not.toContainText("story →");
+      });
+    }
+
+    if (slug === "bnp-paribas") {
+      test("BNP's three award pins hang on its pass, and the ones that lead into this story arrive there", async ({ page }) => {
+        const pins = page.getByRole("region", { name: "Overview" }).getByRole("list", { name: "Awards" });
+        const items = pins.getByRole("listitem");
+        await expect(items).toHaveCount(3);
+        for (const [index, pin] of (passRecords[slug].pins ?? []).entries()) {
+          await expect(items.nth(index)).toContainText(pin.label);
+          await expect(items.nth(index)).toContainText(pin.detail);
+          if (pin.href) await expect(items.nth(index).getByRole("link")).toHaveAttribute("href", pin.href);
+        }
+        // Take Ownership's certificate arrives with #213; the other two lead to sections that exist now.
+        for (const [index, section] of [[0, "what-changed"], [2, "what-i-took-with-me"]] as const) {
+          await page.goto(`/work/${slug}`);
+          await items.nth(index).getByRole("link").click();
+          await expect(page).toHaveURL(new RegExp(`#${section}$`));
+          await expect(page.locator(`section#${section}`)).toBeInViewport();
+        }
+      });
+    } else {
+      test("the pass wears no pins", async ({ page }) => {
+        await expect(page.getByRole("region", { name: "Overview" }).getByRole("list", { name: "Awards" })).toHaveCount(0);
+      });
+    }
+
+    test("the pass sits under the text on a phone and beside it from 761 px", async ({ page }) => {
+      const text = await page.locator(".stretch-cs-open__text").boundingBox();
+      const pass = await page.locator(".stretch-cs-open .stretch-pass").boundingBox();
+      if ((page.viewportSize()?.width ?? 0) < 761) expect(pass!.y, "under the text").toBeGreaterThanOrEqual(text!.y + text!.height - 1);
+      else expect(pass!.x, "beside the text").toBeGreaterThanOrEqual(text!.x + text!.width - 1);
     });
 
     test("it is titled and described for search and sharing", async ({ page }) => {
@@ -98,6 +154,13 @@ for (const slug of roleStorySlugs) {
       await expect(items).toHaveText(story.evidence.map(({ value, label }) => `${value}${label}`));
     });
 
+    if (slug === "bnp-paribas") {
+      test("the evidence strip leaves out the awards the pins already show", async ({ page }) => {
+        const items = page.locator("section#what-changed").getByRole("list", { name: "Evidence" }).getByRole("listitem");
+        await expect(items).toHaveText(["Nov 2025won the Early Careers digitisation competition", "6months from zero C# to production code"]);
+      });
+    }
+
     test(next ? "it ends on the next role, in that role's colours" : "it ends on the way back to Work", async ({ page }) => {
       if (next) {
         const tile = page.getByRole("region", { name: roleStoryCopy.nextRole }).getByRole("link");
@@ -122,7 +185,7 @@ for (const slug of roleStorySlugs) {
       expect((await end.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     });
 
-    test("cobalt is not used on the page", async ({ page }) => {
+    test("cobalt is used only by focus, selection and the pass's award pins", async ({ page }) => {
       const cobalt = await page.evaluate(() => {
         const probe = document.createElement("span");
         probe.style.color = "var(--stretch-cobalt)";
@@ -135,6 +198,8 @@ for (const slug of roleStorySlugs) {
         return elements.filter((element) => {
           // The skip link is cobalt, but only when focused; it waits off-screen.
           if (element.classList.contains("stretch-skip")) return false;
+          // The award pins are the one approved exception (STRETCH.md, Cobalt).
+          if (element.closest(".stretch-pass__pins")) return false;
           const style = getComputedStyle(element);
           return [style.color, style.backgroundColor, style.borderTopColor].includes(colour) && element.checkVisibility();
         }).length;
@@ -171,6 +236,9 @@ for (const slug of roleStorySlugs) {
           ".stretch-cs-lead",
           ".stretch-cs-evidence__value",
           ".stretch-cs-evidence__label",
+          ".stretch-pass__title",
+          ".stretch-pass__role",
+          ".stretch-pass__value",
           ...(next ? [".stretch-cs-next__label", ".stretch-cs-next__name", ".stretch-cs-next__outcome"] : []),
         ];
         for (const selector of selectors) {
