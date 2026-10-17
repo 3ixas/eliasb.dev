@@ -238,7 +238,8 @@ for (const slug of slugs) {
   test.describe(`Case study opening: ${slug}`, () => {
     // 761 to 1099 px is where the band's column is narrowest against its display title.
     for (const width of [320, 390, 761, 820, 1000, 1099, 1440]) {
-      test(`the title breaks only between words at ${width} px`, async ({ page }) => {
+      test(`the title breaks only between words at ${width} px`, async ({ page }, testInfo) => {
+        test.skip(!/-1440-light$/.test(testInfo.project.name), "Sweeps its own widths: once per engine");
         await page.setViewportSize({ width, height: 900 });
         await page.goto(`/things-i-make/${slug}`);
         const title = page.getByRole("heading", { level: 1 });
@@ -272,7 +273,8 @@ for (const slug of slugs) {
 
   test.describe(`Case study section links: ${slug}`, () => {
     for (const width of [390, 820]) {
-      test(`the six links sit in two columns, the first on the page gutter, at ${width} px`, async ({ page }) => {
+      test(`the six links sit in two columns, the first on the page gutter, at ${width} px`, async ({ page }, testInfo) => {
+        test.skip(!/-1440-light$/.test(testInfo.project.name), "Sweeps its own widths: once per engine");
         await page.setViewportSize({ width, height: 900 });
         await page.goto(`/things-i-make/${slug}`);
         const links = page.getByRole("navigation", { name: "Sections" }).getByRole("link");

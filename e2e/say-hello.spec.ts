@@ -112,7 +112,8 @@ const expectedSizes = (width: number) => {
 
 test.describe("Say hello against the footer at every width", () => {
   for (const width of [320, 390, 600, 759, 760, 820, 1100, 1440, 1920]) {
-    test(`at ${width} px`, async ({ page }) => {
+    test(`at ${width} px`, async ({ page }, testInfo) => {
+      test.skip(!/-1440-light$/.test(testInfo.project.name), "Sweeps its own widths: once per engine");
       await page.setViewportSize({ width, height: 900 });
       await page.goto("/");
       const sizes = () =>
@@ -143,7 +144,8 @@ test("the link row at 390 px is one row of 44 px targets", async ({ page }) => {
 test.describe("The footer away from the homepage", () => {
   for (const path of ["/things-i-make/threshold", "/this-page-does-not-exist"]) {
     for (const width of [320, 390]) {
-      test(`${path} at ${width} px`, async ({ page }) => {
+      test(`${path} at ${width} px`, async ({ page }, testInfo) => {
+        test.skip(!/-1440-light$/.test(testInfo.project.name), "Sweeps its own widths: once per engine");
         await page.setViewportSize({ width, height: 900 });
         await page.goto(path);
         const footer = page.getByRole("contentinfo");

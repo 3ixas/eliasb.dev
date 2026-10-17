@@ -244,7 +244,8 @@ for (const slug of roleStorySlugs) {
 
     // #219: the title and the section links share the case study's rules, so a long employer name (Optegra's) must not split mid-word either.
     for (const width of [320, 390, 820]) {
-      test(`the title and the section links break only between words at ${width} px`, async ({ page }) => {
+      test(`the title and the section links break only between words at ${width} px`, async ({ page }, testInfo) => {
+        test.skip(!/-1440-light$/.test(testInfo.project.name), "Sweeps its own widths: once per engine");
         await page.setViewportSize({ width, height: 900 });
         await page.goto(`/work/${slug}`);
         await page.evaluate(() => document.fonts.ready);
