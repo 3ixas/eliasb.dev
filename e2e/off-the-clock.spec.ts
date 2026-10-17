@@ -376,6 +376,24 @@ test.describe("Off the clock: the GitHub year", () => {
     await expect(stops).toHaveCount(1);
   });
 
+  test("on phones the busiest-stretch caption is pinned outside the scroller and the left edge fades", async ({ page }) => {
+    test.skip(!phone(page), "the grid only scrolls on phones");
+    const card = fixture(page, "github");
+    const scroller = card.locator("[data-github-scroll]");
+    const caption = card.locator(".stretch-gh__note");
+    await expect(caption).toBeVisible();
+    await expect(scroller.locator(".stretch-gh__note")).toHaveCount(0);
+    const inView = async () => {
+      const box = (await caption.boundingBox())!;
+      const cardBox = (await card.boundingBox())!;
+      return box.x >= cardBox.x - 1 && box.x + box.width <= cardBox.x + cardBox.width + 1;
+    };
+    await expect.poll(inView, { message: "caption is fully visible on open" }).toBe(true);
+    await scroller.evaluate((el) => (el.scrollLeft = 0));
+    await expect.poll(inView, { message: "caption is fully visible after scrolling" }).toBe(true);
+    await expect(scroller).not.toHaveCSS("mask-image", "none");
+  });
+
   test("a stale year says when its data is from; a missing year is gone", async ({ page }) => {
     await expect(fixture(page, "github-stale")).toContainText("as of 28 Sept");
     await expect(fixture(page, "github")).not.toContainText("as of");
