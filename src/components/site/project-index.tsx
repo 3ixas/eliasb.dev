@@ -31,6 +31,7 @@ export function ProjectIndex({
   limit?: number;
 }) {
   const shown = rows.slice(0, limit);
+  const resting = shown.findIndex((project) => project.screenshot);
   return (
     <div className="stretch-index">
       <ol className="stretch-index__list">
@@ -54,7 +55,7 @@ export function ProjectIndex({
                 →
               </span>
               {screenshot && (
-                <span className="stretch-index__shot">
+                <span className="stretch-index__shot" data-resting={position === resting ? "" : undefined}>
                   <Image
                     src={screenshot.src}
                     alt=""

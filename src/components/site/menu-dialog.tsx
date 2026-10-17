@@ -6,7 +6,7 @@ import { SiteGreeting } from "@/components/site/site-greeting";
 import { siteCopy } from "@/content/stretch/site-copy";
 
 /** Where the phone header gives way to the desktop one; stretch-shell.css uses the same width. */
-const DESKTOP = "(min-width: 761px)";
+const DESKTOP = "(min-width: 900px)";
 
 /**
  * The phone menu: a Menu button and the full-screen dialog it opens, with the

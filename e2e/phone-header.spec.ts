@@ -7,7 +7,7 @@ const menuLabels = siteCopy.menu.map(({ label }) => label);
 const header = (page: Page) => page.locator("[data-stretch-header]");
 const menuButton = (page: Page) => page.getByRole("button", { name: "Menu" });
 const dialog = (page: Page) => page.getByRole("dialog", { name: "Menu" });
-const phone = (page: Page) => (page.viewportSize()?.width ?? 0) < 761;
+const phone = (page: Page) => (page.viewportSize()?.width ?? 0) < 900;
 const overflows = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
 
 /** Every visible link and button inside the scope, with its rendered height. */
@@ -144,6 +144,46 @@ test.describe("Phone header and menu", () => {
     await expect(dialog(page)).toBeHidden();
     await expect(page.getByRole("navigation", { name: "Primary navigation" })).toBeVisible();
   });
+});
+
+// 760 and 761 straddle the old phone breakpoint, 899 and 900 the current one.
+for (const width of [760, 761, 820, 899, 900, 901]) {
+  test(`${width} px: the header is one row, ${width < 900 ? "the theme button and Menu" : "the greeting, theme button and links"}`, async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width, height: 900 } });
+    const page = await context.newPage();
+    await page.goto("/");
+    const rows = await header(page).evaluate((element) => {
+      const tops = [...element.querySelectorAll<HTMLElement>(".stretch-header__inner p, .stretch-header__inner a, .stretch-header__inner button")]
+        .filter((child) => child.checkVisibility() && !child.matches(".stretch-skip"))
+        .map((child) => Math.round(child.getBoundingClientRect().top));
+      return { tops: new Set(tops).size, height: element.getBoundingClientRect().height };
+    });
+    expect(rows.height, "header height").toBeLessThanOrEqual(80);
+    if (width < 900) {
+      expect(rows.tops, "the theme button and Menu share a row").toBe(1);
+      await expect(menuButton(page)).toBeVisible();
+      await expect(page.locator("[data-greeting]:visible")).toHaveCount(0);
+    } else {
+      await expect(menuButton(page)).toBeHidden();
+      await expect(page.locator("[data-greeting]:visible")).toHaveCount(1);
+    }
+    expect(await overflows(page)).toBe(false);
+    await context.close();
+  });
+}
+
+test("every width from 761 to 899 px keeps the header on one row with Menu", async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 761, height: 900 } });
+  const page = await context.newPage();
+  await page.goto("/");
+  const heights = new Set<number>();
+  for (const width of [761, 768, 800, 834, 860, 880, 895, 899]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect(menuButton(page), `${width} px`).toBeVisible();
+    heights.add(await header(page).evaluate((element) => Math.round(element.getBoundingClientRect().height)));
+  }
+  expect([...heights], "one height at every width").toHaveLength(1);
+  await context.close();
 });
 
 test("without script the section links stay on the phone header", async ({ browser }) => {

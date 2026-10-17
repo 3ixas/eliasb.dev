@@ -135,6 +135,7 @@ test.describe("Work: Project index with a long catalogue", () => {
       const box = await shot.boundingBox();
       expect(box!.width).toBeLessThanOrEqual(100);
     } else {
+      await rows(page).nth(1).getByRole("link").hover();
       await expect(shot).toBeHidden();
       await rows(page).first().getByRole("link").hover();
       await expect(shot).toBeVisible();
@@ -142,5 +143,27 @@ test.describe("Work: Project index with a long catalogue", () => {
       const box = await shot.boundingBox();
       expect(box!.x).toBeGreaterThan(list!.x + list!.width * 0.55);
     }
+  });
+
+  test("desktop shows the first screenshot at rest, hands over to a hovered or focused row and returns", async ({ page, browserName }) => {
+    test.skip(phone(page), "Phones use inline thumbnails");
+    const resting = page.locator(".stretch-index__shot[data-resting]");
+    const other = rows(page).nth(4).locator(".stretch-index__shot");
+    await expect(resting).toHaveCount(1);
+    await expect(rows(page).first().locator(".stretch-index__shot")).toHaveAttribute("data-resting", "");
+    await expect(resting).toBeVisible();
+    await rows(page).nth(4).getByRole("link").hover();
+    await expect(other).toBeVisible();
+    await expect(resting).toBeHidden();
+    await page.mouse.move(0, 0);
+    await expect(other).toBeHidden();
+    await expect(resting).toBeVisible();
+    test.skip(browserName !== "chromium", "WebKit does not Tab to links");
+    const link = rows(page).nth(4).getByRole("link");
+    await link.focus();
+    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press("Tab");
+    await expect(other).toBeVisible();
+    await expect(resting).toBeHidden();
   });
 });
