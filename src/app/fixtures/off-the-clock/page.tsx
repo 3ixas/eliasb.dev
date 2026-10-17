@@ -129,6 +129,7 @@ const items = [
   { name: "film", item: <FilmCard film={diary({})} now={now} /> },
   { name: "film-empty", item: <FilmCard film={diary({ film: null })} now={now} /> },
   { name: "film-stale", item: <FilmCard film={diary({ updatedAt: daysAgo(61) })} now={now} /> },
+  { name: "film-long", item: <FilmCard film={diary({ film: { ...film, title: "The Assassination of Jesse James by the Coward Robert Ford", year: "2007", rating: 3.5, watchedOn: "2026-10-09" } })} now={now} /> },
   { name: "film-unrated", item: <FilmCard film={diary({ film: { ...film, rating: null, posterUrl: null } })} now={now} /> },
   { name: "making", item: <NowMakingCard latest={latest({})} /> },
   { name: "making-no-description", item: <NowMakingCard latest={latest({ repository: { ...repository, description: null } })} /> },

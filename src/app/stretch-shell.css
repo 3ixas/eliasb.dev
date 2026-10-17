@@ -1570,7 +1570,19 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
 .stretch-otc__film {
   grid-template-columns: minmax(0, 40%) minmax(0, 1fr);
   align-items: start;
+  /* Size to content: side by side, the shorter card doesn't stretch to the taller one's height. */
+  align-self: start;
   gap: 20px;
+}
+
+/* A film title stops at three lines; the whole title stays in the link. */
+.stretch-otc__film .stretch-otc__name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 .stretch-otc__text {
@@ -1744,10 +1756,6 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
 }
 
 .stretch-otc__clipping .stretch-otc__label {
-  color: var(--stretch-ink);
-  font-size: clamp(20px, 2vw, 24px);
-  font-weight: 700;
-  line-height: 1.35;
   border-bottom: 2px solid var(--stretch-cobalt);
   padding-bottom: 16px;
 }
@@ -1928,6 +1936,11 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   .stretch-gh__sheet {
     min-width: 700px;
   }
+
+  /* The edge the grid scrolls off fades, so a cut month label reads as the year continuing. */
+  .stretch-gh__scroll {
+    mask-image: linear-gradient(to right, transparent, #000 28px);
+  }
 }
 
 .stretch-gh__months,
@@ -1976,7 +1989,7 @@ button.stretch-gh__day[data-selected] {
 
 .stretch-gh__stretch {
   position: relative;
-  height: 32px;
+  height: 8px;
   margin-top: 8px;
 }
 
@@ -1989,12 +2002,15 @@ button.stretch-gh__day[data-selected] {
   border-radius: 0 0 4px 4px;
 }
 
+/* The caption sits outside the scroller, so it never scrolls or opens clipped; it leans toward the bracket's side. */
 .stretch-gh__note {
-  position: absolute;
-  top: 12px;
+  margin: 0;
   color: var(--stretch-muted);
   font-size: 12px;
-  white-space: nowrap;
+}
+
+.stretch-gh__note[data-align="end"] {
+  text-align: right;
 }
 
 .stretch-gh__foot {

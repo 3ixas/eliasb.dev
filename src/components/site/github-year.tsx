@@ -19,7 +19,7 @@ const grouped = (value: number) => String(Math.round(value)).replace(/\B(?=(\d{3
 /**
  * The GitHub year as squares in the site's ink, with the latest day in cobalt
  * and a bracket under the busiest four weeks. Hover, focus or tap a day to read
- * its count. On phones the grid scrolls inside its own card and opens on today.
+ * its count. On phones the grid scrolls inside its own card and opens on today, with its left edge faded and the caption pinned beneath it.
  */
 export function GitHubYear({ activity, total }: { activity: ActivityDay[]; total: number }) {
   const calendar = createContributionCalendar(activity);
@@ -110,16 +110,15 @@ export function GitHubYear({ activity, total }: { activity: ActivityDay[]; total
           {stretch && (
             <div className="stretch-gh__stretch" aria-hidden="true" data-busiest>
               <span className="stretch-gh__bracket" style={{ left: percent(stretch.column), width: percent(stretch.span) }} />
-              <span
-                className="stretch-mono stretch-gh__note"
-                style={before ? { right: `calc(100% - ${percent(stretch.column)} + 8px)` } : { left: `calc(${percent(stretch.column + stretch.span)} + 8px)` }}
-              >
-                {before ? copy.busiest(stretch.when) : copy.busiestAfter(stretch.when)}
-              </span>
             </div>
           )}
         </div>
       </div>
+      {stretch && (
+        <p className="stretch-mono stretch-gh__note" aria-hidden="true" data-align={before ? "end" : "start"}>
+          {before ? copy.busiest(stretch.when) : copy.busiestAfter(stretch.when)}
+        </p>
+      )}
       <p id={hintId} className="sr-only">
         {copy.keys}
       </p>
