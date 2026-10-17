@@ -128,6 +128,24 @@ test.describe("Work: Project index with a long catalogue", () => {
     expect(tops[1]).toBeLessThan(tops[2]);
   });
 
+  test("the resting screenshot sits at the top of the right column even when the first rows have none", async ({ page }) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 761, "Phones use inline thumbnails");
+    // Make a later row the first with a screenshot, as a catalogue whose leading rows lack one would.
+    await page.evaluate(() => {
+      document.querySelectorAll(".stretch-index__shot[data-resting]").forEach((shot) => shot.removeAttribute("data-resting"));
+      const later = document.querySelectorAll(".stretch-index__row")[4].querySelector(".stretch-index__shot");
+      later?.setAttribute("data-resting", "");
+    });
+    const resting = page.locator(".stretch-index__shot[data-resting]");
+    await expect(resting).toBeVisible();
+    await expect
+      .poll(async () => {
+        const [list, box] = await Promise.all([page.locator(".stretch-index__list").boundingBox(), resting.boundingBox()]);
+        return box!.y - list!.y;
+      })
+      .toBeLessThan(40);
+  });
+
   test("a row with a screenshot previews it on hover or shows a thumbnail on phones", async ({ page }) => {
     const shot = rows(page).first().locator(".stretch-index__shot");
     if (phone(page)) {

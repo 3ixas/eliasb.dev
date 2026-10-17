@@ -1136,6 +1136,17 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
     opacity: 1;
   }
 
+  /* The resting shot belongs to the list's stage, not to its row: when the first rows have no screenshot it still sits at the top of the right column. */
+  .stretch-index__row:has(> .stretch-index__link > .stretch-index__shot[data-resting]) {
+    position: static;
+  }
+
+  .stretch-index__list > .stretch-index__row .stretch-index__link .stretch-index__shot[data-resting] {
+    top: 20px;
+    bottom: auto;
+    translate: none;
+  }
+
   /* A selector list, not :is(), inside :has(): WebKit does not restyle on :is() there. */
   :where(.stretch-index__list:has(.stretch-index__link:hover, .stretch-index__link:focus-visible)) .stretch-index__shot[data-resting] {
     visibility: hidden;
