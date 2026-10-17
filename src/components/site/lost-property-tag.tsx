@@ -1,7 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import type { CSSProperties } from "react";
+import { useSyncExternalStore, type CSSProperties } from "react";
 import { tagSwing } from "@/components/site/signature-springs";
 import { notFound as copy } from "@/content/stretch/site-copy";
 
@@ -10,6 +9,11 @@ const SHORTEN_AT = 48;
 
 /** The tag swings in on the same spring from the first paint; the keyframes live in stretch-shell.css. */
 const springStyle = { "--tag-ease": tagSwing.easing, "--tag-ms": `${tagSwing.duration}ms` } as CSSProperties;
+
+const noSubscription = () => () => {};
+const requestPath = () => window.location.pathname;
+/** The static 404 page is built once, so the server cannot know the address: it sends none rather than a wrong one. */
+const unknownOnServer = () => null;
 
 /** The address asked for, shortened in the middle when it would run on. */
 function shortened(path: string) {
@@ -32,11 +36,11 @@ function shortened(path: string) {
  * string and settles at its resting tilt (`tagSwing`, a spring of bounce 0.4
  * and visual duration 0.6 s, which takes about 1.6 s to come to rest). The swing is CSS, played on the individual `rotate` property
  * from the hole the tag hangs by, so it starts at first paint and reduced
- * motion shows the tag at rest. The address is the request path, read from the
- * URL, so the server renders it too.
+ * motion shows the tag at rest. The address is the request path, read in the
+ * browser: the 404 is prerendered, so the HTML carries no address until then.
  */
 export function LostPropertyTag() {
-  const path = shortened(usePathname());
+  const path = useSyncExternalStore(noSubscription, requestPath, unknownOnServer);
   const { tag: words } = copy;
   return (
     <div className="stretch-404__hang">
@@ -49,7 +53,7 @@ export function LostPropertyTag() {
         <dl className="stretch-404__fields">
           <div>
             <dt className="stretch-mono">{words.item}</dt>
-            <dd className="stretch-404__address">{path}</dd>
+            <dd className="stretch-404__address">{path === null ? "" : shortened(path)}</dd>
           </div>
           <div>
             <dt className="stretch-mono">{words.foundAt}</dt>

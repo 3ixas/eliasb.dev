@@ -42,9 +42,11 @@ test.describe("The 404", () => {
       .toBe(true);
   });
 
-  test("the address is in the HTML the server sends, before any script runs", async ({ request }) => {
+  test("the prerendered HTML never names a wrong address", async ({ request }) => {
     const html = await (await request.get("/nothing-here/at-all")).text();
-    expect(html).toContain('<dd class="stretch-404__address">/nothing-here/at-all</dd>');
+    // The page is built once for every missing address, so the tag fills its address in the browser.
+    expect(html).not.toContain("_not-found</dd>");
+    expect(html).toContain("stretch-404__address");
   });
 
   test("a 100-character address is shortened in the middle and stays readable", async ({ page }) => {
