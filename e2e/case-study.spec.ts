@@ -203,6 +203,72 @@ for (const slug of slugs) {
   });
 }
 
+for (const slug of slugs) {
+  test.describe(`Case study opening: ${slug}`, () => {
+    // 761 to 1099 px is where the band's column is narrowest against its display title.
+    for (const width of [320, 390, 761, 820, 1000, 1099, 1440]) {
+      test(`the title breaks only between words at ${width} px`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(`/things-i-make/${slug}`);
+        const title = page.getByRole("heading", { level: 1 });
+        await expect(title).toBeVisible();
+        await page.evaluate(() => document.fonts.ready);
+        // A word never splits if the heading has no more lines than words and no word is wider than the heading.
+        await expect
+          .poll(() =>
+            title.evaluate((heading) => {
+              const words = heading.textContent!.trim().split(/\s+/);
+              const lineHeight = parseFloat(getComputedStyle(heading).lineHeight);
+              const lines = Math.round(heading.getBoundingClientRect().height / lineHeight);
+              const widest = Math.max(
+                ...words.map((word) => {
+                  const probe = document.createElement("span");
+                  probe.textContent = word;
+                  probe.style.cssText = "position:absolute;white-space:nowrap;visibility:hidden";
+                  heading.appendChild(probe);
+                  const wide = probe.getBoundingClientRect().width;
+                  probe.remove();
+                  return wide;
+                }),
+              );
+              return { lines: lines <= words.length, fits: widest <= heading.clientWidth + 0.5 };
+            }),
+          )
+          .toEqual({ lines: true, fits: true });
+      });
+    }
+  });
+
+  test.describe(`Case study section links: ${slug}`, () => {
+    for (const width of [390, 820]) {
+      test(`the six links sit in two columns, the first on the page gutter, at ${width} px`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(`/things-i-make/${slug}`);
+        const links = page.getByRole("navigation", { name: "Sections" }).getByRole("link");
+        await expect(links).toHaveCount(6);
+        // The page gutter: 16 px on a phone, wider on a tablet. The heading sits on it.
+        const gutter = Math.round((await page.getByRole("heading", { level: 1 }).boundingBox())!.x);
+        if (width === 390) expect(gutter).toBe(16);
+        await expect
+          .poll(async () => {
+            const boxes = await links.evaluateAll((items) =>
+              items.map((item) => {
+                const range = document.createRange();
+                range.selectNodeContents(item);
+                const text = range.getBoundingClientRect();
+                return { left: Math.round(text.left), top: Math.round(item.getBoundingClientRect().top) };
+              }),
+            );
+            const columns = new Set(boxes.map((box) => box.left));
+            const rows = new Set(boxes.map((box) => box.top));
+            return { columns: columns.size, rows: rows.size, first: boxes[0].left };
+          })
+          .toEqual({ columns: 2, rows: 3, first: gutter });
+      });
+    }
+  });
+}
+
 test("a slug with no case study is a 404", async ({ page }) => {
   expect(caseStudies).not.toHaveProperty("ask-professor-past");
   expect(projects.find((project) => project.slug === "ask-professor-past")?.links.caseStudy).toBeUndefined();

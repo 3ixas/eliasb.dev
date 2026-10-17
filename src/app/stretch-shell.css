@@ -2322,8 +2322,16 @@ button.stretch-gh__day[data-selected] {
   text-underline-offset: 4px;
 }
 
+/*
+ * The text column is a size container, so the title is sized to its column
+ * (--cs-name-fit) as well as to the viewport: 0.4em is a little over the
+ * widest a display letter runs, so the longest word fits and only ever breaks
+ * between words.
+ */
 .stretch-cs-open__text {
   min-width: 0;
+  container-type: inline-size;
+  --cs-name-fit: calc(100cqw / (var(--cs-name-chars, 1) * 0.4));
 }
 
 .stretch-cs-open__number {
@@ -2336,11 +2344,10 @@ button.stretch-gh__day[data-selected] {
 
 .stretch-cs-open__name {
   margin: 10px 0 0;
-  font-size: clamp(56px, 13vw, 128px);
+  font-size: min(clamp(56px, 13vw, 128px), var(--cs-name-fit));
   font-weight: 800;
   line-height: 0.9;
   letter-spacing: -0.015em;
-  overflow-wrap: anywhere;
 }
 
 .stretch-cs-open__outcome {
@@ -2465,6 +2472,23 @@ button.stretch-gh__day[data-selected] {
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 4px;
+}
+
+/*
+ * Phones and tablets: a fixed two-column grid instead of ragged wrapped rows.
+ * The links lose their side padding so the first label sits on the page gutter;
+ * each link still fills its grid cell, so the target stays large.
+ */
+@media (max-width: 899px) {
+  .stretch-cs-links-row ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 16px;
+  }
+
+  .stretch-cs-links-row a {
+    padding-inline: 0;
+  }
 }
 
 /* The reading column is about 720 px; figures and the evidence strip use the wider box. */
@@ -2599,7 +2623,7 @@ button.stretch-gh__day[data-selected] {
 
 /* A long employer name (Optegra's) is set smaller, so the band is not five lines of display type. */
 .stretch-cs-open__name.stretch-role-name--long {
-  font-size: clamp(36px, 7.5vw, 76px);
+  font-size: min(clamp(36px, 7.5vw, 76px), var(--cs-name-fit));
   line-height: 0.95;
 }
 
