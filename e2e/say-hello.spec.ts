@@ -102,6 +102,14 @@ test.describe("Say hello and the footer", () => {
 });
 
 // The invariant (#216): Say hello renders larger than the footer at every width, across the breakpoint too.
+// The sizes are the stylesheet's own scales: Say hello is clamp(56px, 11vw, 160px) (clamp(46px, 14.4vw, 56px) under 390 px); the footer is the smaller of 12vw (clamp(44px, 7vw, 104px) from 760 px) and 85% of Say hello.
+const clamp = (min: number, value: number, max: number) => Math.min(Math.max(value, min), max);
+const expectedSizes = (width: number) => {
+  const hello = width < 390 ? clamp(46, width * 0.144, 56) : clamp(56, width * 0.11, 160);
+  const own = width < 760 ? width * 0.12 : clamp(44, width * 0.07, 104);
+  return { hello, footer: Math.min(own, hello * 0.85) };
+};
+
 test.describe("Say hello against the footer at every width", () => {
   for (const width of [320, 390, 600, 759, 760, 820, 1100, 1440, 1920]) {
     test(`at ${width} px`, async ({ page }) => {
@@ -109,17 +117,43 @@ test.describe("Say hello against the footer at every width", () => {
       await page.goto("/");
       const sizes = () =>
         page.evaluate(() => [".stretch-hello__big", ".stretch-footer p"].map((selector) => parseFloat(getComputedStyle(document.querySelector(selector)!).fontSize)));
-      await expect.poll(async () => { const [hello, footer] = await sizes(); return hello > footer; }).toBe(true);
+      const expected = expectedSizes(width);
+      await expect.poll(async () => (await sizes()).map((size) => Math.round(size))).toEqual([Math.round(expected.hello), Math.round(expected.footer)]);
       const [hello, footer] = await sizes();
-      if (width === 390) {
-        expect(hello).toBeCloseTo(56, 0);
-        expect(footer).toBeCloseTo(46.8, 0);
-      }
-      if (width === 1440) {
-        expect(hello).toBeGreaterThan(150);
-        expect(footer).toBeCloseTo(100.8, 0);
-      }
+      expect(hello).toBeGreaterThan(footer);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     });
+  }
+});
+
+// #216: on a phone the Résumé, GitHub and LinkedIn links each stay a 44 px target, on one row.
+test("the link row at 390 px is one row of 44 px targets", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.goto("/");
+  const links = section(page).locator(".stretch-hello__link");
+  await expect(links).toHaveCount(3);
+  await expect.poll(async () => {
+    const boxes = await Promise.all((await links.all()).map((link) => link.boundingBox()));
+    return new Set(boxes.map((box) => Math.round(box!.y))).size;
+  }).toBe(1);
+  for (const link of await links.all()) expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+});
+
+// #216: the footer is on every page, so it must also fit on a page that is not the homepage.
+test.describe("The footer away from the homepage", () => {
+  for (const path of ["/things-i-make/threshold", "/this-page-does-not-exist"]) {
+    for (const width of [320, 390]) {
+      test(`${path} at ${width} px`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(path);
+        const footer = page.getByRole("contentinfo");
+        await expect(footer).toHaveText(siteCopy.footer);
+        await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        await expect.poll(async () => {
+          const box = await footer.locator("p").boundingBox();
+          return box !== null && box.x >= 0 && box.x + box.width <= width;
+        }).toBe(true);
+      });
+    }
   }
 });

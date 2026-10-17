@@ -937,42 +937,42 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
 }
 
 /*
- * Hover and keyboard focus: the screenshot straightens and the prop reacts.
+ * Hover and keyboard focus: the screenshot straightens and the prop reacts. The Next project tile shares these rules.
  * Hover only moves things where there is a real hover, so a tap on a phone
  * (or a return by the back button) never leaves a tile in its hover pose.
  */
 @media (prefers-reduced-motion: no-preference) {
-  .stretch-tile:focus-visible .stretch-tile__shot {
+  :is(.stretch-tile, .stretch-cs-next__tile):focus-visible .stretch-tile__shot {
     transform: rotate(0deg) translateY(-6px) scale(1.02);
   }
 
-  .stretch-tile:focus-visible .stretch-fastener--tape {
+  :is(.stretch-tile, .stretch-cs-next__tile):focus-visible .stretch-fastener--tape {
     animation: stretch-tape-lift 0.5s ease-out;
   }
 
-  .stretch-tile:focus-visible .stretch-fastener--paperclip {
+  :is(.stretch-tile, .stretch-cs-next__tile):focus-visible .stretch-fastener--paperclip {
     animation: stretch-clip-swing 0.55s ease-in-out;
   }
 
-  .stretch-tile:focus-visible .stretch-fastener--pin {
+  :is(.stretch-tile, .stretch-cs-next__tile):focus-visible .stretch-fastener--pin {
     animation: stretch-pin-press 0.35s ease-out;
   }
 }
 
 @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
-  .stretch-tile:hover .stretch-tile__shot {
+  :is(.stretch-tile, .stretch-cs-next__tile):hover .stretch-tile__shot {
     transform: rotate(0deg) translateY(-6px) scale(1.02);
   }
 
-  .stretch-tile:hover .stretch-fastener--tape {
+  :is(.stretch-tile, .stretch-cs-next__tile):hover .stretch-fastener--tape {
     animation: stretch-tape-lift 0.5s ease-out;
   }
 
-  .stretch-tile:hover .stretch-fastener--paperclip {
+  :is(.stretch-tile, .stretch-cs-next__tile):hover .stretch-fastener--paperclip {
     animation: stretch-clip-swing 0.55s ease-in-out;
   }
 
-  .stretch-tile:hover .stretch-fastener--pin {
+  :is(.stretch-tile, .stretch-cs-next__tile):hover .stretch-fastener--pin {
     animation: stretch-pin-press 0.35s ease-out;
   }
 }
@@ -982,7 +982,7 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
     transition: none;
   }
 
-  .stretch-tile:is(:hover, :focus-visible) .stretch-tile__shot {
+  :is(.stretch-tile, .stretch-cs-next__tile):is(:hover, :focus-visible) .stretch-tile__shot {
     transform: rotate(0deg);
   }
 }
@@ -3078,43 +3078,6 @@ button.stretch-gh__day[data-selected] {
   .stretch-cs-next__tile .stretch-tile__shot {
     flex: 1 1 0;
     margin-top: 0;
-  }
-}
-
-/* The screenshot straightens and the Fastener reacts on hover and focus, as on the Featured tile. */
-@media (prefers-reduced-motion: no-preference) {
-  .stretch-cs-next__tile:focus-visible .stretch-tile__shot {
-    transform: rotate(0deg) translateY(-6px) scale(1.02);
-  }
-
-  .stretch-cs-next__tile:focus-visible .stretch-fastener--tape {
-    animation: stretch-tape-lift 0.5s ease-out;
-  }
-
-  .stretch-cs-next__tile:focus-visible .stretch-fastener--paperclip {
-    animation: stretch-clip-swing 0.55s ease-in-out;
-  }
-
-  .stretch-cs-next__tile:focus-visible .stretch-fastener--pin {
-    animation: stretch-pin-press 0.35s ease-out;
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
-  .stretch-cs-next__tile:hover .stretch-tile__shot {
-    transform: rotate(0deg) translateY(-6px) scale(1.02);
-  }
-
-  .stretch-cs-next__tile:hover .stretch-fastener--tape {
-    animation: stretch-tape-lift 0.5s ease-out;
-  }
-
-  .stretch-cs-next__tile:hover .stretch-fastener--paperclip {
-    animation: stretch-clip-swing 0.55s ease-in-out;
-  }
-
-  .stretch-cs-next__tile:hover .stretch-fastener--pin {
-    animation: stretch-pin-press 0.35s ease-out;
   }
 }
 

@@ -124,6 +124,16 @@ for (const slug of slugs) {
           })
           .toBe(true);
         await expect(shot).not.toHaveCSS("transform", "none");
+      } else {
+        // On a phone the screenshot stacks below the text, and is still tilted.
+        const shot = tile.locator(".stretch-tile__shot");
+        await expect
+          .poll(async () => {
+            const [text, picture] = await Promise.all([tile.locator(".stretch-cs-next__text").boundingBox(), shot.boundingBox()]);
+            return picture!.y >= text!.y + text!.height;
+          })
+          .toBe(true);
+        await expect(shot).not.toHaveCSS("transform", "none");
       }
     });
 

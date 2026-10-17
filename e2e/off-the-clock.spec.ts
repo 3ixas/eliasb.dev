@@ -288,6 +288,8 @@ test.describe("Off the clock: Now making", () => {
 
 test.describe("Off the clock: card sizes and heading roles", () => {
   test.beforeEach(async ({ page }) => {
+    // The sizes below are the desktop ones: 40-56 px display, a two-column card.
+    await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/fixtures/off-the-clock");
   });
 
@@ -313,13 +315,16 @@ test.describe("Off the clock: card sizes and heading roles", () => {
     const font = (selector: string) =>
       layout.locator(selector).evaluate((el) => {
         const style = getComputedStyle(el);
-        return { size: style.fontSize, transform: style.textTransform, family: style.fontFamily };
+        return { size: style.fontSize, transform: style.textTransform, family: style.fontFamily, weight: style.fontWeight, stretch: style.fontStretch };
       });
     const book = await font("[data-otc='reading'] h3");
     expect(book.size).toBe("13px");
     expect(book.transform).toBe("uppercase");
     for (const item of ["film", "clipping", "making"]) expect(await font(`[data-otc='${item}'] h3`)).toEqual(book);
-    expect((await font("[data-otc='training'] h3")).size).not.toBe("13px");
+    // The leading card's heading is the display role: Bricolage Grotesque condensed and extra-bold, at the title size (56 px at 1440).
+    const leading = await font("[data-otc='training'] h3");
+    expect(leading).toMatchObject({ size: "56px", transform: "uppercase", weight: "800", stretch: "75%" });
+    expect(leading.family).not.toBe(book.family);
   });
 });
 

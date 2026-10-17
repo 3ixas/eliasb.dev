@@ -4,7 +4,10 @@ import { siteCopy } from "@/content/stretch/site-copy";
 
 const springStyle = { "--fill-ease": nameFill.easing, "--fill-ms": `${nameFill.duration}ms` } as CSSProperties;
 
-const [made, name] = [siteCopy.footer.replace(/ Elias$/, ""), "Elias"];
+// The footer line is "Made by Elias": the name is its last word and gets the fill. Fail loudly if the copy stops ending in it.
+const name = "Elias";
+if (!siteCopy.footer.endsWith(` ${name}`)) throw new Error(`siteCopy.footer must end in " ${name}", got "${siteCopy.footer}"`);
+const made = siteCopy.footer.slice(0, -name.length - 1);
 
 /**
  * The footer on every page: "Made by Elias" in the name's condensed display

@@ -242,6 +242,35 @@ for (const slug of roleStorySlugs) {
       await expect(page.locator("section#what-i-took-with-me")).toBeInViewport();
     });
 
+    // #219: the title and the section links share the case study's rules, so a long employer name (Optegra's) must not split mid-word either.
+    for (const width of [320, 390, 820]) {
+      test(`the title and the section links break only between words at ${width} px`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(`/work/${slug}`);
+        await page.evaluate(() => document.fonts.ready);
+        // A word never splits if no word is wider than the box that holds it (a link is inline, so its list item is the box).
+        const widestWordFits = (element: Element) => {
+          const holder = getComputedStyle(element).display === "inline" ? element.parentElement! : element;
+          const widest = Math.max(
+            ...element.textContent!.trim().split(/\s+/).map((word) => {
+              const probe = document.createElement("span");
+              probe.textContent = word;
+              probe.style.cssText = "position:absolute;white-space:nowrap;visibility:hidden";
+              element.appendChild(probe);
+              const wide = probe.getBoundingClientRect().width;
+              probe.remove();
+              return wide;
+            }),
+          );
+          return widest <= holder.clientWidth + 0.5;
+        };
+        await expect.poll(() => page.getByRole("heading", { level: 1 }).evaluate(widestWordFits)).toBe(true);
+        const links = page.getByRole("navigation", { name: "Sections" }).getByRole("link");
+        await expect(links).toHaveCount(roleStorySectionKeys.length);
+        for (const link of await links.all()) await expect.poll(() => link.evaluate(widestWordFits)).toBe(true);
+      });
+    }
+
     test("section copy is the approved copy", async ({ page }) => {
       for (const key of roleStorySectionKeys) {
         const { heading, paragraphs, points } = story.sections[key];

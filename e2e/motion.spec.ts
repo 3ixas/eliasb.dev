@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { tagSwing } from "../src/components/site/signature-springs";
+import { nameFill, tagSwing } from "../src/components/site/signature-springs";
 
 // Motion that is not the entrance: scroll sway, and hover that only moves things where there is a hover.
 const tile = (page: Page) => page.locator("#things-i-make .stretch-tile").first();
@@ -416,14 +416,16 @@ test.describe("Footer name fill", () => {
       await filled(page).toContain("100%");
     });
 
-    test("it runs on the nameFill spring over about 0.7 s", async ({ page }) => {
+    test("it runs on the nameFill spring", async ({ page }) => {
       await page.goto("/");
-      const timing = await page.locator(".stretch-footer__name").evaluate((el) => {
-        const style = getComputedStyle(el, "::after");
-        return { duration: style.transitionDuration, easing: style.transitionTimingFunction };
-      });
-      expect(parseFloat(timing.duration) * 1000).toBeGreaterThan(600);
-      expect(timing.easing).toContain("linear(");
+      const timing = () =>
+        page.locator(".stretch-footer__name").evaluate((el) => {
+          const style = getComputedStyle(el, "::after");
+          return { duration: parseFloat(style.transitionDuration) * 1000, easing: style.transitionTimingFunction };
+        });
+      // The transition lasts the spring's whole settle time (the spring's 0.7 s is its visual duration, which spring.ts stretches to settle), so it is the spring's own value, not a loose lower bound.
+      await expect.poll(async () => (await timing()).duration, { timeout: 5000 }).toBeCloseTo(nameFill.duration, 0);
+      await expect.poll(async () => (await timing()).easing).toContain("linear(");
     });
 
     test("it fills while a Say hello link has keyboard focus, and not for the footer text itself", async ({ page, browserName }) => {
