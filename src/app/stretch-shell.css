@@ -2852,8 +2852,9 @@ button.stretch-gh__day[data-selected] {
 
 .stretch-cs-next__tile {
   position: relative;
-  display: grid;
-  gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
   min-height: 44px;
   padding: 28px 24px;
   border: 1px solid var(--stretch-tile-edge);
@@ -2861,6 +2862,14 @@ button.stretch-gh__day[data-selected] {
   background-color: var(--cs-field);
   color: var(--cs-ink);
   text-decoration: none;
+  /* The Featured tile's screenshot and Fasteners, tilted the same way. */
+  --tile-tilt: -1deg;
+}
+
+.stretch-cs-next__text {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
 }
 
 .stretch-cs-next__label {
@@ -2901,7 +2910,56 @@ button.stretch-gh__day[data-selected] {
 
 @media (min-width: 761px) {
   .stretch-cs-next__tile {
+    flex-direction: row;
+    align-items: center;
+    gap: 40px;
     padding: 40px;
+  }
+
+  .stretch-cs-next__text:has(~ .stretch-tile__shot) {
+    flex: 0 1 42%;
+  }
+
+  .stretch-cs-next__tile .stretch-tile__shot {
+    flex: 1 1 0;
+    margin-top: 0;
+  }
+}
+
+/* The screenshot straightens and the Fastener reacts on hover and focus, as on the Featured tile. */
+@media (prefers-reduced-motion: no-preference) {
+  .stretch-cs-next__tile:focus-visible .stretch-tile__shot {
+    transform: rotate(0deg) translateY(-6px) scale(1.02);
+  }
+
+  .stretch-cs-next__tile:focus-visible .stretch-fastener--tape {
+    animation: stretch-tape-lift 0.5s ease-out;
+  }
+
+  .stretch-cs-next__tile:focus-visible .stretch-fastener--paperclip {
+    animation: stretch-clip-swing 0.55s ease-in-out;
+  }
+
+  .stretch-cs-next__tile:focus-visible .stretch-fastener--pin {
+    animation: stretch-pin-press 0.35s ease-out;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  .stretch-cs-next__tile:hover .stretch-tile__shot {
+    transform: rotate(0deg) translateY(-6px) scale(1.02);
+  }
+
+  .stretch-cs-next__tile:hover .stretch-fastener--tape {
+    animation: stretch-tape-lift 0.5s ease-out;
+  }
+
+  .stretch-cs-next__tile:hover .stretch-fastener--paperclip {
+    animation: stretch-clip-swing 0.55s ease-in-out;
+  }
+
+  .stretch-cs-next__tile:hover .stretch-fastener--pin {
+    animation: stretch-pin-press 0.35s ease-out;
   }
 }
 

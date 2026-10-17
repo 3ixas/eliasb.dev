@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
-import type { Fastener, Project } from "@/content/projects";
+import type { Fastener, Project, ProjectImage } from "@/content/projects";
 
 /** Alternate the screenshot's tilt, inside the spec's ±1 to 1.5 degrees. */
 const tilts = ["-1.5deg", "1deg", "-1deg"] as const;
@@ -8,7 +8,7 @@ const tilts = ["-1.5deg", "1deg", "-1deg"] as const;
 const number = (position: number) => String(position + 1).padStart(2, "0");
 
 /** The one small prop on a tile's edge; decorative, so hidden from assistive technology. */
-function FastenerProp({ kind }: { kind: Fastener }) {
+export function FastenerProp({ kind }: { kind: Fastener }) {
   if (kind === "paperclip") {
     return (
       <svg className="stretch-fastener stretch-fastener--paperclip" aria-hidden="true" width="34" height="86" viewBox="0 0 34 86" fill="none" stroke="#b8babd" strokeWidth="3" strokeLinecap="round">
@@ -18,6 +18,15 @@ function FastenerProp({ kind }: { kind: Fastener }) {
     );
   }
   return <span className={`stretch-fastener stretch-fastener--${kind}`} aria-hidden="true" />;
+}
+
+/** A project's screenshot as a tile shows it: tilted by the tile's --tile-tilt, with its shadow. */
+export function TileShot({ screenshot, sizes }: { screenshot: ProjectImage; sizes: string }) {
+  return (
+    <div className="stretch-tile__shot">
+      <Image src={screenshot.src} alt={screenshot.alt} width={screenshot.width} height={screenshot.height} sizes={sizes} />
+    </div>
+  );
 }
 
 /**
@@ -54,15 +63,7 @@ export function FeaturedTiles({ projects }: { projects: readonly Project[] }) {
                   {project.type} · {project.year}
                 </p>
               </div>
-              <div className="stretch-tile__shot">
-                <Image
-                  src={screenshot.src}
-                  alt={screenshot.alt}
-                  width={screenshot.width}
-                  height={screenshot.height}
-                  sizes="(max-width: 760px) 90vw, (max-width: 1400px) 50vw, 640px"
-                />
-              </div>
+              <TileShot screenshot={screenshot} sizes="(max-width: 760px) 90vw, (max-width: 1400px) 50vw, 640px" />
             </a>
           </li>
         );

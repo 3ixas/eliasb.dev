@@ -9,6 +9,7 @@ import {
   StorySectionLinks,
   storyColours,
 } from "@/components/site/story";
+import { FastenerProp, TileShot } from "@/components/site/featured-tiles";
 import { SubpageHeader } from "@/components/site/subpage-header";
 import { projects, type Project } from "@/content/projects";
 import { caseStudies } from "@/content/stretch/case-studies";
@@ -169,6 +170,8 @@ function Prd({ study }: { study: CaseStudy }) {
 
 function NextProject({ next }: { next: ReturnType<typeof nextProject> }) {
   const { project, colours } = next;
+  const { screenshot, fastener } = project;
+  if (!screenshot || !fastener) throw new Error(`Case study "${project.slug}" is a next project, so it needs a screenshot and a fastener.`);
   return (
     <StoryNext
       label={caseStudyCopy.nextProject}
@@ -177,6 +180,8 @@ function NextProject({ next }: { next: ReturnType<typeof nextProject> }) {
       number={next.number}
       name={project.name}
       outcome={project.outcome}
+      fastener={<FastenerProp kind={fastener} />}
+      shot={<TileShot screenshot={screenshot} sizes="(max-width: 760px) calc(100vw - 80px), 520px" />}
     />
   );
 }
