@@ -2351,6 +2351,7 @@ button.stretch-gh__day[data-selected] {
 /* One plain row of text links divided by hairlines. */
 .stretch-hello__links {
   display: flex;
+  flex-wrap: wrap; /* one row at every width by default; wraps only when a visitor widens text spacing */
   margin: 0;
   padding: 0;
   list-style: none;
