@@ -106,13 +106,16 @@ for (const slug of slugs) {
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(next.name);
     });
 
-    test("the Next project tile carries the next project's screenshot, tilted, with one Fastener", async ({ page }) => {
+    test("the Next project tile carries the next project's screenshot, tilted, with its one Fastener if it has one", async ({ page }) => {
       const tile = page.getByRole("region", { name: "Next project" }).getByRole("link");
       const next = projects.find((entry) => entry.slug === study.next)!;
       await expect(tile.locator("img")).toHaveAttribute("alt", next.screenshot!.alt);
-      await expect(tile.locator(".stretch-fastener")).toHaveCount(1);
-      await expect(tile.locator(".stretch-fastener")).toHaveClass(new RegExp(`stretch-fastener--${next.fastener}`));
-      await expect(tile.locator(".stretch-fastener")).toHaveAttribute("aria-hidden", "true");
+      // A project without a Fastener is valid in the catalogue, so the tile then carries none.
+      await expect(tile.locator(".stretch-fastener")).toHaveCount(next.fastener ? 1 : 0);
+      if (next.fastener) {
+        await expect(tile.locator(".stretch-fastener")).toHaveClass(new RegExp(`stretch-fastener--${next.fastener}`));
+        await expect(tile.locator(".stretch-fastener")).toHaveAttribute("aria-hidden", "true");
+      }
       await expect(tile).toHaveAttribute("href", `/things-i-make/${study.next}`);
       if ((page.viewportSize()?.width ?? 0) > 760) {
         // From 761 px the screenshot sits on the right of the text, at a slight tilt.
