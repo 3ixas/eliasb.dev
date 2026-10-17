@@ -147,6 +147,7 @@ for (const { source } of headed.bars) {
 assert.deepEqual(headedProblems(headed.bars), []);
 assert.match(headedProblems([{ ...headed.bars[0], soFar: { ...headed.bars[0].soFar, restates: ["decided what the engineers built next"] } }])[0], /Judgement bar.*decided what the engineers built next/);
 assert.match(headedProblems([{ ...headed.bars[2], soFar: { ...headed.bars[2].soFar, restates: ["58 user stories"] } }])[0], /Range bar.*58 user stories/);
+assert.match(headedProblems([{ ...headed.bars[2], soFar: { ...headed.bars[2].soFar, text: "Threshold, a live site." } }])[0], /Range bar.*no longer shows "57 user stories"/);
 // The rail hangs every Role story once, the current one first and the rest returned.
 assert.deepEqual([...work.rail.map((pass) => pass.slug)].sort(), [...roleStorySlugs].sort(), "The Work rail hangs every Role story exactly once");
 assert.deepEqual(work.rail.map((pass) => pass.state), ["current", ...work.rail.slice(1).map(() => "returned")], "The Work rail starts with the one current pass, then the returned ones");

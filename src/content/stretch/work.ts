@@ -70,11 +70,22 @@ export function shownSource(source: HeadedSource): ShownSource {
   };
 }
 
-/** Bars whose "So far" does not restate a fact in their source, as messages naming the bar; empty when valid. */
+/** The words that carry a phrase: figures and words of four letters or more. */
+const keyWords = (text: string) => text.toLowerCase().match(/\d+|[a-z]{4,}/g) ?? [];
+
+/**
+ * Bars whose "So far" does not restate a fact in its source, as messages naming the bar; empty when valid.
+ * Each phrase must be in the source, and the shown line must keep a key word of it, so the claim cannot drift from the phrases that check it.
+ */
 export function headedProblems(bars: readonly HeadedBar[]): string[] {
   return bars.flatMap((bar) => {
-    const text = shownSource(bar.source).text.toLowerCase();
-    return bar.soFar.restates.filter((phrase) => !text.includes(phrase.toLowerCase())).map((phrase) => `Where I’m headed: the ${bar.label} bar’s "So far" restates "${phrase}", which its source does not say.`);
+    const source = shownSource(bar.source).text.toLowerCase();
+    const shown = new Set(keyWords(bar.soFar.text));
+    return bar.soFar.restates.flatMap((phrase) => {
+      if (!source.includes(phrase.toLowerCase())) return [`Where I’m headed: the ${bar.label} bar’s "So far" restates "${phrase}", which its source does not say.`];
+      if (!keyWords(phrase).some((word) => shown.has(word))) return [`Where I’m headed: the ${bar.label} bar’s "So far" no longer shows "${phrase}", which is what checks it.`];
+      return [];
+    });
   });
 }
 
