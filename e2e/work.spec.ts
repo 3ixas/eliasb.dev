@@ -6,6 +6,8 @@ import { passLinkLabel, passRecords, passStatus } from "../src/content/stretch/s
 import { shownLink, work } from "../src/content/stretch/work";
 import { contrastOnPaper } from "./support/contrast";
 
+/** BNP's award pins that lead into its Role story. */
+const pinLinks = (passRecords["bnp-paribas"].pins ?? []).filter((pin) => pin.href);
 const currentProofs = work.rail.flatMap((pass) => (pass.state === "current" ? pass.proofs : []));
 const section = (page: Page) => page.locator("section#work");
 const rail = (page: Page) => section(page).locator(".stretch-work__rail");
@@ -59,15 +61,15 @@ test.describe("Work", () => {
       await expect(pass(page, slug).locator(`a[href="/work/${slug}"]`)).toHaveCount(1);
       await expect(pass(page, slug).locator(".stretch-pass__card")).toHaveJSProperty("tagName", "A");
     }
-    // The only other link on a pass is the Take Ownership pin, below.
-    await expect(pass(page, "bnp-paribas").getByRole("link")).toHaveCount(2);
+    // The only other links on a pass are its award pins, below.
+    await expect(pass(page, "bnp-paribas").getByRole("link")).toHaveCount(1 + pinLinks.length);
     await expect(pass(page, "joveen").getByRole("link")).toHaveCount(1);
     await expect(pass(page, "optegra").getByRole("link")).toHaveCount(1);
     const [joveen, optegra] = await Promise.all((["joveen", "optegra"] as const).map(async (slug) => (await boxOf(pass(page, slug).locator(".stretch-pass__strap"))).height));
     expect(joveen).not.toBeCloseTo(optegra, 0);
   });
 
-  test("the awards are three pins of readable text on BNP's lanyard; Take Ownership leads to the certificate", async ({ page }) => {
+  test("the awards are three pins of readable text on BNP's lanyard, each leading into the Role story", async ({ page }) => {
     const pins = pass(page, "bnp-paribas").getByRole("list", { name: "Awards" }).getByRole("listitem");
     await expect(pins).toHaveCount(3);
     for (const [index, pin] of (passRecords["bnp-paribas"].pins ?? []).entries()) {
@@ -77,8 +79,10 @@ test.describe("Work", () => {
     }
     await expect(section(page).locator(".stretch-pass__pins")).toHaveCount(1);
     await expect(pins.locator("img, svg, canvas")).toHaveCount(0);
-    await expect(pins.getByRole("link")).toHaveCount(1);
-    await expect(pins.nth(1).getByRole("link")).toHaveAttribute("href", "/work/bnp-paribas#take-ownership-certificate");
+    await expect(pins.getByRole("link")).toHaveCount(pinLinks.length);
+    for (const [index, pin] of (passRecords["bnp-paribas"].pins ?? []).entries()) {
+      if (pin.href) await expect(pins.nth(index).getByRole("link")).toHaveAttribute("href", pin.href);
+    }
   });
 
   test("History is a dashed note under the passes, not a pass, and Now and How I got here no longer render as text", async ({ page }) => {
@@ -187,8 +191,8 @@ test.describe("Work", () => {
   test("it is in the server-rendered page", async ({ page }) => {
     await page.route("**/*.js", (route) => route.abort());
     await page.reload();
-    // Three passes, the Take Ownership pin, and the three strands.
-    await expect(section(page).getByRole("link")).toHaveCount(3 + 1 + work.headed.strands.length);
+    // Three passes, the three award pins, and the three strands.
+    await expect(section(page).getByRole("link")).toHaveCount(3 + pinLinks.length + work.headed.strands.length);
     await expect(section(page)).toContainText(currentProofs[0]);
   });
 

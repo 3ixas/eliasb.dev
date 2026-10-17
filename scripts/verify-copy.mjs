@@ -226,7 +226,7 @@ assert.deepEqual(roles.map((story) => story.slug), ["bnp-paribas", "joveen", "op
 assert.deepEqual(roles.map((story) => story.next), ["joveen", "optegra", null], "Next role follows the order, and Optegra ends on ← Work");
 assert.deepEqual(roles.map((story) => story.number), ["01", "02", "03"]);
 const [bnp, ...rest] = roles;
-assert.match(roleStoryProblems([{ ...bnp, evidence: [...bnp.evidence, bnp.evidence[0]] }, ...rest])[0], /more than 4 evidence/);
+assert.match(roleStoryProblems([{ ...bnp, evidence: Array(5).fill(bnp.evidence[0]) }, ...rest])[0], /more than 4 evidence/);
 assert.match(roleStoryProblems([{ ...bnp, next: "bnp-paribas" }, ...rest])[0], /different Role story or none/);
 assert.match(roleStoryProblems([{ ...bnp, next: "ghost" }, ...rest])[0], /different Role story or none/);
 assert.match(roleStoryProblems([{ ...bnp, sections: { ...bnp.sections, decisions: {} } }, ...rest])[0], /empty "decisions" section/);

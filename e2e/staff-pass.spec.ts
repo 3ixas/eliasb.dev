@@ -2,6 +2,9 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { roleStories } from "../src/content/stretch/role-stories";
 import { passLinkLabel, passRecords, passStatus } from "../src/content/stretch/staff-pass";
 
+/** BNP's award pins that lead into its Role story: the only links on its pass besides the pass itself. */
+const pinLinks = (passRecords["bnp-paribas"].pins ?? []).filter((pin) => pin.href).length;
+
 // The Staff pass in every state, on its fixture route, before any section uses it.
 const fixture = (page: Page, name: string) => page.locator(`[data-fixture="${name}"]`);
 const hang = (page: Page, name: string) => fixture(page, name).locator(".stretch-pass");
@@ -80,7 +83,7 @@ test.describe("Staff pass", () => {
       const pass = hang(page, name);
       // The pass is one link to its story; the only other link on a pass is a pin that leads to its evidence.
       await expect(pass.locator(`a[href="/work/${slug}"]`)).toHaveCount(1);
-      await expect(pass.getByRole("link")).toHaveCount(name === "current" ? 2 : 1);
+      await expect(pass.getByRole("link")).toHaveCount(name === "current" ? 1 + pinLinks : 1);
     }
 
     const pass = hang(page, "current");
@@ -98,9 +101,9 @@ test.describe("Staff pass", () => {
   });
 
   test("an opening pass and the self-issued pass are not links to a story", async ({ page }) => {
-    // The opening pass's pin still leads to its evidence, inside the story it opens.
+    // The opening pass's pins still lead to their evidence, inside the story it opens.
     await expect(hang(page, "opening").locator('a[href="/work/bnp-paribas"]')).toHaveCount(0);
-    await expect(hang(page, "opening").getByRole("link")).toHaveCount(1);
+    await expect(hang(page, "opening").getByRole("link")).toHaveCount(pinLinks);
     await expect(hang(page, "opening").locator(".stretch-pass__foot")).not.toContainText("story");
     await expect(hang(page, "self-issued").getByRole("link")).toHaveCount(0);
   });

@@ -76,8 +76,6 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
     },
     evidence: [
       { value: "Nov 2025", label: "won the Early Careers digitisation competition" },
-      { value: "Q1 2026", label: "Take Ownership award" },
-      { value: "Spring 2026", label: "nominated AI Champion" },
       { value: "6", label: "months from zero C# to production code" },
     ],
     // BNP's green, as a hue only (no logo). The light field takes near-black ink (5.0:1);

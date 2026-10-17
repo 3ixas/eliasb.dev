@@ -148,6 +148,22 @@ test.describe("Staff pass lean", () => {
     expect(await resting(passAt(page, "current"))).toBeCloseTo(-1, 1);
   });
 
+  test("the pass that opens a Role story leans as it does on Work", async ({ page, browserName }) => {
+    test.skip(browserName !== "chromium", "Pointer sampling, Chromium");
+    await page.goto("/work/bnp-paribas");
+    const pass = page.locator(".stretch-cs-open .stretch-pass");
+    await expect(pass).toHaveAttribute("data-lean", "");
+    const samples = await leanSamples(page, pass, 1500);
+    const at = (from: number, to: number) => samples.filter(([time]) => time >= from && time <= to).map(([, angle]) => angle);
+    const kick = Math.max(...at(0, 250));
+    expect(kick, "it leans").toBeGreaterThan(2);
+    expect(kick, "by no more than the kick").toBeLessThanOrEqual(4.01);
+    expect(Math.min(...at(250, 1200)), "and swings back past rest").toBeLessThan(-0.05);
+    expect(Math.abs(samples.at(-1)![1]), "and settles").toBeLessThanOrEqual(0.2 * kick);
+    // The same resting tilt as on Work.
+    expect(await resting(pass)).toBeCloseTo(-1, 1);
+  });
+
   test("the self-issued pass never leans, and an opening pass that does not lean stays put", async ({ page, browserName }) => {
     test.skip(browserName !== "chromium", "Pointer sampling, Chromium");
     await page.goto(passFixture);

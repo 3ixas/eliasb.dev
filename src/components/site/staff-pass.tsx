@@ -12,7 +12,8 @@ import { passLinkLabel, passRecords, passStatus, type PassPin, type PassState } 
  * An employer's Staff pass (GLOSSARY.md): the current one, or a returned one.
  * It links to the employer's Role story when `linked`, and is the opening
  * object of that story when it is not. `lean` hangs it on the lanyard that
- * leans away from the pointer (a pendulum on touch); `pins` wears the awards.
+ * leans away from the pointer (a pendulum on touch); `pins` wears the awards;
+ * `onBand` hangs it in its own colour band, in the other theme's pair.
  */
 export type EmployerPassProps = {
   slug: RoleStorySlug;
@@ -23,6 +24,11 @@ export type EmployerPassProps = {
   linked: boolean;
   pins: boolean;
   lean: boolean;
+  /**
+   * Hung in a band of its own Employer colour, as on its Role story: the pass
+   * wears the other theme's pair so it stands off the band, with a faint ink edge.
+   */
+  onBand?: boolean;
   /** Extra lines under the headline number, such as the current role's proofs. */
   children?: ReactNode;
 };
@@ -46,12 +52,13 @@ export function StaffPass(props: EmployerPassProps | SelfIssuedPassProps) {
 /** The lanyard's easing is the same spring the lean plays, so focus straightens the pass the same way. */
 const springStyle = { "--pass-ease": passLean.easing, "--pass-ease-ms": `${passLean.duration}ms` };
 
-function EmployerPass({ slug, state, size, tilt, linked, pins, lean, children }: EmployerPassProps) {
+function EmployerPass({ slug, state, size, tilt, linked, pins, lean, onBand = false, children }: EmployerPassProps) {
   const story = roleStories[slug];
   const record = passRecords[slug];
-  const { field, ink, swatch } = roleStoryColours(story.colours);
+  const { light, dark } = story.colours;
+  const { field, ink, swatch } = roleStoryColours(onBand ? { light: dark, dark: light } : story.colours);
   const style = { ...springStyle, "--pass-field": field, "--pass-ink": ink, "--pass-swatch": swatch, "--pass-rest": `${tilt}deg` } as CSSProperties;
-  const className = `stretch-pass stretch-pass--${size}`;
+  const className = `stretch-pass stretch-pass--${size}${onBand ? " stretch-pass--on-band" : ""}`;
 
   const card = (
     <>

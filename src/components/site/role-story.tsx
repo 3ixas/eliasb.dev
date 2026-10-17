@@ -8,6 +8,7 @@ import {
   StorySectionLinks,
   storyColours,
 } from "@/components/site/story";
+import { StaffPass } from "@/components/site/staff-pass";
 import { SubpageHeader } from "@/components/site/subpage-header";
 import { roleStories } from "@/content/stretch/role-stories";
 import {
@@ -21,17 +22,20 @@ import {
   type RoleStory,
 } from "@/content/stretch/role-story";
 import { siteCopy } from "@/content/stretch/site-copy";
+import { railPass } from "@/content/stretch/work";
 
 /**
  * A Role story (GLOSSARY.md): the same shape as a case study, for an employer.
- * An opening band in the employer's colour, the row of section links, a neutral
- * reading column with the six sections in their fixed order, and the evidence
- * strip under What changed, and it ends on the Next role tile or, on the last
- * story, "← Work". It has no entrance, the server renders all of it, and the
- * only cobalt on the page is the focus ring and selection.
+ * An opening band in the employer's colour with the employer's Staff pass hung
+ * in it, the row of section links, a neutral reading column with the six
+ * sections in their fixed order, and the evidence strip under What changed, and
+ * it ends on the Next role tile or, on the last story, "← Work". It has no
+ * entrance, the server renders all of it, and the only cobalt on the page is the
+ * focus ring, selection and the pass's award pins.
  */
 export function RoleStoryPage({ story }: { story: RoleStory }) {
   const colours = roleStoryColours(story.colours);
+  const { state, tilt } = railPass(story.slug);
 
   return (
     <div data-stretch-shell data-role-story={story.slug}>
@@ -51,7 +55,11 @@ export function RoleStoryPage({ story }: { story: RoleStory }) {
             name={story.employer}
             nameClassName={hasLongEmployer(story) ? "stretch-role-name--long" : undefined}
             lead={story.role}
-            aside={null}
+            aside={
+              <div className="stretch-role-pass">
+                <StaffPass slug={story.slug} state={state} size="lg" tilt={tilt} linked={false} pins lean onBand />
+              </div>
+            }
           >
             <p className="stretch-mono stretch-cs-open__meta">{roleStoryMetadata(story)}</p>
           </StoryOpening>
