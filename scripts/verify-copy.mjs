@@ -112,6 +112,9 @@ const rows = (text, heading) => {
 // How I work.
 const beats = rows(raw, "## How I work");
 assert.equal(beats.length, 3);
+// The pen underlines a phrase of each proof, so the phrase must be in the proof word for word.
+for (const beat of howIWork.beats) assert.ok(beat.proof.includes(beat.underline), `How I work: "${beat.habit}" has no "${beat.underline}" in its proof to underline`);
+assert.equal(howIWork.beats.filter((beat) => beat.arrowToCard).length, 1, "How I work: exactly one beat points at the PRD card");
 assert.deepEqual(
   howIWork.beats.map((beat) => [`**${beat.habit}**`, beat.proof]),
   beats,
