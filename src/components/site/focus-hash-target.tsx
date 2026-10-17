@@ -32,11 +32,18 @@ export function FocusHashTarget() {
       focusWhenReady(() => id);
     };
 
+    // Back and Forward change the fragment without a click.
+    const onHistory = () => focusWhenReady(hashOfUrl);
+
     focusWhenReady(hashOfUrl);
     document.addEventListener("click", onClick);
+    window.addEventListener("hashchange", onHistory);
+    window.addEventListener("popstate", onHistory);
     return () => {
       cancelAnimationFrame(frame);
       document.removeEventListener("click", onClick);
+      window.removeEventListener("hashchange", onHistory);
+      window.removeEventListener("popstate", onHistory);
     };
   }, []);
 

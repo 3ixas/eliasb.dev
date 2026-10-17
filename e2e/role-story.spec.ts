@@ -128,6 +128,16 @@ for (const slug of roleStorySlugs) {
           await expect(page.locator(`#${id}`)).toBeFocused();
         }
       });
+
+      test("Back and Forward between pin targets carry focus with them", async ({ page }) => {
+        const links = page.getByRole("region", { name: "Overview" }).getByRole("list", { name: "Awards" }).getByRole("link");
+        await links.first().click();
+        await expect(page.locator("#what-changed")).toBeFocused();
+        await links.last().click();
+        await expect(page.locator("#what-i-took-with-me")).toBeFocused();
+        await page.goBack();
+        await expect(page.locator("#what-changed")).toBeFocused();
+      });
     } else {
       test("the pass wears no pins", async ({ page }) => {
         await expect(page.getByRole("region", { name: "Overview" }).getByRole("list", { name: "Awards" })).toHaveCount(0);
