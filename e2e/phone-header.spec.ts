@@ -152,15 +152,17 @@ for (const width of [760, 761, 820, 899, 900, 901]) {
     const context = await browser.newContext({ viewport: { width, height: 900 } });
     const page = await context.newPage();
     await page.goto("/");
-    const rows = await header(page).evaluate((element) => {
-      const tops = [...element.querySelectorAll<HTMLElement>(".stretch-header__inner p, .stretch-header__inner a, .stretch-header__inner button")]
-        .filter((child) => child.checkVisibility() && !child.matches(".stretch-skip"))
-        .map((child) => Math.round(child.getBoundingClientRect().top));
-      return { tops: new Set(tops).size, height: element.getBoundingClientRect().height };
-    });
-    expect(rows.height, "header height").toBeLessThanOrEqual(80);
+    // The visible controls depend on hydration, so read the header until it settles.
+    const rows = () =>
+      header(page).evaluate((element) => {
+        const tops = [...element.querySelectorAll<HTMLElement>(".stretch-header__inner p, .stretch-header__inner a, .stretch-header__inner button")]
+          .filter((child) => child.checkVisibility() && !child.matches(".stretch-skip"))
+          .map((child) => Math.round(child.getBoundingClientRect().top));
+        return { tops: new Set(tops).size, height: element.getBoundingClientRect().height };
+      });
+    await expect.poll(async () => (await rows()).height, { message: "header height" }).toBeLessThanOrEqual(80);
     if (width < 900) {
-      expect(rows.tops, "the theme button and Menu share a row").toBe(1);
+      await expect.poll(async () => (await rows()).tops, { message: "the theme button and Menu share a row" }).toBe(1);
       await expect(menuButton(page)).toBeVisible();
       await expect(page.locator("[data-greeting]:visible")).toHaveCount(0);
     } else {

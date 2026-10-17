@@ -81,10 +81,14 @@ test.describe("How I work", () => {
     await expect(arrow).toHaveCount(1);
     if ((page.viewportSize()?.width ?? 0) < 761) return expect(arrow).toBeHidden();
     await expect(arrow).toBeVisible();
-    const from = await arrow.boundingBox();
-    const card = await section(page).locator(".stretch-prd").boundingBox();
-    expect(from!.x + from!.width, "the arrow ends at the card, not past it").toBeLessThanOrEqual(card!.x + 1);
-    expect(from!.y + from!.height).toBeGreaterThan(card!.y);
+    await expect
+      .poll(async () => {
+        const from = (await arrow.boundingBox())!;
+        const card = (await section(page).locator(".stretch-prd").boundingBox())!;
+        // The arrow ends at the card, not past it, and reaches down to it.
+        return from.x + from.width <= card.x + 1 && from.y + from.height > card.y;
+      })
+      .toBe(true);
   });
 
   test.describe("the PRD card holds still", () => {
@@ -94,6 +98,8 @@ test.describe("How I work", () => {
       await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
       const card = section(page).locator("figure.stretch-prd");
       const pose = () => card.evaluate((element) => ({ transform: getComputedStyle(element).transform, rotate: getComputedStyle(element).rotate, translate: getComputedStyle(element).translate }));
+      // The entrance holds the page until it is released; the card's pose is read after that.
+      await expect.poll(() => page.evaluate(() => !document.documentElement.hasAttribute("data-entering")), { timeout: 8000 }).toBe(true);
       await card.scrollIntoViewIfNeeded();
       const resting = await pose();
       expect(resting.rotate).toBe("none");
@@ -106,8 +112,7 @@ test.describe("How I work", () => {
           const { top, height } = element.getBoundingClientRect();
           scrollBy(0, top + height / 2 - (padding + (innerHeight - padding) * down));
         }, at);
-        await page.waitForTimeout(150);
-        expect(await pose()).toEqual(resting);
+        await expect.poll(pose).toEqual(resting);
       }
     });
   });
