@@ -6,7 +6,7 @@ import { passLean } from "@/components/site/signature-springs";
 import { passPhoto } from "@/content/stretch/media";
 import { roleStories } from "@/content/stretch/role-stories";
 import { roleStoryColours, type RoleStorySlug } from "@/content/stretch/role-story";
-import { passLinkLabel, passRecords, passStatus, type PassState } from "@/content/stretch/staff-pass";
+import { passLinkLabel, passRecords, passStatus, type PassPin, type PassState } from "@/content/stretch/staff-pass";
 
 /**
  * An employer's Staff pass (GLOSSARY.md): the current one, or a returned one.
@@ -91,8 +91,15 @@ function EmployerPass({ slug, state, size, tilt, linked, pins, lean, children }:
         <ul className="stretch-pass__pins" aria-label="Awards">
           {record.pins.map((pin) => (
             <li key={pin.label} className="stretch-pass__pin">
-              <span className="stretch-pass__pin-label">{pin.label}</span>
-              <span className="stretch-pass__pin-detail stretch-mono">{pin.detail}</span>
+              {pin.href ? (
+                <Link href={pin.href} className="stretch-pass__pin-body">
+                  <PinText pin={pin} />
+                </Link>
+              ) : (
+                <span className="stretch-pass__pin-body">
+                  <PinText pin={pin} />
+                </span>
+              )}
             </li>
           ))}
         </ul>
@@ -142,6 +149,15 @@ function SelfIssuedPass({ title, children }: SelfIssuedPassProps) {
         </span>
       </div>
     </div>
+  );
+}
+
+function PinText({ pin }: { pin: PassPin }) {
+  return (
+    <>
+      <span className="stretch-pass__pin-label">{pin.label}</span>
+      <span className="stretch-pass__pin-detail stretch-mono">{pin.detail}</span>
+    </>
   );
 }
 

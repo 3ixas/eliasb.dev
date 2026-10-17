@@ -1,6 +1,6 @@
 /*
  * Work, the homepage section straight after the hero (see Work in GLOSSARY.md):
- * Now, Where I'm headed and How I got here. Copy is from
+ * the Staff passes on their rail, History, and Where I'm headed. Copy is from
  * docs/content/redesign-copy.md ("Work"), approved by Elias; scripts/verify-copy.mjs
  * checks it. BNP Paribas detail stays at CV level: no colleague names, internal
  * system names or review context.
@@ -9,6 +9,7 @@
  */
 import { roleStories } from "./role-stories.ts";
 import type { RoleStorySlug } from "./role-story";
+import type { PassState } from "./staff-pass.ts";
 
 /**
  * Where a link in Work leads: a Role story, named by its slug so the label and
@@ -29,45 +30,41 @@ export function shownLink(link: WorkLink): ShownLink {
 export type HeadedStrand = { title: string; proof: string; link: WorkLink };
 
 /**
- * A row of "How I got here". A row that opens a Role story names it and keeps
- * only its own note: the dates, role and employer come from the story, so the
- * row cannot say one thing while linking to another. History has no story, so
- * it carries its own.
+ * A pass on the rail: whose it is, how it hangs (its resting tilt, in degrees,
+ * and an optional strap length in px, so past passes can hang at different
+ * heights), and whether the job is current or over. Size and pins follow from
+ * the state: only the current pass is large and wears the awards. The current
+ * pass also carries its own proofs, the lines under its headline number, so
+ * they cannot end up on another employer's pass.
  */
-export type GotHereRow =
-  | { story: RoleStorySlug; note: string }
-  | { story: null; dates: string; role: string; note: string };
-
-/** A row as it is shown. */
-export type ShownRow = { story: RoleStorySlug | null; dates: string; role: string; organisation?: string; note: string };
-
-export function shownRow(row: GotHereRow): ShownRow {
-  if (row.story === null) return row;
-  const { dates, role, employer } = roleStories[row.story];
-  return { story: row.story, dates, role, organisation: employer, note: row.note };
-}
-
-/** Now as it is shown: the role and dates are the Role story's, and so is the route its link opens. */
-export function shownNow() {
-  const { story, organisation } = work.now;
-  const { role, dates } = roleStories[story];
-  return { role, organisation, dates, link: shownLink({ story }) };
-}
+export type RailPass = { slug: RoleStorySlug; tilt: number; strap?: number } & (
+  | { state: Extract<PassState, "current">; proofs: readonly string[] }
+  | { state: Extract<PassState, "returned"> }
+);
 
 export const work = {
   heading: "Work",
-  now: {
-    heading: "Now",
-    /** The Role story Now is about: its role and dates, and the route of its link, come from there. */
-    story: "bnp-paribas",
-    /** How Now names the employer, as the First glance does; the story's own name is "BNP Paribas". */
-    organisation: "BNP Paribas CIB",
-    proofs: [
-      "I’m the team’s only C# engineer, so I own the C# side from planning through review.",
-      "I was nominated as an AI Champion, and the workflow I built is now used by several teams across the department.",
-      "With that workflow I integrated a pricer in a couple of days, a job that takes an experienced engineer about two weeks.",
-    ],
-  },
+  /** The note under the heading: it frames the changes of craft, and was How I got here's. */
+  note: "History, then marketing, then code. Each move was towards the work I liked most.",
+  /** Newest first: the current pass, then the returned ones. verify:copy checks it covers every Role story once. */
+  rail: [
+    {
+      slug: "bnp-paribas",
+      state: "current",
+      tilt: -1,
+      /**
+       * What the pass says beyond its headline number ("Only · C# engineer on the
+       * team", from src/content/stretch/staff-pass.ts). The first of the three
+       * approved Now proofs is that headline, so it is not repeated here.
+       */
+      proofs: [
+        "I was nominated as an AI Champion, and the workflow I built is now used by several teams across the department.",
+        "With that workflow I integrated a pricer in a couple of days, a job that takes an experienced engineer about two weeks.",
+      ],
+    },
+    { slug: "joveen", state: "returned", tilt: 1.5, strap: 84 },
+    { slug: "optegra", state: "returned", tilt: -1.2 },
+  ] satisfies readonly RailPass[],
   headed: {
     heading: "Where I’m headed",
     line: "At work, I’m learning to build systems that hold up. On my own products, I’m learning what’s worth building. I want to be genuinely good at both.",
@@ -89,14 +86,6 @@ export const work = {
       },
     ] satisfies readonly HeadedStrand[],
   },
-  gotHere: {
-    heading: "How I got here",
-    note: "History, then marketing, then code. Each move was towards the work I liked most.",
-    /** Newest first. */
-    rows: [
-      { story: "joveen", note: "Cut page load by 40% and deploys from 10 minutes to under 2." },
-      { story: "optegra", note: "Raised the Core Web Vitals pass rate from 62% to 88%." },
-      { story: null, dates: "Before 2021", role: "History at uni", note: "Because I loved it, and I still do." },
-    ] satisfies readonly GotHereRow[],
-  },
+  /** History is a dashed note under the rail, not a pass: it has no Role story to open. */
+  history: { dates: "Before 2021", role: "History at uni", note: "Because I loved it, and I still do." },
 } as const;

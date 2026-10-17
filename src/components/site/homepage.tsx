@@ -30,8 +30,8 @@ export function Homepage() {
       <main id="main-content" tabIndex={-1}>
         <Hero />
 
-        <section id="work" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="work-heading">
-          <SectionHeading id="work-heading" heading={work.heading} />
+        <section id="work" className="stretch-wrap stretch-section stretch-section--work" data-entrance="rest" aria-labelledby="work-heading">
+          <SectionHeading id="work-heading" heading={work.heading} note={work.note} />
           <Work />
         </section>
 
