@@ -2779,6 +2779,52 @@ button.stretch-gh__day[data-selected] {
   border-radius: 2px;
 }
 
+/* Screenshots of a public page in a Role story: a desktop shot beside a phone shot, framed plainly, the caption linking its source. */
+.stretch-role-screens {
+  max-width: 720px;
+}
+
+.stretch-role-screens__row {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.stretch-role-screens__shot {
+  overflow: hidden;
+  border: 1px solid var(--stretch-rule);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 18px 36px -20px rgb(0 0 0 / 0.35);
+}
+
+.stretch-role-screens__shot--desktop {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.stretch-role-screens__shot--phone {
+  flex: 0 0 22%;
+  border-radius: 14px;
+}
+
+.stretch-role-screens__shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* On its own line, so the link is a 44 px target. */
+.stretch-role-screens__source {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--stretch-ink);
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* The Role story ends on its back link, on the page, not in the band. */
 .stretch-role-end {
   padding-block: 56px 0;
