@@ -18,8 +18,11 @@
  * Any failure releases the hold at once. Client-side navigation back to `/`
  * never runs either script, because React does not execute scripts it inserts.
  *
- * This module has no imports so `scripts/verify-opening.mjs` can load it.
+ * Its only import is the spring (`spring.ts`, itself import-free), so
+ * `scripts/verify-opening.mjs` can load it.
  */
+
+import { spring, type SpringCurve } from "./spring.ts";
 
 /**
  * The approved timings: variant A3 of the two-act entrance (#160,
@@ -74,58 +77,6 @@ export const entranceTimings = {
 
 export type EntranceTimings = typeof entranceTimings;
 
-/**
- * A spring as CSS: the easing curve, how long the curve runs, and when Motion
- * would consider the spring at rest (the moment its `await animate()` resolves).
- */
-export type SpringCurve = { easing: string; duration: number; settled: number };
-
-/**
- * Motion's spring({ bounce, visualDuration }) sampled as a CSS linear()
- * easing, for bounce ≥ 0. It mirrors framer-motion's resolution: damping
- * ratio 1 − bounce, natural frequency 2π / (1.2 × visualDuration).
- */
-export function springCurve(bounce: number, visualDuration: number): SpringCurve {
-  const zeta = Math.max(1 - bounce, 0.05);
-  const omega = (2 * Math.PI) / (visualDuration * 1.2);
-  // Long enough for Motion's rest test to pass even for the most lightly damped spring here.
-  const settle = Math.min(2, Math.log(5000) / (zeta * omega));
-  const steps = 40;
-  const points: number[] = [];
-  for (let step = 0; step <= steps; step += 1) {
-    const t = (settle * step) / steps;
-    let x: number;
-    if (zeta < 1) {
-      const damped = omega * Math.sqrt(1 - zeta * zeta);
-      x = 1 - Math.exp(-zeta * omega * t) * (Math.cos(damped * t) + ((zeta * omega) / damped) * Math.sin(damped * t));
-    } else {
-      x = 1 - Math.exp(-omega * t) * (1 + omega * t);
-    }
-    points.push(step === steps ? 1 : Math.round(x * 1000) / 1000);
-  }
-  // Motion's rest test: within 0.005 of the target and slower than 0.01 per second.
-  let settled = 0;
-  for (let ms = 0; ms <= settle * 1000; ms += 1) {
-    const t = ms / 1000;
-    const decay = Math.exp(-zeta * omega * t);
-    let offset: number;
-    let velocity: number;
-    if (zeta < 1) {
-      const damped = omega * Math.sqrt(1 - zeta * zeta);
-      offset = decay * (Math.cos(damped * t) + ((zeta * omega) / damped) * Math.sin(damped * t));
-      velocity = decay * ((omega * omega) / damped) * Math.sin(damped * t);
-    } else {
-      offset = decay * (1 + omega * t);
-      velocity = decay * omega * omega * t;
-    }
-    if (Math.abs(offset) <= 0.005 && Math.abs(velocity) <= 0.01) {
-      settled = ms;
-      break;
-    }
-  }
-  return { easing: `linear(${points.join(", ")})`, duration: Math.round(settle * 1000), settled: settled || Math.round(settle * 1000) };
-}
-
 /** When each beat of the entrance happens, in ms from its start, and the springs that drive them. */
 export type EntranceSchedule = {
   /** When each character of the typed line appears. */
@@ -159,7 +110,7 @@ export type EntranceSchedule = {
  * `scripts/verify-opening.mjs` checks it, so the two cannot drift apart.
  * `fits` is whether the headline's place is on the screen to move into, and
  * `letters` is the number of letters in the name. Self-contained: it is serialised
- * into the inline script beside `springCurve`, which it takes as `spring`.
+ * into the inline script beside `spring`, which it takes as its `spring` argument.
  */
 export function entranceSchedule(
   spring: (bounce: number, visualDuration: number) => SpringCurve,
@@ -525,4 +476,4 @@ export function runEntrance(
 export const entranceGuardScript = `try{(${holdPage.toString()})(${entranceTimings.safetyMs})}catch(_){document.documentElement.removeAttribute("data-entering")}`;
 
 /** The inline script that plays the entrance. */
-export const entranceScript = `try{(${whenFontsReady.toString()})(function(){try{(${runEntrance.toString()})(${springCurve.toString()},${entranceSchedule.toString()},${JSON.stringify(entranceTimings)})}catch(_){document.documentElement.removeAttribute("data-entering")}},${entranceTimings.fontWaitMs})}catch(_){document.documentElement.removeAttribute("data-entering")}`;
+export const entranceScript = `try{(${whenFontsReady.toString()})(function(){try{(${runEntrance.toString()})(${spring.toString()},${entranceSchedule.toString()},${JSON.stringify(entranceTimings)})}catch(_){document.documentElement.removeAttribute("data-entering")}},${entranceTimings.fontWaitMs})}catch(_){document.documentElement.removeAttribute("data-entering")}`;
