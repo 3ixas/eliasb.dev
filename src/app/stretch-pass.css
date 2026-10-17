@@ -299,7 +299,8 @@
   position: relative;
   left: 50%;
   width: max-content;
-  max-width: 44vw;
+  /* Half the pass less the strap and a margin, so a pin never leaves the pass, however narrow. */
+  max-width: calc(50% - 22px);
   pointer-events: auto;
 }
 
@@ -348,6 +349,14 @@ a.stretch-pass__pin-body:focus-visible {
   .stretch-pass--lg {
     --pass-strap: 120px;
     width: 100%;
+  }
+
+  /*
+   * The strap is short here, so the pins on either side of it interleave
+   * instead of stacking: three pills would otherwise run over the card's top row.
+   */
+  .stretch-pass__pin:nth-child(n + 2) {
+    margin-top: -24px;
   }
 
   /* A past pass is half the width here: no photo and no barcode. */

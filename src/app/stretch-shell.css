@@ -1884,6 +1884,16 @@ button.stretch-gh__day[data-selected] {
 
 /* ---- Work: the Staff passes on one rail, then Where I'm headed ---- */
 
+/*
+ * A pass hangs a degree or so off level, so on a narrow screen its far corner can
+ * swing past the page edge once a visitor's text spacing makes it taller. The
+ * section's own edge is the viewport's, so clipping there loses nothing visible
+ * and keeps the page from scrolling sideways.
+ */
+.stretch-section--work {
+  overflow-x: clip;
+}
+
 .stretch-work {
   display: grid;
   gap: 56px;
