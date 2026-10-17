@@ -11,18 +11,19 @@ import { shownLink, work, type ShownLink } from "@/content/stretch/work";
  * pass leads to the certificate inside it.
  */
 export function Work() {
-  const { headed, history, proofs, rail } = work;
+  const { headed, history, rail } = work;
   return (
     <div className="stretch-work">
       <div className="stretch-work__rail">
-        {rail.map(({ slug, state, tilt, strap }) => {
+        {rail.map((pass) => {
+          const { slug, state, tilt, strap } = pass;
           const current = state === "current";
           return (
             <div key={slug} className="stretch-work__hang" data-slug={slug} data-hang={state} style={strap ? ({ "--pass-strap-rest": `${strap}px` } as CSSProperties) : undefined}>
               <StaffPass slug={slug} state={state} size={current ? "lg" : "sm"} tilt={tilt} linked pins={current} lean>
-                {current && (
+                {pass.state === "current" && (
                   <ul className="stretch-pass__proofs">
-                    {proofs.map((proof) => (
+                    {pass.proofs.map((proof) => (
                       <li key={proof}>{proof}</li>
                     ))}
                   </ul>

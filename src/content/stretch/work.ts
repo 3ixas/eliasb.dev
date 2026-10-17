@@ -30,29 +30,38 @@ export function shownLink(link: WorkLink): ShownLink {
 export type HeadedStrand = { title: string; proof: string; link: WorkLink };
 
 /**
- * A pass on the rail: whose it is, whether the job is current or over, how it
- * hangs (its resting tilt, in degrees, and an optional strap length in px, so
- * past passes can hang at different heights). Size, pins and proofs follow
- * from the state: only the current pass is large and wears the awards.
+ * A pass on the rail: whose it is, how it hangs (its resting tilt, in degrees,
+ * and an optional strap length in px, so past passes can hang at different
+ * heights), and whether the job is current or over. Size and pins follow from
+ * the state: only the current pass is large and wears the awards. The current
+ * pass also carries its own proofs, the lines under its headline number, so
+ * they cannot end up on another employer's pass.
  */
-export type RailPass = { slug: RoleStorySlug; state: PassState; tilt: number; strap?: number };
+export type RailPass = { slug: RoleStorySlug; tilt: number; strap?: number } & (
+  | { state: Extract<PassState, "current">; proofs: readonly string[] }
+  | { state: Extract<PassState, "returned"> }
+);
 
 export const work = {
   heading: "Work",
   /** The note under the heading: it frames the changes of craft, and was How I got here's. */
   note: "History, then marketing, then code. Each move was towards the work I liked most.",
-  /**
-   * What the current pass says beyond its headline number ("Only · C# engineer
-   * on the team", from src/content/stretch/staff-pass.ts). The first of the
-   * three approved Now proofs is that headline, so it is not repeated here.
-   */
-  proofs: [
-    "I was nominated as an AI Champion, and the workflow I built is now used by several teams across the department.",
-    "With that workflow I integrated a pricer in a couple of days, a job that takes an experienced engineer about two weeks.",
-  ],
   /** Newest first: the current pass, then the returned ones. verify:copy checks it covers every Role story once. */
   rail: [
-    { slug: "bnp-paribas", state: "current", tilt: -1 },
+    {
+      slug: "bnp-paribas",
+      state: "current",
+      tilt: -1,
+      /**
+       * What the pass says beyond its headline number ("Only · C# engineer on the
+       * team", from src/content/stretch/staff-pass.ts). The first of the three
+       * approved Now proofs is that headline, so it is not repeated here.
+       */
+      proofs: [
+        "I was nominated as an AI Champion, and the workflow I built is now used by several teams across the department.",
+        "With that workflow I integrated a pricer in a couple of days, a job that takes an experienced engineer about two weeks.",
+      ],
+    },
     { slug: "joveen", state: "returned", tilt: 1.5, strap: 84 },
     { slug: "optegra", state: "returned", tilt: -1.2 },
   ] satisfies readonly RailPass[],

@@ -120,7 +120,9 @@ const bullet = (text, label) => text.match(new RegExp(`^- ${label}: (.+)$`, "m")
 const { headed, history } = work;
 
 const nowRows = Object.fromEntries(rows(copyFor("Now"), "### ").map(([part, copy]) => [part, copy]));
-assert.equal(work.proofs.join(" · "), nowRows.Proofs, "Now: proofs");
+const [current, ...returned] = work.rail;
+assert.equal(current.state === "current" && current.proofs.join(" · "), nowRows.Proofs, "Now: proofs");
+assert.ok(returned.every((pass) => !("proofs" in pass)), "Only the current pass carries proofs");
 
 const headedCopy = copyFor("Where I’m headed");
 assert.equal(headed.heading, bullet(headedCopy, "Heading"), "Where I’m headed: heading");

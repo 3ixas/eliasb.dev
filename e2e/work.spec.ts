@@ -6,6 +6,7 @@ import { passLinkLabel, passRecords, passStatus } from "../src/content/stretch/s
 import { shownLink, work } from "../src/content/stretch/work";
 import { contrastOnPaper } from "./support/contrast";
 
+const currentProofs = work.rail.flatMap((pass) => (pass.state === "current" ? pass.proofs : []));
 const section = (page: Page) => page.locator("section#work");
 const rail = (page: Page) => section(page).locator(".stretch-work__rail");
 const slugs = ["bnp-paribas", "joveen", "optegra"] as const;
@@ -41,7 +42,7 @@ test.describe("Work", () => {
   });
 
   test("the current pass keeps the two proofs its headline does not already state", async ({ page }) => {
-    await expect(pass(page, "bnp-paribas").locator(".stretch-pass__proofs li")).toHaveText(work.proofs);
+    await expect(pass(page, "bnp-paribas").locator(".stretch-pass__proofs li")).toHaveText(currentProofs);
     for (const slug of ["joveen", "optegra"] as const) await expect(pass(page, slug).locator(".stretch-pass__proofs")).toHaveCount(0);
   });
 
@@ -188,7 +189,7 @@ test.describe("Work", () => {
     await page.reload();
     // Three passes, the Take Ownership pin, and the three strands.
     await expect(section(page).getByRole("link")).toHaveCount(3 + 1 + work.headed.strands.length);
-    await expect(section(page)).toContainText(work.proofs[0]);
+    await expect(section(page)).toContainText(currentProofs[0]);
   });
 
   for (const scheme of ["light", "dark"] as const) {
