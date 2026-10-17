@@ -342,8 +342,8 @@ assert.equal(filmFromLetterboxd({ title: " " }, letterboxdProfile), null);
 
 // The ticket's line, shown and spoken.
 const watched = { short: "14 Sept", long: "14 September" };
-assert.deepEqual(filmLine(watched, 4), { shown: "Watched 14 Sept · ★★★★", spoken: "Watched 14 September, rated 4 out of 5" });
-assert.deepEqual(filmLine(watched, 4.5), { shown: "Watched 14 Sept · ★★★★½", spoken: "Watched 14 September, rated 4.5 out of 5" });
+assert.deepEqual(filmLine(watched, 4), { shown: "Watched 14 Sept\u00a0·\u00a0★★★★", spoken: "Watched 14 September, rated 4 out of 5" });
+assert.deepEqual(filmLine(watched, 4.5), { shown: "Watched 14 Sept\u00a0·\u00a0★★★★½", spoken: "Watched 14 September, rated 4.5 out of 5" });
 assert.deepEqual(filmLine(watched, null), { shown: "Watched 14 Sept", spoken: "Watched 14 September" });
 assert.deepEqual(filmLine(null, 3), { shown: "★★★", spoken: "Rated 3 out of 5" });
 assert.equal(filmLine(null, null), null);
