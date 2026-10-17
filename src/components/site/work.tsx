@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { StaffPass } from "@/components/site/staff-pass";
 import { shownLink, work, type ShownLink } from "@/content/stretch/work";
 
@@ -10,25 +11,26 @@ import { shownLink, work, type ShownLink } from "@/content/stretch/work";
  * pass leads to the certificate inside it.
  */
 export function Work() {
-  const { headed, history, proofs } = work;
+  const { headed, history, proofs, rail } = work;
   return (
     <div className="stretch-work">
       <div className="stretch-work__rail">
-        <div className="stretch-work__hang" data-hang="bnp-paribas">
-          <StaffPass slug="bnp-paribas" state="current" size="lg" tilt={-1} linked pins lean>
-            <ul className="stretch-pass__proofs">
-              {proofs.map((proof) => (
-                <li key={proof}>{proof}</li>
-              ))}
-            </ul>
-          </StaffPass>
-        </div>
-        <div className="stretch-work__hang" data-hang="joveen">
-          <StaffPass slug="joveen" state="returned" size="sm" tilt={1.5} linked pins={false} lean />
-        </div>
-        <div className="stretch-work__hang" data-hang="optegra">
-          <StaffPass slug="optegra" state="returned" size="sm" tilt={-1.2} linked pins={false} lean />
-        </div>
+        {rail.map(({ slug, state, tilt, strap }) => {
+          const current = state === "current";
+          return (
+            <div key={slug} className="stretch-work__hang" data-slug={slug} data-hang={state} style={strap ? ({ "--pass-strap-rest": `${strap}px` } as CSSProperties) : undefined}>
+              <StaffPass slug={slug} state={state} size={current ? "lg" : "sm"} tilt={tilt} linked pins={current} lean>
+                {current && (
+                  <ul className="stretch-pass__proofs">
+                    {proofs.map((proof) => (
+                      <li key={proof}>{proof}</li>
+                    ))}
+                  </ul>
+                )}
+              </StaffPass>
+            </div>
+          );
+        })}
         <p className="stretch-mono stretch-work__history">
           <span className="stretch-work__history-dates">{history.dates}</span> · {history.role} · {history.note}
         </p>

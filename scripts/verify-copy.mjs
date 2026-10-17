@@ -48,7 +48,8 @@ const modules = {
   sayHello,
   workArchive,
   howIWork,
-  work,
+  // The rail names slugs and tilts, not copy; it has its own checks below.
+  work: { ...work, rail: [] },
   offTheClock,
   caseStudyCopy,
   caseStudySectionLabels,
@@ -139,6 +140,9 @@ assert.equal(work.heading, bullet(raw.slice(raw.indexOf("## Work\n")), "Heading"
 for (const { href } of headed.strands.map((strand) => shownLink(strand.link))) {
   assert.ok(href.startsWith("#") ? siteCopy.menu.some(({ id }) => `#${id}` === href) : roleStorySlugs.some((slug) => href === `/work/${slug}`), `Work links to "${href}", which does not exist`);
 }
+// The rail hangs every Role story once, the current one first and the rest returned.
+assert.deepEqual([...work.rail.map((pass) => pass.slug)].sort(), [...roleStorySlugs].sort(), "The Work rail hangs every Role story exactly once");
+assert.deepEqual(work.rail.map((pass) => pass.state), ["current", ...work.rail.slice(1).map(() => "returned")], "The Work rail starts with the one current pass, then the returned ones");
 assert.deepEqual(siteCopy.menu.map(({ id }) => id), ["work", "things-i-make", "how-i-work", "off-the-clock", "say-hello"], "The menu follows the page");
 
 // Case studies.

@@ -1923,13 +1923,8 @@ button.stretch-gh__day[data-selected] {
   min-width: 0;
 }
 
-.stretch-work__hang[data-hang="bnp-paribas"] {
+.stretch-work__hang[data-hang="current"] {
   grid-column: 1 / -1;
-}
-
-/* Past passes hang on straps of different lengths. */
-.stretch-work__hang[data-hang="joveen"] .stretch-pass--sm {
-  --pass-strap: 84px;
 }
 
 .stretch-work__history {
@@ -1954,12 +1949,12 @@ button.stretch-gh__day[data-selected] {
     justify-content: space-between;
   }
 
-  .stretch-work__hang[data-hang="bnp-paribas"] {
+  .stretch-work__hang[data-hang="current"] {
     grid-column: 1;
     grid-row: 1 / span 3;
   }
 
-  .stretch-work__hang:not([data-hang="bnp-paribas"]),
+  .stretch-work__hang:not([data-hang="current"]),
   .stretch-work__history {
     grid-column: 2;
   }
@@ -1970,11 +1965,12 @@ button.stretch-gh__day[data-selected] {
     grid-template-columns: minmax(0, 440px) repeat(2, minmax(0, 250px));
   }
 
-  .stretch-work__hang[data-hang="bnp-paribas"] {
+  .stretch-work__hang[data-hang="current"] {
     grid-row: 1 / span 2;
   }
 
-  .stretch-work__hang[data-hang="optegra"] {
+  /* The second returned pass takes the third column. */
+  .stretch-work__hang[data-hang="returned"] ~ .stretch-work__hang[data-hang="returned"] {
     grid-column: 3;
   }
 

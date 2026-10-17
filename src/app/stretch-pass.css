@@ -26,7 +26,8 @@
 }
 
 .stretch-pass--sm {
-  --pass-strap: 40px;
+  /* A section may hang a past pass lower: --pass-strap-rest, set on an ancestor. */
+  --pass-strap: var(--pass-strap-rest, 40px);
   width: min(100%, 250px);
 }
 

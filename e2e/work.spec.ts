@@ -9,7 +9,7 @@ import { contrastOnPaper } from "./support/contrast";
 const section = (page: Page) => page.locator("section#work");
 const rail = (page: Page) => section(page).locator(".stretch-work__rail");
 const slugs = ["bnp-paribas", "joveen", "optegra"] as const;
-const pass = (page: Page, slug: (typeof slugs)[number]) => section(page).locator(`[data-hang="${slug}"] .stretch-pass`);
+const pass = (page: Page, slug: (typeof slugs)[number]) => section(page).locator(`[data-slug="${slug}"] .stretch-pass`);
 const history = (page: Page) => section(page).locator(".stretch-work__history");
 /** A locator's box, which the test needs whole. */
 const boxOf = async (locator: Locator) => (await locator.boundingBox())!;
@@ -22,7 +22,7 @@ test.describe("Work", () => {
 
   test("three Staff passes hang from the rail, newest first, each with its fields in order", async ({ page }) => {
     await expect(section(page).locator(".stretch-pass")).toHaveCount(3);
-    expect(await section(page).locator(".stretch-pass").evaluateAll((all) => all.map((element) => element.closest("[data-hang]")?.getAttribute("data-hang")))).toEqual([...slugs]);
+    expect(await section(page).locator(".stretch-pass").evaluateAll((all) => all.map((element) => element.closest("[data-slug]")?.getAttribute("data-slug")))).toEqual([...slugs]);
     for (const slug of slugs) {
       const story = roleStories[slug];
       const record = passRecords[slug];
@@ -102,7 +102,7 @@ test.describe("Work", () => {
 
   test("on a phone the current pass is full width, the past passes sit side by side, and the pins stay clear of the strap", async ({ page }) => {
     test.skip(viewportWidth(page) > 760, "the phone layout");
-    const [box, current, joveen, optegra] = await Promise.all([boxOf(rail(page)), ...slugs.map((slug) => boxOf(section(page).locator(`[data-hang="${slug}"]`)))]);
+    const [box, current, joveen, optegra] = await Promise.all([boxOf(rail(page)), ...slugs.map((slug) => boxOf(section(page).locator(`[data-slug="${slug}"]`)))]);
     expect(current.width, "BNP's pass is the rail's full width").toBeCloseTo(box.width, 0);
     expect(joveen.y, "the past passes hang level").toBeCloseTo(optegra.y, 0);
     expect(joveen.x + joveen.width, "side by side").toBeLessThanOrEqual(optegra.x + 1);
@@ -126,7 +126,7 @@ test.describe("Work", () => {
   test("from 761 px the row ends on Optegra: nothing is left empty at its right", async ({ page }) => {
     test.skip(viewportWidth(page) <= 760, "the wide layout");
     // The hang is the layout box; the pass inside it is turned a degree or so off level, so its own box is not.
-    const hang = (slug: (typeof slugs)[number]) => section(page).locator(`[data-hang="${slug}"]`);
+    const hang = (slug: (typeof slugs)[number]) => section(page).locator(`[data-slug="${slug}"]`);
     const [box, current, joveen, optegra] = await Promise.all([boxOf(rail(page)), ...slugs.map((slug) => boxOf(hang(slug)))]);
     expect(Math.abs(box.x + box.width - (optegra.x + optegra.width)), "Optegra's hang ends at the rail's right edge").toBeLessThanOrEqual(1);
     expect(await pass(page, "optegra").evaluate((element) => (element as HTMLElement).offsetWidth - element.parentElement!.clientWidth), "and its pass fills the hang").toBe(0);

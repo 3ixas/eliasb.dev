@@ -9,6 +9,7 @@
  */
 import { roleStories } from "./role-stories.ts";
 import type { RoleStorySlug } from "./role-story";
+import type { PassState } from "./staff-pass.ts";
 
 /**
  * Where a link in Work leads: a Role story, named by its slug so the label and
@@ -28,6 +29,14 @@ export function shownLink(link: WorkLink): ShownLink {
 /** A line of "Where I'm headed": the strand, one proof, and where it leads. */
 export type HeadedStrand = { title: string; proof: string; link: WorkLink };
 
+/**
+ * A pass on the rail: whose it is, whether the job is current or over, how it
+ * hangs (its resting tilt, in degrees, and an optional strap length in px, so
+ * past passes can hang at different heights). Size, pins and proofs follow
+ * from the state: only the current pass is large and wears the awards.
+ */
+export type RailPass = { slug: RoleStorySlug; state: PassState; tilt: number; strap?: number };
+
 export const work = {
   heading: "Work",
   /** The note under the heading: it frames the changes of craft, and was How I got here's. */
@@ -41,6 +50,12 @@ export const work = {
     "I was nominated as an AI Champion, and the workflow I built is now used by several teams across the department.",
     "With that workflow I integrated a pricer in a couple of days, a job that takes an experienced engineer about two weeks.",
   ],
+  /** Newest first: the current pass, then the returned ones. verify:copy checks it covers every Role story once. */
+  rail: [
+    { slug: "bnp-paribas", state: "current", tilt: -1 },
+    { slug: "joveen", state: "returned", tilt: 1.5, strap: 84 },
+    { slug: "optegra", state: "returned", tilt: -1.2 },
+  ] satisfies readonly RailPass[],
   headed: {
     heading: "Where I’m headed",
     line: "At work, I’m learning to build systems that hold up. On my own products, I’m learning what’s worth building. I want to be genuinely good at both.",
