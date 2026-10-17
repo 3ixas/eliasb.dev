@@ -8,6 +8,7 @@ import {
   StorySectionLinks,
   storyColours,
 } from "@/components/site/story";
+import { RoleStoryFigureBlock } from "@/components/site/role-story-figures";
 import { StaffPass } from "@/components/site/staff-pass";
 import { SubpageHeader } from "@/components/site/subpage-header";
 import { roleStories } from "@/content/stretch/role-stories";
@@ -67,6 +68,11 @@ export function RoleStoryPage({ story }: { story: RoleStory }) {
           <div className="stretch-cs-body stretch-wrap">
             {roleStorySectionKeys.map((key, position) => (
               <StorySection key={key} id={key} label={roleStorySectionLabels[key]} position={position} section={story.sections[key]}>
+                {story.figures?.[key] && (
+                  <div className="stretch-role-figures" style={storyColours(colours)}>
+                    <RoleStoryFigureBlock figure={story.figures[key]} />
+                  </div>
+                )}
                 {key === "what-changed" && (
                   <div className="stretch-role-evidence" style={storyColours(colours)}>
                     <StoryEvidence evidence={story.evidence} />

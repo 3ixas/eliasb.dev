@@ -85,6 +85,13 @@ test.describe("Work", () => {
     }
   });
 
+  test("BNP's Take Ownership pin lands on the certificate in its Role story", async ({ page }) => {
+    await pass(page, "bnp-paribas").getByRole("list", { name: "Awards" }).getByRole("link", { name: /Take Ownership/ }).click();
+    await expect(page).toHaveURL(/\/work\/bnp-paribas#take-ownership-certificate$/);
+    await expect(page.locator("#take-ownership-certificate")).toBeInViewport();
+    await expect(page.locator("#take-ownership-certificate")).toBeFocused();
+  });
+
   test("History is a dashed note under the passes, not a pass, and Now and How I got here no longer render as text", async ({ page }) => {
     const note = history(page);
     await expect(note).toHaveText(`${work.history.dates} · ${work.history.role} · ${work.history.note}`);

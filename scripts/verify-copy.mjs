@@ -221,6 +221,12 @@ assert.match(
 );
 assert.throws(() => caseStudyOpening({ ...threshold, slug: "home-secretary" }, projects), /needs its project's screenshot and colours/);
 
+// A figure's words are approved copy too.
+for (const story of roles) {
+  for (const [path, text] of leaves(story.figures ?? {}, `${story.slug}.figures`)) {
+    assert.ok(plain.includes(text), `${path} is not in docs/content/redesign-copy.md: "${text}"`);
+  }
+}
 assert.deepEqual(roleStoryProblems(roles), []);
 assert.deepEqual(roles.map((story) => story.slug), ["bnp-paribas", "joveen", "optegra"], "Role stories run newest to oldest");
 assert.deepEqual(roles.map((story) => story.next), ["joveen", "optegra", null], "Next role follows the order, and Optegra ends on ← Work");

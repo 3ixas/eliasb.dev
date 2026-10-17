@@ -74,6 +74,41 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
         ],
       },
     },
+    figures: {
+      decisions: {
+        kind: "flag",
+        live: "Live pricing · today’s path",
+        toggled: "New path · no stale file · cached",
+        state: "off by default",
+        caption: "Protect the blast radius",
+      },
+      // Lengths are in one unit per row: working days (two weeks taken as ten) and minutes (30–40 drawn at 40, under 5 at 5).
+      "what-changed": {
+        kind: "scale",
+        rows: [
+          {
+            what: "Integrating a pricer",
+            before: { label: "about two weeks, experienced", amount: 10 },
+            after: { label: "a couple of days, new to it", amount: 2 },
+          },
+          {
+            what: "The competition dashboard’s data load",
+            before: { label: "30–40 min", amount: 40 },
+            after: { label: "under 5 min", amount: 5 },
+          },
+        ],
+        caption: "Bars to scale. Two weeks is taken as ten working days.",
+      },
+      "what-i-took-with-me": {
+        kind: "certificate",
+        id: "take-ownership-certificate",
+        src: "/work/bnp-paribas/take-ownership.png",
+        alt: "_nology’s Q1 2026 Take Ownership award certificate for Elias Bennett, citing his move into a C# role with no prior experience, production C# in pricing and risk systems, onboarding documentation and a winning digitisation project.",
+        width: 1600,
+        height: 900,
+        caption: "Take Ownership · _nology · Q1 2026 · awarded May 2026",
+      },
+    },
     evidence: [
       { value: "Nov 2025", label: "won the Early Careers digitisation competition" },
       { value: "6", label: "months from zero C# to production code" },

@@ -44,6 +44,36 @@ export const roleStoryCopy = { nextRole: "Next role" } as const;
 /** The one back link every Role story shares: the homepage's Work section. */
 export const roleStoryBack = { label: siteCopy.header.backToWork, href: "/#work" } as const;
 
+/** A before-and-after bar: the words say it, the number sets its length. */
+export type ScaleBar = { label: string; amount: number };
+
+/** One figure a Role story attaches to a section, drawn only from the story's own facts. */
+export type RoleStoryFigure =
+  | {
+      kind: "flag";
+      live: string;
+      toggled: string;
+      /** "off by default". */
+      state: string;
+      caption: string;
+    }
+  | {
+      kind: "scale";
+      /** Each row is one measurement; both bars share its unit, so the lengths compare. */
+      rows: readonly { what: string; before: ScaleBar; after: ScaleBar }[];
+      caption: string;
+    }
+  | {
+      kind: "certificate";
+      /** The anchor the Take Ownership pin leads to. */
+      id: string;
+      src: string;
+      alt: string;
+      width: number;
+      height: number;
+      caption: string;
+    };
+
 export type RoleStory = {
   slug: RoleStorySlug;
   /** "BNP Paribas": the band's name, the page title and the social card. */
@@ -58,6 +88,8 @@ export type RoleStory = {
   setting?: string;
   /** The summary is also the page's description. */
   sections: Record<RoleStorySectionKey, StorySectionBody> & { summary: { paragraphs: readonly [string] } };
+  /** A figure under a section, where the story has one. */
+  figures?: Partial<Record<RoleStorySectionKey, RoleStoryFigure>>;
   /** At most four, shown under What changed. */
   evidence: readonly EvidenceItem[];
   /** The employer's colour in each theme. */
