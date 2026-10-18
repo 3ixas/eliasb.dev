@@ -598,13 +598,20 @@ html:has(.stretch-menu[open]) {
     font-size: 19px;
   }
 
+  /* Hero portrait alignment (#224): the portrait sits on the bottom of the text
+     column, level with the bottom of the actions, instead of hanging from the
+     top. The 3 degree tilt about the top centre swings the lower right corner
+     half the 290px column (145px) times sin(3deg), about 7px, below the layout
+     box, so the box is lifted by that much and the lowest painted corner is what
+     meets the bottom of the actions. Tilt and origin are untouched, so the
+     entrance lands exactly where the finished hero has it. */
   .stretch-portrait {
     grid-column: 2;
     grid-row: 1 / span 2;
-    align-self: start;
+    align-self: end;
     justify-self: stretch;
     width: auto;
-    margin: 16px 0 0;
+    margin: 0 0 7px;
     transform: rotate(3deg);
   }
 
@@ -614,23 +621,6 @@ html:has(.stretch-menu[open]) {
     padding: 10px 16px;
     font-size: 17px;
     transform: rotate(-7deg);
-  }
-}
-
-/*
- * Hero portrait alignment (#224). On desktop the portrait sits on the bottom of
- * the text column, level with the bottom of the actions, instead of hanging from
- * the top and leaving the space beside the actions empty. Its tilt and origin are
- * untouched, so the entrance, which reads the portrait's resting place, lands
- * exactly where the finished hero has it. The 3 degree tilt about the top centre
- * swings the lower right corner half the 290px column (145px) times sin(3deg),
- * about 7px, below the layout box, so the box is lifted by that much and the
- * lowest painted corner is what meets the bottom of the actions.
- */
-@media (min-width: 761px) {
-  .stretch-portrait {
-    align-self: end;
-    margin: 0 0 7px;
   }
 }
 
