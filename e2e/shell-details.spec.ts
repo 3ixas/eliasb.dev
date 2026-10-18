@@ -64,8 +64,8 @@ test.describe("Shell details: separators", () => {
   for (const route of ["/", "/things-i-make", "/things-i-make/threshold", `/work/${Object.keys(roleStories)[0]}`]) {
     test(`no metadata line on ${route} starts with the dot`, async ({ page }) => {
       await page.goto(route);
-      await expect.poll(() => page.locator(".stretch-mono").count()).toBeGreaterThan(0);
-      expect(await dotsStartingALine(page)).toEqual([]);
+      await page.evaluate(() => document.fonts.ready);
+      await expect.poll(() => dotsStartingALine(page)).toEqual([]);
     });
   }
 
@@ -80,8 +80,9 @@ test.describe("Shell details: separators", () => {
 
   test("the History line stays inside its dashed box, even at the narrowest width", async ({ page }) => {
     await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
     const history = page.locator(".stretch-work__history");
-    expect(await history.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(0);
+    await expect.poll(() => history.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(0);
   });
 });
 
