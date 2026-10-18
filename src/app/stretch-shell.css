@@ -1924,7 +1924,12 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
 
 /* ---- Now making and the GitHub year ---- */
 
+/* The Now making mark: a still cobalt dot with a ring behind it. The ring plays
+   three times when the card first comes into view (now-mark.tsx sets data-rung),
+   moving only transform and opacity, then rests invisible. Reduced motion never
+   plays it, so the dot alone is the still form. */
 .stretch-now {
+  position: relative;
   display: inline-block;
   width: 10px;
   height: 10px;
@@ -1933,19 +1938,30 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   background-color: var(--stretch-cobalt);
 }
 
+.stretch-now::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-color: var(--stretch-cobalt);
+  opacity: 0;
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  .stretch-now {
-    animation: stretch-now-pulse 1.8s ease-in-out infinite;
+  .stretch-now[data-rung]::after {
+    animation: stretch-now-pulse 1.8s ease-out 3;
   }
 }
 
 @keyframes stretch-now-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--stretch-cobalt) 55%, transparent);
+  from {
+    opacity: 0.55;
+    transform: scale(1);
   }
-  60% {
-    box-shadow: 0 0 0 7px transparent;
+  to {
+    opacity: 0;
+    transform: scale(2.6);
   }
 }
 
