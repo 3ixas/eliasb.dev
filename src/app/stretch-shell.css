@@ -617,6 +617,20 @@ html:has(.stretch-menu[open]) {
   }
 }
 
+/*
+ * Hero portrait alignment (#224). On desktop the portrait sits on the bottom of
+ * the text column, level with the bottom of the actions, instead of hanging from
+ * the top and leaving the space beside the actions empty. Its tilt and origin are
+ * untouched, so the entrance, which reads the portrait's resting place, lands
+ * exactly where the finished hero has it.
+ */
+@media (min-width: 761px) {
+  .stretch-portrait {
+    align-self: end;
+    margin-top: 0;
+  }
+}
+
 /* ---- Signature entrance (entrance.ts) ---- */
 
 /*

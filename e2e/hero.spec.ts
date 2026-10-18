@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { hero } from "../src/content/stretch/site-copy";
 import { contrastOnPaper } from "./support/contrast";
+import { heroBottoms } from "./support/hero-bottoms";
 
 const phone = (page: Page) => (page.viewportSize()?.width ?? 0) < 761;
 const name = (page: Page) => page.locator(".stretch-name");
@@ -115,6 +116,16 @@ test.describe("Hero", () => {
     const portrait = (await page.locator(".stretch-portrait").boundingBox())!;
     expect(portrait.x).toBeGreaterThan(nameRight);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  });
+
+  test("on desktop the portrait's bottom meets the bottom of the text column", async ({ page }) => {
+    test.skip(phone(page), "Desktop layout");
+    await expect
+      .poll(async () => {
+        const { portrait, column } = await heroBottoms(page);
+        return Math.abs(portrait - column);
+      })
+      .toBeLessThanOrEqual(1);
   });
 
   test("on phones the portrait is stacked below the actions", async ({ page }) => {
