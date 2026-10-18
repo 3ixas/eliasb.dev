@@ -622,12 +622,15 @@ html:has(.stretch-menu[open]) {
  * the text column, level with the bottom of the actions, instead of hanging from
  * the top and leaving the space beside the actions empty. Its tilt and origin are
  * untouched, so the entrance, which reads the portrait's resting place, lands
- * exactly where the finished hero has it.
+ * exactly where the finished hero has it. The 3 degree tilt about the top centre
+ * swings the lower right corner half the 290px column (145px) times sin(3deg),
+ * about 7px, below the layout box, so the box is lifted by that much and the
+ * lowest painted corner is what meets the bottom of the actions.
  */
 @media (min-width: 761px) {
   .stretch-portrait {
     align-self: end;
-    margin-top: 0;
+    margin: 0 0 7px;
   }
 }
 
