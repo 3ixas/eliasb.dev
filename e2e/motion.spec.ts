@@ -453,3 +453,88 @@ test.describe("Footer name fill", () => {
     });
   });
 });
+
+test.describe("Now making pulse", () => {
+  const mark = (page: Page) => page.locator("[data-fixture='making'] [data-now-mark]");
+  // The ring is the mark's ::after, so its animations come from the subtree.
+  const ring = (page: Page) =>
+    mark(page).evaluate((element) =>
+      element.getAnimations({ subtree: true }).map((animation) => {
+        const effect = animation.effect as KeyframeEffect;
+        return {
+          name: (animation as CSSAnimation).animationName,
+          iterations: effect.getComputedTiming().iterations,
+          properties: [...new Set(effect.getKeyframes().flatMap((frame) => Object.keys(frame)))].filter((key) => !["offset", "easing", "composite", "computedOffset"].includes(key)).sort(),
+          playState: animation.playState,
+        };
+      }),
+    );
+
+  const ringStyle = (page: Page) => mark(page).evaluate((element) => getComputedStyle(element, "::after").animationName);
+  // Counts the ring's real playback: the animation events fire on the mark for its ::after.
+  const countPlayback = (page: Page) =>
+    mark(page).evaluate((element) => {
+      const counts = { starts: 0, iterations: 0, ends: 0 };
+      element.addEventListener("animationstart", () => counts.starts++);
+      element.addEventListener("animationiteration", () => counts.iterations++);
+      element.addEventListener("animationend", () => counts.ends++);
+      (window as unknown as { __pulse: typeof counts }).__pulse = counts;
+    });
+  const playback = (page: Page) => page.evaluate(() => ({ ...(window as unknown as { __pulse: object }).__pulse }));
+
+  test.describe("with motion", () => {
+    test.use({ reducedMotion: "no-preference" });
+
+    test("rings three times as its card enters view, on transform and opacity only, then rests", async ({ page }) => {
+      await page.goto("/fixtures/off-the-clock");
+      await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
+      const card = page.locator("[data-fixture='making']");
+      await expect.poll(() => card.evaluate((element) => element.getBoundingClientRect().top > innerHeight), { message: "the card starts below the fold" }).toBe(true);
+      expect(await ring(page), "nothing plays before the card is in view").toEqual([]);
+      await countPlayback(page);
+      await card.scrollIntoViewIfNeeded();
+      await expect.poll(async () => (await ring(page))[0]?.name).toBe("stretch-now-pulse");
+      const [pulse] = await ring(page);
+      expect(pulse.iterations).toBe(3);
+      expect(pulse.properties).toEqual(["opacity", "transform"]);
+      await expect.poll(async () => await ring(page), { timeout: 10_000, message: "the animation ends after its three plays" }).toEqual([]);
+      // One start, a new play at each of the two boundaries after it, one end: three plays, observed.
+      await expect.poll(() => playback(page)).toEqual({ starts: 1, iterations: 2, ends: 1 });
+      await page.waitForTimeout(2_000);
+      expect(await playback(page), "and it stays at rest").toEqual({ starts: 1, iterations: 2, ends: 1 });
+    });
+
+    test("scrolling away and back does not start it again", async ({ page }) => {
+      await page.goto("/fixtures/off-the-clock");
+      await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
+      const card = page.locator("[data-fixture='making']");
+      await card.scrollIntoViewIfNeeded();
+      await expect.poll(async () => (await ring(page)).length).toBe(1);
+      await expect.poll(async () => (await ring(page)).length, { timeout: 10_000 }).toBe(0);
+      await page.evaluate(() => scrollTo(0, 0));
+      await card.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(500);
+      expect(await ring(page)).toEqual([]);
+    });
+  });
+
+  test.describe("with reduced motion", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("the mark is the still dot: nothing plays even once the card has been seen", async ({ page }) => {
+      await page.goto("/fixtures/off-the-clock");
+      await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
+      await countPlayback(page);
+      await page.locator("[data-fixture='making']").scrollIntoViewIfNeeded();
+      // The card has been seen: the observer fired and set the state that starts the ring.
+      await expect(mark(page)).toHaveAttribute("data-rung", "");
+      await page.waitForTimeout(500);
+      expect(await ring(page)).toEqual([]);
+      expect(await ringStyle(page)).toBe("none");
+      expect(await playback(page)).toEqual({ starts: 0, iterations: 0, ends: 0 });
+      // So it is the media query that holds it back: allow motion and the same state plays.
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await expect.poll(() => ringStyle(page)).toBe("stretch-now-pulse");
+    });
+  });
+});

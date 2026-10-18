@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { entranceTimings } from "../src/components/site/entrance";
 import { hero } from "../src/content/stretch/site-copy";
+import { heroBottoms } from "./support/hero-bottoms";
 
 const headline = `${hero.headline.lead} ${hero.headline.emphasis}`;
 const isEntering = (page: Page) => page.evaluate(() => document.documentElement.hasAttribute("data-entering"));
@@ -176,6 +177,18 @@ test.describe("Signature entrance", () => {
     await page.reload();
     await finished(page);
     expect(await rest()).toEqual(expected);
+  });
+
+  test("once settled on desktop the portrait's bottom meets the text column's bottom", async ({ page }) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 761, "Desktop layout");
+    await page.goto("/");
+    await finished(page);
+    await expect
+      .poll(async () => {
+        const { portrait, column } = await heroBottoms(page);
+        return Math.abs(portrait - column);
+      })
+      .toBeLessThanOrEqual(1);
   });
 
   test("the content is in the server HTML, and the document starts unheld", async ({ request }) => {

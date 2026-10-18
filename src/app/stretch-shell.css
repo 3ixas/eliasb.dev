@@ -598,13 +598,20 @@ html:has(.stretch-menu[open]) {
     font-size: 19px;
   }
 
+  /* Hero portrait alignment (#224): the portrait sits on the bottom of the text
+     column, level with the bottom of the actions, instead of hanging from the
+     top. The 3 degree tilt about the top centre swings the lower right corner
+     half the 290px column (145px) times sin(3deg), about 7px, below the layout
+     box, so the box is lifted by that much and the lowest painted corner is what
+     meets the bottom of the actions. Tilt and origin are untouched, so the
+     entrance lands exactly where the finished hero has it. */
   .stretch-portrait {
     grid-column: 2;
     grid-row: 1 / span 2;
-    align-self: start;
+    align-self: end;
     justify-self: stretch;
     width: auto;
-    margin: 16px 0 0;
+    margin: 0 0 7px;
     transform: rotate(3deg);
   }
 
@@ -1924,7 +1931,12 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
 
 /* ---- Now making and the GitHub year ---- */
 
+/* The Now making mark: a still cobalt dot with a ring behind it. The ring plays
+   three times when the card first comes into view (now-mark.tsx sets data-rung),
+   moving only transform and opacity, then rests invisible. Reduced motion never
+   plays it, so the dot alone is the still form. */
 .stretch-now {
+  position: relative;
   display: inline-block;
   width: 10px;
   height: 10px;
@@ -1933,19 +1945,30 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   background-color: var(--stretch-cobalt);
 }
 
+.stretch-now::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-color: var(--stretch-cobalt);
+  opacity: 0;
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  .stretch-now {
-    animation: stretch-now-pulse 1.8s ease-in-out infinite;
+  .stretch-now[data-rung]::after {
+    animation: stretch-now-pulse 1.8s ease-out 3;
   }
 }
 
 @keyframes stretch-now-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--stretch-cobalt) 55%, transparent);
+  from {
+    opacity: 0.55;
+    transform: scale(1);
   }
-  60% {
-    box-shadow: 0 0 0 7px transparent;
+  to {
+    opacity: 0;
+    transform: scale(2.6);
   }
 }
 
