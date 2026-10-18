@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { StaffPass } from "@/components/site/staff-pass";
+import { bindDots } from "@/components/site/bind-dots";
 import { shownSource, work } from "@/content/stretch/work";
 
 /**
@@ -33,7 +34,8 @@ export function Work() {
           );
         })}
         <p className="stretch-mono stretch-work__history">
-          <span className="stretch-work__history-dates">{history.dates}</span> · {history.role} · {history.note}
+          <span className="stretch-work__history-dates">{history.dates}</span>
+          {bindDots(` · ${history.role} · ${history.note}`)}
         </p>
       </div>
 

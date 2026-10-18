@@ -13,6 +13,7 @@ import { RoleStoryFigureBlock } from "@/components/site/role-story-figures";
 import { StaffPass } from "@/components/site/staff-pass";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SubpageHeader } from "@/components/site/subpage-header";
+import { bindDots } from "@/components/site/bind-dots";
 import { roleStories } from "@/content/stretch/role-stories";
 import {
   hasLongEmployer,
@@ -64,7 +65,7 @@ export function RoleStoryPage({ story }: { story: RoleStory }) {
               </div>
             }
           >
-            <p className="stretch-mono stretch-cs-open__meta">{roleStoryMetadata(story)}</p>
+            <p className="stretch-mono stretch-cs-open__meta">{bindDots(roleStoryMetadata(story))}</p>
           </StoryOpening>
           <StorySectionLinks sections={roleStorySections} />
           <div className="stretch-cs-body stretch-wrap">

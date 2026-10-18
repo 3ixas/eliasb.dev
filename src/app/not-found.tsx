@@ -33,7 +33,8 @@ export default function NotFound() {
           <h1 className="stretch-display stretch-h2">{copy.heading}</h1>
           <p className="stretch-404__line">{copy.line}</p>
           <Link className="stretch-404__home" href="/">
-            {copy.button.replace(/ →$/, "")} <span aria-hidden="true">→</span>
+            {copy.button.replace(/ →$/, "")}
+            <span aria-hidden="true">→</span>
           </Link>
         </div>
         <LostPropertyTag />
