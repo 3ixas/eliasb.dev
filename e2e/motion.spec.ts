@@ -453,3 +453,63 @@ test.describe("Footer name fill", () => {
     });
   });
 });
+
+test.describe("Now making pulse", () => {
+  const mark = (page: Page) => page.locator("[data-fixture='making'] [data-now-mark]");
+  // The ring is the mark's ::after, so its animations come from the subtree.
+  const ring = (page: Page) =>
+    mark(page).evaluate((element) =>
+      element.getAnimations({ subtree: true }).map((animation) => {
+        const effect = animation.effect as KeyframeEffect;
+        return {
+          name: (animation as CSSAnimation).animationName,
+          iterations: effect.getComputedTiming().iterations,
+          properties: [...new Set(effect.getKeyframes().flatMap((frame) => Object.keys(frame)))].filter((key) => !["offset", "easing", "composite", "computedOffset"].includes(key)).sort(),
+          playState: animation.playState,
+        };
+      }),
+    );
+
+  test.describe("with motion", () => {
+    test.use({ reducedMotion: "no-preference" });
+
+    test("rings three times as its card enters view, on transform and opacity only, then rests", async ({ page }) => {
+      await page.goto("/fixtures/off-the-clock");
+      await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
+      const card = page.locator("[data-fixture='making']");
+      await expect.poll(() => card.evaluate((element) => element.getBoundingClientRect().top > innerHeight), { message: "the card starts below the fold" }).toBe(true);
+      expect(await ring(page), "nothing plays before the card is in view").toEqual([]);
+      await card.scrollIntoViewIfNeeded();
+      await expect.poll(async () => (await ring(page))[0]?.name).toBe("stretch-now-pulse");
+      const [pulse] = await ring(page);
+      expect(pulse.iterations).toBe(3);
+      expect(pulse.properties).toEqual(["opacity", "transform"]);
+      await expect.poll(async () => await ring(page), { timeout: 10_000, message: "the animation ends after its three plays" }).toEqual([]);
+    });
+
+    test("scrolling away and back does not start it again", async ({ page }) => {
+      await page.goto("/fixtures/off-the-clock");
+      await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
+      const card = page.locator("[data-fixture='making']");
+      await card.scrollIntoViewIfNeeded();
+      await expect.poll(async () => (await ring(page)).length).toBe(1);
+      await expect.poll(async () => (await ring(page)).length, { timeout: 10_000 }).toBe(0);
+      await page.evaluate(() => scrollTo(0, 0));
+      await card.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(500);
+      expect(await ring(page)).toEqual([]);
+    });
+  });
+
+  test.describe("with reduced motion", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("the mark is the still dot: nothing plays even in view", async ({ page }) => {
+      await page.goto("/fixtures/off-the-clock");
+      await page.locator("[data-fixture='making']").scrollIntoViewIfNeeded();
+      await page.waitForTimeout(500);
+      expect(await ring(page)).toEqual([]);
+      await expect(mark(page)).toHaveCSS("animation-name", "none");
+    });
+  });
+});

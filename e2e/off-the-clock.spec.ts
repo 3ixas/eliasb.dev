@@ -273,14 +273,6 @@ test.describe("Off the clock: Now making", () => {
     await expect(links(card)).toHaveAttribute("href", "https://github.com/3ixas/risk-event-tracker");
   });
 
-  test("the mark pulses, and stops for reduced motion", async ({ page }) => {
-    const mark = fixture(page, "making").locator("[data-now-mark]");
-    await page.emulateMedia({ reducedMotion: "no-preference" });
-    await expect(mark).toHaveCSS("animation-name", "stretch-now-pulse");
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await expect(mark).toHaveCSS("animation-name", "none");
-  });
-
   test("with no repository the card is gone", async ({ page }) => {
     await expect(fixture(page, "making-none").locator("[data-otc]")).toHaveCount(0);
   });

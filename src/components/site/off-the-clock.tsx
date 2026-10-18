@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useId, type ReactNode } from "react";
+import { NowMark } from "@/components/site/now-mark";
 import { TrainingWeek } from "@/components/site/training-week";
 import { GitHubYear } from "@/components/site/github-year";
 import { nowMakingEntry, offTheClock } from "@/content/stretch/off-the-clock";
@@ -224,7 +225,7 @@ export function NowMakingCard({ latest }: { latest: LatestRepositorySignal }) {
     <article className="stretch-otc__card stretch-otc__making" data-otc="making" aria-labelledby={headingId}>
       <span className="stretch-fastener stretch-fastener--pin" aria-hidden="true" />
       <h3 id={headingId} className="stretch-mono stretch-otc__label">
-        <span className="stretch-now" data-now-mark aria-hidden="true" />
+        <NowMark />
         {making.label}
       </h3>
       <p className="stretch-otc__name">
