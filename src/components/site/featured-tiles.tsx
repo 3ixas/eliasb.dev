@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import type { Fastener, Project, ProjectImage } from "@/content/projects";
+import { bindDots } from "@/components/site/bind-dots";
 
 /** Alternate the screenshot's tilt, inside the spec's ±1 to 1.5 degrees. */
 const tilts = ["-1.5deg", "1deg", "-1deg"] as const;
@@ -60,7 +61,7 @@ export function FeaturedTiles({ projects }: { projects: readonly Project[] }) {
                 <h3 className="stretch-tile__name">{project.name}</h3>
                 <p className="stretch-tile__outcome">{project.outcome}</p>
                 <p className="stretch-mono stretch-tile__meta">
-                  {project.type} · {project.year}
+                  {bindDots(`${project.type} · ${project.year}`)}
                 </p>
               </div>
               <TileShot screenshot={screenshot} sizes="(max-width: 760px) 90vw, (max-width: 1400px) 50vw, 640px" />

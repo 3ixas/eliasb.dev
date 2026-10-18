@@ -11,6 +11,7 @@ import {
 } from "@/components/site/story";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SubpageHeader } from "@/components/site/subpage-header";
+import { bindDots } from "@/components/site/bind-dots";
 import { projects, type Project } from "@/content/projects";
 import { caseStudies } from "@/content/stretch/case-studies";
 import {
@@ -92,7 +93,7 @@ function Opening({ opening }: { opening: CaseStudyOpening }) {
         </div>
       }
     >
-      <p className="stretch-mono stretch-cs-open__meta">{opening.metadata}</p>
+      <p className="stretch-mono stretch-cs-open__meta">{bindDots(opening.metadata)}</p>
       <p className="stretch-mono stretch-cs-open__meta">{opening.stack}</p>
       <div className="stretch-cs-links">
         {links.live && (

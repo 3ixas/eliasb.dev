@@ -18,7 +18,7 @@ html:has([data-stretch-shell]) body {
 
 [data-stretch-shell] {
   --stretch-gutter: 16px;
-  min-height: 100vh;
+  min-height: 100svh;
   font-family: var(--font-bricolage), system-ui, sans-serif;
   background-color: var(--stretch-page);
   color: var(--stretch-ink);
@@ -35,7 +35,7 @@ html:has([data-stretch-shell]) body {
 [data-work-archive] {
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
+  min-height: 100svh;
 }
 
 [data-not-found] > main,
@@ -153,10 +153,12 @@ html:has([data-stretch-shell]) body {
   text-decoration: none;
 }
 
-.stretch-nav a:hover {
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
+@media (hover: hover) {
+  .stretch-nav a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
 }
 
 /* Say hello: the one link that takes the cobalt. */
@@ -165,8 +167,10 @@ html:has([data-stretch-shell]) body {
   color: var(--stretch-on-cobalt);
 }
 
-.stretch-nav a.stretch-nav__cta:hover {
-  text-decoration: none;
+@media (hover: hover) {
+  .stretch-nav a.stretch-nav__cta:hover {
+    text-decoration: none;
+  }
 }
 
 .stretch-pill {
@@ -1113,8 +1117,14 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   line-height: 1;
 }
 
-.stretch-index__link:is(:hover, :focus-visible) :is(.stretch-index__name, .stretch-index__arrow) {
+.stretch-index__link:focus-visible :is(.stretch-index__name, .stretch-index__arrow) {
   color: var(--stretch-cobalt);
+}
+
+@media (hover: hover) {
+  .stretch-index__link:hover :is(.stretch-index__name, .stretch-index__arrow) {
+    color: var(--stretch-cobalt);
+  }
 }
 
 .stretch-index__all {
@@ -1129,8 +1139,14 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   font-size: 14px;
 }
 
-.stretch-index__all a:is(:hover, :focus-visible) {
+.stretch-index__all a:focus-visible {
   color: var(--stretch-cobalt);
+}
+
+@media (hover: hover) {
+  .stretch-index__all a:hover {
+    color: var(--stretch-cobalt);
+  }
 }
 
 /* Desktop: the rows keep the left of the list and the screenshot previews on the right. */
@@ -1662,8 +1678,10 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   text-transform: uppercase;
 }
 
-.stretch-link:hover {
-  color: var(--stretch-cobalt);
+@media (hover: hover) {
+  .stretch-link:hover {
+    color: var(--stretch-cobalt);
+  }
 }
 
 /* A name that is also a link keeps the name's own type, with the link's underline and 44px target. */
@@ -1677,8 +1695,10 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   text-underline-offset: 4px;
 }
 
-.stretch-otc__name-link:hover {
-  color: var(--stretch-cobalt);
+@media (hover: hover) {
+  .stretch-otc__name-link:hover {
+    color: var(--stretch-cobalt);
+  }
 }
 
 /* The training poster. */
@@ -1813,7 +1833,7 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
 }
 
 .stretch-otc__clipping .stretch-otc__label {
-  border-bottom: 2px solid var(--stretch-cobalt);
+  border-bottom: 2px solid var(--stretch-ink);
   padding-bottom: 16px;
 }
 
@@ -2292,8 +2312,14 @@ button.stretch-gh__day[data-selected] {
   text-underline-offset: 4px;
 }
 
-.stretch-work__link:is(:hover, :focus-visible) {
+.stretch-work__link:focus-visible {
   color: var(--stretch-cobalt);
+}
+
+@media (hover: hover) {
+  .stretch-work__link:hover {
+    color: var(--stretch-cobalt);
+  }
 }
 
 @media (max-width: 760px) {
@@ -2446,6 +2472,7 @@ button.stretch-gh__day[data-selected] {
   justify-self: start;
   display: inline-flex;
   align-items: center;
+  gap: 0.4em;
   min-height: 44px;
   color: var(--cs-ink);
   font-size: 17px;
@@ -2511,6 +2538,7 @@ button.stretch-gh__day[data-selected] {
 .stretch-cs-button {
   display: inline-flex;
   align-items: center;
+  gap: 0.4em;
   min-height: 48px;
   padding-inline: 22px;
   border: 2px solid var(--cs-ink);
@@ -2527,10 +2555,12 @@ button.stretch-gh__day[data-selected] {
   color: var(--cs-field);
 }
 
-.stretch-cs-button:hover {
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
+@media (hover: hover) {
+  .stretch-cs-button:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
 }
 
 .stretch-cs-open__note {
@@ -2601,10 +2631,12 @@ button.stretch-gh__day[data-selected] {
   font-size: 13px;
 }
 
-.stretch-cs-links-row a:hover {
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
+@media (hover: hover) {
+  .stretch-cs-links-row a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
 }
 
 /*
@@ -3081,10 +3113,12 @@ button.stretch-gh__day[data-selected] {
   line-height: 1;
 }
 
-.stretch-cs-next__tile:hover .stretch-cs-next__name {
-  text-decoration: underline;
-  text-decoration-thickness: 3px;
-  text-underline-offset: 6px;
+@media (hover: hover) {
+  .stretch-cs-next__tile:hover .stretch-cs-next__name {
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 6px;
+  }
 }
 
 @media (min-width: 761px) {

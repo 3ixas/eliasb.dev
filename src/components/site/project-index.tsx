@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { HOMEPAGE_INDEX_ROWS, type Project } from "@/content/projects";
 import { thingsIMake } from "@/content/stretch/site-copy";
+import { bindDots } from "@/components/site/bind-dots";
 
 const number = (position: number) => String(position).padStart(2, "0");
 
@@ -49,7 +50,7 @@ export function ProjectIndex({
                 <span className="stretch-index__outcome">{project.outcome}</span>
               </span>
               <span className="stretch-mono stretch-index__meta">
-                {project.type} · {project.year}
+                {bindDots(`${project.type} · ${project.year}`)}
               </span>
               <span className="stretch-index__arrow" aria-hidden="true">
                 →
