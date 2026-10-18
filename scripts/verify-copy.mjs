@@ -34,8 +34,8 @@ const plain = raw.replace(/\*/g, "").replace(/[{}]/g, "");
 // ---- Every string in the typed modules is in the approved copy ----------------------------
 
 const leaves = (value, path = "") => {
-  // Links, image paths, dates, anchors, category keys and Role story slugs are addresses and data, not words, so the approved copy does not list them.
-  if (typeof value === "string") return /(href|src|writtenOn|\.id|\.category|\.story|\.project|\.restates\[\d+\])$/.test(path) ? [] : [[path, value]];
+  // Links, image paths, a figure's kind and its screens' devices, dates, anchors, category keys and Role story slugs are addresses and data, not words, so the approved copy does not list them.
+  if (typeof value === "string") return /(href|src|writtenOn|\.id|\.figures\.[\w-]+\.kind|\.figures\.[\w-]+\.images\[\d+\]\.device|\.category|\.story|\.project|\.restates\[\d+\])$/.test(path) ? [] : [[path, value]];
   if (Array.isArray(value)) return value.flatMap((item, index) => leaves(item, `${path}[${index}]`));
   if (value && typeof value === "object") return Object.entries(value).flatMap(([key, item]) => leaves(item, `${path}.${key}`));
   return [];

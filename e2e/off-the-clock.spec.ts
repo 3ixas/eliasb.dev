@@ -140,6 +140,21 @@ test.describe("Off the clock: the book and the film", () => {
     await expect(links(card)).toHaveText("Letterboxd ↗");
   });
 
+  test("a long film title stops at three lines, the date and rating stay together, and the link carries the whole title", async ({ page }) => {
+    const card = fixture(page, "film-long");
+    const title = "The Assassination of Jesse James by the Coward Robert Ford";
+    const name = card.locator(".stretch-otc__name");
+    await expect(name).toContainText(title);
+    // Three lines at the name's line height, never more.
+    await expect
+      .poll(() => name.evaluate((el) => el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight)))
+      .toBeLessThanOrEqual(3.05);
+    // The rating can't wrap alone after the separator: the dot binds to it.
+    const line = card.locator(".stretch-otc__by [aria-hidden='true']");
+    await expect(line).toHaveText(/\u00a0·\u00a0★★★½$/);
+    await expect(links(card)).toHaveAttribute("aria-label", new RegExp(`Letterboxd.*${title}`));
+  });
+
   test("an empty diary shows the written fallback in the poster's shape", async ({ page }) => {
     const card = fixture(page, "film-empty");
     await expect(card.getByText(offTheClock.watched.fallback)).toBeVisible();
@@ -271,6 +286,48 @@ test.describe("Off the clock: Now making", () => {
   });
 });
 
+test.describe("Off the clock: card sizes and heading roles", () => {
+  test.beforeEach(async ({ page }) => {
+    // The sizes below are the desktop ones: 40-56 px display, a two-column card.
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/fixtures/off-the-clock");
+  });
+
+  test("the book and film cards size to their content, with no empty lower half", async ({ page }) => {
+    const layout = fixture(page, "layout");
+    for (const item of ["reading", "film"]) {
+      const card = layout.locator(`[data-otc='${item}']`);
+      await expect
+        .poll(() =>
+          card.evaluate((el) => {
+            const bottom = Math.max(...[...el.children].filter((child) => getComputedStyle(child).position !== "absolute").map((child) => child.getBoundingClientRect().bottom));
+            // Card padding is 24px below the content, plus the 1px border.
+            return el.getBoundingClientRect().bottom - bottom;
+          }),
+          { message: `${item} card has no space below its content` },
+        )
+        .toBeLessThanOrEqual(28);
+    }
+  });
+
+  test("headings use two roles: display for the leading card, the small mono label for the rest", async ({ page }) => {
+    const layout = fixture(page, "layout");
+    const font = (selector: string) =>
+      layout.locator(selector).evaluate((el) => {
+        const style = getComputedStyle(el);
+        return { size: style.fontSize, transform: style.textTransform, family: style.fontFamily, weight: style.fontWeight, stretch: style.fontStretch };
+      });
+    const book = await font("[data-otc='reading'] h3");
+    expect(book.size).toBe("13px");
+    expect(book.transform).toBe("uppercase");
+    for (const item of ["film", "clipping", "making"]) expect(await font(`[data-otc='${item}'] h3`)).toEqual(book);
+    // The leading card's heading is the display role: Bricolage Grotesque condensed and extra-bold, at the title size (56 px at 1440).
+    const leading = await font("[data-otc='training'] h3");
+    expect(leading).toMatchObject({ size: "56px", transform: "uppercase", weight: "800", stretch: "75%" });
+    expect(leading.family).not.toBe(book.family);
+  });
+});
+
 test.describe("Off the clock: the GitHub year", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
@@ -322,6 +379,24 @@ test.describe("Off the clock: the GitHub year", () => {
   test("only one day is a tab stop, so the grid costs a keyboard user one Tab", async ({ page }) => {
     const stops = fixture(page, "github").locator("[data-github-days] button:not([tabindex='-1'])");
     await expect(stops).toHaveCount(1);
+  });
+
+  test("on phones the busiest-stretch caption is pinned outside the scroller and the left edge fades", async ({ page }) => {
+    test.skip(!phone(page), "the grid only scrolls on phones");
+    const card = fixture(page, "github");
+    const scroller = card.locator("[data-github-scroll]");
+    const caption = card.locator(".stretch-gh__note");
+    await expect(caption).toBeVisible();
+    await expect(scroller.locator(".stretch-gh__note")).toHaveCount(0);
+    const inView = async () => {
+      const box = (await caption.boundingBox())!;
+      const cardBox = (await card.boundingBox())!;
+      return box.x >= cardBox.x - 1 && box.x + box.width <= cardBox.x + cardBox.width + 1;
+    };
+    await expect.poll(inView, { message: "caption is fully visible on open" }).toBe(true);
+    await scroller.evaluate((el) => (el.scrollLeft = 0));
+    await expect.poll(inView, { message: "caption is fully visible after scrolling" }).toBe(true);
+    await expect(scroller).not.toHaveCSS("mask-image", "none");
   });
 
   test("a stale year says when its data is from; a missing year is gone", async ({ page }) => {

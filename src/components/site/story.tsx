@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import type { EvidenceItem, StoryColours, StorySectionBody } from "@/content/stretch/story";
+import { FastenerProp, TileShot } from "@/components/site/featured-tiles";
+import type { Fastener, ProjectImage } from "@/content/projects";
 
 /*
  * The parts of a story page that a Case study and a Role story share: the
@@ -9,6 +11,9 @@ import type { EvidenceItem, StoryColours, StorySectionBody } from "@/content/str
  * screenshot, links, back link) is passed in or rendered by the page itself.
  * Nothing here knows about a project.
  */
+
+/** The characters in a name's longest word: the opening band sizes the title so that word fits its column. */
+const longestWord = (name: string) => Math.max(...name.split(/\s+/).map((word) => word.length));
 
 export const storyNumber = (position: number) => String(position + 1).padStart(2, "0");
 
@@ -60,7 +65,7 @@ export function StoryOpening({
     <section className="stretch-cs-open" style={storyColours(colours)} aria-label="Overview">
       <div className="stretch-wrap stretch-cs-open__inner">
         {back}
-        <div className="stretch-cs-open__text">
+        <div className="stretch-cs-open__text" style={{ "--cs-name-chars": longestWord(name) } as CSSProperties}>
           <p className="stretch-display stretch-cs-open__number" aria-hidden="true">
             {number}
           </p>
@@ -157,7 +162,11 @@ export function StoryEvidence({ evidence }: { evidence: readonly EvidenceItem[] 
   );
 }
 
-/** The tile that ends a story, in the next story's colours: a number, a name, a one-line outcome and an arrow. */
+/**
+ * The tile that ends a story, in the next story's colours: a number, a name, a
+ * one-line outcome and an arrow. A story whose next has a picture passes it as
+ * `media`: the screenshot, tilted on the right, and the project's Fastener if it has one.
+ */
 export function StoryNext({
   label,
   href,
@@ -165,6 +174,7 @@ export function StoryNext({
   number,
   name,
   outcome,
+  media,
 }: {
   label: string;
   href: string;
@@ -172,19 +182,24 @@ export function StoryNext({
   number: string;
   name: string;
   outcome: string;
+  media?: { screenshot: ProjectImage; fastener?: Fastener };
 }) {
   return (
     <section className="stretch-wrap stretch-cs-next" aria-label={label}>
       <Link className="stretch-cs-next__tile" href={href} style={storyColours(colours)}>
-        <span className="stretch-mono stretch-cs-next__label">{label}</span>
-        <span className="stretch-display stretch-cs-next__number" aria-hidden="true">
-          {number}
+        {media?.fastener && <FastenerProp kind={media.fastener} />}
+        <span className="stretch-cs-next__text">
+          <span className="stretch-mono stretch-cs-next__label">{label}</span>
+          <span className="stretch-display stretch-cs-next__number" aria-hidden="true">
+            {number}
+          </span>
+          <span className="stretch-cs-next__name">{name}</span>
+          <span className="stretch-cs-next__outcome">{outcome}</span>
+          <span className="stretch-cs-next__arrow" aria-hidden="true">
+            →
+          </span>
         </span>
-        <span className="stretch-cs-next__name">{name}</span>
-        <span className="stretch-cs-next__outcome">{outcome}</span>
-        <span className="stretch-cs-next__arrow" aria-hidden="true">
-          →
-        </span>
+        {media && <TileShot screenshot={media.screenshot} sizes="(max-width: 760px) calc(100vw - 80px), 520px" />}
       </Link>
     </section>
   );

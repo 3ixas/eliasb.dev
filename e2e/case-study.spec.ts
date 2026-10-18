@@ -106,6 +106,40 @@ for (const slug of slugs) {
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(next.name);
     });
 
+    test("the Next project tile carries the next project's screenshot, tilted, with its one Fastener if it has one", async ({ page }) => {
+      const tile = page.getByRole("region", { name: "Next project" }).getByRole("link");
+      const next = projects.find((entry) => entry.slug === study.next)!;
+      await expect(tile.locator("img")).toHaveAttribute("alt", next.screenshot!.alt);
+      // A project without a Fastener is valid in the catalogue, so the tile then carries none.
+      await expect(tile.locator(".stretch-fastener")).toHaveCount(next.fastener ? 1 : 0);
+      if (next.fastener) {
+        await expect(tile.locator(".stretch-fastener")).toHaveClass(new RegExp(`stretch-fastener--${next.fastener}`));
+        await expect(tile.locator(".stretch-fastener")).toHaveAttribute("aria-hidden", "true");
+      }
+      await expect(tile).toHaveAttribute("href", `/things-i-make/${study.next}`);
+      if ((page.viewportSize()?.width ?? 0) > 760) {
+        // From 761 px the screenshot sits on the right of the text, at a slight tilt.
+        const shot = tile.locator(".stretch-tile__shot");
+        await expect
+          .poll(async () => {
+            const [text, picture] = await Promise.all([tile.locator(".stretch-cs-next__text").boundingBox(), shot.boundingBox()]);
+            return picture!.x >= text!.x + text!.width;
+          })
+          .toBe(true);
+        await expect(shot).not.toHaveCSS("transform", "none");
+      } else {
+        // On a phone the screenshot stacks below the text, and is still tilted.
+        const shot = tile.locator(".stretch-tile__shot");
+        await expect
+          .poll(async () => {
+            const [text, picture] = await Promise.all([tile.locator(".stretch-cs-next__text").boundingBox(), shot.boundingBox()]);
+            return picture!.y >= text!.y + text!.height;
+          })
+          .toBe(true);
+        await expect(shot).not.toHaveCSS("transform", "none");
+      }
+    });
+
     test("cobalt is not used on the page", async ({ page }) => {
       const cobalt = await page.evaluate(() => {
         const probe = document.createElement("span");
@@ -200,6 +234,74 @@ for (const slug of slugs) {
         expect(box!.height, (await target.textContent()) ?? "").toBeGreaterThanOrEqual(44);
       }
     });
+  });
+}
+
+for (const slug of slugs) {
+  test.describe(`Case study opening: ${slug}`, () => {
+    // 761 to 1099 px is where the band's column is narrowest against its display title.
+    for (const width of [320, 390, 761, 820, 1000, 1099, 1440]) {
+      test(`the title breaks only between words at ${width} px`, async ({ page }, testInfo) => {
+        test.skip(!/-1440-light$/.test(testInfo.project.name), "Sweeps its own widths: once per engine");
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(`/things-i-make/${slug}`);
+        const title = page.getByRole("heading", { level: 1 });
+        await expect(title).toBeVisible();
+        await page.evaluate(() => document.fonts.ready);
+        // A word never splits if the heading has no more lines than words and no word is wider than the heading.
+        await expect
+          .poll(() =>
+            title.evaluate((heading) => {
+              const words = heading.textContent!.trim().split(/\s+/);
+              const lineHeight = parseFloat(getComputedStyle(heading).lineHeight);
+              const lines = Math.round(heading.getBoundingClientRect().height / lineHeight);
+              const widest = Math.max(
+                ...words.map((word) => {
+                  const probe = document.createElement("span");
+                  probe.textContent = word;
+                  probe.style.cssText = "position:absolute;white-space:nowrap;visibility:hidden";
+                  heading.appendChild(probe);
+                  const wide = probe.getBoundingClientRect().width;
+                  probe.remove();
+                  return wide;
+                }),
+              );
+              return { lines: lines <= words.length, fits: widest <= heading.clientWidth + 0.5 };
+            }),
+          )
+          .toEqual({ lines: true, fits: true });
+      });
+    }
+  });
+
+  test.describe(`Case study section links: ${slug}`, () => {
+    for (const width of [390, 820]) {
+      test(`the six links sit in two columns, the first on the page gutter, at ${width} px`, async ({ page }, testInfo) => {
+        test.skip(!/-1440-light$/.test(testInfo.project.name), "Sweeps its own widths: once per engine");
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(`/things-i-make/${slug}`);
+        const links = page.getByRole("navigation", { name: "Sections" }).getByRole("link");
+        await expect(links).toHaveCount(6);
+        // The page gutter: 16 px on a phone, wider on a tablet. The heading sits on it.
+        const gutter = Math.round((await page.getByRole("heading", { level: 1 }).boundingBox())!.x);
+        if (width === 390) expect(gutter).toBe(16);
+        await expect
+          .poll(async () => {
+            const boxes = await links.evaluateAll((items) =>
+              items.map((item) => {
+                const range = document.createRange();
+                range.selectNodeContents(item);
+                const text = range.getBoundingClientRect();
+                return { left: Math.round(text.left), top: Math.round(item.getBoundingClientRect().top) };
+              }),
+            );
+            const columns = new Set(boxes.map((box) => box.left));
+            const rows = new Set(boxes.map((box) => box.top));
+            return { columns: columns.size, rows: rows.size, first: boxes[0].left };
+          })
+          .toEqual({ columns: 2, rows: 3, first: gutter });
+      });
+    }
   });
 }
 

@@ -61,6 +61,52 @@ for (const slug of roleStorySlugs) {
       });
     }
 
+    if (slug === "joveen" || slug === "optegra") {
+      test("its screenshots sit under their sections, captioned with their source", async ({ page }) => {
+        for (const [key, figure] of Object.entries(story.figures ?? {})) {
+          if (figure.kind !== "screens") throw new Error(`${slug}'s figures are screenshots`);
+          const block = page.locator(`section#${key} figure`);
+          await expect(block.locator("figcaption")).toContainText(figure.caption);
+          await expect(block.locator("figcaption a")).toHaveAttribute("href", figure.source.href);
+          await expect(block.locator("figcaption a")).toHaveText(figure.source.label);
+          await expect(block.locator("img")).toHaveCount(figure.images.length);
+          for (const [index, image] of figure.images.entries()) {
+            const img = block.locator("img").nth(index);
+            await img.scrollIntoViewIfNeeded();
+            await expect(img).toHaveAttribute("alt", image.alt);
+            await expect.poll(() => img.evaluate((el: HTMLImageElement) => (el.complete ? el.naturalWidth : 0))).toBeGreaterThan(0);
+            expect((await page.request.get(image.src)).status()).toBe(200);
+          }
+        }
+      });
+    }
+
+    if (slug === "joveen") {
+      test("the Joveen hero sits desktop beside phone, and is captioned as the live site today", async ({ page }) => {
+        const shots = page.locator("section#the-role .stretch-role-screens__shot");
+        await expect(shots).toHaveCount(2);
+        const desktop = shots.first();
+        const phone = shots.last();
+        await expect(desktop).toHaveClass(/--desktop/);
+        await expect(phone).toHaveClass(/--phone/);
+        await expect(page.locator("section#the-role figcaption")).toContainText("the live site, not my UI");
+        await expect.poll(async () => {
+          const [a, b] = [await desktop.boundingBox(), await phone.boundingBox()];
+          return a && b ? a.x + a.width <= b.x && Math.abs(a.y + a.height - (b.y + b.height)) < 2 : false;
+        }).toBe(true);
+      });
+    }
+
+    if (slug === "optegra") {
+      test("the Optegra captions give their Wayback URL and June 2024 date", async ({ page }) => {
+        for (const [key, date] of [["the-role", "5 June 2024"], ["what-changed", "13 June 2024"]]) {
+          const caption = page.locator(`section#${key} figcaption`);
+          await expect(caption).toContainText(date);
+          await expect(caption.locator("a")).toHaveAttribute("href", /^https:\/\/web\.archive\.org\/web\/202406\d{8}\/https:\/\/www\.optegra\.com\//);
+        }
+      });
+    }
+
     if (slug === "bnp-paribas") {
       test("its three figures sit under their sections with their captions", async ({ page }) => {
         const flag = page.locator("section#decisions figure");
@@ -195,6 +241,36 @@ for (const slug of roleStorySlugs) {
       await expect(page).toHaveURL(/#what-i-took-with-me$/);
       await expect(page.locator("section#what-i-took-with-me")).toBeInViewport();
     });
+
+    // #219: the title and the section links share the case study's rules, so a long employer name (Optegra's) must not split mid-word either.
+    for (const width of [320, 390, 820]) {
+      test(`the title and the section links break only between words at ${width} px`, async ({ page }, testInfo) => {
+        test.skip(!/-1440-light$/.test(testInfo.project.name), "Sweeps its own widths: once per engine");
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(`/work/${slug}`);
+        await page.evaluate(() => document.fonts.ready);
+        // A word never splits if no word is wider than the box that holds it (a link is inline, so its list item is the box).
+        const widestWordFits = (element: Element) => {
+          const holder = getComputedStyle(element).display === "inline" ? element.parentElement! : element;
+          const widest = Math.max(
+            ...element.textContent!.trim().split(/\s+/).map((word) => {
+              const probe = document.createElement("span");
+              probe.textContent = word;
+              probe.style.cssText = "position:absolute;white-space:nowrap;visibility:hidden";
+              element.appendChild(probe);
+              const wide = probe.getBoundingClientRect().width;
+              probe.remove();
+              return wide;
+            }),
+          );
+          return widest <= holder.clientWidth + 0.5;
+        };
+        await expect.poll(() => page.getByRole("heading", { level: 1 }).evaluate(widestWordFits)).toBe(true);
+        const links = page.getByRole("navigation", { name: "Sections" }).getByRole("link");
+        await expect(links).toHaveCount(roleStorySectionKeys.length);
+        for (const link of await links.all()) await expect.poll(() => link.evaluate(widestWordFits)).toBe(true);
+      });
+    }
 
     test("section copy is the approved copy", async ({ page }) => {
       for (const key of roleStorySectionKeys) {

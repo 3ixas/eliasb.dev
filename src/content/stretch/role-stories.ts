@@ -177,6 +177,29 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
         ],
       },
     },
+    figures: {
+      "the-role": {
+        kind: "screens",
+        images: [
+          {
+            src: "/work/joveen/home-desktop.webp",
+            alt: "The joveen.com homepage on a desktop: the Joveen wordmark and menu above a hero for CliniCare skincare, with a Shop the Range button and a row of the range’s products.",
+            width: 1600,
+            height: 800,
+            device: "desktop",
+          },
+          {
+            src: "/work/joveen/home-phone.webp",
+            alt: "The same joveen.com hero on a phone, stacked: the CliniCare line, the Shop the Range button and the products.",
+            width: 585,
+            height: 796,
+            device: "phone",
+          },
+        ],
+        caption: "joveen.com today, 16 October 2026. It now runs on Shopify: the live site, not my UI",
+        source: { href: "https://www.joveen.com/", label: "joveen.com" },
+      },
+    },
     evidence: [
       { value: "−40%", label: "page load" },
       { value: "Under 2", label: "minutes to deploy, down from 10" },
@@ -238,6 +261,42 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
         paragraphs: [
           "The click came in early 2024. A friend loved his work so much that even a hectic week sounded exciting, and I wanted that from mine. I started coding in my spare time, just to see, and by August 2024 I was doing it for a living.",
         ],
+      },
+    },
+    figures: {
+      "the-role": {
+        kind: "screens",
+        images: [
+          {
+            src: "/work/optegra/home.webp",
+            alt: "The Optegra homepage in June 2024: a sunset beach behind the headline Choose Our Top Rated Eye Hospitals, a booking panel for a free video or telephone consultation, and the Trustpilot and NHS marks.",
+            width: 1440,
+            height: 900,
+            device: "desktop",
+          },
+        ],
+        caption: "Optegra homepage, Wayback Machine snapshot of 5 June 2024",
+        source: {
+          href: "https://web.archive.org/web/20240605112227/https://www.optegra.com/",
+          label: "web.archive.org/web/20240605112227/https://www.optegra.com/",
+        },
+      },
+      "what-changed": {
+        kind: "screens",
+        images: [
+          {
+            src: "/work/optegra/dry-amd-treatment.webp",
+            alt: "Optegra’s dry AMD treatment page in June 2024: the headline Dry AMD Treatment, Available at our Central London and Manchester Eye Hospitals, Valeda Light Therapy, and a Request a Callback form.",
+            width: 1440,
+            height: 900,
+            device: "desktop",
+          },
+        ],
+        caption: "Optegra dry AMD treatment launch page, Wayback Machine snapshot of 13 June 2024",
+        source: {
+          href: "https://web.archive.org/web/20240613032246/https://www.optegra.com/dry-amd-treatment/",
+          label: "web.archive.org/web/20240613032246/https://www.optegra.com/dry-amd-treatment/",
+        },
       },
     },
     evidence: [

@@ -2,7 +2,7 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import type { RoleStoryFigure } from "@/content/stretch/role-story";
 
-/** The figure a Role story attaches to a section: a flag, a to-scale before-and-after, or a certificate. */
+/** The figure a Role story attaches to a section: a flag, a to-scale before-and-after, a certificate, or screenshots of a public page. */
 export function RoleStoryFigureBlock({ figure }: { figure: RoleStoryFigure }) {
   switch (figure.kind) {
     case "flag":
@@ -11,6 +11,8 @@ export function RoleStoryFigureBlock({ figure }: { figure: RoleStoryFigure }) {
       return <ScaleFigure figure={figure} />;
     case "certificate":
       return <CertificateFigure figure={figure} />;
+    case "screens":
+      return <ScreensFigure figure={figure} />;
   }
 }
 
@@ -74,6 +76,33 @@ function CertificateFigure({ figure }: { figure: Extract<RoleStoryFigure, { kind
         <Image src={figure.src} alt={figure.alt} width={figure.width} height={figure.height} sizes="(min-width: 761px) 720px, 100vw" />
       </div>
       <figcaption className="stretch-mono stretch-role-figure__caption">{figure.caption}</figcaption>
+    </figure>
+  );
+}
+
+/** Screenshots of a public page, never edited: the caption says when, and links to where, they were taken. */
+function ScreensFigure({ figure }: { figure: Extract<RoleStoryFigure, { kind: "screens" }> }) {
+  return (
+    <figure className="stretch-role-figure stretch-role-screens">
+      <div className="stretch-role-screens__row">
+        {figure.images.map(({ src, alt, width, height, device }) => (
+          <div key={src} className={`stretch-role-screens__shot stretch-role-screens__shot--${device}`}>
+            <Image
+              src={src}
+              alt={alt}
+              width={width}
+              height={height}
+              sizes={device === "phone" ? "(min-width: 761px) 160px, 24vw" : "(min-width: 761px) 540px, 72vw"}
+            />
+          </div>
+        ))}
+      </div>
+      <figcaption className="stretch-mono stretch-role-figure__caption">
+        {figure.caption} ·{" "}
+        <a className="stretch-role-screens__source" href={figure.source.href}>
+          {figure.source.label}
+        </a>
+      </figcaption>
     </figure>
   );
 }
