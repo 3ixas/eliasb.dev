@@ -1,0 +1,126 @@
+{
+ "W": 390,
+ "variant": "shipped",
+ "scrollTo": 1200,
+ "before": {
+  "innerWidth": 390,
+  "clientWidth": 390,
+  "scrollbar": 0,
+  "scrollY": 1200,
+  "scrollHeight": 11043,
+  "header": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 69
+  },
+  "themeBtn": {
+   "x": 16,
+   "y": 12,
+   "w": 44,
+   "h": 44
+  },
+  "menuBtn": {
+   "x": 298.4,
+   "y": 12,
+   "w": 75.6,
+   "h": 44
+  },
+  "closeBtn": null,
+  "dialog": null,
+  "dialogScrollbar": null,
+  "workHeading": {
+   "x": 16,
+   "y": -25.3,
+   "w": 130.9,
+   "h": 57.6
+  },
+  "firstVisibleText": null
+ },
+ "open": {
+  "innerWidth": 390,
+  "clientWidth": 390,
+  "scrollbar": 0,
+  "scrollY": 1200,
+  "scrollHeight": 11043,
+  "header": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 69
+  },
+  "themeBtn": {
+   "x": 16,
+   "y": 12,
+   "w": 44,
+   "h": 44
+  },
+  "menuBtn": {
+   "x": 298.4,
+   "y": 12,
+   "w": 75.6,
+   "h": 44
+  },
+  "closeBtn": {
+   "x": 306,
+   "y": 16,
+   "w": 68,
+   "h": 44
+  },
+  "dialog": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 844
+  },
+  "dialogScrollbar": 0,
+  "workHeading": {
+   "x": 16,
+   "y": -25.3,
+   "w": 130.9,
+   "h": 57.6
+  },
+  "firstVisibleText": null
+ },
+ "behind": {
+  "headerW": 390,
+  "workHeadingX": 16,
+  "workHeadingY": -25.296875,
+  "clientWidth": 390
+ },
+ "after": {
+  "innerWidth": 390,
+  "clientWidth": 390,
+  "scrollbar": 0,
+  "scrollY": 1200,
+  "scrollHeight": 11043,
+  "header": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 69
+  },
+  "themeBtn": {
+   "x": 16,
+   "y": 12,
+   "w": 44,
+   "h": 44
+  },
+  "menuBtn": {
+   "x": 298.4,
+   "y": 12,
+   "w": 75.6,
+   "h": 44
+  },
+  "closeBtn": null,
+  "dialog": null,
+  "dialogScrollbar": null,
+  "workHeading": {
+   "x": 16,
+   "y": -25.3,
+   "w": 130.9,
+   "h": 57.6
+  },
+  "firstVisibleText": null
+ }
+}

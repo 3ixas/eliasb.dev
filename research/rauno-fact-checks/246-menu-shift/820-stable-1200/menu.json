@@ -1,0 +1,144 @@
+{
+ "W": 820,
+ "variant": "stable",
+ "scrollTo": 1200,
+ "before": {
+  "innerWidth": 820,
+  "clientWidth": 805,
+  "scrollbar": 15,
+  "scrollY": 1200,
+  "scrollHeight": 7489,
+  "header": {
+   "x": 0,
+   "y": 0,
+   "w": 805,
+   "h": 69
+  },
+  "themeBtn": {
+   "x": 32,
+   "y": 12,
+   "w": 44,
+   "h": 44
+  },
+  "menuBtn": {
+   "x": 697.4,
+   "y": 12,
+   "w": 75.6,
+   "h": 44
+  },
+  "closeBtn": null,
+  "dialog": null,
+  "dialogScrollbar": null,
+  "workHeading": {
+   "x": 32,
+   "y": -264.6,
+   "w": 145.2,
+   "h": 65.2
+  },
+  "firstVisibleText": {
+   "text": "Before 2021 · History at uni · Because I",
+   "x": 523,
+   "y": 684.4,
+   "w": 250,
+   "h": 76.6
+  }
+ },
+ "open": {
+  "innerWidth": 820,
+  "clientWidth": 820,
+  "scrollbar": 0,
+  "scrollY": 1200,
+  "scrollHeight": 7489,
+  "header": {
+   "x": 0,
+   "y": 0,
+   "w": 805,
+   "h": 69
+  },
+  "themeBtn": {
+   "x": 32,
+   "y": 12,
+   "w": 44,
+   "h": 44
+  },
+  "menuBtn": {
+   "x": 697.4,
+   "y": 12,
+   "w": 75.6,
+   "h": 44
+  },
+  "closeBtn": {
+   "x": 721,
+   "y": 16,
+   "w": 68,
+   "h": 44
+  },
+  "dialog": {
+   "x": 0,
+   "y": 0,
+   "w": 805,
+   "h": 1000
+  },
+  "dialogScrollbar": 0,
+  "workHeading": {
+   "x": 32,
+   "y": -264.6,
+   "w": 145.2,
+   "h": 65.2
+  },
+  "firstVisibleText": {
+   "text": "Before 2021 · History at uni · Because I",
+   "x": 523,
+   "y": 684.4,
+   "w": 250,
+   "h": 76.6
+  }
+ },
+ "behind": {
+  "headerW": 805,
+  "workHeadingX": 32,
+  "workHeadingY": -264.5625,
+  "clientWidth": 820
+ },
+ "after": {
+  "innerWidth": 820,
+  "clientWidth": 805,
+  "scrollbar": 15,
+  "scrollY": 1200,
+  "scrollHeight": 7489,
+  "header": {
+   "x": 0,
+   "y": 0,
+   "w": 805,
+   "h": 69
+  },
+  "themeBtn": {
+   "x": 32,
+   "y": 12,
+   "w": 44,
+   "h": 44
+  },
+  "menuBtn": {
+   "x": 697.4,
+   "y": 12,
+   "w": 75.6,
+   "h": 44
+  },
+  "closeBtn": null,
+  "dialog": null,
+  "dialogScrollbar": null,
+  "workHeading": {
+   "x": 32,
+   "y": -264.6,
+   "w": 145.2,
+   "h": 65.2
+  },
+  "firstVisibleText": {
+   "text": "Before 2021 · History at uni · Because I",
+   "x": 523,
+   "y": 684.4,
+   "w": 250,
+   "h": 76.6
+  }
+ }
+}
