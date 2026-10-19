@@ -1,0 +1,382 @@
+== full 1440px 3g font-display:block  FP 2276 FCP 3476
+   font 70bc3e132a0a741e 40757B  2137->12416ms
+   font 74effe3e2193102a 131704B  2137->17253ms
+   fonts loadingdone t=17276: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0332; total CLS 0.0941; nonzero shifts:
+     t=17274 v=0.0332 #text [52, 112, 998, 302]->[52, 42, 998, 302]; #text [52, 314, 998, 302]->[52, 244, 998, 302]; stretch-portrait [1081, 466, 309, 377]->[1079, 495, 309, 377]; #text [52, 594, 881, 118]->[52, 590, 881, 118]; stretch-hero__actions [52, 796, 998, 48]->[52, 824, 998, 48]
+   name: first sample t=2253; t2253:998x403.2@52,93 op0 fFalse | t7301:998x403.2@52,93 op1 fFalse
+   headline: first sample t=2253; t2253:881.3x112@52,592.7 op0 fFalse | t7119:881.3x112@52,592.7 op1 fFalse
+   support: first sample t=2253; t2253:494x57@52,718.7 op0 fFalse | t7618:494x57@52,718.7 op1 fFalse
+   workHeading: first sample t=2253; t2253:170.5x86.4@52,987.7 op1 fFalse
+== full 1440px 3g font-display:optional  FP 2288 FCP 3480
+   font 70bc3e132a0a741e 40820B  2129->12304ms
+   font 74effe3e2193102a 131649B  2130->17249ms
+   fonts loadingdone t=17259: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0609; nonzero shifts:
+   name: first sample t=2261; t2261:998x403.2@52,93 op0 fFalse | t7302:998x403.2@52,93 op1 fFalse
+   headline: first sample t=2261; t2261:881.3x112@52,592.7 op0 fFalse | t7121:881.3x112@52,592.7 op1 fFalse
+   support: first sample t=2261; t2261:494x57@52,718.7 op0 fFalse | t7620:494x57@52,718.7 op1 fFalse
+   workHeading: first sample t=2261; t2261:170.5x86.4@52,987.7 op1 fFalse
+== full 1440px 3g font-display:swap  FP 5368 FCP 6372
+   font 70bc3e132a0a741e 40770B  2102->6454ms
+   font 74effe3e2193102a 131640B  2102->15216ms
+   fonts loadingdone t=15232: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0048; total CLS 0.0657; nonzero shifts:
+     t=15234 v=0.0048 stretch-portrait [1081, 466, 309, 377]->[1079, 495, 309, 377]; #text [52, 594, 881, 118]->[52, 590, 881, 118]; stretch-hero__actions [52, 796, 998, 48]->[52, 824, 998, 48]
+   name: first sample t=5354; t5354:998x403.2@52,93 op0 fFalse | t10197:998x403.2@52,93 op1 fFalse
+   headline: first sample t=5354; t5354:881.3x112@52,592.7 op0 fFalse | t10015:881.3x112@52,592.7 op1 fFalse
+   support: first sample t=5354; t5354:494x57@52,718.7 op0 fFalse | t10515:494x57@52,718.7 op1 fFalse
+   workHeading: first sample t=5354; t5354:170.5x86.4@52,987.7 op1 fFalse
+== full 1440px slow4g font-display:swap  FP 1584 FCP 2456
+   font 70bc3e132a0a741e 40756B  631->1859ms
+   font 74effe3e2193102a 131672B  631->2424ms
+   fonts loadingdone t=2438: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0443; nonzero shifts:
+   name: first sample t=1571; t1571:998x403.2@52,93 op0 fFalse | t2443:998x403.2@52,93 op0 fTrue | t6281:998x403.2@52,93 op1 fTrue
+   headline: first sample t=1571; t1571:881.3x112@52,592.7 op0 fFalse | t2443:881.3x112@52,592.7 op0 fTrue | t6098:881.3x112@52,592.7 op1 fTrue
+   support: first sample t=1571; t1571:494x57@52,718.7 op0 fFalse | t2443:494x85.5@52,718.7 op0 fTrue | t6598:494x85.5@52,718.7 op1 fTrue
+   workHeading: first sample t=1571; t1571:170.5x86.4@52,987.7 op1 fFalse | t2443:181.4x86.4@52,1016.2 op1 fTrue
+== full 390px 3g font-display:block  FP 2228 FCP 3444
+   font 70bc3e132a0a741e 40820B  2098->9842ms
+   font 74effe3e2193102a 131640B  2098->13020ms
+   fonts loadingdone t=13039: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0306; total CLS 0.0697; nonzero shifts:
+     t=13037 v=0.0306 #text [16, 90, 358, 147]->[16, 56, 358, 147]; #text [16, 188, 358, 147]->[16, 154, 358, 147]; #text [16, 352, 358, 36]->[16, 414, 358, 36]; #text [16, 416, 253, 36]->[74, 414, 277, 36]; stretch-button stretch-button--primary [166, 559, 106, 48]->[178, 559, 112, 48]
+   name: first sample t=2205; t2205:358x196.5@16,81 op0 fFalse | t7276:358x196.5@16,81 op1 fFalse
+   headline: first sample t=2205; t2205:358x97.2@16,351.5 op0 fFalse | t7076:358x97.2@16,351.5 op1 fFalse
+   support: first sample t=2205; t2205:358x76.5@16,462.7 op0 fFalse | t7575:358x76.5@16,462.7 op1 fFalse
+   workHeading: first sample t=2205; t2205:113.7x57.6@16,1174.7 op1 fFalse
+== full 390px 3g font-display:optional  FP 2208 FCP 3444
+   font 70bc3e132a0a741e 40820B  2098->9904ms
+   font 74effe3e2193102a 131640B  2098->13024ms
+   fonts loadingdone t=13034: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0391; nonzero shifts:
+   name: first sample t=2186; t2186:358x196.5@16,81 op0 fFalse | t7275:358x196.5@16,81 op1 fFalse
+   headline: first sample t=2186; t2186:358x97.2@16,351.5 op0 fFalse | t7093:358x97.2@16,351.5 op1 fFalse
+   support: first sample t=2186; t2186:358x76.5@16,462.7 op0 fFalse | t7593:358x76.5@16,462.7 op1 fFalse
+   workHeading: first sample t=2186; t2186:113.7x57.6@16,1174.7 op1 fFalse
+== full 390px 3g font-display:swap  FP 5388 FCP 6392
+   font 70bc3e132a0a741e 40770B  2133->6484ms
+   font 74effe3e2193102a 131640B  2133->12628ms
+   fonts loadingdone t=12647: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0037; total CLS 0.0428; nonzero shifts:
+     t=12645 v=0.0037 EM [16, 416, 253, 32]->[74, 414, 277, 36]; stretch-button stretch-button--primary [166, 559, 106, 48]->[178, 559, 112, 48]
+   name: first sample t=5379; t5379:358x196.5@16,81 op0 fFalse | t10223:358x196.5@16,81 op1 fFalse
+   headline: first sample t=5379; t5379:358x97.2@16,351.5 op0 fFalse | t10040:358x97.2@16,351.5 op1 fFalse
+   support: first sample t=5379; t5379:358x76.5@16,462.7 op0 fFalse | t10538:358x76.5@16,462.7 op1 fFalse
+   workHeading: first sample t=5379; t5379:113.7x57.6@16,1174.7 op1 fFalse
+== full 390px slow4g font-display:swap  FP 1792 FCP 2640
+   font 70bc3e132a0a741e 40820B  786->2003ms
+   font 74effe3e2193102a 131640B  787->2604ms
+   fonts loadingdone t=2619: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0201; nonzero shifts:
+   name: first sample t=1721; t1721:358x196.5@16,81 op0 fFalse | t2630:358x196.5@16,81 op0 fTrue | t6478:358x196.5@16,81 op1 fTrue
+   headline: first sample t=1721; t1721:358x97.2@16,351.5 op0 fFalse | t2630:358x97.2@16,351.5 op0 fTrue | t6279:358x97.2@16,351.5 op1 fTrue
+   support: first sample t=1721; t1721:358x76.5@16,462.7 op0 fFalse | t2630:358x76.5@16,462.7 op0 fTrue | t6779:358x76.5@16,462.7 op1 fTrue
+   workHeading: first sample t=1721; t1721:113.7x57.6@16,1174.7 op1 fFalse | t2630:130.9x57.6@16,1174.7 op1 fTrue
+== rm 1440px 3g font-display:swap  FP 5424 FCP 5424
+   font 70bc3e132a0a741e 40756B  2163->6541ms
+   font 74effe3e2193102a 131654B  2163->15272ms
+   fonts loadingdone t=15288: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0332; total CLS 0.0332; nonzero shifts:
+     t=15292 v=0.0332 #text [52, 112, 998, 302]->[52, 42, 998, 302]; #text [52, 314, 998, 302]->[52, 244, 998, 302]; stretch-portrait [1081, 466, 309, 377]->[1079, 495, 309, 377]; #text [52, 594, 881, 118]->[52, 590, 881, 118]; stretch-hero__actions [52, 796, 998, 48]->[52, 824, 998, 48]
+   name: first sample t=5406; t5406:998x403.2@52,93 op1 fFalse
+   headline: first sample t=5406; t5406:881.3x112@52,592.7 op1 fFalse
+   support: first sample t=5406; t5406:494x57@52,718.7 op1 fFalse
+   workHeading: first sample t=5406; t5406:170.5x86.4@52,987.7 op1 fFalse
+== rm 1440px none font-display:optional  FP 260 FCP 260
+   font 70bc3e132a0a741e 40756B  88->144ms
+   font 74effe3e2193102a 131704B  88->140ms
+   fonts loadingdone t=248: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0000; nonzero shifts:
+   name: first sample t=239; t239:998x403.2@52,93 op1 fTrue
+   headline: first sample t=239; t239:881.3x112@52,592.7 op1 fTrue
+   support: first sample t=239; t239:494x85.5@52,718.7 op1 fTrue
+   workHeading: first sample t=239; t239:181.4x86.4@52,1016.2 op1 fTrue
+== rm 1440px none font-display:swap-routed  FP 288 FCP 288
+   font 70bc3e132a0a741e 40820B  110->147ms
+   font 74effe3e2193102a 131640B  110->173ms
+   fonts loadingdone t=264: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0000; nonzero shifts:
+   name: first sample t=255; t255:998x403.2@52,93 op1 fTrue
+   headline: first sample t=255; t255:881.3x112@52,592.7 op1 fTrue
+   support: first sample t=255; t255:494x85.5@52,718.7 op1 fTrue
+   workHeading: first sample t=255; t255:181.4x86.4@52,1016.2 op1 fTrue
+== rm 1440px slow4g font-display:block  FP 972 FCP 972
+   font 70bc3e132a0a741e 40821B  646->2555ms
+   font 74effe3e2193102a 131640B  646->3430ms
+   fonts loadingdone t=3444: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0056; total CLS 0.0056; nonzero shifts:
+     t=3450 v=0.0056 stretch-portrait [1081, 466, 309, 377]->[1079, 495, 309, 377]; stretch-hero__actions [52, 796, 998, 48]->[52, 824, 998, 48]; EM [329, 649, 437, 56]->[337, 646, 466, 62]; stretch-header__right [795, 12, 593, 44]->[756, 12, 632, 44]; stretch-portrait__label [1050, 753, 160, 56]->[1052, 781, 171, 57]
+   name: first sample t=942; t942:998x403.2@52,93 op1 fFalse | t3448:998x403.2@52,93 op1 fTrue
+   headline: first sample t=942; t942:881.3x112@52,592.7 op1 fFalse | t3448:881.3x112@52,592.7 op1 fTrue
+   support: first sample t=942; t942:494x57@52,718.7 op1 fFalse | t3448:494x85.5@52,718.7 op1 fTrue
+   workHeading: first sample t=942; t942:170.5x86.4@52,987.7 op1 fFalse | t3448:181.4x86.4@52,1016.2 op1 fTrue
+== rm 1440px slow4g font-display:optional  FP 844 FCP 844
+   font 70bc3e132a0a741e 40820B  633->2591ms
+   font 74effe3e2193102a 131640B  633->3415ms
+   fonts loadingdone t=3424: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0000; nonzero shifts:
+   name: first sample t=828; t828:998x403.2@52,93 op1 fFalse | t3429:998x403.2@52,93 op1 fTrue
+   headline: first sample t=828; t828:881.3x112@52,592.7 op1 fFalse | t3429:881.3x112@52,592.7 op1 fTrue
+   support: first sample t=828; t828:494x57@52,718.7 op1 fFalse | t3429:494x57@52,718.7 op1 fTrue
+   workHeading: first sample t=828; t828:170.5x86.4@52,987.7 op1 fFalse | t3429:170.5x86.4@52,987.7 op1 fTrue
+== rm 1440px slow4g font-display:swap  FP 1596 FCP 1596
+   font 70bc3e132a0a741e 40756B  624->1849ms
+   font 74effe3e2193102a 131654B  625->2415ms
+   fonts loadingdone t=2428: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0332; total CLS 0.0332; nonzero shifts:
+     t=2431 v=0.0332 #text [52, 112, 998, 302]->[52, 42, 998, 302]; #text [52, 314, 998, 302]->[52, 244, 998, 302]; stretch-portrait [1081, 466, 309, 377]->[1079, 495, 309, 377]; #text [52, 594, 881, 118]->[52, 590, 881, 118]; stretch-hero__actions [52, 796, 998, 48]->[52, 824, 998, 48]
+   name: first sample t=1565; t1565:998x403.2@52,93 op1 fFalse | t2429:998x403.2@52,93 op1 fTrue
+   headline: first sample t=1565; t1565:881.3x112@52,592.7 op1 fFalse | t2429:881.3x112@52,592.7 op1 fTrue
+   support: first sample t=1565; t1565:494x57@52,718.7 op1 fFalse | t2429:494x85.5@52,718.7 op1 fTrue
+   workHeading: first sample t=1565; t1565:170.5x86.4@52,987.7 op1 fFalse | t2429:181.4x86.4@52,1016.2 op1 fTrue
+== rm 1440px slow4g font-display:swap-routed  FP 936 FCP 936
+   font 70bc3e132a0a741e 40765B  680->2630ms
+   font 74effe3e2193102a 131704B  680->3463ms
+   fonts loadingdone t=3478: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0332; total CLS 0.0332; nonzero shifts:
+     t=3482 v=0.0332 #text [52, 112, 998, 302]->[52, 42, 998, 302]; #text [52, 314, 998, 302]->[52, 244, 998, 302]; stretch-portrait [1081, 466, 309, 377]->[1079, 495, 309, 377]; #text [52, 594, 881, 118]->[52, 590, 881, 118]; stretch-hero__actions [52, 796, 998, 48]->[52, 824, 998, 48]
+   name: first sample t=918; t918:998x403.2@52,93 op1 fFalse | t3479:998x403.2@52,93 op1 fTrue
+   headline: first sample t=918; t918:881.3x112@52,592.7 op1 fFalse | t3479:881.3x112@52,592.7 op1 fTrue
+   support: first sample t=918; t918:494x57@52,718.7 op1 fFalse | t3479:494x85.5@52,718.7 op1 fTrue
+   workHeading: first sample t=918; t918:170.5x86.4@52,987.7 op1 fFalse | t3479:181.4x86.4@52,1016.2 op1 fTrue
+== rm 390px 3g font-display:block  FP 2256 FCP 2256
+   font 70bc3e132a0a741e 40820B  2101->9843ms
+   font 74effe3e2193102a 131649B  2101->13018ms
+   fonts loadingdone t=13035: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0306; total CLS 0.0306; nonzero shifts:
+     t=13034 v=0.0306 #text [16, 90, 358, 147]->[16, 56, 358, 147]; #text [16, 188, 358, 147]->[16, 154, 358, 147]; #text [16, 352, 358, 36]->[16, 414, 358, 36]; #text [16, 416, 253, 36]->[74, 414, 277, 36]; stretch-button stretch-button--primary [166, 559, 106, 48]->[178, 559, 112, 48]
+   name: first sample t=2232; t2232:358x196.5@16,81 op1 fFalse
+   headline: first sample t=2232; t2232:358x97.2@16,351.5 op1 fFalse
+   support: first sample t=2232; t2232:358x76.5@16,462.7 op1 fFalse
+   workHeading: first sample t=2232; t2232:113.7x57.6@16,1174.7 op1 fFalse
+== rm 390px 3g font-display:optional  FP 2280 FCP 2280
+   font 70bc3e132a0a741e 40829B  2131->9870ms
+   font 74effe3e2193102a 131640B  2131->13053ms
+   fonts loadingdone t=13064: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0000; nonzero shifts:
+   name: first sample t=2255; t2255:358x196.5@16,81 op1 fFalse
+   headline: first sample t=2255; t2255:358x97.2@16,351.5 op1 fFalse
+   support: first sample t=2255; t2255:358x76.5@16,462.7 op1 fFalse
+   workHeading: first sample t=2255; t2255:113.7x57.6@16,1174.7 op1 fFalse
+== rm 390px 3g font-display:swap  FP 5364 FCP 5364
+   font 70bc3e132a0a741e 40770B  2099->6455ms
+   font 74effe3e2193102a 131677B  2099->12598ms
+   fonts loadingdone t=12617: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0306; total CLS 0.0306; nonzero shifts:
+     t=12616 v=0.0306 #text [16, 90, 358, 147]->[16, 56, 358, 147]; #text [16, 188, 358, 147]->[16, 154, 358, 147]; #text [16, 352, 358, 36]->[16, 414, 358, 36]; #text [16, 416, 253, 36]->[74, 414, 277, 36]; stretch-button stretch-button--primary [166, 559, 106, 48]->[178, 559, 112, 48]
+   name: first sample t=5351; t5351:358x196.5@16,81 op1 fFalse
+   headline: first sample t=5351; t5351:358x97.2@16,351.5 op1 fFalse
+   support: first sample t=5351; t5351:358x76.5@16,462.7 op1 fFalse
+   workHeading: first sample t=5351; t5351:113.7x57.6@16,1174.7 op1 fFalse
+== rm 390px 3g font-display:swap-routed  FP 2240 FCP 2240
+   font 70bc3e132a0a741e 40820B  2098->9842ms
+   font 74effe3e2193102a 131640B  2098->13024ms
+   fonts loadingdone t=13042: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0306; total CLS 0.0306; nonzero shifts:
+     t=13041 v=0.0306 #text [16, 90, 358, 147]->[16, 56, 358, 147]; #text [16, 188, 358, 147]->[16, 154, 358, 147]; #text [16, 352, 358, 36]->[16, 414, 358, 36]; #text [16, 416, 253, 36]->[74, 414, 277, 36]; stretch-button stretch-button--primary [166, 559, 106, 48]->[178, 559, 112, 48]
+   name: first sample t=2216; t2216:358x196.5@16,81 op1 fFalse
+   headline: first sample t=2216; t2216:358x97.2@16,351.5 op1 fFalse
+   support: first sample t=2216; t2216:358x76.5@16,462.7 op1 fFalse
+   workHeading: first sample t=2216; t2216:113.7x57.6@16,1174.7 op1 fFalse
+== rm 390px none font-display:optional  FP 360 FCP 360
+   font 70bc3e132a0a741e 40829B  109->134ms
+   font 74effe3e2193102a 131640B  109->155ms
+   fonts loadingdone t=355: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0000; nonzero shifts:
+   name: first sample t=347; t347:358x196.5@16,81 op1 fTrue
+   headline: first sample t=347; t347:358x97.2@16,351.5 op1 fTrue
+   support: first sample t=347; t347:358x76.5@16,462.7 op1 fTrue
+   workHeading: first sample t=347; t347:130.9x57.6@16,1174.7 op1 fTrue
+== rm 390px slow4g font-display:block  FP 956 FCP 956
+   font 70bc3e132a0a741e 40820B  676->2444ms
+   font 74effe3e2193102a 131649B  678->3287ms
+   fonts loadingdone t=3305: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0045; total CLS 0.0045; nonzero shifts:
+     t=3305 v=0.0045 EM [16, 416, 253, 32]->[74, 414, 277, 36]; stretch-button stretch-button--primary [166, 559, 106, 48]->[178, 559, 112, 48]; stretch-pill stretch-menu-button [304, 12, 70, 44]->[298, 12, 76, 44]; [object SVGAnimatedString] [12, 443, 260, 9]->[69, 443, 285, 9]
+   name: first sample t=932; t932:358x196.5@16,81 op1 fFalse | t3303:358x196.5@16,81 op1 fTrue
+   headline: first sample t=932; t932:358x97.2@16,351.5 op1 fFalse | t3303:358x97.2@16,351.5 op1 fTrue
+   support: first sample t=932; t932:358x76.5@16,462.7 op1 fFalse | t3303:358x76.5@16,462.7 op1 fTrue
+   workHeading: first sample t=932; t932:113.7x57.6@16,1174.7 op1 fFalse | t3303:130.9x57.6@16,1174.7 op1 fTrue
+== rm 390px slow4g font-display:optional  FP 856 FCP 856
+   font 70bc3e132a0a741e 40820B  632->2406ms
+   font 74effe3e2193102a 131640B  632->3232ms
+   fonts loadingdone t=3239: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0000; nonzero shifts:
+   name: first sample t=845; t845:358x196.5@16,81 op1 fFalse | t3244:358x196.5@16,81 op1 fTrue
+   headline: first sample t=845; t845:358x97.2@16,351.5 op1 fFalse | t3244:358x97.2@16,351.5 op1 fTrue
+   support: first sample t=845; t845:358x76.5@16,462.7 op1 fFalse | t3244:358x76.5@16,462.7 op1 fTrue
+   workHeading: first sample t=845; t845:113.7x57.6@16,1174.7 op1 fFalse | t3244:113.7x57.6@16,1174.7 op1 fTrue
+== rm 390px slow4g font-display:swap  FP 1644 FCP 1644
+   font 70bc3e132a0a741e 40756B  665->1891ms
+   font 74effe3e2193102a 131704B  665->2456ms
+   fonts loadingdone t=2470: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0306; total CLS 0.0306; nonzero shifts:
+     t=2472 v=0.0306 #text [16, 90, 358, 147]->[16, 56, 358, 147]; #text [16, 188, 358, 147]->[16, 154, 358, 147]; #text [16, 352, 358, 36]->[16, 414, 358, 36]; #text [16, 416, 253, 36]->[74, 414, 277, 36]; stretch-button stretch-button--primary [166, 559, 106, 48]->[178, 559, 112, 48]
+   name: first sample t=1632; t1632:358x196.5@16,81 op1 fFalse | t2470:358x196.5@16,81 op1 fTrue
+   headline: first sample t=1632; t1632:358x97.2@16,351.5 op1 fFalse | t2470:358x97.2@16,351.5 op1 fTrue
+   support: first sample t=1632; t1632:358x76.5@16,462.7 op1 fFalse | t2470:358x76.5@16,462.7 op1 fTrue
+   workHeading: first sample t=1632; t1632:113.7x57.6@16,1174.7 op1 fFalse | t2470:130.9x57.6@16,1174.7 op1 fTrue
+== rm 390px slow4g font-display:swap-routed  FP 944 FCP 944
+   font 70bc3e132a0a741e 40821B  680->2464ms
+   font 74effe3e2193102a 131640B  681->3286ms
+   fonts loadingdone t=3303: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0306; total CLS 0.0306; nonzero shifts:
+     t=3306 v=0.0306 #text [16, 90, 358, 147]->[16, 56, 358, 147]; #text [16, 188, 358, 147]->[16, 154, 358, 147]; #text [16, 352, 358, 36]->[16, 414, 358, 36]; #text [16, 416, 253, 36]->[74, 414, 277, 36]; stretch-button stretch-button--primary [166, 559, 106, 48]->[178, 559, 112, 48]
+   name: first sample t=910; t910:358x196.5@16,81 op1 fFalse | t3304:358x196.5@16,81 op1 fTrue
+   headline: first sample t=910; t910:358x97.2@16,351.5 op1 fFalse | t3304:358x97.2@16,351.5 op1 fTrue
+   support: first sample t=910; t910:358x76.5@16,462.7 op1 fFalse | t3304:358x76.5@16,462.7 op1 fTrue
+   workHeading: first sample t=910; t910:113.7x57.6@16,1174.7 op1 fFalse | t3304:130.9x57.6@16,1174.7 op1 fTrue
+== full 1440px 3g font-display:block  FP 2276 FCP 3476
+   font 70bc3e132a0a741e 40757B  2137->12416ms
+   font 74effe3e2193102a 131704B  2137->17253ms
+   fonts loadingdone t=17276: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0332; total CLS 0.0941; nonzero shifts:
+     t=17274 v=0.0332 #text [52, 112, 998, 302]->[52, 42, 998, 302]; #text [52, 314, 998, 302]->[52, 244, 998, 302]; stretch-portrait [1081, 466, 309, 377]->[1079, 495, 309, 377]; #text [52, 594, 881, 118]->[52, 590, 881, 118]; stretch-hero__actions [52, 796, 998, 48]->[52, 824, 998, 48]
+   name: first sample t=2253; t2253:998x403.2@52,93 op0 fFalse | t7301:998x403.2@52,93 op1 fFalse
+   headline: first sample t=2253; t2253:881.3x112@52,592.7 op0 fFalse | t7119:881.3x112@52,592.7 op1 fFalse
+   support: first sample t=2253; t2253:494x57@52,718.7 op0 fFalse | t7618:494x57@52,718.7 op1 fFalse
+   workHeading: first sample t=2253; t2253:170.5x86.4@52,987.7 op1 fFalse
+== rm 1440px slow4g font-display:block  FP 972 FCP 972
+   font 70bc3e132a0a741e 40821B  646->2555ms
+   font 74effe3e2193102a 131640B  646->3430ms
+   fonts loadingdone t=3444: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0056; total CLS 0.0056; nonzero shifts:
+     t=3450 v=0.0056 stretch-portrait [1081, 466, 309, 377]->[1079, 495, 309, 377]; stretch-hero__actions [52, 796, 998, 48]->[52, 824, 998, 48]; EM [329, 649, 437, 56]->[337, 646, 466, 62]; stretch-header__right [795, 12, 593, 44]->[756, 12, 632, 44]; stretch-portrait__label [1050, 753, 160, 56]->[1052, 781, 171, 57]
+   name: first sample t=942; t942:998x403.2@52,93 op1 fFalse | t3448:998x403.2@52,93 op1 fTrue
+   headline: first sample t=942; t942:881.3x112@52,592.7 op1 fFalse | t3448:881.3x112@52,592.7 op1 fTrue
+   support: first sample t=942; t942:494x57@52,718.7 op1 fFalse | t3448:494x85.5@52,718.7 op1 fTrue
+   workHeading: first sample t=942; t942:170.5x86.4@52,987.7 op1 fFalse | t3448:181.4x86.4@52,1016.2 op1 fTrue
+== full 390px 3g font-display:block  FP 2228 FCP 3444
+   font 70bc3e132a0a741e 40820B  2098->9842ms
+   font 74effe3e2193102a 131640B  2098->13020ms
+   fonts loadingdone t=13039: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0306; total CLS 0.0697; nonzero shifts:
+     t=13037 v=0.0306 #text [16, 90, 358, 147]->[16, 56, 358, 147]; #text [16, 188, 358, 147]->[16, 154, 358, 147]; #text [16, 352, 358, 36]->[16, 414, 358, 36]; #text [16, 416, 253, 36]->[74, 414, 277, 36]; stretch-button stretch-button--primary [166, 559, 106, 48]->[178, 559, 112, 48]
+   name: first sample t=2205; t2205:358x196.5@16,81 op0 fFalse | t7276:358x196.5@16,81 op1 fFalse
+   headline: first sample t=2205; t2205:358x97.2@16,351.5 op0 fFalse | t7076:358x97.2@16,351.5 op1 fFalse
+   support: first sample t=2205; t2205:358x76.5@16,462.7 op0 fFalse | t7575:358x76.5@16,462.7 op1 fFalse
+   workHeading: first sample t=2205; t2205:113.7x57.6@16,1174.7 op1 fFalse
+== rm 390px 3g font-display:block  FP 2256 FCP 2256
+   font 70bc3e132a0a741e 40820B  2101->9843ms
+   font 74effe3e2193102a 131649B  2101->13018ms
+   fonts loadingdone t=13035: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0306; total CLS 0.0306; nonzero shifts:
+     t=13034 v=0.0306 #text [16, 90, 358, 147]->[16, 56, 358, 147]; #text [16, 188, 358, 147]->[16, 154, 358, 147]; #text [16, 352, 358, 36]->[16, 414, 358, 36]; #text [16, 416, 253, 36]->[74, 414, 277, 36]; stretch-button stretch-button--primary [166, 559, 106, 48]->[178, 559, 112, 48]
+   name: first sample t=2232; t2232:358x196.5@16,81 op1 fFalse
+   headline: first sample t=2232; t2232:358x97.2@16,351.5 op1 fFalse
+   support: first sample t=2232; t2232:358x76.5@16,462.7 op1 fFalse
+   workHeading: first sample t=2232; t2232:113.7x57.6@16,1174.7 op1 fFalse
+== rm 390px slow4g font-display:block  FP 956 FCP 956
+   font 70bc3e132a0a741e 40820B  676->2444ms
+   font 74effe3e2193102a 131649B  678->3287ms
+   fonts loadingdone t=3305: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0045; total CLS 0.0045; nonzero shifts:
+     t=3305 v=0.0045 EM [16, 416, 253, 32]->[74, 414, 277, 36]; stretch-button stretch-button--primary [166, 559, 106, 48]->[178, 559, 112, 48]; stretch-pill stretch-menu-button [304, 12, 70, 44]->[298, 12, 76, 44]; [object SVGAnimatedString] [12, 443, 260, 9]->[69, 443, 285, 9]
+   name: first sample t=932; t932:358x196.5@16,81 op1 fFalse | t3303:358x196.5@16,81 op1 fTrue
+   headline: first sample t=932; t932:358x97.2@16,351.5 op1 fFalse | t3303:358x97.2@16,351.5 op1 fTrue
+   support: first sample t=932; t932:358x76.5@16,462.7 op1 fFalse | t3303:358x76.5@16,462.7 op1 fTrue
+   workHeading: first sample t=932; t932:113.7x57.6@16,1174.7 op1 fFalse | t3303:130.9x57.6@16,1174.7 op1 fTrue
+== full 1440px 3g font-display:optional  FP 2288 FCP 3480
+   font 70bc3e132a0a741e 40820B  2129->12304ms
+   font 74effe3e2193102a 131649B  2130->17249ms
+   fonts loadingdone t=17259: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0609; nonzero shifts:
+   name: first sample t=2261; t2261:998x403.2@52,93 op0 fFalse | t7302:998x403.2@52,93 op1 fFalse
+   headline: first sample t=2261; t2261:881.3x112@52,592.7 op0 fFalse | t7121:881.3x112@52,592.7 op1 fFalse
+   support: first sample t=2261; t2261:494x57@52,718.7 op0 fFalse | t7620:494x57@52,718.7 op1 fFalse
+   workHeading: first sample t=2261; t2261:170.5x86.4@52,987.7 op1 fFalse
+== rm 1440px none font-display:optional  FP 260 FCP 260
+   font 70bc3e132a0a741e 40756B  88->144ms
+   font 74effe3e2193102a 131704B  88->140ms
+   fonts loadingdone t=248: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0000; nonzero shifts:
+   name: first sample t=239; t239:998x403.2@52,93 op1 fTrue
+   headline: first sample t=239; t239:881.3x112@52,592.7 op1 fTrue
+   support: first sample t=239; t239:494x85.5@52,718.7 op1 fTrue
+   workHeading: first sample t=239; t239:181.4x86.4@52,1016.2 op1 fTrue
+== rm 1440px slow4g font-display:optional  FP 844 FCP 844
+   font 70bc3e132a0a741e 40820B  633->2591ms
+   font 74effe3e2193102a 131640B  633->3415ms
+   fonts loadingdone t=3424: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0000; nonzero shifts:
+   name: first sample t=828; t828:998x403.2@52,93 op1 fFalse | t3429:998x403.2@52,93 op1 fTrue
+   headline: first sample t=828; t828:881.3x112@52,592.7 op1 fFalse | t3429:881.3x112@52,592.7 op1 fTrue
+   support: first sample t=828; t828:494x57@52,718.7 op1 fFalse | t3429:494x57@52,718.7 op1 fTrue
+   workHeading: first sample t=828; t828:170.5x86.4@52,987.7 op1 fFalse | t3429:170.5x86.4@52,987.7 op1 fTrue
+== full 390px 3g font-display:optional  FP 2208 FCP 3444
+   font 70bc3e132a0a741e 40820B  2098->9904ms
+   font 74effe3e2193102a 131640B  2098->13024ms
+   fonts loadingdone t=13034: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0391; nonzero shifts:
+   name: first sample t=2186; t2186:358x196.5@16,81 op0 fFalse | t7275:358x196.5@16,81 op1 fFalse
+   headline: first sample t=2186; t2186:358x97.2@16,351.5 op0 fFalse | t7093:358x97.2@16,351.5 op1 fFalse
+   support: first sample t=2186; t2186:358x76.5@16,462.7 op0 fFalse | t7593:358x76.5@16,462.7 op1 fFalse
+   workHeading: first sample t=2186; t2186:113.7x57.6@16,1174.7 op1 fFalse
+== rm 390px 3g font-display:optional  FP 2280 FCP 2280
+   font 70bc3e132a0a741e 40829B  2131->9870ms
+   font 74effe3e2193102a 131640B  2131->13053ms
+   fonts loadingdone t=13064: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0000; nonzero shifts:
+   name: first sample t=2255; t2255:358x196.5@16,81 op1 fFalse
+   headline: first sample t=2255; t2255:358x97.2@16,351.5 op1 fFalse
+   support: first sample t=2255; t2255:358x76.5@16,462.7 op1 fFalse
+   workHeading: first sample t=2255; t2255:113.7x57.6@16,1174.7 op1 fFalse
+== rm 390px none font-display:optional  FP 360 FCP 360
+   font 70bc3e132a0a741e 40829B  109->134ms
+   font 74effe3e2193102a 131640B  109->155ms
+   fonts loadingdone t=355: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0000; nonzero shifts:
+   name: first sample t=347; t347:358x196.5@16,81 op1 fTrue
+   headline: first sample t=347; t347:358x97.2@16,351.5 op1 fTrue
+   support: first sample t=347; t347:358x76.5@16,462.7 op1 fTrue
+   workHeading: first sample t=347; t347:130.9x57.6@16,1174.7 op1 fTrue
+== rm 390px slow4g font-display:optional  FP 856 FCP 856
+   font 70bc3e132a0a741e 40820B  632->2406ms
+   font 74effe3e2193102a 131640B  632->3232ms
+   fonts loadingdone t=3239: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0000; nonzero shifts:
+   name: first sample t=845; t845:358x196.5@16,81 op1 fFalse | t3244:358x196.5@16,81 op1 fTrue
+   headline: first sample t=845; t845:358x97.2@16,351.5 op1 fFalse | t3244:358x97.2@16,351.5 op1 fTrue
+   support: first sample t=845; t845:358x76.5@16,462.7 op1 fFalse | t3244:358x76.5@16,462.7 op1 fTrue
+   workHeading: first sample t=845; t845:113.7x57.6@16,1174.7 op1 fFalse | t3244:113.7x57.6@16,1174.7 op1 fTrue
+== rm 1440px none font-display:swap-routed  FP 288 FCP 288
+   font 70bc3e132a0a741e 40820B  110->147ms
+   font 74effe3e2193102a 131640B  110->173ms
+   fonts loadingdone t=264: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0000; total CLS 0.0000; nonzero shifts:
+   name: first sample t=255; t255:998x403.2@52,93 op1 fTrue
+   headline: first sample t=255; t255:881.3x112@52,592.7 op1 fTrue
+   support: first sample t=255; t255:494x85.5@52,718.7 op1 fTrue
+   workHeading: first sample t=255; t255:181.4x86.4@52,1016.2 op1 fTrue
+== rm 1440px slow4g font-display:swap-routed  FP 936 FCP 936
+   font 70bc3e132a0a741e 40765B  680->2630ms
+   font 74effe3e2193102a 131704B  680->3463ms
+   fonts loadingdone t=3478: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0332; total CLS 0.0332; nonzero shifts:
+     t=3482 v=0.0332 #text [52, 112, 998, 302]->[52, 42, 998, 302]; #text [52, 314, 998, 302]->[52, 244, 998, 302]; stretch-portrait [1081, 466, 309, 377]->[1079, 495, 309, 377]; #text [52, 594, 881, 118]->[52, 590, 881, 118]; stretch-hero__actions [52, 796, 998, 48]->[52, 824, 998, 48]
+   name: first sample t=918; t918:998x403.2@52,93 op1 fFalse | t3479:998x403.2@52,93 op1 fTrue
+   headline: first sample t=918; t918:881.3x112@52,592.7 op1 fFalse | t3479:881.3x112@52,592.7 op1 fTrue
+   support: first sample t=918; t918:494x57@52,718.7 op1 fFalse | t3479:494x85.5@52,718.7 op1 fTrue
+   workHeading: first sample t=918; t918:170.5x86.4@52,987.7 op1 fFalse | t3479:181.4x86.4@52,1016.2 op1 fTrue
+== rm 390px 3g font-display:swap-routed  FP 2240 FCP 2240
+   font 70bc3e132a0a741e 40820B  2098->9842ms
+   font 74effe3e2193102a 131640B  2098->13024ms
+   fonts loadingdone t=13042: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0306; total CLS 0.0306; nonzero shifts:
+     t=13041 v=0.0306 #text [16, 90, 358, 147]->[16, 56, 358, 147]; #text [16, 188, 358, 147]->[16, 154, 358, 147]; #text [16, 352, 358, 36]->[16, 414, 358, 36]; #text [16, 416, 253, 36]->[74, 414, 277, 36]; stretch-button stretch-button--primary [166, 559, 106, 48]->[178, 559, 112, 48]
+   name: first sample t=2216; t2216:358x196.5@16,81 op1 fFalse
+   headline: first sample t=2216; t2216:358x97.2@16,351.5 op1 fFalse
+   support: first sample t=2216; t2216:358x76.5@16,462.7 op1 fFalse
+   workHeading: first sample t=2216; t2216:113.7x57.6@16,1174.7 op1 fFalse
+== rm 390px slow4g font-display:swap-routed  FP 944 FCP 944
+   font 70bc3e132a0a741e 40821B  680->2464ms
+   font 74effe3e2193102a 131640B  681->3286ms
+   fonts loadingdone t=3303: ['Bricolage Fallback loaded', 'Bricolage Grotesque loaded', 'JetBrains Mono Fallback loaded', 'JetBrains Mono loaded']
+   font-window CLS 0.0306; total CLS 0.0306; nonzero shifts:
+     t=3306 v=0.0306 #text [16, 90, 358, 147]->[16, 56, 358, 147]; #text [16, 188, 358, 147]->[16, 154, 358, 147]; #text [16, 352, 358, 36]->[16, 414, 358, 36]; #text [16, 416, 253, 36]->[74, 414, 277, 36]; stretch-button stretch-button--primary [166, 559, 106, 48]->[178, 559, 112, 48]
+   name: first sample t=910; t910:358x196.5@16,81 op1 fFalse | t3304:358x196.5@16,81 op1 fTrue
+   headline: first sample t=910; t910:358x97.2@16,351.5 op1 fFalse | t3304:358x97.2@16,351.5 op1 fTrue
+   support: first sample t=910; t910:358x76.5@16,462.7 op1 fFalse | t3304:358x76.5@16,462.7 op1 fTrue
+   workHeading: first sample t=910; t910:113.7x57.6@16,1174.7 op1 fFalse | t3304:130.9x57.6@16,1174.7 op1 fTrue
