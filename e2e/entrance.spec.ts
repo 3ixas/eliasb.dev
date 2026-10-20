@@ -160,7 +160,9 @@ test.describe("Signature entrance", () => {
 
   test("a wheel scroll ends the entrance, and the page still scrolls", async ({ page }) => {
     await mid(page);
-    await page.mouse.move(400, 300);
+    // Over the page, at any width: a wheel outside the viewport reaches nothing.
+    const { width, height } = page.viewportSize()!;
+    await page.mouse.move(width / 2, height / 2);
     await page.mouse.wheel(0, 600);
     await endedEarly(page);
     await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
@@ -205,7 +207,8 @@ test.describe("Signature entrance", () => {
 
   test("moving the mouse does not end the entrance", async ({ page }) => {
     await mid(page);
-    for (let step = 0; step < 10; step++) await page.mouse.move(100 + step * 40, 200 + step * 20);
+    const { width, height } = page.viewportSize()!;
+    for (let step = 1; step <= 10; step++) await page.mouse.move((width * step) / 11, (height * step) / 11);
     await page.waitForTimeout(600);
     expect(await isEntering(page)).toBe(true);
     await expect(page.locator("[data-entrance-layer]")).toHaveCount(1);
