@@ -660,6 +660,11 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   opacity: 0;
 }
 
+/* An intent from the visitor: every part fades in together, as quickly as the layer fades out. */
+html[data-entering][data-fast-forward] [data-entrance] {
+  transition: opacity 0.2s ease-out;
+}
+
 /* The decorative layer the entrance plays on: the typed line and the name's letters. */
 .stretch-entrance {
   position: fixed;

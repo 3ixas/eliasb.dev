@@ -15,7 +15,9 @@
  *   edits the page's own markup, so a late hydration has nothing to disagree
  *   with. The real `h1` keeps its full text throughout.
  *
- * Any failure releases the hold at once. Client-side navigation back to `/`
+ * Any intent from the visitor (a wheel, touch, pointer down or key) fast-forwards the
+ * sequence to the finished page in about 200 ms, and is never swallowed. Any failure
+ * releases the hold at once. Client-side navigation back to `/`
  * never runs either script, because React does not execute scripts it inserts.
  *
  * Its only import is the spring (`spring.ts`, itself import-free), so
@@ -63,6 +65,8 @@ export const entranceTimings = {
   labelScaleFrom: 1.25,
   /** The header, support line and rest of the page fade in over this long. */
   fadeMs: 500,
+  /** Any intent from the visitor fast-forwards to the finished page over this long. */
+  fastForwardMs: 200,
   /** If the hold has not been released after this long, the guard releases it. */
   safetyMs: 7000,
   /**
@@ -188,13 +192,18 @@ export function holdPage(safetyMs: number) {
   const release = () => root.removeAttribute("data-entering");
   root.setAttribute("data-entering", "");
   window.setTimeout(release, safetyMs);
-  // Someone tabbing around would land on held, invisible controls: the first Tab shows the page.
-  const onKey = (event: KeyboardEvent) => {
-    if (event.key !== "Tab") return;
-    release();
-    window.removeEventListener("keydown", onKey, true);
+  // Any intent ends the entrance: a wheel, a touch, a pointer down or a key. Mouse movement is not
+  // one. The listeners are passive and never stop the event, so the scroll scrolls and the link
+  // is followed. While the sequence plays it fast-forwards (`runEntrance` listens); before it has
+  // begun there is nothing to fast-forward, so the hold is released. Someone tabbing around would
+  // otherwise land on held, invisible controls.
+  const intents = ["wheel", "touchstart", "pointerdown", "keydown"];
+  const onIntent = () => {
+    intents.forEach((type) => window.removeEventListener(type, onIntent, true));
+    if (document.querySelector("[data-entrance-layer]")) document.dispatchEvent(new Event("entrance-intent"));
+    else release();
   };
-  window.addEventListener("keydown", onKey, true);
+  intents.forEach((type) => window.addEventListener(type, onIntent, { capture: true, passive: true }));
   // A page restored from the back-forward cache is shown as it was left.
   window.addEventListener("pageshow", (event) => {
     if (event.persisted) release();
@@ -251,6 +260,7 @@ export function runEntrance(
   const animations: Animation[] = [];
   let layer: HTMLElement | undefined;
   let finished = false;
+  let fastForwarding = false;
 
   const finish = () => {
     if (finished) return;
@@ -259,9 +269,27 @@ export function runEntrance(
     animations.forEach((animation) => animation.cancel());
     layer?.remove();
     root.removeAttribute("data-released");
+    root.removeAttribute("data-fast-forward");
     root.removeAttribute("data-entering");
     reducedMotion.removeEventListener("change", finish);
     document.removeEventListener("visibilitychange", onVisibility);
+    document.removeEventListener("entrance-intent", fastForward);
+  };
+  // The visitor did something: stop the sequence, release every part of the page to fade in over
+  // `fastForwardMs` while the layer fades out, then finish. The parts of the page that were
+  // mid-animation snap home, so nothing keeps moving underneath.
+  const fastForward = () => {
+    if (finished || fastForwarding) return;
+    fastForwarding = true;
+    timers.forEach((timer) => window.clearTimeout(timer));
+    animations.forEach((animation) => {
+      const target = (animation.effect as KeyframeEffect | null)?.target;
+      if (target && !layer?.contains(target)) animation.cancel();
+    });
+    root.setAttribute("data-fast-forward", "");
+    root.setAttribute("data-released", "header name role headline support portrait rest");
+    layer?.animate([{ opacity: 1 }, { opacity: 0 }], { duration: timing.fastForwardMs, easing: "ease-out", fill: "both" });
+    timers.push(window.setTimeout(finish, timing.fastForwardMs));
   };
   const onVisibility = () => {
     if (document.hidden) finish();
@@ -371,6 +399,7 @@ export function runEntrance(
 
     reducedMotion.addEventListener("change", finish);
     document.addEventListener("visibilitychange", onVisibility);
+    document.addEventListener("entrance-intent", fastForward);
 
     const fits = target.top >= 0 && target.bottom <= innerHeight - 24;
     const plan = schedule(spring, timing, rest.textContent!, letters.length, fits);
