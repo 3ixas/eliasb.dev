@@ -280,6 +280,7 @@ export function runEntrance(
     }
     root.removeAttribute("data-released");
     root.removeAttribute("data-fast-forward");
+    root.style.removeProperty("--entrance-fast-forward");
     root.removeAttribute("data-entering");
     reducedMotion.removeEventListener("change", finish);
     document.removeEventListener("visibilitychange", onVisibility);
@@ -306,6 +307,8 @@ export function runEntrance(
       const target = (animation.effect as KeyframeEffect | null)?.target;
       if (target && !layer?.contains(target)) animation.cancel();
     });
+    // The page's fade takes its duration from the same timing as the layer's.
+    root.style.setProperty("--entrance-fast-forward", `${timing.fastForwardMs}ms`);
     root.setAttribute("data-fast-forward", "");
     root.setAttribute("data-released", "header name role headline support portrait rest");
     layer?.animate([{ opacity: 1 }, { opacity: 0 }], { duration: timing.fastForwardMs, easing: "ease-out", fill: "both" });
