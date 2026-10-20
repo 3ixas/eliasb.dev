@@ -180,6 +180,13 @@ test.describe("Signature entrance", () => {
     await endedEarly(page);
   });
 
+  test("a click with no pointer or key before it ends the entrance", async ({ page }) => {
+    await mid(page);
+    // Assistive technology can activate a control with a click alone.
+    await page.evaluate(() => document.body.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+    await endedEarly(page);
+  });
+
   test("the first Tab ends the entrance, so focus never lands on a held control", async ({ page, browserName }) => {
     await mid(page);
     await page.keyboard.press("Tab");

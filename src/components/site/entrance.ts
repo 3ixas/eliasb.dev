@@ -192,12 +192,12 @@ export function holdPage(safetyMs: number) {
   const release = () => root.removeAttribute("data-entering");
   root.setAttribute("data-entering", "");
   window.setTimeout(release, safetyMs);
-  // Any intent ends the entrance: a wheel, a touch, a pointer down or a key. Mouse movement is not
-  // one. The listeners are passive and never stop the event, so the scroll scrolls and the link
-  // is followed. While the sequence plays it fast-forwards (`runEntrance` listens); before it has
+  // Any intent ends the entrance: a wheel, a touch, a pointer down, a key or a click (assistive
+  // technology can activate a control with a click alone). Mouse movement is not one.
+  // The listeners are passive and never stop the event, so the scroll scrolls and the link is followed. While the sequence plays it fast-forwards (`runEntrance` listens); before it has
   // begun there is nothing to fast-forward, so the hold is released. Someone tabbing around would
   // otherwise land on held, invisible controls.
-  const intents = ["wheel", "touchstart", "pointerdown", "keydown"];
+  const intents = ["wheel", "touchstart", "pointerdown", "keydown", "click"];
   const onIntent = () => {
     intents.forEach((type) => window.removeEventListener(type, onIntent, true));
     if (document.querySelector("[data-entrance-layer]")) document.dispatchEvent(new Event("entrance-intent"));
