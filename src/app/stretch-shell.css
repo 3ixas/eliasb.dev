@@ -665,6 +665,10 @@ html[data-entering][data-fast-forward] [data-entrance] {
   transition: opacity 0.2s ease-out;
 }
 
+html[data-entering][data-fast-forward="instant"] [data-entrance] {
+  transition: none;
+}
+
 /* The decorative layer the entrance plays on: the typed line and the name's letters. */
 .stretch-entrance {
   position: fixed;

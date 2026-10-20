@@ -207,6 +207,24 @@ test.describe("Signature entrance", () => {
     await endedEarly(page);
   });
 
+  test("a modifier key then Tab still ends the entrance before focus moves", async ({ page, browserName }) => {
+    await mid(page);
+    // The modifier's keydown starts the fade; the Tab that follows must still finish it before focus moves.
+    await page.keyboard.press("Shift");
+    expect(await isEntering(page), "the fade has begun").toBe(true);
+    await page.keyboard.press("Tab");
+    expect(await isEntering(page), "the Tab finished the fade at once").toBe(false);
+    if (browserName === "chromium") {
+      const opacity = await page.evaluate(() => {
+        let product = 1;
+        for (let node: Element | null = document.activeElement; node; node = node.parentElement) product *= Number(getComputedStyle(node).opacity);
+        return product;
+      });
+      expect(opacity, "the focused control is visible").toBe(1);
+    }
+    await endedEarly(page);
+  });
+
   test("moving the mouse does not end the entrance", async ({ page }) => {
     await mid(page);
     const { width, height } = page.viewportSize()!;

@@ -271,12 +271,24 @@ export function runEntrance(
     timers.forEach((timer) => window.clearTimeout(timer));
     animations.forEach((animation) => animation.cancel());
     layer?.remove();
+    // Finishing mid-fade (a Tab after another key): a running opacity transition outlives the rule
+    // that started it, so switch transitions off and flush the style before the hold is lifted.
+    if (fastForwarding) {
+      root.setAttribute("data-fast-forward", "instant");
+      void getComputedStyle(root).opacity;
+      void document.body.offsetHeight;
+    }
     root.removeAttribute("data-released");
     root.removeAttribute("data-fast-forward");
     root.removeAttribute("data-entering");
     reducedMotion.removeEventListener("change", finish);
     document.removeEventListener("visibilitychange", onVisibility);
     document.removeEventListener("entrance-intent", fastForward);
+    window.removeEventListener("keydown", onTab, true);
+  };
+  // A Tab during the fade (Shift, then Tab) still finishes the entrance before focus moves.
+  const onTab = (event: KeyboardEvent) => {
+    if (event.key === "Tab") finish();
   };
   // The visitor did something: stop the sequence, release every part of the page to fade in over
   // `fastForwardMs` while the layer fades out, then finish. The parts of the page that were
@@ -288,6 +300,7 @@ export function runEntrance(
       return;
     }
     fastForwarding = true;
+    window.addEventListener("keydown", onTab, true);
     timers.forEach((timer) => window.clearTimeout(timer));
     animations.forEach((animation) => {
       const target = (animation.effect as KeyframeEffect | null)?.target;
