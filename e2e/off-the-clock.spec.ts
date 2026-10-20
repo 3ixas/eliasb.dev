@@ -49,6 +49,24 @@ test.describe("Off the clock: on the homepage", () => {
   });
 });
 
+test.describe("Off the clock: Fasteners", () => {
+  test("only the training poster and the history clipping are fastened, with the GitHub card present", async ({ page }) => {
+    await page.goto("/fixtures/off-the-clock");
+    const layout = fixture(page, "layout");
+    await expect(layout.locator("[data-otc='github']")).toHaveCount(1);
+    await expect(layout.locator(".stretch-fastener")).toHaveCount(2);
+    await expect(layout.locator("[data-otc='training'] .stretch-fastener--tape")).toHaveCount(1);
+    await expect(layout.locator("[data-otc='clipping'] .stretch-fastener--push-pin")).toHaveCount(1);
+    for (const item of ["reading", "film", "making", "github"]) await expect(layout.locator(`[data-otc='${item}'] .stretch-fastener`)).toHaveCount(0);
+  });
+
+  test("the homepage carries six Fasteners: three tiles, the PRD card, the poster and the clipping", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator(".stretch-fastener")).toHaveCount(6);
+    await expect(page.locator("#off-the-clock .stretch-fastener")).toHaveCount(2);
+  });
+});
+
 test.describe("Off the clock: the training poster", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");

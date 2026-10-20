@@ -915,7 +915,7 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
   filter: drop-shadow(1px 2px 1px rgba(0, 0, 0, 0.3));
 }
 
-.stretch-fastener--pin {
+.stretch-fastener--push-pin {
   top: -9px;
   right: 40px;
   width: 20px;
@@ -965,7 +965,7 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
     animation: stretch-clip-swing 0.55s ease-in-out;
   }
 
-  :is(.stretch-tile, .stretch-cs-next__tile):focus-visible .stretch-fastener--pin {
+  :is(.stretch-tile, .stretch-cs-next__tile):focus-visible .stretch-fastener--push-pin {
     animation: stretch-pin-press 0.35s ease-out;
   }
 }
@@ -983,7 +983,7 @@ html[data-entering]:not([data-released~="rest"]) [data-entrance="rest"] {
     animation: stretch-clip-swing 0.55s ease-in-out;
   }
 
-  :is(.stretch-tile, .stretch-cs-next__tile):hover .stretch-fastener--pin {
+  :is(.stretch-tile, .stretch-cs-next__tile):hover .stretch-fastener--push-pin {
     animation: stretch-pin-press 0.35s ease-out;
   }
 }
