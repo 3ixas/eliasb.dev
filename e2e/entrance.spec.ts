@@ -189,10 +189,11 @@ test.describe("Signature entrance", () => {
     await endedEarly(page);
   });
 
-  test("the first Tab ends the entrance, so focus never lands on a held control", async ({ page, browserName }) => {
+  test("the first Tab ends the entrance at once, so focus never lands on a held control", async ({ page, browserName }) => {
     await mid(page);
     await page.keyboard.press("Tab");
-    await endedEarly(page);
+    // Read straight after the key: a fade would still be under way and the focused control not yet opaque.
+    expect(await isEntering(page), "no fade for a Tab").toBe(false);
     // Safari does not tab to links by default, so there it is enough that the page was released.
     if (browserName === "chromium") {
       const focused = await page.evaluate(() => {
@@ -203,6 +204,7 @@ test.describe("Signature entrance", () => {
       expect(focused.tag).not.toBe("BODY");
       expect(focused.opacity, "the focused control is visible").toBe(1);
     }
+    await endedEarly(page);
   });
 
   test("moving the mouse does not end the entrance", async ({ page }) => {

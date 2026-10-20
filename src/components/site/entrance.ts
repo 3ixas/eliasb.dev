@@ -198,9 +198,12 @@ export function holdPage(safetyMs: number) {
   // begun there is nothing to fast-forward, so the hold is released. Someone tabbing around would
   // otherwise land on held, invisible controls.
   const intents = ["wheel", "touchstart", "pointerdown", "keydown", "click"];
-  const onIntent = () => {
+  // A Tab moves focus as the keydown finishes, so it ends the entrance with no fade: focus must
+  // never land on a control that is still transparent.
+  const onIntent = (event: Event) => {
     intents.forEach((type) => window.removeEventListener(type, onIntent, true));
-    if (document.querySelector("[data-entrance-layer]")) document.dispatchEvent(new Event("entrance-intent"));
+    const instant = event.type === "keydown" && (event as KeyboardEvent).key === "Tab";
+    if (document.querySelector("[data-entrance-layer]")) document.dispatchEvent(new CustomEvent("entrance-intent", { detail: { instant } }));
     else release();
   };
   intents.forEach((type) => window.addEventListener(type, onIntent, { capture: true, passive: true }));
@@ -278,8 +281,12 @@ export function runEntrance(
   // The visitor did something: stop the sequence, release every part of the page to fade in over
   // `fastForwardMs` while the layer fades out, then finish. The parts of the page that were
   // mid-animation snap home, so nothing keeps moving underneath.
-  const fastForward = () => {
+  const fastForward = (event: Event) => {
     if (finished || fastForwarding) return;
+    if ((event as CustomEvent<{ instant: boolean }>).detail.instant) {
+      finish();
+      return;
+    }
     fastForwarding = true;
     timers.forEach((timer) => window.clearTimeout(timer));
     animations.forEach((animation) => {
