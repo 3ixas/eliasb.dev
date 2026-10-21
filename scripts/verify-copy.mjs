@@ -97,6 +97,11 @@ for (const [hour, line] of [
 assert.equal(siteCopy.greeting.hello, "Hello");
 for (let hour = 0; hour < 24; hour += 1) assert.notEqual(greetingKey(hour), "hello", "Only the browser's clock picks a greeting; hello is the line before it");
 
+// The hero names the employer once on screen, in the headline: the name down to the buttons reads "BNP" in the h1 and nowhere else (#243).
+const heroText = [hero.name.first, hero.name.last, hero.role, hero.portraitLabel, hero.headline.lead, hero.headline.emphasis, hero.support, hero.actions.work, hero.actions.hello];
+assert.equal(heroText.join(" ").match(/BNP/g)?.length, 1, "The hero names BNP exactly once");
+assert.ok(`${hero.headline.lead} ${hero.headline.emphasis}`.includes("BNP"), "The hero's one BNP is in the h1");
+
 // ---- Tables and sections, word for word --------------------------------------------------
 
 const rows = (text, heading) => {

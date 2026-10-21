@@ -34,10 +34,10 @@ The lost-property tag hung beside the heading, and the five sections under the l
 
 ## Hero
 
-- Role line, plain text under the name: Software Engineer at BNP Paribas CIB
+- Role line, plain text under the name: Software Engineer
 - Label on the portrait: Based in London
 - Headline: I build pricing and risk engines at BNP Paribas, and *products of my own.*
-- Supporting line: In C# and Java, on CPU and GPU. I’ve won BNP’s Early Careers digitisation competition and a Take Ownership award.
+- Supporting line: In C# and Java, on CPU and GPU. I’ve won the bank’s Early Careers digitisation competition and a Take Ownership award.
 - Buttons: See my work ↓ · Say hello
 
 The First glance changed for the forward-facing redesign ([#159](https://github.com/3ixas/eliasb.dev/issues/159), [#162](https://github.com/3ixas/eliasb.dev/issues/162), [#168](https://github.com/3ixas/eliasb.dev/issues/168)): the entrance is built around “*products of my own.*” landing.
