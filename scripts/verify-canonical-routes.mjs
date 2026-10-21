@@ -22,6 +22,7 @@ const expectedSitemapUrls = new Set([
   "https://www.eliasb.dev/things-i-make/threshold",
   "https://www.eliasb.dev/things-i-make/argus-risk",
   "https://www.eliasb.dev/things-i-make/flowtime",
+  "https://www.eliasb.dev/resume",
   ...roleStoryRoutes.map((route) => `https://www.eliasb.dev${route}`),
 ]);
 
@@ -85,7 +86,7 @@ async function verifyRoutes(baseUrl) {
     assert.notEqual(response.status, 308, `${route} must not be redirected`);
   }
 
-  for (const [route, expectedCanonical] of [["/things-i-make", "https://www.eliasb.dev/things-i-make"], ["/things-i-make/threshold", "https://www.eliasb.dev/things-i-make/threshold"], ...roleStoryRoutes.map((route) => [route, `https://www.eliasb.dev${route}`])]) {
+  for (const [route, expectedCanonical] of [["/things-i-make", "https://www.eliasb.dev/things-i-make"], ["/things-i-make/threshold", "https://www.eliasb.dev/things-i-make/threshold"], ["/resume", "https://www.eliasb.dev/resume"], ...roleStoryRoutes.map((route) => [route, `https://www.eliasb.dev${route}`])]) {
     const response = await fetch(new URL(route, baseUrl), { redirect: "manual" });
     assert.equal(response.status, 200, `${route} should render successfully`);
     const document = await response.text();
