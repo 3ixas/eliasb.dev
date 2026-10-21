@@ -208,10 +208,16 @@ test.describe("Signature entrance", () => {
   });
 
   test("a modifier key then Tab still ends the entrance before focus moves", async ({ page, browserName }) => {
+    // The fade lasts 200 ms, shorter than a stalled CI runner takes to answer a key press and a read
+    // (seen in WebKit), so on the real clock the fade can be over before the Shift is observed. The page's
+    // clock is paused once the entrance is under way: the fade then waits for the Tab, as it must.
+    await page.clock.install({ time: 0 });
     await mid(page);
+    await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 300);
     // The modifier's keydown starts the fade; the Tab that follows must still finish it before focus moves.
     await page.keyboard.press("Shift");
     expect(await isEntering(page), "the fade has begun").toBe(true);
+    expect(await page.evaluate(() => document.documentElement.hasAttribute("data-fast-forward")), "and is fading").toBe(true);
     await page.keyboard.press("Tab");
     expect(await isEntering(page), "the Tab finished the fade at once").toBe(false);
     if (browserName === "chromium") {
