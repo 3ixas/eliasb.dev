@@ -68,7 +68,7 @@ for (const slug of roleStorySlugs) {
           const block = page.locator(`section#${key} figure`);
           await expect(block.locator("figcaption")).toContainText(figure.caption);
           await expect(block.locator("figcaption a")).toHaveAttribute("href", figure.source.href);
-          await expect(block.locator("figcaption a")).toHaveText(figure.source.label);
+          await expect(block.locator("figcaption a")).toHaveText(`${figure.source.label} ↗`);
           await expect(block.locator("img")).toHaveCount(figure.images.length);
           for (const [index, image] of figure.images.entries()) {
             const img = block.locator("img").nth(index);

@@ -31,7 +31,10 @@ export function ResumePage() {
             <ul className="stretch-resume__contacts stretch-mono">
               {sheet.contacts.map(({ label, href }) => (
                 <li key={href}>
-                  <SiteLink href={href}>{label}</SiteLink>
+                  <SiteLink href={href}>
+                    {label}
+                    {href.startsWith("http") && <span className="stretch-resume__away" aria-hidden="true"> ↗</span>}
+                  </SiteLink>
                 </li>
               ))}
             </ul>
