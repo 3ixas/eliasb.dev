@@ -48,6 +48,15 @@ test.describe("The Résumé", () => {
     await expect.poll(() => sheet(page).evaluate((el) => (el as HTMLElement).innerText).then(plain)).toBe(plain(resumeText(resumeSheet()).join(" ")));
   });
 
+  test("prints on one A4 page, with room to spare", async ({ page }) => {
+    // The page is 210 mm with 8 mm top and bottom and 14 mm at the sides, so the sheet prints 182 mm wide and may be 281 mm tall.
+    const mm = (n: number) => (n / 25.4) * 96;
+    await page.setViewportSize({ width: Math.round(mm(182)), height: 1123 });
+    await page.emulateMedia({ media: "print" });
+    // 20 px (about one line) of headroom, so rewording a line does not tip the sheet onto a second page.
+    await expect.poll(() => sheet(page).evaluate((el) => el.getBoundingClientRect().height)).toBeLessThanOrEqual(mm(281) - 20);
+  });
+
   test("gives each role the Role story's own Résumé lines", async ({ page }) => {
     for (const [index, slug] of roleStorySlugs.entries()) {
       await expect(page.locator("[data-resume-entry]").nth(index).locator(".stretch-resume__results li")).toHaveText([...roleStories[slug].resume]);

@@ -208,7 +208,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
     },
     resume: [
       "Cut page load by 40% by refactoring React components and lazy-loading assets.",
-      "Moved PHP modules to Spring Boot module by module, writing the endpoints, validation and tests.",
+      "Moved PHP modules to Spring Boot module by module, with endpoints, validation and tests.",
       "Fixed mobile layout and browser bugs found by a cross-browser testing pipeline; mobile retention rose by 30%.",
       "Added indexes and rewrote slow queries, taking the key API’s p95 from 520 ms to 230 ms.",
     ],
