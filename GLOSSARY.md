@@ -10,7 +10,7 @@ _Avoid_: Online CV, LinkedIn replacement
 
 **Stretch direction**:
 The visual direction chosen for the from-scratch redesign on 8 October 2026 ([#107](https://github.com/3ixas/eliasb.dev/issues/107)). It has a clean neutral base with enough expressiveness to stay interesting: the **Cobalt accent** used large, Bricolage Grotesque condensed at display size with JetBrains Mono for metadata, **Featured work** tiles in each **Project colour**, and **Fasteners** on cards. It replaces the Board.
-_Avoid_: Board, playful theme (its play comes from scale and colour, not from added objects)
+_Avoid_: Board, a playful theme of props (its play comes from scale, colour and a few paper objects from one desk, each carrying real content; [#242](https://github.com/3ixas/eliasb.dev/issues/242))
 
 **Cobalt accent**:
 The site's one accent colour (`#2340ff` in light, `#8b9cff` in dark). It may be used large, and marks Elias's name, today and now, and the way to say hello. It also colours the award pins on a **Staff pass**, wherever the pass appears, as Elias's own achievements ([#198](https://github.com/3ixas/eliasb.dev/issues/198)). It never colours a project.
@@ -49,8 +49,12 @@ The homepage section straight after the hero, led by employment. Every employer 
 _Avoid_: Experience, CV, calling Elias's own projects "Work"
 
 **Staff pass**:
-A pass hanging on its lanyard: a strap and clip, Elias's portrait as the ID photo, a top line, a foot with a barcode, and real text, never decoration. It comes in two kinds. An **employer's pass** hangs in **Work** and again at the top of its **Role story**, in its **Employer colour**: the employer, role and dates, one headline number, and a link to its **Role story**. The current pass is the largest and reads "Valid · present"; a past one is stamped "Returned". Awards are pins on the current pass's lanyard. Its content is the employment history ([#194](https://github.com/3ixas/eliasb.dev/issues/194)). On its own Role story it is the opening object rather than a link, and its pins lead to the evidence for each award ([#198](https://github.com/3ixas/eliasb.dev/issues/198)). It carries the lean. The **self-issued pass** is the one pass with no employer: **Where I'm headed**, issued by Elias to himself. It has no **Employer colour** of its own, no pins, no status or dates, and no lean; its fields are the bars of his direction ([#190](https://github.com/3ixas/eliasb.dev/issues/190)).
+A pass hanging on its lanyard: a strap and clip, Elias's portrait as the ID photo, a top line, a foot with a barcode, and real text, never decoration. It comes in two kinds. An **employer's pass** hangs in **Work** and again at the top of its **Role story**, in its **Employer colour**: the employer, role and dates, one headline number, and a link to its **Role story**. The current pass is the largest and reads "Valid · present"; a past one is stamped "Returned". Awards are **award pins** on the current pass's lanyard. Its content is the employment history ([#194](https://github.com/3ixas/eliasb.dev/issues/194)). On its own Role story it is the opening object rather than a link, and its award pins lead to the evidence for each award ([#198](https://github.com/3ixas/eliasb.dev/issues/198)). It carries the lean. The **self-issued pass** is the one pass with no employer: **Where I'm headed**, issued by Elias to himself. It has no **Employer colour** of its own, no award pins, no status or dates, and no lean; its fields are the bars of his direction ([#190](https://github.com/3ixas/eliasb.dev/issues/190)).
 _Avoid_: Badge, ID card, "Expired" (it can read as "let go"), employer logos
+
+**Award pin**:
+A cobalt pin on an employer's **Staff pass** lanyard, one per award, as Elias's own achievements. It is part of the pass, not a **Fastener**.
+_Avoid_: Pin (alone), badge
 
 **Things I make**:
 The homepage section for Elias's own projects: **Featured work** above the **Project index**, with a count of what he has built, introduced by what the hero used to say: making complicated things feel simple, and taking ideas all the way through ([#159](https://github.com/3ixas/eliasb.dev/issues/159)). It follows **Work**: reordered, not reduced, and keeping its product edge. The **Work archive** and every **Case study** live under `/things-i-make`, and `/work` and the old case-study paths redirect there permanently, one path at a time, since `/work/[employer]` now holds the **Role story** pages ([#157](https://github.com/3ixas/eliasb.dev/issues/157), [#158](https://github.com/3ixas/eliasb.dev/issues/158)).
@@ -73,8 +77,8 @@ The **Off the clock** item that follows Elias's latest pushed public GitHub repo
 _Avoid_: Experiments, Lab
 
 **Fastener**:
-The single small prop on a card's edge: tape, a paperclip, or a pin. There is at most one per object, the card itself stays clean, and the image carries the colour.
-_Avoid_: Prop that stands in for content, more than one per card
+The single small prop on a card's edge: tape, a paperclip, or a push pin. It fastens only what would be held to a surface (a screenshot on its tile, a sheet of paper on a wall), so a card that is simply a card has none ([#242](https://github.com/3ixas/eliasb.dev/issues/242)). There is at most one per object, the card itself stays clean, and the image carries the colour.
+_Avoid_: Prop that stands in for content, more than one per card, a Fastener on every card, "pin" alone (say push pin, or award pin)
 
 **Career ruler** (superseded):
 Where I've been, shown as a vertical log, oldest first: each stage has its dates, a bar (cobalt for the current role), the role, and the organisation, with story beats as one-line notes and milestones as marked lines beneath it ([#110](https://github.com/3ixas/eliasb.dev/issues/110)). Superseded on 11 October 2026 by **How I got here** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)); kept for history.

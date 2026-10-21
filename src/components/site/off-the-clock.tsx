@@ -88,7 +88,6 @@ export function BookCard({ reading, now }: { reading: ReadingSignal; now: Date }
   const status = pinStatus("reading", reading, now);
   return (
     <article className="stretch-otc__card stretch-otc__book" data-otc="reading" data-state={status.kind === "stale" ? "stale" : "current"} aria-labelledby={headingId}>
-      <span className="stretch-fastener stretch-fastener--pin" aria-hidden="true" />
       <Print src={book?.coverUrl} alt={book ? copy.reading.coverAlt(book.title, book.author) : ""} sizes="(max-width: 760px) 40vw, 200px" />
       <div className="stretch-otc__text">
         <h3 id={headingId} className="stretch-mono stretch-otc__label">
@@ -117,7 +116,6 @@ export function FilmCard({ film: signal, now }: { film: FilmSignal; now: Date })
   const line = film ? filmLine(film.watchedOn ? asOfDate(new Date(`${film.watchedOn}T12:00:00Z`)) : null, film.rating) : null;
   return (
     <article className="stretch-otc__card stretch-otc__film" data-otc="film" data-state={status.kind === "stale" ? "stale" : "current"} aria-labelledby={headingId}>
-      <span className="stretch-fastener stretch-fastener--tape" aria-hidden="true" />
       <Print src={film?.posterUrl} alt={film ? copy.watched.posterAlt(film.title, film.year) : ""} sizes="(max-width: 760px) 40vw, 200px" />
       <div className="stretch-otc__text">
         <p className="stretch-mono stretch-otc__kicker">{copy.watched.kicker}</p>
@@ -188,7 +186,7 @@ export function ClippingCard({ history }: { history: HistorySignal }) {
   const day = history.weekOf ? asOfDate(new Date(`${history.weekOf}T12:00:00Z`)) : null;
   return (
     <article className="stretch-otc__card stretch-otc__clipping" data-otc="clipping" data-state={day ? "live" : "archive"} aria-labelledby={headingId}>
-      <span className="stretch-fastener stretch-fastener--pin" aria-hidden="true" />
+      <span className="stretch-fastener stretch-fastener--push-pin" aria-hidden="true" />
       <h3 id={headingId} className="stretch-mono stretch-otc__label">
         {copy.curiosity.label}
       </h3>
@@ -223,7 +221,6 @@ export function NowMakingCard({ latest }: { latest: LatestRepositorySignal }) {
   const making = copy.nowMaking;
   return (
     <article className="stretch-otc__card stretch-otc__making" data-otc="making" aria-labelledby={headingId}>
-      <span className="stretch-fastener stretch-fastener--pin" aria-hidden="true" />
       <h3 id={headingId} className="stretch-mono stretch-otc__label">
         <NowMark />
         {making.label}
@@ -250,7 +247,6 @@ export function GitHubCard({ github, now }: { github: GitHubSignal; now: Date })
   if (status.kind === "removed" || github.activity.length === 0) return null;
   return (
     <article className="stretch-otc__card stretch-otc__github" data-otc="github" data-state={status.kind === "stale" ? "stale" : "current"} aria-labelledby={headingId}>
-      <span className="stretch-fastener stretch-fastener--tape" aria-hidden="true" />
       <h3 id={headingId} className="sr-only">
         {copy.github.heading}
       </h3>

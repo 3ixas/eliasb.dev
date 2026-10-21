@@ -41,11 +41,13 @@ Every text pair passes WCAG 2.2 AA (5.7:1 to 18.2:1, [#108](https://github.com/3
 
 ## Fasteners
 
-One per physical-looking object (a tile, a card, the portrait), and never more. The card itself stays clean and the image carries the colour.
+A Fastener fastens only what would be held to a surface: a screenshot on its tile, a sheet of paper on a wall. A card that is simply a card has none ([#242](https://github.com/3ixas/eliasb.dev/issues/242)). Where one belongs, there is one per object and never more. The card itself stays clean and the image carries the colour.
 
+- The homepage carries six: the three Featured tiles, the PRD card, tape on the training poster and a push pin on the history clipping. The book, film, Now making and GitHub cards have none.
+- Elsewhere: the case-study PRD, the Next-project tile and a Role story's certificate.
 - **Tape**: lifts on hover. More transparent in dark.
 - **Paperclip**: swings on hover.
-- **Pin**: presses on hover.
+- **Push pin**: presses on hover. Not to be confused with an award pin, which is part of a Staff pass.
 - A Fastener is decoration on a card, never a stand-in for content, and reduced motion removes its movement.
 
 ## Components

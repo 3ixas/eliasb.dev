@@ -13,7 +13,7 @@
  */
 
 /** The single small prop on a card's edge (see the Fastener in GLOSSARY.md). */
-export type Fastener = "tape" | "paperclip" | "pin";
+export type Fastener = "tape" | "paperclip" | "push-pin";
 
 /** What the /things-i-make filters group by: Products, Systems or Experiments. */
 export const PROJECT_CATEGORIES = ["products", "systems", "experiments"] as const;
@@ -109,7 +109,7 @@ const entries = [
       height: 640,
     },
     colours: { field: "#1e1915", ink: "#ece4d8", swatch: "#c0876a" },
-    fastener: "pin",
+    fastener: "push-pin",
   },
   {
     slug: "home-secretary",
