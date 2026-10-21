@@ -38,6 +38,8 @@ Every text pair passes WCAG 2.2 AA (5.7:1 to 18.2:1, [#108](https://github.com/3
 - **JetBrains Mono** for metadata, counts, dates and section notes.
 - The name fills the screen's width on phones (31.5vw, no wrap) and is capped at 28svh everywhere, so it never takes more than about 45% of the screen's height. Section headings are giant, condensed and uppercase, with a mono note and true counts ("06 things I've built · 03 I'm proudest of").
 - Newsreader is retired.
+- **One floor.** Nothing a visitor is meant to read is smaller than 13 px, on the page or as **Print** on an object (a Staff pass, an award pin, the lost-property tag, a credit). Reading text is 15 px or more, and body copy is 17 px. Text below the floor is enlarged to 13 px, or removed when it repeats something nearby or carries nothing a visitor needs ([#244](https://github.com/3ixas/eliasb.dev/issues/244)).
+- **One text scale.** Text under 24 px uses five steps, each a token in `stretch-tokens.css`: `--text-label` 13 px (mono labels, dates, counts, print), `--text-small` 15 px, `--text-body` 17 px, `--text-lead` 19 px and `--text-quote` 22 px. A size may move up one step at a wider breakpoint, but never off the scale. Display type (the name, section headings, posters) stays fluid, each size fitted to its own space.
 
 ## Fasteners
 
