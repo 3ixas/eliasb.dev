@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useId, type CSSProperties, type ReactNode } from "react";
+import { bindDots } from "@/components/site/bind-dots";
 import { PassHang } from "@/components/site/staff-pass-hang";
 import { passLean } from "@/components/site/signature-springs";
 import { passPhoto } from "@/content/stretch/media";
@@ -172,7 +173,7 @@ function PinText({ pin }: { pin: PassPin }) {
   return (
     <>
       <span className="stretch-pass__pin-label">{pin.label}</span>
-      <span className="stretch-pass__pin-detail stretch-mono">{pin.detail}</span>
+      <span className="stretch-pass__pin-detail stretch-mono">{bindDots(pin.detail)}</span>
     </>
   );
 }

@@ -160,8 +160,8 @@ function Story({ event, day, lead = false }: { event: HistoryEvent; day: ReturnT
             {copy.curiosity.imageCredit}{" "}
             <a href={image.sourceUrl} target="_blank" rel="noreferrer">
               {image.creator}
-            </a>{" "}
-            ·{" "}
+            </a>
+            {"\u00a0"}·{" "}
             <a href={image.licenseUrl ?? image.sourceUrl} target="_blank" rel="noreferrer">
               {image.licenseName}
             </a>

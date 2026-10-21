@@ -113,12 +113,12 @@ test.describe("Work", () => {
     await expect(section(page).locator(".stretch-note")).toHaveText(work.note);
   });
 
-  test("on a phone the current pass is full width, the past passes sit side by side, and the pins stay clear of the strap", async ({ page }) => {
+  test("on a phone the current pass is full width, the past passes hang one under the other, and the pins stay clear of the strap", async ({ page }) => {
     test.skip(viewportWidth(page) > 760, "the phone layout");
     const [box, current, joveen, optegra] = await Promise.all([boxOf(rail(page)), ...slugs.map((slug) => boxOf(section(page).locator(`[data-slug="${slug}"]`)))]);
     expect(current.width, "BNP's pass is the rail's full width").toBeCloseTo(box.width, 0);
-    expect(joveen.y, "the past passes hang level").toBeCloseTo(optegra.y, 0);
-    expect(joveen.x + joveen.width, "side by side").toBeLessThanOrEqual(optegra.x + 1);
+    // Under 480 px two 13 px passes don't fit side by side (#257); every phone project is under it.
+    expect(optegra.y, "Optegra hangs under Joveen").toBeGreaterThanOrEqual(joveen.y + joveen.height);
     expect((await boxOf(pass(page, "bnp-paribas").locator(".stretch-pass__strap"))).height, "BNP's strap is 120 px").toBeCloseTo(120, 0);
     for (const slug of ["joveen", "optegra"] as const) {
       await expect(pass(page, slug).locator(".stretch-pass__photo")).toBeHidden();

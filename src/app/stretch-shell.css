@@ -2177,7 +2177,8 @@ button.stretch-gh__day[data-selected] {
 
 /*
  * The rail: a metal bar the lanyards hang from, newest first. On a phone the
- * current pass is the full width and the two past passes sit side by side.
+ * current pass is the full width and the past passes hang one under the other;
+ * from 480 px there is room for their 13 px dates and story links side by side.
  * From 761 px the current pass stands at the left and the past passes at the
  * right (stacked, then in a row from 1100 px), spread so the row ends on
  * Optegra with nothing empty beside it. History is a dashed note under the
@@ -2186,10 +2187,16 @@ button.stretch-gh__day[data-selected] {
 .stretch-work__rail {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 32px 16px;
   align-items: start;
   padding-top: 10px;
+}
+
+@media (min-width: 480px) {
+  .stretch-work__rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .stretch-work__rail::before {
