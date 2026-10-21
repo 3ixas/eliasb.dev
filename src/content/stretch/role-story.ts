@@ -8,6 +8,7 @@ import { siteCopy } from "./site-copy.ts";
 import {
   MAX_EVIDENCE,
   storySectionHasContent,
+  storyText,
   type EvidenceItem,
   type StoryColours,
   type StorySectionBody,
@@ -133,6 +134,23 @@ export function roleStoryColours({ light, dark }: RoleStory["colours"]): StoryCo
   return { field: pick("field"), ink: pick("ink"), swatch: pick("swatch") };
 }
 
+/**
+ * The figures a Résumé line claims (digits, and the number words a line uses), which its own Role story
+ * must also state: the lines are written separately, so this is what stops one keeping a number the story
+ * has since changed.
+ */
+const figures = (line: string) => line.toLowerCase().match(/\d+|\b(?:one|two|three|four|five|six|seven|eight|nine|ten)\b/g) ?? [];
+
+/** Résumé lines whose figures their Role story does not state, as messages; empty when valid. */
+export function resumeLineProblems(story: RoleStory): string[] {
+  const said = new Set(storyText(story).toLowerCase().match(/\d+|[a-z]+/g));
+  return story.resume.flatMap((line) =>
+    figures(line)
+      .filter((figure) => !said.has(figure))
+      .map((figure) => `Role story "${story.slug}" has a Résumé line with "${figure}", which its story does not say: "${line}"`),
+  );
+}
+
 /** Problems with a set of Role stories, as messages; empty when valid. */
 export function roleStoryProblems(stories: readonly RoleStory[]): string[] {
   const problems: string[] = [];
@@ -147,6 +165,7 @@ export function roleStoryProblems(stories: readonly RoleStory[]): string[] {
     if (story.resume.length < RESUME_LINES.min || story.resume.length > RESUME_LINES.max) {
       problems.push(`Role story "${story.slug}" has ${story.resume.length} Résumé lines, not ${RESUME_LINES.min} to ${RESUME_LINES.max}.`);
     }
+    problems.push(...resumeLineProblems(story));
     for (const key of roleStorySectionKeys) {
       if (!storySectionHasContent(story.sections[key])) {
         problems.push(`Role story "${story.slug}" has an empty "${key}" section.`);

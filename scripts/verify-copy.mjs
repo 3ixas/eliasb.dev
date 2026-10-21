@@ -259,6 +259,10 @@ assert.match(roleStoryProblems([{ ...bnp, evidence: Array(5).fill(bnp.evidence[0
 assert.match(roleStoryProblems([{ ...bnp, next: "bnp-paribas" }, ...rest])[0], /different Role story or none/);
 assert.match(roleStoryProblems([{ ...bnp, next: "ghost" }, ...rest])[0], /different Role story or none/);
 assert.match(roleStoryProblems([{ ...bnp, sections: { ...bnp.sections, decisions: {} } }, ...rest])[0], /empty "decisions" section/);
+// A Résumé line states only figures its Role story states, so a changed number cannot linger on the sheet.
+assert.match(roleStoryProblems([{ ...bnp, resume: [...bnp.resume.slice(1), "Went from no C# to production code in nine months."] }, ...rest])[0], /"nine", which its story does not say/);
+assert.match(roleStoryProblems([{ ...bnp, resume: [bnp.resume[0], "Cut a 30–40 minute data load to under 7."] }, ...rest])[0], /"7", which its story does not say/);
+assert.match(roleStoryProblems([{ ...bnp, resume: ["Only one line."] }, ...rest])[0], /1 Résumé lines, not 2 to 4/);
 
 // A Staff pass's headline number is one of its Role story's evidence items or a fact the story states in words
 // (#209), so a pass never claims more than its story does. Each failure names the pass.
