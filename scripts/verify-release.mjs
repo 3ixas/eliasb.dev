@@ -18,6 +18,7 @@ const canonicalPages = [
   "/work/bnp-paribas",
   "/work/joveen",
   "/work/optegra",
+  "/resume",
 ];
 const expectedSitemapUrls = new Set(canonicalPages.map((route) => route === "/" ? "https://www.eliasb.dev" : `https://www.eliasb.dev${route}`));
 const expectedWorkSocialCards = new Map([
@@ -254,8 +255,12 @@ function verifyHomepage(markup) {
   const emailAction = hrefs(helloSection).find(({ href }) => href?.startsWith("mailto:"));
   check(emailAction, "Say hello should keep the email action");
   equal(emailAction?.href, "mailto:eliasthebennett@gmail.com", "The email action should write to Elias");
-  const cards = [...helloSection.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].filter(([, tag]) => attribute(tag, "target") === "_blank");
+  const cards = [...helloSection.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].filter(([, tag]) => (attribute(tag, "class") ?? "").includes("stretch-hello__link"));
   equal(cards.map(([, , body]) => plainText(body).split(" ")[0]).join("|"), "Résumé|GitHub|LinkedIn", "The links should be the résumé, GitHub and LinkedIn, in that order");
+  const resumeCard = cards.find(([, , body]) => plainText(body).startsWith("Résumé"));
+  equal(attribute(resumeCard?.[1] ?? "", "href"), "/resume", "Say hello's Résumé should open /resume on this site");
+  check(attribute(resumeCard?.[1] ?? "", "target") === null, "Say hello's Résumé should open in the same tab");
+  check(cards.filter((card) => card !== resumeCard).every(([, tag]) => attribute(tag, "target") === "_blank"), "GitHub and LinkedIn should open in a new tab");
   const footer = markup.slice(markup.indexOf("<footer"), markup.indexOf("</footer>"));
   equal(plainText(footer), "Made by Elias", "The footer should be my signature");
 
@@ -299,6 +304,7 @@ async function verifyRoutes(baseUrl, pages) {
     if (route === "/") await verifyHomeSocialMetadata(baseUrl, page.document);
     if (route.startsWith("/things-i-make")) await verifyWorkSocialMetadata(baseUrl, page.document, route);
     if (route.startsWith("/work/")) await verifyRoleStorySocialMetadata(baseUrl, page.document, route);
+    if (route === "/resume") await verifyResume(baseUrl, page);
   }
 
   const retiredConcepts = await fetch(new URL("/concepts", baseUrl), { redirect: "manual" });
@@ -312,6 +318,18 @@ async function verifyRoutes(baseUrl, pages) {
     equal(response.status, 308, `${route} should permanently redirect`);
     equal(response.headers.get("location"), location, `${route} compatibility target`);
   }
+}
+
+// The Résumé: the title and description, a Download PDF that serves the committed file, and no Drive link.
+async function verifyResume(baseUrl, { document, markup }) {
+  equal(document.match(/<title>([^<]*)<\/title>/i)?.[1], "Résumé · Elias Bennett", "Résumé title");
+  check((metaContent(document, "description", "name") ?? "").startsWith("Elias Bennett’s résumé"), "Résumé description");
+  const download = hrefs(markup).find(({ tag }) => attribute(tag, "download") !== null);
+  equal(download?.href, "/Elias-Bennett-Resume.pdf", "Download PDF should serve the committed file");
+  const pdf = await fetch(new URL("/Elias-Bennett-Resume.pdf", baseUrl));
+  equal(pdf.status, 200, "The résumé PDF should be served");
+  equal(pdf.headers.get("content-type"), "application/pdf", "The résumé PDF content type");
+  check(!markup.includes("drive.google.com"), "The Résumé should not link to Google Drive");
 }
 
 async function verifyHomeSocialMetadata(baseUrl, document) {

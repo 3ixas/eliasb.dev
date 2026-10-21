@@ -83,6 +83,9 @@ export type RoleStoryFigure =
       source: { href: string; label: string };
     };
 
+/** How many achievement lines a role gives the Résumé. */
+export const RESUME_LINES = { min: 2, max: 4 } as const;
+
 export type RoleStory = {
   slug: RoleStorySlug;
   /** "BNP Paribas": the band's name, the page title and the social card. */
@@ -99,6 +102,8 @@ export type RoleStory = {
   sections: Record<RoleStorySectionKey, StorySectionBody> & { summary: { paragraphs: readonly [string] } };
   /** A figure under a section, where the story has one. */
   figures?: Partial<Record<RoleStorySectionKey, RoleStoryFigure>>;
+  /** The achievement lines the Résumé shows for this role (see Résumé in GLOSSARY.md): written to stand alone, not the evidence fragments. */
+  resume: readonly string[];
   /** At most four, shown under What changed. */
   evidence: readonly EvidenceItem[];
   /** The employer's colour in each theme. */
@@ -138,6 +143,9 @@ export function roleStoryProblems(stories: readonly RoleStory[]): string[] {
     }
     if (story.next !== null && (!slugs.includes(story.next) || story.next === story.slug)) {
       problems.push(`Role story "${story.slug}" must end with a different Role story or none, not "${story.next}".`);
+    }
+    if (story.resume.length < RESUME_LINES.min || story.resume.length > RESUME_LINES.max) {
+      problems.push(`Role story "${story.slug}" has ${story.resume.length} Résumé lines, not ${RESUME_LINES.min} to ${RESUME_LINES.max}.`);
     }
     for (const key of roleStorySectionKeys) {
       if (!storySectionHasContent(story.sections[key])) {

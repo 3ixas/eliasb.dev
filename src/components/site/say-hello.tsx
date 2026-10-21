@@ -1,11 +1,12 @@
 import { sectionLabel } from "@/components/site/sections";
+import { SiteLink, isInternalHref } from "@/components/site/site-link";
 import { profile } from "@/content/site";
 import { sayHello } from "@/content/stretch/site-copy";
 
 /**
  * The closing section, and the biggest thing on the page (#216): the one cobalt
  * action (an email to Elias) at display size, the approved line, the address in
- * words, and a plain row of Résumé, GitHub and LinkedIn links.
+ * words, and a plain row of Résumé (a page here), GitHub and LinkedIn links.
  */
 const address = profile.links.email.replace(/^mailto:/, "");
 
@@ -24,13 +25,17 @@ export function SayHello({ headingId }: { headingId: string }) {
         </a>
       </div>
       <ul className="stretch-hello__links">
-        {sayHello.links.map(({ id, label }) => (
-          <li key={id}>
-            <a className="stretch-hello__link" href={profile.links[id]} target="_blank" rel="noreferrer">
-              {label} <span aria-hidden="true">↗</span>
-            </a>
-          </li>
-        ))}
+        {sayHello.links.map(({ id, label }) => {
+          const href: string = profile.links[id];
+          // The Résumé is a page of this site (/resume), so it gets the internal arrow; the others leave it.
+          return (
+            <li key={id}>
+              <SiteLink className="stretch-hello__link" href={href}>
+                {label} <span aria-hidden="true">{isInternalHref(href) ? "→" : "↗"}</span>
+              </SiteLink>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

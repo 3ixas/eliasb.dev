@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 // Nothing a visitor reads is smaller than 13 px (docs/design/STRETCH.md, "Type"). The pages are
 // hydrated and laid out after load, so the reading polls rather than trusting the first one.
-const routes = ["/", "/things-i-make/threshold", "/work/bnp-paribas", "/things-i-make", "/nothing-pinned-here"];
+const routes = ["/", "/things-i-make/threshold", "/work/bnp-paribas", "/resume", "/things-i-make", "/nothing-pinned-here"];
 
 for (const route of routes) {
   test(`${route} has no visible text under 13 px`, async ({ page }) => {
