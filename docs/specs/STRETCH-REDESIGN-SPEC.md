@@ -31,7 +31,7 @@ A from-scratch front end in the **Stretch direction**, keeping the existing data
 6. As a screen-reader user, I want the full homepage content available from the start, so that the visual opening never delays what I can read.
 7. As a search engine, I want all homepage content in the server-rendered HTML, so that the site is indexed completely.
 8. As a visitor whose script fails or is blocked, I want the finished page rather than a blank one, so that a failure never hides the site.
-9. As a visitor, I want to see Elias's name at display size in cobalt, his role "Software Engineer at BNP Paribas CIB" under it, his headline and his supporting line on the first screen, so that I know who he is straight away.
+9. As a visitor, I want to see Elias's name at display size in cobalt, his role "Software Engineer" under it, his headline, the one place on the first screen that names BNP Paribas, and his supporting line on the first screen, so that I know who he is straight away.
 10. As a visitor, I want *See my work* and *Say hello* in the hero, so that I can act immediately.
 
 **Visitors: Things I make**
