@@ -20,7 +20,7 @@ import {
   roleStorySectionKeys,
   roleStorySectionLabels,
 } from "../src/content/stretch/role-story.ts";
-import { passLinkLabel, passProblems, passRecords, passStatus } from "../src/content/stretch/staff-pass.ts";
+import { currentPassStatus, passLinkLabel, passProblems, passRecords } from "../src/content/stretch/staff-pass.ts";
 import { howIWork } from "../src/content/stretch/how-i-work.ts";
 import { greetingKey } from "../src/content/stretch/greeting.ts";
 import { offTheClock } from "../src/content/stretch/off-the-clock.ts";
@@ -270,9 +270,7 @@ assert.equal(passRecords.joveen.pins, undefined, "Only the current pass wears th
   assert.match(claim("bnp-paribas", { value: "Only", label: "C# engineer on the team" })[0], /"bnp-paribas"/, "A stated fact needs the sentence that states it");
   assert.match(claim("bnp-paribas", { value: "Only", label: "C# engineer on the team", quote: "only Rust engineer" })[0], /"bnp-paribas"/, "...and the story must say it");
 }
-assert.equal(passStatus(roleStories["bnp-paribas"], "current"), "Valid · present");
-assert.equal(passStatus(roleStories.joveen, "returned"), "Jun 2025", "A returned pass shows the month it ended");
-assert.equal(passStatus(roleStories.optegra, "returned"), "Aug 2024");
+assert.equal(currentPassStatus, "Valid · present");
 assert.equal(passLinkLabel(passRecords.optegra), "The Optegra story →", "The link names the short employer, not Optegra Eye Healthcare & Kensington Medical");
 
 // Each entry owns its pairing, so reordering the copy cannot redirect a link or a filter.

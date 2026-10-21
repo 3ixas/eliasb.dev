@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { roleStories } from "../src/content/stretch/role-stories";
-import { passLinkLabel, passRecords, passStatus } from "../src/content/stretch/staff-pass";
+import { currentPassStatus, passLinkLabel, passRecords } from "../src/content/stretch/staff-pass";
 
 /** BNP's award pins that lead into its Role story: the only links on its pass besides the pass itself. */
 const pinLinks = (passRecords["bnp-paribas"].pins ?? []).filter((pin) => pin.href).length;
@@ -28,7 +28,7 @@ test.describe("Staff pass", () => {
     const shown = await text(hang(page, "current"));
     const fields = [
       `Staff · ${story.number}`,
-      passStatus(story, "current"),
+      currentPassStatus,
       record.short,
       story.role,
       story.dates,
@@ -44,14 +44,13 @@ test.describe("Staff pass", () => {
     await expect(hang(page, "current").locator(".stretch-pass__barcode")).toHaveAttribute("aria-hidden", "true");
   });
 
-  test("a returned pass shows the month it ended and says Returned, never Expired", async ({ page }) => {
+  test("a returned pass has no status date and says Returned, never Expired", async ({ page }) => {
     for (const [name, slug] of [
       ["returned-joveen", "joveen"],
       ["returned-optegra", "optegra"],
     ] as const) {
-      const story = roleStories[slug];
       const pass = hang(page, name);
-      await expect(pass.locator(".stretch-pass__status")).toHaveText(passStatus(story, "returned"));
+      await expect(pass.locator(".stretch-pass__status"), "the dates line already says when it ended").toHaveCount(0);
       await expect(pass.locator(".stretch-pass__stamp")).toHaveText("Returned");
       const shown = await text(pass);
       expect(shown.indexOf("Returned"), "the stamp comes before the employer").toBeLessThan(shown.indexOf(passRecords[slug].short));

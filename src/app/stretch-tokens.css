@@ -29,6 +29,13 @@
   --stretch-tape: rgba(232, 222, 188, 0.85);
   --stretch-dark: 0;
   color-scheme: light;
+
+  /* Text under 24 px: nothing is smaller than 13 px, docs/design/STRETCH.md "Type". */
+  --text-label: 13px;
+  --text-small: 15px;
+  --text-body: 17px;
+  --text-lead: 19px;
+  --text-quote: 22px;
 }
 
 @media (prefers-color-scheme: dark) {

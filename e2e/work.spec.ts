@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { roleStories } from "../src/content/stretch/role-stories";
 import { hero } from "../src/content/stretch/site-copy";
-import { passLinkLabel, passRecords, passStatus } from "../src/content/stretch/staff-pass";
+import { currentPassStatus, passLinkLabel, passRecords } from "../src/content/stretch/staff-pass";
 import { shownSource, work } from "../src/content/stretch/work";
 import { contrastOnPaper } from "./support/contrast";
 
@@ -30,7 +30,8 @@ test.describe("Work", () => {
       const story = roleStories[slug];
       const record = passRecords[slug];
       const shown = await pass(page, slug).locator(".stretch-pass__card").evaluate((card) => card.textContent ?? "");
-      const fields = [`Staff · ${story.number}`, passStatus(story, slug === "bnp-paribas" ? "current" : "returned"), record.short, story.role, story.dates, record.headline.value, record.headline.label, passLinkLabel(record)];
+      const fields = [`Staff · ${story.number}`, record.short, story.role, story.dates, record.headline.value, record.headline.label, passLinkLabel(record)];
+      if (slug === "bnp-paribas") fields.splice(1, 0, currentPassStatus);
       const positions = fields.map((field) => shown.indexOf(field));
       expect(positions, `${slug} shows every field: ${fields.join(" | ")}`).not.toContain(-1);
       expect(positions, `${slug} shows them in this order`).toEqual([...positions].sort((a, b) => a - b));
