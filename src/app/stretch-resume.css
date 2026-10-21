@@ -221,6 +221,11 @@
     display: none;
   }
 
+  /* ↗ marks a link that leaves the site on screen; on paper there is nowhere to leave to, and the PDF holds only the sheet's text. */
+  .stretch-resume__away {
+    display: none;
+  }
+
   .stretch-resume__desk {
     display: block;
     padding: 0;

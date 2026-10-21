@@ -43,8 +43,9 @@ test.describe("The Résumé", () => {
 
   test("shows exactly the text the PDF check expects, in that order", async ({ page }) => {
     // verify:resume holds the PDF to resumeText(); this holds the rendered sheet to it, so the page and the PDF share one source.
-    // CSS capitals and the comma after a role are decoration, so case and commas are ignored; whitespace follows the layout.
-    const plain = (text: string) => text.toLowerCase().replace(/[\s,]+/g, "");
+    // CSS capitals, the comma after a role and the screen-only ↗ on links that leave the site are decoration, so case, commas and
+    // arrows are ignored; whitespace follows the layout.
+    const plain = (text: string) => text.toLowerCase().replace(/[\s,↗]+/g, "");
     await expect.poll(() => sheet(page).evaluate((el) => (el as HTMLElement).innerText).then(plain)).toBe(plain(resumeText(resumeSheet()).join(" ")));
   });
 

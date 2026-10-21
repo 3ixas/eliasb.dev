@@ -159,11 +159,11 @@ function Story({ event, day, lead = false }: { event: HistoryEvent; day: ReturnT
           <figcaption className="stretch-mono">
             {copy.curiosity.imageCredit}{" "}
             <a href={image.sourceUrl} target="_blank" rel="noreferrer">
-              {image.creator}
+              <Label text={`${image.creator} ↗`} />
             </a>
             {"\u00a0"}·{" "}
             <a href={image.licenseUrl ?? image.sourceUrl} target="_blank" rel="noreferrer">
-              {image.licenseName}
+              <Label text={`${image.licenseName} ↗`} />
             </a>
           </figcaption>
         </figure>
