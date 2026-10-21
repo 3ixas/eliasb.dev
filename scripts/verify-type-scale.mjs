@@ -1,11 +1,13 @@
 // Every `font-size` in src/app/*.css must be one the check can vouch for (docs/design/STRETCH.md, "Type"):
-// one of the five text tokens, a px size of 24 or more, a clamp() whose minimum keeps the 13 px floor,
-// or a display expression named below. Anything else (rem, em, %, a bare vw, a new expression) fails.
+// one of the five text tokens, a px size of 24 or more, a clamp() that never goes under 24 px, or a
+// display expression named below. Text under 24 px stays on the five steps, so a clamp() that dips
+// below 24 px would sit between them. Anything else (rem, em, %, a bare vw, a new expression) fails.
 import { readdirSync, readFileSync } from "node:fs";
 
 const dir = new URL("../src/app/", import.meta.url);
 const tokens = new Set(["--text-label", "--text-small", "--text-body", "--text-lead", "--text-quote"]);
-const floor = 13;
+/** Under this, text uses the five steps; from it, display type may be fluid. */
+const displayFrom = 24;
 
 /** Display sizes the patterns above can't read, each with why it never gets small. */
 const display = new Map([
@@ -30,12 +32,12 @@ for (const file of readdirSync(dir).filter((name) => name.endsWith(".css"))) {
     }
     const px = size.match(/^(\d*\.?\d+)px$/)?.[1];
     if (px) {
-      if (Number(px) < 24) problems.push(`${at} is under 24 px and not a token`);
+      if (Number(px) < displayFrom) problems.push(`${at} is under ${displayFrom} px and not a token`);
       return;
     }
     const least = size.match(/^clamp\(\s*(\d*\.?\d+)px\s*,/)?.[1];
     if (least) {
-      if (Number(least) < floor) problems.push(`${at} can fall under the ${floor} px floor`);
+      if (Number(least) < displayFrom) problems.push(`${at} can fall under ${displayFrom} px, between the text steps; start it at a --text-* token and make it fluid from the width where it clears ${displayFrom} px`);
       return;
     }
     if (!display.has(size)) problems.push(`${at} is not a token, a px size, a clamp() with a px minimum or a named display size`);
@@ -46,4 +48,4 @@ if (problems.length) {
   console.error(`${problems.join("\n")}\nUse --text-label (13px), --text-small, --text-body, --text-lead or --text-quote.`);
   process.exit(1);
 }
-console.log(`Type scale check passed: every font-size is a text token, 24 px or more, or a display size that keeps the ${floor} px floor.`);
+console.log(`Type scale check passed: every font-size is a text token or a display size of ${displayFrom} px or more.`);

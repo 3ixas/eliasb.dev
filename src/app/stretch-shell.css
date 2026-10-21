@@ -469,9 +469,16 @@ html:has(.stretch-menu[open]) {
 /* The role line sits plainly under the name, in plain ink. */
 .stretch-hero__role {
   margin: 16px 0 0;
-  font-size: clamp(20px, 1.9vw, 27px);
+  font-size: var(--text-quote);
   font-weight: 650;
   letter-spacing: -0.01em;
+}
+
+/* Fluid only once 1.9vw clears 24 px, so the role line never sits between steps. */
+@media (min-width: 1264px) {
+  .stretch-hero__role {
+    font-size: clamp(24px, 1.9vw, 27px);
+  }
 }
 
 .stretch-hero__lede {
@@ -1894,7 +1901,14 @@ html[data-entering][data-fast-forward="instant"] [data-entrance] {
 }
 
 .stretch-story--lead .stretch-story__fact {
-  font-size: clamp(22px, 2.4vw, 26px);
+  font-size: var(--text-quote);
+}
+
+/* Fluid only once 2.4vw clears 24 px, so the lead fact never sits between steps. */
+@media (min-width: 1000px) {
+  .stretch-story--lead .stretch-story__fact {
+    font-size: clamp(24px, 2.4vw, 26px);
+  }
 }
 
 .stretch-story__date {
@@ -2529,9 +2543,16 @@ button.stretch-gh__day[data-selected] {
 .stretch-cs-open__outcome {
   max-width: 28ch;
   margin: 20px 0 0;
-  font-size: clamp(22px, 3vw, 30px);
+  font-size: var(--text-quote);
   font-weight: 600;
   line-height: 1.2;
+}
+
+/* Fluid only once 3vw clears 24 px, so the outcome never sits between steps. */
+@media (min-width: 800px) {
+  .stretch-cs-open__outcome {
+    font-size: clamp(24px, 3vw, 30px);
+  }
 }
 
 .stretch-cs-open__meta {
