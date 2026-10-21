@@ -66,6 +66,7 @@ A Fastener fastens only what would be held to a surface: a screenshot on its til
 | Off the clock | Training poster (today in cobalt), book, film, history clipping, **Now making** (pulsing cobalt "now"), GitHub year grid (today in cobalt) |
 | Theme | The Eclipse: an icon-only sun (light) or crescent moon (dark), named "Dark theme", pressed while the dark theme is in force |
 | Case study | Opening band in the project colour, section links, a neutral reading column about 720 px wide, framed figures, PRD card with evidence strip, Next-project tile |
+| Résumé | `/resume`, linked only from Say hello: an A4 sheet lying on the desk, which is also what prints and what `public/Elias-Bennett-Resume.pdf` holds. Light paper in both themes, no Fastener, full width with no paper edge on phones. Download PDF sits on the desk above it and does not print. Its text is the site's own records (`src/content/resume.ts`); `pnpm resume:pdf` renders the PDF and `verify:resume` fails when it is stale ([#247](https://github.com/3ixas/eliasb.dev/issues/247)) |
 | Signature entrance | Homepage only; timings in the spec |
 
 ## Motion

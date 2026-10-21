@@ -149,10 +149,10 @@ test.describe("Things I make: moved from /work", () => {
     await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", workArchive.description);
   });
 
-  test("the sitemap lists home, the archive, the case studies at their new paths and the Role stories, and no moved /work paths", async ({ request }) => {
+  test("the sitemap lists home, the archive, the case studies at their new paths, the Role stories and the Résumé, and no moved /work paths", async ({ request }) => {
     const xml = await (await request.get("/sitemap.xml")).text();
     const paths = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, loc]) => new URL(loc).pathname);
-    const expected = ["/", "/things-i-make", ...Object.keys(caseStudies).map((slug) => `/things-i-make/${slug}`), ...roleStorySlugs.map((slug) => `/work/${slug}`)];
+    const expected = ["/", "/things-i-make", ...Object.keys(caseStudies).map((slug) => `/things-i-make/${slug}`), ...roleStorySlugs.map((slug) => `/work/${slug}`), "/resume"];
     expect(paths.sort()).toEqual(expected.sort());
   });
 });

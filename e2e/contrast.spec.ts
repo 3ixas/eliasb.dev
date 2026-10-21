@@ -10,7 +10,7 @@ import { renderedContrast } from "./support/rendered-contrast";
 test.use({ reducedMotion: "reduce" });
 
 const currentProofs = work.rail.flatMap((pass) => (pass.state === "current" ? pass.proofs : []));
-const routes = ["/", "/things-i-make", ...Object.keys(caseStudies).map((slug) => `/things-i-make/${slug}`), "/nothing-pinned-here"];
+const routes = ["/", "/resume", "/things-i-make", ...Object.keys(caseStudies).map((slug) => `/things-i-make/${slug}`), "/nothing-pinned-here"];
 /** Pages that are not the site's own routes but must meet the same bar: every state of the Staff pass. */
 const fixtureRoutes = ["/fixtures/staff-pass"];
 /** Fewest text runs a page shows; the 404 has five now that the theme button carries no text, and the Staff pass fixture dozens. */

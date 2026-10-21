@@ -18,6 +18,10 @@ The config starts `pnpm start` (a production build) on port 3100 if nothing is l
 - `pnpm verify:routes` can run against it with `CANONICAL_ROUTE_BASE_URL=http://127.0.0.1:3100`.
 - `pnpm verify:release` needs a production build, so CI is where it first runs. It has caught real issues that no other check did (attribute entities, the sitemap list), so read its failures rather than re-running.
 
+## The résumé PDF
+
+`public/Elias-Bennett-Resume.pdf` is committed, and `pnpm verify:resume` (part of `pnpm check`) fails when its text no longer matches the sheet or it runs past two pages. After changing anything `/resume` shows (a Role story's résumé lines, `src/content/resume.ts`, the sheet's CSS), start the dev server on 3100 as above, run `pnpm resume:pdf` and commit the result. Playwright's Chromium renders it, so the Vercel build never needs a browser.
+
 ## When a spec fails only in dev
 
 `next.config.ts` hides the dev badge and allows `eval()` in development only, so the contrast, focus-ring and entrance specs no longer fail under `next dev` because of Next's own overlay. A failure now is real until shown otherwise: reproduce it against a production build or in CI before dismissing it.

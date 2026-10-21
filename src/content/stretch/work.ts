@@ -12,7 +12,7 @@ import { caseStudies } from "./case-studies.ts";
 import { roleStories } from "./role-stories.ts";
 import { roleStoryColours, type RoleStorySlug } from "./role-story.ts";
 import { passLinkLabel, passRecords, type PassState } from "./staff-pass.ts";
-import type { EvidenceItem, StorySectionBody } from "./story.ts";
+import { storyText } from "./story.ts";
 
 /**
  * Where a "So far" fact comes from: a Role story (an employer) or a Case study
@@ -38,15 +38,6 @@ export type HeadedBar = {
 /** A bar's source as it is shown: its name for the "So far" tag, the link, the thread colour and the text a "So far" must restate. */
 export type ShownSource = { name: string; link: { label: string; href: string }; thread: string; text: string };
 
-/** Everything a story or study says, as plain text: its sections and its evidence strip. */
-const textOf = ({ sections, evidence }: { sections: Record<string, StorySectionBody>; evidence: readonly EvidenceItem[] }) =>
-  [
-    ...Object.values(sections).flatMap((section) => [section.heading, ...(section.paragraphs ?? []), ...(section.points ?? []).flatMap((point) => [point.lead, point.text])]),
-    ...evidence.map((item) => `${item.value} ${item.label}`),
-  ]
-    .filter(Boolean)
-    .join(" ");
-
 export function shownSource(source: HeadedSource): ShownSource {
   if ("story" in source) {
     const story = roleStories[source.story];
@@ -55,7 +46,7 @@ export function shownSource(source: HeadedSource): ShownSource {
       name: short,
       link: { label: passLinkLabel(passRecords[source.story]), href: `/work/${source.story}` },
       thread: roleStoryColours(story.colours).swatch,
-      text: textOf(story),
+      text: storyText(story),
     };
   }
   const project = projects.find((entry) => entry.slug === source.project);
@@ -66,7 +57,7 @@ export function shownSource(source: HeadedSource): ShownSource {
     link: { label: `The ${project.name} case study →`, href: `/things-i-make/${source.project}` },
     // A project's swatch is one colour for both themes; on the light card it falls short of 3:1 (Threshold's is 2.6), so light takes it deepened, as the Role stories' light swatches are.
     thread: `light-dark(color-mix(in srgb, ${project.colours.swatch} 80%, black), ${project.colours.swatch})`,
-    text: textOf(study),
+    text: storyText(study),
   };
 }
 
