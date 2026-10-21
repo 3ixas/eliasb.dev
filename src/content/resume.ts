@@ -97,7 +97,8 @@ export function resumeSheet(): ResumeSheet {
 /**
  * The sheet's text in reading order, one string for each thing a reader sees: what the PDF's text must
  * contain, in this order, and nothing else. It lists the same things in the same order as
- * src/components/site/resume.tsx, so change them together; a string left out here is not checked.
+ * src/components/site/resume.tsx, and e2e/resume.spec.ts fails when the rendered sheet's text differs
+ * from it, so the page, this list and (through verify:resume) the PDF cannot drift apart unseen.
  */
 export function resumeText(sheet: ResumeSheet): string[] {
   return [

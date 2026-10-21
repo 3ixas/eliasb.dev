@@ -199,8 +199,11 @@
   }
 }
 
-/* Cmd-P gives the sheet: the desk, the header, the button and the footer stay behind. */
-@page {
+/*
+ * Cmd-P gives the sheet: the desk, the header, the button and the footer stay behind. The A4 page is a
+ * named page that only the sheet uses (`page: resume` below), so no other route's print is touched.
+ */
+@page resume {
   size: A4;
   margin: 8mm 14mm;
 }
@@ -228,6 +231,7 @@
     min-height: 0;
     padding: 0;
     box-shadow: none;
+    page: resume;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }

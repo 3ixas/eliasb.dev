@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { resumeCopy, resumePdf } from "../src/content/resume";
+import { resumeCopy, resumePdf, resumeSheet, resumeText } from "../src/content/resume";
 import { roleStories, roleStorySlugs } from "../src/content/stretch/role-stories";
 import { work } from "../src/content/stretch/work";
 
@@ -39,6 +39,13 @@ test.describe("The Résumé", () => {
           return { role, employer, dates, story: `/work/${slug}` };
         }),
       );
+  });
+
+  test("shows exactly the text the PDF check expects, in that order", async ({ page }) => {
+    // verify:resume holds the PDF to resumeText(); this holds the rendered sheet to it, so the page and the PDF share one source.
+    // CSS capitals and the comma after a role are decoration, so case and commas are ignored; whitespace follows the layout.
+    const plain = (text: string) => text.toLowerCase().replace(/[\s,]+/g, "");
+    await expect.poll(() => sheet(page).evaluate((el) => (el as HTMLElement).innerText).then(plain)).toBe(plain(resumeText(resumeSheet()).join(" ")));
   });
 
   test("gives each role the Role story's own Résumé lines", async ({ page }) => {
