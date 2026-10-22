@@ -38,7 +38,7 @@ export function MenuDialog() {
   // While the menu is open the page is pinned where it was: the body goes fixed at its scroll offset, so
   // nothing behind can scroll, whatever moves it (wheel, touch, a dragged scrollbar). The html scrollbar stays
   // as a track, so the page keeps its width and nothing moves; overflow: hidden would drop it. Closing puts
-  // the page back, or on to the section that was chosen: its link's own jump ran while the page was pinned.
+  // the page back, then on to the section that was chosen, once it can scroll again.
   useEffect(() => {
     if (!open) return;
     const root = document.documentElement;
@@ -48,9 +48,9 @@ export function MenuDialog() {
     return () => {
       root.style.overflowY = "";
       Object.assign(document.body.style, { position: "", top: "", left: "", right: "" });
-      const section = chosen.current && document.getElementById(chosen.current);
-      if (section) section.scrollIntoView({ behavior: "instant", block: "start" });
-      else window.scrollTo({ top: scrollY, behavior: "instant" });
+      window.scrollTo({ top: scrollY, behavior: "instant" });
+      // The jump waits for the unpin, so Back returns to where the menu was opened from.
+      if (chosen.current) window.location.hash = chosen.current;
       chosen.current = null;
     };
   }, [open]);
@@ -113,7 +113,10 @@ export function MenuDialog() {
                   className={index === sectionLinks.length - 1 ? "stretch-menu__cta" : undefined}
                   onClick={(event) => {
                     // A click that opens the section elsewhere (a new tab) leaves this page where it was.
-                    if (!(event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) chosen.current = id;
+                    if (!(event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) {
+                      event.preventDefault();
+                      chosen.current = id;
+                    }
                     close();
                   }}
                 >

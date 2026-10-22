@@ -114,6 +114,19 @@ test.describe("Phone header and menu", () => {
     });
   }
 
+  test("Back after choosing a section returns to where the menu was opened", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.evaluate(() => window.scrollTo({ top: 600, behavior: "instant" }));
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(600);
+    const button = (await menuButton(page).boundingBox())!;
+    await page.mouse.click(button.x + button.width / 2, button.y + button.height / 2);
+    await dialog(page).getByRole("link", { name: menuLabels[menuLabels.length - 1], exact: true }).click();
+    await expect(page).toHaveURL(/#say-hello$/);
+    await page.goBack();
+    await expect(page).not.toHaveURL(/#/);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(600);
+  });
+
   test("a modified click on a section name leaves the page where it was", async ({ page, context }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.evaluate(() => window.scrollTo({ top: 600, behavior: "instant" }));
