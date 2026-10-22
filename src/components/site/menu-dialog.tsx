@@ -25,8 +25,6 @@ export function MenuDialog() {
   const closer = useRef<HTMLButtonElement>(null);
   /** The section a link in the menu was chosen for, so focus can follow the page to it. */
   const chosen = useRef<string | null>(null);
-  /** Where the page was when the menu opened, put back on Close in case its scrollbar was dragged behind the dialog. */
-  const scrolledTo = useRef(0);
   const [open, setOpen] = useState(false);
 
   // A dialog left open when the window grows to the desktop layout would cover it.
@@ -37,29 +35,21 @@ export function MenuDialog() {
     return () => media.removeEventListener("change", onChange);
   }, []);
 
-  // Keep a classic scrollbar's width reserved, so opening the menu moves nothing. Set from here, and only
-  // when scrollbars take room, because a stylesheet rule would also reserve 15 px where they are hidden or
-  // overlaid, and narrow every page there. A probe measures them, since the page may not scroll yet.
+  // While the menu is open the page is pinned where it was: the body goes fixed at its scroll offset, so
+  // nothing behind can scroll, whatever moves it (wheel, touch, a dragged scrollbar). The html scrollbar stays
+  // as a track, so the page keeps its width and nothing moves; overflow: hidden would drop it. Closing puts
+  // the page back, unless a section was chosen, whose jump is the scroll.
   useEffect(() => {
-    const probe = document.createElement("div");
-    probe.style.cssText = "position:absolute;visibility:hidden;width:50px;height:50px;overflow:scroll";
-    document.body.append(probe);
-    if (probe.offsetWidth > probe.clientWidth) document.documentElement.style.scrollbarGutter = "stable";
-    probe.remove();
-  }, []);
-
-  // Wheel and touch do not scroll the page behind. Not overflow: hidden on html, which makes Chromium give up the
-  // scrollbar width that scrollbar-gutter reserves, so opening the menu would move the page 15 px.
-  useEffect(() => {
-    const menu = dialog.current;
-    if (!open || !menu) return;
-    // A menu taller than the screen scrolls itself (stretch-shell.css keeps that from reaching the page).
-    const hold = (event: Event) => menu.scrollHeight <= menu.clientHeight && event.preventDefault();
-    menu.addEventListener("wheel", hold, { passive: false });
-    menu.addEventListener("touchmove", hold, { passive: false });
+    if (!open) return;
+    const root = document.documentElement;
+    const scrollY = window.scrollY;
+    if (root.scrollHeight > root.clientHeight) root.style.overflowY = "scroll";
+    Object.assign(document.body.style, { position: "fixed", top: `${-scrollY}px`, left: "0", right: "0" });
     return () => {
-      menu.removeEventListener("wheel", hold);
-      menu.removeEventListener("touchmove", hold);
+      root.style.overflowY = "";
+      Object.assign(document.body.style, { position: "", top: "", left: "", right: "" });
+      if (!chosen.current) window.scrollTo({ top: scrollY, behavior: "instant" });
+      chosen.current = null;
     };
   }, [open]);
 
@@ -82,7 +72,6 @@ export function MenuDialog() {
         className="stretch-pill stretch-menu-button"
         aria-haspopup="dialog"
         onClick={() => {
-          scrolledTo.current = window.scrollY;
           dialog.current?.showModal();
           setOpen(true);
           closer.current?.focus();
@@ -98,14 +87,12 @@ export function MenuDialog() {
         onClose={() => {
           setOpen(false);
           const section = chosen.current ? document.getElementById(chosen.current) : null;
-          chosen.current = null;
           if (section) {
             // The page has scrolled to the section: start the next Tab there, not back at Menu.
             if (!section.hasAttribute("tabindex")) section.setAttribute("tabindex", "-1");
             section.focus({ preventScroll: true });
             return;
           }
-          window.scrollTo({ top: scrolledTo.current, behavior: "instant" });
           opener.current?.focus({ preventScroll: true });
         }}
       >

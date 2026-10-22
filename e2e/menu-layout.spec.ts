@@ -38,9 +38,7 @@ test.describe("Opening the phone menu", () => {
 
   for (const scrolled of [false, true]) {
     test(`moves nothing ${scrolled ? "after scrolling down" : "at the top of the page"}`, async ({ page, browserName }) => {
-      if (scrolled) {
-        await scrollTo600(page);
-      }
+      if (scrolled) await scrollTo600(page);
       if (browserName === "chromium") {
         // Without a classic scrollbar there is no 15 px to lose, and the check would pass for nothing.
         await expect.poll(() => page.evaluate(() => window.innerWidth - document.documentElement.clientWidth)).toBeGreaterThan(0);
@@ -56,22 +54,18 @@ test.describe("Opening the phone menu", () => {
     });
   }
 
-  test("keeps the page behind from scrolling", async ({ page }) => {
+  test("pins the page while open, and puts it back where it was on Close", async ({ page }) => {
     await scrollTo600(page);
     await pressMenu(page);
     await expect(closeButton(page)).toBeVisible();
+    // Nothing is left to scroll, so a dragged scrollbar has nothing to move either.
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight <= document.documentElement.clientHeight)).toBe(true);
+    const pinned = await page.evaluate(() => window.scrollY);
     await page.mouse.wheel(0, 400);
-    // Nothing to wait for when the wheel is ignored, so give a scroll that would happen time to start.
+    await page.evaluate(() => window.scrollBy({ top: 400, behavior: "instant" }));
+    // Nothing to wait for when the scroll is ignored, so give one that would happen time to start.
     await page.waitForTimeout(300);
-    expect(await page.evaluate(() => window.scrollY)).toBe(600);
-  });
-
-  test("puts the page back where it was on Close, if its scrollbar was dragged behind the menu", async ({ page }) => {
-    await scrollTo600(page);
-    await pressMenu(page);
-    await expect(closeButton(page)).toBeVisible();
-    // Dragging the page's scrollbar sends no wheel or touch event, so the script moves the page the same way.
-    await page.evaluate(() => window.scrollTo({ top: 1500, behavior: "instant" }));
+    expect(await page.evaluate(() => window.scrollY)).toBe(pinned);
     await closeButton(page).click();
     await expect(page.getByRole("dialog", { name: "Menu" })).toBeHidden();
     await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(600);

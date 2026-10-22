@@ -324,8 +324,6 @@ button.stretch-pill {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  /* A menu taller than the screen scrolls on its own, and never hands the rest to the page. */
-  overscroll-behavior: contain;
 }
 
 .stretch-menu__top {
