@@ -323,7 +323,6 @@ button.stretch-pill {
 .stretch-menu[open] {
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
 }
 
 .stretch-menu__top {
@@ -338,8 +337,14 @@ button.stretch-pill {
   cursor: pointer;
 }
 
+/* Only the list scrolls in a short window, so its scrollbar never takes room from the top row and Close stays under Menu. */
 .stretch-menu__nav {
-  margin-top: 32px;
+  flex: 1 1 auto;
+  min-height: 0;
+  /* The room a link's focus ring needs (3px ring, 3px offset), which the list's own clipping would otherwise take. */
+  margin: 26px -6px 0;
+  padding: 6px;
+  overflow-y: auto;
 }
 
 .stretch-menu__nav ul {

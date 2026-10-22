@@ -36,8 +36,15 @@ test.describe("Opening the phone menu", () => {
     await page.evaluate(() => document.fonts.ready.then(() => undefined));
   });
 
-  for (const scrolled of [false, true]) {
-    test(`moves nothing ${scrolled ? "after scrolling down" : "at the top of the page"}`, async ({ page, browserName }) => {
+  const cases = [
+    { name: "at the top of the page", scrolled: false, height: 0 },
+    { name: "after scrolling down", scrolled: true, height: 0 },
+    // Short enough that the menu's own list scrolls, which must not push Close sideways.
+    { name: "in a window too short for the menu", scrolled: false, height: 390 },
+  ];
+  for (const { name, scrolled, height } of cases) {
+    test(`moves nothing ${name}`, async ({ page, browserName }) => {
+      if (height) await page.setViewportSize({ width: page.viewportSize()!.width, height });
       if (scrolled) await scrollTo600(page);
       if (browserName === "chromium") {
         // Without a classic scrollbar there is no 15 px to lose, and the check would pass for nothing.
