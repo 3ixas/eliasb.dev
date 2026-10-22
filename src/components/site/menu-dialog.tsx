@@ -111,8 +111,9 @@ export function MenuDialog() {
                 <a
                   href={`#${id}`}
                   className={index === sectionLinks.length - 1 ? "stretch-menu__cta" : undefined}
-                  onClick={() => {
-                    chosen.current = id;
+                  onClick={(event) => {
+                    // A click that opens the section elsewhere (a new tab) leaves this page where it was.
+                    if (!(event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) chosen.current = id;
                     close();
                   }}
                 >

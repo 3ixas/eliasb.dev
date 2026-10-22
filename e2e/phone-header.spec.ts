@@ -114,6 +114,20 @@ test.describe("Phone header and menu", () => {
     });
   }
 
+  test("a modified click on a section name leaves the page where it was", async ({ page, context }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.evaluate(() => window.scrollTo({ top: 600, behavior: "instant" }));
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(600);
+    const button = (await menuButton(page).boundingBox())!;
+    await page.mouse.click(button.x + button.width / 2, button.y + button.height / 2);
+    // Control-click opens the section in a new tab (Meta does on a Mac); this page does not navigate.
+    await dialog(page).getByRole("link", { name: menuLabels[menuLabels.length - 1], exact: true }).click({ modifiers: ["ControlOrMeta"] });
+    await expect(dialog(page)).toBeHidden();
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(600);
+    await expect(page).not.toHaveURL(/#/);
+    await Promise.all(context.pages().filter((other) => other !== page).map((other) => other.close()));
+  });
+
   test("every target is at least 44 px tall, in the header and in the menu", async ({ page }) => {
     for (const reading of await targets(page, "[data-stretch-header]")) expect(reading.height, reading.name).toBeGreaterThanOrEqual(44);
     await menuButton(page).click();
