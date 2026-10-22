@@ -35,6 +35,26 @@ export function MenuDialog() {
     return () => media.removeEventListener("change", onChange);
   }, []);
 
+  // While the menu is open the page is pinned where it was: the body goes fixed at its scroll offset, so
+  // nothing behind can scroll, whatever moves it (wheel, touch, a dragged scrollbar). The html scrollbar stays
+  // as a track, so the page keeps its width and nothing moves; overflow: hidden would drop it. Closing puts
+  // the page back, then on to the section that was chosen, once it can scroll again.
+  useEffect(() => {
+    if (!open) return;
+    const root = document.documentElement;
+    const scrollY = window.scrollY;
+    if (root.scrollHeight > root.clientHeight) root.style.overflowY = "scroll";
+    Object.assign(document.body.style, { position: "fixed", top: `${-scrollY}px`, left: "0", right: "0" });
+    return () => {
+      root.style.overflowY = "";
+      Object.assign(document.body.style, { position: "", top: "", left: "", right: "" });
+      window.scrollTo({ top: scrollY, behavior: "instant" });
+      // The jump waits for the unpin, so Back returns to where the menu was opened from.
+      if (chosen.current) window.location.hash = chosen.current;
+      chosen.current = null;
+    };
+  }, [open]);
+
   const close = () => dialog.current?.close();
 
   function wrapTab(event: React.KeyboardEvent<HTMLDialogElement>) {
@@ -69,7 +89,6 @@ export function MenuDialog() {
         onClose={() => {
           setOpen(false);
           const section = chosen.current ? document.getElementById(chosen.current) : null;
-          chosen.current = null;
           if (section) {
             // The page has scrolled to the section: start the next Tab there, not back at Menu.
             if (!section.hasAttribute("tabindex")) section.setAttribute("tabindex", "-1");
@@ -92,8 +111,12 @@ export function MenuDialog() {
                 <a
                   href={`#${id}`}
                   className={index === sectionLinks.length - 1 ? "stretch-menu__cta" : undefined}
-                  onClick={() => {
-                    chosen.current = id;
+                  onClick={(event) => {
+                    // A click that opens the section elsewhere (a new tab) leaves this page where it was.
+                    if (!(event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) {
+                      event.preventDefault();
+                      chosen.current = id;
+                    }
                     close();
                   }}
                 >
