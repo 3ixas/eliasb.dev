@@ -47,6 +47,7 @@ const server = createServer((request, response) => {
   const { url, method } = request;
   if (url === '/ok') return void response.writeHead(200).end();
   if (url === '/head-refused') return void response.writeHead(method === 'HEAD' ? 405 : 200).end();
+  if (url === '/head-dropped') return void (method === 'HEAD' ? request.socket.destroy() : response.writeHead(200).end());
   if (url === '/flaky') return void response.writeHead(flaky++ === 0 ? 503 : 200).end();
   if (url === '/limited') return void response.writeHead(429).end();
   response.writeHead(404).end();
@@ -57,6 +58,7 @@ const run = (path) => check(`${base}${path}`, { wait: 0 });
 try {
   assert.deepEqual(await run('/ok'), { url: `${base}/ok`, ok: true, detail: '200' });
   assert.equal((await run('/head-refused')).ok, true, 'a 405 to HEAD falls back to GET');
+  assert.equal((await run('/head-dropped')).ok, true, 'a dropped HEAD falls back to GET');
   assert.equal((await run('/flaky')).ok, true, 'a single 503 is retried');
   assert.equal((await run('/limited')).ok, true, 'a 429 is not a broken link');
   assert.deepEqual(await run('/gone'), { url: `${base}/gone`, ok: false, detail: '404' });

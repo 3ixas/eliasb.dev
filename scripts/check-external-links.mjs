@@ -98,9 +98,9 @@ const ok = (status) => (status >= 200 && status < 400) || status === 429;
 
 const attempt = async (url) => {
   try {
-    // Many servers answer HEAD with 403/404/405, so anything but a pass is asked again with GET.
-    const head = await request(url, 'HEAD');
-    if (ok(head)) return { status: head };
+    // Many servers answer HEAD with 403/404/405 or drop it, so anything but a pass is asked again with GET.
+    const head = await request(url, 'HEAD').catch(() => null);
+    if (head !== null && ok(head)) return { status: head };
     return { status: await request(url, 'GET') };
   } catch (error) {
     return { status: null, error: error.name === 'TimeoutError' ? 'timed out' : (error.cause?.code ?? error.message) };
