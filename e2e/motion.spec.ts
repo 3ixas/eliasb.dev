@@ -538,3 +538,52 @@ test.describe("Now making pulse", () => {
     });
   });
 });
+
+// One signature per surface, and nothing else that runs on its own beside it (#227). A motion "runs on its own" when
+// it plays on the document's clock: scroll- and view-driven motion follows the reader's hand, and a transition is
+// feedback. Once the entrance has released, the only such motion on the page is the Now making ring.
+test.describe("One self-running motion on screen at a time", () => {
+  test.use({ reducedMotion: "no-preference" });
+
+  /** The name of every animation playing on its own, on an element that is on screen right now: one entry per running animation. */
+  const selfRunning = (page: Page) =>
+    page.evaluate(() => {
+      const onScreen = (animation: Animation) => {
+        const target = (animation.effect as KeyframeEffect | null)?.target;
+        if (!target) return false;
+        const { top, bottom } = target.getBoundingClientRect();
+        return bottom > 0 && top < innerHeight;
+      };
+      return document
+        .getAnimations()
+        .filter((animation) => !(animation instanceof CSSTransition) && animation.timeline instanceof DocumentTimeline && animation.playState === "running")
+        .filter(onScreen)
+        .map((animation) => (animation as CSSAnimation).animationName ?? "script");
+    });
+
+  test("the sampler sees a running ring on the Off the clock fixture", async ({ page }) => {
+    await page.goto("/fixtures/off-the-clock");
+    await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
+    await page.locator("[data-fixture='making']").scrollIntoViewIfNeeded();
+    // The fixture shows the ring on more than one card, so it is the name that is compared here.
+    await expect.poll(async () => [...new Set(await selfRunning(page))]).toEqual(["stretch-now-pulse"]);
+  });
+
+  test("a scroll pass down the homepage never has two on screen together", async ({ page }) => {
+    await page.goto("/");
+    await released(page);
+    await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
+    const seen = new Set<string>();
+    for (let y = 0; ; y += 240) {
+      await page.evaluate((to) => scrollTo(0, to), y);
+      for (let sample = 0; sample < 4; sample++) {
+        await page.waitForTimeout(60);
+        const running = await selfRunning(page);
+        running.forEach((name) => seen.add(name));
+        expect(running.length, `at scroll ${y}px: ${running.join(", ")}`).toBeLessThanOrEqual(1);
+      }
+      if (await page.evaluate(() => scrollY + innerHeight >= document.documentElement.scrollHeight - 1)) break;
+    }
+    expect([...seen].every((name) => name === "stretch-now-pulse")).toBe(true);
+  });
+});
