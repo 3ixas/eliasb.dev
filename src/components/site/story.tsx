@@ -1,8 +1,9 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import type { EvidenceItem, StoryColours, StorySectionBody } from "@/content/stretch/story";
-import { FastenerProp, TileShot } from "@/components/site/featured-tiles";
-import type { Fastener, ProjectImage } from "@/content/projects";
+import { Fastener } from "@/components/site/fastener";
+import { TileShot } from "@/components/site/featured-tiles";
+import type { FastenerKind, ProjectImage } from "@/content/projects";
 
 /*
  * The parts of a story page that a Case study and a Role story share: the
@@ -182,12 +183,12 @@ export function StoryNext({
   number: string;
   name: string;
   outcome: string;
-  media?: { screenshot: ProjectImage; fastener?: Fastener };
+  media?: { screenshot: ProjectImage; fastener?: FastenerKind };
 }) {
   return (
     <section className="stretch-wrap stretch-cs-next" aria-label={label}>
       <Link className="stretch-cs-next__tile" href={href} style={storyColours(colours)}>
-        {media?.fastener && <FastenerProp kind={media.fastener} />}
+        {media?.fastener && <Fastener kind={media.fastener} />}
         <span className="stretch-cs-next__text">
           <span className="stretch-mono stretch-cs-next__label">{label}</span>
           <span className="stretch-display stretch-cs-next__number" aria-hidden="true">
