@@ -38,7 +38,7 @@ export function MenuDialog() {
   // While the menu is open the page is pinned where it was: the body goes fixed at its scroll offset, so
   // nothing behind can scroll, whatever moves it (wheel, touch, a dragged scrollbar). The html scrollbar stays
   // as a track, so the page keeps its width and nothing moves; overflow: hidden would drop it. Closing puts
-  // the page back, unless a section was chosen, whose jump is the scroll.
+  // the page back, or on to the section that was chosen: its link's own jump ran while the page was pinned.
   useEffect(() => {
     if (!open) return;
     const root = document.documentElement;
@@ -48,7 +48,9 @@ export function MenuDialog() {
     return () => {
       root.style.overflowY = "";
       Object.assign(document.body.style, { position: "", top: "", left: "", right: "" });
-      if (!chosen.current) window.scrollTo({ top: scrollY, behavior: "instant" });
+      const section = chosen.current && document.getElementById(chosen.current);
+      if (section) section.scrollIntoView({ behavior: "instant", block: "start" });
+      else window.scrollTo({ top: scrollY, behavior: "instant" });
       chosen.current = null;
     };
   }, [open]);

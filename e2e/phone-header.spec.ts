@@ -90,17 +90,29 @@ test.describe("Phone header and menu", () => {
     }
   });
 
-  test("a section name closes the menu and jumps to its section", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await menuButton(page).click();
-    await dialog(page).getByRole("link", { name: "Work", exact: true }).click();
-    await expect(dialog(page)).toBeHidden();
-    await expect(page).toHaveURL(/#work$/);
-    const headerBottom = await header(page).evaluate((element) => element.getBoundingClientRect().bottom);
-    const top = await page.locator("#work h2").evaluate((element) => element.getBoundingClientRect().top);
-    expect(top).toBeGreaterThanOrEqual(headerBottom - 1);
-    await expect(page.locator("html")).not.toHaveCSS("overflow", "hidden");
-  });
+  for (const label of [menuLabels[0], menuLabels[menuLabels.length - 1]]) {
+    test(`${label} closes the menu and jumps to its section`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      // Pressed with a real pointer so the page is still at the top: the jump is then the only scrolling.
+      const button = (await menuButton(page).boundingBox())!;
+      await page.mouse.click(button.x + button.width / 2, button.y + button.height / 2);
+      const link = dialog(page).getByRole("link", { name: label, exact: true });
+      const id = (await link.getAttribute("href"))!.slice(1);
+      await link.click();
+      await expect(dialog(page)).toBeHidden();
+      await expect(page).toHaveURL(new RegExp(`#${id}$`));
+      // scroll-padding-top leaves the section just under the sticky header, or the page has run out of room (the last one).
+      const sits = () =>
+        page.evaluate((target) => {
+          const top = document.getElementById(target)!.getBoundingClientRect().top;
+          const padding = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop);
+          const atEnd = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1;
+          return { moved: window.scrollY > 0, offset: top >= padding - 2 && (top <= padding + 2 || atEnd) };
+        }, id);
+      await expect.poll(sits).toEqual({ moved: true, offset: true });
+      await expect(page.locator("html")).not.toHaveCSS("overflow", "hidden");
+    });
+  }
 
   test("every target is at least 44 px tall, in the header and in the menu", async ({ page }) => {
     for (const reading of await targets(page, "[data-stretch-header]")) expect(reading.height, reading.name).toBeGreaterThanOrEqual(44);
