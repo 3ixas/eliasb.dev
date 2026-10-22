@@ -42,9 +42,9 @@ test.describe("Phone header and menu", () => {
     const menu = dialog(page);
     await expect(menu).toBeVisible();
     const box = (await menu.boundingBox())!;
-    const viewport = page.viewportSize()!;
-    expect(box.width).toBe(viewport.width);
-    expect(box.height).toBe(viewport.height);
+    // The scrollbar's reserved width stays beside the dialog (menu-layout.spec.ts), so it covers the page, not the window.
+    expect(box.width).toBe(await page.evaluate(() => document.documentElement.getBoundingClientRect().width));
+    expect(box.height).toBe(page.viewportSize()!.height);
     await expect(menu.locator("[data-greeting]")).toHaveAttribute("data-greeting", /^(morning|afternoon|evening|late)$/);
     await expect(menu.getByRole("navigation", { name: "Primary navigation" }).getByRole("link")).toHaveText(menuLabels);
     await expect(menu.getByRole("link", { name: "Things I make", exact: true })).toHaveCSS("text-transform", "uppercase");

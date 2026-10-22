@@ -8,6 +8,8 @@
 /* The surface behind the shell, so overscroll and the toolbar match the page. */
 html:has([data-stretch-shell]) {
   scroll-padding-top: 6rem;
+  /* A classic scrollbar's width stays reserved, so opening the phone menu moves nothing. */
+  scrollbar-gutter: stable;
 }
 
 html:has([data-stretch-shell]),
@@ -313,7 +315,8 @@ button.stretch-pill {
   max-width: none;
   max-height: none;
   margin: 0;
-  padding: 16px;
+  /* The header's own padding, so Close lands exactly where Menu was. */
+  padding: 12px var(--stretch-gutter);
   border: 0;
   background-color: var(--stretch-page);
   color: var(--stretch-ink);
@@ -323,11 +326,8 @@ button.stretch-pill {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-}
-
-/* The page behind a modal menu does not scroll. */
-html:has(.stretch-menu[open]) {
-  overflow: hidden;
+  /* A menu taller than the screen scrolls on its own, and never hands the rest to the page. */
+  overscroll-behavior: contain;
 }
 
 .stretch-menu__top {

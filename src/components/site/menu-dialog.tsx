@@ -35,6 +35,21 @@ export function MenuDialog() {
     return () => media.removeEventListener("change", onChange);
   }, []);
 
+  // The page behind does not scroll. Not overflow: hidden on html, which makes Chromium give up the
+  // scrollbar width that scrollbar-gutter reserves, so opening the menu would move the page 15 px.
+  useEffect(() => {
+    const menu = dialog.current;
+    if (!open || !menu) return;
+    // A menu taller than the screen scrolls itself (stretch-shell.css keeps that from reaching the page).
+    const hold = (event: Event) => menu.scrollHeight <= menu.clientHeight && event.preventDefault();
+    menu.addEventListener("wheel", hold, { passive: false });
+    menu.addEventListener("touchmove", hold, { passive: false });
+    return () => {
+      menu.removeEventListener("wheel", hold);
+      menu.removeEventListener("touchmove", hold);
+    };
+  }, [open]);
+
   const close = () => dialog.current?.close();
 
   function wrapTab(event: React.KeyboardEvent<HTMLDialogElement>) {
