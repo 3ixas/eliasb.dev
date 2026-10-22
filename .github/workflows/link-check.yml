@@ -1,0 +1,44 @@
+name: Link check
+
+# Weekly check that every external link on the live site still works (#266). Third-party
+# sites flake, so this never runs on pull requests and is not a required check. It reads
+# the deployed sitemap and pages, keeps one "External links failing" issue in step with the
+# result, and fails the run while any link is broken. scripts/check-external-links.mjs
+# decides; scripts/verify-link-check.mjs holds its cases and runs in quality.yml.
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      extra-url:
+        description: Optional URL to add to the check, to prove a broken link opens the issue (then rerun without it to close it)
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: link-check
+  cancel-in-progress: false
+
+jobs:
+  link-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+
+      - name: Check every external link
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          EXTRA_URL: ${{ inputs.extra-url }}
+        run: node scripts/check-external-links.mjs --base-url https://www.eliasb.dev ${EXTRA_URL:+--extra-url "$EXTRA_URL"}

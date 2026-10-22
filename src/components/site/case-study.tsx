@@ -23,6 +23,7 @@ import {
   type CaseStudyOpening,
   type CaseStudySectionKey,
 } from "@/content/stretch/case-study";
+import { Fastener } from "@/components/site/fastener";
 
 /**
  * A case study (docs/specs/STRETCH-REDESIGN-SPEC.md, "Case studies and the
@@ -155,7 +156,7 @@ function Prd({ study }: { study: CaseStudy }) {
   return (
     <div className="stretch-cs-prd-group">
       <figure className="stretch-prd stretch-cs-prd">
-        <span className="stretch-fastener stretch-fastener--tape" aria-hidden="true" />
+        <Fastener kind="tape" />
         {prd.lead && <p className="stretch-cs-prd__around">{prd.lead}</p>}
         <blockquote className="stretch-prd__quote">{prd.quote}</blockquote>
         {prd.after && <p className="stretch-cs-prd__around">{prd.after}</p>}

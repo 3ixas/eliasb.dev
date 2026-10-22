@@ -9,6 +9,12 @@ const number = (position: number) => String(position).padStart(2, "0");
 /** A project opens at its case study, else its live site, else its code. */
 const destination = ({ links }: Project) => links.caseStudy ?? links.live ?? links.code ?? "/things-i-make";
 
+/** Where an external row goes, as a person would say it: "GitHub", else the host without "www.". */
+const hostLabel = (href: string) => {
+  const { hostname } = new URL(href);
+  return hostname === "github.com" ? "GitHub" : hostname.replace(/^www\./, "");
+};
+
 /**
  * The Project index: every non-featured project as a typographic row, newest
  * first. On the homepage it is capped at ten with "Everything I’ve built (n)" after it:
@@ -17,7 +23,8 @@ const destination = ({ links }: Project) => links.caseStudy ?? links.live ?? lin
  * row and has no link to itself. Hover and focus
  * are CSS only: the screenshot follows its row on desktop (bounded by the list edges) and is
  * the thumbnail inside the row on phones, so it needs no script and a row
- * without a screenshot simply has none. The screenshot is decorative here: the
+ * without a screenshot simply has none. An external row says so to assistive
+ * technology with sr-only text after its arrow (the arrow itself is aria-hidden). The screenshot is decorative here: the
  * row's own text already names the project.
  */
 export function ProjectIndex({
@@ -55,6 +62,7 @@ export function ProjectIndex({
               <span className="stretch-index__arrow" aria-hidden="true">
                 {external ? "↗" : "→"}
               </span>
+              {external && <span className="sr-only"> opens {hostLabel(href)} in a new tab</span>}
               {screenshot && (
                 <span className="stretch-index__shot" data-resting={position === resting ? "" : undefined}>
                   <Image

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 import type { RoleStoryFigure } from "@/content/stretch/role-story";
+import { Fastener } from "@/components/site/fastener";
 
 /** The figure a Role story attaches to a section: a flag, a to-scale before-and-after, a certificate, or screenshots of a public page. */
 export function RoleStoryFigureBlock({ figure }: { figure: RoleStoryFigure }) {
@@ -72,7 +73,7 @@ function CertificateFigure({ figure }: { figure: Extract<RoleStoryFigure, { kind
   return (
     <figure id={figure.id} tabIndex={-1} className="stretch-role-figure stretch-role-cert">
       <div className="stretch-role-cert__frame">
-        <span className="stretch-fastener stretch-fastener--tape" aria-hidden="true" />
+        <Fastener kind="tape" />
         <Image src={figure.src} alt={figure.alt} width={figure.width} height={figure.height} sizes="(min-width: 761px) 720px, 100vw" />
       </div>
       <figcaption className="stretch-mono stretch-role-figure__caption">{figure.caption}</figcaption>

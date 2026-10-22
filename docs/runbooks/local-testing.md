@@ -29,3 +29,7 @@ The config starts `pnpm start` (a production build) on port 3100 if nothing is l
 ## Node
 
 Use Node 22 at `/usr/local/bin`; the Hermes symlinks on the default path are older.
+
+## The weekly link check
+
+`.github/workflows/link-check.yml` runs `scripts/check-external-links.mjs` against the deployed site every Monday, and on demand with `workflow_dispatch`. It is not a pull-request check. To try it locally, start `next dev` (any free port), then `pnpm links:check --base-url http://127.0.0.1:<port> --dry-run`: it requests every external link and prints the issue it would open, update or close, without calling GitHub. `--extra-url <url>` adds a link as if a page carried it, to see a failure. `pnpm verify:link-check` holds the offline cases and runs in `pnpm check`.

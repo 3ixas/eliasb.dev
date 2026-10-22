@@ -352,7 +352,7 @@ async function verifyHomeSocialMetadata(baseUrl, document) {
   check(metaContent(document, "twitter:image", "name")?.includes("/opengraph-image"), "Homepage Twitter image should be the headline card");
 
   const icon = tags(document, "link").find((tag) => attribute(tag, "rel") === "icon");
-  check(attribute(icon ?? "", "href")?.startsWith("/icon.svg"), "The favicon should be the cobalt E SVG");
+  check(attribute(icon ?? "", "href")?.startsWith("/icon.svg"), "The favicon should be the Bricolage E SVG");
   const iconSvg = await fetchAsset(baseUrl, "/icon.svg");
   check(iconSvg.includes("prefers-color-scheme: dark"), "The favicon should carry a dark-tab variant");
 }
