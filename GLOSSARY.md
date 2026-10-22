@@ -29,7 +29,7 @@ An employer's own hue (BNP Paribas green, Joveen black, Optegra teal), worn the 
 _Avoid_: Employer logos, recolouring employers in the Cobalt accent
 
 **Case study**:
-A project's own page at `/things-i-make/[slug]`, short and in its **Project colour**: Where it started, What I wrote down first, Decisions, How it's built, Where it stands, What I'd do next, then the next project. Every number comes from the project's own records, and "Where it stands" says plainly what isn't launched or measured ([#112](https://github.com/3ixas/eliasb.dev/issues/112)).
+A project's own page at `/things-i-make/[slug]`, short and in its **Project colour**: Where it started, What I wrote down first, Decisions, How it's built, Where it stands, What I'd do next, then the next project. Every number comes from the project's own records, and "Where it stands" says plainly what isn't launched or measured ([#112](https://github.com/3ixas/eliasb.dev/issues/112)) Its back link, "← Things I make", returns to the Things I make index ([#248](https://github.com/3ixas/eliasb.dev/issues/248)).
 _Avoid_: Case file, long write-up
 
 **Project index**:
