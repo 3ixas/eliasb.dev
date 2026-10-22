@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { caseStudies } from "@/content/stretch/case-studies";
 import { howIWork } from "@/content/stretch/how-i-work";
+import { Fastener } from "@/components/site/fastener";
 
 /**
  * One pen stroke. Every drawn path is normalised with `pathLength`, so the CSS
@@ -66,7 +67,7 @@ export function HowIWork() {
       </ol>
 
       <figure className="stretch-prd">
-        <span className="stretch-fastener stretch-fastener--tape" aria-hidden="true" />
+        <Fastener kind="tape" />
         <blockquote className="stretch-prd__quote">{quote}</blockquote>
         <figcaption className="stretch-mono stretch-prd__caption">{prdCaption}</figcaption>
       </figure>

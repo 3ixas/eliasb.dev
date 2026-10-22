@@ -13,7 +13,7 @@
  */
 
 /** The single small prop on a card's edge (see the Fastener in GLOSSARY.md). */
-export type Fastener = "tape" | "paperclip" | "push-pin";
+export type FastenerKind = "tape" | "paperclip" | "push-pin";
 
 /** What the /things-i-make filters group by: Products, Systems or Experiments. */
 export const PROJECT_CATEGORIES = ["products", "systems", "experiments"] as const;
@@ -41,7 +41,7 @@ export type Project = {
   screenshot?: ProjectImage;
   /** The project's own colours, carried by its tile. Needed to be featured. */
   colours?: { field: string; ink: string; swatch: string };
-  fastener?: Fastener;
+  fastener?: FastenerKind;
 };
 
 /*

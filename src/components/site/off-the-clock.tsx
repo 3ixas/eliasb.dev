@@ -13,6 +13,7 @@ import { getCachedHistorySignal } from "@/integrations/history-cache";
 import { getFilmSignal } from "@/integrations/letterboxd";
 import { asOfDate, pinStatus, type PinStatus } from "@/integrations/pin-rules";
 import type { FilmSignal, GitHubSignal, HistoryEvent, HistorySignal, LatestRepositorySignal, ReadingSignal } from "@/integrations/types";
+import { Fastener } from "@/components/site/fastener";
 
 const copy = offTheClock;
 
@@ -65,7 +66,7 @@ export function TrainingPoster({ now }: { now?: string }) {
   const { photo, week, zone2, photoCaption } = copy.training;
   return (
     <article className="stretch-otc__card stretch-otc__training" data-otc="training" aria-labelledby={headingId}>
-      <span className="stretch-fastener stretch-fastener--tape" aria-hidden="true" />
+      <Fastener kind="tape" />
       <figure className="stretch-otc__photo">
         <Image src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} sizes="(max-width: 760px) 90vw, 320px" />
         <figcaption className="stretch-mono">{photoCaption}</figcaption>
@@ -186,7 +187,7 @@ export function ClippingCard({ history }: { history: HistorySignal }) {
   const day = history.weekOf ? asOfDate(new Date(`${history.weekOf}T12:00:00Z`)) : null;
   return (
     <article className="stretch-otc__card stretch-otc__clipping" data-otc="clipping" data-state={day ? "live" : "archive"} aria-labelledby={headingId}>
-      <span className="stretch-fastener stretch-fastener--push-pin" aria-hidden="true" />
+      <Fastener kind="push-pin" />
       <h3 id={headingId} className="stretch-mono stretch-otc__label">
         {copy.curiosity.label}
       </h3>

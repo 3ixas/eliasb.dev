@@ -1,25 +1,13 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
-import type { Fastener, Project, ProjectImage } from "@/content/projects";
+import type { Project, ProjectImage } from "@/content/projects";
+import { Fastener } from "@/components/site/fastener";
 import { bindDots } from "@/components/site/bind-dots";
 
 /** Alternate the screenshot's tilt, inside the spec's ±1 to 1.5 degrees. */
 const tilts = ["-1.5deg", "1deg", "-1deg"] as const;
 
 const number = (position: number) => String(position + 1).padStart(2, "0");
-
-/** The one small prop on a tile's edge; decorative, so hidden from assistive technology. */
-export function FastenerProp({ kind }: { kind: Fastener }) {
-  if (kind === "paperclip") {
-    return (
-      <svg className="stretch-fastener stretch-fastener--paperclip" aria-hidden="true" width="34" height="86" viewBox="0 0 34 86" fill="none" stroke="#b8babd" strokeWidth="3" strokeLinecap="round">
-        {/* The outside leg goes behind the paper at its top edge (y=22). */}
-        <path d="M2 22 V16 a11 11 0 0 1 22 0 V70 a7 7 0 0 1 -14 0 V30" />
-      </svg>
-    );
-  }
-  return <span className={`stretch-fastener stretch-fastener--${kind}`} aria-hidden="true" />;
-}
 
 /** A project's screenshot as a tile shows it: tilted by the tile's --tile-tilt, with its shadow. */
 export function TileShot({ screenshot, sizes }: { screenshot: ProjectImage; sizes: string }) {
@@ -53,7 +41,7 @@ export function FeaturedTiles({ projects }: { projects: readonly Project[] }) {
         return (
           <li key={project.slug} className="stretch-tiles__item" data-wide={position === 0 ? "" : undefined}>
             <a className="stretch-tile" href={links.caseStudy} style={style}>
-              {project.fastener && <FastenerProp kind={project.fastener} />}
+              {project.fastener && <Fastener kind={project.fastener} />}
               <div className="stretch-tile__text">
                 <p className="stretch-display stretch-tile__number" aria-hidden="true">
                   {number(position)}
