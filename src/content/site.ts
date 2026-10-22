@@ -1,4 +1,5 @@
-import { siteCopy } from "@/content/stretch/site-copy";
+// Relative, with the extension, so Node can load this file directly (the résumé PDF check) as well as Next.
+import { siteCopy } from "./stretch/site-copy.ts";
 
 // Approved in docs/content/redesign-copy.md.
 export const siteName = "Elias Bennett";
@@ -19,7 +20,6 @@ export const profile = {
     email: "mailto:eliasthebennett@gmail.com",
     github: "https://github.com/3ixas",
     linkedin: "https://linkedin.com/in/elias-t-bennett/",
-    resume:
-      "https://drive.google.com/file/d/1Yv_oB-sNMXQhyY9K_EJbQ4CV11hM2ZY7/view?usp=drivesdk",
+    resume: "/resume",
   },
 } as const;

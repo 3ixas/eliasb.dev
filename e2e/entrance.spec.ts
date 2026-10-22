@@ -141,14 +141,59 @@ test.describe("Signature entrance", () => {
     expect(beat.entering, "settled by 4.8 s").toBe(false);
   });
 
-  test("the first Tab shows the page, so focus never lands on a held control", async ({ page, browserName }) => {
+  // Any intent fast-forwards the entrance to the finished page in about 200 ms (#251). The bound is
+  // loose enough for a busy runner and tight enough that the 4.6 s sequence cannot pass it.
+  const mid = async (page: Page) => {
     await page.goto("/", { waitUntil: "commit" });
     await page.waitForSelector("[data-entrance-layer]");
+    await expect.poll(() => typedText(page)).toMatch(/^I build/);
     expect(await isEntering(page)).toBe(true);
-    await page.keyboard.press("Tab");
-    await expect.poll(() => isEntering(page)).toBe(false);
+  };
+  const endedEarly = async (page: Page) => {
+    await expect.poll(() => isEntering(page), { timeout: 800 }).toBe(false);
     await expect(page.locator("[data-entrance-layer]")).toHaveCount(0);
-    expect(await opacityOf(page, '[data-entrance="header"]')).toBe(1);
+    for (const part of ["header", "name", "role", "headline", "support", "portrait", "rest"]) {
+      await expect.poll(() => opacityOf(page, `[data-entrance="${part}"]`), { message: `${part} is shown` }).toBe(1);
+    }
+    expect(await page.locator(".stretch-portrait").evaluate((element) => element.getAnimations().length)).toBe(0);
+  };
+
+  test("a wheel scroll ends the entrance, and the page still scrolls", async ({ page }) => {
+    await mid(page);
+    // Over the page, at any width: a wheel outside the viewport reaches nothing.
+    const { width, height } = page.viewportSize()!;
+    await page.mouse.move(width / 2, height / 2);
+    await page.mouse.wheel(0, 600);
+    await endedEarly(page);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  });
+
+  test("a pointer down ends the entrance", async ({ page }) => {
+    await mid(page);
+    await page.mouse.move(5, 5);
+    await page.mouse.down();
+    await page.mouse.up();
+    await endedEarly(page);
+  });
+
+  test("a key press ends the entrance", async ({ page }) => {
+    await mid(page);
+    await page.keyboard.press("ArrowDown");
+    await endedEarly(page);
+  });
+
+  test("a click with no pointer or key before it ends the entrance", async ({ page }) => {
+    await mid(page);
+    // Assistive technology can activate a control with a click alone.
+    await page.evaluate(() => document.body.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+    await endedEarly(page);
+  });
+
+  test("the first Tab ends the entrance at once, so focus never lands on a held control", async ({ page, browserName }) => {
+    await mid(page);
+    await page.keyboard.press("Tab");
+    // Read straight after the key: a fade would still be under way and the focused control not yet opaque.
+    expect(await isEntering(page), "no fade for a Tab").toBe(false);
     // Safari does not tab to links by default, so there it is enough that the page was released.
     if (browserName === "chromium") {
       const focused = await page.evaluate(() => {
@@ -159,6 +204,77 @@ test.describe("Signature entrance", () => {
       expect(focused.tag).not.toBe("BODY");
       expect(focused.opacity, "the focused control is visible").toBe(1);
     }
+    await endedEarly(page);
+  });
+
+  test("a modifier key then Tab still ends the entrance before focus moves", async ({ page, browserName }) => {
+    // The fade lasts 200 ms, shorter than a stalled CI runner takes to answer a key press and a read
+    // (seen in WebKit), so on the real clock the fade can be over before the Shift is observed. The page's
+    // clock is paused once the entrance is under way: the fade then waits for the Tab, as it must.
+    await page.clock.install({ time: 0 });
+    await mid(page);
+    await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 300);
+    // The modifier's keydown starts the fade; the Tab that follows must still finish it before focus moves.
+    await page.keyboard.press("Shift");
+    expect(await isEntering(page), "the fade has begun").toBe(true);
+    expect(await page.evaluate(() => document.documentElement.hasAttribute("data-fast-forward")), "and is fading").toBe(true);
+    await page.keyboard.press("Tab");
+    expect(await isEntering(page), "the Tab finished the fade at once").toBe(false);
+    if (browserName === "chromium") {
+      const opacity = await page.evaluate(() => {
+        let product = 1;
+        for (let node: Element | null = document.activeElement; node; node = node.parentElement) product *= Number(getComputedStyle(node).opacity);
+        return product;
+      });
+      expect(opacity, "the focused control is visible").toBe(1);
+    }
+    await endedEarly(page);
+  });
+
+  test("moving the mouse does not end the entrance", async ({ page }) => {
+    await mid(page);
+    const { width, height } = page.viewportSize()!;
+    for (let step = 1; step <= 10; step++) await page.mouse.move((width * step) / 11, (height * step) / 11);
+    await page.waitForTimeout(600);
+    expect(await isEntering(page)).toBe(true);
+    await expect(page.locator("[data-entrance-layer]")).toHaveCount(1);
+  });
+
+  test("a click on a link ends the entrance and still follows the link", async ({ page }) => {
+    await mid(page);
+    const href = await page.evaluate(() => {
+      const link = [...document.querySelectorAll<HTMLAnchorElement>("a[href^='/']")].find((a) => !a.getAttribute("href")!.includes("#"));
+      link!.setAttribute("data-intent-link", "");
+      return link!.getAttribute("href")!;
+    });
+    await page.locator("[data-intent-link]").dispatchEvent("pointerdown");
+    await page.locator("[data-intent-link]").dispatchEvent("click");
+    await expect.poll(() => new URL(page.url()).pathname, { timeout: 4000 }).toBe(href);
+  });
+
+  test.describe("on a touch screen", () => {
+    test.use({ hasTouch: true });
+    test("a touch ends the entrance", async ({ page }) => {
+      await mid(page);
+      await page.touchscreen.tap(10, 10);
+      await endedEarly(page);
+    });
+  });
+
+  test("an intent before the sequence has begun releases the hold at once", async ({ page }) => {
+    await page.addInitScript(() => {
+      // As soon as the page is held, before the entrance script can run, the visitor acts.
+      const watch = new MutationObserver(() => {
+        if (!document.documentElement.hasAttribute("data-entering")) return;
+        watch.disconnect();
+        window.dispatchEvent(new Event("pointerdown"));
+      });
+      watch.observe(document, { subtree: true, attributes: true, attributeFilter: ["data-entering"] });
+    });
+    await page.goto("/", { waitUntil: "commit" });
+    await expect.poll(() => page.evaluate(() => document.readyState)).not.toBe("loading");
+    await expect.poll(() => isEntering(page), { timeout: 1500 }).toBe(false);
+    await expect(page.locator("[data-entrance-layer]")).toHaveCount(0);
   });
 
   test("ends on exactly the finished hero", async ({ page }) => {

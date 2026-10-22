@@ -1,0 +1,258 @@
+/*
+ * The Résumé (GLOSSARY.md, src/components/site/resume.tsx): an A4 sheet lying on the desk, and the
+ * same sheet when printed. The sheet is paper in either theme, so it sets its own colours rather
+ * than reading the page's, and it is the one thing that prints. Its padding on screen is the page
+ * margin in print, so the lines break in the same places in both.
+ */
+
+.stretch-resume__desk {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 24px var(--stretch-gutter) 64px;
+}
+
+.stretch-resume__sheet {
+  --sheet-paper: #ffffff;
+  --sheet-ink: #111114;
+  --sheet-muted: #55555e;
+  --sheet-rule: #cfcfc8;
+  /* The light theme's cobalt: the sheet is paper in both themes, so the page's own cobalt (lighter in dark) would not hold on it. */
+  --sheet-focus: #2340ff;
+  box-sizing: border-box;
+  width: 210mm;
+  max-width: 100%;
+  min-height: 297mm;
+  padding: 8mm 14mm;
+  background-color: var(--sheet-paper);
+  color: var(--sheet-ink);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 12px 32px rgba(0, 0, 0, 0.14);
+  font-size: var(--text-small);
+  line-height: 1.25;
+  color-scheme: light;
+}
+
+/* A phone shows the sheet full width, with no paper edge. */
+@media (max-width: 760px) {
+  .stretch-resume__desk {
+    padding-inline: 0;
+  }
+
+  .stretch-resume__sheet {
+    min-height: 0;
+    padding: 24px var(--stretch-gutter);
+    box-shadow: none;
+  }
+}
+
+.stretch-resume__sheet :focus-visible {
+  outline-color: var(--sheet-focus);
+}
+
+:where(.stretch-resume__sheet) a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--sheet-rule);
+  text-underline-offset: 3px;
+}
+
+:where(.stretch-resume__sheet) :is(ul, dl, p, h1, h2, h3) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Display type, over the 24 px where the text scale ends; one size, since a sheet has one name. */
+.stretch-resume__name {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  font-stretch: 75%;
+  letter-spacing: 0;
+}
+
+.stretch-resume__role {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+  font-size: var(--text-body);
+  font-weight: 600;
+}
+
+.stretch-resume__role span + span {
+  color: var(--sheet-muted);
+  font-weight: 400;
+}
+
+.stretch-resume__contacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 16px;
+  margin-top: 8px;
+  font-size: var(--text-label);
+}
+
+.stretch-resume__summary {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--sheet-rule);
+  font-size: var(--text-body);
+}
+
+.stretch-resume__heading {
+  margin-top: 8px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--sheet-ink);
+  font-size: var(--text-label);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stretch-resume__entry {
+  margin-top: 5px;
+}
+
+/* A role or school on the left, its dates on the right. */
+.stretch-resume__line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  font-size: var(--text-small);
+  font-weight: 400;
+}
+
+.stretch-resume__line > .stretch-mono {
+  flex: none;
+  font-size: var(--text-label);
+  color: var(--sheet-muted);
+}
+
+.stretch-resume__link {
+  margin-top: 2px;
+  color: var(--sheet-muted);
+  font-size: var(--text-label);
+}
+
+/*
+ * A native marker, not a positioned ::before: Chromium paints positioned boxes after the rest of the
+ * page, so the PDF's text would list every result last, out of order.
+ */
+.stretch-resume__results {
+  margin-top: 4px;
+  padding-left: 14px;
+  list-style: "– ";
+}
+
+.stretch-resume__results li + li {
+  margin-top: 2px;
+}
+
+.stretch-resume__projects li {
+  margin-top: 4px;
+}
+
+.stretch-resume__awards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  margin-top: 6px;
+}
+
+.stretch-resume__awards .stretch-mono {
+  color: var(--sheet-muted);
+  font-size: var(--text-label);
+}
+
+.stretch-resume__skills {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 24px;
+  margin-top: 6px;
+}
+
+.stretch-resume__skills dt {
+  font-weight: 700;
+}
+
+.stretch-resume__skills dd {
+  margin: 0;
+}
+
+.stretch-resume__education {
+  display: grid;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+@media (max-width: 560px) {
+  .stretch-resume__line {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .stretch-resume__skills {
+    grid-template-columns: 1fr;
+  }
+}
+
+/*
+ * Cmd-P gives the sheet: the desk, the header, the button and the footer stay behind. The A4 page is a
+ * named page that only the sheet uses (`page: resume` below), so no other route's print is touched.
+ */
+@page resume {
+  size: A4;
+  margin: 8mm 14mm;
+}
+
+@media print {
+  html:has([data-resume]),
+  html:has([data-resume]) body,
+  [data-resume] {
+    background: #ffffff;
+  }
+
+  [data-resume] .stretch-header,
+  [data-resume] .stretch-footer,
+  [data-resume] .stretch-resume__download {
+    display: none;
+  }
+
+  /* ↗ marks a link that leaves the site on screen; on paper there is nowhere to leave to, and the PDF holds only the sheet's text. */
+  .stretch-resume__away {
+    display: none;
+  }
+
+  .stretch-resume__desk {
+    display: block;
+    padding: 0;
+  }
+
+  .stretch-resume__sheet {
+    width: auto;
+    min-height: 0;
+    padding: 0;
+    box-shadow: none;
+    page: resume;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* The print window can be narrower than the sheet's own layout would suggest; keep the wide arrangement. */
+  .stretch-resume__line {
+    flex-direction: row;
+    gap: 16px;
+  }
+
+  .stretch-resume__entry,
+  .stretch-resume__projects li {
+    break-inside: avoid;
+  }
+
+  .stretch-resume__heading {
+    break-after: avoid;
+  }
+}

@@ -53,7 +53,7 @@ export function ProjectIndex({
                 {bindDots(`${project.type} · ${project.year}`)}
               </span>
               <span className="stretch-index__arrow" aria-hidden="true">
-                →
+                {external ? "↗" : "→"}
               </span>
               {screenshot && (
                 <span className="stretch-index__shot" data-resting={position === resting ? "" : undefined}>

@@ -46,10 +46,8 @@ export const passRecords: Record<RoleStorySlug, PassRecord> = {
   optegra: { short: "Optegra", headline: { value: "88%", label: "Core Web Vitals pass rate" } },
 };
 
-/** "Valid · present" while the job lasts; the month it ended afterwards ("Aug 2024 – Jun 2025" gives "Jun 2025"). */
-export function passStatus({ dates }: Pick<RoleStory, "dates">, state: PassState): string {
-  return state === "current" ? "Valid · present" : (dates.split(" – ").at(-1) ?? dates);
-}
+/** Only a current pass shows a status; a returned one has the "Returned" stamp, and its dates line already says when it ended. */
+export const currentPassStatus = "Valid · present";
 
 /** "The Optegra story →": the foot of a pass that links to its Role story. */
 export const passLinkLabel = ({ short }: PassRecord) => `The ${short} story →`;

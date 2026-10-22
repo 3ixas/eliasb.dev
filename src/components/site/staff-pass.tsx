@@ -1,12 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useId, type CSSProperties, type ReactNode } from "react";
+import { bindDots } from "@/components/site/bind-dots";
 import { PassHang } from "@/components/site/staff-pass-hang";
 import { passLean } from "@/components/site/signature-springs";
 import { passPhoto } from "@/content/stretch/media";
 import { roleStories } from "@/content/stretch/role-stories";
 import { roleStoryColours, type RoleStorySlug } from "@/content/stretch/role-story";
-import { passLinkLabel, passRecords, passStatus, type PassPin, type PassState } from "@/content/stretch/staff-pass";
+import { currentPassStatus, passLinkLabel, passRecords, type PassPin, type PassState } from "@/content/stretch/staff-pass";
 
 /**
  * An employer's Staff pass (GLOSSARY.md): the current one, or a returned one.
@@ -68,9 +69,11 @@ function EmployerPass({ slug, state, size, tilt, linked, pins, lean, onBand = fa
       <span className="stretch-pass__slot" aria-hidden="true" />
       <span className="stretch-pass__top stretch-mono">
         <span>Staff · {story.number}</span>
-        <span className="stretch-pass__status" data-current={state === "current" || undefined}>
-          {passStatus(story, state)}
-        </span>
+        {state === "current" && (
+          <span className="stretch-pass__status" data-current>
+            {currentPassStatus}
+          </span>
+        )}
       </span>
       {state === "returned" && <span className="stretch-pass__stamp stretch-mono">Returned</span>}
       <span className="stretch-pass__id">
@@ -170,7 +173,7 @@ function PinText({ pin }: { pin: PassPin }) {
   return (
     <>
       <span className="stretch-pass__pin-label">{pin.label}</span>
-      <span className="stretch-pass__pin-detail stretch-mono">{pin.detail}</span>
+      <span className="stretch-pass__pin-detail stretch-mono">{bindDots(pin.detail)}</span>
     </>
   );
 }

@@ -109,6 +109,12 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
         caption: "Take Ownership · _nology · Q1 2026 · awarded May 2026",
       },
     },
+    resume: [
+      "Went from no C# to shipping production code independently in six months, and now own implementation and delivery as the team’s only C# engineer.",
+      "Ported Java market-data loaders to C#, and took a stale data dependency out of live pricing behind a feature flag that defaults to off, with caching and an end-to-end test.",
+      "Built an AI workflow that gives each stage its own scoped agent. It took a pricer integration from about two weeks to a couple of days, and several teams across the department now use it.",
+      "Led a team of four to win the Early Careers digitisation competition, co-building a dashboard that cut a 30–40 minute data load to under 5.",
+    ],
     evidence: [
       { value: "Nov 2025", label: "won the Early Careers digitisation competition" },
       { value: "6", label: "months from zero C# to production code" },
@@ -200,6 +206,12 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
         source: { href: "https://www.joveen.com/", label: "joveen.com" },
       },
     },
+    resume: [
+      "Cut page load by 40% by refactoring React components and lazy-loading assets.",
+      "Moved PHP modules to Spring Boot module by module, with endpoints, validation and tests.",
+      "Fixed mobile layout and browser bugs found by a cross-browser testing pipeline; mobile retention rose by 30%.",
+      "Added indexes and rewrote slow queries, taking the key API’s p95 from 520 ms to 230 ms.",
+    ],
     evidence: [
       { value: "−40%", label: "page load" },
       { value: "Under 2", label: "minutes to deploy, down from 10" },
@@ -299,6 +311,10 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
         },
       },
     },
+    resume: [
+      "Scoped performance fixes with the engineers and ticketed them, taking the Core Web Vitals pass rate from 62% to 88% and cutting p95 page load by 30%.",
+      "Ran split tests and built analytics dashboards that showed which changes brought in consultations and guided what the engineers built next; consultation conversion rose by 15%.",
+    ],
     evidence: [
       { value: "88%", label: "Core Web Vitals pass rate, up from 62%" },
       { value: "−30%", label: "p95 page load" },

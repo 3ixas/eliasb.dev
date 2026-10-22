@@ -20,7 +20,7 @@ import {
   roleStorySectionKeys,
   roleStorySectionLabels,
 } from "../src/content/stretch/role-story.ts";
-import { passLinkLabel, passProblems, passRecords, passStatus } from "../src/content/stretch/staff-pass.ts";
+import { currentPassStatus, passLinkLabel, passProblems, passRecords } from "../src/content/stretch/staff-pass.ts";
 import { howIWork } from "../src/content/stretch/how-i-work.ts";
 import { greetingKey } from "../src/content/stretch/greeting.ts";
 import { offTheClock } from "../src/content/stretch/off-the-clock.ts";
@@ -96,6 +96,11 @@ for (const [hour, line] of [
 }
 assert.equal(siteCopy.greeting.hello, "Hello");
 for (let hour = 0; hour < 24; hour += 1) assert.notEqual(greetingKey(hour), "hello", "Only the browser's clock picks a greeting; hello is the line before it");
+
+// The hero names the employer once on screen, in the headline: the name down to the buttons reads "BNP" in the h1 and nowhere else (#243).
+const heroText = [hero.name.first, hero.name.last, hero.role, hero.portraitLabel, hero.headline.lead, hero.headline.emphasis, hero.support, hero.actions.work, hero.actions.hello];
+assert.equal(heroText.join(" ").match(/BNP/g)?.length, 1, "The hero names BNP exactly once");
+assert.ok(`${hero.headline.lead} ${hero.headline.emphasis}`.includes("BNP"), "The hero's one BNP is in the h1");
 
 // ---- Tables and sections, word for word --------------------------------------------------
 
@@ -254,6 +259,10 @@ assert.match(roleStoryProblems([{ ...bnp, evidence: Array(5).fill(bnp.evidence[0
 assert.match(roleStoryProblems([{ ...bnp, next: "bnp-paribas" }, ...rest])[0], /different Role story or none/);
 assert.match(roleStoryProblems([{ ...bnp, next: "ghost" }, ...rest])[0], /different Role story or none/);
 assert.match(roleStoryProblems([{ ...bnp, sections: { ...bnp.sections, decisions: {} } }, ...rest])[0], /empty "decisions" section/);
+// A Résumé line states only figures its Role story states, so a changed number cannot linger on the sheet.
+assert.match(roleStoryProblems([{ ...bnp, resume: [...bnp.resume.slice(1), "Went from no C# to production code in nine months."] }, ...rest])[0], /"nine", which its story does not say/);
+assert.match(roleStoryProblems([{ ...bnp, resume: [bnp.resume[0], "Cut a 30–40 minute data load to under 7."] }, ...rest])[0], /"7", which its story does not say/);
+assert.match(roleStoryProblems([{ ...bnp, resume: ["Only one line."] }, ...rest])[0], /1 Résumé lines, not 2 to 4/);
 
 // A Staff pass's headline number is one of its Role story's evidence items or a fact the story states in words
 // (#209), so a pass never claims more than its story does. Each failure names the pass.
@@ -270,9 +279,7 @@ assert.equal(passRecords.joveen.pins, undefined, "Only the current pass wears th
   assert.match(claim("bnp-paribas", { value: "Only", label: "C# engineer on the team" })[0], /"bnp-paribas"/, "A stated fact needs the sentence that states it");
   assert.match(claim("bnp-paribas", { value: "Only", label: "C# engineer on the team", quote: "only Rust engineer" })[0], /"bnp-paribas"/, "...and the story must say it");
 }
-assert.equal(passStatus(roleStories["bnp-paribas"], "current"), "Valid · present");
-assert.equal(passStatus(roleStories.joveen, "returned"), "Jun 2025", "A returned pass shows the month it ended");
-assert.equal(passStatus(roleStories.optegra, "returned"), "Aug 2024");
+assert.equal(currentPassStatus, "Valid · present");
 assert.equal(passLinkLabel(passRecords.optegra), "The Optegra story →", "The link names the short employer, not Optegra Eye Healthcare & Kensington Medical");
 
 // Each entry owns its pairing, so reordering the copy cannot redirect a link or a filter.

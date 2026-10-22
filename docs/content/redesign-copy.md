@@ -34,10 +34,10 @@ The lost-property tag hung beside the heading, and the five sections under the l
 
 ## Hero
 
-- Role line, plain text under the name: Software Engineer at BNP Paribas CIB
+- Role line, plain text under the name: Software Engineer
 - Label on the portrait: Based in London
 - Headline: I build pricing and risk engines at BNP Paribas, and *products of my own.*
-- Supporting line: In C# and Java, on CPU and GPU. I’ve won BNP’s Early Careers digitisation competition and a Take Ownership award.
+- Supporting line: In C# and Java, on CPU and GPU. I’ve won the bank’s Early Careers digitisation competition and a Take Ownership award.
 - Buttons: See my work ↓ · Say hello
 
 The First glance changed for the forward-facing redesign ([#159](https://github.com/3ixas/eliasb.dev/issues/159), [#162](https://github.com/3ixas/eliasb.dev/issues/162), [#168](https://github.com/3ixas/eliasb.dev/issues/168)): the entrance is built around “*products of my own.*” landing.
@@ -146,7 +146,7 @@ Strings added while building, shipped, and recorded here on 2026-10-09 so `verif
 - Big link: Say hello ↗
 - Line: Got an idea, a project, or just want to talk about building things? Email’s the best way to reach me.
 - Links: Résumé · GitHub · LinkedIn
-- Résumé opens the current publicly shared PDF: https://drive.google.com/file/d/1Yv_oB-sNMXQhyY9K_EJbQ4CV11hM2ZY7/view?usp=drivesdk
+- Résumé opens `/resume`, the sheet built from the site’s own records, with the internal → arrow ([#247](https://github.com/3ixas/eliasb.dev/issues/247)).
 
 ## Work archive (`/things-i-make`)
 

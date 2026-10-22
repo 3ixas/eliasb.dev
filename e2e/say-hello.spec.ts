@@ -28,14 +28,30 @@ test.describe("Say hello and the footer", () => {
     expect(background).not.toBe(link);
   });
 
-  test("Résumé, GitHub and LinkedIn go where the profile says, in a new tab", async ({ page }) => {
-    for (const [index, { id, label }] of sayHello.links.entries()) {
+  test("GitHub and LinkedIn go where the profile says, in a new tab", async ({ page }) => {
+    const outside = sayHello.links.flatMap((entry, index) => (entry.id === "resume" ? [] : [{ ...entry, index }]));
+    expect(outside.length).toBe(sayHello.links.length - 1);
+    for (const { id, label, index } of outside) {
       const link = section(page).locator(".stretch-hello__link").nth(index);
       await expect(link).toContainText(label);
+      await expect(link).toContainText("↗");
       await expect(link).toHaveAttribute("href", profile.links[id]);
       await expect(link).toHaveAttribute("target", "_blank");
       await expect(link).toHaveAttribute("rel", /noreferrer/);
     }
+  });
+
+  test("Résumé opens /resume on this site, with the internal arrow", async ({ page }) => {
+    const index = sayHello.links.findIndex(({ id }) => id === "resume");
+    const link = section(page).locator(".stretch-hello__link").nth(index);
+    await expect(link).toContainText("Résumé");
+    await expect(link).toContainText("→");
+    await expect(link).not.toContainText("↗");
+    await expect(link).toHaveAttribute("href", "/resume");
+    await expect(link).not.toHaveAttribute("target", "_blank");
+    expect(profile.links.resume).toBe("/resume");
+    await link.click();
+    await expect(page).toHaveURL(/\/resume$/);
   });
 
   test("the hero's Say hello button lands on this section", async ({ page }) => {

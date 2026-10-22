@@ -38,14 +38,18 @@ Every text pair passes WCAG 2.2 AA (5.7:1 to 18.2:1, [#108](https://github.com/3
 - **JetBrains Mono** for metadata, counts, dates and section notes.
 - The name fills the screen's width on phones (31.5vw, no wrap) and is capped at 28svh everywhere, so it never takes more than about 45% of the screen's height. Section headings are giant, condensed and uppercase, with a mono note and true counts ("06 things I've built · 03 I'm proudest of").
 - Newsreader is retired.
+- **One floor.** Nothing a visitor is meant to read is smaller than 13 px, on the page or as **Print** on an object (a Staff pass, an award pin, the lost-property tag, a credit). Reading text is 15 px or more, and body copy is 17 px. Text below the floor is enlarged to 13 px, or removed when it repeats something nearby or carries nothing a visitor needs ([#244](https://github.com/3ixas/eliasb.dev/issues/244)).
+- **One text scale.** Text under 24 px uses five steps, each a token in `stretch-tokens.css`: `--text-label` 13 px (mono labels, dates, counts, print), `--text-small` 15 px, `--text-body` 17 px, `--text-lead` 19 px and `--text-quote` 22 px. A size may move up one step at a wider breakpoint, but never off the scale. Display type (the name, section headings, posters) stays fluid, each size fitted to its own space.
 
 ## Fasteners
 
-One per physical-looking object (a tile, a card, the portrait), and never more. The card itself stays clean and the image carries the colour.
+A Fastener fastens only what would be held to a surface: a screenshot on its tile, a sheet of paper on a wall. A card that is simply a card has none ([#242](https://github.com/3ixas/eliasb.dev/issues/242)). Where one belongs, there is one per object and never more. The card itself stays clean and the image carries the colour.
 
+- The homepage carries six: the three Featured tiles, the PRD card, tape on the training poster and a push pin on the history clipping. The book, film, Now making and GitHub cards have none.
+- Elsewhere: the case-study PRD, the Next-project tile and a Role story's certificate.
 - **Tape**: lifts on hover. More transparent in dark.
 - **Paperclip**: swings on hover.
-- **Pin**: presses on hover.
+- **Push pin**: presses on hover. Not to be confused with an award pin, which is part of a Staff pass.
 - A Fastener is decoration on a card, never a stand-in for content, and reduced motion removes its movement.
 
 ## Components
@@ -62,6 +66,7 @@ One per physical-looking object (a tile, a card, the portrait), and never more. 
 | Off the clock | Training poster (today in cobalt), book, film, history clipping, **Now making** (pulsing cobalt "now"), GitHub year grid (today in cobalt) |
 | Theme | The Eclipse: an icon-only sun (light) or crescent moon (dark), named "Dark theme", pressed while the dark theme is in force |
 | Case study | Opening band in the project colour, section links, a neutral reading column about 720 px wide, framed figures, PRD card with evidence strip, Next-project tile |
+| Résumé | `/resume`, linked only from Say hello: an A4 sheet lying on the desk, which is also what prints and what `public/Elias-Bennett-Resume.pdf` holds. Light paper in both themes, no Fastener, full width with no paper edge on phones. Download PDF sits on the desk above it and does not print. Its text is the site's own records (`src/content/resume.ts`); `pnpm resume:pdf` renders the PDF and `verify:resume` fails when it is stale ([#247](https://github.com/3ixas/eliasb.dev/issues/247)) |
 | Signature entrance | Homepage only; timings in the spec |
 
 ## Motion

@@ -27,3 +27,12 @@ export const MAX_EVIDENCE = 4;
 /** True when a section has something to read. */
 export const storySectionHasContent = (section: StorySectionBody | undefined) =>
   Boolean(section && (section.heading || section.paragraphs?.length || section.points?.length));
+
+/** Everything a story or study says, as plain text: its sections and its evidence strip. */
+export const storyText = ({ sections, evidence }: { sections: Record<string, StorySectionBody>; evidence: readonly EvidenceItem[] }) =>
+  [
+    ...Object.values(sections).flatMap((section) => [section.heading, ...(section.paragraphs ?? []), ...(section.points ?? []).flatMap((point) => [point.lead, point.text])]),
+    ...evidence.map((item) => `${item.value} ${item.label}`),
+  ]
+    .filter(Boolean)
+    .join(" ");

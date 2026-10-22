@@ -10,6 +10,7 @@ const routes = [
   "/things-i-make/argus-risk",
   "/things-i-make/flowtime",
   ...roleStorySlugs.map((slug) => `/work/${slug}`),
+  "/resume",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
