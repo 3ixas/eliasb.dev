@@ -15,17 +15,19 @@ const html = `
   <a href="/work/relative">relative</a>
   <a href="mailto:me@eliasb.dev">mail</a>
   <a href="#top">fragment</a>
-  <a href='https://github.com/3ixas/eliasb.dev'>again, single quotes</a>
+  <a href='https://single.example/q'>single quotes</a>
   <link href="https://fonts.example/f.css" rel="stylesheet">`;
 assert.deepEqual(externalLinks(html), [
   'https://github.com/3ixas/eliasb.dev',
   'https://example.com/a?b=1&c=2',
+  'https://single.example/q',
 ]);
 assert.deepEqual(
   [...collectLinks([{ path: '/', html }, { path: '/resume', html: '<a href="https://example.com/a?b=1&amp;c=2">q</a>' }])],
   [
     ['https://github.com/3ixas/eliasb.dev', ['/']],
     ['https://example.com/a?b=1&c=2', ['/', '/resume']],
+    ['https://single.example/q', ['/']],
   ],
 );
 assert.deepEqual(

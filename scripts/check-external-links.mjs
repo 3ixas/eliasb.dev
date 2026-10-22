@@ -49,8 +49,8 @@ const decodeEntities = (text) =>
 /** Every external http(s) <a href> in a page, without the fragment, in document order. */
 export const externalLinks = (html) => {
   const found = [];
-  for (const [, quoted, bare] of html.matchAll(/<a\s[^>]*?\bhref=(?:"([^"]*)"|([^\s>]+))/gi)) {
-    const href = decodeEntities(quoted ?? bare);
+  for (const [, double, single, bare] of html.matchAll(/<a\s[^>]*?\bhref=(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi)) {
+    const href = decodeEntities(double ?? single ?? bare);
     if (!/^https?:\/\//i.test(href)) continue;
     let url;
     try {
