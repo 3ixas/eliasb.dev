@@ -37,6 +37,17 @@ export function MenuDialog() {
     return () => media.removeEventListener("change", onChange);
   }, []);
 
+  // Keep a classic scrollbar's width reserved, so opening the menu moves nothing. Set from here, and only
+  // when scrollbars take room, because a stylesheet rule would also reserve 15 px where they are hidden or
+  // overlaid, and narrow every page there. A probe measures them, since the page may not scroll yet.
+  useEffect(() => {
+    const probe = document.createElement("div");
+    probe.style.cssText = "position:absolute;visibility:hidden;width:50px;height:50px;overflow:scroll";
+    document.body.append(probe);
+    if (probe.offsetWidth > probe.clientWidth) document.documentElement.style.scrollbarGutter = "stable";
+    probe.remove();
+  }, []);
+
   // Wheel and touch do not scroll the page behind. Not overflow: hidden on html, which makes Chromium give up the
   // scrollbar width that scrollbar-gutter reserves, so opening the menu would move the page 15 px.
   useEffect(() => {

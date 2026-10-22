@@ -8,8 +8,6 @@
 /* The surface behind the shell, so overscroll and the toolbar match the page. */
 html:has([data-stretch-shell]) {
   scroll-padding-top: 6rem;
-  /* A classic scrollbar's width stays reserved, so opening the phone menu moves nothing. */
-  scrollbar-gutter: stable;
 }
 
 html:has([data-stretch-shell]),
