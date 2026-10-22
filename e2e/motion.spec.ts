@@ -545,7 +545,7 @@ test.describe("Now making pulse", () => {
 test.describe("One self-running motion on screen at a time", () => {
   test.use({ reducedMotion: "no-preference" });
 
-  /** The distinct motions playing on their own, on an element that is on screen right now. */
+  /** The name of every animation playing on its own, on an element that is on screen right now: one entry per running animation. */
   const selfRunning = (page: Page) =>
     page.evaluate(() => {
       const onScreen = (animation: Animation) => {
@@ -554,19 +554,19 @@ test.describe("One self-running motion on screen at a time", () => {
         const { top, bottom } = target.getBoundingClientRect();
         return bottom > 0 && top < innerHeight;
       };
-      const names = document
+      return document
         .getAnimations()
         .filter((animation) => !(animation instanceof CSSTransition) && animation.timeline instanceof DocumentTimeline && animation.playState === "running")
         .filter(onScreen)
         .map((animation) => (animation as CSSAnimation).animationName ?? "script");
-      return [...new Set(names)];
     });
 
   test("the sampler sees a running ring on the Off the clock fixture", async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
     await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
     await page.locator("[data-fixture='making']").scrollIntoViewIfNeeded();
-    await expect.poll(() => selfRunning(page)).toEqual(["stretch-now-pulse"]);
+    // The fixture shows the ring on more than one card, so it is the name that is compared here.
+    await expect.poll(async () => [...new Set(await selfRunning(page))]).toEqual(["stretch-now-pulse"]);
   });
 
   test("a scroll pass down the homepage never has two on screen together", async ({ page }) => {
