@@ -9,6 +9,11 @@ on:
   schedule:
     - cron: "17 6 * * 1"
   workflow_dispatch:
+    inputs:
+      extra-url:
+        description: Optional URL to add to the check, to prove a broken link opens the issue (then rerun without it to close it)
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -35,4 +40,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: node scripts/check-external-links.mjs --base-url https://www.eliasb.dev
+          EXTRA_URL: ${{ inputs.extra-url }}
+        run: node scripts/check-external-links.mjs --base-url https://www.eliasb.dev ${EXTRA_URL:+--extra-url "$EXTRA_URL"}

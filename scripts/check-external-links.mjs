@@ -214,6 +214,8 @@ const main = async () => {
   const pages = [];
   for (const path of paths) pages.push({ path, html: await fetchText(path) });
   const links = collectLinks(pages);
+  // A collector that finds nothing has broken, and passing quietly would hide that.
+  if (links.size === 0) throw new Error(`No external links found on ${paths.length} pages of ${baseUrl}.`);
   for (const url of extra) links.set(url, [...(links.get(url) ?? []), '(injected with --extra-url)']);
   console.log(`Collected ${links.size} external links from ${paths.length} pages of ${baseUrl}.`);
 
