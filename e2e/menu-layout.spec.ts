@@ -15,6 +15,14 @@ async function scrollTo600(page: Page) {
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(600);
 }
 
+/** A real pointer: locator.click() scrolls its target into view first, which would hide a jump. */
+async function pressMenu(page: Page) {
+  const box = (await menuButton(page).boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.up();
+}
+
 /** What the eye tracks when the menu opens: the pill's right edge, top and height. */
 async function pill(button: ReturnType<typeof menuButton>) {
   const box = (await button.boundingBox())!;
@@ -40,11 +48,7 @@ test.describe("Opening the phone menu", () => {
       await expect(menuButton(page)).toBeVisible();
       const before = { pill: await pill(menuButton(page)), width: await clientWidth(page) };
 
-      // A real pointer: locator.click() scrolls its target into view first, which would hide a jump.
-      const box = (await menuButton(page).boundingBox())!;
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-      await page.mouse.down();
-      await page.mouse.up();
+      await pressMenu(page);
 
       await expect(closeButton(page)).toBeVisible();
       await expect.poll(() => pill(closeButton(page))).toEqual(before.pill);
@@ -54,14 +58,22 @@ test.describe("Opening the phone menu", () => {
 
   test("keeps the page behind from scrolling", async ({ page }) => {
     await scrollTo600(page);
-    const box = (await menuButton(page).boundingBox())!;
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await page.mouse.down();
-    await page.mouse.up();
+    await pressMenu(page);
     await expect(closeButton(page)).toBeVisible();
     await page.mouse.wheel(0, 400);
     // Nothing to wait for when the wheel is ignored, so give a scroll that would happen time to start.
     await page.waitForTimeout(300);
     expect(await page.evaluate(() => window.scrollY)).toBe(600);
+  });
+
+  test("puts the page back where it was on Close, if its scrollbar was dragged behind the menu", async ({ page }) => {
+    await scrollTo600(page);
+    await pressMenu(page);
+    await expect(closeButton(page)).toBeVisible();
+    // Dragging the page's scrollbar sends no wheel or touch event, so the script moves the page the same way.
+    await page.evaluate(() => window.scrollTo({ top: 1500, behavior: "instant" }));
+    await closeButton(page).click();
+    await expect(page.getByRole("dialog", { name: "Menu" })).toBeHidden();
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(600);
   });
 });

@@ -25,6 +25,8 @@ export function MenuDialog() {
   const closer = useRef<HTMLButtonElement>(null);
   /** The section a link in the menu was chosen for, so focus can follow the page to it. */
   const chosen = useRef<string | null>(null);
+  /** Where the page was when the menu opened, put back on Close in case its scrollbar was dragged behind the dialog. */
+  const scrolledTo = useRef(0);
   const [open, setOpen] = useState(false);
 
   // A dialog left open when the window grows to the desktop layout would cover it.
@@ -35,7 +37,7 @@ export function MenuDialog() {
     return () => media.removeEventListener("change", onChange);
   }, []);
 
-  // The page behind does not scroll. Not overflow: hidden on html, which makes Chromium give up the
+  // Wheel and touch do not scroll the page behind. Not overflow: hidden on html, which makes Chromium give up the
   // scrollbar width that scrollbar-gutter reserves, so opening the menu would move the page 15 px.
   useEffect(() => {
     const menu = dialog.current;
@@ -69,6 +71,7 @@ export function MenuDialog() {
         className="stretch-pill stretch-menu-button"
         aria-haspopup="dialog"
         onClick={() => {
+          scrolledTo.current = window.scrollY;
           dialog.current?.showModal();
           setOpen(true);
           closer.current?.focus();
@@ -91,6 +94,7 @@ export function MenuDialog() {
             section.focus({ preventScroll: true });
             return;
           }
+          window.scrollTo({ top: scrolledTo.current, behavior: "instant" });
           opener.current?.focus({ preventScroll: true });
         }}
       >
