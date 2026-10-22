@@ -6,6 +6,29 @@ const phone = (page: Page) => (page.viewportSize()?.width ?? 0) < 761;
 const rows = (page: Page) => page.locator(".stretch-index__row");
 const expected = projectIndex(projects, featuredSlugs);
 
+test.describe("Work: external rows say they open in a new tab", () => {
+  for (const path of ["/", "/things-i-make"]) {
+    test(`on ${path}, an external row's name keeps the project and adds where it goes; an internal row's name is unchanged`, async ({ page }) => {
+      await page.goto(path);
+      await expect(rows(page).first()).toBeVisible();
+      const links = rows(page).getByRole("link");
+      const count = await links.count();
+      expect(count).toBeGreaterThan(0);
+      for (let index = 0; index < count; index++) {
+        const link = links.nth(index);
+        const href = (await link.getAttribute("href"))!;
+        const name = (await link.locator(".stretch-index__name").textContent())!;
+        if (href.startsWith("http")) {
+          const where = new URL(href).hostname === "github.com" ? "GitHub" : new URL(href).hostname.replace(/^www\./, "");
+          await expect(link).toHaveAccessibleName(new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}.* opens ${where} in a new tab$`));
+        } else {
+          await expect(link).not.toHaveAccessibleName(/new tab/);
+        }
+      }
+    });
+  }
+});
+
 test.describe("Work: Project index on the homepage", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
@@ -33,7 +56,7 @@ test.describe("Work: Project index on the homepage", () => {
     await expect(all).toHaveAttribute("href", "/things-i-make");
   });
 
-  test("a row turns cobalt and nudges its arrow on hover and on focus", async ({ page, browserName }) => {
+  test("a row turns cobalt, and so does its arrow, on hover and on focus", async ({ page, browserName }) => {
     const cobalt = await page.evaluate(() => {
       const probe = document.createElement("span");
       probe.style.color = "var(--stretch-cobalt)";
