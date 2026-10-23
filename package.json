@@ -19,8 +19,9 @@
     "verify:codex-gate": "node scripts/verify-codex-gate.mjs",
     "verify:link-check": "node scripts/verify-link-check.mjs",
     "links:check": "node scripts/check-external-links.mjs",
+    "verify:playwright-image": "node scripts/verify-playwright-image.mjs",
     "verify:ci-coverage": "node scripts/verify-ci-coverage.mjs",
-    "check": "pnpm lint && tsc --noEmit --incremental false && pnpm verify:signals && pnpm verify:catalogue && pnpm verify:copy && pnpm verify:opening && pnpm verify:type-scale && pnpm verify:fastener && pnpm verify:resume && pnpm verify:link-check && pnpm verify:ci-coverage",
+    "check": "pnpm lint && tsc --noEmit --incremental false && pnpm verify:signals && pnpm verify:catalogue && pnpm verify:copy && pnpm verify:opening && pnpm verify:type-scale && pnpm verify:fastener && pnpm verify:resume && pnpm verify:link-check && pnpm verify:playwright-image && pnpm verify:ci-coverage",
     "check:built": "pnpm verify:routes && pnpm verify:release",
     "test:e2e": "playwright test",
     "resume:pdf": "node --no-warnings --experimental-strip-types scripts/render-resume-pdf.mjs"
