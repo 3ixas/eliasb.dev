@@ -13,6 +13,7 @@ Read this before running Playwright, the verify scripts or a build on a laptop. 
 
 The config starts `pnpm start` (a production build) on port 3100 if nothing is listening, and reuses whatever is already there. For a quick loop, start `next dev` on 3100 with `BOARD_FIXTURES=1` instead: the `/fixtures` pages exist only with that variable, and the specs for Off the clock and the tokens need them.
 
+- In a worktree, use its own port: `E2E_PORT=3101` (and up) for both the server and `playwright test`. Locally the config reuses any server already on the port, so two worktrees on 3100 means one tests the other's code, with nothing to say so.
 - The dev server is stopped when a turn ends. Check with `curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3100/` and start it again if that is not `200`; the first request after a start compiles the page, so allow a minute.
 - Restart it after changing `next.config.ts`.
 - `pnpm verify:routes` can run against it with `CANONICAL_ROUTE_BASE_URL=http://127.0.0.1:3100`.
