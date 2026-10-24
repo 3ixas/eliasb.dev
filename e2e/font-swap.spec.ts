@@ -9,13 +9,20 @@ test.beforeEach(({}, testInfo) => {
   test.skip(!/-(390|1440)-light$/.test(testInfo.project.name), "Measured at a phone and a desktop width");
 });
 
-type Measure = { fontLoaded: boolean; lines: { top: number; height: number; width: number }[]; box: { top: number; height: number } };
+type Measure = { lines: { top: number; height: number; width: number }[]; box: { top: number; height: number } };
+
+const nameFontLoaded = (page: Page) =>
+  page.evaluate(() => [...document.fonts].some((face) => face.family.replaceAll('"', "") === "Bricolage Grotesque" && face.status === "loaded"));
 
 async function measureName(page: Page, { blockFonts }: { blockFonts: boolean }): Promise<Measure> {
   if (blockFonts) await page.route(/\.woff2(\?|$)/, (route) => route.abort());
   await page.goto("/");
-  // Both runs settle the same way: every font either loaded or failed.
   await page.evaluate(() => document.fonts.ready);
+  // The real font is requested lazily (WebKit resolves fonts.ready before it
+  // starts), so wait for it to be in; the blocked run never gets it.
+  if (!blockFonts) await expect.poll(() => nameFontLoaded(page)).toBe(true);
+  // Guards against comparing a font with itself.
+  expect(await nameFontLoaded(page), blockFonts ? "the fallback run had the font" : "the real run lacks the font").toBe(!blockFonts);
   return page.evaluate(() => {
     const name = document.querySelector<HTMLElement>(".stretch-name")!;
     const lines = [...name.querySelectorAll("span")].map((span) => {
@@ -25,22 +32,15 @@ async function measureName(page: Page, { blockFonts }: { blockFonts: boolean }):
       return { top: rect.top, height: rect.height, width: rect.width };
     });
     const box = name.getBoundingClientRect();
-    return {
-      fontLoaded: document.fonts.check("800 100px 'Bricolage Grotesque'"),
-      lines,
-      box: { top: box.top, height: box.height },
-    };
+    return { lines, box: { top: box.top, height: box.height } };
   });
 }
 
-test("the name does not move or resize when the display font replaces its fallback", async ({ page }) => {
+test("the name does not move or resize when the display font replaces its fallback", async ({ page, context }) => {
   const fallback = await measureName(page, { blockFonts: true });
-  await page.unrouteAll();
-  const real = await measureName(page, { blockFonts: false });
+  // A new page: WebKit keeps a font that failed to load for the life of the page.
+  const real = await measureName(await context.newPage(), { blockFonts: false });
 
-  // Guard against a test that compares a font with itself.
-  expect(fallback.fontLoaded, "fallback run still had the font").toBe(false);
-  expect(real.fontLoaded, "real run never loaded the font").toBe(true);
   expect(fallback.lines.length).toBeGreaterThan(0);
   expect(fallback.lines.length).toBe(real.lines.length);
 

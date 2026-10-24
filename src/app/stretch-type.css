@@ -15,11 +15,12 @@
  * divided by the size-adjust, so each line's content area is as tall as the real
  * font's and the text sits on the same baseline before and after the swap.
  * Without them Arial's own 0.905/0.212 moved the name 34 px (phones) to 70 px
- * (desktop) when the font arrived.
+ * (desktop) when the font arrived. Liberation Sans and Arimo are Arial's
+ * metric-compatible twins, for Linux, where there is no Arial.
  */
 @font-face {
   font-family: "Bricolage Fallback";
-  src: local("Arial");
+  src: local("Arial"), local("Liberation Sans"), local("Arimo");
   font-weight: 300 599;
   font-stretch: 100%;
   size-adjust: 94%;
@@ -30,7 +31,7 @@
 
 @font-face {
   font-family: "Bricolage Fallback";
-  src: local("Arial Bold");
+  src: local("Arial Bold"), local("Liberation Sans Bold"), local("Arimo Bold");
   font-weight: 600 800;
   font-stretch: 100%;
   size-adjust: 91%;
@@ -41,7 +42,7 @@
 
 @font-face {
   font-family: "Bricolage Fallback";
-  src: local("Arial Bold");
+  src: local("Arial Bold"), local("Liberation Sans Bold"), local("Arimo Bold");
   font-weight: 300 800;
   font-stretch: 75%;
   size-adjust: 58%;
