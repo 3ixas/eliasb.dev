@@ -36,7 +36,14 @@ Playwright runs with no retries, so a timing flake fails its shard.
 
 The ruleset can require only a check that `main` already reports. Merge the workflow that adds the check first, then add it to the ruleset's `required_status_checks` with integration_id `15368` (GitHub Actions). Read the ruleset with `gh api repos/3ixas/eliasb.dev/rulesets/<id>` and PUT it back whole, so the other rules are kept.
 
+## Before merging
+
+1. Check that CI ran against today's `main`: `git fetch` and `git merge-base --is-ancestor origin/main origin/<branch>`. `CLEAN` does not show this, and `baseRefOid` is the current tip of `main`, not where the branch started. If `main` has moved since the branch's last push and the new commits touch what its specs cover, run `gh pr update-branch <number>`; that is a push, so it needs CI and another `@codex review`.
+2. Pin the merge to the head you checked: `gh pr merge <number> --squash --match-head-commit <sha>`. It needs the full 40-character SHA; a short one fails with a GraphQL coercion error.
+3. Auto-merge pinned with `--match-head-commit` is checked again when it fires. After any later push the pull request stays armed and `CLEAN` but never merges, and GitHub reports nothing. Turn auto-merge off, then on again pinned to the new head, and only once Elias has approved that commit.
+4. The app's `set_auto_merge` works only on a pull request bound to the calling session. For one another session opened, use `gh pr merge <number> --squash --auto --match-head-commit <sha>`.
+
 ## After merging
 
-1. Squash-merge with `gh pr merge <number> --squash`, then delete the branch on the remote and locally.
+1. Squash-merge as above, then delete the branch on the remote and locally. A branch checked out in a worktree cannot be deleted, so remove the worktree first, once `git status --porcelain` there is empty.
 2. Check out `main` and pull with `--ff-only`. If local `main` has the same work as an unpushed commit (committed before branching), `git diff` it against the merged head first; only when the trees match, `git reset --hard origin/main`. Start from a feature branch next time so this does not arise.
