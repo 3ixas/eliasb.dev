@@ -10,29 +10,45 @@
  * has in Bricolage (measured), so nothing wraps or moves when the real font
  * swaps in: the condensed display type is far narrower than Arial, and the
  * name would otherwise break onto extra lines on a slow connection.
+ *
+ * The ascent and descent overrides are Bricolage's metrics (0.93 and 0.27 em)
+ * divided by the size-adjust, so each line's content area is as tall as the real
+ * font's and the text sits on the same baseline before and after the swap.
+ * Without them Arial's own 0.905/0.212 moved the name 34 px (phones) to 70 px
+ * (desktop) when the font arrived. Liberation Sans and Arimo are Arial's
+ * metric-compatible twins, for Linux, where there is no Arial.
  */
 @font-face {
   font-family: "Bricolage Fallback";
-  src: local("Arial");
+  src: local("Arial"), local("Liberation Sans"), local("Arimo");
   font-weight: 300 599;
   font-stretch: 100%;
   size-adjust: 94%;
+  ascent-override: 98.94%;
+  descent-override: 28.72%;
+  line-gap-override: 0%;
 }
 
 @font-face {
   font-family: "Bricolage Fallback";
-  src: local("Arial Bold");
+  src: local("Arial Bold"), local("Liberation Sans Bold"), local("Arimo Bold");
   font-weight: 600 800;
   font-stretch: 100%;
   size-adjust: 91%;
+  ascent-override: 102.2%;
+  descent-override: 29.67%;
+  line-gap-override: 0%;
 }
 
 @font-face {
   font-family: "Bricolage Fallback";
-  src: local("Arial Bold");
+  src: local("Arial Bold"), local("Liberation Sans Bold"), local("Arimo Bold");
   font-weight: 300 800;
   font-stretch: 75%;
   size-adjust: 58%;
+  ascent-override: 160.34%;
+  descent-override: 46.55%;
+  line-gap-override: 0%;
 }
 
 .stretch-display {
