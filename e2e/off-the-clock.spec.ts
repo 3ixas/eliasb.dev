@@ -27,9 +27,13 @@ test.describe("Off the clock: on the homepage", () => {
     const training = section.locator("[data-otc='training']");
     const reading = section.locator("[data-otc='reading']");
     const clipping = section.locator("[data-otc='clipping']");
+    // Polled: until the display font swaps in, the fallback sets the cards at other heights.
+    const gap = async () => {
+      const [trainingBox, readingBox] = [(await training.boundingBox())!, (await reading.boundingBox())!];
+      return readingBox.y - trainingBox.y - trainingBox.height;
+    };
+    await expect.poll(gap).toBeCloseTo(phone(page) ? 32 : 40, 0);
     const trainingBox = (await training.boundingBox())!;
-    const readingBox = (await reading.boundingBox())!;
-    expect(readingBox.y - trainingBox.y - trainingBox.height).toBeCloseTo(phone(page) ? 32 : 40, 0);
     if (phone(page)) {
       const filmBox = (await section.locator("[data-otc='film']").boundingBox())!;
       expect((await clipping.boundingBox())!.y).toBeGreaterThan(filmBox.y + filmBox.height);
