@@ -5,8 +5,12 @@ import { expect, test, type Page } from "@playwright/test";
 // the name in the Arial fallback, loads the page again with the real font and
 // compares the two. Nothing is throttled and nothing waits on timing: the
 // fallback run has no font to wait for.
+//
+// Chromium only: the fallback is local("Arial"), which WebKit on Linux cannot
+// resolve (its CI build wrapped the name onto a third line in a wider font), so
+// there is no Arial-metric face there to measure. Safari on a Mac has Arial.
 test.beforeEach(({}, testInfo) => {
-  test.skip(!/-(390|1440)-light$/.test(testInfo.project.name), "Measured at a phone and a desktop width");
+  test.skip(!/^chromium-(390|1440)-light$/.test(testInfo.project.name), "Measured at a phone and a desktop width, in Chromium");
 });
 
 type Measure = { lines: { top: number; height: number; width: number }[]; box: { top: number; height: number } };
