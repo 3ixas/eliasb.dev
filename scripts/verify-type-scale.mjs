@@ -1,4 +1,4 @@
-// Every `font-size` in src/app/*.css must be one the check can vouch for (docs/design/STRETCH.md, "Type"):
+// Every `font-size` in src/app/*.css must be one the check can vouch for (docs/design/DESIGN.md, "Type"):
 // one of the five text tokens, a px size of 24 or more, a clamp() that never goes under 24 px, or a
 // display expression named below. Text under 24 px stays on the five steps, so a clamp() that dips
 // below 24 px would sit between them. Anything else (rem, em, %, a bare vw, a new expression) fails.

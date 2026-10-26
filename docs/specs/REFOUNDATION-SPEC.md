@@ -4,7 +4,7 @@ Published as [GitHub issue #75](https://github.com/3ixas/eliasb.dev/issues/75).
 
 Sources:
 - Scope: `docs/specs/REFOUNDATION-SCOPE.md`, approved 29 September 2026.
-- Design: `docs/design/DESIGN.md`, signed off 1 October 2026 against the [canvas](https://claude.ai/artifact/4zfQfGQme3zy2kUgvh4V8H), version 32.
+- Design: `docs/design/DESIGN.md` (the Board, now `docs/design/history/BOARD.md`), signed off 1 October 2026 against the [canvas](https://claude.ai/artifact/4zfQfGQme3zy2kUgvh4V8H), version 32.
 - Architecture: ADR 0004 (Motion and design tokens).
 - Motion reference: the `prototype/board-motion` branch.
 

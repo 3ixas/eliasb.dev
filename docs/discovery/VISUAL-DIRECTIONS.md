@@ -4,7 +4,7 @@
 
 Elias selected **Cabinet of Curiosities** on 2026-09-14, with **Living Editorial** providing its structural and typographic foundation. Signals and Systems will not define the whole site because it felt too harsh; its visual language remains available for small, contained data experiences.
 
-The selected direction is specified in `docs/design/SELECTED-DIRECTION.md`. The original territories remain below as decision history.
+The selected direction is specified in `docs/design/history/SELECTED-DIRECTION.md`. The original territories remain below as decision history.
 
 These three territories are approved for exploration. They must use the same confirmed content hierarchy so the comparison tests visual and interaction choices rather than different product scopes.
 

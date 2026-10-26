@@ -1,5 +1,5 @@
 /*
- * The Stretch homepage shell (docs/design/STRETCH.md): page surface, header,
+ * The Stretch homepage shell (docs/design/history/STRETCH.md): page surface, header,
  * theme button, section headings and footer. Everything is scoped to
  * [data-stretch-shell]; only the page surface reaches up to html and body,
  * through :has().

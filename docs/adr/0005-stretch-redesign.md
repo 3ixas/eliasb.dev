@@ -46,7 +46,7 @@ ADR 0001: Next.js on Vercel, integrations, snapshots and fallbacks stay as they 
 
 ## Consequences
 
-- The Board-era design document becomes history; `docs/design/STRETCH.md` is the live reference.
+- The Board-era design document becomes history; `docs/design/STRETCH.md` is the live reference. (Since 26 October 2026 it is history at `docs/design/history/STRETCH.md`, and `docs/design/DESIGN.md` is the live contract.)
 - Every Board component, its stylesheet and its specs were retired once the new surfaces replaced them (#136). Their behavioural intent carries into the new specs.
 - The Stretch tokens are `--stretch-*` variables. They were prefixed to sit beside the Board's; the prefix stays now the Board is gone.
 - The cost is a second full rebuild of the presentation layer. It is accepted because the data layer is untouched and the Board no longer tells the story the site needs to tell.

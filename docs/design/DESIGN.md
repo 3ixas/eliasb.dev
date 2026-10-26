@@ -1,299 +1,305 @@
-# DESIGN.md: The Board
+# DESIGN.md: the quiet index
 
-> **History.** Superseded on 8 October 2026 by the Stretch direction. The live design reference is `docs/design/STRETCH.md` ([ADR 0005](../adr/0005-stretch-redesign.md)). Kept for the record.
+The design contract for all of eliasb.dev: the homepage, the shell (header, theme, footer), the Case studies, the Role stories, the Work archive, the Résumé and the 404. It is the only live design reference. When this file and anything else disagree, this file wins.
 
-Supersedes the 21 September 2026 refinement brief and `SELECTED-DIRECTION.md` (Cabinet of Curiosities). The product scope is in `docs/specs/REFOUNDATION-SCOPE.md`; ADR 0004 covers the motion and styling architecture.
+**Keeping it current.** A tweak edits this file in place, in the same pull request as the change. A new direction first copies this file into `history/` with a superseded note at the top, then rewrites it. The directions it replaced are in `history/`: the Stretch direction (`STRETCH.md`), the Board (`BOARD.md`) and the Cabinet of Curiosities (`SELECTED-DIRECTION.md`).
 
-## Product and decision
+The decisions are on [Map: a refined foundation with moments of character](https://github.com/3ixas/eliasb.dev/issues/276):
+- [What the current contract and tests lock in](https://github.com/3ixas/eliasb.dev/issues/277)
+- [Three directions on real content](https://github.com/3ixas/eliasb.dev/issues/278)
+- [What stays on the homepage, and the one signature object](https://github.com/3ixas/eliasb.dev/issues/279)
+- [The Signature entrance under a composed-first bar](https://github.com/3ixas/eliasb.dev/issues/280)
+- [A copy pass in Elias's voice](https://github.com/3ixas/eliasb.dev/issues/281)
+- [The quiet index design contract, with its removal rule](https://github.com/3ixas/eliasb.dev/issues/282)
+- [The inner pages in the quiet index's language](https://github.com/3ixas/eliasb.dev/issues/301)
 
-- **Product:** eliasb.dev, Elias Bennett's personal site.
-- **Problem and user:** the current site looks good but is "not fully there". Hiring founders, product teams, and fellow builders should feel within seconds that this person has taste and care, then want to explore the person behind the work.
-- **Design decision this work must settle:** a complete visual and motion system for the **Board**, a well-kept studio wall Elias pins things to, strong enough to meet his subjective bar: a site he is proud to share with anyone, and one that would genuinely impress them.
-- **Primary job:** show that Elias is a **maker of clarity**. The work is pinned carefully and clearly; the life around it is pinned more loosely.
-- **Primary journey:** the opening headline is typed and then pinned → a supporting line → Work (pinned carefully, over a faint grid) → a case study or back → the personal Board (the making pin, books, film, music, weekly clipping, training, fantasy, London, GitHub) → About (the story, opening with history) → contact.
-- **Success looks like:** the polish criteria in the scope (no blank content, no layout shift, one type and spacing scale, shared motion, every state designed, 320–1440 px in both themes, strong Lighthouse scores), plus Elias's side-by-side judgement against the references.
+The visual references are the agreed prototypes, kept outside the repo: the homepage at `~/.agents/handoffs/eliasb.dev/2026-10-26-quiet-index-prototype/` (`sketch/m.html`), and the inner pages at `~/.agents/handoffs/eliasb.dev/2026-10-26-inner-pages-prototype/` (`sketch/role.html`, `sketch/case.html` and `sketch/404.html`). Where a prototype and this file disagree, this file wins. Terms follow `GLOSSARY.md`; approved copy is in `docs/content/redesign-copy.md`.
 
-## Scope
+## Principle
 
-- **Surfaces:** `/` (the One-page home), `/work`, `/work/[slug]` (three case studies), the navigation shell, the theme control, the social share image, and the `/about`, `/library`, and `/lab` redirects (no UI).
-- **Target devices:** 320, 390, 820, and 1440 px, plus wide screens. Pointer, touch, and keyboard. Light and dark themes. Reduced motion.
-- **Included states:** the first-load opening, a reload, back-navigation without the opening, live, cached, and fallback pins, a pin removed when it has nothing current, fantasy between game windows, fantasy off-season, the Making pin fallback, weekly clipping closed and open, a clipping without an image, slow images, JavaScript blocked, and long content.
-- **Explicitly excluded:** visitor-draggable pins, 3D scenes or WebGL, gated intros ("click to enter"), sound, new integrations, a CMS.
-- **Constraints:** Next.js App Router. Tokens plus Tailwind v4 and Motion (ADR 0004). All content in the HTML and visible from first paint. Self-hosted fonts through `next/font`. WCAG 2.2 AA.
-- **Real content and assets:** real project screenshots (`public/work/*`), portraits (`public/profile/*`), the running photo (source `~/Downloads/IMG_1421.HEIC`, metadata stripped), the London photograph, live book and film artwork, Wikimedia images for the clipping, and the E/B mark with its orange slash.
+Simplicity and focus are the foundation; character is what you find when you look closer. Every page is one quiet column. **Anything that names something real can show it**: point at it and a closer look arrives in the margin, moving the way the real thing would. Nothing else moves.
 
-## References
+## The removal rule
 
-| Reference | Role | Carry over | Do not carry over |
+The Stretch homepage grew by addition: every pass added a well-made object, and none took one away. These rules stop that happening again. A change that breaks one needs a decision on the map, not a judgement in review.
+
+1. **Everything is a row.** A row has a 44 px object, a title, one line, and optional quiet metadata. The only things that aren't rows are the opening line, the GitHub year and Say hello's email.
+2. **A new object earns a place in two ways only**: as a row's object, drawn for the 44 px slot, or as a row's closer look. No new section-level set pieces, cards, Fasteners, tilts, posters or rails.
+3. **Motion must mean something.** It is allowed for a closer look, for a reaction of something real, for feedback on a control, and for the three arrival reactions. Nothing loops on screen, apart from a reveal that is itself showing work happening (the cores).
+4. **There are two widths.** The 600 px reading column and the 300 px margin. Nothing spans them.
+5. **The homepage has a length budget.** It stays within 4 screens at 1440 × 900 and 5 screens at 390 × 844 with nothing open (measured: 3.8 and 4.8). Something new pushes something else into a closer look or off the homepage. A long-form page has no budget: its length is the story.
+6. **Detail goes behind, not beside.** A fact that doesn't need to be read on arrival moves into a closer look or onto its own page. It doesn't get its own block on the homepage.
+7. **Proof is inline; names are behind.** On a long-form page, a figure the paragraph argues from (a screenshot of the work, a to-scale comparison, the PRD) sits inline at column width. A real thing the sentence only names (a certificate, the cores behind "CPU and GPU", a site as it is today) is a closer look on that word. Neither sits beside the column.
+
+## Layout
+
+- **The column**: `min(100% − 40px, 600px)`, centred, with 96 px above the header on desktop and 32 px on phones.
+- **Sections**: 80 px apart (64 px on phones). Each has a title at 17 px, weight 650, and a note at 15 px muted directly beneath. There are no giant headings and no mono counts in headings.
+- **Lists**: rows 2 px apart. A list sits 18 px below its note and extends 12 px into the gutter on each side, so a row's hover fill lines up with the text column.
+
+## The row
+
+| Part | Spec |
+|---|---|
+| Grid | `44px` object · `1fr` text · `auto` metadata; 16 px gaps; at least 68 px tall; 10 × 12 px padding; 14 px radius |
+| Title | 17 px, weight 600, line height 1.35 |
+| Line | 15 px, muted, line height 1.45 |
+| Metadata | 13 px mono, muted (a year, a source). Hidden on phones, where the whole row is the target |
+| Hover / focus | Card fill (`--stretch-card`), and an arrow that appears beside the metadata (opacity and 4 px travel) and turns cobalt. A 2 px cobalt focus ring inside the row |
+| States | A link row goes to its page. A plain row (History at uni, a habit, a strand) is focusable only if it has a closer look |
+
+Every row's text starts at the same edge down the whole page; that alignment is what makes the page read as one list.
+
+## Objects
+
+An object is drawn to be read at 44 px. It is never a whole page shrunk down.
+
+| Object | Where | What it is |
+|---|---|---|
+| Project | Things I make | One legible detail of the project's own screenshot (Threshold's serif "Th", Argus Risk's donut, Flowtime's timer, Home Secretary's button, Risk Event Tracker's method badges, Ask Professor Past's portrait), on its **Project colour**, 11 px radius. The crop is data on the project: focal point and zoom |
+| Mini pass | Work | A 30 × 38 **Staff pass** on a short strap in its **Employer colour**. It carries no marks of its own: awards and highlights belong to its closer look |
+| Cover | Off the clock | The real book cover or film poster, 30 × 44, with a spine shadow |
+| Calendar tile | Training, history, History at uni | A day tile with a band and a number. The band is cobalt for today. It turns over to a second face (the year, the week) as a reaction |
+| Thread | Where I'm headed | A 4 px line in the colour of the strand's source |
+| Number | How I work | The habit's number, ringed by the pen (below) |
+| Sheet | Threshold's PRD; Say hello on the 404 | A small page of ruled lines |
+| Dot | Now making | The cobalt "now" dot |
+| Empty slot | The 404's missing row | A dashed 44 px outline with nothing in it |
+
+## Closer looks
+
+A **closer look** is a row's detail: on desktop it appears in the margin, and on phones in the dock. Each kind arrives the way the real thing would. They use only approved copy and real assets.
+
+| Row or word | Closer look | Arrives by |
+|---|---|---|
+| A project | Its screenshot on its Project colour, then type and year | Sliding in and settling |
+| An employer | Its full Staff pass, then that role's best points in the same form for every employer: BNP Paribas's three award pins, and each other role's strongest highlights (chosen in the copy pass), then the Résumé lines that explain its figure | Dropping on its strap and swinging to rest; the points pop on; the figure counts up (Optegra 62% → 88%, Joveen's page load cut by 40%) |
+| History at uni | A note: University of Essex, Diploma of Higher Education, History, July 2021 | Unfolding |
+| A Where I'm headed strand | "So far" with its source and proof | Its thread drawing down from the source |
+| Threshold's PRD | The quote | Typing itself, with a caret. Typing is time-based and smooth: characters appear on the animation frame at a steady rate (about 45 a second), never one timer per character |
+| Today's training | The run photo and the week, today in cobalt | The days filling in one by one, today last |
+| The book | The cover pulled from a row of spines, then the title, author and a "Live from Goodreads" line | Lifting off the shelf and turning to face you |
+| The film | A ticket with the poster, title, date and stars | Arriving, the stars filling in, the stub tearing |
+| This week in history | A newspaper clipping with the image, date, fact and credit | Unfolding, then being stamped "This week in history" |
+| Now making | The repository and its description | The description typing itself |
+| Your face (header) | The full white-tux portrait, "Based in London" | Sliding in |
+| "pricing and risk engines" | Illustrative simulated paths, one in BNP green, with the Role story's line about simulation-based calculations | The paths fanning out |
+| "CPU and GPU" | A CPU with a few cores taking turns and a GPU with many lighting at once, with the line about running the same tests on both | The cores lighting |
+| "digitisation competition" | Its award pin, its Résumé line, and two bars: 30–40 min and under 5 | The pin popping on and the bar shrinking |
+| "Take Ownership award" | The certificate | Sliding up like a sheet of paper |
+| Résumé (Say hello) | The one-page sheet | Sliding up |
+| "joveen.com" (Joveen's Role story) | The site as it is today, on Shopify, with the caption saying it isn't Elias's UI | Sliding in and settling |
+
+On a long-form page, the closer looks are the real things its prose names in passing (rule 7). The Role stories' and case studies' own figures are inline, not closer looks.
+
+**Words that can show something** have a dotted underline (muted at 70%, 1.5 px, 5 px offset), which turns cobalt on hover or focus. They are focusable.
+
+**BNP Paribas** in the opening line is the exception: it reacts where it is. It turns BNP green, and a small pass drops below it on its strap. On phones, tapping it sends BNP's closer look to the dock.
+
+**The history row cycles.** Clicking it, or pressing Enter, swaps in the week's next oddity in place: the clipping restamps and "1 of 3" moves on. Nothing opens or closes. The change is announced politely.
+
+### The margin (desktop)
+
+- **When it's used**: on wide screens (from 1180 px) with a hovering pointer. A row or word shows its closer look on pointer enter or focus, and hides it 140 ms after leave or blur.
+- **Placement**: 40 px right of the column, 300 px wide. It lines up with the row's top (minus 6 px), but always fits the window: it rises until it sits 16 px above the bottom edge, and never above 16 px from the top. It keeps fitting as images load (`ResizeObserver`) and while the page scrolls.
+- **Moving between rows**: it glides on the `spring` timing. It takes no pointer events and never covers the column. A closer look has no links; the row is the link.
+
+### The dock (phones and touch)
+
+> **Under review** in [Closer looks on phones: the dock, or inline under the row](https://github.com/3ixas/eliasb.dev/issues/302). Elias decided on 26 October 2026 that a closer look on a phone appears only when tapped, never as the page scrolls, so the reading line's filling of the dock below will change. That ticket also decides between a dock and an inline closer look under the tapped row or word. Until it closes, this section describes the earlier decision and nothing here should be built.
+
+- **When it's used**: below 1180 px, or without hover.
+- **The reading line** sits 38% down the screen. The row crossing it takes its focus fill, and its closer look appears in a dock at the bottom of the screen in a compact form: the picture on the left, the words on the right, at most 38% of the screen tall. It clears the safe area, and the page reserves room below its last row.
+- **Interaction**: tapping the dock opens the row's page; × hides the dock for the visit. Tapping a dotted word sends its closer look to the dock. No row opens or closes, and nothing in the column moves as the dock changes.
+- **Playing once**: each row's object plays its reaction once as it reaches the reading line.
+- **Featured work**: the three featured projects become swipeable cards (82% wide, snapping to the gutter) with their screenshots at a readable size. The other projects stay rows. Markup is one list that changes shape, not two.
+
+## Reactions that aren't closer looks
+
+| Where | Reaction |
+|---|---|
+| "products of my own." | It draws its cobalt underline once on arrival. On hover, the letters lift in a short wave and the underline scribbles out and back |
+| Greeting | A small scene for the visitor's own time of day: morning (the sun comes up), afternoon (the rays turn), evening (the sun sets), late (the moon rocks and the stars come out). Hover or focus plays it and adds "it's HH:MM here in London". Phones play it once on arrival, without the extra words |
+| The Eclipse (theme) | The icon turns over when pressed. The page crossfades (see Motion) |
+| Rows' objects | Projects lift and tilt 3°, Flowtime's icon counts seconds, passes swing, covers open on their spine, calendar tiles turn over |
+| How I work's pen | Rings around the numbers, arrows between habits, and underlines under each proof's strongest phrase draw as they scroll up the screen and un-draw on the way back (CSS scroll-driven animations; drawn when unsupported) |
+| GitHub year | The cells fill in and the total counts up when it first comes into view. A day shows its count on hover |
+| Live signals | "Live from Goodreads / Letterboxd / GitHub" with a cobalt dot that pulses three times, then rests |
+| Say hello | The email copies in place: the button turns cobalt and says "Copied" |
+| Footer | "Made by Elias" fills with cobalt on hover |
+
+## The arrival
+
+No hold. The page is complete and usable in its first frame, and nothing waits for motion. On every load, the underline draws, the greeting's scene plays, and the GitHub total counts up when it comes into view. The Signature entrance retires ([#280](https://github.com/3ixas/eliasb.dev/issues/280)).
+
+## The header (every page)
+
+One header on every page, in the same place, so following a row never moves it. It has the white-tux portrait as a 40 px circle (it opens the full portrait), "Elias Bennett", the greeting and the Eclipse. The portrait and name lead to the homepage from every other page.
+
+- **Its links are the sections of the page you're on, or none.** On the homepage they are its five sections (Work, Things I make, How I work, Off the clock, Say hello). On a Role story or case study they are that page's own sections, which replaces the numbered section bar. The Work archive, the Résumé and the 404 have no sections, so they have no links.
+- **Style**: 15 px, muted, turning ink on hover, and underlined while their section is in view (`aria-current`). They sit in a navigation landmark named "On this page".
+- **Width**: on wide screens the header spans the column and the margin (940 px), because a long-form page's section names don't fit in 600 px. Its left edge is the column's.
+- **Phones**: no links and no menu, and the greeting moves under the name. A long-form page is read top to bottom, with its back link at the top.
+
+## The homepage, in order
+
+1. **Header**, as above.
+2. **The opening line**, as an `h1`: "I build pricing and risk engines at BNP Paribas, and products of my own." It is set in Bricolage at `clamp(34px, 5.4vw, 50px)`, weight 650, line height 1.1, −0.03 em tracking, and it is the loudest thing on the page. The supporting line follows at 17 px, muted.
+3. **Work**: BNP Paribas, Joveen, Optegra, then History at uni. Then **Where I'm headed**: its line, and three strand rows (Judgement, Depth, Range).
+4. **Things I make**: the three featured projects, the other projects newest first (at most ten), and the link to the Work archive with the true count.
+5. **How I work**: four habit rows with the pen (real problem, write it down, safe to undo, measure), then Threshold's PRD.
+6. **Off the clock**: today's training, the GitHub year, the book, the film, the history row and Now making.
+7. **Say hello**: the line, the email with Copy, then Résumé, GitHub and LinkedIn.
+8. **Footer**: "Made by Elias".
+
+Anchors stay `#work`, `#things-i-make`, `#how-i-work`, `#off-the-clock` and `#say-hello`, so the redirects, the 404's rows and each Role story's "← Work" keep working.
+
+## Long-form pages: Role stories and case studies
+
+The two share one template. Each is the header, a back link, an opening, then its sections in the column, then one row to the next page. The removal rule holds, with rule 7 for figures; there is no length budget.
+
+- **Back link**: "← Work" on a Role story (to `/#work`), "← Things I make" on a case study (to the Work archive). 15 px, muted.
+- **Title**: the page's `h1`, in the opening line's treatment (`clamp(34px, 5.4vw, 50px)`, weight 650). It is the loudest text on the page. A supporting line follows at 17 px, muted, then quiet metadata in 13 px mono.
+- **Sections**: a 17 px title (weight 650) and the prose at 17 px, as on the homepage. No numbers, no giant headings, no condensed display type.
+- **Figures** (rule 7): inline at column width with a 13 px mono caption beneath. Screenshots sit on their Project colour with a 14 px radius. The to-scale bars and the flag figure are drawn on the card surface (`--stretch-card`). Every figure keeps its alt text.
+- **Ending**: one row, under "Next role" or "Next project", with the next page's 44 px object, its name and its one line. The order is unchanged (Role stories newest to oldest; case studies in the Things I make order).
+
+### A Role story's opening
+
+The title (the employer), the role and setting as its line, and the dates. Beside them in the column hangs the employer's full **Staff pass** with its lean and its award pins, as the homepage's closer look shows it. On phones the pass falls below the title. On arrival the pass swings to rest once, over a page that is already readable.
+
+### A case study's opening
+
+The title (the project), its outcome as the line, its type, year and stack as metadata, then Live site and Code. Below them, the project's landing screenshot at column width on its Project colour.
+
+### The PRD and evidence
+
+A case study's PRD is one inline **Sheet**: the quote at 19 px, "From the PRD" and its date, then the evidence figures as a quiet line (each value at 17 px, weight 600, its label in 13 px mono). A Role story's evidence figures follow the same pattern beneath its Summary, leaving out what the pass's pins already show.
+
+### Motion on long-form pages
+
+The pass swings to rest once on arrival; the to-scale bars shrink once when they scroll into view; closer looks arrive as on the homepage. Nothing else moves.
+
+## The Work archive
+
+`/things-i-make` is the homepage's Things I make, unabridged: the same rows, objects and closer looks, every project newest first. Its `h1`, "Things I make", takes the opening line's treatment, with its note beneath. The filters (Products, Systems, Experiments) appear once there are more than ten projects. The header has no links.
+
+## The Résumé
+
+The sheet is unchanged: it is what prints and what `public/Elias-Bennett-Resume.pdf` holds, so `verify:resume` and the committed PDF stay valid. The page around it takes the shared header (no links), the desk, and Download PDF above the sheet.
+
+## The 404
+
+The page tells you what didn't work, then what to try.
+
+1. The header, with no links.
+2. The `h1`, "This page doesn't exist.", in the opening line's treatment, and its line.
+3. **The missing row**: the address asked for, struck through, with an empty dashed slot as its object, "Not on file" as its line and "404" in cobalt as its metadata. It is not a link. The address is shortened in the middle when long, as the lost-property tag did.
+4. **"Try one of these"**, a section title with its note, then the five homepage sections as rows, each with its section's own object: the BNP mini pass (Work), Threshold's "Th" (Things I make), the ringed 1 (How I work), today's calendar tile (Off the clock) and the Sheet (Say hello). Their lines come from the copy deck.
+
+The lost-property tag retires.
+
+## Tokens
+
+Defined in `src/app/stretch-tokens.css` as `--stretch-*` variables. Dark follows the device unless a visitor has chosen light. Once script runs, the theme controller decides: it flips `data-lights` after marking the page as changing, so a change of the device setting crossfades like a click; the media query alone applies only when script has not run.
+
+| Token | Light | Dark | Role |
 |---|---|---|---|
-| [Commissioner](https://commissioner.design) | Opening and hero typography | Two-part typed headline; objects held by paperclips; generous whitespace; calm confidence | The cloud character and illustrations; content blank until lazy-loaded |
-| [Matthew Yu](https://matthewyu.dev) | One signature tactile object | A single memorable interaction built from a personal artefact; restraint around it | The sketchbook itself; the minimal grey world |
-| [Sparsh Paliwal](https://www.sparshpaliwal.com) | Clarity and hierarchy | A one-line identity statement; a plain project list whose images carry colour; clear Email and Résumé actions; a restrained palette in both themes | The generic dark grey surface and system-sans feel |
-| [Josh W. Comeau](https://www.joshwcomeau.com) | Theme woven into the scene; delight | The theme changes a scene rather than swapping colours; small, rewarding interactions | Cartoon illustration style; sound |
-| [Yalamps](https://www.awwwards.com/sites/yalamps) (Awwwards captures; the live site was redesigned) | Light and dark as a lighting change | Day and night as a narrative change, with a toggle that feels like light | Storybook landscape illustration |
-| [Mohit Virli](https://www.awwwards.com/sites/mohit-virlis-portfolio) | Light and dark as a lighting change | Daylight to starry night as the theme transition | 3D, heavy loading, blank first paint |
-| [Emil Kowalski](https://emilkowal.ski) | Motion craft | Interruptible spring motion, tiny durations, nothing gratuitous | The minimal text-only layout |
-| [Rauno Freiberg](https://rauno.me) | Interaction detail | Small, surprising details that reward attention | The experimental layout |
-| [In Common With](https://www.incommonwith.com/collections/all-products) | The bar for a woven theme and its timing | Its "Light" switch crossfades every product photo to a version shot with the lamp on. The page background eases over 1.2 s with `cubic-bezier(0.42, 0, 0.58, 1)`, a slow, symmetrical ease-in-out that feels calm rather than abrupt. | Product photography, the shop layout |
+| `--stretch-page` | `#fbfbf8` | `#0d0d12` | Page background |
+| `--stretch-ink` | `#111114` | `#f1f1f4` | Body and heading text |
+| `--stretch-muted` | `#5a5a63` | `#a2a2ad` | Secondary text and metadata |
+| `--stretch-rule` | `#dcdcd6` | `#2a2a33` | Hairlines and dividers (not text) |
+| `--stretch-card` | `#f0f0ea` | `#17171f` | A row's hover fill, figures and raised surfaces |
+| `--stretch-cobalt` | `#2340ff` | `#8b9cff` | The Cobalt accent |
+| `--stretch-on-cobalt` | `#ffffff` | `#0d0d12` | Text on a cobalt surface |
+| `--stretch-tile-edge` | none | `#2a2a33` | Hairline that keeps objects visible in dark |
+| `--gh-0` | `#e1e4e8` | `#1f242c` | GitHub year, no contributions. Light is a step darker than GitHub's own, so it shows on the card |
+| `--gh-1` … `--gh-4` | `#9be9a8` `#40c463` `#30a14e` `#216e39` | `#0e4429` `#006d32` `#26a641` `#39d353` | GitHub's contribution greens |
+| `--sun` | `#e39a2d` | `#f5b84f` | The greeting's sun, and nothing else: an illustration colour, never an interface colour |
 
-Rejected: Maggie Appleton (Elias does not like the look), Henry Heffernan (the site is gated behind a start screen), Craig Mod and Frank Chimero (too plain for this direction).
+Every text pair passes WCAG 2.2 AA; `e2e/stretch-tokens.spec.ts` measures them on the rendered page. Rules are decorative and are not held to the text ratio. `--stretch-tape`, the Fasteners' tape, retires with them.
 
-## Design DNA
+**Project colours** are data on each project (field, ink, swatch), for example Threshold `#1a1714` field, `#c08a5a` swatch, `#f2efe9` ink. **Employer colours** are data on each Role story, with a light and a dark pair. Text over either is checked per project and per employer.
 
-- **Content priority:** identity statement → Work → the personal Board → the story → contact. Work is always the first thing reached from navigation.
-- **Layout and density:** a 12-column desktop grid. The hero and Work are pinned carefully: large, rotated at most ±0.5°, generously spaced, and aligned to a faint pinned grid visible only behind Work. Personal pins are looser: ±1–3°, different sizes, occasional overlap of up to 8%, never covering text. On mobile, the Board becomes one column of pins with tilt capped at ±1.5° and no overlap.
-- **Type roles:**
-  - A self-hosted characterful serif for statements, pin titles, and split-colour headings. The last word is italic and in the accent colour; Elias loves this and it stays.
-  - A clean sans for reading and controls.
-  - A mono for small labels, dates, and metrics.
-  - One modular scale with a fluid display size. No sizes outside the scale.
-  - **Chosen (30 September 2026): A, Newsreader with Hanken Grotesk and JetBrains Mono.**
-  - Candidate pairings compared on the canvas:
-    - A: Newsreader with Hanken Grotesk and JetBrains Mono.
-    - B: Besley with Figtree and Spline Sans Mono.
-    - C: Brygada 1918 with Schibsted Grotesk and IBM Plex Mono.
-  - Fraunces and Young Serif were dropped: Fraunces is an overused default, and Young Serif has no italic for the split-colour headings.
-- **Colour roles:**
-  - Wall: warm plaster by day, deep warm umber at night.
-  - Paper: pin stock, a little lighter than the wall.
-  - Ink and muted ink.
-  - One accent: the E/B slash orange, used for emphasis, action, and the highlight.
-  - Paper stocks for pins: sage, ochre, blueprint blue, terracotta. These are object identity only, never UI state.
-  - Focus: its own high-contrast ring.
-- **Surfaces:**
-  - The personal Board is a **framed pinboard** mounted on the wall: a thin oak frame and a warm linen surface with a few old pin holes, lit by the same light. It makes the Board read as a board without cork kitsch (Elias, 30 September 2026).
-  - **Work text sits on sticky notes** in pin stocks (ochre, blueprint blue, sage), overlapping the screenshot's edge slightly, so descriptions stand out from the wall (Elias, 30 September 2026).
-  - Pins are paper, photographs, clippings, or cards, each held by a physical fixing chosen by type: a pushpin for notes and headline, tape for photographs, a clip for documents and case studies.
-  - **One light source.** Every shadow is cast from the same light, so each shadow's direction is a theme token rather than a per-component choice.
-  - Radii are small, like real paper corners.
-- **Components and feedback:**
-  - On hover or focus, a pin lifts and straightens slightly, and its shadow lengthens away from the light.
-  - On touch, a pin shows a pressed state.
-  - Hover is never the only route to information.
-  - Links read as links.
-- **Motion:**
-  - Motion follows physics: pins settle with springs, and nothing slides in from off-screen.
-  - Durations are 120, 200, and 320 ms for UI changes; springs are used for pin movement.
-  - All motion is interruptible, and reduced motion swaps it for instant state changes.
-  - Content never waits for motion.
+## Motion
 
-## Direction
+- **Timing**: `--spring: cubic-bezier(.34, 1.56, .64, 1)` for things that arrive or swing, and `--out: cubic-bezier(.2, .8, .2, 1)` for things that settle.
+- **Theme changes** crossfade over 0.3 s with `cubic-bezier(0, 0, 0.38, 0.9)`, or switch instantly with reduced motion.
+- **Reduced motion** removes all movement and keeps 0.2 s fades, except theme changes, which are instant. Content never waits for motion.
 
-- **Chosen direction: A, "Studio wall"**, with two borrowed elements.
-  - From B (the crit wall): a faint pinned grid, only behind Work.
-  - From C (the night desk): the dark theme.
-- **Theme as lighting, not colour swap** (Elias's requirement, 29 September 2026):
-  - **Day:** soft daylight from a window at the upper left. A very faint window-frame shadow lies across the wall, and pin shadows fall down and to the right.
-  - **Night:** the window goes dark and a desk lamp clamped to the wall's upper right switches on, casting a warm pool of light. Pins inside the pool are warmly lit; pins outside it are dimmer but always meet AA contrast. Pin shadows swing to fall down and to the left, away from the lamp.
-  - **The theme control is a light switch in the header** (it superseded an earlier pull cord on 1 October 2026). Flipping it visibly switches the lights on or off, and every shadow on the page swings with the light.
-  - The site starts in the visitor's system theme and follows live changes; a manual choice overrides this, with a clear route back to automatic.
-  - **Timing (from In Common With):** the switch is a 1.2 s ease-in-out (`cubic-bezier(0.42, 0, 0.58, 1)`) crossfade of the wall, the lamp's glow, and pin lighting. Shadows swing over the same 1.2 s. The rocker moves at once with a short spring, so the control feels immediate while the room changes slowly.
-  - With reduced motion, the theme change is a 200 ms crossfade with no swinging and no flicker.
-- **Signature: the headline gets pinned.** The sentence types in two parts, the hand-drawn highlight is drawn beneath it, then the headline card settles onto the wall and a pushpin presses in. The Board is visible behind it from the first frame. It replays on every load or reload, never on back-navigation, and reduced motion shows the finished state at once.
-- **Anti-goals:**
-  - Generic AI portfolio defaults: centred hero with a gradient, Inter or Geist on grey, bento grids, glassmorphism, emoji.
-  - Kitsch corkboard texture or clip-art pins.
-  - Novelty that hides content.
-  - Motion that is decoration rather than physics.
-  - Many shadow styles, accents, or font sizes.
-  - Blank panels while scrolling.
-  - Text over photographs without a scrim.
-- **Why it fits:** it is Elias's own description of what he loves, a board he has stuck things onto. Clarity sits in the careful pins and warmth in the loose ones. One light source gives the system a physical rule that enforces consistency, which is the polish the first build lacked.
-- **Alternatives considered:**
-  - B, "Crit wall" (cool, gridded): clearest, but too cold on its own.
-  - C, "Desk at night" (cursor-moved lamp across the whole site): most dramatic, but it risks legibility and does not work on mobile. It survives as the dark theme.
+## Colour rules
 
-## Screens and states
+- **Cobalt** marks "products of my own", today, now (the live dots, Now making), the way to say hello, award pins, focus and a hovered row's arrow. On the GitHub year it is a ring around today, never a fill, so the greens stay true. Elias's name is no longer cobalt: the opening line leads.
+- **Employer and Project colours** appear only inside objects, figures and closer looks (and on BNP Paribas when hovered), on every page. A Role story's pass and a case study's screenshots carry them; the page around them stays neutral, with no coloured opening band. A page's share card keeps its colour.
+- **GitHub's greens** appear only on the GitHub year.
+- **Colour never carries meaning alone.** A level of the GitHub year has a count on hover and a text alternative; today is marked by a ring as well as colour.
 
-| Screen | User decision | Empty | Loading | Error | Success | Other states |
-|---|---|---|---|---|---|---|
-| Home: hero | Is this person worth my time? | n/a | Fonts load without text jumping (metric-matched fallbacks) | JavaScript blocked: finished headline shown | Headline pinned, Board visible | First load, reload, back-navigation, reduced motion, day and night |
-| Home: Work | Which project should I open? | n/a | Screenshots have reserved sizes with a paper placeholder | Missing image shows a titled paper pin | Three projects pinned carefully, "View all work" | Hover lift, focus, 320 px stack |
-| Home: personal Board | What's he like? | A pin with nothing current is removed | Artwork placeholders reserve their space | Cached pin with a subtle "as of" date; authored fallback | A composed Board | Fantasy: live, last week, off-season. Clipping: closed, open, no image. Making fallback. Training plan with today marked |
-| Home: About | Do I connect with his story? | n/a | Portrait placeholder reserves space | n/a | Story opening with history, portrait | Long text, day and night |
-| Home: contact | How do I reach him? | n/a | n/a | n/a | Email as the main action; résumé, GitHub, LinkedIn | Contact cursors on fine pointers only |
-| `/work` archive | Which case study? | n/a | Image placeholders | n/a | All case studies | 320 px |
-| `/work/[slug]` | Is the reasoning good? | n/a | Hero image placeholder | External link unavailable | Clean reading page with a hint of the Board | Back to Work without replaying the opening |
+## Type
+
+- **Bricolage Grotesque** (variable `opsz`, `wdth`, `wght`), self-hosted through `next/font`, for everything people read. **JetBrains Mono** for metadata, dates, counts, captions and Print.
+- **One floor.** Nothing a visitor is meant to read is smaller than 13 px, on the page or as **Print** on an object (a Staff pass, an award pin, a credit), closer looks included. Reading text is 15 px or more, and body copy is 17 px. Calendar-tile bands are 13 px.
+- **One text scale.** Text under 24 px uses five steps, each a token in `stretch-tokens.css`: `--text-label` 13 px, `--text-small` 15 px, `--text-body` 17 px, `--text-lead` 19 px and `--text-quote` 22 px. A size may move up one step at a wider breakpoint, but never off the scale. `scripts/verify-type-scale.mjs` checks it.
+- **Display type** is only the homepage's opening line, each page's `h1` in the same treatment, and the bold figures inside a Staff pass. Section headings are text, not display. Condensed uppercase display retires everywhere except the pass.
+
+## Accessibility
+
+- **A closer look is supplementary.** Anything a closer look says that isn't on the row or on the row's destination page is also the row's accessible description, through visually hidden text referenced by `aria-describedby`. The margin and dock themselves are `aria-hidden`.
+- **Keyboard**: every row and dotted word with a closer look is focusable, and focus shows it as hover does. Escape hides the margin, and focus stays put. The GitHub year keeps today's single tab stop and arrow keys.
+- **Reduced motion** shows each closer look with a 0.2 s fade and no arrival motion. The pen is drawn, the underline is drawn, nothing counts or types, and the greeting's scene rests.
+- **The standing checks** in the "keep" rows of [#277](https://github.com/3ixas/eliasb.dev/issues/277) all hold. That means one `h1` (the opening line), the skip link, content in the server HTML and complete without script, axe, AA contrast, 3:1 focus rings, external links marked `↗` that open in a new tab, the theme rules, and the home title, description and social image.
+- **Every page has one `h1`**: the opening line on the homepage, the title elsewhere. Section titles are `h2`.
+- **Figures** keep their alt text and captions; a closer look's words are also its word's accessible description.
+- **Touch targets** are at least 44 px.
+- **Overflow**: nothing scrolls sideways at 320–1440 px, and no state widens the page. The greeting's extra words are desktop-only for that reason.
+- **The phone dock** stays inside the safe area and never covers the focused row.
+
+## What retires
+
+These go from the homepage and its checks:
+- the hero's display name, tilted portrait and cobalt label
+- the Staff-pass rail and its hanging physics on the homepage
+- Featured tiles and their tilt, straightening and Fasteners
+- the PRD card and the training poster as objects
+- giant section headings with mono counts
+- the Signature entrance
+- the First glance as a hero layout
+- the phone menu (the page is short enough to scroll)
+
+The Staff pass, its lean and its pins remain on each Role story.
+
+These go from the inner pages and their checks:
+- the subpage header (every page now shares one header)
+- the coloured opening band and the 128 px condensed title on Role stories and case studies
+- the numbered section bar (the header's links replace it)
+- giant section headings
+- the PRD card and its separate evidence strip (one inline Sheet replaces them)
+- the Next-project tile (a row replaces it)
+- the Work archive's 96 px display heading and its side preview
+- the 404's display heading, its numbered rows and the lost-property tag
+- **Fasteners**, everywhere: tape, paperclips and push pins, with their tokens and hover motion
+
+## Decided in review
+
+Elias agreed these on 26 October 2026, when the draft was reviewed:
+
+1. **The sun's amber stays**, as `--sun`, only in the greeting's illustration.
+2. **Navigation**: quiet section links in the desktop header, and no phone menu. The release check's five navigation targets and labels stay.
+3. **The simulation gets a caption** saying the paths are illustrative, worded in the copy pass ([#281](https://github.com/3ixas/eliasb.dev/issues/281)).
+4. **This file was the contract** for the homepage and shell only, as `QUIET-INDEX.md`. On 26 October 2026 the inner pages joined it ([#301](https://github.com/3ixas/eliasb.dev/issues/301)), and it became `DESIGN.md`, the one contract for the site.
+
+## Still to come
+
+- **Phones**: [Closer looks on phones: the dock, or inline under the row](https://github.com/3ixas/eliasb.dev/issues/302), tap-only either way, tried on a real phone.
+- **Copy for the 404's rows** and the "Try one of these" note, through the copy deck.
+- **The build**: the homepage is specified in [Spec: build the quiet index homepage](https://github.com/3ixas/eliasb.dev/issues/288); a follow-on spec covers the inner pages, on the same integration branch. Moving the specs and copy checks across follows the checklist in [#277](https://github.com/3ixas/eliasb.dev/issues/277).
 
 ## Exploration record
 
-- **Service:** Claude Design (the core Design canvas type).
-- **Canvas:** [eliasb.dev: The Board](https://claude.ai/artifact/4zfQfGQme3zy2kUgvh4V8H), created on 29 September 2026. It is private to Elias.
-- **Design system:** built from this file; no stock design system.
-- **First artboard group (round 1, 29 September 2026):**
-  - `Main`: the day hero, with the lamp off.
-  - `Night`: the same hero with the lamp on.
-  - `Type`: pairings A, B, and C.
-  - `Work`: three projects pinned with binder clips over the grid.
-  - `Board`: the weekly clipping, running photo, Making, fantasy (real week 3 result), book, film, London, GitHub year (real data), and music.
-  - `Mobile`: 390 px.
-  - Every artboard except `Type` has a Type tweak for switching pairings A, B, and C.
-  - Strava counts are shown as `[n]` placeholders because the production credentials are unconfirmed. (Superseded: the training pin became an authored plan in #86.)
-  - The draft headline is "I build everyday software, and make complicated things feel simple." It still needs approval in the copy document.
-- **Round 3 (30 September 2026):**
-  - Added the night Board, with the framed pinboard under the lamp.
-  - Mobile now carries the sticky notes and the framed board.
-- **Motion prototype:** a throwaway page on the `prototype/board-motion` branch (`prototypes/board-motion/index.html`, Motion 13.4.6). Its bottom bar compares:
-  - **Opening:** A types the first clause and the rest lands; B types everything and "feel simple." lands.
-  - **Lamp:** A is one 1.2 s room crossfade; B has the bulb bloom first and the room follow.
-  - **Clipping:** A fans out from behind; B unfolds in place.
-  - **Scroll:** still or sway.
-  - **Reduced motion:** a simulated setting.
-- **Motion verdict (Elias, 30 September 2026, after running the prototype himself):**
-  - **Opening B:** type the sentence through "complicated things", then "*feel simple.*" drops in with a small spring (bounce 0.3, 0.45 s), the highlight draws beneath it (0.52 s strong ease-out), and the card settles as the pin presses in. Elias: A felt "a little more rushed"; B "grips me in a bit more".
-  - **Lamp A:** one calm 1.2 s room crossfade using `cubic-bezier(0.42, 0, 0.58, 1)`, with the cord's instant tug.
-  - **Clipping A:** the week's other two cuttings fan out from behind the main one on a spring (bounce 0.2, 0.5 s). On narrow screens they stack below it. **Changed (Elias, 3 October 2026, #87):** with the Board's middle columns full, the two cuttings open below the main one on every screen, so they never cover the Making and training pins.
-  - **Scroll sway:** pins drift and rotate very slightly with scroll depth (at most about 14 px and 0.9°). "It makes the site feel alive." It is off under reduced motion. The production build should drive it with Motion's hardware-accelerated scroll timeline, not a per-frame callback.
-- **Round 4 (30 September 2026): every section lit its own way, every object earned.** Elias approved the full section scan.
-  - **Lights, one per section.** By day, window light falls across everything and each light is an object, switched off. Flipping the switch turns them all on together, and each section's shadows fall away from its own light.
+The options rounds behind the inner pages ([#301](https://github.com/3ixas/eliasb.dev/issues/301)), each drawn on real content in the inner pages prototype:
 
-    | Section | Light |
-    |---|---|
-    | Hero | Clamp desk lamp |
-    | Work | A brass picture light above each project |
-    | Board | Two sources, each attached to the frame: the festoon string across the top (pooling top right) and fairy lights wound down the bottom-right corner. At night the board dims overall so the pools and darker gaps read clearly, but every pin keeps AA-contrast text (measured, not judged by eye) |
-    | About | A candle on a small wall shelf on iron brackets, beside a row of book spines, beside the About heading, in the top half and well away from the neon: gentle flicker at night, steady with reduced motion |
-    | Contact | A bold neon sign: a dark scanlined sign box bolted to the wall with its cable to a socket, a large hot-pink "hello" with a small cyan "SAY" and underline tube. Unlit glass by day; at night it glows strongly and washes the wall pink and cyan. An occasional single-letter flicker, off under reduced motion |
-
-  - **Objects:**
-
-    | Section | Object |
-    |---|---|
-    | Nav | A small pushpin marks the current section and springs between links |
-    | Work tech stacks | Embossed label tape on the sticky notes |
-    | "View all work" | An archive drawer of manila folders |
-    | Case-study pages | An opened kraft case-file folder: tab labelled in label tape, a red "CASE FILE Nº" stamp, and coloured divider tabs on the right edge as the chapter navigation (Problem, Decisions, How it's built, What I'd change). Inside: a red margin rule, a large title, the thesis on a sticky note, a paperclipped screenshot with a pencil note, label-tape stack tags, and stamp-style Live and Code buttons |
-    | Making | A blueprint sheet with a title block |
-    | GitHub | Graph paper with ink-stamp days and a pencil note on hover |
-    | London | Photo plus an analogue clock showing real London time |
-    | Fantasy | A matchday ticket stub |
-    | Book | Cover plus a stamped library card |
-    | Film | Poster plus a cinema ticket stub |
-    | Music | A portable cassette player that opens to Spotify's own player (see the culture corner below) |
-    | Training | Polaroid plus a diary page of the week, today looped in pencil |
-    | About | Prose beside a connected journey: a red string with arrowheads, pinned at five numbered stops and starting with a pencilled "start here". The stops are: (1) history essay, (2) plain bakery bag with doughnut (no brand logo), (3) speech bubble quoting "I need that feeling from what I do.", (4) code sticky note, (5) lanyard, "BNP Paribas, today". In the build, the string draws stop by stop on scroll, and is static under reduced motion |
-    | Contact | A postcard with an E/B stamp, plus pinned link cards |
-    | Footer | The frame's bottom edge and "Made by Elias" |
-    | Stale pins | Sun-faded with a pencilled "as of" date |
-    | Missing photos | A blank polaroid saying "photo coming" |
-    | 404 | "Something was pinned here." on an empty patch of board, with a red "404" stamp |
-    | Favicon | A pushpin |
-    | Social image | The pinned headline card |
-
-  - **Fixings always have a surface (Elias, 1 October 2026).**
-    - Clips belong to clipboards. Project screenshots sit on a hardboard clipboard with a metal clip.
-    - Pins go into the plaster wall (faint plaster texture) or the framed linen board.
-    - Tape joins paper to a visible surface.
-    - Lights are mounted too: clamped, hung, screwed to the wall, or standing on a shelf.
-    - Nothing pinned, clipped, or taped floats.
-  - **One theme control: a light switch in the header (Elias, 1 October 2026).**
-    - The cord and the footer switch are retired.
-    - The control is a UK-style rocker switch, modelled on the MK Logic Plus one-gang switch: a tall rectangular cream plate with a soft bevel and slotted cream screws top and bottom, and an all-cream rocker (slightly lighter than the plate) in a thin shadow gap. The tilt is shown through shading: the pressed end slopes away and darkens, and the proud end is bright and casts a small shadow. No brass (Elias, 1 October 2026: brass made it unrecognisable as a switch). With the lights off the top half is pressed in; with them on, the bottom half is. At night it has a faint warm glow. (Elias rejected a flick toggle on 1 October 2026.)
-    - It sits in the sticky header, so it is always visible on every screen size.
-    - Clicking rocks the switch instantly with a short spring, then the room changes over the 1.2 s fade.
-    - The section lights are scenery and are not clickable.
-    - The accessible name is "Turn the lights on" or "Turn the lights off".
-    - **Back to automatic (build, #77):** flipping the switch so the lights match the device's own setting returns the site to following the device; any other flip is an explicit choice that persists. The single rocker needs no separate "System" control.
-    - Each picture light's glow covers the whole project row (screenshot and sticky note), plus a soft wash on the wall.
-  - **The weekly clipping is "The Weekly Curiosity" (Elias, 1 October 2026).**
-    - A bold all-caps Newsreader masthead, with the strapline "Odd but true, from this week in history" (Elias, 2 October 2026).
-    - A red "STRANGE BUT TRUE" rubber stamp on the photo.
-    - A playful issue line: "Vol. · No. · Week of · Price: one click".
-    - The fact is set as the bold headline, and the button reads "2 more oddities this week".
-    - Curation must favour surprising, quirky "I never knew that" facts over news-headline events.
-    - **Built (Elias, 2 October 2026):** the most surprising fact with a picture leads; the other two follow in date order. A fact's picture comes only from its own subject's page, never a flag, map or logo, so some facts are text-only. On wide screens the other two fan out beside the clipping, each below the one before by its measured height; on narrow screens they open below it. The source link is the readable Wikipedia page for the day.
-  - **The training pin is a photo plus a log card (Elias, 1 October 2026).**
-    - The polaroid carries the mood ("Out on a run, central London.").
-    - A lined "Training this week · via Strava" card pinned over its edge carries the data: one row per activity (Lifts, Runs, and Muay Thai once recorded), each with tally marks and a number.
-    - **Changed (Elias, 3 October 2026):** Strava's API went subscriber-only, so the card is now "My training week", the plan: one ruled line per day, today looped in pencil, and a pencilled "Zone 2 means slow on purpose." Live tallies are the optional ticket #94.
-  - **The GitHub pin is a full-width feature (Elias, 1 October 2026).**
-    - A graph-paper sheet spanning the board, with a large ink total and month labels.
-    - Days are small rounded squares in GitHub's five-step green scale (Elias: green is what people recognise). This is the one deliberate exception to the site palette. There is a Quiet-to-Busy legend.
-    - A pencil loop around the busiest stretch, computed from the data, with a handwritten note.
-    - A hover or tap invitation to see each day's count.
-  - **Every pin says what it is to a stranger (Elias, 1 October 2026).** Each pin carries a clear tag or headline (for example "Now reading", "Last watched", "On repeat") as well as its image.
-  - **The culture corner (Elias, 1 October 2026):** a dedicated row of large objects, each with a kraft shipping tag.
-    - **Book:** cover plus a library card stamped with the day the book went onto my currently-reading shelf (Elias, 2 October 2026).
-    - **Film:** poster plus an "Admit one · Last watched" ticket showing the day watched and the star rating (Elias, 2 October 2026).
-    - **Empty feeds (Elias, 2 October 2026):** the book and film come only from their live feeds. An empty shelf or diary keeps the pin up with a blank cover or poster and "Between books" or "Nothing logged yet"; an unreachable feed keeps the last version fetched.
-    - **Music (Elias, 2 October 2026):** a retro cassette player ("E/B Sound") built round Spotify's own player rather than beside it. Before Play: the tape in the deck's window, one Play button, and a handwritten J-card. Play opens the deck's window to Spotify's full player, 352 px tall, with its own controls and track list; nothing from Spotify loads before that. No Previous or Next buttons, since they couldn't control Spotify's player. An "Open in Spotify" link is always there.
-  - **Photos (Elias, 1 October 2026):** the white-tux portrait (`public/profile/elias-evening.webp`), Elias's favourite, is the hero polaroid. The grey-jumper photo (`public/profile/elias.webp`) goes in About.
-  - **Removed:** the scroll progress bar (the nav pin replaces it) and the per-link contact cursors (the postcard replaces them).
-  - **Kept plain:** focus states stay a solid accent outline, now two-tone (Elias, 7 October 2026): the accent ring sits between two dark bands, so it reaches 3:1 on every surface by day and night (WCAG technique C40). A dark surface (the cassette deck, the blueprint) sets light bands instead (`--shadow-focus`). The bands are a box shadow, so a focused control's own shadow (the Live site button's raised edge) gives way to them; a control styled with a Tailwind `shadow-*` utility (the skip link, the light switch) adds `focus-visible:shadow-(--shadow-focus)`.
-  - **Scroll sway:** kept, implemented with CSS scroll-driven animations (`animation-timeline: view()`) on transforms only. Browsers without support show still pins. Confirm support in Safari and Firefox during implementation.
-  - **Canvas:** artboards `R4Work`, `R4Board`, and `R4Story` each have a Lighting tweak, and the `…Night` artboards show them with the lights on. `R4Extras` covers the case-study folder, 404, states, favicon, and social image.
-  - **Copy status:** the About prose on the canvas is a draft from Elias's spoken story and is not approved. The copy document governs.
-  - **Mobile:** the mobile artboard does not yet show round 4. Mobile follows the single-column rules during implementation.
-- **Motion prototype scope:** It covers the pinned headline, pin lift, the theme lamp with shadow swing, clipping open, and reduced-motion equivalents.
-- **Chosen direction:** A, "Studio wall", with lighting-based themes.
-- **Rejected directions:** B and C as whole-site environments (see above); Cabinet of Curiosities as the direction's name.
-- **Open decisions (settled at sign-off, 1 October 2026):**
-  - **Paper stocks:** the canvas colours (ochre, blueprint blue, sage, terracotta, kraft), fine-tuned for AA contrast in the build.
-  - **Light rendering:** line-drawn objects with CSS light and shadow (no photography or illustration), and a different light type per section.
-  - **Handwriting:** not in v1.
-  - **Case-study chapter pages:** designed in the build within these rules, extending the case-file folder.
-  - **Mobile:** follows the single-column rules (tilt capped at ±1.5°, no overlap) with the round 4 objects.
-  - **Cord discoverability:** superseded. The control is now the header rocker switch; it is still checked by Elias in the first slice that builds it.
-- **Round 2 (30 September 2026):**
-  - Elias loves the headline and the lamp idea, and chose Newsreader.
-  - He asked for Work descriptions on coloured sticky notes, now done, and for the Board to read more clearly as a board, now done with a framed pinboard.
-  - He confirmed that the cord switches the theme.
-  - The mobile artboard does not yet carry the round 2 changes.
-- **Round 4 iterations (1 October 2026):** 16 comment threads, all resolved and recorded above.
-- **Last reviewed:** 1 October 2026.
-
-## Acceptance and sign-off
-
-- **Acceptance criteria:** the polish criteria in `REFOUNDATION-SCOPE.md`, plus:
-  - One light source per theme: all shadows are consistent.
-  - At most four font families and weights in total across the display, sans, and mono families.
-  - Every token comes from this file.
-  - The theme control changes the lighting visibly within 600 ms.
-  - The signature is visible on the home page in both themes.
-- **Evidence reviewed:** the live site (29 September 2026), the reference sites above, and a `globals.css` audit: 30 font sizes, 33 box-shadows, 10 accent and 10 ink values, and a system-only font stack that renders Baskerville or Times New Roman outside Apple devices.
-- **User feedback:**
-  - Elias approved direction A with the borrowed elements, the pinned-headline signature, web fonts, and creating the canvas (29 September 2026).
-  - He requested that light and dark be woven into the design, like lamps switching on.
-- **User sign-off:** Elias signed off the full design direction on 1 October 2026 ("Happy with everything after these iterations, signed off").
-- **Signed off on:** 1 October 2026, against canvas version 32.
-
-## Implementation handoff
-
-- **Approved artboards:**
-  - [Canvas](https://claude.ai/artifact/4zfQfGQme3zy2kUgvh4V8H): `Main` and `Night` (hero), `Type`, `R4Work` and `R4WorkNight`, `R4Board` and `R4BoardNight`, `R4Story` and `R4StoryNight`, and `R4Extras`.
-  - Rounds 1–3 (`Work`, `Board`, `BoardNight`, `Mobile`) are superseded where round 4 differs.
-- **Tokens:**
-  - Wall, paper, ink, muted, rule, and accent `#C94A22` (night wall accent `#FF8A5C`).
-  - Pin stocks: ochre `#F2DFAA`, blueprint `#C9D8E6`, sage `#CCD8C1`, terracotta, kraft `#D7AE63`, ticket `#E9C37A`.
-  - GitHub greens (exception).
-  - Day shadow `1px 2px 2px rgba(70,45,20,.10), 8px 12px 22px -8px rgba(70,45,20,.28)`. Night shadows fall away from each section's light.
-  - Fonts: Newsreader, Hanken Grotesk, JetBrains Mono, all through `next/font`. Newsreader is self-hosted as two fixed optical sizes (Elias, 7 October 2026), since its variable opsz axis cost 274 KiB and the mobile Lighthouse bar: a display cut (opsz 72) for `text-display`, `text-heading`, the masthead, the neon sign, and the string numbers, and a text cut (opsz 20) for everything smaller (`src/app/fonts/newsreader`, OFL). Each face is split by unicode-range into a preloaded core file (Basic Latin and the punctuation the copy uses, about 115 KiB for all eight) and an accents file a page fetches only when it shows an accented letter; `scripts/fonts/newsreader.py` rebuilds them. As with Google's own split, a core letter isn't kerned against an accented one, and the site's own copy stays inside the core set (a test checks /work, the case studies and the 404).
-  - Spacing scale 4–128; one type scale with a fluid display size.
-  - The canvas values are the starting point; they are normalised into the token file in the first slice.
-- **Component rules:**
-  - Every fixing has a visible surface.
-  - Every pin says what it is to a stranger.
-  - Lights are mounted objects and are not interactive.
-  - The single theme control is the header rocker switch.
-  - Hover: lift and straighten. Press: squeeze. Focus: the two-tone accent ring.
-- **Responsive:**
-  - 12-column desktop. Below 900 px, a single column with tilt capped at ±1.5° and no overlap.
-  - The sticky header keeps the switch visible.
-  - The culture corner stacks.
-  - The GitHub sheet scrolls horizontally on phones, with month labels.
-- **Accessibility:**
-  - WCAG 2.2 AA, measured in both themes, including the dimmed areas of the night Board.
-  - One `h1` per route; the full headline is in the HTML.
-  - Decorative objects are `aria-hidden`; meaningful images have alt text.
-  - The 44 px target minimum applies to the switch and pin actions.
-- **Motion:**
-  - Opening B: the card starts lifted, the headline types, "feel simple." lands on a spring (bounce 0.3, 0.45 s), the highlight draws (0.52 s), and the pin presses in. It replays on every load and reload, never on back-navigation.
-  - The theme change is a 1.2 s `cubic-bezier(0.42, 0, 0.58, 1)` room crossfade with shadow swing; the switch rocks instantly.
-  - The clipping fans out on a spring (bounce 0.2, 0.5 s).
-  - Scroll sway uses CSS scroll-driven animations, transform only.
-  - Support, checked 2 October 2026 (#82): Chromium 153 and WebKit 26.6 support `animation-timeline: view()` (verified in Playwright). Firefox does not ship it: MDN's compatibility data (8.1.4, 1 October 2026) lists it as preview-only on desktop and unsupported on Android. Firefox visitors get the still pins, which is the accepted fallback.
-  - The About string draws on scroll.
-  - The neon flickers occasionally, and the candle flickers gently.
-  - Reduced motion removes movement and keeps 200 ms crossfades.
-  - Prototype: the `prototype/board-motion` branch.
-- **Acceptance evidence for the build:** rendered checks at 320, 390, 820, and 1440 px in both themes, Playwright, Lighthouse, contrast measurements, and Elias's review of each slice against the canvas.
+- Round 1 (Direction): header A homepage links, B this page's sections, C no links. Chose B, because the header stays put and its links are the outline of what you're reading. Six section names don't fit in 600 px, so the header spans column and margin.
+- Round 1 (Direction): long-form layout A one column, B sidenotes in the margin, C closer looks only [stretch]. Chose a hybrid, now rule 7: proof inline, names behind. B lost because the margin keeps one job; C lost because evidence shouldn't hide on a page people chose to read.
+- Round 1 (Detail): title (a) the opening line's treatment, (b) 128 px condensed display. Chose (a): one loudest-thing rule for the site.
+- Round 2 (Design): Role story opening A the pass in the column, B a mini pass with the full pass behind the title, C the title printed on the pass [stretch]. Chose A. B opened on a bare page; C was a section-level set piece and filled a phone's first screen.
+- Round 2 (Design): case study opening A the screenshot under the title, B an object with the screenshot behind it, C the screenshot first [stretch]. Chose A, the Role story's shape.
+- Round 3 (Design): 404 A rows only, B the missing row, C the lost-property tag as a closer look [stretch]. Chose B with A's "Try one of these" heading, so the page reads: this didn't work, try one of these.
