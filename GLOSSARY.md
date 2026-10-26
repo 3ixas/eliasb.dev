@@ -22,7 +22,7 @@ The one shape on the **Quiet index**: a 44 px object, a title, one line and quie
 _Avoid_: Card, tile, thumbnail of a whole page
 
 **Closer look**:
-A **Row**'s detail, shown in the **Margin** on desktop and in the **Dock** on phones. Each kind arrives the way the real thing would: a pass drops and swings, a book is plucked from a shelf, a ticket tears, a clipping is stamped, the PRD types itself. It uses only approved copy and real assets, has no links of its own (the row is the link), and anything it says that isn't elsewhere is also the row's accessible description. On a long-form page, a closer look shows a real thing the prose only names (a certificate, the cores behind "CPU and GPU"); a figure the paragraph argues from is shown inline instead, never hidden behind a word.
+A **Row**'s detail, shown in the **Margin** on desktop and inline on phones, under the tapped row or paragraph, only when tapped. Each kind arrives the way the real thing would: a pass drops and swings, a book is plucked from a shelf, a ticket tears, a clipping is stamped, the PRD types itself. It uses only approved copy and real assets, has no links of its own (the row is the link), and anything it says that isn't elsewhere is also the row's accessible description. On a long-form page, a closer look shows a real thing the prose only names (a certificate, the cores behind "CPU and GPU"); a figure the paragraph argues from is shown inline instead, never hidden behind a word.
 _Avoid_: Tooltip, popover, preview (alone), a closer look that adds facts, hiding a page's evidence behind a closer look
 
 **Margin**:
@@ -30,17 +30,15 @@ The 300 px space to the right of the column on wide screens with a pointer, wher
 _Avoid_: Stage, sidebar, a standing panel that shows something other than what you're looking at
 
 **Dock**:
-The phone's **Margin**: a compact **Closer look** at the bottom of the screen for the row crossing the **Reading line**, or for a tapped **Reveal word**. Tap it to open the row's page; × hides it for the visit. Nothing in the column opens, closes or jumps.
-Under review ([#302](https://github.com/3ixas/eliasb.dev/issues/302)): a closer look on a phone will appear only when tapped, never as the page scrolls, and the dock may give way to closer looks inline under the tapped row.
-_Avoid_: Bottom sheet, drawer, rows that expand as you scroll
+Retired ([#302](https://github.com/3ixas/eliasb.dev/issues/302)). It was a compact **Closer look** fixed at the bottom of a phone screen. On phones a closer look now opens inline, under the row or paragraph that was tapped, and only when tapped.
+_Avoid_: Bottom sheet, drawer, a closer look that appears as the page scrolls
 
 **Reading line**:
-The line 38% down a phone screen. The row crossing it is the one in focus: it takes the row's hover fill, fills the **Dock** and plays its object's reaction once.
-Under review ([#302](https://github.com/3ixas/eliasb.dev/issues/302)): it will no longer fill the Dock, since closer looks become tap-only.
-_Avoid_: Scroll trigger, centre of the screen
+Retired ([#302](https://github.com/3ixas/eliasb.dev/issues/302)). It was the line 38% down a phone screen that put the row crossing it in focus. Nothing on a phone now happens because of where a row sits on the screen.
+_Avoid_: Scroll trigger
 
 **Reveal word**:
-A word in the opening or supporting line that names something real and can show it: "pricing and risk engines", "CPU and GPU", the digitisation competition, the Take Ownership award. It has a dotted underline that turns cobalt, is focusable, and opens its **Closer look** like a row. "BNP Paribas" reacts where it is instead: it turns BNP green and drops its pass.
+A word in the opening or supporting line that names something real and can show it: "pricing and risk engines", "CPU and GPU", the digitisation competition, the Take Ownership award. It has a dotted underline that turns cobalt, is focusable, and opens its **Closer look** like a row. "BNP Paribas" reacts where it is instead: it turns BNP green and drops its pass. On phones that reaction is all it does.
 _Avoid_: Link styling (it isn't a link), more than a few per line
 
 **Missing row**:
