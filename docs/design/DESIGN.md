@@ -12,12 +12,13 @@ The decisions are on [Map: a refined foundation with moments of character](https
 - [A copy pass in Elias's voice](https://github.com/3ixas/eliasb.dev/issues/281)
 - [The quiet index design contract, with its removal rule](https://github.com/3ixas/eliasb.dev/issues/282)
 - [The inner pages in the quiet index's language](https://github.com/3ixas/eliasb.dev/issues/301)
+- [Closer looks on phones: the dock, or inline under the row](https://github.com/3ixas/eliasb.dev/issues/302)
 
-The visual references are the agreed prototypes, kept outside the repo: the homepage at `~/.agents/handoffs/eliasb.dev/2026-10-26-quiet-index-prototype/` (`sketch/m.html`), and the inner pages at `~/.agents/handoffs/eliasb.dev/2026-10-26-inner-pages-prototype/` (`sketch/role.html`, `sketch/case.html` and `sketch/404.html`). Where a prototype and this file disagree, this file wins. Terms follow `GLOSSARY.md`; approved copy is in `docs/content/redesign-copy.md`.
+The visual references are the agreed prototypes, kept outside the repo: the homepage at `~/.agents/handoffs/eliasb.dev/2026-10-26-quiet-index-prototype/` (`sketch/m.html`, and `sketch/tap.html` for phones), and the inner pages at `~/.agents/handoffs/eliasb.dev/2026-10-26-inner-pages-prototype/` (`sketch/role.html`, `sketch/case.html` and `sketch/404.html`, and `sketch/role-tap.html` for phones). Where a prototype and this file disagree, this file wins. Terms follow `GLOSSARY.md`; approved copy is in `docs/content/redesign-copy.md`.
 
 ## Principle
 
-Simplicity and focus are the foundation; character is what you find when you look closer. Every page is one quiet column. **Anything that names something real can show it**: point at it and a closer look arrives in the margin, moving the way the real thing would. Nothing else moves.
+Simplicity and focus are the foundation; character is what you find when you look closer. Every page is one quiet column. **Anything that names something real can show it**: point at it and a closer look arrives in the margin, moving the way the real thing would; on a phone, tap it and the closer look opens in place. Nothing else moves, and nothing appears unasked.
 
 ## The removal rule
 
@@ -44,9 +45,9 @@ The Stretch homepage grew by addition: every pass added a well-made object, and 
 | Grid | `44px` object · `1fr` text · `auto` metadata; 16 px gaps; at least 68 px tall; 10 × 12 px padding; 14 px radius |
 | Title | 17 px, weight 600, line height 1.35 |
 | Line | 15 px, muted, line height 1.45 |
-| Metadata | 13 px mono, muted (a year, a source). Hidden on phones, where the whole row is the target |
+| Metadata | 13 px mono, muted (a year, a source). Hidden on phones |
 | Hover / focus | Card fill (`--stretch-card`), and an arrow that appears beside the metadata (opacity and 4 px travel) and turns cobalt. A 2 px cobalt focus ring inside the row |
-| States | A link row goes to its page. A plain row (History at uni, a habit, a strand) is focusable only if it has a closer look |
+| States | A link row goes to its page. A plain row (History at uni, a habit, a strand) is focusable only if it has a closer look. On phones a link row with a closer look has two targets: its object opens the closer look, the rest of the row opens the page |
 
 Every row's text starts at the same edge down the whole page; that alignment is what makes the page read as one list.
 
@@ -68,7 +69,7 @@ An object is drawn to be read at 44 px. It is never a whole page shrunk down.
 
 ## Closer looks
 
-A **closer look** is a row's detail: on desktop it appears in the margin, and on phones in the dock. Each kind arrives the way the real thing would. They use only approved copy and real assets.
+A **closer look** is a row's detail: on desktop it appears in the margin, and on phones inline, under the row or paragraph that was tapped. Each kind arrives the way the real thing would. They use only approved copy and real assets.
 
 | Row or word | Closer look | Arrives by |
 |---|---|---|
@@ -94,9 +95,9 @@ On a long-form page, the closer looks are the real things its prose names in pas
 
 **Words that can show something** have a dotted underline (muted at 70%, 1.5 px, 5 px offset), which turns cobalt on hover or focus. They are focusable.
 
-**BNP Paribas** in the opening line is the exception: it reacts where it is. It turns BNP green, and a small pass drops below it on its strap. On phones, tapping it sends BNP's closer look to the dock.
+**BNP Paribas** in the opening line is the exception: it reacts where it is. It turns BNP green, and a small pass drops below it on its strap. On phones, tapping it plays that reaction only; the BNP Paribas row in Work holds its closer look.
 
-**The history row cycles.** Clicking it, or pressing Enter, swaps in the week's next oddity in place: the clipping restamps and "1 of 3" moves on. Nothing opens or closes. The change is announced politely.
+**The history row cycles.** Clicking it, or pressing Enter, swaps in the week's next oddity in place: the clipping restamps and "1 of 3" moves on. Nothing opens or closes. The change is announced politely. On phones, tapping the row cycles and tapping its calendar tile opens the clipping; an open clipping follows the cycle.
 
 ### The margin (desktop)
 
@@ -104,15 +105,17 @@ On a long-form page, the closer looks are the real things its prose names in pas
 - **Placement**: 40 px right of the column, 300 px wide. It lines up with the row's top (minus 6 px), but always fits the window: it rises until it sits 16 px above the bottom edge, and never above 16 px from the top. It keeps fitting as images load (`ResizeObserver`) and while the page scrolls.
 - **Moving between rows**: it glides on the `spring` timing. It takes no pointer events and never covers the column. A closer look has no links; the row is the link.
 
-### The dock (phones and touch)
+### Inline (phones and touch)
 
-> **Under review** in [Closer looks on phones: the dock, or inline under the row](https://github.com/3ixas/eliasb.dev/issues/302). Elias decided on 26 October 2026 that a closer look on a phone appears only when tapped, never as the page scrolls, so the reading line's filling of the dock below will change. That ticket also decides between a dock and an inline closer look under the tapped row or word. Until it closes, this section describes the earlier decision and nothing here should be built.
+Decided in [Closer looks on phones: the dock, or inline under the row](https://github.com/3ixas/eliasb.dev/issues/302), with both options built on the prototypes at phone size. It replaces the dock and the reading line.
 
 - **When it's used**: below 1180 px, or without hover.
-- **The reading line** sits 38% down the screen. The row crossing it takes its focus fill, and its closer look appears in a dock at the bottom of the screen in a compact form: the picture on the left, the words on the right, at most 38% of the screen tall. It clears the safe area, and the page reserves room below its last row.
-- **Interaction**: tapping the dock opens the row's page; × hides the dock for the visit. Tapping a dotted word sends its closer look to the dock. No row opens or closes, and nothing in the column moves as the dock changes.
-- **Playing once**: each row's object plays its reaction once as it reaches the reading line.
-- **Featured work**: the three featured projects become swipeable cards (82% wide, snapping to the gutter) with their screenshots at a readable size. The other projects stay rows. Markup is one list that changes shape, not two.
+- **Only when tapped.** Nothing appears as the page scrolls. A row's closer look opens when its 44 px object is tapped; a plain row's or a dotted word's when it is tapped anywhere. Tapping the rest of a link row opens its page in one tap.
+- **Where it opens**: under the tapped row, starting on the row's text edge, or under the paragraph that holds the tapped word. It pushes the text below it down. It is the full closer look, as the margin shows it, at up to 300 px wide; there is no compact form.
+- **Closing**: tapping the same object or word again closes it, and opening another one closes the first, so only one is ever open. Tapping elsewhere does nothing. When a closer look above the tapped row closes, the tapped row stays where it was on screen.
+- **Nothing extra inside**: no hint and no link. The row is the link.
+- **Reactions**: a row's object plays its reaction when it is tapped, never as it scrolls into view.
+- **Featured work**: the three featured projects become swipeable cards (82% wide, snapping to the gutter) with their screenshots at a readable size. Tapping a card opens its page; it has no closer look, because the card already shows the work. The other projects stay rows. Markup is one list that changes shape, not two.
 
 ## Reactions that aren't closer looks
 
@@ -243,7 +246,7 @@ Every text pair passes WCAG 2.2 AA; `e2e/stretch-tokens.spec.ts` measures them o
 
 ## Accessibility
 
-- **A closer look is supplementary.** Anything a closer look says that isn't on the row or on the row's destination page is also the row's accessible description, through visually hidden text referenced by `aria-describedby`. The margin and dock themselves are `aria-hidden`.
+- **A closer look is supplementary.** Anything a closer look says that isn't on the row or on the row's destination page is also the row's accessible description, through visually hidden text referenced by `aria-describedby`. The margin and the inline closer look are themselves `aria-hidden`.
 - **Keyboard**: every row and dotted word with a closer look is focusable, and focus shows it as hover does. Escape hides the margin, and focus stays put. The GitHub year keeps today's single tab stop and arrow keys.
 - **Reduced motion** shows each closer look with a 0.2 s fade and no arrival motion. The pen is drawn, the underline is drawn, nothing counts or types, and the greeting's scene rests.
 - **The standing checks** in the "keep" rows of [#277](https://github.com/3ixas/eliasb.dev/issues/277) all hold. That means one `h1` (the opening line), the skip link, content in the server HTML and complete without script, axe, AA contrast, 3:1 focus rings, external links marked `↗` that open in a new tab, the theme rules, and the home title, description and social image.
@@ -251,7 +254,7 @@ Every text pair passes WCAG 2.2 AA; `e2e/stretch-tokens.spec.ts` measures them o
 - **Figures** keep their alt text and captions; a closer look's words are also its word's accessible description.
 - **Touch targets** are at least 44 px.
 - **Overflow**: nothing scrolls sideways at 320–1440 px, and no state widens the page. The greeting's extra words are desktop-only for that reason.
-- **The phone dock** stays inside the safe area and never covers the focused row.
+- **On phones, a row's object is its own button**, a sibling of the row's link, never inside it (a button nested in a link is invalid and confuses screen readers). Its accessible name says what it shows, such as "A closer look at Joveen".
 
 ## What retires
 
@@ -289,7 +292,6 @@ Elias agreed these on 26 October 2026, when the draft was reviewed:
 
 ## Still to come
 
-- **Phones**: [Closer looks on phones: the dock, or inline under the row](https://github.com/3ixas/eliasb.dev/issues/302), tap-only either way, tried on a real phone.
 - **Copy for the 404's rows** and the "Try one of these" note, through the copy deck.
 - **The build**: the homepage is specified in [Spec: build the quiet index homepage](https://github.com/3ixas/eliasb.dev/issues/288); a follow-on spec covers the inner pages, on the same integration branch. Moving the specs and copy checks across follows the checklist in [#277](https://github.com/3ixas/eliasb.dev/issues/277).
 
@@ -303,3 +305,10 @@ The options rounds behind the inner pages ([#301](https://github.com/3ixas/elias
 - Round 2 (Design): Role story opening A the pass in the column, B a mini pass with the full pass behind the title, C the title printed on the pass [stretch]. Chose A. B opened on a bare page; C was a section-level set piece and filled a phone's first screen.
 - Round 2 (Design): case study opening A the screenshot under the title, B an object with the screenshot behind it, C the screenshot first [stretch]. Chose A, the Role story's shape.
 - Round 3 (Design): 404 A rows only, B the missing row, C the lost-property tag as a closer look [stretch]. Chose B with A's "Try one of these" heading, so the page reads: this didn't work, try one of these.
+
+The rounds behind phones ([#302](https://github.com/3ixas/eliasb.dev/issues/302)), with both options built on the homepage and Role story prototypes and compared at 390 × 844:
+
+- Round 1: closer looks in a dock at the bottom of the screen, or inline under the tapped row. Chose inline. On a long page the dock covered the paragraph after the tapped word and competed with Safari's bottom bar; inline sits where the word is and covers nothing. Inline at full size, not the dock's compact form, which made no sense on a screen that is already small.
+- Round 1: a link row's tap, (a) twice (first shows, second opens) or (b) the object shows and the rest opens. Chose (b): opening the page is the row's main job, and the closer look is supplementary.
+- Round 1: objects reacting at the reading line or only when tapped. Chose tapped only, which retires the reading line.
+- Round 2: closing (only the same trigger or another one, not tapping elsewhere, so text doesn't collapse under a thumb), no hint inside, the history row's two targets, and "BNP Paribas" reacting in place only, since its row holds the closer look.
