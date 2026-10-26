@@ -292,7 +292,7 @@ for (const slug of roleStorySlugs) {
     if (slug === "bnp-paribas") {
       test("the evidence strip leaves out the awards the pins already show", async ({ page }) => {
         const items = page.locator("section#what-changed").getByRole("list", { name: "Evidence" }).getByRole("listitem");
-        await expect(items).toHaveText(["Nov 2025won the Early Careers digitisation competition", "6months from zero C# to production code"]);
+        await expect(items).toHaveText(["Nov 2025won the bank’s digitisation competition", "6months from zero C# to production code"]);
       });
     }
 
