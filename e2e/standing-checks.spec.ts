@@ -40,7 +40,7 @@ test("every page fits its width with no sideways scroll and no visible text unde
           message: `${route} scrolls sideways (px past the viewport)`,
         })
         .toBe(0);
-      // Nothing a visitor reads is smaller than 13 px (docs/design/STRETCH.md, "Type").
+      // Nothing a visitor reads is smaller than 13 px (docs/design/DESIGN.md, "Type").
       await soft
         .poll(
           () =>

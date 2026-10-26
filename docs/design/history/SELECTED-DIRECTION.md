@@ -1,6 +1,6 @@
 # Selected visual direction
 
-> **Superseded** on 29 September 2026 by the Board direction in `docs/design/DESIGN.md`. Kept as history.
+> **Superseded** on 29 September 2026 by the Board direction, now in `history/BOARD.md`. The live design contract is [`docs/design/DESIGN.md`](../DESIGN.md). Kept as history.
 
 ## Decision
 

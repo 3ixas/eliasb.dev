@@ -1,5 +1,5 @@
 /*
- * Stretch type (docs/design/STRETCH.md). Bricolage Grotesque is loaded by
+ * Stretch type (docs/design/DESIGN.md). Bricolage Grotesque is loaded by
  * next/font in layout.tsx with its width and optical-size axes; JetBrains Mono
  * carries metadata. Display text is condensed to 75% width at weight 800 and
  * set in capitals.

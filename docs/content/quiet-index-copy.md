@@ -1,6 +1,6 @@
 # Quiet index copy
 
-The copy deck for the quiet index homepage ([#281](https://github.com/3ixas/eliasb.dev/issues/281); layout in `docs/design/QUIET-INDEX.md`). It covers every string the new homepage shows, including the closer looks.
+The copy deck for the quiet index homepage ([#281](https://github.com/3ixas/eliasb.dev/issues/281); layout in `docs/design/DESIGN.md`). It covers every string the new homepage shows, including the closer looks.
 
 It doesn't replace `docs/content/redesign-copy.md` yet. `verify:copy` checks the live code against that file, so this deck is merged into it when the homepage is built. The inner pages' copy is unchanged.
 

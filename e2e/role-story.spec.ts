@@ -333,7 +333,7 @@ for (const slug of roleStorySlugs) {
         return elements.filter((element) => {
           // The skip link is cobalt, but only when focused; it waits off-screen.
           if (element.classList.contains("stretch-skip")) return false;
-          // The award pins are the one approved exception (STRETCH.md, Cobalt).
+          // The award pins are the one approved exception (docs/design/DESIGN.md, Colour rules).
           if (element.closest(".stretch-pass__pins")) return false;
           const style = getComputedStyle(element);
           return [style.color, style.backgroundColor, style.borderTopColor].includes(colour) && element.checkVisibility();

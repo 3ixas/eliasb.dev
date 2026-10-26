@@ -30,7 +30,7 @@ The visual direction is called **Stretch**: a clean neutral page, one cobalt acc
 - [Playwright](https://playwright.dev) and axe for end-to-end, accessibility and contrast tests
 - pnpm 10 and Node 22, deployed on Vercel
 
-The decisions behind the rebuild are in [ADR 0005](docs/adr/0005-stretch-redesign.md) and the [spec](docs/specs/STRETCH-REDESIGN-SPEC.md). The design reference is [`docs/design/STRETCH.md`](docs/design/STRETCH.md).
+The decisions behind the rebuild are in [ADR 0005](docs/adr/0005-stretch-redesign.md) and the [spec](docs/specs/STRETCH-REDESIGN-SPEC.md). The design contract is [`docs/design/DESIGN.md`](docs/design/DESIGN.md); the directions it replaced are in `docs/design/history/`.
 
 ## Run it
 
