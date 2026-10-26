@@ -51,7 +51,7 @@ An object is drawn to be read at 44 px. It is never a whole page shrunk down.
 | Object | Where | What it is |
 |---|---|---|
 | Project | Things I make | One legible detail of the project's own screenshot (Threshold's serif "Th", Argus Risk's donut, Flowtime's timer, Home Secretary's button, Risk Event Tracker's method badges, Ask Professor Past's portrait), on its **Project colour**, 11 px radius. The crop is data on the project: focal point and zoom |
-| Mini pass | Work | A 30 × 38 **Staff pass** on a short strap in its **Employer colour**. The current pass carries three cobalt dots, one for each award pin |
+| Mini pass | Work | A 30 × 38 **Staff pass** on a short strap in its **Employer colour**. It carries no marks of its own: awards and highlights belong to its closer look |
 | Cover | Off the clock | The real book cover or film poster, 30 × 44, with a spine shadow |
 | Calendar tile | Training, history, History at uni | A day tile with a band and a number. The band is cobalt for today. It turns over to a second face (the year, the week) as a reaction |
 | Thread | Where I'm headed | A 4 px line in the colour of the strand's source |
@@ -66,10 +66,10 @@ A **closer look** is a row's detail: on desktop it appears in the margin, and on
 | Row or word | Closer look | Arrives by |
 |---|---|---|
 | A project | Its screenshot on its Project colour, then type and year | Sliding in and settling |
-| An employer | Its full Staff pass (BNP Paribas with its three award pins), then the Résumé lines that explain its figure | Dropping on its strap and swinging to rest; the pins pop on; the figure counts up (Optegra 62% → 88%, Joveen 40% faster) |
+| An employer | Its full Staff pass, then that role's best points in the same form for every employer: BNP Paribas's three award pins, and each other role's strongest highlights (chosen in the copy pass), then the Résumé lines that explain its figure | Dropping on its strap and swinging to rest; the points pop on; the figure counts up (Optegra 62% → 88%, Joveen's page load cut by 40%) |
 | History at uni | A note: University of Essex, Diploma of Higher Education, History, July 2021 | Unfolding |
 | A Where I'm headed strand | "So far" with its source and proof | Its thread drawing down from the source |
-| Threshold's PRD | The quote | Typing itself, with a caret |
+| Threshold's PRD | The quote | Typing itself, with a caret. Typing is time-based and smooth: characters appear on the animation frame at a steady rate (about 45 a second), never one timer per character |
 | Today's training | The run photo and the week, today in cobalt | The days filling in one by one, today last |
 | The book | The cover pulled from a row of spines, then the title, author and a "Live from Goodreads" line | Lifting off the shelf and turning to face you |
 | The film | A ticket with the poster, title, date and stars | Arriving, the stars filling in, the stub tearing |
@@ -78,7 +78,7 @@ A **closer look** is a row's detail: on desktop it appears in the margin, and on
 | Your face (header) | The full white-tux portrait, "Based in London" | Sliding in |
 | "pricing and risk engines" | Illustrative simulated paths, one in BNP green, with the Role story's line about simulation-based calculations | The paths fanning out |
 | "CPU and GPU" | A CPU with a few cores taking turns and a GPU with many lighting at once, with the line about running the same tests on both | The cores lighting |
-| "Early Careers digitisation competition" | Its award pin, its Résumé line, and two bars: 30–40 min and under 5 | The pin popping on and the bar shrinking |
+| "digitisation competition" | Its award pin, its Résumé line, and two bars: 30–40 min and under 5 | The pin popping on and the bar shrinking |
 | "Take Ownership award" | The certificate | Sliding up like a sheet of paper |
 | Résumé (Say hello) | The one-page sheet | Sliding up |
 
@@ -126,7 +126,7 @@ No hold. The page is complete and usable in its first frame, and nothing waits f
 2. **The opening line**, as an `h1`: "I build pricing and risk engines at BNP Paribas, and products of my own." It is set in Bricolage at `clamp(34px, 5.4vw, 50px)`, weight 650, line height 1.1, −0.03 em tracking, and it is the loudest thing on the page. The supporting line follows at 17 px, muted.
 3. **Work**: BNP Paribas, Joveen, Optegra, then History at uni. Then **Where I'm headed**: its line, and three strand rows (Judgement, Depth, Range).
 4. **Things I make**: the three featured projects, the other projects newest first (at most ten), and the link to the Work archive with the true count.
-5. **How I work**: three habit rows with the pen, then Threshold's PRD.
+5. **How I work**: four habit rows with the pen (real problem, write it down, safe to undo, measure), then Threshold's PRD.
 6. **Off the clock**: today's training, the GitHub year, the book, the film, the history row and Now making.
 7. **Say hello**: the line, the email with Copy, then Résumé, GitHub and LinkedIn.
 8. **Footer**: "Made by Elias".
