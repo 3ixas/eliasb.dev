@@ -10,7 +10,36 @@ _Avoid_: Online CV, LinkedIn replacement
 
 **Stretch direction**:
 The visual direction chosen for the from-scratch redesign on 8 October 2026 ([#107](https://github.com/3ixas/eliasb.dev/issues/107)). It has a clean neutral base with enough expressiveness to stay interesting: the **Cobalt accent** used large, Bricolage Grotesque condensed at display size with JetBrains Mono for metadata, **Featured work** tiles in each **Project colour**, and **Fasteners** on cards. It replaces the Board.
+Superseded on the homepage and the site shell on 26 October 2026 by the **Quiet index** ([#278](https://github.com/3ixas/eliasb.dev/issues/278)); it still governs the inner pages until their own pass.
 _Avoid_: Board, a playful theme of props (its play comes from scale, colour and a few paper objects from one desk, each carrying real content; [#242](https://github.com/3ixas/eliasb.dev/issues/242))
+
+**Quiet index**:
+The homepage's direction since 26 October 2026 ([#278](https://github.com/3ixas/eliasb.dev/issues/278); `docs/design/QUIET-INDEX.md`): one quiet column of **Rows**, the opening line as the loudest thing, and character found by looking closer. Anything that names something real can show it, as a **Closer look**. It replaces the Stretch homepage, which grew by addition, and carries a removal rule so it can't grow that way again.
+_Avoid_: Minimal (it isn't empty), adding a section-level set piece
+
+**Row**:
+The one shape on the **Quiet index**: a 44 px object, a title, one line and quiet metadata, all starting on the same text edge. Projects, employers, strands, habits and personal things are all rows. The object is drawn to read at 44 px (a legible detail of a screenshot, a mini **Staff pass**, a real cover, a calendar tile), never a whole page shrunk down.
+_Avoid_: Card, tile, thumbnail of a whole page
+
+**Closer look**:
+A **Row**'s detail, shown in the **Margin** on desktop and in the **Dock** on phones. Each kind arrives the way the real thing would: a pass drops and swings, a book is plucked from a shelf, a ticket tears, a clipping is stamped, the PRD types itself. It uses only approved copy and real assets, has no links of its own (the row is the link), and anything it says that isn't elsewhere is also the row's accessible description.
+_Avoid_: Tooltip, popover, preview (alone), a closer look that adds facts
+
+**Margin**:
+The 300 px space to the right of the column on wide screens with a pointer, where a **Closer look** appears beside its row on hover or focus. It always fits the window, glides between rows and never covers the column. It is the homepage's signature ([#279](https://github.com/3ixas/eliasb.dev/issues/279)). Not to be confused with **Margin notes**, How I work's ink.
+_Avoid_: Stage, sidebar, a standing panel that shows something other than what you're looking at
+
+**Dock**:
+The phone's **Margin**: a compact **Closer look** at the bottom of the screen for the row crossing the **Reading line**, or for a tapped **Reveal word**. Tap it to open the row's page; × hides it for the visit. Nothing in the column opens, closes or jumps.
+_Avoid_: Bottom sheet, drawer, rows that expand as you scroll
+
+**Reading line**:
+The line 38% down a phone screen. The row crossing it is the one in focus: it takes the row's hover fill, fills the **Dock** and plays its object's reaction once.
+_Avoid_: Scroll trigger, centre of the screen
+
+**Reveal word**:
+A word in the opening or supporting line that names something real and can show it: "pricing and risk engines", "CPU and GPU", the digitisation competition, the Take Ownership award. It has a dotted underline that turns cobalt, is focusable, and opens its **Closer look** like a row. "BNP Paribas" reacts where it is instead: it turns BNP green and drops its pass.
+_Avoid_: Link styling (it isn't a link), more than a few per line
 
 **Cobalt accent**:
 The site's one accent colour (`#2340ff` in light, `#8b9cff` in dark). It may be used large, and marks Elias's name, today and now, and the way to say hello. It also colours the award pins on a **Staff pass**, wherever the pass appears, as Elias's own achievements ([#198](https://github.com/3ixas/eliasb.dev/issues/198)). It never colours a project.
@@ -45,11 +74,12 @@ How I work's hand-drawn layer: a circled number for each beat, an arrow from eac
 _Avoid_: Doodles, decoration that marks nothing, highlighting in the Cobalt accent
 
 **Work**:
-The homepage section straight after the hero, led by employment. Every employer is a **Staff pass** hanging from one rail, the current one largest, with History as a plain note; **Where I'm headed** follows below. The passes replaced Now and **How I got here** as text ([#194](https://github.com/3ixas/eliasb.dev/issues/194)). Employment leads, so it comes before **Things I make** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
+On the **Quiet index**, the first section after the opening line: one **Row** per employer (each with a mini **Staff pass**, whose full pass is its **Closer look**), then History at uni, then **Where I'm headed** as three strand rows. The pass rail is retired from the homepage ([#279](https://github.com/3ixas/eliasb.dev/issues/279)). Before that it was the homepage section straight after the hero, led by employment. Every employer is a **Staff pass** hanging from one rail, the current one largest, with History as a plain note; **Where I'm headed** follows below. The passes replaced Now and **How I got here** as text ([#194](https://github.com/3ixas/eliasb.dev/issues/194)). Employment leads, so it comes before **Things I make** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
 _Avoid_: Experience, CV, calling Elias's own projects "Work"
 
 **Staff pass**:
 A pass hanging on its lanyard: a strap and clip, Elias's portrait as the ID photo, a top line, a foot with a barcode, and real text, never decoration. It comes in two kinds. An **employer's pass** hangs in **Work** and again at the top of its **Role story**, in its **Employer colour**: the employer, role and dates, one headline number, and a link to its **Role story**. The current pass is the largest and reads "Valid · present"; a past one is stamped "Returned", and its dates say when it ended, with no separate status date ([#244](https://github.com/3ixas/eliasb.dev/issues/244)). Awards are **award pins** on the current pass's lanyard. Its content is the employment history ([#194](https://github.com/3ixas/eliasb.dev/issues/194)). On its own Role story it is the opening object rather than a link, and its award pins lead to the evidence for each award ([#198](https://github.com/3ixas/eliasb.dev/issues/198)). It carries the lean. The **self-issued pass** is the one pass with no employer: **Where I'm headed**, issued by Elias to himself. It has no **Employer colour** of its own, no award pins, no status or dates, and no lean; its fields are the bars of his direction ([#190](https://github.com/3ixas/eliasb.dev/issues/190)).
+On the **Quiet index** homepage an employer's pass is a mini pass in its row's slot, and the full pass arrives as the row's **Closer look**, dropping and swinging to rest; Role stories still open on the full pass.
 _Avoid_: Badge, ID card, "Expired" (it can read as "let go"), employer logos
 
 **Award pin**:
@@ -82,6 +112,7 @@ _Avoid_: Experiments, Lab
 
 **Fastener**:
 The single small prop on a card's edge: tape, a paperclip, or a push pin. It fastens only what would be held to a surface (a screenshot on its tile, a sheet of paper on a wall), so a card that is simply a card has none ([#242](https://github.com/3ixas/eliasb.dev/issues/242)). There is at most one per object, the card itself stays clean, and the image carries the colour.
+Retired from the homepage by the **Quiet index** ([#278](https://github.com/3ixas/eliasb.dev/issues/278)); it remains on the inner pages until their own pass.
 _Avoid_: Prop that stands in for content, more than one per card, a Fastener on every card, "pin" alone (say push pin, or award pin)
 
 **Career ruler** (superseded):
@@ -102,6 +133,7 @@ _Avoid_: Making Library, Lab, or About separate primary destinations.
 
 **Featured work**:
 Up to three of Elias's strongest projects, chosen by hand and shown as big tiles in their **Project colour** at the top of **Things I make**, above the **Project index**. A featured project needs a case study, a screenshot, and its colours.
+On the **Quiet index** they are the first three **Rows** of Things I make; on phones they become swipeable cards with readable screenshots.
 _Avoid_: Treating the homepage as a complete project archive.
 
 **Work archive**:
@@ -125,14 +157,17 @@ _Avoid_: Timeline, CV in chronological order, level or job titles ("aspiring Sta
 
 **First glance**:
 What a skimming recruiter takes from the first screen at a glance: who Elias is, what he does now, and his strongest proof. The **Signature entrance** names BNP Paribas within about a second and completes the First glance at about 4 s ([#160](https://github.com/3ixas/eliasb.dev/issues/160)). It reuses the hero's slots ([#159](https://github.com/3ixas/eliasb.dev/issues/159)): the headline "I build pricing and risk engines at BNP Paribas, and *products of my own.*", so it lands in the entrance's first beat; under the name, the role line "Software Engineer"; a supporting line with the stack and both awards; and the portrait label "Based in London". On the screen the headline is the only line that names the employer; the others refer back to it ("the bank's") rather than repeat it ([#243](https://github.com/3ixas/eliasb.dev/issues/243)). It serves a second audience alongside the **Primary audience** without replacing it, and never repeats the proofs that lead Work's Now. The same story carries off the page: the home title is "Elias Bennett, software engineer at BNP Paribas", and the description and social image lead with the BNP pricing and risk engines and products of my own, so a search result or a shared link does the First glance's job ([#162](https://github.com/3ixas/eliasb.dev/issues/162)).
+Superseded on 26 October 2026: the **Quiet index** has no hero layout. The opening line does the First glance's job, and the off-page title, description and social image keep doing theirs ([#278](https://github.com/3ixas/eliasb.dev/issues/278)).
 _Avoid_: Treating the whole site as a CV for skimmers, a separate Now section, naming the employer twice on the screen
 
 **Signature entrance**:
 The Commissioner-style opening on every load and reload ([#109](https://github.com/3ixas/eliasb.dev/issues/109)), in two acts inside one typed sentence ([#160](https://github.com/3ixas/eliasb.dev/issues/160)): Act 1, "I build pricing and risk engines at BNP Paribas,", types alone on a blank page so BNP is readable in about a second; the comma is the act break; "and" types and Act 2, "*products of my own.*", drops in with its underline; the finished sentence holds alone for a beat, then moves up into the hero as the name settles with the role line, the portrait swings in, the label presses on, and the rest of the page arrives, in about 4.6 s. The name is capped at about 45% of the screen's height so the First glance fits on the first screen. Any scroll, tap, click or key press fast-forwards it to the finished page ([#241](https://github.com/3ixas/eliasb.dev/issues/241)), it doesn't replay on back-navigation, and reduced motion gets the finished page. The content is in the HTML throughout.
+Retired on 26 October 2026: no surface holds the page. The arrival is the underline drawing, the greeting's scene and the GitHub total counting up, over a page that is already complete ([#280](https://github.com/3ixas/eliasb.dev/issues/280)).
 _Avoid_: Loader, interaction gate, anything else that holds the page
 
 **Signature motion**:
 The one motion a surface is remembered by, and the only motion that belongs to it: the **Signature entrance** for the hero, an employer's **Staff pass** lean (a pendulum on touch screens) for **Work** and each **Role story**, the screenshot straightening for **Things I make**, **Margin notes** drawing for **How I work**, the Now making pulse for **Off the clock**, Elias filling with cobalt in the footer for the end of the page ([#200](https://github.com/3ixas/eliasb.dev/issues/200)), and the lost-property tag's swing-in for the 404 page. An object brings its signature with it wherever it appears. The self-issued pass for **Where I'm headed** holds still, so Work's one signature stays the employer passes' lean ([#190](https://github.com/3ixas/eliasb.dev/issues/190)). Everything else that moves is shared (scroll sway, a **Fastener**'s reaction, the theme crossfade) or feedback (a state change that only shows what is hovered, focused or chosen, such as an index row turning cobalt with its arrow nudge), and never counts against a surface's one. A signature is defined by what moves, not by what starts it: a hover can start a signature, as it starts the lean and the straightening ([#199](https://github.com/3ixas/eliasb.dev/issues/199)).
+Superseded on the homepage: the **Quiet index**'s signature is the **Margin** itself, and each **Closer look** moves the way its own thing would ([#279](https://github.com/3ixas/eliasb.dev/issues/279)). It still describes the inner pages.
 _Avoid_: Calling shared or feedback motion a section's signature, two signatures on one surface
 
 **Living area** (superseded):
