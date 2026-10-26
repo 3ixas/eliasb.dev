@@ -72,7 +72,7 @@ export const hero = {
   role: "Software Engineer",
   portraitLabel: "Based in London",
   headline: { lead: "I build pricing and risk engines at BNP Paribas, and", emphasis: "products of my own." },
-  support: "In C# and Java, on CPU and GPU. I’ve won the bank’s Early Careers digitisation competition and a Take Ownership award.",
+  support: "In C# and Java, on CPU and GPU. I’ve won the bank’s digitisation competition and a Take Ownership award.",
   actions: { work: "See my work ↓", hello: "Say hello" },
 } as const;
 

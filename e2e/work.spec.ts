@@ -228,7 +228,7 @@ test.describe("Work", () => {
 
   test("it does not repeat the First glance's wording", async ({ page }) => {
     const text = (await section(page).innerText()).replace(/\s+/g, " ");
-    for (const phrase of [hero.support, hero.headline.lead, "Early Careers", "C# and Java", "on CPU and GPU"]) {
+    for (const phrase of [hero.support, hero.headline.lead, "digitisation competition", "C# and Java", "on CPU and GPU"]) {
       expect(text, phrase).not.toContain(phrase);
     }
   });

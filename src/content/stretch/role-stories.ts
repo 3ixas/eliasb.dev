@@ -64,7 +64,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
         paragraphs: [
           "I used that workflow to integrate a pricer into the calculation engine in a couple of days. For an experienced integration engineer it takes about two weeks, and I was new to it.",
           "I went from no C# to shipping production code independently in six months.",
-          "The Early Careers digitisation competition is the other half of this. I led a team of four and co-built a dashboard from our users’ requirements, which cut a 30–40 minute data load to under 5. We won, out of five groups, and presented it to the Head of Risk Systems.",
+          "The bank’s digitisation competition is the other half of this. I led a team of four and co-built a dashboard from our users’ requirements, which cut a 30–40 minute data load to under 5. We won, out of five groups, and presented it to the Head of Risk Systems.",
         ],
       },
       "what-i-took-with-me": {
@@ -113,10 +113,10 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
       "Went from no C# to shipping production code independently in six months, and now own implementation and delivery as the team’s only C# engineer.",
       "Ported Java market-data loaders to C#, and took a stale data dependency out of live pricing behind a feature flag that defaults to off, with caching and an end-to-end test.",
       "Built an AI workflow that gives each stage its own scoped agent. It took a pricer integration from about two weeks to a couple of days, and several teams across the department now use it.",
-      "Led a team of four to win the Early Careers digitisation competition, co-building a dashboard that cut a 30–40 minute data load to under 5.",
+      "Led a team of four to win the bank’s digitisation competition, co-building a dashboard that cut a 30–40 minute data load to under 5.",
     ],
     evidence: [
-      { value: "Nov 2025", label: "won the Early Careers digitisation competition" },
+      { value: "Nov 2025", label: "won the bank’s digitisation competition" },
       { value: "6", label: "months from zero C# to production code" },
     ],
     // BNP's green, as a hue only (no logo). The light field takes near-black ink (5.0:1);
