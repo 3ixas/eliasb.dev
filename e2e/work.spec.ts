@@ -285,6 +285,18 @@ test.describe("Work: the margin", () => {
     await expect(margin(page)).toBeVisible();
   });
 
+  test("a focused row keeps its closer look when the pointer visits that row and leaves the column", async ({ page }) => {
+    const row = rowFor(page, "history-at-uni");
+    await row.scrollIntoViewIfNeeded();
+    await row.focus();
+    await expect(margin(page)).toBeVisible();
+    await row.hover();
+    await page.mouse.move(5, 5);
+    await page.waitForTimeout(300);
+    await expect(margin(page)).toBeVisible();
+    await expect(margin(page).locator(".qi-note")).toBeVisible();
+  });
+
   test("every employer's closer look is its pass and three enamel Pass pins with glyphs, in one form", async ({ page }) => {
     for (const employer of work.employers) {
       const row = rowFor(page, employer.slug);

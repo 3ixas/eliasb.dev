@@ -32,7 +32,8 @@ export function CloserLookRoot({ looks, className, children }: { looks: Record<s
   };
   const show = (id: string, source: "pointer" | "focus") => {
     cancelHide();
-    setActive((now) => (now?.id === id && now.source === source ? now : { id, source }));
+    // A row that already holds focus keeps owning its look when the pointer arrives at it, so leaving the column cannot hide it.
+    setActive((now) => (now?.id === id && (now.source === source || now.source === "focus") ? now : { id, source }));
   };
   const lookOf = (target: EventTarget) => {
     const row = (target as Element).closest<HTMLElement>("[data-look]");
