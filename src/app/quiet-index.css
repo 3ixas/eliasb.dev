@@ -993,6 +993,7 @@
   /* The ordinary row's focus fill would replace the card's Project colour and leave its ink unreadable. */
   [data-stretch-shell] [data-card] .qi-row:focus-visible {
     background: none;
+    outline-color: var(--project-ink);
     outline-offset: -3px;
   }
 
