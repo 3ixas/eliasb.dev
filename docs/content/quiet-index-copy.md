@@ -2,7 +2,7 @@
 
 The copy deck for the quiet index homepage ([#281](https://github.com/3ixas/eliasb.dev/issues/281); layout in `docs/design/DESIGN.md`). It covers every string the new homepage shows, including the closer looks.
 
-It doesn't replace `docs/content/redesign-copy.md` yet. `verify:copy` checks the live code against that file, so this deck is merged into it when the homepage is built. The inner pages' copy is unchanged.
+**Merged** into `docs/content/redesign-copy.md`, under The quiet index homepage, for [#289](https://github.com/3ixas/eliasb.dev/issues/289) on 27 October 2026. That file is the source from now on: change the copy there, not here. This deck stays as the record of how the copy was decided. The inner pages' copy is unchanged.
 
 Facts come only from the Role stories, `src/content/resume.ts` and the project catalogue. The voice follows Elias's voice profile: the position first, something concrete behind every claim, plain words, British spelling and few dashes.
 
