@@ -153,11 +153,11 @@
 @media (prefers-reduced-motion: no-preference) {
   /* The underline draws once on arrival, from left to right. */
   .qi-opening__tail svg {
-    animation: qi-draw 0.9s var(--out) 0.2s both;
+    animation: qi-underline 0.9s var(--out) 0.2s both;
   }
 }
 
-@keyframes qi-draw {
+@keyframes qi-underline {
   from {
     clip-path: inset(0 100% 0 0);
   }

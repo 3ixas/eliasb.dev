@@ -154,10 +154,16 @@ test.describe("products of my own.", () => {
     await expect(tail(page)).toHaveCSS("color", COBALT);
     await expect(tail(page).locator("path")).toHaveCSS("stroke", COBALT);
     const draw = tail(page).locator("svg");
-    await expect(draw).toHaveCSS("animation-name", "qi-draw");
+    await expect(draw).toHaveCSS("animation-name", "qi-underline");
     await expect(draw).toHaveCSS("animation-iteration-count", "1");
     // Once drawn it stays drawn: nothing loops.
     await expect.poll(() => draw.evaluate((svg) => svg.getAnimations().every((animation) => animation.playState === "finished"))).toBe(true);
+  });
+
+  test("no animation name is defined twice, so no stylesheet replaces another's keyframes", async ({ page }) => {
+    await page.goto("/");
+    const names = await page.evaluate(() => [...document.styleSheets].flatMap((sheet) => [...sheet.cssRules].filter((rule): rule is CSSKeyframesRule => rule instanceof CSSKeyframesRule).map((rule) => rule.name)));
+    expect(names.filter((name, index) => names.indexOf(name) !== index)).toEqual([]);
   });
 
   test("the underline is drawn from the first frame when motion is reduced, and nothing animates", async ({ page }) => {
