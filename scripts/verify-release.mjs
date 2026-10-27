@@ -212,7 +212,8 @@ function verifyHomepage(markup) {
   verifyPageShell(markup, "/");
   const fullOpening = "I build pricing and risk engines at BNP Paribas, and products of my own.";
   const headlineContent = markup.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? "";
-  equal(plainText(headlineContent), fullOpening, "Homepage headline should be one complete, server-rendered sentence");
+  // The headline holds only inline markup (reveal words, the employer, the tail's letters), which adds no space between words; plainText would put one at every tag.
+  equal(plainText(headlineContent.replace(/<[^>]+>/g, "")), fullOpening, "Homepage headline should be one complete, server-rendered sentence");
   check(!/data-entering|data-entrance/.test(markup), "Homepage content should never be held or marked for an entrance in the server HTML");
   check(/Elias\s+Bennett/.test(plainText(markup)), "Homepage should carry the name as plain text");
 

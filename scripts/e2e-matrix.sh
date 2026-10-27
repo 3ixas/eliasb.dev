@@ -6,7 +6,7 @@
 #
 #   scripts/e2e-matrix.sh                         all 16 projects (build first: pnpm build)
 #   PROJECTS="chromium-390-dark webkit-820-light" scripts/e2e-matrix.sh
-#   scripts/e2e-matrix.sh hero first-frame      spec filters pass through to Playwright
+#   scripts/e2e-matrix.sh opening first-frame      spec filters pass through to Playwright
 #
 # MAX_LOAD (default 6), MAX_SWAP_PERCENT (80), MAX_FAILURES (5: stop a project early when
 # the machine is struggling), WAIT_MINUTES (30). Logs and summary.txt go to $OUT_DIR.

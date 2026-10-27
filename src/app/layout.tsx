@@ -7,6 +7,7 @@ import "./stretch-type.css";
 import "./stretch-shell.css";
 import "./stretch-pass.css";
 import "./quiet-index.css";
+import "./quiet-opening.css";
 import "./quiet-header.css";
 import "./stretch-resume.css";
 

@@ -24,7 +24,8 @@ import { currentPassStatus, passLinkLabel, passProblems, passRecords } from "../
 import { howIWork } from "../src/content/stretch/how-i-work.ts";
 import { greetingKey } from "../src/content/stretch/greeting.ts";
 import { offTheClock } from "../src/content/stretch/off-the-clock.ts";
-import { hero, notFound, sayHello, siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy.ts";
+import { opening } from "../src/content/stretch/opening.ts";
+import { notFound, sayHello, siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy.ts";
 import { headedProblems, shownSource, work } from "../src/content/stretch/work.ts";
 
 const raw = readFileSync(new URL("../docs/content/redesign-copy.md", import.meta.url), "utf8");
@@ -43,7 +44,15 @@ const leaves = (value, path = "") => {
 const modules = {
   siteCopy,
   notFound,
-  hero,
+  // The opening's own words; the runs are the same sentences cut up, and the certificate's description is the Role story's.
+  opening: {
+    headline: opening.headline,
+    support: opening.support,
+    engines: opening.looks.engines,
+    cores: opening.looks.cores,
+    digitisation: { pin: opening.looks.digitisation.pin, line: opening.looks.digitisation.line, bars: opening.looks.digitisation.bars },
+    ownership: opening.looks.ownership.certificate.caption,
+  },
   thingsIMake,
   sayHello,
   workArchive,
@@ -96,11 +105,6 @@ for (const [hour, line] of [
 assert.equal(siteCopy.greeting.hello, "Hello");
 for (let hour = 0; hour < 24; hour += 1) assert.notEqual(greetingKey(hour), "hello", "Only the browser's clock picks a greeting; hello is the line before it");
 
-// The hero names the employer once on screen, in the headline: the name down to the buttons reads "BNP" in the h1 and nowhere else (#243).
-const heroText = [hero.name.first, hero.name.last, hero.role, hero.portraitLabel, hero.headline.lead, hero.headline.emphasis, hero.support, hero.actions.work, hero.actions.hello];
-assert.equal(heroText.join(" ").match(/BNP/g)?.length, 1, "The hero names BNP exactly once");
-assert.ok(`${hero.headline.lead} ${hero.headline.emphasis}`.includes("BNP"), "The hero's one BNP is in the h1");
-
 // ---- Tables and sections, word for word --------------------------------------------------
 
 const rows = (text, heading) => {
@@ -112,6 +116,35 @@ const rows = (text, heading) => {
   }
   return table.slice(2).map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()));
 };
+
+// The opening names the employer once on screen, in the h1 (#243): "BNP" is in the headline and nowhere else in the opening.
+assert.equal([opening.headline, opening.support].join(" ").match(/BNP/g)?.length, 1, "The opening names BNP exactly once");
+assert.ok(opening.headline.includes("BNP"), "The opening's one BNP is in the h1");
+
+// The opening's lines are the copy deck's, and the runs the page draws put them back together exactly.
+const openingRows = Object.fromEntries(rows(raw, "### Quiet index · Opening").map(([where, copy]) => [where, copy.replaceAll("*", "")]));
+assert.equal(opening.headline, openingRows["Opening line (`h1`)"], "The opening line");
+assert.equal(opening.support, openingRows["Supporting line"], "The supporting line");
+for (const [name, runs, text] of [["headline", opening.headlineRuns, opening.headline], ["supporting line", opening.supportRuns, opening.support]]) {
+  assert.equal(runs.map((run) => run.text).join(""), text, `The opening's ${name} runs read as the ${name}`);
+}
+
+// The reveal words are the deck's, in reading order, each with the closer look the deck describes.
+const reveals = Object.fromEntries(rows(raw, "### Quiet index · The reveal words in the opening").map(([word, caption]) => [word, caption.replaceAll("*", "")]));
+assert.deepEqual(
+  [...opening.headlineRuns, ...opening.supportRuns].filter((run) => run.mark && run.mark !== "employer" && run.mark !== "emphasis").map((run) => run.text),
+  Object.keys(reveals),
+  "The opening's reveal words are the deck's",
+);
+const { engines, cores, digitisation, ownership } = opening.looks;
+assert.equal(`${engines.caption} · ${engines.note}`, reveals["pricing and risk engines"], "The simulation's caption says the paths are illustrative");
+assert.equal(cores.caption, reveals["CPU and GPU"], "The cores' caption");
+assert.equal(
+  `${digitisation.pin.label} · ${digitisation.pin.detail}, then: ${digitisation.line} Bars: ${digitisation.bars.map((bar) => bar.label).join(" · ")}`,
+  reveals["digitisation competition"],
+  "The digitisation competition's closer look",
+);
+assert.equal(ownership.certificate.caption, reveals["Take Ownership award"], "The certificate's caption");
 
 // How I work.
 const beats = rows(raw, "## How I work");

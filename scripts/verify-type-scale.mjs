@@ -15,7 +15,6 @@ const display = new Map([
   ["min(var(--footer-size), calc(var(--say-hello-size) * 0.85))", "the footer name: 12vw or clamp(44px, 7vw, 104px), against Say hello"],
   ["min(clamp(56px, 13vw, 128px), var(--cs-name-fit))", "a case study's name, fitted to its column's width"],
   ["min(clamp(36px, 7.5vw, 76px), var(--cs-name-fit))", "a Role story's name, fitted to its column's width"],
-  ["min(31.5vw, 28svh)", "the hero name: about 100 px on a 320 px phone"],
 ]);
 
 const problems = [];

@@ -1,5 +1,5 @@
 /*
- * The Stretch redesign's site-wide copy: hero, section headings, Say hello, the
+ * The Stretch redesign's site-wide copy: section headings, Say hello, the
  * Work archive and the 404. Every string is from docs/content/redesign-copy.md
  * (approved 8 October 2026); `scripts/verify-copy.mjs` checks that.
  *
@@ -68,20 +68,10 @@ export const notFound = {
   orTry: "Or try",
 } as const;
 
-export const hero = {
-  name: { first: "Elias", last: "Bennett" },
-  /** Plain text directly under the name. */
-  role: "Software Engineer",
-  portraitLabel: "Based in London",
-  headline: { lead: "I build pricing and risk engines at BNP Paribas, and", emphasis: "products of my own." },
-  support: "In C# and Java, on CPU and GPU. I’ve won the bank’s digitisation competition and a Take Ownership award.",
-  actions: { work: "See my work ↓", hello: "Say hello" },
-} as const;
-
 /** The homepage section for Elias's own projects, at #things-i-make. */
 export const thingsIMake = {
   heading: "Things I make",
-  /** What the hero used to say: the Maker of clarity line, then taking ideas all the way through. */
+  /** What the old hero said: the Maker of clarity line, then taking ideas all the way through. */
   intro: {
     lead: "I build everyday software, and make complicated things feel simple.",
     support: "I take ideas all the way through: deciding what’s worth making, designing it, building it across the stack, and finding out whether it actually works.",
