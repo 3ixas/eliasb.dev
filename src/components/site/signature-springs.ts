@@ -3,7 +3,7 @@ import { spring } from "./spring.ts";
 /**
  * The springs the Signature motions play (GLOSSARY.md), each specified as
  * `spring(bounce, duration)` so a motion's feel is one pair of numbers
- * (#199). `scripts/verify-opening.mjs` checks `spring` against Motion's.
+ * (#199). `scripts/verify-springs.mjs` checks `spring` against Motion's.
  */
 
 /** The employer Staff pass leaning away from the pointer and settling. */

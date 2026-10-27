@@ -15,9 +15,9 @@ const made = siteCopy.footer.slice(0, -name.length - 1);
  * keyboard focus (all in CSS, on the `nameFill` spring). Say hello is always set
  * larger than this. The copy stays `siteCopy.footer`.
  */
-export function SiteFooter({ entrance }: { entrance?: "rest" }) {
+export function SiteFooter() {
   return (
-    <footer className="stretch-wrap stretch-footer" data-entrance={entrance} style={springStyle}>
+    <footer className="stretch-wrap stretch-footer" style={springStyle}>
       <p className="stretch-display">
         <span className="stretch-footer__made">{made}</span>{" "}
         <span className="stretch-footer__name" data-text={name}>

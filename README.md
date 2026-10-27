@@ -12,7 +12,7 @@ The visual direction is called **Stretch**: a clean neutral page, one cobalt acc
 
 | Route | What it is |
 | --- | --- |
-| `/` | The homepage: a signature entrance, then Work, Things I make, How I work, Off the clock and Say hello. |
+| `/` | The homepage: complete from its first frame, with Work, Things I make, How I work, Off the clock and Say hello. |
 | `/things-i-make` | The archive: every project, newest first. Filters appear only once there are more than ten. `/work` redirects here. |
 | `/things-i-make/threshold`, `/things-i-make/argus-risk`, `/things-i-make/flowtime` | Case studies, each with a short visual story, a six-section write-up and a PRD card. |
 | 404 | A custom not-found page. |
@@ -26,7 +26,7 @@ The visual direction is called **Stretch**: a clean neutral page, one cobalt acc
 - [Next.js](https://nextjs.org) 16 (App Router) and React 19, written in TypeScript
 - Tailwind CSS 4 for the reset, with the design in plain CSS on custom properties (`src/app/stretch-tokens.css`)
 - Bricolage Grotesque and JetBrains Mono through `next/font`
-- The entrance and the light and dark setting run from small inline scripts, so the page is served finished and the entrance only plays over it
+- The light and dark setting runs from a small inline script, so the page is served finished and nothing is held at first paint
 - [Playwright](https://playwright.dev) and axe for end-to-end, accessibility and contrast tests
 - pnpm 10 and Node 22, deployed on Vercel
 
@@ -77,7 +77,7 @@ The homepage itself revalidates every 15 minutes. The contracts are in [`docs/in
 
 ## Tests
 
-End-to-end tests run against a production build, so build first. The suite covers the entrance, sections, Off the clock, theme, contrast, phone layouts, case studies, the archive, redirects and the 404, with axe on the main pages. It runs in Chromium and WebKit at 320, 390, 820 and 1440 px wide, in light and dark: 16 projects and roughly 3,600 tests, so run only what you need.
+End-to-end tests run against a production build, so build first. The suite covers the first frame, sections, Off the clock, theme, contrast, phone layouts, case studies, the archive, redirects and the 404, with axe on the main pages. It runs in Chromium and WebKit at 320, 390, 820 and 1440 px wide, in light and dark: 16 projects and roughly 3,600 tests, so run only what you need.
 
 ```bash
 SITE_INDEXABLE=true pnpm build
@@ -95,7 +95,7 @@ pnpm exec tsc --noEmit
 pnpm verify:signals      # signal adapters and their fallbacks
 pnpm verify:catalogue    # the project catalogue
 pnpm verify:copy         # every string matches docs/content/redesign-copy.md
-pnpm verify:opening      # the entrance lifecycle
+pnpm verify:springs      # the site spring matches Motion
 pnpm verify:routes       # canonical routes and redirects (needs a build)
 pnpm verify:release      # production markup, metadata and links (needs a build)
 ```

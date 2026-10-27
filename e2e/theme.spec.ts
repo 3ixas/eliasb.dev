@@ -151,7 +151,7 @@ test.describe("Lights and theme", () => {
   });
 
   test("a change of device setting crossfades the page too", async ({ page }) => {
-    // Motion goes on after the page has loaded, so the signature entrance does not hold this one.
+    // Motion goes on after the page has loaded.
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     await page.emulateMedia({ reducedMotion: "no-preference" });

@@ -10,7 +10,7 @@ import { SiteGreeting } from "@/components/site/site-greeting";
  */
 export function SiteHeader() {
   return (
-    <header className="stretch-header" data-stretch-header data-entrance="header">
+    <header className="stretch-header" data-stretch-header>
       <a className="stretch-skip" href="#main-content">
         Skip to content
       </a>

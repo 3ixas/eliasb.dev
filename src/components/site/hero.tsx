@@ -5,26 +5,25 @@ import { hero } from "@/content/stretch/site-copy";
 /**
  * The first screen: the name at display size in cobalt with the role line
  * under it, the real h1 headline, the supporting line and two actions, and
- * the portrait with its label. On
- * desktop the portrait sits right of the name; on phones it is stacked below
- * the actions (stretch-shell.css). The name is plain text, so it reads as
- * "Elias Bennett" whatever the layout. The data-entrance marks are the parts
- * the signature entrance holds and releases (entrance.ts); the underline is
- * the hand-drawn highlight the entrance draws.
+ * the portrait with its label. On desktop the portrait sits right of the name;
+ * on phones it is stacked below the actions (stretch-shell.css). The name is
+ * plain text, so it reads as "Elias Bennett" whatever the layout. Everything
+ * is there and visible in the first frame; the underline is the hand-drawn
+ * highlight under the emphasis.
  */
 export function Hero() {
   return (
     <section className="stretch-wrap stretch-hero" aria-label="Introduction">
       <div>
-        <p className="stretch-display stretch-name" data-entrance="name">
+        <p className="stretch-display stretch-name">
           <span>{hero.name.first}</span> <span>{hero.name.last}</span>
         </p>
-        <p className="stretch-hero__role" data-entrance="role">
+        <p className="stretch-hero__role">
           {hero.role}
         </p>
       </div>
       <div className="stretch-hero__lede">
-        <h1 data-entrance="headline">
+        <h1>
           {hero.headline.lead}{" "}
           <em>
             {hero.headline.emphasis}
@@ -33,10 +32,10 @@ export function Hero() {
             </svg>
           </em>
         </h1>
-        <p className="stretch-hero__support" data-entrance="support">
+        <p className="stretch-hero__support">
           {hero.support}
         </p>
-        <div className="stretch-hero__actions" data-entrance="support">
+        <div className="stretch-hero__actions">
           <a className="stretch-button" href="#work">
             {hero.actions.work}
           </a>
@@ -46,7 +45,7 @@ export function Hero() {
         </div>
       </div>
 
-      <figure className="stretch-portrait" data-entrance="portrait">
+      <figure className="stretch-portrait">
         <Image
           src={heroPortrait.src}
           alt={heroPortrait.alt}

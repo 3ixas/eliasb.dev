@@ -30,7 +30,7 @@ import { Fastener } from "@/components/site/fastener";
  * archive"): an opening band in the project's colour, a row of section links,
  * a neutral reading column about 720 px wide with the six sections in their
  * fixed order, wide figures framed in the project's colour, the PRD card with
- * the evidence strip, and the Next-project tile. It has no entrance and the
+ * the evidence strip, and the Next-project tile. The
  * server renders all of it, so it is readable from the first frame. The only
  * cobalt on the page is the focus ring and selection; the spec keeps the
  * accent for Say hello.

@@ -1,9 +1,8 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { nameFill, tagSwing } from "../src/components/site/signature-springs";
 
-// Motion that is not the entrance: scroll sway, and hover that only moves things where there is a hover.
+// Motion on the finished page: scroll sway, and hover that only moves things where there is a hover.
 const tile = (page: Page) => page.locator("#things-i-make .stretch-tile").first();
-const released = (page: Page) => expect.poll(() => page.evaluate(() => !document.documentElement.hasAttribute("data-entering")), { timeout: 8000 }).toBe(true);
 const sway = (page: Page) =>
   tile(page).evaluate((element) => {
     const style = getComputedStyle(element);
@@ -26,7 +25,6 @@ test.describe("Scroll sway", () => {
   test("tiles drift up to 14 px and tilt at most 0.6 degrees, and sit level in the middle of the screen", async ({ page, browserName }) => {
     test.skip(browserName !== "chromium", "Scroll-driven animation, Chromium");
     await page.goto("/");
-    await released(page);
     expect(await page.evaluate(() => CSS.supports("animation-timeline", "view()"))).toBe(true);
     // The site scrolls smoothly; measuring a position needs the scroll to land where it is sent.
     await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
@@ -48,13 +46,11 @@ test.describe("Scroll sway", () => {
     test.skip(browserName !== "chromium", "Scroll-driven animation, Chromium");
     // How I work's PRD card holds still (see Margin notes below), so the sway is read on the case study's.
     await page.goto("/things-i-make/threshold");
-    await released(page);
     const prd = page.locator(".stretch-prd");
     await prd.scrollIntoViewIfNeeded();
     await expect.poll(() => prd.evaluate((element) => getComputedStyle(element).rotate)).not.toBe("none");
     await expect.poll(() => prd.evaluate((element) => getComputedStyle(element).transform), { message: "the resting 1 degree tilt is still there" }).not.toBe("none");
     await page.goto("/");
-    await released(page);
     const card = page.locator("#off-the-clock .stretch-otc__card").first();
     await card.scrollIntoViewIfNeeded();
     await expect.poll(() => card.evaluate((element) => getComputedStyle(element).translate)).not.toBe("none");
@@ -90,7 +86,6 @@ test.describe("Margin notes", () => {
     test("a stroke draws as it scrolls up the screen and un-draws on the way back", async ({ page, browserName }) => {
       test.skip(browserName !== "chromium", "Scroll-driven animation, Chromium");
       await page.goto("/");
-      await released(page);
       expect(await page.evaluate(() => CSS.supports("animation-timeline", "view()"))).toBe(true);
       await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
       await circle(page).scrollIntoViewIfNeeded();
@@ -129,7 +124,6 @@ test.describe("Hover that needs a hover", () => {
   test("a tile does not take its hover pose on a device with no hover", async ({ page, browserName }) => {
     test.skip(browserName !== "chromium", "Touch emulation, Chromium");
     await page.goto("/");
-    await released(page);
     expect(await page.evaluate(() => matchMedia("(hover: hover)").matches)).toBe(false);
     const shot = tile(page).locator(".stretch-tile__shot");
     await tile(page).scrollIntoViewIfNeeded();
@@ -391,7 +385,6 @@ test.describe("Footer name fill", () => {
 
     test("Elias fills on footer hover and drains when the pointer leaves", async ({ page }) => {
       await page.goto("/");
-      await released(page);
       await page.locator(".stretch-footer").scrollIntoViewIfNeeded();
       await expect.poll(() => fill(page)).toContain("100%");
       await page.locator(".stretch-footer p").hover();
@@ -415,7 +408,6 @@ test.describe("Footer name fill", () => {
     test("it fills while a Say hello link has keyboard focus, and not for the footer text itself", async ({ page, browserName }) => {
       test.skip(browserName === "webkit", "Safari does not Tab to links by default");
       await page.goto("/");
-      await released(page);
       await page.locator("#say-hello .stretch-hello__big").focus();
       await page.keyboard.press("Shift+Tab");
       await page.keyboard.press("Tab");
@@ -525,7 +517,7 @@ test.describe("Now making pulse", () => {
 
 // One signature per surface, and nothing else that runs on its own beside it (#227). A motion "runs on its own" when
 // it plays on the document's clock: scroll- and view-driven motion follows the reader's hand, and a transition is
-// feedback. Once the entrance has released, the only such motion on the page is the Now making ring.
+// feedback. The only such motion on the page is the Now making ring.
 test.describe("One self-running motion on screen at a time", () => {
   test.use({ reducedMotion: "no-preference" });
 
@@ -555,7 +547,6 @@ test.describe("One self-running motion on screen at a time", () => {
 
   test("a scroll pass down the homepage never has two on screen together", async ({ page }) => {
     await page.goto("/");
-    await released(page);
     await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
     const seen = new Set<string>();
     for (let y = 0; ; y += 240) {

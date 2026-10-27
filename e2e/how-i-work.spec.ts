@@ -98,8 +98,6 @@ test.describe("How I work", () => {
       await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
       const card = section(page).locator("figure.stretch-prd");
       const pose = () => card.evaluate((element) => ({ transform: getComputedStyle(element).transform, rotate: getComputedStyle(element).rotate, translate: getComputedStyle(element).translate }));
-      // The entrance holds the page until it is released; the card's pose is read after that.
-      await expect.poll(() => page.evaluate(() => !document.documentElement.hasAttribute("data-entering")), { timeout: 8000 }).toBe(true);
       await card.scrollIntoViewIfNeeded();
       const resting = await pose();
       expect(resting.rotate).toBe("none");

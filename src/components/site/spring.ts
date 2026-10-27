@@ -2,10 +2,9 @@
  * The site's one spring: every Signature motion is specified as
  * `spring(bounce, duration)` and played from the CSS `linear()` curve it
  * returns, so no motion library runs in the browser (ADR 0004, amended by ADR
- * 0005). `scripts/verify-opening.mjs` checks it against Motion's `spring`.
+ * 0005). `scripts/verify-springs.mjs` checks it against Motion's `spring`.
  *
- * This module has no imports so the entrance can serialise `spring` into its
- * inline script and `scripts/verify-opening.mjs` can load it.
+ * This module has no imports so `scripts/verify-springs.mjs` can load it.
  */
 
 /**

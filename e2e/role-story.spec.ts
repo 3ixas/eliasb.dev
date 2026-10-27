@@ -342,10 +342,9 @@ for (const slug of roleStorySlugs) {
       expect(used).toBe(0);
     });
 
-    test("opens at once: no entrance holds the page, even with motion on", async ({ page }) => {
+    test("opens at once, even with motion on", async ({ page }) => {
       await page.emulateMedia({ reducedMotion: "no-preference" });
       await page.goto(`/work/${slug}`);
-      expect(await page.evaluate(() => document.documentElement.hasAttribute("data-entering"))).toBe(false);
       await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
       expect(await page.evaluate(() => Number(getComputedStyle(document.querySelector("main")!).opacity))).toBe(1);
     });
