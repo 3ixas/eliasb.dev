@@ -93,15 +93,16 @@ test.describe("Work: inline closer looks", () => {
     await tapObject(page, "bnp-paribas").click();
     await expect(inlineLook(page, "bnp-paribas").locator(".qi-pass")).toBeVisible();
     const strand = plainRow(page, strandIds[0]);
-    // Put the lower row mid-screen, and let the look finish opening (the row stops moving) before measuring.
+    // Let the look finish opening (the row stops moving), then put the lower row mid-screen: centring it while the look still grows
+    // leaves it off-screen when the look is done, and Playwright's own scroll-into-view on the tap would move it.
+    const stopsMoving = async () => {
+      const first = (await boxOf(strand)).y;
+      await page.waitForTimeout(250);
+      return first === (await boxOf(strand)).y;
+    };
+    await expect.poll(stopsMoving).toBe(true);
     await strand.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
-    await expect
-      .poll(async () => {
-        const first = (await boxOf(strand)).y;
-        await page.waitForTimeout(250);
-        return first === (await boxOf(strand)).y;
-      })
-      .toBe(true);
+    await expect.poll(stopsMoving).toBe(true);
     const before = (await boxOf(strand)).y;
     await strand.click({ position: { x: 100, y: 20 } });
     await expect(inlineLook(page, strandIds[0])).toBeVisible();

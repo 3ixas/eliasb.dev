@@ -52,15 +52,15 @@ test.describe("Phone header and menu", () => {
 
   test("focus moves to Close on open, and back to Menu on Close", async ({ page }) => {
     await menuButton(page).click();
-    await expect(page.getByRole("button", { name: "Close" })).toBeFocused();
-    await page.getByRole("button", { name: "Close" }).click();
+    await expect(page.getByRole("button", { name: "Close", exact: true })).toBeFocused();
+    await page.getByRole("button", { name: "Close", exact: true }).click();
     await expect(dialog(page)).toBeHidden();
     await expect(menuButton(page)).toBeFocused();
   });
 
   test("Escape closes the menu and focus returns to Menu", async ({ page }) => {
     await menuButton(page).click();
-    await expect(page.getByRole("button", { name: "Close" })).toBeFocused();
+    await expect(page.getByRole("button", { name: "Close", exact: true })).toBeFocused();
     await page.keyboard.press("Escape");
     await expect(dialog(page)).toBeHidden();
     await expect(menuButton(page)).toBeFocused();
