@@ -6,7 +6,7 @@ import { expect, test, type Page } from "@playwright/test";
 test.use({ launchOptions: { ignoreDefaultArgs: ["--hide-scrollbars"] } });
 
 const menuButton = (page: Page) => page.getByRole("button", { name: "Menu" });
-const closeButton = (page: Page) => page.getByRole("button", { name: "Close" });
+const closeButton = (page: Page) => page.getByRole("button", { name: "Close", exact: true });
 const clientWidth = (page: Page) => page.evaluate(() => document.documentElement.clientWidth);
 
 /** Instant, because the page's smooth scrolling would still be moving when the menu opened. */
