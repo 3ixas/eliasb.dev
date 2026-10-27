@@ -71,13 +71,12 @@ export const notFound = {
 /** The homepage section for Elias's own projects, at #things-i-make. */
 export const thingsIMake = {
   heading: "Things I make",
-  /** What the old hero said: the Maker of clarity line, then taking ideas all the way through. */
-  intro: {
-    lead: "I build everyday software, and make complicated things feel simple.",
-    support: "I take ideas all the way through: deciding what’s worth making, designing it, building it across the stack, and finding out whether it actually works.",
-  },
-  /** "06 things I’ve built · 03 I’m proudest of", from the catalogue's counts. */
-  note: (built: number, proudest: number) => `${pad(built)} things I’ve built · ${pad(proudest)} I’m proudest of`,
+  note: "Products of my own, from a rental calculator to a risk simulator.",
+  /** Rows whose line is shorter than the project's own outcome, which the inner pages keep. */
+  rowOutcomes: {
+    "argus-risk": "A risk simulator where every number shows its source and age.",
+    "home-secretary": "A household coordination prototype, built for coursework.",
+  } as Readonly<Record<string, string>>,
   /** The link to the archive, with the true count. */
   allThings: (built: number) => `Everything I’ve built (${pad(built)}) →`,
 } as const;

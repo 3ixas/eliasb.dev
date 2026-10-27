@@ -74,7 +74,6 @@ for (const [name, module] of Object.entries(modules)) {
 // Strings built from live values, filled with the copy's own placeholders.
 const built = [
   siteCopy.title("Page"),
-  thingsIMake.note(6, 3),
   thingsIMake.allThings(6),
   offTheClock.curiosity.more("n"),
   offTheClock.github.contributions("1,221"),
@@ -82,7 +81,7 @@ const built = [
   offTheClock.github.asOf("date"),
 ];
 for (const text of built) assert.ok(plain.includes(text), `Built string is not in the approved copy: "${text}"`);
-assert.equal(thingsIMake.note(6, 3), "06 things I’ve built · 03 I’m proudest of");
+assert.equal(thingsIMake.note, "Products of my own, from a rental calculator to a risk simulator.");
 assert.equal(thingsIMake.allThings(projects.length), "Everything I’ve built (06) →");
 
 // The 404's lost-property tag and section rows are listed field by field, not just as stray words.

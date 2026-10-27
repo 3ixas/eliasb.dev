@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import type { EvidenceItem, StoryColours, StorySectionBody } from "@/content/stretch/story";
 import { Fastener } from "@/components/site/fastener";
-import { TileShot } from "@/components/site/featured-tiles";
+import { TileShot } from "@/components/site/tile-shot";
 import type { FastenerKind, ProjectImage } from "@/content/projects";
 
 /*
