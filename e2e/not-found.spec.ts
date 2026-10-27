@@ -14,6 +14,40 @@ test.describe("The 404", () => {
     for (const content of robots) expect(content).toMatch(/noindex/);
   });
 
+  test("shows the new header: the portrait and name lead home, the greeting and the Eclipse, and no section links", async ({ page }) => {
+    await page.goto("/nothing-here");
+    const header = page.locator("[data-stretch-header]");
+    const home = header.getByRole("link", { name: "Elias Bennett, home" });
+    await expect(home).toHaveAttribute("href", "/");
+    await expect(home.locator(".qi-header__face")).toBeVisible();
+    await expect(home.locator(".qi-header__name")).toHaveText("Elias Bennett");
+    expect((await home.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    await expect(header.locator("[data-greeting]")).toBeVisible();
+    await expect(header.locator("[data-eclipse]")).toBeVisible();
+    // The 404 has no sections of its own, so the header has no links and no menu.
+    await expect(header.getByRole("navigation")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Menu", exact: true })).toHaveCount(0);
+    await home.click();
+    await expect(page).toHaveURL(/\/$/);
+  });
+
+  test("on a wide screen the Eclipse stays at the right edge, and London's time never paints over it", async ({ page }) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 900, "The header's single row starts at 900 px");
+    await page.goto("/nothing-here");
+    const greeting = page.locator("[data-greeting]");
+    // The greeting is a tab stop once it has hydrated for a wide screen, which is also when it can read London's time.
+    await expect(greeting).toHaveAttribute("tabindex", "0");
+    await greeting.hover();
+    const more = page.locator(".qi-greeting__more");
+    await expect(more).toHaveCSS("opacity", "1");
+    const [time, eclipse, inner] = await Promise.all(
+      [more, page.locator("[data-eclipse]"), page.locator(".qi-header__inner")].map(async (locator) => (await locator.boundingBox())!),
+    );
+    expect(time.x + time.width).toBeLessThanOrEqual(eclipse.x);
+    // The Eclipse's own margin pulls its icon in line with the column's edge; it is the header's last item.
+    expect(Math.abs(eclipse.x + eclipse.width - (inner.x + inner.width))).toBeLessThanOrEqual(12);
+  });
+
   test("the link home is a 44 px target and works", async ({ page }) => {
     await page.goto("/nothing-here");
     const back = page.getByRole("link", { name: "Back to the homepage" });

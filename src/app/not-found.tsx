@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LostPropertyTag } from "@/components/site/lost-property-tag";
 import { SiteFooter } from "@/components/site/site-footer";
-import { SubpageHeader } from "@/components/site/subpage-header";
+import { SiteHeader } from "@/components/site/site-header";
 import { pageTitle } from "@/content/site";
 import { notFound as copy, siteCopy } from "@/content/stretch/site-copy";
 
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * The 404 (docs/content/redesign-copy.md): the slim header, a short heading
+ * The 404 (docs/content/redesign-copy.md): the header, a short heading
  * and line, one link home, a lost-property tag naming the address asked for
  * (beside them, below on phones) and a row for each homepage section. It has
  * no cobalt beyond focus, selection and hover.
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <div data-stretch-shell data-not-found>
-      <SubpageHeader />
+      <SiteHeader home />
       <main id="main-content" tabIndex={-1} className="stretch-wrap stretch-404">
         <div className="stretch-404__copy">
           <h1 className="stretch-display stretch-h2">{copy.heading}</h1>

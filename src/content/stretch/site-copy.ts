@@ -32,9 +32,11 @@ export const siteCopy = {
   ],
   header: {
     darkTheme: "Dark theme",
-    menu: "Menu",
-    close: "Close",
     backToWork: "← Work",
+    /** Said beside the greeting on a wide screen while it is hovered or focused: London's time, as {HH:MM}. */
+    londonTime: (time: string) => `it’s ${time} here in London`,
+    /** The header's links, named for the page they belong to. */
+    linksLabel: "On this page",
   },
   /** The header's greeting, by the visitor's own time of day. `hello` is the line before the browser has read it, and without script. */
   greeting: {

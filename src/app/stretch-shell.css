@@ -53,7 +53,7 @@ html:has([data-stretch-shell]) body {
   outline-offset: 3px;
 }
 
-/* A section that focus was sent to (after the phone menu) is not a control, so it wears no ring. */
+/* A section that focus was sent to (by a link to it) is not a control, so it wears no ring. */
 [data-stretch-shell] section[tabindex="-1"]:focus-visible {
   outline: none;
 }
@@ -124,55 +124,6 @@ html:has([data-stretch-shell]) body {
   padding-block: 12px;
 }
 
-.stretch-header__right {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 8px;
-}
-
-.stretch-nav ul {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0 4px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.stretch-nav a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding-inline: 14px;
-  border-radius: 999px;
-  color: var(--stretch-ink);
-  font-size: var(--text-body);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-@media (hover: hover) {
-  .stretch-nav a:hover {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 4px;
-  }
-}
-
-/* Say hello: the one link that takes the cobalt. */
-.stretch-nav a.stretch-nav__cta {
-  background-color: var(--stretch-cobalt);
-  color: var(--stretch-on-cobalt);
-}
-
-@media (hover: hover) {
-  .stretch-nav a.stretch-nav__cta:hover {
-    text-decoration: none;
-  }
-}
-
 .stretch-pill {
   display: inline-flex;
   align-items: center;
@@ -189,22 +140,6 @@ html:has([data-stretch-shell]) body {
 
 button.stretch-pill {
   cursor: pointer;
-}
-
-/* The longest greeting is laid out unseen in the same cell as the shown one, so the pill is the same width whichever shows. */
-.stretch-greeting {
-  display: inline-grid;
-}
-
-/* Both sit in the one cell: the shown text in its own element, since a bare text node cannot be placed. */
-.stretch-greeting > span,
-.stretch-greeting::after {
-  grid-area: 1 / 1;
-}
-
-.stretch-greeting::after {
-  content: attr(data-longest);
-  visibility: hidden;
 }
 
 /*
@@ -275,99 +210,6 @@ button.stretch-pill {
   .stretch-eclipse__rays {
     transition-duration: 0ms;
   }
-}
-
-/* ---- Below 900 px: the theme button and Menu only, the rest in the menu dialog. The desktop header needs about 900 px, so a tablet would get two rows. ---- */
-
-.stretch-menu-button {
-  display: none;
-}
-
-@media (max-width: 899px) {
-  .stretch-header__greeting,
-  .stretch-header .stretch-nav {
-    display: none;
-  }
-
-  .stretch-header__right {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .stretch-menu-button {
-    display: inline-flex;
-    border-color: var(--stretch-ink);
-    background-color: var(--stretch-ink);
-    color: var(--stretch-page);
-    font-family: var(--font-bricolage), system-ui, sans-serif;
-    font-size: var(--text-small);
-    font-weight: 700;
-  }
-}
-
-.stretch-menu {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  max-height: none;
-  margin: 0;
-  /* The header's own padding, so Close lands exactly where Menu was. */
-  padding: 12px var(--stretch-gutter);
-  border: 0;
-  background-color: var(--stretch-page);
-  color: var(--stretch-ink);
-}
-
-.stretch-menu[open] {
-  display: flex;
-  flex-direction: column;
-}
-
-.stretch-menu__top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.stretch-menu__close {
-  margin-left: auto;
-  cursor: pointer;
-}
-
-/* Only the list scrolls in a short window, so its scrollbar never takes room from the top row and Close stays under Menu. */
-.stretch-menu__nav {
-  flex: 1 1 auto;
-  min-height: 0;
-  /* The room a link's focus ring needs (3px ring, 3px offset), which the list's own clipping would otherwise take. */
-  margin: 26px -6px 0;
-  padding: 6px;
-  overflow-y: auto;
-}
-
-.stretch-menu__nav ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.stretch-menu__nav a {
-  display: block;
-  padding-block: 6px;
-  font-family: var(--font-bricolage), system-ui, sans-serif;
-  font-size: 56px;
-  font-stretch: 75%;
-  font-weight: 800;
-  line-height: 0.95;
-  text-decoration: none;
-  text-transform: uppercase;
-  color: var(--stretch-ink);
-}
-
-.stretch-menu__nav a.stretch-menu__cta {
-  color: var(--stretch-cobalt);
 }
 
 /* ---- Sections ---- */

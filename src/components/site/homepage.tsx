@@ -1,4 +1,5 @@
 import { Hero } from "@/components/site/hero";
+import { sectionLinks } from "@/components/site/sections";
 import { SayHello } from "@/components/site/say-hello";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SiteFooter } from "@/components/site/site-footer";
@@ -23,7 +24,7 @@ const sayHelloHeadingId = "say-hello-heading";
 export function Homepage() {
   return (
     <div data-stretch-shell>
-      <SiteHeader />
+      <SiteHeader sections={sectionLinks} />
       <main id="main-content" tabIndex={-1}>
         <Hero />
 

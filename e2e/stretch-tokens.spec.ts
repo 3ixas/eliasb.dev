@@ -1,3 +1,4 @@
+import { readdirSync, readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 import { contrastOnPaper } from "./support/contrast";
 
@@ -79,6 +80,11 @@ for (const scheme of ["light", "dark"] as const) {
       }
     });
 
+    test("--sun is the greeting's amber, in the contract's two values", async ({ page }) => {
+      const sun = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--sun").trim().toLowerCase());
+      expect(sun).toBe(scheme === "dark" ? "#f5b84f" : "#e39a2d");
+    });
+
     test("tiles keep the edge the spec gives them", async ({ page }) => {
       const border = await page.locator("[data-tile-edge]").evaluate((element) => getComputedStyle(element).borderTopColor);
       expect(border).toBe(scheme === "dark" ? "rgb(42, 42, 51)" : "rgba(0, 0, 0, 0)");
@@ -93,4 +99,17 @@ test("a remembered choice beats the device setting, in both directions", async (
     await page.evaluate((theme) => (document.documentElement.dataset.theme = theme), chosen);
     expect(await readTokens(page), `${chosen} chosen on a ${device} device`).toEqual(tokens[chosen]);
   }
+});
+
+// DESIGN.md: --sun is the greeting's sun and nothing else, an illustration colour and never an interface colour.
+test("--sun is read only by the greeting's sun and rays", () => {
+  const readers: string[] = [];
+  for (const file of readdirSync("src/app").filter((name) => name.endsWith(".css"))) {
+    let selector = "";
+    for (const line of readFileSync(`src/app/${file}`, "utf8").split("\n")) {
+      if (line.endsWith("{") && !line.trimStart().startsWith("@")) selector = line.slice(0, -1).trim();
+      if (line.includes("var(--sun)")) readers.push(`${file} ${selector}`);
+    }
+  }
+  expect(readers.sort()).toEqual(["quiet-header.css .qi-scene__rays", "quiet-header.css .qi-scene__sun"]);
 });
