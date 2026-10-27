@@ -55,11 +55,11 @@ test.describe("The opening line", () => {
     const size = await heading(page).evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
     expect(size).toBeCloseTo(expected, 1);
     expect(await heading(page).evaluate((element) => parseFloat(getComputedStyle(element).lineHeight) / parseFloat(getComputedStyle(element).fontSize))).toBeCloseTo(1.1, 2);
-    // The sections still in the Stretch style keep their display headings until their own tickets move them (#295 to #299); #300 asserts this for the whole page.
+    // The sections still in the Stretch style keep their display headings until their own tickets move them (#296 to #299); #300 asserts this for the whole page.
     const larger = await page.evaluate((limit) => {
       const found: string[] = [];
       for (const element of document.querySelectorAll("body *")) {
-        if (element.closest("#how-i-work, #off-the-clock, #say-hello, footer, [hidden]") || !element.checkVisibility()) continue;
+        if (element.closest("#off-the-clock, #say-hello, footer, [hidden]") || !element.checkVisibility()) continue;
         const hasText = [...element.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim());
         if (hasText && parseFloat(getComputedStyle(element).fontSize) > limit + 0.01) found.push(`${element.tagName.toLowerCase()}.${element.className}`);
       }

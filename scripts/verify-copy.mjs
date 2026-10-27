@@ -145,16 +145,22 @@ assert.equal(
 );
 assert.equal(ownership.certificate.caption, reveals["Take Ownership award"], "The certificate's caption");
 
-// How I work.
-const beats = rows(raw, "## How I work");
-assert.equal(beats.length, 3);
+// How I work: four habits. The first two are as in the original three-beat table; the last two are in the quiet index table.
+const keptBeats = rows(raw, "## How I work");
+const quietHow = Object.fromEntries(rows(raw, "### Quiet index · How I work"));
+assert.equal(howIWork.beats.length, 4, "How I work has four habits");
+assert.equal(howIWork.note, quietHow.Note, "How I work: note");
 // The pen underlines a phrase of each proof, so the phrase must be in the proof word for word.
 for (const beat of howIWork.beats) assert.ok(beat.proof.includes(beat.underline), `How I work: "${beat.habit}" has no "${beat.underline}" in its proof to underline`);
-assert.equal(howIWork.beats.filter((beat) => beat.arrowToCard).length, 1, "How I work: exactly one beat points at the PRD card");
 assert.deepEqual(
-  howIWork.beats.map((beat) => [`**${beat.habit}**`, beat.proof]),
-  beats,
+  howIWork.beats.slice(0, 2).map((beat) => [`**${beat.habit}**`, beat.proof]),
+  keptBeats.slice(0, 2),
 );
+for (const beat of howIWork.beats.slice(2)) assert.equal(`${beat.proof} Underline: “${beat.underline}”`, quietHow[beat.habit], `How I work: "${beat.habit}"`);
+// The PRD row and the closer look's caption are the case study's own date, so the two cannot drift apart.
+const prdDate = caseStudies.threshold.prd.date;
+assert.equal(`${howIWork.prd.title} · ${prdDate}`, quietHow["PRD row"], "How I work: the PRD row");
+assert.equal(`${howIWork.prd.title}, ${prdDate}`, raw.match(/^- PRD card caption: (.+)$/m)?.[1], "How I work: the PRD closer look's caption");
 
 // The approved copy under a `### name` heading, for the sections that follow.
 const copyFor = (name) => {

@@ -40,7 +40,7 @@ test.describe("Homepage shell", () => {
     await expect(section.locator(".qi-note-line").first()).toHaveText(work.note);
   });
 
-  for (const { id, heading, note } of sections.filter(({ id }) => id !== "say-hello" && id !== "work" && id !== "things-i-make")) {
+  for (const { id, heading, note } of sections.filter(({ id }) => id !== "say-hello" && id !== "work" && id !== "things-i-make" && id !== "how-i-work")) {
     test(`${heading} has its giant heading${note ? ", mono note and true count" : ""}`, async ({ page }) => {
       await page.goto("/");
       const section = page.locator(`section#${id}`);
@@ -60,6 +60,15 @@ test.describe("Homepage shell", () => {
     await expect(title).toHaveCSS("font-size", "17px");
     await expect(title).toHaveCSS("font-weight", "650");
     await expect(section.locator(".qi-note-line").first()).toHaveText(thingsIMake.note);
+  });
+
+  test("How I work has a quiet title and its note", async ({ page }) => {
+    await page.goto("/");
+    const section = page.locator("section#how-i-work");
+    const title = section.getByRole("heading", { level: 2, name: howIWork.heading, exact: true });
+    await expect(title).toHaveCSS("font-size", "17px");
+    await expect(title).toHaveCSS("font-weight", "650");
+    await expect(section.locator(".qi-note-line").first()).toHaveText(howIWork.note);
   });
 
   test("the header links jump to each section, below the sticky header, and underline the one in view", async ({ page }) => {

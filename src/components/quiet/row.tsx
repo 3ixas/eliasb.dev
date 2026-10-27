@@ -12,13 +12,14 @@ export type RowLook = { id: string; description: string };
  * and then the controller (closer-look-root.tsx) shows that look when the pointer or focus arrives.
  * A link to another site (`href` starting with http) opens in a new tab, is marked ↗ and says so to assistive
  * technology. A row given a `card` also has a phone shape: the card is an extra element shown only there (a
- * featured project's screenshot), in a list that CSS turns into swipeable cards.
+ * featured project's screenshot), in a list that CSS turns into swipeable cards. `after` is decoration drawn
+ * over the row's item but outside the row (How I work's pen arrows between habits).
  * Rendered by the server in full: the description is hidden text the row points to with `aria-describedby`,
  * and sits beside the row so it is not part of a link's name. The markup is the same on every screen and CSS
  * decides which presentation shows: on phones a link row's object gets its own button beside the link (a button
  * inside a link is invalid), and the empty slot under the row is where the controller opens the inline closer look.
  */
-export function Row({ object, title, line, meta, href, look, card, style }: { object: ReactNode; title: string; line: string; meta?: string; href?: string; look?: RowLook; card?: ReactNode; style?: CSSProperties }) {
+export function Row({ object, title, line, meta, href, look, card, after, style }: { object: ReactNode; title: string; line: ReactNode; meta?: string; href?: string; look?: RowLook; card?: ReactNode; after?: ReactNode; style?: CSSProperties }) {
   const external = href?.startsWith("http") ?? false;
   const descriptionId = look && `${look.id}-description`;
   const props = look ? { "data-look": look.id, "aria-describedby": descriptionId } : {};
@@ -31,7 +32,7 @@ export function Row({ object, title, line, meta, href, look, card, style }: { ob
       </span>
       <span className="qi-row__text">
         <span id={titleId} className="qi-row__title">{title}</span>
-        <span className="qi-row__line">{bindDots(line)}</span>
+        <span className="qi-row__line">{typeof line === "string" ? bindDots(line) : line}</span>
       </span>
       <span className="qi-row__end">
         {meta && <span className="qi-row__meta stretch-mono">{meta}</span>}
@@ -65,6 +66,7 @@ export function Row({ object, title, line, meta, href, look, card, style }: { ob
           <button type="button" className="qi-row__tap" data-look-tap={look.id} aria-expanded="false" aria-label={`A closer look at ${title}`} />
         )}
       </div>
+      {after}
       {look && (
         <>
           <p id={descriptionId} hidden>
