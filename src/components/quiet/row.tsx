@@ -10,7 +10,9 @@ export type RowLook = { id: string; description: string };
  * metadata. A row with a destination is a link; a plain row takes focus only when it has a closer look,
  * and then the controller (closer-look-root.tsx) shows that look when the pointer or focus arrives.
  * Rendered by the server in full: the description is hidden text the row points to with `aria-describedby`,
- * and sits beside the row so it is not part of a link's name.
+ * and sits beside the row so it is not part of a link's name. The markup is the same on every screen and CSS
+ * decides which presentation shows: on phones a link row's object gets its own button beside the link (a button
+ * inside a link is invalid), and the empty slot under the row is where the controller opens the inline closer look.
  */
 export function Row({ object, title, line, meta, href, look }: { object: ReactNode; title: string; line: string; meta?: string; href?: string; look?: RowLook }) {
   const descriptionId = look && `${look.id}-description`;
@@ -37,19 +39,28 @@ export function Row({ object, title, line, meta, href, look }: { object: ReactNo
   );
   return (
     <li className="qi-list__item">
-      {href ? (
-        <Link className="qi-row" href={href} {...props}>
-          {content}
-        </Link>
-      ) : (
-        <div className="qi-row" tabIndex={look ? 0 : undefined} role={look ? "group" : undefined} aria-labelledby={titleId} {...props}>
-          {content}
-        </div>
-      )}
+      <div className="qi-row-box">
+        {href ? (
+          <Link className="qi-row" href={href} {...props}>
+            {content}
+          </Link>
+        ) : (
+          // A plain row is the whole tap target on phones (data-look-tap); a link row's is the object button beside it.
+          <div className="qi-row" tabIndex={look ? 0 : undefined} role={look ? "group" : undefined} aria-labelledby={titleId} data-look-tap={look?.id} {...props}>
+            {content}
+          </div>
+        )}
+        {href && look && (
+          <button type="button" className="qi-row__tap" data-look-tap={look.id} aria-expanded="false" aria-label={`A closer look at ${title}`} />
+        )}
+      </div>
       {look && (
-        <p id={descriptionId} hidden>
-          {look.description}
-        </p>
+        <>
+          <p id={descriptionId} hidden>
+            {look.description}
+          </p>
+          <div className="qi-inline" data-look-slot={look.id} aria-hidden="true" />
+        </>
       )}
     </li>
   );

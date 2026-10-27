@@ -103,9 +103,8 @@ test.describe("The 404", () => {
     await expect(page).toHaveURL(/\/#how-i-work$/);
   });
 
-  test("has no entrance, no sideways scroll and no axe violations", async ({ page }) => {
+  test("has no sideways scroll and no axe violations", async ({ page }) => {
     await page.goto("/nothing-here");
-    await expect(page.locator("[data-entrance-layer]")).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);

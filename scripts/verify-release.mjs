@@ -213,8 +213,7 @@ function verifyHomepage(markup) {
   const fullOpening = "I build pricing and risk engines at BNP Paribas, and products of my own.";
   const headlineContent = markup.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? "";
   equal(plainText(headlineContent), fullOpening, "Homepage headline should be one complete, server-rendered sentence");
-  // The entrance holds the page only after its guard script has run in a browser.
-  check(!/data-entering/.test(markup), "Homepage content should never wait for the entrance in the server HTML");
+  check(!/data-entering|data-entrance/.test(markup), "Homepage content should never be held or marked for an entrance in the server HTML");
   check(/Elias\s+Bennett/.test(plainText(markup)), "Homepage should carry the name as plain text");
 
   const nav = markup.match(/<nav aria-label="On this page"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] ?? "";

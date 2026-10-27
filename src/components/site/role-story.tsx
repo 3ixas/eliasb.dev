@@ -32,8 +32,8 @@ import { passHang } from "@/content/stretch/staff-pass";
  * An opening band in the employer's colour with the employer's Staff pass hung
  * in it, the row of section links, a neutral reading column with the six
  * sections in their fixed order, and the evidence strip under What changed, and
- * it ends on the Next role tile or, on the last story, "← Work". It has no
- * entrance, the server renders all of it, and the only cobalt on the page is the
+ * it ends on the Next role tile or, on the last story, "← Work". The
+ * server renders all of it, and the only cobalt on the page is the
  * focus ring, selection and the pass's award pins.
  */
 export function RoleStoryPage({ story }: { story: RoleStory }) {
