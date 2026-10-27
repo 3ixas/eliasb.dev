@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 /** How far down the window a section's top may be and still count as the one in view: a third of the way. */
-const READING_LINE = 3;
+const READING_LINE = 1 / 3;
 
 /**
  * The id of the last section whose top has passed the reading line, or none above the first. At the foot of the
@@ -12,7 +12,7 @@ const READING_LINE = 3;
 function sectionInView(ids: readonly string[]): string | null {
   const atFoot = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
   if (atFoot) return ids[ids.length - 1] ?? null;
-  const line = window.innerHeight / READING_LINE;
+  const line = window.innerHeight * READING_LINE;
   let current: string | null = null;
   for (const id of ids) {
     const top = document.getElementById(id)?.getBoundingClientRect().top;

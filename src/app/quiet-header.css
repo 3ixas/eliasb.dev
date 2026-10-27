@@ -110,6 +110,13 @@
   visibility: hidden;
 }
 
+/* On touch a tap would leave :hover on the greeting and replay its scene, which plays once, on load. */
+@media (hover: none) {
+  .qi-greeting {
+    pointer-events: none;
+  }
+}
+
 /* London's time never takes room: from 900 px it hangs beyond the words and lets the pointer through. */
 .qi-greeting__more {
   display: none;
@@ -272,8 +279,9 @@
   }
 
   /* London's time is said where the links would be: they step aside while it is, so the two never overprint. */
-  .qi-header__inner:has(.qi-greeting:is(:hover, :focus-visible)) .qi-header__links {
+  .qi-greeting:is(:hover, :focus-visible) ~ .qi-header__links {
     opacity: 0;
+    pointer-events: none;
   }
 
   .qi-header__links ul {

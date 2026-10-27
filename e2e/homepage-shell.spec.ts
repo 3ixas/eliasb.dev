@@ -118,7 +118,7 @@ test.describe("Homepage shell", () => {
     const name = (await page.locator(".qi-header__name").boundingBox())!;
     const greeting = (await page.locator("[data-greeting]").boundingBox())!;
     expect(greeting.y).toBeGreaterThanOrEqual(name.y + name.height - 1);
-    // In line with the name, not with the portrait.
+    // In line with the name, not with the portrait: the greeting's scene starts a few px left of the name's text.
     expect(greeting.x).toBeGreaterThanOrEqual(name.x - 14);
     // The greeting is not a tab stop on a phone.
     await expect(page.locator("[data-greeting]")).not.toHaveAttribute("tabindex", /.*/);
@@ -320,6 +320,9 @@ test.describe("The header greeting", () => {
     await greeting(page).hover();
     await expect(more).toHaveText(siteCopy.header.londonTime("14:28"));
     await expect(more).toHaveCSS("opacity", "1");
+    // The links step aside while it shows, and an invisible link cannot be clicked.
+    await expect(page.locator(".qi-header__links")).toHaveCSS("opacity", "0");
+    await expect(page.locator(".qi-header__links")).toHaveCSS("pointer-events", "none");
     const after = (await greeting(page).boundingBox())!;
     expect(after.width).toBeCloseTo(before.width, 1);
     expect(await scrollWidth()).toBeLessThanOrEqual(0);
@@ -342,6 +345,15 @@ test.describe("The header greeting", () => {
     await greeting(page).hover();
     await expect(page.locator(".qi-greeting__more")).toHaveCount(0);
     await expect(greeting(page)).not.toHaveAttribute("tabindex", /.*/);
+    await context.close();
+  });
+
+  test("on touch the scene plays once, on load: the greeting ignores the pointer, so a tap cannot replay it", async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+    const page = await context.newPage();
+    await page.goto("/");
+    await expect(greeting(page)).toHaveAttribute("data-greeting", /^(morning|afternoon|evening|late)$/);
+    await expect(greeting(page)).toHaveCSS("pointer-events", "none");
     await context.close();
   });
 });
