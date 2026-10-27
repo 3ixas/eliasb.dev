@@ -42,6 +42,8 @@ The lost-property tag hung beside the heading, and the five sections under the l
 
 The First glance changed for the forward-facing redesign ([#159](https://github.com/3ixas/eliasb.dev/issues/159), [#162](https://github.com/3ixas/eliasb.dev/issues/162), [#168](https://github.com/3ixas/eliasb.dev/issues/168)): the entrance is built around “*products of my own.*” landing.
 
+> **Leaves with this section** when the quiet index replaces it: the role line, the portrait label as a sticker (its words stay, as the portrait’s caption), the supporting line (rewritten under The quiet index homepage) and See my work ↓.
+
 ## Work
 
 The homepage section straight after the hero, led by employment ([#157](https://github.com/3ixas/eliasb.dev/issues/157), [#175](https://github.com/3ixas/eliasb.dev/issues/175)). Proof copy approved by Elias on 16 October 2026. Nothing here repeats the First glance’s wording.
@@ -55,6 +57,8 @@ The current Staff pass. Its role, dates and link come from its Role story, and i
 | Part | Copy |
 | --- | --- |
 | Proofs | I was nominated as an AI Champion, and the workflow I built is now used by several teams across the department. · With that workflow I integrated a pricer in a couple of days, a job that takes an experienced engineer about two weeks. |
+
+> **Leaves with this section** when the quiet index replaces it: Now as a heading. Its two proofs move to the BNP Paribas closer look.
 
 ### Where I’m headed
 
@@ -70,6 +74,8 @@ The self-issued Staff pass (#211, settled on the map on 16 October 2026). Each b
 | Depth | Knowing why it works, not just that it does. | Six months from zero C# to production code, in a pricing engine of around 70 projects. | The BNP Paribas story → |
 | Range | The whole way, from idea to running in production. | Threshold, from 57 user stories to a live site. | The Threshold case study → |
 
+> **Leaves with this section** when the quiet index replaces it: the line, which the quiet index rewrites. The heading, titles, labels and “So far” lines stay.
+
 ### How I got here
 
 Joveen and Optegra are now Staff passes (role, dates and headline number from their Role stories, stamped “Returned”). What remains as text is the note under the Work heading and History, a dashed note under the rail (#210).
@@ -79,6 +85,8 @@ Joveen and Optegra are now Staff passes (role, dates and headline number from th
 | Dates | Role | Note |
 | --- | --- | --- |
 | Before 2021 | History at uni | Because I loved it, and I still do. |
+
+> **Leaves with this section** when the quiet index replaces it: the note’s dashed box. The note’s words and the History row stay.
 
 ## Things I make
 
@@ -107,6 +115,8 @@ The homepage section for my own projects ([#157](https://github.com/3ixas/eliasb
 - Link to the archive: Everything I’ve built ({06}) →
 - Connect Four is left out (the interview rule from #106).
 
+> **Leaves with this section** when the quiet index replaces it: the intro’s second sentence and the note “06 things I’ve built · 03 I’m proudest of”. Argus Risk’s and Home Secretary’s lines are rewritten on the homepage only; the inner pages keep today’s.
+
 ## How I work
 
 - Heading: How I work
@@ -119,6 +129,8 @@ The homepage section for my own projects ([#157](https://github.com/3ixas/eliasb
 | **Measure whether it works.** | I learned this in marketing, running split tests and conversion dashboards. At BNP Paribas I co-built a dashboard from users’ requirements that cut a 30–40 minute data load to under 5. |
 
 - PRD card caption: Threshold’s PRD, 16 April 2026
+
+> **Leaves with this section** when the quiet index replaces it: the note “Three habits, and where I picked them up.” and the Measure proof, both rewritten for four habits.
 
 ## Off the clock
 
@@ -140,6 +152,8 @@ Strings added while building, shipped, and recorded here on 2026-10-09 so `verif
 - Weekly Curiosity: Read more ↗ · Image:
 - GitHub: GitHub, the past year · Use the arrow keys to move between days.
 
+> **Leaves with this section** when the quiet index replaces it: the training row’s “Today · {Thursday}” and “My training week” (now one line), Admit one as a row label (it stays on the film’s closer look), the GitHub “busiest stretch” and “swipe” lines, Quiet / Busy (now Less / More), and “{n} more oddities this week ↓” (now a count).
+
 ## Say hello
 
 - The email action is also the section heading; no separate repeated heading.
@@ -147,6 +161,121 @@ Strings added while building, shipped, and recorded here on 2026-10-09 so `verif
 - Line: Got an idea, a project, or just want to talk about building things? Email’s the best way to reach me.
 - Links: Résumé · GitHub · LinkedIn
 - Résumé opens `/resume`, the sheet built from the site’s own records, with the internal → arrow ([#247](https://github.com/3ixas/eliasb.dev/issues/247)).
+
+> **Leaves with this section** when the quiet index replaces it: the big Say hello ↗ link and the line under it. The new heading has no line after it.
+
+## The quiet index homepage
+
+The quiet index homepage’s copy, merged from the copy deck (`docs/content/quiet-index-copy.md`, [#281](https://github.com/3ixas/eliasb.dev/issues/281)) for [#289](https://github.com/3ixas/eliasb.dev/issues/289). Elias agreed it on 26 October 2026; the deck keeps the research and decisions behind it. Layout is in `docs/design/DESIGN.md`.
+
+It sits beside today’s homepage copy above rather than replacing it, so today’s homepage still passes `verify:copy`. Each section ticket of [#288](https://github.com/3ixas/eliasb.dev/issues/288) takes its copy from here, and removes the strings marked **Leaves with this section** above when it changes that section. A retired string stays wherever an inner page still uses it.
+
+The markers cover the deck’s retired list and the old wording of rows it marks *changed*. A string the deck doesn’t mention is its section ticket’s to decide, with Elias. A *kept* row that points to today’s section relies on that string staying there, so a ticket that clears an old section moves those strings here first.
+
+**Status:** *kept* is approved copy used as it is; *moved* is approved copy in a new place; *changed* is a rewrite; *new* is a string the old homepage didn’t have. `{braces}` are live values.
+
+### Quiet index · Site-wide
+
+| Where | Copy | Status |
+| --- | --- | --- |
+| Page title, meta description, social image | As in Site-wide at the top of this file | kept |
+| Header links (desktop) | Work · Things I make · How I work · Off the clock · Say hello | kept (the Menu entries) |
+| Theme button name | Dark theme | kept |
+| Greeting | Good morning · Good afternoon · Good evening · Still up? (Hello before script) | kept |
+| Greeting, on hover | it’s {14:28} here in London | new: London’s time, from Elias’s side of the screen |
+| Footer | Made by Elias | kept |
+
+### Quiet index · Opening
+
+| Where | Copy | Status |
+| --- | --- | --- |
+| Opening line (`h1`) | I build pricing and risk engines at BNP Paribas, and *products of my own.* | kept |
+| Supporting line | I’m the team’s only C# engineer, and the engines run on CPU and GPU. I’ve won the bank’s digitisation competition and a Take Ownership award. | changed: leads with the concrete fact; “Early Careers” dropped, because it read as a graduate scheme (agreed 26 October 2026) |
+| Portrait caption (closer look) | Based in London | moved, from the portrait label |
+
+### Quiet index · Work
+
+| Where | Copy | Status |
+| --- | --- | --- |
+| Note | History, then marketing, then code. Each move was towards the work I liked most. | kept |
+| BNP Paribas row | Software engineer · Jul 2025 – now | kept (from the Role story) |
+| BNP Paribas closer look | The pass, then: I was nominated as an AI Champion, and the workflow I built is now used by several teams across the department. · With that workflow I integrated a pricer in a couple of days, a job that takes an experienced engineer about two weeks. | moved, from Now’s proofs |
+| Joveen row | Full stack software engineer · Aug 2024 – Jun 2025 | kept |
+| Joveen closer look | The pass, then three points, each a bold result and its cause: **Page load, cut by 40%** · Cut page load by 40% by refactoring React components and lazy-loading assets. **Key API p95, 520 ms → 230 ms** · Added indexes and rewrote slow queries, starting with the API that mattered most. **Mobile retention, up 30%** · Fixed mobile layout and browser bugs found by a cross-browser testing pipeline. | changed: the bare “−40% page load” becomes three explained results, in the form of BNP’s pins (#283) |
+| Optegra row | Marketing executive · Sep 2021 – Aug 2024 | kept |
+| Optegra closer look | The pass, then: **Core Web Vitals pass rate, 62% → 88%** · Scoped performance fixes with the engineers and ticketed them. **p95 page load, cut by 30%** · The same scoped, ticketed fixes. **Where the switch started** · The best part of the job was working with the engineers who built our website. | changed: three points (#283). Its 15% conversion is How I work’s Measure proof, so it isn’t repeated here |
+| History at uni row | Before 2021 · Because I loved it, and I still do. | kept |
+| History at uni closer look | University of Essex · Diploma of Higher Education, History · Jul 2021 | new: from the Résumé’s education |
+| Where I’m headed: heading and line | Where I’m headed · Building a whole product well: what to make, why it works, and getting it to production. How far I’ve got on each. | changed: the aim as a job, not a feeling (#283) |
+| Strand rows (title · line) | Knowing what’s worth building. · Judgement · Knowing why it works, not just that it does. · Depth · The whole way, from idea to running in production. · Range | kept (the bars’ titles and labels) |
+| Strand closer looks | So far · {Optegra / BNP Paribas / Threshold}, then its “So far” line from today’s Where I’m headed | kept |
+
+### Quiet index · Things I make
+
+| Where | Copy | Status |
+| --- | --- | --- |
+| Note | Products of my own, from a rental calculator to a risk simulator. | moved, from the Work archive’s description (agreed 26 October 2026) |
+| Argus Risk row | A risk simulator where every number shows its source and age. | changed: says what it is first (#283) |
+| Project rows (outcome · year) | As approved: A clearer view of what moving could cost. · Breaks that match how long you actually focused. · A tested C# Web API for managing risk events. · History you can talk to. Version 1; I’m rebuilding it. | kept |
+| Home Secretary row | A household coordination prototype, built for coursework. | changed: the old line wrapped to two lines in a row; “software engineering” is already implied by the section |
+| Project closer look | {type} · {year} under the screenshot | kept (the tiles’ metadata) |
+| Archive link | Everything I’ve built ({06}) → | kept |
+| Phone cards | {name} · {outcome} | kept |
+
+### Quiet index · How I work
+
+| Where | Copy | Status |
+| --- | --- | --- |
+| Note | Four habits, and where I picked them up. | changed: four habits (#284) |
+| Start from a real problem. | As in today’s How I work section, underlining “no clear idea” | kept |
+| Write it down first. | As in today’s How I work section, underlining “57 user stories” | kept |
+| Ship it so it’s safe to undo. | At BNP Paribas, taking a stale data dependency out of live pricing, I put the new path behind a feature flag that defaults to off, with caching and an end-to-end test nobody had asked for. Underline: “defaults to off” | new: Elias’s own line from the BNP Role story (#284) |
+| Measure whether it works. | I learned this in marketing. At Optegra, split tests and analytics dashboards showed which changes brought in consultations and guided what the engineers built next; consultation conversion rose by 15%. Underline: “rose by 15%” | changed: a real measurement rather than a speed-up (#284); the competition dashboard stays in the award’s closer look |
+| PRD row | Threshold’s PRD · 16 April 2026 | kept (today’s PRD card caption; the · separates the row’s parts) |
+| PRD closer look | Threshold’s PRD quote from its case study, typed, and its caption | kept |
+
+### Quiet index · The reveal words in the opening
+
+| Word | Closer look caption | Status |
+| --- | --- | --- |
+| pricing and risk engines | The engines run large simulation-based calculations across several asset classes. · *Illustrative paths, not real prices.* | kept, plus a new line, as agreed in [#282](https://github.com/3ixas/eliasb.dev/issues/282) |
+| CPU and GPU | The same tests had to run on both CPU and GPU. | kept (from the Role story) |
+| digitisation competition | Winner · Digitisation · 2025, then: Led a team of four to win the bank’s digitisation competition, co-building a dashboard that cut a 30–40 minute data load to under 5. Bars: **30–40 min** · **Under 5** | changed: the Résumé line without “Early Careers”; the bar labels are new |
+| Take Ownership award | Take Ownership · _nology · Q1 2026 · awarded May 2026 | kept (the certificate’s caption) |
+
+### Quiet index · Off the clock
+
+| Where | Copy | Status |
+| --- | --- | --- |
+| Note | What my own time looks like this week. | kept |
+| Training row | {Assault bike intervals} · Today’s session, from my training week | changed: replaces the sketch’s “Today, from my training week” |
+| Training closer look | The week, today in cobalt · Zone 2 means slow on purpose. · Out on a run, central London. | kept |
+| GitHub year | GitHub, the past year · {1,726} contributions in the past year · Less / More · {12} contributions on {3 June} | kept (the sketch said “last year”); “Less / More” replaces “Quiet / Busy” to match GitHub’s own key |
+| Source marks (live) | Live from Goodreads · Live from Letterboxd · Live from GitHub · Live from Wikipedia | new |
+| Source marks (saved data gone stale) | From Goodreads, as of {date} (and so on) | new: built on the approved “as of {date}” |
+| Book row | {Dark Age} · Now reading · {Pierce Brown} | kept |
+| Book fallback | Between books. | kept |
+| Film row | {Kiss Kiss Bang Bang} · Last watched {9 Oct} · {★★★½} | kept |
+| Film fallback | Nothing logged yet. | kept |
+| Film closer look | Admit one · {title} · {year} · Watched {9 Oct} · {stars} | kept |
+| History row title | Odd but true, from this week in history | kept |
+| History row line | {3} things that happened this week, some stranger than others. | new: says it’s weekly and meant to be fun, using only live values |
+| History closer look | The clipping stamped **This week in history**, then {date}, {fact}, the image credit, and **{1} of {3}** | changed: “{n} more oddities this week ↓” becomes a count, because clicking the row now cycles them in place |
+| History fallback | From the archive | kept |
+| Now making row | {eliasb.dev} · Now making · {GitHub description} | kept |
+
+### Quiet index · Say hello
+
+| Where | Copy | Status |
+| --- | --- | --- |
+| Heading | Say hello, with no line after it: the email and its Copy button are the line | changed: none of 21 experienced engineers’ sites asks the reader a question (#283) |
+| Email | {eliasthebennett@gmail.com} · Copy → Copied | new (the copy button) |
+| Links | Résumé → · GitHub ↗ · LinkedIn ↗ | kept |
+| Résumé closer look | One page, with a PDF to download. | changed: shorter than the sketch’s line |
+
+**Not drafted:** a “what to write to me about” line in Say hello. It would need Elias to say what he wants to hear about.
+
+**Excluded:** Joveen’s deploy time, because the Role story records no cause for it.
 
 ## Work archive (`/things-i-make`)
 
