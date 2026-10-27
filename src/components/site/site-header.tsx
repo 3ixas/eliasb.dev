@@ -1,40 +1,48 @@
+import Image from "next/image";
+import Link from "next/link";
 import { EclipseToggle } from "@/components/site/eclipse-toggle";
-import { MenuDialog } from "@/components/site/menu-dialog";
-import { sectionLinks } from "@/components/site/sections";
+import { SectionLinks } from "@/components/site/section-links";
 import { SiteGreeting } from "@/components/site/site-greeting";
+import { heroPortrait } from "@/content/stretch/media";
+import { siteCopy } from "@/content/stretch/site-copy";
+
+type Section = { readonly id: string; readonly label: string };
+
+/** A page's own sections, or `home` on a page that leads back to the homepage (the portrait and name become the link). */
+type HeaderProps = { sections: readonly Section[]; home?: never } | { sections?: never; home: true };
+
+const name = "Elias Bennett";
 
 /**
- * The header. On desktop: the greeting, Lights and the section links.
- * Below 900 px: Lights and Menu only, with the greeting and the section
- * names in the menu dialog. CSS switches between the two (stretch-shell.css).
+ * The header (docs/design/DESIGN.md "The header"): the white-tux portrait as a 40 px circle, the name, the greeting
+ * with its scene, quiet links to the page's sections on a wide screen, and the Eclipse. There is no phone menu:
+ * below 900 px the links are not shown and the greeting sits under the name (quiet-header.css). The links are
+ * in the server HTML, so they work without script.
  */
-export function SiteHeader() {
+export function SiteHeader(props: HeaderProps) {
+  const who = (
+    <>
+      <Image className="qi-header__face" src={heroPortrait.src} alt="" width={80} height={80} sizes="40px" />
+      <span className="qi-header__name">{name}</span>
+    </>
+  );
+
   return (
-    <header className="stretch-header" data-stretch-header data-entrance="header">
+    <header className="qi-header" data-stretch-header>
       <a className="stretch-skip" href="#main-content">
         Skip to content
       </a>
-      {/* Without script the menu cannot open, so the section links stay on the page. */}
-      <noscript>
-        <style>{".stretch-header__greeting{display:inline-flex!important}.stretch-header .stretch-nav{display:block!important}.stretch-menu-button{display:none!important}"}</style>
-      </noscript>
-      <div className="stretch-wrap stretch-header__inner">
-        <SiteGreeting className="stretch-header__greeting" />
-        <div className="stretch-header__right">
-          <EclipseToggle />
-          <nav aria-label="Primary navigation" className="stretch-nav">
-            <ul>
-              {sectionLinks.map(({ id, label }, index) => (
-                <li key={id}>
-                  <a href={`#${id}`} className={index === sectionLinks.length - 1 ? "stretch-nav__cta" : undefined}>
-                    {label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <MenuDialog />
-        </div>
+      <div className="qi-header__inner">
+        {props.home ? (
+          <Link className="qi-header__who" href="/" aria-label={`${name}, home`}>
+            {who}
+          </Link>
+        ) : (
+          <div className="qi-header__who">{who}</div>
+        )}
+        <SiteGreeting />
+        {props.sections && <SectionLinks label={siteCopy.header.linksLabel} sections={props.sections} />}
+        <EclipseToggle />
       </div>
     </header>
   );

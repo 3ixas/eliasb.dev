@@ -13,8 +13,8 @@ Approved by Elias on 8 October 2026 for [#113](https://github.com/3ixas/eliasb.d
 | Meta description | I’m Elias, a software engineer in London. I build pricing and risk engines at BNP Paribas in C# and Java, and products of my own. |
 | Social image | ELIAS BENNETT · I build pricing and risk engines at BNP Paribas, and *products of my own.* |
 | Menu | Work · Things I make · How I work · Off the clock · Say hello |
-| Header | Dark theme · Menu · Close · ← Work |
-| Greeting (header, and the menu dialog on phones) | Good morning (05:00 to 11:59) · Good afternoon (12:00 to 17:59) · Good evening (18:00 to 21:59) · Still up? (22:00 to 04:59), by the visitor’s own clock. Hello before the browser has read it, and without script. Approved by Elias on 15 October 2026 for [#180](https://github.com/3ixas/eliasb.dev/issues/180) |
+| Header | Dark theme · ← Work |
+| Greeting (header) | Good morning (05:00 to 11:59) · Good afternoon (12:00 to 17:59) · Good evening (18:00 to 21:59) · Still up? (22:00 to 04:59), by the visitor’s own clock. Hello before the browser has read it, and without script. Approved by Elias on 15 October 2026 for [#180](https://github.com/3ixas/eliasb.dev/issues/180) |
 | Footer | Made by Elias |
 
 **404**
@@ -166,6 +166,7 @@ The markers cover the deck’s retired list and the old wording of rows it marks
 | Page title, meta description, social image | As in Site-wide at the top of this file | kept |
 | Header links (desktop) | Work · Things I make · How I work · Off the clock · Say hello | kept (the Menu entries) |
 | Theme button name | Dark theme | kept |
+| Header links, landmark name (not on screen) | On this page | new: the design contract names the navigation landmark |
 | Greeting | Good morning · Good afternoon · Good evening · Still up? (Hello before script) | kept |
 | Greeting, on hover | it’s {14:28} here in London | new: London’s time, from Elias’s side of the screen |
 | Footer | Made by Elias | kept |

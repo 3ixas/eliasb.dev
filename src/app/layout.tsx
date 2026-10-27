@@ -7,6 +7,7 @@ import "./stretch-type.css";
 import "./stretch-shell.css";
 import "./stretch-pass.css";
 import "./quiet-index.css";
+import "./quiet-header.css";
 import "./stretch-resume.css";
 
 // Self-hosted at build time by next/font, so no request goes to Google when a

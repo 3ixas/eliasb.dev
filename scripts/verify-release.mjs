@@ -217,7 +217,7 @@ function verifyHomepage(markup) {
   check(!/data-entering/.test(markup), "Homepage content should never wait for the entrance in the server HTML");
   check(/Elias\s+Bennett/.test(plainText(markup)), "Homepage should carry the name as plain text");
 
-  const nav = markup.match(/<nav aria-label="Primary navigation"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] ?? "";
+  const nav = markup.match(/<nav aria-label="On this page"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] ?? "";
   const navHrefs = hrefs(nav).map(({ href }) => href);
   equal(navHrefs.join("|"), "#work|#things-i-make|#how-i-work|#off-the-clock|#say-hello", "Homepage primary navigation targets");
   const navLabels = [...nav.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/gi)].map(([, content]) => plainText(content));

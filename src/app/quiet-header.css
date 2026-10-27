@@ -1,0 +1,328 @@
+/*
+ * The quiet index's header (docs/design/DESIGN.md "The header"): the portrait, the name, the greeting with its
+ * scene, quiet links to the page's sections from 900 px, and the Eclipse. No phone menu. The greeting's sun is
+ * the only place --sun is read.
+ */
+
+.qi-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--stretch-page);
+  border-bottom: 1px solid var(--stretch-rule);
+}
+
+/* Phones: no links and no menu. The portrait and name lead; the greeting sits under the name, in line with it. */
+.qi-header__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "who eclipse"
+    "greet eclipse";
+  align-items: center;
+  column-gap: 12px;
+  width: min(100% - 40px, 600px);
+  margin-inline: auto;
+  padding-block: 8px;
+}
+
+.qi-header__who {
+  grid-area: who;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 44px;
+  color: var(--stretch-ink);
+  text-decoration: none;
+}
+
+.qi-header__face {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--stretch-rule);
+  object-fit: cover;
+  object-position: 52% 20%;
+}
+
+.qi-header__name {
+  font-size: var(--text-body);
+  font-weight: 650;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.qi-header .stretch-eclipse {
+  grid-area: eclipse;
+  margin-right: -10px;
+  color: var(--stretch-muted);
+}
+
+@media (hover: hover) {
+  .qi-header .stretch-eclipse:hover {
+    color: var(--stretch-ink);
+  }
+}
+
+.qi-header__links {
+  display: none;
+}
+
+/* ---------- the greeting: words, and a small scene for the time of day ---------- */
+
+.qi-greeting {
+  grid-area: greet;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: start;
+  min-height: 28px;
+  margin: -8px 0 0 52px;
+  color: var(--stretch-muted);
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: var(--text-label);
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.qi-greeting:focus-visible {
+  border-radius: 8px;
+  outline: 2px solid var(--stretch-cobalt);
+  outline-offset: 2px;
+}
+
+/* The longest greeting is laid out unseen in the same cell as the shown one, so the words are the same width whichever shows. */
+.qi-greeting__words {
+  display: inline-grid;
+}
+
+.qi-greeting__words > span,
+.qi-greeting__words::after {
+  grid-area: 1 / 1;
+}
+
+.qi-greeting__words::after {
+  content: attr(data-longest);
+  visibility: hidden;
+}
+
+/* London's time never takes room: from 900 px it hangs beyond the words and lets the pointer through. */
+.qi-greeting__more {
+  display: none;
+}
+
+.qi-scene {
+  flex: none;
+  width: 30px;
+  height: 22px;
+  overflow: visible;
+}
+
+.qi-scene__horizon {
+  fill: none;
+  stroke: var(--stretch-rule);
+  stroke-width: 1.5;
+}
+
+.qi-scene__sun {
+  fill: var(--sun);
+}
+
+.qi-scene__rays {
+  fill: none;
+  stroke: var(--sun);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  transform-origin: 15px 11px;
+}
+
+.qi-scene__moon,
+.qi-scene__star {
+  fill: currentColor;
+}
+
+.qi-scene__moon {
+  transform-origin: 15px 11px;
+}
+
+.qi-scene__star {
+  opacity: 0.35;
+}
+
+/* At rest: morning has the sun just peeking over the line, evening has it above the line, afternoon is high. */
+[data-greeting="morning"] .qi-scene__sun {
+  transform: translateY(7px);
+}
+
+[data-greeting="morning"] .qi-scene__rays {
+  opacity: 0;
+}
+
+[data-greeting="evening"] .qi-scene__rays {
+  opacity: 0.4;
+}
+
+/*
+ * The scene plays on every load (data-playing, set for a few seconds by the greeting) and on hover or focus.
+ * With reduced motion none of this applies, so the scene stays at rest.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .qi-scene__sun {
+    transition: transform 0.9s var(--spring);
+  }
+
+  .qi-scene__rays {
+    transition:
+      transform 1.2s var(--out),
+      opacity 0.4s;
+  }
+
+  .qi-scene__moon {
+    transition: transform 0.8s var(--spring);
+  }
+
+  .qi-scene__star {
+    transition: opacity 0.3s;
+  }
+
+  /* Morning: the sun comes up. */
+  [data-greeting="morning"]:is(:hover, :focus-visible, [data-playing]) .qi-scene__sun {
+    transform: translateY(-1px);
+  }
+
+  [data-greeting="morning"]:is(:hover, :focus-visible, [data-playing]) .qi-scene__rays {
+    opacity: 1;
+    transform: rotate(20deg);
+  }
+
+  /* Afternoon: the rays turn. */
+  [data-greeting="afternoon"]:is(:hover, :focus-visible, [data-playing]) .qi-scene__rays {
+    transform: rotate(90deg) scale(1.15);
+  }
+
+  [data-greeting="afternoon"]:is(:hover, :focus-visible, [data-playing]) .qi-scene__sun {
+    transform: scale(1.12);
+    transform-origin: 15px 11px;
+  }
+
+  /* Evening: the sun sets behind the line. */
+  [data-greeting="evening"]:is(:hover, :focus-visible, [data-playing]) .qi-scene__sun {
+    transform: translateY(9px);
+  }
+
+  [data-greeting="evening"]:is(:hover, :focus-visible, [data-playing]) .qi-scene__rays {
+    opacity: 0;
+    transform: translateY(9px);
+  }
+
+  /* Late: the moon rocks and the stars come out one by one. */
+  [data-greeting="late"]:is(:hover, :focus-visible, [data-playing]) .qi-scene__moon {
+    transform: rotate(-18deg);
+  }
+
+  [data-greeting="late"]:is(:hover, :focus-visible, [data-playing]) .qi-scene__star {
+    opacity: 1;
+  }
+
+  [data-greeting="late"]:is(:hover, :focus-visible, [data-playing]) .qi-scene__star:nth-of-type(2) {
+    transition-delay: 0.3s;
+  }
+
+  [data-greeting="late"]:is(:hover, :focus-visible, [data-playing]) .qi-scene__star:nth-of-type(3) {
+    transition-delay: 0.6s;
+  }
+}
+
+/* ---------- from 900 px: one row, and quiet links to the page's sections ---------- */
+
+@media (min-width: 900px) {
+  .qi-header__inner {
+    display: flex;
+    gap: 16px;
+    width: min(100% - 40px, 940px);
+    padding-block: 12px;
+  }
+
+  .qi-greeting {
+    margin: 0;
+  }
+
+  .qi-greeting__more {
+    position: absolute;
+    left: 100%;
+    display: block;
+    padding-left: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .qi-greeting:is(:hover, :focus-visible) .qi-greeting__more {
+    opacity: 1;
+  }
+
+  .qi-header__links {
+    display: block;
+    margin-left: auto;
+    transition: opacity 0.3s;
+  }
+
+  /* London's time is said where the links would be: they step aside while it is, so the two never overprint. */
+  .qi-header__inner:has(.qi-greeting:is(:hover, :focus-visible)) .qi-header__links {
+    opacity: 0;
+  }
+
+  .qi-header__links ul {
+    display: flex;
+    align-items: center;
+    gap: 0 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .qi-header__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 10px;
+    border-radius: 8px;
+    color: var(--stretch-muted);
+    font-size: var(--text-small);
+    white-space: nowrap;
+    text-decoration: none;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 6px;
+  }
+
+  .qi-header__links a[aria-current] {
+    color: var(--stretch-ink);
+    text-decoration-line: underline;
+  }
+}
+
+@media (hover: hover) and (min-width: 900px) {
+  .qi-header__links a:hover {
+    color: var(--stretch-ink);
+  }
+}
+
+/* From 1180 px the header spans the column and the margin, and its left edge is the column's. */
+@media (min-width: 1180px) {
+  .qi-header__inner {
+    width: 940px;
+    margin-left: calc((100% - 600px) / 2 - max(0px, 656px - 50vw));
+    margin-right: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qi-greeting__more,
+  .qi-header__links {
+    transition: none;
+  }
+}

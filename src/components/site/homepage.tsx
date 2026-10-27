@@ -1,5 +1,6 @@
 import { EntranceGuard, EntrancePlayer } from "@/components/site/entrance-scripts";
 import { Hero } from "@/components/site/hero";
+import { sectionLinks } from "@/components/site/sections";
 import { SayHello } from "@/components/site/say-hello";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SiteFooter } from "@/components/site/site-footer";
@@ -26,7 +27,7 @@ export function Homepage() {
   return (
     <div data-stretch-shell>
       <EntranceGuard />
-      <SiteHeader />
+      <SiteHeader sections={sectionLinks} />
       <main id="main-content" tabIndex={-1}>
         <Hero />
 
