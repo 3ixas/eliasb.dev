@@ -3,16 +3,13 @@ import { SayHello } from "@/components/site/say-hello";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
-import { FeaturedTiles } from "@/components/site/featured-tiles";
 import { HowIWork } from "@/components/site/how-i-work";
 import { OffTheClock } from "@/components/site/off-the-clock";
-import { ProjectIndex } from "@/components/site/project-index";
 import { Opening } from "@/components/quiet/opening";
+import { ThingsIMake } from "@/components/quiet/things-i-make";
 import { Work } from "@/components/quiet/work";
-import { featuredProjects, featuredSlugs, projectIndex, projects } from "@/content/projects";
 import { howIWork } from "@/content/stretch/how-i-work";
 import { offTheClock } from "@/content/stretch/off-the-clock";
-import { thingsIMake } from "@/content/stretch/site-copy";
 
 const sayHelloHeadingId = "say-hello-heading";
 
@@ -33,21 +30,7 @@ export function Homepage() {
         </section>
 
         <section id="things-i-make" className="stretch-wrap stretch-section" aria-labelledby="things-i-make-heading">
-          <SectionHeading
-            id="things-i-make-heading"
-            heading={thingsIMake.heading}
-            note={thingsIMake.note(projects.length, featuredSlugs.length)}
-          />
-          <div className="stretch-intro">
-            <p className="stretch-intro__lead">{thingsIMake.intro.lead}</p>
-            <p>{thingsIMake.intro.support}</p>
-          </div>
-          <FeaturedTiles projects={featuredProjects(projects, featuredSlugs)} />
-          <ProjectIndex
-            rows={projectIndex(projects, featuredSlugs)}
-            firstNumber={featuredProjects(projects, featuredSlugs).length + 1}
-            total={projects.length}
-          />
+          <ThingsIMake />
         </section>
 
         <section id="how-i-work" className="stretch-wrap stretch-section" aria-labelledby="how-i-work-heading">

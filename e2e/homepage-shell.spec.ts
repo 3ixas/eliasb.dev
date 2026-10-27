@@ -1,6 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { featuredSlugs, projects } from "../src/content/projects";
 import { howIWork } from "../src/content/stretch/how-i-work";
 import { offTheClock } from "../src/content/stretch/off-the-clock";
 import { opening } from "../src/content/stretch/opening";
@@ -12,7 +11,7 @@ const menuLabels = siteCopy.menu.map(({ label }) => label);
 
 const sections = [
   { id: "work", heading: work.heading, note: work.note },
-  { id: "things-i-make", heading: thingsIMake.heading, note: thingsIMake.note(projects.length, featuredSlugs.length) },
+  { id: "things-i-make", heading: thingsIMake.heading, note: thingsIMake.note },
   { id: "how-i-work", heading: howIWork.heading, note: howIWork.note },
   { id: "off-the-clock", heading: offTheClock.heading, note: offTheClock.note },
   { id: "say-hello", heading: "Say hello", note: null },
@@ -41,7 +40,7 @@ test.describe("Homepage shell", () => {
     await expect(section.locator(".qi-note-line").first()).toHaveText(work.note);
   });
 
-  for (const { id, heading, note } of sections.filter(({ id }) => id !== "say-hello" && id !== "work")) {
+  for (const { id, heading, note } of sections.filter(({ id }) => id !== "say-hello" && id !== "work" && id !== "things-i-make")) {
     test(`${heading} has its giant heading${note ? ", mono note and true count" : ""}`, async ({ page }) => {
       await page.goto("/");
       const section = page.locator(`section#${id}`);
@@ -54,24 +53,13 @@ test.describe("Homepage shell", () => {
     });
   }
 
-  test("Things I make is introduced by what the old hero said", async ({ page }) => {
+  test("Things I make has a quiet title and its note", async ({ page }) => {
     await page.goto("/");
-    const section = page.locator("#things-i-make");
-    await expect(section.getByRole("heading", { level: 2, name: thingsIMake.heading })).toBeVisible();
-    const intro = section.locator(".stretch-intro");
-    await expect(intro).toContainText(thingsIMake.intro.lead);
-    await expect(intro).toContainText(thingsIMake.intro.support);
-    // The intro sits between the heading and the Featured work tiles.
-    const [head, introBox, tiles] = await Promise.all(
-      [section.locator(".stretch-section__head"), intro, section.locator(".stretch-tile").first()].map(async (locator) => (await locator.boundingBox())!),
-    );
-    expect(introBox.y).toBeGreaterThanOrEqual(head.y + head.height - 1);
-    expect(introBox.y + introBox.height).toBeLessThanOrEqual(tiles.y);
-  });
-
-  test("the counts are the catalogue's: 06 built, 03 featured", async ({ page }) => {
-    await page.goto("/");
-    await expect(page.locator("#things-i-make .stretch-note")).toHaveText("06 things I’ve built · 03 I’m proudest of");
+    const section = page.locator("section#things-i-make");
+    const title = section.getByRole("heading", { level: 2, name: thingsIMake.heading, exact: true });
+    await expect(title).toHaveCSS("font-size", "17px");
+    await expect(title).toHaveCSS("font-weight", "650");
+    await expect(section.locator(".qi-note-line").first()).toHaveText(thingsIMake.note);
   });
 
   test("the header links jump to each section, below the sticky header, and underline the one in view", async ({ page }) => {
@@ -397,7 +385,7 @@ test.describe("Accessibility and contrast", () => {
       const readings = await renderedContrast(page);
       const texts = readings.map((reading) => reading.text);
       // The greeting is hydrated by now, and the pill, nav, headings and notes were measured.
-      for (const expected of [siteCopy.menu[0].label, siteCopy.menu[4].label, thingsIMake.heading, thingsIMake.note(projects.length, featuredSlugs.length)]) {
+      for (const expected of [siteCopy.menu[0].label, siteCopy.menu[4].label, thingsIMake.heading, thingsIMake.note.split(",")[0]]) {
         expect(texts.some((text) => text.includes(expected)), expected).toBe(true);
       }
       expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);

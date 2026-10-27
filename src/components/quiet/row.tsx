@@ -1,6 +1,7 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { bindDots } from "@/components/site/bind-dots";
+import { hostLabel } from "@/components/site/host-label";
 
 /** A row's closer look: its id (the key of the controller's `looks`) and what it says beyond the row, as the row's accessible description. */
 export type RowLook = { id: string; description: string };
@@ -9,17 +10,22 @@ export type RowLook = { id: string; description: string };
  * The Row (GLOSSARY.md): the quiet index's only list shape. A 44 px object, a title, one line and optional
  * metadata. A row with a destination is a link; a plain row takes focus only when it has a closer look,
  * and then the controller (closer-look-root.tsx) shows that look when the pointer or focus arrives.
+ * A link to another site (`href` starting with http) opens in a new tab, is marked ↗ and says so to assistive
+ * technology. A row given a `card` also has a phone shape: the card is an extra element shown only there (a
+ * featured project's screenshot), in a list that CSS turns into swipeable cards.
  * Rendered by the server in full: the description is hidden text the row points to with `aria-describedby`,
  * and sits beside the row so it is not part of a link's name. The markup is the same on every screen and CSS
  * decides which presentation shows: on phones a link row's object gets its own button beside the link (a button
  * inside a link is invalid), and the empty slot under the row is where the controller opens the inline closer look.
  */
-export function Row({ object, title, line, meta, href, look }: { object: ReactNode; title: string; line: string; meta?: string; href?: string; look?: RowLook }) {
+export function Row({ object, title, line, meta, href, look, card, style }: { object: ReactNode; title: string; line: string; meta?: string; href?: string; look?: RowLook; card?: ReactNode; style?: CSSProperties }) {
+  const external = href?.startsWith("http") ?? false;
   const descriptionId = look && `${look.id}-description`;
   const props = look ? { "data-look": look.id, "aria-describedby": descriptionId } : {};
   const titleId = look && `${look.id}-title`;
   const content = (
     <>
+      {card}
       <span className="qi-row__object" aria-hidden="true">
         {object}
       </span>
@@ -31,16 +37,21 @@ export function Row({ object, title, line, meta, href, look }: { object: ReactNo
         {meta && <span className="qi-row__meta stretch-mono">{meta}</span>}
         {href && (
           <span className="qi-row__arrow" aria-hidden="true">
-            →
+            {external ? "↗" : "→"}
           </span>
         )}
+        {external && href && <span className="sr-only"> opens {hostLabel(href)} in a new tab</span>}
       </span>
     </>
   );
   return (
-    <li className="qi-list__item">
+    <li className="qi-list__item" data-card={card ? "" : undefined} style={style}>
       <div className="qi-row-box">
-        {href ? (
+        {external ? (
+          <a className="qi-row" href={href} target="_blank" rel="noreferrer" {...props}>
+            {content}
+          </a>
+        ) : href ? (
           <Link className="qi-row" href={href} {...props}>
             {content}
           </Link>

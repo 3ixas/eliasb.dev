@@ -1,13 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
-import { featuredSlugs, projectIndex, projects } from "../src/content/projects";
 import { thingsIMake } from "../src/content/stretch/site-copy";
 
 const phone = (page: Page) => (page.viewportSize()?.width ?? 0) < 761;
 const rows = (page: Page) => page.locator(".stretch-index__row");
-const expected = projectIndex(projects, featuredSlugs);
 
 test.describe("Work: external rows say they open in a new tab", () => {
-  for (const path of ["/", "/things-i-make"]) {
+  for (const path of ["/things-i-make"]) {
     test(`on ${path}, an external row's name keeps the project and adds where it goes; an internal row's name is unchanged`, async ({ page }) => {
       await page.goto(path);
       await expect(rows(page).first()).toBeVisible();
@@ -27,83 +25,6 @@ test.describe("Work: external rows say they open in a new tab", () => {
       }
     });
   }
-});
-
-test.describe("Work: Project index on the homepage", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
-
-  test("rows are the non-featured projects, newest first, with outcome, type and year", async ({ page }) => {
-    await expect(rows(page)).toHaveCount(expected.length);
-    for (const [index, project] of expected.entries()) {
-      const row = rows(page).nth(index);
-      await expect(row.locator(".stretch-index__name")).toHaveText(project.name);
-      await expect(row.locator(".stretch-index__outcome")).toHaveText(project.outcome);
-      await expect(row.locator(".stretch-index__meta")).toHaveText(`${project.type} · ${project.year}`);
-      await expect(row.getByRole("link")).toHaveAttribute("href", project.links.caseStudy ?? project.links.live ?? project.links.code!);
-    }
-    const years = await rows(page).locator(".stretch-index__meta").allTextContents();
-    const sorted = years.map((text) => Number(text.slice(-4)));
-    expect(sorted).toEqual([...sorted].sort((a, b) => b - a));
-  });
-
-  test("the index is in the server-rendered page and the archive link goes to /things-i-make", async ({ page }) => {
-    await page.route("**/*.js", (route) => route.abort());
-    await page.reload();
-    await expect(rows(page)).toHaveCount(expected.length);
-    const all = page.locator("#things-i-make").getByRole("link", { name: thingsIMake.allThings(projects.length) });
-    await expect(all).toHaveAttribute("href", "/things-i-make");
-  });
-
-  test("a row turns cobalt, and so does its arrow, on hover and on focus", async ({ page, browserName }) => {
-    const cobalt = await page.evaluate(() => {
-      const probe = document.createElement("span");
-      probe.style.color = "var(--stretch-cobalt)";
-      document.body.appendChild(probe);
-      const colour = getComputedStyle(probe).color;
-      probe.remove();
-      return colour;
-    });
-    const link = rows(page).first().getByRole("link");
-    const name = rows(page).first().locator(".stretch-index__name");
-    await expect(name).not.toHaveCSS("color", cobalt);
-    await link.hover();
-    await expect(name).toHaveCSS("color", cobalt);
-    await expect(rows(page).first().locator(".stretch-index__arrow")).toHaveCSS("color", cobalt);
-    await page.mouse.move(0, 0);
-    await expect(name).not.toHaveCSS("color", cobalt);
-    test.skip(browserName !== "chromium", "WebKit does not Tab to links");
-    await link.focus();
-    await page.keyboard.press("Shift+Tab");
-    await page.keyboard.press("Tab");
-    await expect(name).toHaveCSS("color", cobalt);
-  });
-
-  test("rows without a screenshot render cleanly and with no preview", async ({ page }) => {
-    for (const [index, project] of expected.entries()) {
-      if (project.screenshot) continue;
-      const row = rows(page).nth(index);
-      await expect(row.locator(".stretch-index__shot")).toHaveCount(0);
-      await row.getByRole("link").hover();
-      await expect(row.locator(".stretch-index__name")).toBeVisible();
-    }
-  });
-
-  test("rows are single-tap, 44 px targets with no sideways scroll on phones", async ({ page }) => {
-    for (const index of expected.keys()) {
-      const box = await rows(page).nth(index).getByRole("link").boundingBox();
-      expect(box!.height).toBeGreaterThanOrEqual(44);
-    }
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
-    expect(overflow).toBeLessThanOrEqual(0);
-    const all = await page.locator(".stretch-index__all a").boundingBox();
-    expect(all!.height).toBeGreaterThanOrEqual(44);
-    if (phone(page)) {
-      const first = await rows(page).first().getByRole("link").boundingBox();
-      expect(first!.width).toBeGreaterThan((page.viewportSize()?.width ?? 0) - 40);
-    }
-  });
 });
 
 test.describe("Work: Project index with a long catalogue", () => {

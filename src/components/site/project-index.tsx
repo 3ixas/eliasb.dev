@@ -3,17 +3,12 @@ import Link from "next/link";
 import { HOMEPAGE_INDEX_ROWS, type Project } from "@/content/projects";
 import { thingsIMake } from "@/content/stretch/site-copy";
 import { bindDots } from "@/components/site/bind-dots";
+import { hostLabel } from "@/components/site/host-label";
 
 const number = (position: number) => String(position).padStart(2, "0");
 
 /** A project opens at its case study, else its live site, else its code. */
 const destination = ({ links }: Project) => links.caseStudy ?? links.live ?? links.code ?? "/things-i-make";
-
-/** Where an external row goes, as a person would say it: "GitHub", else the host without "www.". */
-const hostLabel = (href: string) => {
-  const { hostname } = new URL(href);
-  return hostname === "github.com" ? "GitHub" : hostname.replace(/^www\./, "");
-};
 
 /**
  * The Project index: every non-featured project as a typographic row, newest

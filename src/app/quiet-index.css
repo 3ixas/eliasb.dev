@@ -822,6 +822,202 @@
   }
 }
 
+/* ---------- Things I make: a project's object, its closer look, its phone card ---------- */
+
+/*
+ * A project's object (project-object.tsx): a detail of its screenshot, in a glass-edged slot on its Project colour
+ * (the page's card colour for a project without one). The image is placed in px by the component.
+ */
+.qi-crop {
+  position: relative;
+  display: block;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  border-radius: 11px;
+  background: var(--project-field, var(--stretch-card));
+  box-shadow:
+    0 1px 1px rgb(0 0 0 / 0.3),
+    0 3px 5px -1px rgb(0 0 0 / 0.35);
+}
+
+.qi-crop img {
+  position: absolute;
+  display: block;
+  max-width: none;
+}
+
+/* The glass edge sits over the image. */
+.qi-crop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.22),
+    inset 0 1px 0 rgb(255 255 255 / 0.5),
+    inset 0 -1px 0 rgb(0 0 0 / 0.25);
+  pointer-events: none;
+}
+
+/* The closer look: the screenshot on its Project colour, with its type and year. It slides in and settles. */
+.qi-project {
+  box-sizing: border-box;
+  width: 300px;
+  margin: 0;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--project-field, var(--stretch-card));
+  color: var(--project-ink, var(--stretch-ink));
+  box-shadow:
+    0 1px 1px rgb(0 0 0 / 0.25),
+    0 8px 18px -8px rgb(0 0 0 / 0.4);
+  animation: qi-project-in 0.55s var(--out) both;
+}
+
+.qi-project img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.qi-project figcaption {
+  margin-top: 10px;
+  font-size: var(--text-label);
+  line-height: 1.4;
+}
+
+@keyframes qi-project-in {
+  0% {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(-5px);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* The link to the archive, under the list. */
+.qi-all {
+  margin: 14px 0 0;
+}
+
+.qi-all a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--stretch-muted);
+  font-size: var(--text-small);
+  text-decoration: none;
+}
+
+.qi-all a:focus-visible {
+  outline: 2px solid var(--stretch-cobalt);
+  outline-offset: 2px;
+  color: var(--stretch-cobalt);
+}
+
+@media (hover: hover) {
+  .qi-all a:hover {
+    color: var(--stretch-cobalt);
+  }
+}
+
+/* The phone card's screenshot exists in the markup for every screen and shows on phones only. */
+.qi-card__shot {
+  display: none;
+}
+
+/*
+ * On phones the featured projects (the list items with a card) become cards that swipe, from the same list: the
+ * list scrolls sideways, each card is 82% of its width and snaps to the gutter, and the other rows span the
+ * list's full width and stay at the left edge while it scrolls, so they read as the rows they are.
+ */
+@media (max-width: 760px) {
+  .qi-list[data-things] {
+    container-type: inline-size;
+    grid-template-columns: repeat(3, 82%);
+    column-gap: 12px;
+    margin-inline: -16px;
+    padding-inline: 16px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-padding-inline: 16px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .qi-list[data-things]::-webkit-scrollbar {
+    display: none;
+  }
+
+  .qi-list[data-things] > li:not([data-card]) {
+    grid-column: 1 / -1;
+    /* Sticky offsets are measured from the list's padding, so 0 keeps a row at the gutter. */
+    position: sticky;
+    left: 0;
+    width: 100cqw;
+  }
+
+  /* A row reaches 12 px into the gutter, as it does in every list; its closer look keeps the text edge. */
+  .qi-list[data-things] > li:not([data-card]) .qi-row-box {
+    margin-inline: -12px;
+  }
+
+  .qi-list[data-things] > li:not([data-card]) .qi-inline {
+    margin-left: 52px;
+  }
+
+  .qi-list[data-things] > li[data-card] {
+    grid-row: 1;
+    overflow: hidden;
+    border-radius: 20px;
+    background: var(--project-field);
+    color: var(--project-ink);
+    scroll-snap-align: start;
+  }
+
+  [data-card] .qi-row {
+    display: block;
+    min-height: 0;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  [data-card] .qi-card__shot {
+    display: block;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+  }
+
+  [data-card] .qi-card__shot img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+  }
+
+  [data-card] .qi-row__text {
+    padding: 14px 16px 18px;
+  }
+
+  [data-card] .qi-row__line {
+    color: inherit;
+  }
+
+  /* A card has no object, no end and no closer look: the card already shows the work. */
+  [data-card] :is(.qi-row__object, .qi-row__end, .qi-row__tap, .qi-inline) {
+    display: none;
+  }
+}
+
 /* ---------- motion that only plays when asked for ---------- */
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
@@ -831,6 +1027,14 @@
 
   .qi-row:hover .qi-tile {
     animation: qi-turn 0.6s var(--spring);
+  }
+
+  .qi-crop {
+    transition: transform 0.4s var(--spring);
+  }
+
+  .qi-row:hover .qi-crop {
+    transform: translateY(-2px) rotate(3deg);
   }
 }
 
@@ -842,6 +1046,11 @@
 
   .qi-list__item:has(.qi-inline__in) .qi-tile {
     animation: qi-turn 0.6s var(--spring);
+  }
+
+  .qi-list__item:has(.qi-inline__in) .qi-crop {
+    transform: translateY(-2px) rotate(3deg);
+    transition: transform 0.4s var(--spring);
   }
 }
 
@@ -866,6 +1075,7 @@
 /* Reduced motion: every closer look fades in over 0.2 s, and nothing arrives with motion. */
 @media (prefers-reduced-motion: reduce) {
   .qi-pass,
+  .qi-project,
   .qi-pins__item,
   .qi-note,
   .qi-strand__thread,
