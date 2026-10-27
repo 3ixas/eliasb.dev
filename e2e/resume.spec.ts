@@ -19,8 +19,8 @@ test.describe("The Résumé", () => {
   });
 
   test("lists the Role stories' employers, roles and dates, newest first", async ({ page }) => {
-    // Work's rail is the order the site calls newest first, and the Résumé must follow it.
-    expect(roleStorySlugs).toEqual(work.rail.map(({ slug }) => slug));
+    // Work's rows are the order the site calls newest first, and the Résumé must follow it.
+    expect(roleStorySlugs).toEqual(work.employers.map(({ slug }) => slug));
     const entries = page.locator("[data-resume-entry]");
     await expect
       .poll(() =>

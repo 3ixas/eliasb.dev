@@ -1,7 +1,7 @@
 /*
  * Work, the homepage section straight after the hero (see Work in GLOSSARY.md):
- * the Staff passes on their rail, History, and Where I'm headed. Copy is from
- * docs/content/redesign-copy.md ("Work"), approved by Elias; scripts/verify-copy.mjs
+ * a row for each employer, History at uni, and Where I'm headed with its three
+ * strand rows. Copy is from docs/content/redesign-copy.md ("Quiet index · Work"), approved by Elias; scripts/verify-copy.mjs
  * checks it. BNP Paribas detail stays at CV level: no colleague names, internal
  * system names or review context.
  *
@@ -11,7 +11,7 @@ import { projects, type CaseStudySlug } from "../projects.ts";
 import { caseStudies } from "./case-studies.ts";
 import { roleStories } from "./role-stories.ts";
 import { roleStoryColours, type RoleStorySlug } from "./role-story.ts";
-import { passLinkLabel, passRecords, type PassState } from "./staff-pass.ts";
+import { passLinkLabel, passRecords } from "./staff-pass.ts";
 import { storyText } from "./story.ts";
 
 /**
@@ -80,45 +80,68 @@ export function headedProblems(bars: readonly HeadedBar[]): string[] {
   });
 }
 
+/** The small enamel glyphs a Pass pin can carry (src/components/quiet/finished-pass.tsx draws them). */
+export type PinGlyph = "trophy" | "key" | "spark" | "gauge" | "database" | "phone" | "tick" | "branch";
+
+/** A Pass pin in an employer's closer look: its glyph, what it is for in bold, and the cause or date beside it. */
+export type WorkPin = { glyph: PinGlyph; label: string; detail: string };
+
 /**
- * A pass on the rail: whose it is, how it hangs (its resting tilt, in degrees,
- * and an optional strap length in px, so past passes can hang at different
- * heights), and whether the job is current or over. Size and pins follow from
- * the state: only the current pass is large and wears the awards. The current
- * pass also carries its own proofs, the lines under its headline number, so
- * they cannot end up on another employer's pass.
+ * An employer's row (GLOSSARY.md, Row): the Role story it leads to, then what its closer look shows under
+ * its pass: three Pass pins, each a result and its cause (a Résumé line from the Role story), and `proofs`,
+ * extra lines the copy deck gives the closer look.
  */
-export type RailPass = { slug: RoleStorySlug; tilt: number; strap?: number } & (
-  | { state: Extract<PassState, "current">; proofs: readonly string[] }
-  | { state: Extract<PassState, "returned"> }
-);
+export type Employer = {
+  slug: RoleStorySlug;
+  pins: readonly WorkPin[];
+  proofs: readonly string[];
+  /** Where the pass's headline figure counts up from, when it is a number that moved (Optegra's pass rate was 62%). */
+  countFrom?: number;
+};
 
 export const work = {
   heading: "Work",
-  /** The note under the heading: it frames the changes of craft, and was How I got here's. */
+  /** The note under the heading: it frames the changes of craft. */
   note: "History, then marketing, then code. Each move was towards the work I liked most.",
-  /** Newest first: the current pass, then the returned ones. verify:copy checks it covers every Role story once. */
-  rail: [
+  /** Newest first. verify:copy checks it covers every Role story once. */
+  employers: [
     {
       slug: "bnp-paribas",
-      state: "current",
-      tilt: -1,
-      /**
-       * What the pass says beyond its headline number ("Only · C# engineer on the
-       * team", from src/content/stretch/staff-pass.ts). The first of the three
-       * approved Now proofs is that headline, so it is not repeated here.
-       */
+      pins: [
+        { glyph: "trophy", label: "Winner", detail: "Digitisation · 2025" },
+        { glyph: "key", label: "Take Ownership", detail: "Q1 2026" },
+        { glyph: "spark", label: "AI Champion", detail: "2026" },
+      ],
+      /** What the pass says beyond its headline number ("Only · C# engineer on the team", from staff-pass.ts). */
       proofs: [
         "I was nominated as an AI Champion, and the workflow I built is now used by several teams across the department.",
         "With that workflow I integrated a pricer in a couple of days, a job that takes an experienced engineer about two weeks.",
       ],
     },
-    { slug: "joveen", state: "returned", tilt: 1.5, strap: 84 },
-    { slug: "optegra", state: "returned", tilt: -1.2 },
-  ] satisfies readonly RailPass[],
+    {
+      slug: "joveen",
+      pins: [
+        { glyph: "gauge", label: "Page load, cut by 40%", detail: "Cut page load by 40% by refactoring React components and lazy-loading assets." },
+        { glyph: "database", label: "Key API p95, 520 ms → 230 ms", detail: "Added indexes and rewrote slow queries, starting with the API that mattered most." },
+        { glyph: "phone", label: "Mobile retention, up 30%", detail: "Fixed mobile layout and browser bugs found by a cross-browser testing pipeline." },
+      ],
+      proofs: [],
+      countFrom: 0,
+    },
+    {
+      slug: "optegra",
+      pins: [
+        { glyph: "tick", label: "Core Web Vitals pass rate, 62% → 88%", detail: "Scoped performance fixes with the engineers and ticketed them." },
+        { glyph: "gauge", label: "p95 page load, cut by 30%", detail: "The same scoped, ticketed fixes." },
+        { glyph: "branch", label: "Where the switch started", detail: "The best part of the job was working with the engineers who built our website." },
+      ],
+      proofs: [],
+      countFrom: 62,
+    },
+  ] satisfies readonly Employer[],
   headed: {
     heading: "Where I’m headed",
-    line: "I want to be really good at this. Here’s what that means to me, and how far I’ve got.",
+    line: "Building a whole product well: what to make, why it works, and getting it to production. How far I’ve got on each.",
     soFar: "So far",
     bars: [
       {
@@ -147,13 +170,10 @@ export const work = {
       },
     ] satisfies readonly HeadedBar[],
   },
-  /** History is a dashed note under the rail, not a pass: it has no Role story to open. */
-  history: { dates: "Before 2021", role: "History at uni", note: "Because I loved it, and I still do." },
+  /** History at uni: a row whose closer look is a note. */
+  history: {
+    title: "History at uni",
+    line: "Before 2021 · Because I loved it, and I still do.",
+    note: { school: "University of Essex", course: "Diploma of Higher Education, History", date: "Jul 2021" },
+  },
 } as const;
-
-/** How a Role story's pass hangs on Work (its state and resting tilt), so the story opens on the same pass. */
-export function railPass(slug: RoleStorySlug): RailPass {
-  const pass = work.rail.find((item) => item.slug === slug);
-  if (!pass) throw new Error(`Work's rail has no pass for the Role story "${slug}".`);
-  return pass;
-}

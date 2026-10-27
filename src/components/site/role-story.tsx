@@ -25,7 +25,7 @@ import {
   roleStorySectionLabels,
   type RoleStory,
 } from "@/content/stretch/role-story";
-import { railPass } from "@/content/stretch/work";
+import { passHang } from "@/content/stretch/staff-pass";
 
 /**
  * A Role story (GLOSSARY.md): the same shape as a case study, for an employer.
@@ -38,7 +38,7 @@ import { railPass } from "@/content/stretch/work";
  */
 export function RoleStoryPage({ story }: { story: RoleStory }) {
   const colours = roleStoryColours(story.colours);
-  const { state, tilt } = railPass(story.slug);
+  const { state, tilt } = passHang[story.slug];
 
   return (
     <div data-stretch-shell data-role-story={story.slug}>

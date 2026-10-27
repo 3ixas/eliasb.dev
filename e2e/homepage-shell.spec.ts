@@ -30,7 +30,17 @@ test.describe("Homepage shell", () => {
     await expect(page.getByRole("heading", { level: 2 })).toHaveText(sections.map((section) => section.id === "say-hello" ? sayHello.bigLink : section.heading));
   });
 
-  for (const { id, heading, note } of sections.filter(({ id }) => id !== "say-hello")) {
+  // Work is the first section in the quiet index's language: a 17 px title and a 15 px note, not a giant heading (#291).
+  test("Work has a quiet title and its note", async ({ page }) => {
+    await page.goto("/");
+    const section = page.locator("section#work");
+    const title = section.getByRole("heading", { level: 2, name: work.heading, exact: true });
+    await expect(title).toHaveCSS("font-size", "17px");
+    await expect(title).toHaveCSS("font-weight", "650");
+    await expect(section.locator(".qi-note-line").first()).toHaveText(work.note);
+  });
+
+  for (const { id, heading, note } of sections.filter(({ id }) => id !== "say-hello" && id !== "work")) {
     test(`${heading} has its giant heading${note ? ", mono note and true count" : ""}`, async ({ page }) => {
       await page.goto("/");
       const section = page.locator(`section#${id}`);

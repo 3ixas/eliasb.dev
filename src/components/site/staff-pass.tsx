@@ -30,7 +30,7 @@ export type EmployerPassProps = {
    * wears the other theme's pair so it stands off the band, with a faint ink edge.
    */
   onBand?: boolean;
-  /** Extra lines under the headline number, such as the current role's proofs. */
+  /** Extra lines under the headline number. */
   children?: ReactNode;
 };
 

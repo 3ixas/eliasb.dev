@@ -46,6 +46,19 @@ export const passRecords: Record<RoleStorySlug, PassRecord> = {
   optegra: { short: "Optegra", headline: { value: "88%", label: "Core Web Vitals pass rate" } },
 };
 
+/**
+ * How an employer's pass hangs where it is the opening object of its Role story: whether the job is current
+ * or over, and its resting tilt in degrees (held under reduced motion).
+ */
+export const passHang: Record<RoleStorySlug, { state: PassState; tilt: number }> = {
+  "bnp-paribas": { state: "current", tilt: -1 },
+  joveen: { state: "returned", tilt: 1.5 },
+  optegra: { state: "returned", tilt: -1.2 },
+};
+
+/** What a pass says its status is: "Valid · present" while the job is current, otherwise "Returned". */
+export const passStatus = (state: PassState) => (state === "current" ? currentPassStatus : "Returned");
+
 /** Only a current pass shows a status; a returned one has the "Returned" stamp, and its dates line already says when it ended. */
 export const currentPassStatus = "Valid · present";
 

@@ -1,0 +1,56 @@
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { bindDots } from "@/components/site/bind-dots";
+
+/** A row's closer look: its id (the key of the controller's `looks`) and what it says beyond the row, as the row's accessible description. */
+export type RowLook = { id: string; description: string };
+
+/**
+ * The Row (GLOSSARY.md): the quiet index's only list shape. A 44 px object, a title, one line and optional
+ * metadata. A row with a destination is a link; a plain row takes focus only when it has a closer look,
+ * and then the controller (closer-look-root.tsx) shows that look when the pointer or focus arrives.
+ * Rendered by the server in full: the description is hidden text the row points to with `aria-describedby`,
+ * and sits beside the row so it is not part of a link's name.
+ */
+export function Row({ object, title, line, meta, href, look }: { object: ReactNode; title: string; line: string; meta?: string; href?: string; look?: RowLook }) {
+  const descriptionId = look && `${look.id}-description`;
+  const props = look ? { "data-look": look.id, "aria-describedby": descriptionId } : {};
+  const titleId = look && `${look.id}-title`;
+  const content = (
+    <>
+      <span className="qi-row__object" aria-hidden="true">
+        {object}
+      </span>
+      <span className="qi-row__text">
+        <span id={titleId} className="qi-row__title">{title}</span>
+        <span className="qi-row__line">{bindDots(line)}</span>
+      </span>
+      <span className="qi-row__end">
+        {meta && <span className="qi-row__meta stretch-mono">{meta}</span>}
+        {href && (
+          <span className="qi-row__arrow" aria-hidden="true">
+            →
+          </span>
+        )}
+      </span>
+    </>
+  );
+  return (
+    <li className="qi-list__item">
+      {href ? (
+        <Link className="qi-row" href={href} {...props}>
+          {content}
+        </Link>
+      ) : (
+        <div className="qi-row" tabIndex={look ? 0 : undefined} role={look ? "group" : undefined} aria-labelledby={titleId} {...props}>
+          {content}
+        </div>
+      )}
+      {look && (
+        <p id={descriptionId} hidden>
+          {look.description}
+        </p>
+      )}
+    </li>
+  );
+}

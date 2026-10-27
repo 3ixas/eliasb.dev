@@ -297,22 +297,6 @@
   transform: rotate(-4deg);
 }
 
-/* The current pass's remaining proofs: lines under the headline number. */
-.stretch-pass__proofs {
-  display: grid;
-  gap: 10px;
-  margin: 0;
-  padding: 0;
-  font-size: var(--text-small);
-  line-height: 1.4;
-  list-style: none;
-}
-
-.stretch-pass__proofs li {
-  padding-left: 14px;
-  border-left: 2px solid color-mix(in srgb, var(--pass-ink) 40%, transparent);
-}
-
 /* ---------- the awards, worn as pins on the lanyard ---------- */
 
 .stretch-pass__pins {

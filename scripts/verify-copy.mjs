@@ -35,7 +35,7 @@ const plain = raw.replace(/\*/g, "").replace(/[{}]/g, "");
 
 const leaves = (value, path = "") => {
   // Links, image paths, a figure's kind and its screens' devices, dates, anchors, category keys and Role story slugs are addresses and data, not words, so the approved copy does not list them.
-  if (typeof value === "string") return /(href|src|writtenOn|\.id|\.figures\.[\w-]+\.kind|\.figures\.[\w-]+\.images\[\d+\]\.device|\.category|\.story|\.project|\.restates\[\d+\])$/.test(path) ? [] : [[path, value]];
+  if (typeof value === "string") return /(href|src|writtenOn|\.id|\.glyph|\.slug|\.figures\.[\w-]+\.kind|\.figures\.[\w-]+\.images\[\d+\]\.device|\.category|\.story|\.project|\.restates\[\d+\])$/.test(path) ? [] : [[path, value]];
   if (Array.isArray(value)) return value.flatMap((item, index) => leaves(item, `${path}[${index}]`));
   if (value && typeof value === "object") return Object.entries(value).flatMap(([key, item]) => leaves(item, `${path}.${key}`));
   return [];
@@ -48,8 +48,7 @@ const modules = {
   sayHello,
   workArchive,
   howIWork,
-  // The rail names slugs and tilts, not copy; it has its own checks below.
-  work: { ...work, rail: [] },
+  work,
   offTheClock,
   caseStudyCopy,
   caseStudySectionLabels,
@@ -132,18 +131,25 @@ const copyFor = (name) => {
   return raw.slice(start, end === -1 ? undefined : start + 1 + end);
 };
 
-// Work: the Now proofs, Where I'm headed and History, word for word.
+// Work: the employers' closer looks, Where I'm headed and History at uni, word for word.
 const bullet = (text, label) => text.match(new RegExp(`^- ${label}: (.+)$`, "m"))?.[1];
 const { headed, history } = work;
 
-const nowRows = Object.fromEntries(rows(copyFor("Now"), "### ").map(([part, copy]) => [part, copy]));
-const [current, ...returned] = work.rail;
-assert.equal(current.state === "current" && current.proofs.join(" · "), nowRows.Proofs, "Now: proofs");
-assert.ok(returned.every((pass) => !("proofs" in pass)), "Only the current pass carries proofs");
+const workCopy = copyFor("Quiet index · Work");
+const workRows = Object.fromEntries(rows(workCopy, "### ").map(([where, copy]) => [where, copy]));
+const nowProofs = work.employers[0].proofs;
+assert.ok(workRows["BNP Paribas closer look"].includes(nowProofs.join(" · ")), "BNP Paribas: the closer look's proofs");
+for (const { slug, pins } of work.employers) {
+  const story = roleStories[slug];
+  assert.equal(`${story.role} · ${story.dates}`, workRows[`${passRecords[slug].short} row`], `${slug}: the row's line is its Role story's role and dates`);
+  assert.equal(pins.length, 3, `${slug}: three Pass pins`);
+}
+assert.equal(`${history.line}`, workRows["History at uni row"], "History at uni: row");
+assert.equal(`${history.note.school} · ${history.note.course} · ${history.note.date}`, workRows["History at uni closer look"], "History at uni: closer look");
+assert.ok(workRows["Where I’m headed: heading and line"].includes(`${headed.heading} · ${headed.line}`), "Where I’m headed: heading and line");
 
 const headedCopy = copyFor("Where I’m headed");
 assert.equal(headed.heading, bullet(headedCopy, "Heading"), "Where I’m headed: heading");
-assert.equal(headed.line, bullet(headedCopy, "Line"), "Where I’m headed: line");
 assert.equal(headed.soFar, bullet(headedCopy, "Tag"), "Where I’m headed: tag");
 assert.deepEqual(
   headed.bars.map((bar) => [bar.label, bar.title, bar.soFar.text, shownSource(bar.source).link.label]),
@@ -153,7 +159,7 @@ assert.deepEqual(
 
 const gotHereCopy = copyFor("How I got here");
 assert.equal(work.note, bullet(gotHereCopy, "Note"), "Work: note");
-assert.deepEqual([[history.dates, history.role, history.note]], rows(gotHereCopy, "### "), "History");
+assert.equal(history.line, rows(gotHereCopy, "### ").map(([dates, , note]) => `${dates} · ${note}`)[0], "History");
 assert.equal(work.heading, bullet(raw.slice(raw.indexOf("## Work\n")), "Heading"), "Work: heading");
 
 // Every link goes to a Role story or Case study that exists, and every "So far" restates a fact its source tells.
@@ -165,9 +171,9 @@ assert.deepEqual(headedProblems(headed.bars), []);
 assert.match(headedProblems([{ ...headed.bars[0], soFar: { ...headed.bars[0].soFar, restates: ["decided what the engineers built next"] } }])[0], /Judgement bar.*decided what the engineers built next/);
 assert.match(headedProblems([{ ...headed.bars[2], soFar: { ...headed.bars[2].soFar, restates: ["58 user stories"] } }])[0], /Range bar.*58 user stories/);
 assert.match(headedProblems([{ ...headed.bars[2], soFar: { ...headed.bars[2].soFar, text: "Threshold, a live site." } }])[0], /Range bar.*no longer shows "57 user stories"/);
-// The rail hangs every Role story once, the current one first and the rest returned.
-assert.deepEqual([...work.rail.map((pass) => pass.slug)].sort(), [...roleStorySlugs].sort(), "The Work rail hangs every Role story exactly once");
-assert.deepEqual(work.rail.map((pass) => pass.state), ["current", ...work.rail.slice(1).map(() => "returned")], "The Work rail starts with the one current pass, then the returned ones");
+// Work has a row for every Role story exactly once, the current job first.
+assert.deepEqual([...work.employers.map((employer) => employer.slug)].sort(), [...roleStorySlugs].sort(), "Work has a row for every Role story exactly once");
+assert.equal(work.employers[0].slug, roleStorySlugs[0], "Work starts with the newest Role story");
 assert.deepEqual(siteCopy.menu.map(({ id }) => id), ["work", "things-i-make", "how-i-work", "off-the-clock", "say-hello"], "The menu follows the page");
 
 // Case studies.

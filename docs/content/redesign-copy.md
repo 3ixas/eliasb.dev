@@ -50,22 +50,11 @@ The homepage section straight after the hero, led by employment ([#157](https://
 
 - Heading: Work
 
-### Now
-
-The current Staff pass. Its role, dates and link come from its Role story, and its headline number from `src/content/stretch/staff-pass.ts`: the first approved proof, “I’m the team’s only C# engineer, so I own the C# side from planning through review”, became that headline (“Only · C# engineer on the team”). The other two stay on the pass as lines (#210).
-
-| Part | Copy |
-| --- | --- |
-| Proofs | I was nominated as an AI Champion, and the workflow I built is now used by several teams across the department. · With that workflow I integrated a pricer in a couple of days, a job that takes an experienced engineer about two weeks. |
-
-> **Leaves with this section** when the quiet index replaces it: Now as a heading. Its two proofs move to the BNP Paribas closer look.
-
 ### Where I’m headed
 
-The self-issued Staff pass (#211, settled on the map on 16 October 2026). Each bar says what “good” means; its “So far” restates a fact already in a Role story or Case study, checked by `verify:copy`. The Optegra line says “guided”, as the Optegra Role story does (the prototype said “decided”).
+Three strands (#211, settled on the map on 16 October 2026), shown as rows. Each says what “good” means; its “So far” is its closer look, and restates a fact already in a Role story or Case study, checked by `verify:copy`. The Optegra line says “guided”, as the Optegra Role story does (the prototype said “decided”).
 
 - Heading: Where I’m headed
-- Line: I want to be really good at this. Here’s what that means to me, and how far I’ve got.
 - Tag: So far
 
 | Bar | Title | So far | Link |
@@ -74,19 +63,15 @@ The self-issued Staff pass (#211, settled on the map on 16 October 2026). Each b
 | Depth | Knowing why it works, not just that it does. | Six months from zero C# to production code, in a pricing engine of around 70 projects. | The BNP Paribas story → |
 | Range | The whole way, from idea to running in production. | Threshold, from 57 user stories to a live site. | The Threshold case study → |
 
-> **Leaves with this section** when the quiet index replaces it: the line, which the quiet index rewrites. The heading, titles, labels and “So far” lines stay.
-
 ### How I got here
 
-Joveen and Optegra are now Staff passes (role, dates and headline number from their Role stories, stamped “Returned”). What remains as text is the note under the Work heading and History, a dashed note under the rail (#210).
+The employers are rows (role and dates from their Role stories). What is text of its own is the note under the Work heading and the History at uni row (#210).
 
 - Note: History, then marketing, then code. Each move was towards the work I liked most.
 
 | Dates | Role | Note |
 | --- | --- | --- |
 | Before 2021 | History at uni | Because I loved it, and I still do. |
-
-> **Leaves with this section** when the quiet index replaces it: the note’s dashed box. The note’s words and the History row stay.
 
 ## Things I make
 

@@ -88,7 +88,7 @@ A **closer look** is a row's detail: on desktop it appears in the margin, and on
 |---|---|---|
 | A project | Its screenshot on its Project colour, then type and year | Sliding in and settling |
 | An employer | Its full Staff pass, then that role's three **Pass pins** in the same form for every employer: BNP Paribas's three awards, and Joveen's and Optegra's three best points from the copy deck, then the Résumé lines that explain its figure | Dropping on its strap and swinging to rest; the points pop on; the figure counts up (Optegra 62% → 88%, Joveen's page load cut by 40%) |
-| History at uni | A note: University of Essex, Diploma of Higher Education, History, July 2021 | Unfolding |
+| History at uni | A note: University of Essex, Diploma of Higher Education, History, Jul 2021 | Unfolding |
 | A Where I'm headed strand | "So far" with its source and proof | Its thread drawing down from the source |
 | Threshold's PRD | The quote | Typing itself, with a caret. Typing is time-based and smooth: characters appear on the animation frame at a steady rate (about 45 a second), never one timer per character |
 | Today's training | The run photo and the week, today in cobalt | The days filling in one by one, today last |
