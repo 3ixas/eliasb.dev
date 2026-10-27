@@ -733,6 +733,95 @@
   line-height: 1.45;
 }
 
+/* ---------- inline closer looks: phones and touch ---------- */
+
+/* A row's box holds its link and, on phones, the object's own button. */
+.qi-row-box {
+  position: relative;
+}
+
+/* The object's button sits over the object, beside the link rather than inside it. It exists only where a tap opens a closer look. */
+.qi-row__tap {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.qi-row__tap:focus-visible {
+  outline: 2px solid var(--stretch-cobalt);
+  outline-offset: 0;
+}
+
+/*
+ * The inline closer look (docs/design/DESIGN.md, "Inline"): the same full closer look the margin shows, opening
+ * under the tapped row on the row's text edge (12 px padding + 44 px object + 16 px gap, less the 8 px the swing
+ * of a pass needs), at up to 300 px wide, and pushing the text below it down. The slot is empty until a tap.
+ * Its width is a container, so a look on a 320 px screen scales to fit rather than scrolling sideways.
+ */
+.qi-inline {
+  display: grid;
+  grid-template-rows: 1fr;
+  margin-left: 64px;
+  container-type: inline-size;
+}
+
+.qi-inline:has(> .qi-inline__in) {
+  animation: qi-open 0.34s var(--out) both;
+}
+
+@keyframes qi-open {
+  from {
+    grid-template-rows: 0fr;
+  }
+}
+
+.qi-inline__in {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.qi-inline .qi-look {
+  box-sizing: border-box;
+  width: 316px;
+  padding: 10px 8px 20px;
+  zoom: min(1, tan(atan2(100cqw, 316px)));
+}
+
+@media not all and (min-width: 1180px) and (hover: hover) {
+  .qi-row__tap {
+    display: block;
+  }
+
+  /* A plain row is tapped anywhere; the open row keeps its card so it is clear which look is showing. */
+  .qi-row[data-look-tap] {
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .qi-list__item[data-open] .qi-row {
+    background: var(--stretch-card);
+  }
+}
+
+/* The margin's wide layout has no slot to fill. */
+@media (min-width: 1180px) and (hover: hover) {
+  .qi-inline {
+    display: none;
+  }
+}
+
 /* ---------- motion that only plays when asked for ---------- */
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
@@ -741,6 +830,17 @@
   }
 
   .qi-row:hover .qi-tile {
+    animation: qi-turn 0.6s var(--spring);
+  }
+}
+
+/* On touch there is no hover: a row's object plays its reaction when the row is tapped open, never as it scrolls into view. */
+@media (prefers-reduced-motion: no-preference) {
+  .qi-list__item[data-open] .qi-mini {
+    animation: qi-swing 0.9s var(--out);
+  }
+
+  .qi-list__item[data-open] .qi-tile {
     animation: qi-turn 0.6s var(--spring);
   }
 }
@@ -768,7 +868,8 @@
   .qi-pass,
   .qi-pins__item,
   .qi-note,
-  .qi-strand__thread {
+  .qi-strand__thread,
+  .qi-inline:has(> .qi-inline__in) {
     animation: none;
   }
 
