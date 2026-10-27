@@ -15,6 +15,14 @@ const plainRow = (page: Page, id: string) => section(page).locator(`.qi-row[data
 const openLooks = (page: Page) => page.locator(".qi-inline__in");
 const inlineLook = (page: Page, id: string) => section(page).locator(`[data-look-slot="${id}"] .qi-look`);
 const boxOf = async (locator: Locator) => (await locator.boundingBox())!;
+const lastTap = new WeakMap<Page, number>();
+/** WebKit folds a second click inside its double-click interval into the first; a person's next tap comes later, so taps are spaced like theirs. */
+const tap = async (page: Page, target: Locator, options?: Parameters<Locator["click"]>[0]) => {
+  const wait = 600 - (Date.now() - (lastTap.get(page) ?? 0));
+  if (wait > 0) await page.waitForTimeout(wait);
+  await target.click(options);
+  lastTap.set(page, Date.now());
+};
 const strandIds = work.headed.bars.map((bar) => `strand-${bar.label.toLowerCase()}`);
 const narrow = (page: Page) => (page.viewportSize()?.width ?? 0) < 1180;
 
@@ -58,7 +66,7 @@ test.describe("Work: inline closer looks", () => {
 
   test("tapping Joveen's object opens its full closer look under the row, on the row's text edge; tapping it again closes it", async ({ page }) => {
     const row = section(page).locator('a[data-look="joveen"]');
-    await tapObject(page, "joveen").click();
+    await tap(page, tapObject(page, "joveen"));
     await expect(page).toHaveURL(/\/$/);
     const look = inlineLook(page, "joveen");
     await expect(look.locator(".qi-pass")).toBeVisible();
@@ -71,15 +79,15 @@ test.describe("Work: inline closer looks", () => {
     const box = await boxOf(look);
     // The padding scales with the look, so a 320 px screen drifts by under 2 px.
     expect(Math.abs(box.x + 8 * (box.width / 316) - text.x)).toBeLessThanOrEqual(2);
-    await tapObject(page, "joveen").click();
+    await tap(page, tapObject(page, "joveen"));
     await expect(openLooks(page)).toHaveCount(0);
     await expect(tapObject(page, "joveen")).toHaveAttribute("aria-expanded", "false");
   });
 
   test("opening a second closer look closes the first, and tapping outside any trigger leaves one open", async ({ page }) => {
-    await tapObject(page, "bnp-paribas").click();
+    await tap(page, tapObject(page, "bnp-paribas"));
     await expect(inlineLook(page, "bnp-paribas")).toBeVisible();
-    await tapObject(page, "optegra").click();
+    await tap(page, tapObject(page, "optegra"));
     await expect(inlineLook(page, "optegra")).toBeVisible();
     await expect(openLooks(page)).toHaveCount(1);
     await expect(inlineLook(page, "bnp-paribas")).toHaveCount(0);
@@ -90,7 +98,7 @@ test.describe("Work: inline closer looks", () => {
   });
 
   test("when a look above the tapped row closes, the tapped row stays where it was on screen", async ({ page }) => {
-    await tapObject(page, "bnp-paribas").click();
+    await tap(page, tapObject(page, "bnp-paribas"));
     await expect(inlineLook(page, "bnp-paribas").locator(".qi-pass")).toBeVisible();
     const strand = plainRow(page, strandIds[0]);
     // Let the look finish opening (the row stops moving), then put the lower row mid-screen: centring it while the look still grows
@@ -104,7 +112,7 @@ test.describe("Work: inline closer looks", () => {
     await strand.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
     await expect.poll(stopsMoving).toBe(true);
     const before = (await boxOf(strand)).y;
-    await strand.click({ position: { x: 100, y: 20 } });
+    await tap(page, strand, { position: { x: 100, y: 20 } });
     await expect(inlineLook(page, strandIds[0])).toBeVisible();
     await expect(inlineLook(page, "bnp-paribas")).toHaveCount(0);
     await expect.poll(async () => Math.abs((await boxOf(strand)).y - before)).toBeLessThanOrEqual(2);
@@ -134,7 +142,7 @@ test.describe("Work: inline closer looks", () => {
     const describedBefore = await link.evaluate((element) => document.getElementById(element.getAttribute("aria-describedby")!)!.textContent);
     await expect(link).toHaveAccessibleDescription(describedBefore!);
     for (const [id, kind] of [["optegra", ".qi-pass"], ["history-at-uni", ".qi-note"], [strandIds[1], ".qi-strand__thread"]] as const) {
-      await (id === "optegra" ? tapObject(page, id) : plainRow(page, id)).click();
+      await tap(page, id === "optegra" ? tapObject(page, id) : plainRow(page, id));
       await expect(inlineLook(page, id).locator(kind)).toBeVisible();
       await expect(page.locator(`[data-look-slot="${id}"]`)).toHaveAttribute("aria-hidden", "true");
       await expect(page.locator(`[data-look-slot="${id}"] a, [data-look-slot="${id}"] button`)).toHaveCount(0);
@@ -153,7 +161,7 @@ test.describe("Work: inline closer looks", () => {
     for (const row of await section(page).locator(".qi-row[data-look-tap]").all()) expect((await boxOf(row)).height).toBeGreaterThanOrEqual(44);
     const ids = [...work.employers.map((employer) => employer.slug), "history-at-uni", ...strandIds];
     for (const id of ids) {
-      await (id in passRecords ? tapObject(page, id) : plainRow(page, id)).click();
+      await tap(page, id in passRecords ? tapObject(page, id) : plainRow(page, id));
       const look = inlineLook(page, id);
       await expect(look).toBeVisible();
       await expect.poll(async () => (await boxOf(look)).height).toBeGreaterThan(40);
@@ -167,16 +175,16 @@ test.describe("Work: inline closer looks", () => {
   test("an object plays its reaction when its row is tapped open", async ({ page }) => {
     const mini = section(page).locator('[data-look="joveen"] .qi-mini');
     await expect(mini).toHaveCSS("animation-name", "none");
-    await tapObject(page, "joveen").click();
+    await tap(page, tapObject(page, "joveen"));
     await expect(mini).toHaveCSS("animation-name", "qi-swing");
     await expect(section(page).locator('[data-look="history-at-uni"] .qi-tile')).toHaveCSS("animation-name", "none");
-    await plainRow(page, "history-at-uni").click();
+    await tap(page, plainRow(page, "history-at-uni"));
     await expect(section(page).locator('[data-look="history-at-uni"] .qi-tile')).toHaveCSS("animation-name", "qi-turn");
   });
 
   test("reduced motion: a closer look fades in over 0.2 s with no height animation or arrival motion", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await tapObject(page, "joveen").click();
+    await tap(page, tapObject(page, "joveen"));
     const look = inlineLook(page, "joveen");
     await expect(look).toBeVisible();
     await expect(look).toHaveCSS("animation-name", "qi-fade");
