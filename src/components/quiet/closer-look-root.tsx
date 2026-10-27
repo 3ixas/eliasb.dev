@@ -157,10 +157,10 @@ export function CloserLookRoot({ looks, className, children }: { looks: Record<s
     requestAnimationFrame(() => document.documentElement.style.removeProperty("overflow-anchor"));
   }, [active]);
 
-  // The object button says what is open to assistive technology (CSS styles an open row from its filled slot).
+  // The object button (or reveal word) says what is open to assistive technology (CSS styles an open row from its filled slot).
   useEffect(() => {
     if (active?.source !== "tap") return;
-    const buttons = root.current?.querySelectorAll(`button[data-look-tap="${CSS.escape(active.id)}"]`) ?? [];
+    const buttons = root.current?.querySelectorAll(`[data-look-tap="${CSS.escape(active.id)}"][aria-expanded]`) ?? [];
     buttons.forEach((button) => button.setAttribute("aria-expanded", "true"));
     return () => {
       buttons.forEach((button) => button.setAttribute("aria-expanded", "false"));

@@ -2,16 +2,16 @@
  * The Résumé (see Résumé in GLOSSARY.md): the sheet at /resume and the text its PDF must hold.
  * It owns only what the site does not already say, which is Education and grouped Skills. Roles,
  * dates and results come from the Role stories, the projects from the same featured list Work
- * uses, awards from the Staff pass's pins, and the summary and contact details from the hero and
- * the profile, so the sheet cannot drift from them.
+ * uses, awards from the Staff pass's pins, and the summary and contact details from the opening
+ * line and the profile, so the sheet cannot drift from them.
  *
  * Its runtime imports carry a .ts extension, so Node can load it directly (the PDF check) as well
  * as Next.
  */
 import { featuredProjects, featuredSlugs, projects } from "./projects.ts";
 import { profile } from "./site.ts";
+import { opening } from "./stretch/opening.ts";
 import { roleStories, roleStorySlugs } from "./stretch/role-stories.ts";
-import { hero } from "./stretch/site-copy.ts";
 import { passRecords } from "./stretch/staff-pass.ts";
 
 /** The public address the PDF's links point at; the page links to its own paths. */
@@ -62,7 +62,8 @@ const siteHost = bare(resumeOrigin).replace(/^www\./, "");
 export function resumeSheet(): ResumeSheet {
   return {
     name: profile.name,
-    role: hero.role,
+    // The sheet's own role line, capitalised as on the PDF; the homepage no longer has one.
+    role: "Software Engineer",
     location: profile.location,
     contacts: [
       { label: bare(profile.links.email), href: profile.links.email },
@@ -70,7 +71,7 @@ export function resumeSheet(): ResumeSheet {
       { label: bare(profile.links.github), href: profile.links.github },
       { label: bare(profile.links.linkedin), href: profile.links.linkedin },
     ],
-    summary: `${hero.headline.lead} ${hero.headline.emphasis}`,
+    summary: opening.headline,
     // Newest first: the Role stories are declared in that order, and each one's `next` follows it.
     experience: roleStorySlugs.map((slug) => {
       const story = roleStories[slug];

@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { passRecords } from "../src/content/stretch/staff-pass";
 import { work } from "../src/content/stretch/work";
+import { tap } from "./support/tap";
 
 /*
  * Inline closer looks on phones and touch (docs/design/DESIGN.md, "Inline"): below 1180 px a closer look opens
@@ -15,14 +16,6 @@ const plainRow = (page: Page, id: string) => section(page).locator(`.qi-row[data
 const openLooks = (page: Page) => page.locator(".qi-inline__in");
 const inlineLook = (page: Page, id: string) => section(page).locator(`[data-look-slot="${id}"] .qi-look`);
 const boxOf = async (locator: Locator) => (await locator.boundingBox())!;
-const lastTap = new WeakMap<Page, number>();
-/** WebKit folds a second click inside its double-click interval into the first; a person's next tap comes later, so taps are spaced like theirs. */
-const tap = async (page: Page, target: Locator, options?: Parameters<Locator["click"]>[0]) => {
-  const wait = 600 - (Date.now() - (lastTap.get(page) ?? 0));
-  if (wait > 0) await page.waitForTimeout(wait);
-  await target.click(options);
-  lastTap.set(page, Date.now());
-};
 const strandIds = work.headed.bars.map((bar) => `strand-${bar.label.toLowerCase()}`);
 const narrow = (page: Page) => (page.viewportSize()?.width ?? 0) < 1180;
 

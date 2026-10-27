@@ -29,10 +29,26 @@
   line-gap-override: 0%;
 }
 
+/*
+ * Semibold, the opening line's weight (650). Bricolage is lighter here than at 700 and up and its optical size
+ * widens it at smaller sizes, so the fallback runs 5% (50 px) to 8% (34 px) narrower at 91%: 97% is the middle,
+ * measured on the opening line. At 91% it wrapped to three lines at 390 px where Bricolage takes four.
+ */
 @font-face {
   font-family: "Bricolage Fallback";
   src: local("Arial Bold"), local("Liberation Sans Bold"), local("Arimo Bold");
-  font-weight: 600 800;
+  font-weight: 600 699;
+  font-stretch: 100%;
+  size-adjust: 97%;
+  ascent-override: 95.88%;
+  descent-override: 27.84%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Bricolage Fallback";
+  src: local("Arial Bold"), local("Liberation Sans Bold"), local("Arimo Bold");
+  font-weight: 700 800;
   font-stretch: 100%;
   size-adjust: 91%;
   ascent-override: 102.2%;

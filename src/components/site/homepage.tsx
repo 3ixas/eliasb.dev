@@ -1,4 +1,3 @@
-import { Hero } from "@/components/site/hero";
 import { sectionLinks } from "@/components/site/sections";
 import { SayHello } from "@/components/site/say-hello";
 import { SectionHeading } from "@/components/site/section-heading";
@@ -8,6 +7,7 @@ import { FeaturedTiles } from "@/components/site/featured-tiles";
 import { HowIWork } from "@/components/site/how-i-work";
 import { OffTheClock } from "@/components/site/off-the-clock";
 import { ProjectIndex } from "@/components/site/project-index";
+import { Opening } from "@/components/quiet/opening";
 import { Work } from "@/components/quiet/work";
 import { featuredProjects, featuredSlugs, projectIndex, projects } from "@/content/projects";
 import { howIWork } from "@/content/stretch/how-i-work";
@@ -17,7 +17,7 @@ import { thingsIMake } from "@/content/stretch/site-copy";
 const sayHelloHeadingId = "say-hello-heading";
 
 /**
- * The Stretch homepage shell: the header, the hero and five anchored sections
+ * The Stretch homepage shell: the header, the opening line and five anchored sections
  * (Work first) with their headings, notes and true counts, and the footer. The
  * page is complete from its first frame: nothing is held, faded or played in.
  */
@@ -26,7 +26,7 @@ export function Homepage() {
     <div data-stretch-shell>
       <SiteHeader sections={sectionLinks} />
       <main id="main-content" tabIndex={-1}>
-        <Hero />
+        <Opening />
 
         <section id="work" className="stretch-wrap stretch-section" aria-labelledby="work-heading">
           <Work />

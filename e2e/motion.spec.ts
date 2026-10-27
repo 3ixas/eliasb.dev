@@ -547,6 +547,8 @@ test.describe("One self-running motion on screen at a time", () => {
 
   test("a scroll pass down the homepage never has two on screen together", async ({ page }) => {
     await page.goto("/");
+    // The arrival reactions (the underline drawing, the greeting's scene) play once on every load and finish by themselves; what the pass looks for is what keeps running.
+    await expect.poll(async () => (await selfRunning(page)).filter((name) => name !== "stretch-now-pulse")).toEqual([]);
     await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
     const seen = new Set<string>();
     for (let y = 0; ; y += 240) {

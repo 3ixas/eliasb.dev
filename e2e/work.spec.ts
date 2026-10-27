@@ -193,7 +193,7 @@ test.describe("Work: the margin", () => {
     // Placement follows the row as images load and the page scrolls, so it is read until it settles.
     await expect
       .poll(async () => {
-        const [m, r, column, height] = await Promise.all([boxOf(margin(page)), boxOf(row), boxOf(page.locator(".qi-column")), page.evaluate(() => innerHeight)]);
+        const [m, r, column, height] = await Promise.all([boxOf(margin(page)), boxOf(row), boxOf(page.locator("#work .qi-column")), page.evaluate(() => innerHeight)]);
         const wanted = Math.max(16, Math.min(r.y - 6, height - 16 - m.height));
         return [Math.abs(m.x - (column.x + column.width + 40)) < 1, Math.abs(m.y - wanted) < 1, m.x >= column.x + column.width, m.x + m.width <= viewportWidth(page) - 16 + 1, m.width];
       })

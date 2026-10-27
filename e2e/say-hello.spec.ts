@@ -54,8 +54,10 @@ test.describe("Say hello and the footer", () => {
     await expect(page).toHaveURL(/\/resume$/);
   });
 
-  test("the hero's Say hello button lands on this section", async ({ page }) => {
-    await page.getByRole("link", { name: "Say hello", exact: true }).first().click();
+  test("the header's Say hello link lands on this section", async ({ page }) => {
+    const link = page.locator("[data-stretch-header]").getByRole("link", { name: "Say hello", exact: true });
+    test.skip(!(await link.isVisible()), "Narrow screens have no section links and no menu: the section is reached by scrolling");
+    await link.click();
     await expect(page).toHaveURL(/#say-hello$/);
     await expect(section(page)).toBeInViewport();
   });

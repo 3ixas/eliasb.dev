@@ -3,7 +3,8 @@ import { expect, test, type Page } from "@playwright/test";
 import { featuredSlugs, projects } from "../src/content/projects";
 import { howIWork } from "../src/content/stretch/how-i-work";
 import { offTheClock } from "../src/content/stretch/off-the-clock";
-import { hero, sayHello, siteCopy, thingsIMake } from "../src/content/stretch/site-copy";
+import { opening } from "../src/content/stretch/opening";
+import { sayHello, siteCopy, thingsIMake } from "../src/content/stretch/site-copy";
 import { work } from "../src/content/stretch/work";
 import { renderedContrast } from "./support/rendered-contrast";
 
@@ -18,7 +19,7 @@ const sections = [
 ];
 
 test.describe("Homepage shell", () => {
-  test("six sections in order, the five after the hero anchored", async ({ page }) => {
+  test("six sections in order, the five after the opening anchored", async ({ page }) => {
     await page.goto("/");
     const main = page.locator("#main-content");
     await expect(main.locator("> section")).toHaveCount(6);
@@ -26,7 +27,7 @@ test.describe("Homepage shell", () => {
       "",
       ...sections.map((section) => section.id),
     ]);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName(`${hero.headline.lead} ${hero.headline.emphasis}`);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName(opening.headline);
     await expect(page.getByRole("heading", { level: 2 })).toHaveText(sections.map((section) => section.id === "say-hello" ? sayHello.bigLink : section.heading));
   });
 
@@ -53,7 +54,7 @@ test.describe("Homepage shell", () => {
     });
   }
 
-  test("Things I make is introduced by what the hero used to say", async ({ page }) => {
+  test("Things I make is introduced by what the old hero said", async ({ page }) => {
     await page.goto("/");
     const section = page.locator("#things-i-make");
     await expect(section.getByRole("heading", { level: 2, name: thingsIMake.heading })).toBeVisible();

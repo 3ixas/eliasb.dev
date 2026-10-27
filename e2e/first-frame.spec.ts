@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
-import { hero } from "../src/content/stretch/site-copy";
+import { opening } from "../src/content/stretch/opening";
 
-const headline = `${hero.headline.lead} ${hero.headline.emphasis}`;
+const headline = opening.headline;
 
 type Sample = { held: string[]; marked: string[] };
 
@@ -93,9 +93,10 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
 
 test("the content is in the server HTML, and the document starts unheld", async ({ request }) => {
   const html = await (await request.get("/")).text();
-  expect(html).toContain(hero.headline.lead);
-  expect(html).toContain(hero.headline.emphasis);
-  expect(html).toContain(hero.support);
+  // The tail's letters are separate elements (they lift on hover), so the sentences are read as text.
+  const text = html.replace(/<[^>]+>/g, "");
+  expect(text).toContain(opening.headline);
+  expect(text).toContain(opening.support);
   expect(html).toContain(">Say hello</a>");
   expect(html).not.toMatch(/data-entering|data-entrance/);
 });
