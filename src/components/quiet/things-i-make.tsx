@@ -28,8 +28,8 @@ function CardShot({ project }: { project: Project }) {
   const { screenshot } = project;
   if (!screenshot) return null;
   return (
-    <span className="qi-card__shot" aria-hidden="true">
-      <Image src={screenshot.src} alt="" width={screenshot.width} height={screenshot.height} sizes="(max-width: 760px) 82vw, 1px" />
+    <span className="qi-card__shot">
+      <Image src={screenshot.src} alt={screenshot.alt} width={screenshot.width} height={screenshot.height} sizes="(max-width: 760px) 82vw, 1px" />
     </span>
   );
 }

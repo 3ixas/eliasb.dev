@@ -145,7 +145,7 @@ test.describe("Things I make: phone cards", () => {
       const box = (await card.boundingBox())!;
       expect(box.width, project.slug).toBeCloseTo(content * 0.82, 0);
       await expect(card).toHaveCSS("scroll-snap-align", "start");
-      await expect(card.locator(".qi-card__shot img")).toBeVisible();
+      await expect(card.getByRole("img", { name: project.screenshot!.alt })).toBeVisible();
       await expect(card.locator(".qi-row__object")).toBeHidden();
       await expect(card.locator(".qi-row__tap")).toBeHidden();
       await expect(card.locator(".qi-row__title")).toHaveText(project.name);
@@ -178,6 +178,18 @@ test.describe("Things I make: phone cards", () => {
     }
     await items(page).first().locator(".qi-row").click();
     await expect(page).toHaveURL(/\/things-i-make\/threshold$/);
+  });
+
+  test("a focused card keeps its Project colour", async ({ page, browserName }) => {
+    test.skip(!phone(page) || browserName !== "chromium", "Phones, Chromium (Safari does not Tab to links)");
+    const link = items(page).first().locator(".qi-row");
+    await link.focus();
+    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press("Tab");
+    await expect(link).toBeFocused();
+    await expect(link).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await expect(items(page).first()).toHaveCSS("background-color", rgb(featured[0].colours!.field));
+    expect(parseFloat(await link.evaluate((element) => getComputedStyle(element).outlineWidth))).toBeGreaterThanOrEqual(2);
   });
 
   test("from 761 px the list is not a carousel and shows no card screenshot", async ({ page }) => {
