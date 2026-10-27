@@ -13,8 +13,9 @@ The decisions are on [Map: a refined foundation with moments of character](https
 - [The quiet index design contract, with its removal rule](https://github.com/3ixas/eliasb.dev/issues/282)
 - [The inner pages in the quiet index's language](https://github.com/3ixas/eliasb.dev/issues/301)
 - [Closer looks on phones: the dock, or inline under the row](https://github.com/3ixas/eliasb.dev/issues/302)
+- [Object illustrations that look finished](https://github.com/3ixas/eliasb.dev/issues/285)
 
-The visual references are the agreed prototypes, kept outside the repo: the homepage at `~/.agents/handoffs/eliasb.dev/2026-10-26-quiet-index-prototype/` (`sketch/m.html`, and `sketch/tap.html` for phones), and the inner pages at `~/.agents/handoffs/eliasb.dev/2026-10-26-inner-pages-prototype/` (`sketch/role.html`, `sketch/case.html` and `sketch/404.html`, and `sketch/role-tap.html` for phones). Where a prototype and this file disagree, this file wins. Terms follow `GLOSSARY.md`; approved copy is in `docs/content/redesign-copy.md`.
+The visual references are the agreed prototypes, kept outside the repo: the homepage at `~/.agents/handoffs/eliasb.dev/2026-10-26-quiet-index-prototype/` (`sketch/m.html`, `sketch/tap.html` for phones, and `sketch/finish.html` for how every object is finished), the Staff pass at `~/.agents/handoffs/eliasb.dev/2026-10-26-objects-prototype/` (`sketch/pass.html?o=b`), and the inner pages at `~/.agents/handoffs/eliasb.dev/2026-10-26-inner-pages-prototype/` (`sketch/role.html`, `sketch/case.html` and `sketch/404.html`, and `sketch/role-tap.html` for phones). Where a prototype and this file disagree, this file wins. Terms follow `GLOSSARY.md`; approved copy is in `docs/content/redesign-copy.md`.
 
 ## Principle
 
@@ -58,14 +59,26 @@ An object is drawn to be read at 44 px. It is never a whole page shrunk down.
 | Object | Where | What it is |
 |---|---|---|
 | Project | Things I make | One legible detail of the project's own screenshot (Threshold's serif "Th", Argus Risk's donut, Flowtime's timer, Home Secretary's button, Risk Event Tracker's method badges, Ask Professor Past's portrait), on its **Project colour**, 11 px radius. The crop is data on the project: focal point and zoom |
-| Mini pass | Work | A 30 × 38 **Staff pass** on a short strap in its **Employer colour**. It carries no marks of its own: awards and highlights belong to its closer look |
-| Cover | Off the clock | The real book cover or film poster, 30 × 44, with a spine shadow |
-| Calendar tile | Training, history, History at uni | A day tile with a band and a number. The band is cobalt for today. It turns over to a second face (the year, the week) as a reaction |
+| Mini pass | Work | A 28 × 38 **Staff pass**, portrait, on a short strap and metal clip in its **Employer colour**: a punched slot, the photo, two lines and a barcode. It carries no marks of its own: its **Pass pins** belong to its closer look |
+| Cover | Off the clock | The real book cover or film poster, 30 × 44, with a spine crease and shadow |
+| Calendar tile | Training, history, History at uni | A desk-calendar tile: a band with two binding holes, and a number on paper. The band is cobalt for today. It turns over to a second face (the year, the week) as a reaction |
 | Thread | Where I'm headed | A 4 px line in the colour of the strand's source |
 | Number | How I work | The habit's number, ringed by the pen (below) |
-| Sheet | Threshold's PRD; Say hello on the 404 | A small page of ruled lines |
+| Sheet | Threshold's PRD; Say hello on the 404 | A small page of ruled lines with a folded corner |
 | Dot | Now making | The cobalt "now" dot |
 | Empty slot | The 404's missing row | A dashed 44 px outline with nothing in it |
+
+## Finish
+
+Decided in [Object illustrations that look finished](https://github.com/3ixas/eliasb.dev/issues/285): objects are **laminated**, not printed flat and not tilting toward the pointer. Character comes from each object being made of its real material; the rows and the page around them stay flat.
+
+- **One light, from above.** A highlight on an object's top edge, a contact shadow under it and a soft ambient one beneath that. Only objects have depth.
+- **Each object in its real material.** Card for the Staff pass, with a PVC sheen, edge light and a small hologram on the photo's corner. Woven cloth for its strap, with stitched edges, and metal for its swivel clip. Enamel with a gilt rim for **Pass pins**. Glass edges for project crops. Paper for the calendar tile, the sheet and the note (the note keeps its fold crease). Cream card stock for the cinema ticket, with a dotted perforation and notches where it tears. Newsprint with grain for the clipping, whose photo is greyed, and whose stamp is ink on the paper. Cloth and print for the shelf's spines, on a plank. A chip package with its pins for the cores. Graph paper under the simulation.
+- **Photographs stay as they are**: no print border.
+- **Corners are concentric**: a nested shape's radius is its parent's minus the gap between them.
+- **Detail thins as the object shrinks.** At 44 px only the edge light, shadow and one defining detail survive (a spine crease, binding holes, a folded corner, the slot and clip).
+- **The Staff pass** has a real ID card's proportions (CR80, 85.6 × 54) and hangs from a punched slot. It carries the employer's name in condensed caps as its wordmark, the photo, the role, the dates, its status ("Valid · present" or "Returned"), its headline figure and a barcode with a real bar rhythm. Every text on it is at least 13 px.
+- **Pass pins**: three on every employer's pass. Each is an enamel pin with a glyph, with its label beside it: BNP Paribas's trophy (Winner), key (Take Ownership) and spark (AI Champion); Joveen's gauge (page load), database (key API p95) and phone (mobile retention); Optegra's tick (Core Web Vitals), gauge (p95 page load) and branch (where the switch started). Each enamel colour is as in the prototype.
 
 ## Closer looks
 
@@ -74,7 +87,7 @@ A **closer look** is a row's detail: on desktop it appears in the margin, and on
 | Row or word | Closer look | Arrives by |
 |---|---|---|
 | A project | Its screenshot on its Project colour, then type and year | Sliding in and settling |
-| An employer | Its full Staff pass, then that role's best points in the same form for every employer: BNP Paribas's three award pins, and each other role's strongest highlights (chosen in the copy pass), then the Résumé lines that explain its figure | Dropping on its strap and swinging to rest; the points pop on; the figure counts up (Optegra 62% → 88%, Joveen's page load cut by 40%) |
+| An employer | Its full Staff pass, then that role's three **Pass pins** in the same form for every employer: BNP Paribas's three awards, and Joveen's and Optegra's three best points from the copy deck, then the Résumé lines that explain its figure | Dropping on its strap and swinging to rest; the points pop on; the figure counts up (Optegra 62% → 88%, Joveen's page load cut by 40%) |
 | History at uni | A note: University of Essex, Diploma of Higher Education, History, July 2021 | Unfolding |
 | A Where I'm headed strand | "So far" with its source and proof | Its thread drawing down from the source |
 | Threshold's PRD | The quote | Typing itself, with a caret. Typing is time-based and smooth: characters appear on the animation frame at a steady rate (about 45 a second), never one timer per character |
@@ -169,7 +182,7 @@ The two share one template. Each is the header, a back link, an opening, then it
 
 ### A Role story's opening
 
-The title (the employer), the role and setting as its line, and the dates. Beside them in the column hangs the employer's full **Staff pass** with its lean and its award pins, as the homepage's closer look shows it. On phones the pass falls below the title. On arrival the pass swings to rest once, over a page that is already readable.
+The title (the employer), the role and setting as its line, and the dates. Beside them in the column hangs the employer's full **Staff pass** with its lean and its Pass pins, as the homepage's closer look shows it. On phones the pass falls below the title. On arrival the pass swings to rest once, over a page that is already readable.
 
 ### A case study's opening
 
@@ -232,7 +245,7 @@ Every text pair passes WCAG 2.2 AA; `e2e/stretch-tokens.spec.ts` measures them o
 
 ## Colour rules
 
-- **Cobalt** marks "products of my own", today, now (the live dots, Now making), the way to say hello, award pins, focus and a hovered row's arrow. On the GitHub year it is a ring around today, never a fill, so the greens stay true. Elias's name is no longer cobalt: the opening line leads.
+- **Cobalt** marks "products of my own", today, now (the live dots, Now making), the way to say hello, focus and a hovered row's arrow. **Pass pins** take their own enamel colours, inside the pass. On the GitHub year it is a ring around today, never a fill, so the greens stay true. Elias's name is no longer cobalt: the opening line leads.
 - **Employer and Project colours** appear only inside objects, figures and closer looks (and on BNP Paribas when hovered), on every page. A Role story's pass and a case study's screenshots carry them; the page around them stays neutral, with no coloured opening band. A page's share card keeps its colour.
 - **GitHub's greens** appear only on the GitHub year.
 - **Colour never carries meaning alone.** A level of the GitHub year has a count on hover and a text alternative; today is marked by a ring as well as colour.
@@ -240,7 +253,7 @@ Every text pair passes WCAG 2.2 AA; `e2e/stretch-tokens.spec.ts` measures them o
 ## Type
 
 - **Bricolage Grotesque** (variable `opsz`, `wdth`, `wght`), self-hosted through `next/font`, for everything people read. **JetBrains Mono** for metadata, dates, counts, captions and Print.
-- **One floor.** Nothing a visitor is meant to read is smaller than 13 px, on the page or as **Print** on an object (a Staff pass, an award pin, a credit), closer looks included. Reading text is 15 px or more, and body copy is 17 px. Calendar-tile bands are 13 px.
+- **One floor.** Nothing a visitor is meant to read is smaller than 13 px, on the page or as **Print** on an object (a Staff pass, a Pass pin's label, a credit), closer looks included. Reading text is 15 px or more, and body copy is 17 px. Calendar-tile bands are 13 px.
 - **One text scale.** Text under 24 px uses five steps, each a token in `stretch-tokens.css`: `--text-label` 13 px, `--text-small` 15 px, `--text-body` 17 px, `--text-lead` 19 px and `--text-quote` 22 px. A size may move up one step at a wider breakpoint, but never off the scale. `scripts/verify-type-scale.mjs` checks it.
 - **Display type** is only the homepage's opening line, each page's `h1` in the same treatment, and the bold figures inside a Staff pass. Section headings are text, not display. Condensed uppercase display retires everywhere except the pass.
 
@@ -268,7 +281,7 @@ These go from the homepage and its checks:
 - the First glance as a hero layout
 - the phone menu (the page is short enough to scroll)
 
-The Staff pass, its lean and its pins remain on each Role story.
+The Staff pass, its lean and its Pass pins remain on each Role story.
 
 These go from the inner pages and their checks:
 - the subpage header (every page now shares one header)
@@ -312,3 +325,9 @@ The rounds behind phones ([#302](https://github.com/3ixas/eliasb.dev/issues/302)
 - Round 1: a link row's tap, (a) twice (first shows, second opens) or (b) the object shows and the rest opens. Chose (b): opening the page is the row's main job, and the closer look is supplementary.
 - Round 1: objects reacting at the reading line or only when tapped. Chose tapped only, which retires the reading line.
 - Round 2: closing (only the same trigger or another one, not tapping elsewhere, so text doesn't collapse under a thumb), no hint inside, the history row's two targets, and "BNP Paribas" reacting in place only, since its row holds the closer look.
+
+The rounds behind the finish ([#285](https://github.com/3ixas/eliasb.dev/issues/285)), drawn on the three employers' passes and then on every other object:
+
+- Round 1 (Design): the Staff pass A printed (flat, drawn like a real card), B laminated (A plus real material), C physical [stretch] (B plus thickness and a light that follows the pointer as it tilts). Chose B: the passes looked cartoonish because they had no material. A stayed close to clip art; C couldn't work in the margin, which takes no pointer events, and its tilt is decoration under rule 3.
+- Round 1: pins as enamel pins with glyphs rather than text labels, on every employer's pass, not only BNP Paribas's. Joveen's and Optegra's are their copy deck points, so nothing new is claimed.
+- Round 2: B's vocabulary applied to every other object, side by side with the old drawing. Agreed, without a print border on photographs.
