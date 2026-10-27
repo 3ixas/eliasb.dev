@@ -106,9 +106,10 @@ test.describe("Work: the rows", () => {
   test("the timing tokens exist with the contract's values", async ({ page }) => {
     const tokens = await page.evaluate(() => {
       const style = getComputedStyle(document.documentElement);
-      return [style.getPropertyValue("--spring").trim(), style.getPropertyValue("--out").trim()];
+      // A production build strips the spaces after the commas; the values are the same.
+      return [style.getPropertyValue("--spring"), style.getPropertyValue("--out")].map((value) => value.replace(/\s/g, ""));
     });
-    expect(tokens).toEqual(["cubic-bezier(.34, 1.56, .64, 1)", "cubic-bezier(.2, .8, .2, 1)"]);
+    expect(tokens).toEqual(["cubic-bezier(.34,1.56,.64,1)", "cubic-bezier(.2,.8,.2,1)"]);
   });
 
   test("a Role story's ← Work lands on this section, below the header", async ({ page }) => {

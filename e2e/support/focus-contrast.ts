@@ -10,6 +10,8 @@ export type FocusReading = {
 
 /** How far outside a control the ring reaches: 2 px offset, 8 px of bands. */
 const ringReach = 10;
+/** How far inside a control's edge a ring may be drawn: a row's ring sits inside it (docs/design/DESIGN.md, "The row"). */
+const ringDepth = 4;
 /** Summed RGB difference below which a pixel counts as unchanged (antialiasing). */
 const unchangedBelow = 30;
 /** The thinnest band's share of the ring: 2 px of 8. */
@@ -21,7 +23,7 @@ export const minimumChanged = 20;
  * WCAG 2.2 non-text contrast for focus indicators, measured from pixels. Tabs
  * through every control on the page; for each it captures the control with
  * its focus indicator and again with the indicator turned off, and compares
- * each pixel the indicator changed in the ring's band just outside the control
+ * each pixel the indicator changed in the ring's band just outside the control, or in the few pixels just inside its edge
  * (so a pin lifting on focus doesn't count) with the pixel it covered. The
  * ring is two-tone (technique C40): dark bands of 2 and 3 px either side of a
  * 3 px accent. A ring passes when at least one band, `minimumShare` of the
@@ -72,7 +74,7 @@ export async function focusContrast(page: Page, maxStops = 150): Promise<{ readi
     }, saved);
     // The control's box within the clip; the ring is drawn just outside it.
     const control = { left: box.x - left, top: box.y - top, right: box.x - left + box.w, bottom: box.y - top + box.h };
-    const reading = await page.evaluate(async ({ focused, plain, control, ringReach, unchangedBelow }) => {
+    const reading = await page.evaluate(async ({ focused, plain, control, ringReach, ringDepth, unchangedBelow }) => {
       const pixels = async (png: string) => {
         const image = new Image();
         image.src = `data:image/png;base64,${png}`;
@@ -90,7 +92,7 @@ export async function focusContrast(page: Page, maxStops = 150): Promise<{ readi
         const x = ((index / 4) % width) / devicePixelRatio;
         const y = Math.floor(index / 4 / width) / devicePixelRatio;
         const outside = Math.max(control.left - x, x - control.right, control.top - y, y - control.bottom);
-        return outside > 0 && outside <= ringReach;
+        return outside > -ringDepth && outside <= ringReach;
       };
       const linear = (channel: number) => {
         const c = channel / 255;
@@ -108,7 +110,7 @@ export async function focusContrast(page: Page, maxStops = 150): Promise<{ readi
         if ((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05) >= 3) contrasting += 1;
       }
       return { changed, contrasting: changed ? contrasting / changed : 0 };
-    }, { focused: focused.toString("base64"), plain: plain.toString("base64"), control, ringReach, unchangedBelow });
+    }, { focused: focused.toString("base64"), plain: plain.toString("base64"), control, ringReach, ringDepth, unchangedBelow });
     readings.push({ name, ...reading });
   }
   return { readings, complete: false };
