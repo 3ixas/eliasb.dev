@@ -1079,6 +1079,182 @@
   }
 }
 
+/* ---------- How I work: the pen, the Sheet and the typed PRD ---------- */
+
+/* A habit's number sits level with its title, so the rings line up down the list and the pen's arrows have a fixed start. */
+[data-habits] .qi-list__item {
+  position: relative;
+}
+
+[data-habits] .qi-row {
+  align-items: start;
+}
+
+.qi-number {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: var(--stretch-ink);
+  font-family: var(--font-bricolage), system-ui, sans-serif;
+  font-size: var(--text-body);
+  font-weight: 650;
+  line-height: 1;
+}
+
+/*
+ * Ink only, no colour. Each stroke is a path normalised with pathLength, so one dash offset (1 to 0) draws it
+ * whatever its length. Never vector-effect: non-scaling-stroke on these: it would make the dashes measure in
+ * screen pixels, not in pathLength units. Undrawn strokes exist only inside the motion query below; everywhere
+ * else (reduced motion, no scroll-driven animation) the offset is 0 and the pen is simply drawn.
+ */
+.qi-ink {
+  overflow: visible;
+  fill: none;
+  stroke: var(--stretch-ink);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: 0;
+  pointer-events: none;
+}
+
+.qi-ink--circle {
+  position: absolute;
+  inset: -5px;
+  width: calc(100% + 10px);
+  height: calc(100% + 10px);
+  stroke-width: 5;
+  transform: rotate(-8deg);
+}
+
+/*
+ * From just under a ring to just above the next one: a row's object starts 10 px in and rows are 2 px apart, so a
+ * box 58 px down and 4 px past the row's bottom ends 4 px above the next ring. An SVG does not stretch between
+ * `top` and `bottom` (it keeps its aspect ratio), hence the explicit height.
+ */
+.qi-ink--next {
+  position: absolute;
+  top: 58px;
+  left: 12px;
+  width: 44px;
+  height: calc(100% - 54px);
+  stroke-width: 3;
+}
+
+.qi-mark {
+  position: relative;
+  white-space: nowrap;
+}
+
+.qi-ink--under {
+  position: absolute;
+  left: -2px;
+  bottom: -4px;
+  width: calc(100% + 4px);
+  height: 8px;
+  stroke-width: 2;
+}
+
+@keyframes qi-ink-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .qi-ink {
+      animation: qi-ink-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 40% cover 40%;
+    }
+  }
+}
+
+/* The Sheet: a small page of ruled lines with a folded corner. */
+.qi-sheet {
+  position: relative;
+  display: block;
+  width: 30px;
+  height: 38px;
+  border-radius: 3px;
+  background: light-dark(#fffdf6, #26262f);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.4),
+    0 1px 1px rgb(0 0 0 / 0.25),
+    0 3px 5px -1px rgb(0 0 0 / 0.3);
+}
+
+.qi-sheet::before {
+  content: "";
+  position: absolute;
+  inset: 13px 5px 5px;
+  background: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--stretch-ink) 28%, transparent) 0 1px, transparent 1px 5px);
+}
+
+.qi-sheet::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 0 3px 0 3px;
+  background: linear-gradient(225deg, var(--stretch-page) 50%, rgb(0 0 0 / 0.14) 50%);
+}
+
+/* The PRD's closer look: paper with the quote typing itself, a caret and its caption. */
+.qi-prd {
+  margin: 0;
+  padding: 18px 18px 14px;
+  border-radius: 6px;
+  background: light-dark(#fffdf6, #26262f);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.4),
+    0 1px 1px rgb(0 0 0 / 0.2),
+    0 8px 18px -8px rgb(0 0 0 / 0.35);
+}
+
+.qi-prd blockquote {
+  margin: 0;
+  font-size: var(--text-small);
+  line-height: 1.5;
+}
+
+.qi-prd figcaption {
+  margin-top: 12px;
+  color: var(--stretch-muted);
+  font-size: var(--text-label);
+  line-height: 1.4;
+}
+
+/* What is still to type holds its place in the layout, so the look does not grow as it types. */
+.qi-untyped {
+  visibility: hidden;
+}
+
+.qi-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  margin: 0 1px -0.2em;
+  background: var(--stretch-cobalt);
+}
+
+.qi-caret[data-done] {
+  opacity: 0;
+  transition: opacity 0.4s 0.6s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qi-caret {
+    display: none;
+  }
+}
+
 /* Reduced motion: every closer look fades in over 0.2 s, and nothing arrives with motion. */
 @media (prefers-reduced-motion: reduce) {
   .qi-pass,

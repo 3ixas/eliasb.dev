@@ -7,7 +7,6 @@ test.describe("Scroll sway", () => {
 
   test("cards sway too, the PRD card keeping its own resting tilt", async ({ page, browserName }) => {
     test.skip(browserName !== "chromium", "Scroll-driven animation, Chromium");
-    // How I work's PRD card holds still (see Margin notes below), so the sway is read on the case study's.
     await page.goto("/things-i-make/threshold");
     const prd = page.locator(".stretch-prd");
     await prd.scrollIntoViewIfNeeded();
@@ -25,6 +24,7 @@ test.describe("Scroll sway", () => {
     const card = page.locator("#off-the-clock .stretch-otc__card").first();
     await card.scrollIntoViewIfNeeded();
     expect(await card.evaluate((element) => ({ translate: getComputedStyle(element).translate, rotate: getComputedStyle(element).rotate }))).toEqual({ translate: "none", rotate: "none" });
+    await page.goto("/things-i-make/threshold");
     expect(await page.locator(".stretch-prd").evaluate((element) => getComputedStyle(element).rotate)).toBe("none");
   });
 });
@@ -32,7 +32,7 @@ test.describe("Scroll sway", () => {
 test.describe("Margin notes", () => {
   const strokes = (page: Page) => page.locator("#how-i-work path[pathLength]");
   // The first habit's circle, a stroke that is on screen at every width.
-  const circle = (page: Page) => page.locator("#how-i-work .stretch-ink--circle").first();
+  const circle = (page: Page) => page.locator("#how-i-work .qi-ink--circle").first();
   const offset = (page: Page) => circle(page).locator("path").evaluate((path) => parseFloat(getComputedStyle(path).strokeDashoffset));
   // Scrolls so the circle's middle sits this far down the visible area (0 is its top, 1 its bottom edge).
   const scrollCircleTo = (page: Page, down: number) =>
@@ -67,7 +67,7 @@ test.describe("Margin notes", () => {
     test("every stroke is simply drawn, wherever the page is scrolled", async ({ page }) => {
       await page.goto("/");
       await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
-      await expect(strokes(page)).toHaveCount(9);
+      await expect(strokes(page)).toHaveCount(11);
       await circle(page).scrollIntoViewIfNeeded();
       for (const at of [0.97, 0.3]) {
         await scrollCircleTo(page, at);

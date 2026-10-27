@@ -64,9 +64,9 @@ test.describe("Off the clock: Fasteners", () => {
     for (const item of ["reading", "film", "making", "github"]) await expect(layout.locator(`[data-otc='${item}'] .stretch-fastener`)).toHaveCount(0);
   });
 
-  test("the homepage carries three Fasteners: the PRD card, the poster and the clipping (the project tiles left with Things I make)", async ({ page }) => {
+  test("the homepage carries two Fasteners: the poster and the clipping (the project tiles left with Things I make, the PRD card with How I work)", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator(".stretch-fastener")).toHaveCount(3);
+    await expect(page.locator(".stretch-fastener")).toHaveCount(2);
     await expect(page.locator("#off-the-clock .stretch-fastener")).toHaveCount(2);
   });
 });

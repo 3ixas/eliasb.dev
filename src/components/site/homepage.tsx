@@ -3,12 +3,11 @@ import { SayHello } from "@/components/site/say-hello";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
-import { HowIWork } from "@/components/site/how-i-work";
 import { OffTheClock } from "@/components/site/off-the-clock";
+import { HowIWork } from "@/components/quiet/how-i-work";
 import { Opening } from "@/components/quiet/opening";
 import { ThingsIMake } from "@/components/quiet/things-i-make";
 import { Work } from "@/components/quiet/work";
-import { howIWork } from "@/content/stretch/how-i-work";
 import { offTheClock } from "@/content/stretch/off-the-clock";
 
 const sayHelloHeadingId = "say-hello-heading";
@@ -34,7 +33,6 @@ export function Homepage() {
         </section>
 
         <section id="how-i-work" className="stretch-wrap stretch-section" aria-labelledby="how-i-work-heading">
-          <SectionHeading id="how-i-work-heading" heading={howIWork.heading} note={howIWork.note} />
           <HowIWork />
         </section>
 
