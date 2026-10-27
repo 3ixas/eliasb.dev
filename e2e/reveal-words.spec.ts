@@ -191,6 +191,20 @@ test.describe("On wide screens: the margin", () => {
     await expect(margin(page)).toHaveCount(1);
   });
 
+  test("a look in Work replaces the opening's, and the other way round: one margin on the page", async ({ page }) => {
+    const row = page.locator('#work a[data-look="joveen"]');
+    await hoverWord(page, "cores");
+    await expect(margin(page).locator(".qi-cores")).toBeVisible();
+    await row.hover();
+    await expect(margin(page).locator(".qi-pass")).toBeVisible();
+    await expect(margin(page)).toHaveCount(1);
+    await expect(margin(page).locator(".qi-cores")).toHaveCount(0);
+    await hoverWord(page, "ownership");
+    await expect(margin(page).locator(".qi-certificate")).toBeVisible();
+    await expect(margin(page)).toHaveCount(1);
+    await expect(margin(page).locator(".qi-pass")).toHaveCount(0);
+  });
+
   test("the slots for inline looks are not used on wide screens", async ({ page }) => {
     for (const { id } of words) await expect(slot(page, id)).toBeHidden();
     await word(page, "cores").click({ position: await onFirstLine(word(page, "cores")) });
@@ -280,6 +294,35 @@ test.describe("On phones and narrow windows: inline", () => {
     await expect(slot(page, "digitisation").locator(".qi-bar")).toHaveCount(2);
     await tapWord(page, "digitisation");
     await expect(openInline(page)).toHaveCount(0);
+  });
+
+  test("a look in Work closes the opening's, and the other way round: one look is open on the page, and the tapped object stays put", async ({ page }) => {
+    const object = page.locator('#work button[data-look-tap="joveen"]');
+    await tapWord(page, "cores");
+    await expect(slot(page, "cores").locator(".qi-cores")).toBeVisible();
+    // The opening look has finished growing, so the object has stopped moving down the page.
+    await expect
+      .poll(async () => {
+        const first = (await boxOf(object)).y;
+        await page.waitForTimeout(100);
+        return Math.abs((await boxOf(object)).y - first);
+      })
+      .toBe(0);
+    // Centred, so the page has room to hold the object where it is when the look above it closes.
+    await object.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+    const before = await boxOf(object);
+    await tap(page, object);
+    await expect(page.locator('#work [data-look-slot="joveen"] .qi-pass')).toBeVisible();
+    await expect(openInline(page)).toHaveCount(1);
+    await expect(slot(page, "cores").locator(".qi-look")).toHaveCount(0);
+    await expect(word(page, "cores")).toHaveAttribute("aria-expanded", "false");
+    // The look above it closed, and the tapped object is where it was on screen.
+    await expect.poll(async () => Math.abs((await boxOf(object)).y - before.y)).toBeLessThanOrEqual(1);
+    await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
+    await tapWord(page, "engines");
+    await expect(slot(page, "engines").locator(".qi-sim")).toBeVisible();
+    await expect(openInline(page)).toHaveCount(1);
+    await expect(object).toHaveAttribute("aria-expanded", "false");
   });
 
   test("tapping elsewhere does nothing, and scrolling opens or closes nothing", async ({ page }) => {

@@ -6,6 +6,8 @@ import { placeMargin } from "@/components/quiet/margin-placement";
 
 /** The margin hides this long after the pointer leaves a row or focus leaves it, so crossing the gap between two rows does not flash. */
 const HIDE_MS = 140;
+/** Fired on `window` when a controller shows a look, so the others hide theirs: only one look is showing on the page. */
+const SHOWING = "qi-closer-look-showing";
 /** The margin is for wide screens with a hovering pointer; below that, or on touch, a closer look opens inline instead. */
 const WIDE = "(min-width: 1180px) and (hover: hover)";
 
@@ -36,12 +38,14 @@ export function CloserLookRoot({ looks, className, children }: { looks: Record<s
   const held = useRef<{ trigger: HTMLElement; top: number } | null>(null);
 
   const cancelHide = () => window.clearTimeout(hideTimer.current);
+  const announce = () => window.dispatchEvent(new CustomEvent(SHOWING, { detail: root.current }));
   const hideSoon = () => {
     cancelHide();
     hideTimer.current = window.setTimeout(() => setActive(null), HIDE_MS);
   };
   const show = (id: string, source: "pointer" | "focus") => {
     cancelHide();
+    announce();
     // A row that already holds focus keeps owning its look when the pointer arrives at it, so leaving the column cannot hide it.
     setActive((now) => (now?.id === id && (now.source === source || now.source === "focus") ? now : { id, source }));
   };
@@ -58,6 +62,8 @@ export function CloserLookRoot({ looks, className, children }: { looks: Record<s
     // Closing a look above the trigger moves it; the browser's own scroll anchoring would fight the correction below.
     document.documentElement.style.overflowAnchor = "none";
     held.current = { trigger, top: trigger.getBoundingClientRect().top };
+    // Opening a look closes one in another controller in the same batch, so the correction below sees both moves.
+    if (!(active?.source === "tap" && active.id === id)) announce();
     setActive((now) => (now?.source === "tap" && now.id === id ? null : { id, source: "tap", slot }));
   };
   const onClick = (event: MouseEvent) => {
@@ -101,6 +107,16 @@ export function CloserLookRoot({ looks, className, children }: { looks: Record<s
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [active]);
+
+  useEffect(() => {
+    const onShowing = (event: Event) => {
+      if ((event as CustomEvent<HTMLElement | null>).detail === root.current) return;
+      cancelHide();
+      setActive(null);
+    };
+    window.addEventListener(SHOWING, onShowing);
+    return () => window.removeEventListener(SHOWING, onShowing);
+  }, []);
 
   useEffect(() => {
     const wide = window.matchMedia(WIDE);
