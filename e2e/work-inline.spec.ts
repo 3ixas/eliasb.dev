@@ -24,7 +24,11 @@ test.describe("Work: inline closer looks", () => {
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
-    await expect(section(page).locator(".qi-row").first()).toBeVisible();
+    // The controller listens through React's props on the column, which exist only once it has hydrated; a tap before that does nothing.
+    await page.waitForFunction(() => {
+      const column = document.querySelector("#work [data-quiet-column]");
+      return !!column && Object.keys(column).some((key) => key.startsWith("__reactProps$"));
+    });
   });
 
   test("scrolling the whole page opens nothing and plays no reaction", async ({ page }) => {
@@ -34,7 +38,6 @@ test.describe("Work: inline closer looks", () => {
       await page.waitForTimeout(40);
     }
     await expect(openLooks(page)).toHaveCount(0);
-    await expect(page.locator("[data-open]")).toHaveCount(0);
     await expect(page.locator(".qi-margin")).toHaveCount(0);
     for (const mini of await section(page).locator(".qi-mini").all()) await expect(mini).toHaveCSS("animation-name", "none");
   });

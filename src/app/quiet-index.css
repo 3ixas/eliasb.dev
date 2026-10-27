@@ -810,7 +810,7 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  .qi-list__item[data-open] .qi-row {
+  .qi-list__item:has(.qi-inline__in) .qi-row {
     background: var(--stretch-card);
   }
 }
@@ -836,11 +836,11 @@
 
 /* On touch there is no hover: a row's object plays its reaction when the row is tapped open, never as it scrolls into view. */
 @media (prefers-reduced-motion: no-preference) {
-  .qi-list__item[data-open] .qi-mini {
+  .qi-list__item:has(.qi-inline__in) .qi-mini {
     animation: qi-swing 0.9s var(--out);
   }
 
-  .qi-list__item[data-open] .qi-tile {
+  .qi-list__item:has(.qi-inline__in) .qi-tile {
     animation: qi-turn 0.6s var(--spring);
   }
 }
