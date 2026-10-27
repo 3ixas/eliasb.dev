@@ -72,17 +72,18 @@ test.describe("Shell details: separators", () => {
   test("every dot in a metadata line is bound to the item before it", async ({ page }) => {
     for (const route of ["/", "/things-i-make/threshold"]) {
       await page.goto(route);
-      const lines = await page.locator(".stretch-cs-open__meta, .stretch-index__meta, .stretch-tile__meta, .stretch-work__history").allTextContents();
+      const lines = await page.locator(".stretch-cs-open__meta, .stretch-index__meta, .stretch-tile__meta, .qi-row__line").allTextContents();
       expect(lines.length).toBeGreaterThan(0);
       for (const line of lines) expect(line).not.toMatch(/[^\u00a0]·/u);
     }
   });
 
-  test("the History line stays inside its dashed box, even at the narrowest width", async ({ page }) => {
+  test("a Work row's line stays inside its row, even at the narrowest width", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => document.fonts.ready);
-    const history = page.locator(".stretch-work__history");
-    await expect.poll(() => history.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(0);
+    const rows = page.locator("#work .qi-row");
+    await expect(rows.first()).toBeVisible();
+    await expect.poll(() => rows.evaluateAll((all) => all.filter((row) => row.scrollWidth > row.clientWidth).length)).toBe(0);
   });
 });
 

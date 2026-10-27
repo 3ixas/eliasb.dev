@@ -8,12 +8,11 @@ import { FeaturedTiles } from "@/components/site/featured-tiles";
 import { HowIWork } from "@/components/site/how-i-work";
 import { OffTheClock } from "@/components/site/off-the-clock";
 import { ProjectIndex } from "@/components/site/project-index";
-import { Work } from "@/components/site/work";
+import { Work } from "@/components/quiet/work";
 import { featuredProjects, featuredSlugs, projectIndex, projects } from "@/content/projects";
 import { howIWork } from "@/content/stretch/how-i-work";
 import { offTheClock } from "@/content/stretch/off-the-clock";
 import { thingsIMake } from "@/content/stretch/site-copy";
-import { work } from "@/content/stretch/work";
 
 const sayHelloHeadingId = "say-hello-heading";
 
@@ -31,8 +30,7 @@ export function Homepage() {
       <main id="main-content" tabIndex={-1}>
         <Hero />
 
-        <section id="work" className="stretch-wrap stretch-section stretch-section--work" data-entrance="rest" aria-labelledby="work-heading">
-          <SectionHeading id="work-heading" heading={work.heading} note={work.note} />
+        <section id="work" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="work-heading">
           <Work />
         </section>
 

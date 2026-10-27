@@ -119,9 +119,9 @@ test.describe("Staff pass", () => {
   });
 });
 
-// The small returned passes, as the homepage hangs them.
+// The small returned passes, on their fixture route: the homepage no longer hangs them (its Work is rows).
 test("a returned Staff pass keeps its dates and its story link on one line, with nothing clipped", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/fixtures/staff-pass");
   const passes = page.locator(".stretch-pass--sm");
   await expect(passes).toHaveCount(2);
   await expect

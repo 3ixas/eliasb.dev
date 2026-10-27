@@ -30,6 +30,10 @@
   --stretch-dark: 0;
   color-scheme: light;
 
+  /* Motion timing (docs/design/DESIGN.md "Motion"): --spring for things that arrive or swing, --out for things that settle. */
+  --spring: cubic-bezier(.34, 1.56, .64, 1);
+  --out: cubic-bezier(.2, .8, .2, 1);
+
   /* Text under 24 px: nothing is smaller than 13 px, docs/design/DESIGN.md "Type". */
   --text-label: 13px;
   --text-small: 15px;
