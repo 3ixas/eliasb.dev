@@ -3,7 +3,7 @@ status: accepted
 date: 2026-09-29
 ---
 
-> **Amended** on 8 October 2026 by [ADR 0005](0005-stretch-redesign.md): the first-paint constraint at the end is replaced. Only the homepage's signature entrance may hold the page visually, for about 5 seconds; content is in the server HTML throughout. Motion is no longer a runtime dependency either: the site runs its own spring (`components/site/spring.ts`, played by the entrance in `components/site/entrance.ts`), and `verify:opening` checks it against Motion's `spring`, so the package is a dev dependency.
+> **Amended** on 8 October 2026 by [ADR 0005](0005-stretch-redesign.md): the first-paint constraint at the end was replaced to allow the homepage's signature entrance to hold the page visually. **That allowance was withdrawn on 27 October 2026** (ADR 0005, "Amended on 27 October 2026"), so the constraint at the end applies again as written. Motion is no longer a runtime dependency: the site runs its own spring (`components/site/spring.ts`), and `verify:springs` checks it against Motion's `spring`, so the package is a dev dependency.
 
 # Rebuild the presentation layer on Motion and design tokens
 

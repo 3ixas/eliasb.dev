@@ -30,11 +30,10 @@ test.describe("Work archive: the catalogue", () => {
     await expect(page.getByRole("button", { name: "Products" })).toHaveCount(0);
   });
 
-  test("renders without script and has no entrance", async ({ page }) => {
+  test("renders without script", async ({ page }) => {
     await page.route("**/*.js", (route) => route.abort());
     await page.reload();
     await expect(rows(page)).toHaveCount(projects.length);
-    await expect(page.locator("[data-entrance-layer]")).toHaveCount(0);
   });
 
   test("links home, and each row goes to its case study, live site or code", async ({ page }) => {

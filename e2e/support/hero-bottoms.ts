@@ -5,7 +5,7 @@ import type { Page } from "@playwright/test";
  * page-y coordinates. The portrait's bottom is its bounding box (its lowest
  * painted corner, tilt included); the column ends where the actions, the last
  * thing in the lede, end. Read it with expect.poll: the layout moves while the
- * font loads and the entrance settles.
+ * font loads.
  */
 export const heroBottoms = (page: Page) =>
   page.evaluate(() => {

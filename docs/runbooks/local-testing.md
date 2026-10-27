@@ -25,7 +25,7 @@ The config starts `pnpm start` (a production build) on port 3100 if nothing is l
 
 ## When a spec fails only in dev
 
-`next.config.ts` hides the dev badge and allows `eval()` in development only, so the contrast, focus-ring and entrance specs no longer fail under `next dev` because of Next's own overlay. A failure now is real until shown otherwise: reproduce it against a production build or in CI before dismissing it.
+`next.config.ts` hides the dev badge and allows `eval()` in development only, so the contrast and focus-ring specs no longer fail under `next dev` because of Next's own overlay. A failure now is real until shown otherwise: reproduce it against a production build or in CI before dismissing it.
 
 ## Node
 

@@ -1,4 +1,3 @@
-import { EntranceGuard, EntrancePlayer } from "@/components/site/entrance-scripts";
 import { Hero } from "@/components/site/hero";
 import { SayHello } from "@/components/site/say-hello";
 import { SectionHeading } from "@/components/site/section-heading";
@@ -18,23 +17,21 @@ const sayHelloHeadingId = "say-hello-heading";
 
 /**
  * The Stretch homepage shell: the header, the hero and five anchored sections
- * (Work first) with their headings, notes and true counts, and the footer. The signature
- * entrance (entrance.ts) holds all of it for about 4.6 seconds on a fresh
- * load; the server renders the finished page.
+ * (Work first) with their headings, notes and true counts, and the footer. The
+ * page is complete from its first frame: nothing is held, faded or played in.
  */
 export function Homepage() {
   return (
     <div data-stretch-shell>
-      <EntranceGuard />
       <SiteHeader />
       <main id="main-content" tabIndex={-1}>
         <Hero />
 
-        <section id="work" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="work-heading">
+        <section id="work" className="stretch-wrap stretch-section" aria-labelledby="work-heading">
           <Work />
         </section>
 
-        <section id="things-i-make" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="things-i-make-heading">
+        <section id="things-i-make" className="stretch-wrap stretch-section" aria-labelledby="things-i-make-heading">
           <SectionHeading
             id="things-i-make-heading"
             heading={thingsIMake.heading}
@@ -52,23 +49,22 @@ export function Homepage() {
           />
         </section>
 
-        <section id="how-i-work" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="how-i-work-heading">
+        <section id="how-i-work" className="stretch-wrap stretch-section" aria-labelledby="how-i-work-heading">
           <SectionHeading id="how-i-work-heading" heading={howIWork.heading} note={howIWork.note} />
           <HowIWork />
         </section>
 
-        <section id="off-the-clock" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby="off-the-clock-heading">
+        <section id="off-the-clock" className="stretch-wrap stretch-section" aria-labelledby="off-the-clock-heading">
           <SectionHeading id="off-the-clock-heading" heading={offTheClock.heading} note={offTheClock.note} />
           <OffTheClock />
         </section>
 
-        <section id="say-hello" className="stretch-wrap stretch-section" data-entrance="rest" aria-labelledby={sayHelloHeadingId}>
+        <section id="say-hello" className="stretch-wrap stretch-section" aria-labelledby={sayHelloHeadingId}>
           <SayHello headingId={sayHelloHeadingId} />
         </section>
       </main>
 
-      <SiteFooter entrance="rest" />
-      <EntrancePlayer />
+      <SiteFooter />
     </div>
   );
 }

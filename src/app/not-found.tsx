@@ -22,7 +22,7 @@ export const metadata: Metadata = {
  * The 404 (docs/content/redesign-copy.md): the slim header, a short heading
  * and line, one link home, a lost-property tag naming the address asked for
  * (beside them, below on phones) and a row for each homepage section. It has
- * no entrance and no cobalt beyond focus, selection and hover.
+ * no cobalt beyond focus, selection and hover.
  */
 export default function NotFound() {
   return (

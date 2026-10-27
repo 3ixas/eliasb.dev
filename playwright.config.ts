@@ -23,9 +23,8 @@ export default defineConfig({
   use: {
     baseURL: `http://127.0.0.1:${port}`,
     trace: "retain-on-failure",
-    // The homepage's signature entrance holds the page for about five seconds on
-    // a fresh load and animates the hero, so specs read the finished page. Only
-    // entrance.spec.ts turns motion back on.
+    // Specs read the finished page with motion off; those that test motion turn
+    // it back on with test.use.
     reducedMotion: "reduce",
   },
   projects: browsers.flatMap(({ name, device }) =>

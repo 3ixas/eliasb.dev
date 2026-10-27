@@ -112,7 +112,7 @@ test.describe("Say hello and the footer", () => {
     const size = (selector: string) => page.locator(selector).first().evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
     const [hello, footer] = await Promise.all([size(".stretch-hello__big"), size(".stretch-footer p")]);
     expect(hello).toBeGreaterThan(footer);
-    // Fonts and the entrance settle after goto, so poll the row count rather than read it once.
+    // Fonts settle after goto, so poll the row count rather than read it once.
     await expect
       .poll(async () => {
         const boxes = await Promise.all((await section(page).locator(".stretch-hello__link").all()).map((link) => link.boundingBox()));
