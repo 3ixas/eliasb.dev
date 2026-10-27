@@ -46,7 +46,7 @@ The 404's first **Row**: the address asked for, struck through, with an empty sl
 _Avoid_: Error illustration, a set piece on the 404
 
 **Cobalt accent**:
-The site's one accent colour (`#2340ff` in light, `#8b9cff` in dark). It may be used large, and marks Elias's name, today and now, and the way to say hello. It also colours the award pins on a **Staff pass**, wherever the pass appears, as Elias's own achievements ([#198](https://github.com/3ixas/eliasb.dev/issues/198)). It never colours a project.
+The site's one accent colour (`#2340ff` in light, `#8b9cff` in dark). It may be used large, and marks Elias's name, today and now, and the way to say hello. It coloured the award pins on a **Staff pass** until [#285](https://github.com/3ixas/eliasb.dev/issues/285); **Pass pins** now take their own enamel colours. It never colours a project.
 _Avoid_: Using it for project tiles or as decoration
 
 **Eclipse**:
@@ -82,12 +82,16 @@ On the **Quiet index**, the first section after the opening line: one **Row** pe
 _Avoid_: Experience, CV, calling Elias's own projects "Work"
 
 **Staff pass**:
-A pass hanging on its lanyard: a strap and clip, Elias's portrait as the ID photo, a top line, a foot with a barcode, and real text, never decoration. It comes in two kinds. An **employer's pass** hangs in **Work** and again at the top of its **Role story**, in its **Employer colour**: the employer, role and dates, one headline number, and a link to its **Role story**. The current pass is the largest and reads "Valid · present"; a past one is stamped "Returned", and its dates say when it ended, with no separate status date ([#244](https://github.com/3ixas/eliasb.dev/issues/244)). Awards are **award pins** on the current pass's lanyard. Its content is the employment history ([#194](https://github.com/3ixas/eliasb.dev/issues/194)). On its own Role story it is the opening object rather than a link, and its award pins lead to the evidence for each award ([#198](https://github.com/3ixas/eliasb.dev/issues/198)). It carries the lean. The **self-issued pass** is the one pass with no employer: **Where I'm headed**, issued by Elias to himself. It has no **Employer colour** of its own, no award pins, no status or dates, and no lean; its fields are the bars of his direction ([#190](https://github.com/3ixas/eliasb.dev/issues/190)).
+A pass hanging on its lanyard: a strap and clip, Elias's portrait as the ID photo, a top line, a foot with a barcode, and real text, never decoration. It comes in two kinds. An **employer's pass** hangs in **Work** and again at the top of its **Role story**, in its **Employer colour**: the employer, role and dates, one headline number, and a link to its **Role story**. The current pass is the largest and reads "Valid · present"; a past one is stamped "Returned", and its dates say when it ended, with no separate status date ([#244](https://github.com/3ixas/eliasb.dev/issues/244)). Each employer's pass carries three **Pass pins**: its awards or best points. Its content is the employment history ([#194](https://github.com/3ixas/eliasb.dev/issues/194)). On its own Role story it is the opening object rather than a link, and its Pass pins lead to the evidence for each ([#198](https://github.com/3ixas/eliasb.dev/issues/198)). It carries the lean. The **self-issued pass** is the one pass with no employer: **Where I'm headed**, issued by Elias to himself. It has no **Employer colour** of its own, no award pins, no status or dates, and no lean; its fields are the bars of his direction ([#190](https://github.com/3ixas/eliasb.dev/issues/190)).
 On the **Quiet index** homepage an employer's pass is a mini pass in its row's slot, and the full pass arrives as the row's **Closer look**, dropping and swinging to rest; Role stories still open on the full pass.
 _Avoid_: Badge, ID card, "Expired" (it can read as "let go"), employer logos
 
+**Pass pin**:
+An enamel pin with a gilt rim and a glyph, with its label beside it, on an employer's **Staff pass**: three per employer ([#285](https://github.com/3ixas/eliasb.dev/issues/285)). BNP Paribas's are its awards (**Award pins**); Joveen's and Optegra's are their three best points from the copy deck. It is part of the pass, not a **Fastener**, and claims nothing that isn't approved copy.
+_Avoid_: Pin (alone), badge, a pin for something with no evidence
+
 **Award pin**:
-A cobalt pin on an employer's **Staff pass** lanyard, one per award, as Elias's own achievements. It is part of the pass, not a **Fastener**.
+A **Pass pin** for an award: BNP Paribas's Winner (Digitisation), Take Ownership and AI Champion, as Elias's own achievements. Until [#285](https://github.com/3ixas/eliasb.dev/issues/285) they were cobalt and the only pins.
 _Avoid_: Pin (alone), badge
 
 **Print**:
