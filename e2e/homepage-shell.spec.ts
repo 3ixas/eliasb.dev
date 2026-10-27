@@ -362,6 +362,8 @@ test.describe("The Eclipse", () => {
   test("turns the icon over when pressed, and not with reduced motion", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
+    // The button's handler exists once it has hydrated, and aria-pressed appears with it.
+    await expect(page.locator("[data-eclipse]")).toHaveAttribute("aria-pressed", /^(true|false)$/);
     const turning = () =>
       page.evaluate(() => {
         const icon = document.querySelector("[data-eclipse] svg")!;

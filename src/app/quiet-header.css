@@ -278,6 +278,11 @@
     transition: opacity 0.3s;
   }
 
+  /* A page with no links (the 404) has the Eclipse right after the greeting, so the Eclipse takes the right edge, and London's time has the room between. */
+  .qi-greeting + .stretch-eclipse {
+    margin-left: auto;
+  }
+
   /* London's time is said where the links would be: they step aside while it is, so the two never overprint. */
   .qi-greeting:is(:hover, :focus-visible) ~ .qi-header__links {
     opacity: 0;
