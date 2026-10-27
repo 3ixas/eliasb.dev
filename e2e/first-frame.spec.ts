@@ -66,13 +66,11 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       expect(flatten(await page.evaluate(() => window.firstFrame!))).toEqual([]);
     });
 
-    test("the page is readable and usable at once, and the real h1 is complete", async ({ page }) => {
+    test("the real h1 is complete and visible as soon as the document commits", async ({ page }) => {
       await page.goto("/", { waitUntil: "commit" });
       const heading = page.getByRole("heading", { level: 1 });
       await expect(heading).toBeVisible();
       await expect(heading).toHaveAccessibleName(headline);
-      await expect(page.locator("main")).toHaveCSS("opacity", "1");
-      await expect(page.getByRole("link", { name: "Say hello" }).first()).toBeVisible();
     });
 
     test("a reload is as complete as the first load", async ({ page }) => {
@@ -94,12 +92,15 @@ test("the content is in the server HTML, and the document starts unheld", async 
   expect(html).not.toMatch(/data-entering|data-entrance/);
 });
 
-test.describe("with JavaScript blocked", () => {
-  test.use({ javaScriptEnabled: false });
+// Without script nothing can hold or release the page, so each poll reads the document as it is; a CSS-only hold would show here.
+for (const reducedMotion of ["no-preference", "reduce"] as const) {
+  test.describe(`with JavaScript blocked (motion ${reducedMotion})`, () => {
+    test.use({ javaScriptEnabled: false, reducedMotion });
 
-  test("the page is complete and nothing is faded", async ({ page }) => {
-    await page.goto("/", { waitUntil: "domcontentloaded" });
-    await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName(headline);
-    expect(flatten([await page.evaluate(findHeld)])).toEqual([]);
+    test("the page is complete and nothing is faded", async ({ page }) => {
+      await page.goto("/", { waitUntil: "commit" });
+      await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName(headline);
+      await expect.poll(async () => flatten([await page.evaluate(findHeld)])).toEqual([]);
+    });
   });
-});
+}

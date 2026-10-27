@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { spring as motionSpring } from 'motion';
 import { spring } from '../src/components/site/spring.ts';
+import { signatureSpringPairs } from '../src/components/site/signature-springs.ts';
 
 // The site's spring (spring.ts) must match Motion's: at the settings the Signature motions play, and across the bounces
 // and durations the Signature motions may use (bounce 0 to 0.45). A `linear()` curve is straight between its
@@ -10,8 +11,8 @@ const springCurveTolerance = 0.02;
 // keeps its tail) plus the 0.001 the samples are rounded to.
 const springSampleTolerance = 0.006;
 const samples = (curve) => curve.easing.slice('linear('.length, -1).split(',').map(Number);
-// The pairs behind passLean, tagSwing and nameFill (signature-springs.ts).
-const signatureSprings = [[0.4, 0.7], [0.4, 0.6], [0, 0.7]].map(([bounce, visualDuration]) => ({ bounce, visualDuration }));
+// The pairs behind passLean, tagSwing and nameFill, read from signature-springs.ts.
+const signatureSprings = Object.values(signatureSpringPairs).map(([bounce, visualDuration]) => ({ bounce, visualDuration }));
 const springGrid = [0, 0.15, 0.3, 0.45].flatMap((bounce) => [0.3, 0.6, 1].map((visualDuration) => ({ bounce, visualDuration })));
 for (const { bounce, visualDuration } of [...signatureSprings, ...springGrid]) {
   const label = `spring(${bounce}, ${visualDuration})`;
