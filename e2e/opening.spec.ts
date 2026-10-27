@@ -190,10 +190,21 @@ test.describe("products of my own.", () => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
     test.skip(!(await canHover(page)), "Hover only");
+    // The baseline is taken once the display font is in and the line has stopped moving: a font swap changes widths on its own.
+    await expect.poll(() => page.evaluate(() => [...document.fonts].some((face) => face.family.replaceAll('"', "") === "Bricolage Grotesque" && face.status === "loaded"))).toBe(true);
     const boxes = () => Promise.all([heading(page), page.locator(".qi-opening__support"), tail(page)].map((locator) => locator.boundingBox()));
-    const before = await boxes();
+    let before = await boxes();
+    await expect
+      .poll(async () => {
+        const now = await boxes();
+        const still = JSON.stringify(now) === JSON.stringify(before);
+        before = now;
+        return still;
+      })
+      .toBe(true);
     await tail(page).hover();
-    await page.waitForTimeout(300);
-    expect(await boxes()).toEqual(before);
+    // The wave has started, and the line is where it was.
+    await expect(tail(page).locator(".qi-letter").first()).toHaveCSS("animation-name", "qi-lift");
+    await expect.poll(boxes).toEqual(before);
   });
 });
