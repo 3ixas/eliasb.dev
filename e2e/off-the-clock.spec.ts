@@ -68,7 +68,7 @@ test.describe("Off the clock: on the homepage", () => {
     const section = page.locator("section#off-the-clock");
     for (const item of ["training", "clipping", "reading", "film"]) await expect(section.locator(`[data-otc='${item}']`)).toHaveCount(1);
     await expect(title(section.locator("[data-otc='training']"))).toHaveText(offTheClock.training.week);
-    await expect(line(section.locator("[data-otc='training']"))).toHaveText(offTheClock.training.zone2);
+    await expect(line(section.locator("[data-otc='training']"))).toHaveText("");
   });
 });
 
@@ -121,11 +121,10 @@ test.describe("Off the clock: training", () => {
     });
   }
 
-  test("the look carries the run's photo, its caption and the Zone 2 note", async ({ page }) => {
+  test("the look carries the run's photo and its caption", async ({ page }) => {
     const look = await openLook(page, "training-saturday", "training");
     await expect(look.locator(".qi-week__photo img")).toBeVisible();
     await expect(look.getByText(offTheClock.training.photoCaption)).toBeVisible();
-    await expect(look.getByText(offTheClock.training.zone2)).toBeVisible();
   });
 
   test("today fills in last", async ({ page }) => {

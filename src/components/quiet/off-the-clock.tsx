@@ -71,7 +71,7 @@ export function trainingEntry(now?: string): Entry {
         object={<TrainingTile now={now} />}
         title={<TrainingTitle now={now} />}
         line={<TrainingLine now={now} />}
-        look={{ id, description: `${week} ${copy.training.zone2} ${copy.training.photoCaption}` }}
+        look={{ id, description: `${week} ${copy.training.photoCaption}` }}
       />
     ),
   };
