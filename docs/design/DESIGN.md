@@ -65,7 +65,8 @@ An object is drawn to be read at 44 px. It is never a whole page shrunk down.
 | Thread | Where I'm headed | A 4 px line in the colour of the strand's source |
 | Number | How I work | The habit's number, ringed by the pen (below) |
 | Sheet | Threshold's PRD; Say hello and the 404 | A small page of ruled lines with a folded corner |
-| Badge | Say hello | A 36 px tile for the GitHub and LinkedIn rows. GitHub's Invertocat is drawn unmodified in ink (GitHub's brand rules allow it as a link to your own profile, kept less prominent than the name). LinkedIn shows "in" in mono until its official [in] file, which only LinkedIn's own download gives, is added; a logo is never redrawn |
+| Contribution tile | Say hello (GitHub) | A 38 px card holding a five by five contribution calendar in GitHub's own levels; the pattern is authored, not data. No logo is drawn |
+| Name card | Say hello (LinkedIn) | A 40 by 28 px business card: a cobalt portrait dot and two printed lines. No logo is drawn |
 | Brackets | Now making | Code brackets in ink with a cobalt slash; the live dot is left to "Live from GitHub" |
 | Empty slot | The 404's missing row | A dashed 44 px outline with nothing in it |
 

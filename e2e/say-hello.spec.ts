@@ -138,7 +138,7 @@ test.describe("Say hello", () => {
 
   test("text passes WCAG 2.2 AA contrast", async ({ page }) => {
     await expect(copyButton(page)).toBeVisible();
-    for (const selector of ["#say-hello .qi-title", "#say-hello .qi-email__address", "#say-hello .qi-copy", "#say-hello .qi-row__title", "#say-hello .qi-badge", ".stretch-footer__made", ".stretch-footer__name"]) {
+    for (const selector of ["#say-hello .qi-title", "#say-hello .qi-email__address", "#say-hello .qi-copy", "#say-hello .qi-row__title", ".stretch-footer__made", ".stretch-footer__name"]) {
       const readings = await contrastOnPaper(page, selector);
       expect(readings.length, selector).toBeGreaterThan(0);
       for (const reading of readings) expect(reading.ratio, `${selector}: ${reading.text}`).toBeGreaterThanOrEqual(4.5);
