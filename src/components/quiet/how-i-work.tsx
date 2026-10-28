@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { CloserLookRoot } from "@/components/quiet/closer-look-root";
 import { Row } from "@/components/quiet/row";
+import { Sheet } from "@/components/quiet/sheet";
 import { TypedQuote } from "@/components/quiet/typed-quote";
 import { caseStudies } from "@/content/stretch/case-studies";
 import { howIWork } from "@/content/stretch/how-i-work";
@@ -47,11 +48,6 @@ function HabitNumber({ position }: { position: number }) {
       />
     </span>
   );
-}
-
-/** The Sheet (DESIGN.md, Objects): a small page of ruled lines with a folded corner. */
-function Sheet() {
-  return <span className="qi-sheet" />;
 }
 
 /** The PRD's closer look: its quote typing itself, with the caption beneath. */

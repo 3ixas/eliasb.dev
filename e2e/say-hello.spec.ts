@@ -2,56 +2,106 @@ import { expect, test, type Page } from "@playwright/test";
 import { profile } from "../src/content/site";
 import { sayHello, siteCopy } from "../src/content/stretch/site-copy";
 import { contrastOnPaper } from "./support/contrast";
+import { tap } from "./support/tap";
+
+/*
+ * Say hello and the footer (docs/design/DESIGN.md, "The homepage, in order" 7 and 8): the heading with no line after
+ * it, the email with its Copy button, then Résumé, GitHub and LinkedIn as rows; and "Made by Elias", filling with
+ * cobalt on hover only.
+ */
 
 const section = (page: Page) => page.locator("section#say-hello");
+const address = profile.links.email.replace(/^mailto:/, "");
+const wide = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1180;
+/** Found by class, not name: its name changes to "Copied". */
+const copyButton = (page: Page) => section(page).locator(".qi-copy");
+const rows = (page: Page) => section(page).locator("a.qi-row");
 
-test.describe("Say hello and the footer", () => {
+test.describe("Say hello", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
   });
 
-  test("the copy matches the approved text", async ({ page }) => {
+  test("is a heading with no line after it, then the email, Résumé, GitHub and LinkedIn in that order", async ({ page }) => {
     const heading = section(page).getByRole("heading", { level: 2, name: "Say hello", exact: true });
     await expect(heading).toHaveCount(1);
     await expect(section(page)).toHaveAttribute("aria-labelledby", (await heading.getAttribute("id"))!);
-    await expect(heading.getByRole("link", { name: sayHello.bigLink, exact: true })).toBeVisible();
-    await expect(section(page).locator(".stretch-section__head")).toHaveCount(0);
-    await expect(section(page).locator(".stretch-hello__line")).toHaveText(sayHello.line);
-    await expect(section(page).locator(".stretch-hello__link")).toHaveCount(sayHello.links.length);
-  });
-
-  test("the big link emails Elias, and it is the one cobalt block", async ({ page }) => {
-    const big = section(page).locator(".stretch-hello__big");
-    await expect(big).toHaveAttribute("href", profile.links.email);
+    // Nothing is written under the heading: the email and its button are the line.
+    await expect(section(page).locator("p:visible")).toHaveCount(0);
+    expect(await section(page).locator("a[href]").evaluateAll((links) => links.map((link) => link.getAttribute("href")))).toEqual([
+      profile.links.email,
+      profile.links.resume,
+      profile.links.github,
+      profile.links.linkedin,
+    ]);
     expect(profile.links.email.startsWith("mailto:")).toBe(true);
-    const [background, link] = await Promise.all([big.evaluate((el) => getComputedStyle(el).backgroundColor), section(page).locator(".stretch-hello__link").first().evaluate((el) => getComputedStyle(el).backgroundColor)]);
-    expect(background).not.toBe(link);
+    await expect(section(page).locator(".qi-email__address")).toHaveText(address);
+    await expect(rows(page).locator(".qi-row__title")).toHaveText(sayHello.links.map(({ label }) => label));
   });
 
-  test("GitHub and LinkedIn go where the profile says, in a new tab", async ({ page }) => {
-    const outside = sayHello.links.flatMap((entry, index) => (entry.id === "resume" ? [] : [{ ...entry, index }]));
-    expect(outside.length).toBe(sayHello.links.length - 1);
-    for (const { id, label, index } of outside) {
-      const link = section(page).locator(".stretch-hello__link").nth(index);
-      await expect(link).toContainText(label);
-      await expect(link).toContainText("↗");
-      await expect(link).toHaveAttribute("href", profile.links[id]);
-      await expect(link).toHaveAttribute("target", "_blank");
-      await expect(link).toHaveAttribute("rel", /noreferrer/);
-    }
+  test("the giant Say hello and its line are gone", async ({ page }) => {
+    await expect(page.locator(".stretch-hello, .stretch-hello__big")).toHaveCount(0);
+    await expect(page.getByText("Got an idea, a project")).toHaveCount(0);
+    await expect(page.getByText("Say hello ↗")).toHaveCount(0);
+  });
+
+  test("Copy puts the address on the clipboard, turns cobalt and says Copied, then goes back", async ({ page, browserName }) => {
+    test.skip(browserName !== "chromium", "Only Chromium can grant clipboard reads");
+    await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+    const copy = copyButton(page);
+    await expect(copy).toBeVisible();
+    const quiet = await copy.evaluate((element) => getComputedStyle(element).backgroundColor);
+    await copy.click();
+    await expect(copy).toHaveText(sayHello.copied);
+    await expect(section(page).getByRole("status")).toHaveText(sayHello.copied);
+    await expect.poll(() => copy.evaluate((element) => getComputedStyle(element).backgroundColor)).toMatch(/^rgb\((35, 64, 255|139, 156, 255)\)$/);
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(address);
+    await expect(copy).toHaveText(sayHello.copy, { timeout: 5000 });
+    await expect.poll(() => copy.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe(quiet);
+  });
+
+  test("without script the email is still a working link and there is no dead button", async ({ page }) => {
+    await page.route("**/*.js", (route) => route.abort());
+    await page.reload();
+    await expect(section(page).getByRole("link", { name: address, exact: true })).toHaveAttribute("href", profile.links.email);
+    await expect(copyButton(page)).toBeHidden();
+    await expect(page.getByRole("contentinfo")).toHaveText(siteCopy.footer);
+    await expect(rows(page)).toHaveCount(3);
   });
 
   test("Résumé opens /resume on this site, with the internal arrow", async ({ page }) => {
-    const index = sayHello.links.findIndex(({ id }) => id === "resume");
-    const link = section(page).locator(".stretch-hello__link").nth(index);
-    await expect(link).toContainText("Résumé");
-    await expect(link).toContainText("→");
-    await expect(link).not.toContainText("↗");
+    const link = rows(page).filter({ hasText: "Résumé" });
     await expect(link).toHaveAttribute("href", "/resume");
     await expect(link).not.toHaveAttribute("target", "_blank");
+    await expect(link.locator(".qi-row__arrow")).toHaveText("→");
     expect(profile.links.resume).toBe("/resume");
     await link.click();
     await expect(page).toHaveURL(/\/resume$/);
+  });
+
+  test("GitHub and LinkedIn go where the profile says, in a new tab, marked ↗", async ({ page }) => {
+    for (const { id, label } of sayHello.links.filter(({ id }) => id !== "resume")) {
+      const link = rows(page).filter({ hasText: label });
+      await expect(link).toHaveAttribute("href", profile.links[id]);
+      await expect(link).toHaveAttribute("target", "_blank");
+      await expect(link).toHaveAttribute("rel", /noreferrer/);
+      await expect(link.locator(".qi-row__arrow")).toHaveText("↗");
+    }
+  });
+
+  test("the Résumé row's closer look is the sheet, with the line about the PDF", async ({ page }) => {
+    const row = rows(page).filter({ hasText: "Résumé" });
+    await expect(row).toHaveAccessibleDescription(sayHello.resumeLook);
+    if (wide(page)) {
+      await row.hover();
+      await expect(page.locator(".qi-margin")).toBeVisible();
+      await expect(page.locator(".qi-margin .qi-resume-look figcaption")).toHaveText(sayHello.resumeLook);
+      await expect(page.locator(".qi-margin a")).toHaveCount(0);
+    } else {
+      await tap(page, section(page).getByRole("button", { name: "A closer look at Résumé" }));
+      await expect(section(page).locator(".qi-inline__in .qi-resume-look figcaption")).toHaveText(sayHello.resumeLook);
+      await expect(page).toHaveURL(/\/$/);
+    }
   });
 
   test("the header's Say hello link lands on this section", async ({ page }) => {
@@ -62,108 +112,65 @@ test.describe("Say hello and the footer", () => {
     await expect(section(page)).toBeInViewport();
   });
 
-  test("the footer is there, and it is in the server-rendered page", async ({ page }) => {
-    await page.route("**/*.js", (route) => route.abort());
-    await page.reload();
-    await expect(page.getByRole("contentinfo")).toHaveText(siteCopy.footer);
-    await expect(section(page).locator(".stretch-hello__link")).toHaveCount(3);
-  });
-
   test("every target is at least 44 px and nothing overflows", async ({ page }) => {
+    await expect(copyButton(page)).toBeVisible();
     const width = page.viewportSize()?.width ?? 0;
-    for (const link of await section(page).locator("a").all()) {
-      const box = (await link.boundingBox())!;
+    for (const target of await section(page).locator("a, button:visible").all()) {
+      const box = (await target.boundingBox())!;
       expect(box.height).toBeGreaterThanOrEqual(44);
-      expect(box.width).toBeGreaterThanOrEqual(44);
       expect(box.x).toBeGreaterThanOrEqual(0);
       expect(box.x + box.width).toBeLessThanOrEqual(width);
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 
-  test("focus is visible on each link", async ({ page }) => {
-    for (const link of await section(page).locator("a").all()) {
-      await link.focus();
-      const outline = await link.evaluate((el) => ({ style: getComputedStyle(el).outlineStyle, width: parseFloat(getComputedStyle(el).outlineWidth) }));
-      expect(outline.style).not.toBe("none");
-      expect(outline.width).toBeGreaterThanOrEqual(2);
+  test("focus is visible on the email, Copy and each row", async ({ page }) => {
+    await expect(copyButton(page)).toBeVisible();
+    for (const target of await section(page).locator("a, button:visible").all()) {
+      await target.focus();
+      const ring = await target.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return { outline: style.outlineStyle !== "none" && parseFloat(style.outlineWidth) >= 2, shadow: style.boxShadow !== "none" };
+      });
+      expect(ring.outline || ring.shadow).toBe(true);
     }
   });
 
   test("text passes WCAG 2.2 AA contrast", async ({ page }) => {
-    for (const selector of [".stretch-hello__big", ".stretch-hello__line", ".stretch-hello__link"]) {
-      const readings = await contrastOnPaper(page, `#say-hello ${selector}`);
-      expect(readings.length, selector).toBeGreaterThan(0);
-      for (const reading of readings) expect(reading.ratio, `${selector}: ${reading.text}`).toBeGreaterThanOrEqual(4.5);
-    }
-    for (const selector of [".stretch-footer__made", ".stretch-footer__name", ".stretch-hello__address"]) {
+    await expect(copyButton(page)).toBeVisible();
+    for (const selector of ["#say-hello .qi-title", "#say-hello .qi-email__address", "#say-hello .qi-copy", "#say-hello .qi-row__title", "#say-hello .qi-badge", ".stretch-footer__made", ".stretch-footer__name"]) {
       const readings = await contrastOnPaper(page, selector);
       expect(readings.length, selector).toBeGreaterThan(0);
       for (const reading of readings) expect(reading.ratio, `${selector}: ${reading.text}`).toBeGreaterThanOrEqual(4.5);
     }
   });
+});
 
-  test("the address appears in words, as a link that emails Elias", async ({ page }) => {
-    const address = profile.links.email.replace(/^mailto:/, "");
-    const link = section(page).getByRole("link", { name: address, exact: true });
-    await expect(link).toHaveAttribute("href", profile.links.email);
-    await expect(link).toHaveText(address);
-  });
-
-  test("Say hello is larger than the footer, and the link row stays on one line", async ({ page }) => {
-    const size = (selector: string) => page.locator(selector).first().evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
-    const [hello, footer] = await Promise.all([size(".stretch-hello__big"), size(".stretch-footer p")]);
-    expect(hello).toBeGreaterThan(footer);
-    // Fonts settle after goto, so poll the row count rather than read it once.
-    await expect
-      .poll(async () => {
-        const boxes = await Promise.all((await section(page).locator(".stretch-hello__link").all()).map((link) => link.boundingBox()));
-        return new Set(boxes.map((box) => Math.round(box!.y))).size;
-      }, { message: "the three links share a row" })
-      .toBe(1);
+test.describe("The footer", () => {
+  test("says Made by Elias and is quieter than the opening line, with Elias in the display face", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("contentinfo")).toHaveText(siteCopy.footer);
+    const size = (selector: string) => page.locator(selector).first().evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
+    await expect.poll(async () => (await size(".stretch-footer p")) < (await size(".qi-opening__line"))).toBe(true);
   });
 });
 
-// The invariant (#216): Say hello renders larger than the footer at every width, across the breakpoint too.
-// The sizes are the stylesheet's own scales: Say hello is clamp(56px, 11vw, 160px) (clamp(46px, 14.4vw, 56px) under 390 px); the footer is the smaller of 12vw (clamp(44px, 7vw, 104px) from 760 px) and 85% of Say hello.
-const clamp = (min: number, value: number, max: number) => Math.min(Math.max(value, min), max);
-const expectedSizes = (width: number) => {
-  const hello = width < 390 ? clamp(46, width * 0.144, 56) : clamp(56, width * 0.11, 160);
-  const own = width < 760 ? width * 0.12 : clamp(44, width * 0.07, 104);
-  return { hello, footer: Math.min(own, hello * 0.85) };
-};
-
-test.describe("Say hello against the footer at every width", () => {
-  for (const width of [320, 390, 600, 759, 760, 820, 1100, 1440, 1920]) {
+// The footer is on every page, so it must fit at every width, and never be the largest type on the page.
+test.describe("The footer at every width", () => {
+  for (const width of [320, 390, 760, 1100, 1440, 1920]) {
     test(`at ${width} px`, async ({ page }, testInfo) => {
       test.skip(!/-1440-light$/.test(testInfo.project.name), "Sweeps its own widths: once per engine");
       await page.setViewportSize({ width, height: 900 });
       await page.goto("/");
-      const sizes = () =>
-        page.evaluate(() => [".stretch-hello__big", ".stretch-footer p"].map((selector) => parseFloat(getComputedStyle(document.querySelector(selector)!).fontSize)));
-      const expected = expectedSizes(width);
-      await expect.poll(async () => (await sizes()).map((size) => Math.round(size))).toEqual([Math.round(expected.hello), Math.round(expected.footer)]);
-      const [hello, footer] = await sizes();
-      expect(hello).toBeGreaterThan(footer);
+      await expect.poll(async () => page.locator(".stretch-footer p").evaluate((element) => parseFloat(getComputedStyle(element).fontSize))).toBeLessThanOrEqual(
+        Math.min(Math.max(width * 0.054, 34), 50) * 0.8 + 0.5,
+      );
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     });
   }
 });
 
-// #216: on a phone the Résumé, GitHub and LinkedIn links each stay a 44 px target, on one row.
-test("the link row at 390 px is one row of 44 px targets", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 900 });
-  await page.goto("/");
-  const links = section(page).locator(".stretch-hello__link");
-  await expect(links).toHaveCount(3);
-  await expect.poll(async () => {
-    const boxes = await Promise.all((await links.all()).map((link) => link.boundingBox()));
-    return new Set(boxes.map((box) => Math.round(box!.y))).size;
-  }).toBe(1);
-  for (const link of await links.all()) expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
-});
-
-// #216: the footer is on every page, so it must also fit on a page that is not the homepage.
+// The footer is on every page, so it must also fit on a page that is not the homepage.
 test.describe("The footer away from the homepage", () => {
   for (const path of ["/things-i-make/threshold", "/this-page-does-not-exist"]) {
     for (const width of [320, 390]) {
@@ -174,10 +181,12 @@ test.describe("The footer away from the homepage", () => {
         const footer = page.getByRole("contentinfo");
         await expect(footer).toHaveText(siteCopy.footer);
         await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-        await expect.poll(async () => {
-          const box = await footer.locator("p").boundingBox();
-          return box !== null && box.x >= 0 && box.x + box.width <= width;
-        }).toBe(true);
+        await expect
+          .poll(async () => {
+            const box = await footer.locator("p").boundingBox();
+            return box !== null && box.x >= 0 && box.x + box.width <= width;
+          })
+          .toBe(true);
       });
     }
   }

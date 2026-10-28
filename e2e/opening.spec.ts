@@ -59,7 +59,7 @@ test.describe("The opening line", () => {
     const larger = await page.evaluate((limit) => {
       const found: string[] = [];
       for (const element of document.querySelectorAll("body *")) {
-        if (element.closest("#say-hello, footer, [hidden]") || !element.checkVisibility()) continue;
+        if (element.closest("[hidden]") || !element.checkVisibility()) continue;
         const hasText = [...element.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim());
         if (hasText && parseFloat(getComputedStyle(element).fontSize) > limit + 0.01) found.push(`${element.tagName.toLowerCase()}.${element.className}`);
       }
