@@ -147,3 +147,17 @@ test("between 900 and 1179 px the tapped look opens on its own row under the hea
   expect(image.y).toBeGreaterThanOrEqual(header.y + 40);
   expect(row.x + row.width).toBeLessThanOrEqual(header.x + header.width + 1);
 });
+
+test("following a section link closes the inline look, so the section is not left behind the taller header", async ({ page }) => {
+  await page.setViewportSize({ width: 1000, height: 800 });
+  await page.goto("/");
+  await expect(page.locator("[data-greeting]")).toBeVisible();
+  await tap(page, face(page));
+  await expect(inline(page)).toBeVisible();
+  await page.getByRole("navigation", { name: siteCopy.header.linksLabel }).getByRole("link", { name: "How I work" }).click();
+  await expect(inline(page)).toHaveCount(0);
+  await expect(face(page)).toHaveAttribute("aria-expanded", "false");
+  await expect
+    .poll(() => page.evaluate(() => document.getElementById("how-i-work")!.getBoundingClientRect().top - document.querySelector("[data-stretch-header]")!.getBoundingClientRect().bottom))
+    .toBeGreaterThanOrEqual(-1);
+});

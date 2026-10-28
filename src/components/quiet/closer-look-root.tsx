@@ -74,6 +74,8 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     setActive((now) => (now?.source === "tap" && now.id === id ? null : { id, source: "tap", slot }));
   };
   const onClick = (event: MouseEvent) => {
+    // Following a link closes an inline look: it can sit in a sticky header, and an anchor would land behind it.
+    if (active?.source === "tap" && (event.target as Element).closest("a[href]")) setActive(null);
     const trigger = (event.target as Element).closest<HTMLElement>("[data-look-tap]");
     if (trigger && root.current?.contains(trigger) && !window.matchMedia(WIDE).matches) toggle(trigger);
   };
