@@ -102,6 +102,8 @@ test.describe("The Résumé", () => {
     await expect(download).toBeHidden();
     await expect(page.locator("header.stretch-header")).toBeHidden();
     await expect(page.locator("footer")).toBeHidden();
+    // The room below the content is for the screen: paper has none to leave, so it must not push a blank page.
+    await expect(page.locator("[data-resume] main")).toHaveCSS("padding-bottom", "0px");
     await expect(sheet(page)).toBeVisible();
     await expect
       .poll(() => sheet(page).evaluate((el) => ({ paper: getComputedStyle(el).backgroundColor, ink: getComputedStyle(el).color })))

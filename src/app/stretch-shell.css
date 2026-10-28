@@ -30,9 +30,11 @@ html:has([data-stretch-shell]) body {
   }
 }
 
-/* No page has a footer: each ends on its own last content, with room to breathe below it. */
-[data-stretch-shell] main {
-  padding-bottom: clamp(80px, 12vw, 128px);
+/* No page has a footer: each ends on its own last content, with room to breathe below it. On screen only: paper has no room to leave. */
+@media screen {
+  [data-stretch-shell] main {
+    padding-bottom: clamp(80px, 12vw, 128px);
+  }
 }
 
 [data-stretch-shell] ::selection {
