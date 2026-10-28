@@ -43,11 +43,29 @@ test.describe("Inline closer looks close as smoothly as they open", () => {
     test("the row itself closes it, and a tap while it folds opens it again", async ({ page }) => {
       await tap(page, row(page));
       await expect(open(page)).toBeVisible();
-      await tap(page, row(page));
+      // The spaced tap helper waits longer than a look takes to fold, so these taps are made as quickly as a thumb could.
+      await row(page).click();
       await expect(open(page)).toHaveAttribute("data-leaving", "");
+      await row(page).click();
+      await expect(open(page)).not.toHaveAttribute("data-leaving", "");
+      // It is the same look, still there well after the first fold's removal would have fired.
+      await page.waitForTimeout(400);
+      await expect(open(page)).toBeVisible();
+    });
+
+    test("closing again while it folds starts a new fold that the first one's timer cannot cut short", async ({ page }) => {
       await tap(page, row(page));
       await expect(open(page)).toBeVisible();
-      await expect(open(page)).not.toHaveAttribute("data-leaving", "");
+      // Close, reopen at once, then close again 120 ms after the first close: the first fold's removal is due at about 260 ms, the second's at 380.
+      await row(page).evaluate(async (element: HTMLElement) => {
+        element.click();
+        element.click();
+        await new Promise((resolve) => setTimeout(resolve, 120));
+        element.click();
+      });
+      await page.waitForTimeout(190);
+      await expect(open(page)).toHaveAttribute("data-leaving", "", { timeout: 100 });
+      await expect(open(page)).toHaveCount(0);
     });
   });
 
