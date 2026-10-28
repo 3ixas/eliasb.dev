@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type FocusEvent, type Key
 import { createPortal } from "react-dom";
 import { useCycleAdvance } from "@/components/quiet/cycle";
 import { margin as marginSpacing, placeMargin, WIDE } from "@/components/quiet/margin-placement";
-import { correctHold, foldEnded, foldStarted, startHold, stopHold } from "@/components/quiet/scroll-hold";
+import { correctHold, reportFolding, startHold, stopHold } from "@/components/quiet/scroll-hold";
 
 /** The margin hides this long after the pointer leaves a row or focus leaves it, so crossing the gap between two rows does not flash. */
 const HIDE_MS = 140;
@@ -35,7 +35,6 @@ function cancelRemoval(removals: Map<HTMLElement, number>, slot: HTMLElement) {
   if (timer === undefined) return;
   window.clearTimeout(timer);
   removals.delete(slot);
-  foldEnded();
 }
 
 /**
@@ -64,6 +63,8 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
   const advance = useCycleAdvance();
   /** The pending removal of each folding look, by slot: a look that is reopened or closed again takes its earlier removal with it. */
   const removals = useRef(new Map<HTMLElement, number>());
+  /** Names this controller to the page's scroll hold, which counts looks folding across every controller. */
+  const owner = useRef({});
 
   const cancelHide = () => window.clearTimeout(hideTimer.current);
   const announce = () => window.dispatchEvent(new CustomEvent(SHOWING, { detail: root.current }));
@@ -82,15 +83,14 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     const gone = { id: before.id, slot: before.slot };
     setLeaving((all) => [...all.filter(({ id }) => id !== gone.id), gone]);
     cancelRemoval(removals.current, gone.slot);
-    foldStarted();
     removals.current.set(
       gone.slot,
       window.setTimeout(() => {
         removals.current.delete(gone.slot);
-        foldEnded();
         setLeaving((all) => all.filter((one) => one.slot !== gone.slot));
       }, CLOSE_MS + 40),
     );
+    reportFolding(owner.current, removals.current.size + 1);
   };
   const hideSoon = () => {
     cancelHide();
@@ -203,15 +203,14 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     const onChange = () => change(null);
     wide.addEventListener("change", onChange);
     const timers = removals.current;
+    const counter = owner.current;
     return () => {
       wide.removeEventListener("change", onChange);
       cancelHide();
       stopHold();
-      timers.forEach((timer) => {
-        window.clearTimeout(timer);
-        foldEnded();
-      });
+      timers.forEach((timer) => window.clearTimeout(timer));
       timers.clear();
+      reportFolding(counter, 0);
     };
   }, []);
 
@@ -254,6 +253,8 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
   // After a tap changes the page, put the tapped trigger back where it was on screen straight away; `hold` keeps it there while the looks move.
   useLayoutEffect(() => {
     correctHold();
+    // After this commit the looks still folding are those in `leaving`, plus any whose removal is still to come.
+    reportFolding(owner.current, new Set([...removals.current.keys(), ...leaving.map(({ slot }) => slot)]).size);
   }, [active, leaving]);
 
   // The object button (or reveal word) says what is open to assistive technology (CSS styles an open row from its filled slot).

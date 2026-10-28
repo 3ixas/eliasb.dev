@@ -11,17 +11,19 @@ type Hold = { trigger: HTMLElement; top: number; frame: number; stop: () => void
  * must wait for every controller's folds.
  */
 let current: Hold | null = null;
-let folding = 0;
+const folding = new Map<object, number>();
 
-/** A look has begun folding away, and will be unmounted a moment later. */
-export function foldStarted() {
-  folding += 1;
+/**
+ * How many looks `owner` (a controller) still has folding or waiting to be unmounted: those scheduled for removal and those removed
+ * but not yet committed. A controller reports it when it schedules a removal and again after every commit, so the count falls
+ * only once the look is really gone from the page, however far apart the timer and the commit are on a slow one.
+ */
+export function reportFolding(owner: object, count: number) {
+  if (count > 0) folding.set(owner, count);
+  else folding.delete(owner);
 }
 
-/** A look that was folding has been unmounted, or was reopened or closed again, so one fewer is outstanding. */
-export function foldEnded() {
-  folding = Math.max(0, folding - 1);
-}
+const stillFolding = () => [...folding.values()].some((count) => count > 0);
 
 /** Puts the held row back where it was on screen, if the page has moved it. Run in a commit, so the correction lands with the layout change. */
 export function correctHold() {
@@ -67,7 +69,7 @@ export function startHold(trigger: HTMLElement) {
     if (taken || !trigger.isConnected) return hold.stop();
     correctHold();
     const now = performance.now();
-    if (now >= started + HOLD_CAP_MS || (now >= started + HOLD_MS && folding === 0)) return hold.stop();
+    if (now >= started + HOLD_CAP_MS || (now >= started + HOLD_MS && !stillFolding())) return hold.stop();
     hold.frame = window.requestAnimationFrame(step);
   };
   hold.frame = window.requestAnimationFrame(step);
