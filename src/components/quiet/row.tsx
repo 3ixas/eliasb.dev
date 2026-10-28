@@ -1,14 +1,19 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
+import { CycleTrigger } from "@/components/quiet/cycle";
 import { bindDots } from "@/components/site/bind-dots";
 import { hostLabel } from "@/components/site/host-label";
 
-/** A row's closer look: its id (the key of the controller's `looks`) and what it says beyond the row, as the row's accessible description. */
-export type RowLook = { id: string; description: string };
+/**
+ * A row's closer look: its id (the key of the controller's `looks`) and what it says beyond the row, as the row's
+ * accessible description. A row with `cycle` (what each step of the cycle says, for the live region) steps through
+ * its look's pages when clicked instead of opening it; on phones its object button opens the look.
+ */
+export type RowLook = { id: string; description: string; cycle?: string[] };
 
-/** A link row's object button is named for its title, so the title of a row with a link and a closer look is text. */
+/** The object button of a link row, or a cycling row, is named for its title, so that title is text. */
 function nameOf(title: ReactNode) {
-  if (typeof title !== "string") throw new Error("A row with a link and a closer look needs a text title to name its object button");
+  if (typeof title !== "string") throw new Error("A row with a link or a cycle, and a closer look, needs a text title to name its object button");
   return title;
 }
 
@@ -20,7 +25,7 @@ function nameOf(title: ReactNode) {
  * technology. A row given a `card` also has a phone shape: the card is an extra element shown only there (a
  * featured project's screenshot), in a list that CSS turns into swipeable cards. `after` is decoration drawn
  * over the row's item but outside the row (How I work's pen arrows between habits). `attrs` puts data attributes on
- * the item. A title that is not a string is for a row whose words wait on the visitor's clock (the training row).
+ * the item. A row whose look has a `cycle` is a button that steps the look on (cycle.tsx). A title that is not a string is for a row whose words wait on the visitor's clock (the training row).
  * Rendered by the server in full: the description is hidden text the row points to with `aria-describedby`,
  * and sits beside the row so it is not part of a link's name. The markup is the same on every screen and CSS
  * decides which presentation shows: on phones a link row's object gets its own button beside the link (a button
@@ -63,13 +68,17 @@ export function Row({ object, title, line, meta, href, look, card, after, style,
           <Link className="qi-row" href={href} {...props}>
             {content}
           </Link>
+        ) : look?.cycle ? (
+          <CycleTrigger id={look.id} announcements={look.cycle} labelledBy={titleId!} describedBy={descriptionId!}>
+            {content}
+          </CycleTrigger>
         ) : (
           // A plain row is the whole tap target on phones (data-look-tap); a link row's is the object button beside it.
           <div className="qi-row" tabIndex={look ? 0 : undefined} role={look ? "group" : undefined} aria-labelledby={titleId} data-look-tap={look?.id} {...props}>
             {content}
           </div>
         )}
-        {href && look && <button type="button" className="qi-row__tap" data-look-tap={look.id} aria-expanded="false" aria-label={`A closer look at ${nameOf(title)}`} />}
+        {(href || look?.cycle) && look && <button type="button" className="qi-row__tap" data-look-tap={look.id} aria-expanded="false" aria-label={`A closer look at ${nameOf(title)}`} />}
       </div>
       {after}
       {look && (

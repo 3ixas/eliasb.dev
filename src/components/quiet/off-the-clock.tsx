@@ -1,15 +1,19 @@
 import Image from "next/image";
 import { Fragment, type CSSProperties, type ReactNode } from "react";
+import { CalendarTile } from "@/components/quiet/calendar-tile";
+import { ClippingLook } from "@/components/quiet/clipping";
 import { CloserLookRoot } from "@/components/quiet/closer-look-root";
+import { CycleScope } from "@/components/quiet/cycle";
 import { Row } from "@/components/quiet/row";
 import { TrainingLine, TrainingLook, TrainingTile, TrainingTitle } from "@/components/quiet/training";
 import { TypedQuote } from "@/components/quiet/typed-quote";
+import { GitHubYear } from "@/components/site/github-year";
 import { SourceMark } from "@/components/site/now-mark";
 import { projects } from "@/content/projects";
 import { filmLine } from "@/content/stretch/film-line";
 import { nowMakingEntry, offTheClock as copy } from "@/content/stretch/off-the-clock";
 import { asOfDate, pinStatus, type PinStatus } from "@/integrations/pin-rules";
-import type { FilmSignal, LatestRepositorySignal, ReadingSignal, SignalState } from "@/integrations/types";
+import type { FilmSignal, GitHubSignal, HistorySignal, LatestRepositorySignal, ReadingSignal, SignalState } from "@/integrations/types";
 
 /** A row with its closer look: the id they share, the `Row` for the list and what the margin and the inline slot show. */
 export type Entry = { id: string; row: ReactNode; look: ReactNode };
@@ -242,6 +246,64 @@ export function makingEntry(latest: LatestRepositorySignal): Entry | null {
   };
 }
 
+/** The oddity's date as the clipping prints it: "28 September 1924", or "Born 28 September 1852"; the year alone for the archive. */
+function printedDate(event: HistorySignal["events"][number], day: ReturnType<typeof asOfDate> | null) {
+  const date = day ? `${day.long} ${event.year}` : String(event.year);
+  return event.kind === "birth" ? copy.curiosity.born(date) : date;
+}
+
+/**
+ * This week in history: the row cycles through the week's oddities when clicked, and its closer look is the
+ * clipping for the one it is on (cycle.tsx). With one oddity it is a plain row with the one clipping. Without a
+ * live week it is the archive's saved examples, which say so. With none it is gone.
+ */
+export function historyEntry(history: HistorySignal): Entry | null {
+  const { events } = history;
+  if (events.length === 0) return null;
+  const id = "history";
+  const day = history.weekOf ? asOfDate(new Date(`${history.weekOf}T12:00:00Z`)) : null;
+  const dates = events.map((event) => printedDate(event, day));
+  const steps = events.map((event, index) => `${copy.curiosity.count(index + 1, events.length)}. ${dates[index]}. ${event.text}`);
+  const mark = sourceMark(copy.curiosity.sourceName, history.state);
+  const attrs = { "data-otc": id, "data-state": day ? "live" : "archive" };
+  const line = !day ? copy.curiosity.fallback : events.length > 1 ? copy.curiosity.rowLine(events.length) : day.long;
+  return {
+    id,
+    look: <ClippingLook id={id} events={events} dates={dates} />,
+    row: (
+      <Row
+        key={id}
+        attrs={attrs}
+        object={<CalendarTile number={history.weekOf ? String(Number(history.weekOf.slice(8))) : ""} />}
+        title={copy.curiosity.label}
+        line={joined([line, mark?.shown])}
+        look={{ id, description: steps.join(" "), cycle: events.length > 1 ? steps : undefined }}
+      />
+    ),
+  };
+}
+
+/**
+ * My GitHub year (docs/design/DESIGN.md, one of the three things that are not rows). It sits in the list as an
+ * item of its own, with no closer look. Saved data gone stale says so; a year with nothing to show is gone.
+ */
+export function githubEntry(github: GitHubSignal, now: Date): Entry | null {
+  const id = "github";
+  const status = pinStatus("github", github, now);
+  if (status.kind === "removed" || github.activity.length === 0) return null;
+  const mark = sourceMark(copy.github.sourceName, github.state, status);
+  return {
+    id,
+    look: null,
+    row: (
+      <li key={id} className="qi-list__item qi-github" {...sourceAttrs(id, status)}>
+        <h3 className="sr-only">{copy.github.heading}</h3>
+        <GitHubYear activity={github.activity} total={github.total} mark={mark?.shown} />
+      </li>
+    ),
+  };
+}
+
 /**
  * The list of Off the clock rows (GLOSSARY.md, Row) with the controller that shows their closer looks. `children`
  * are the section's heading and note, inside the controller's column like Work's.
@@ -250,11 +312,13 @@ export function OffTheClockList({ entries, children }: { entries: (Entry | null)
   const shown = entries.filter((entry) => entry !== null);
   const looks = Object.fromEntries(shown.filter(({ look }) => look).map(({ id, look }) => [id, look]));
   return (
-    <CloserLookRoot looks={looks} className="qi-column">
-      {children}
-      <ul className="qi-list" data-off-the-clock="">
-        {shown.map(({ row }) => row)}
-      </ul>
-    </CloserLookRoot>
+    <CycleScope>
+      <CloserLookRoot looks={looks} className="qi-column">
+        {children}
+        <ul className="qi-list" data-off-the-clock="">
+          {shown.map(({ row }) => row)}
+        </ul>
+      </CloserLookRoot>
+    </CycleScope>
   );
 }

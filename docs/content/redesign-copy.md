@@ -127,17 +127,17 @@ The homepage section for my own projects ([#157](https://github.com/3ixas/eliasb
 | Training | Today · {Thursday} / {Interval run} · My training week · Zone 2 means slow on purpose. · Photo caption: Out on a run, central London. · Photo alt: Elias mid-run on a rainy street in central London | Authored, so never empty. |
 | Now reading | Now reading · {title} · {author} · Goodreads ↗ | Between books. |
 | Last watched | Admit one · Last watched · {title} · {year} · Letterboxd ↗ | Nothing logged yet. |
-| The Weekly Curiosity | Odd but true, from this week in history · {fact} · {year} · {n} more oddities this week ↓ · Read on Wikipedia ↗ | From the archive |
+| The Weekly Curiosity | Odd but true, from this week in history · {3} things that happened this week, some stranger than others. · This week in history · {fact} · {year} · {1} of {3} · Live from Wikipedia | From the archive |
 | Now making | ● Now making · {project or repository name} · {GitHub description, when it has one} · View on GitHub ↗ (a project with a case study links its name to the case study instead) | Hidden when GitHub can’t be reached |
-| GitHub | {1,221} contributions in the past year · busiest stretch, {September–October} → · ← swipe for the whole year · Quiet / Busy / today | as of {date} |
+| GitHub | {1,221} contributions in the past year · Less / More / today · Live from GitHub | From GitHub, as of {date} |
 
 Strings added while building, shipped, and recorded here on 2026-10-09 so `verify:copy` covers them. They were not in the original approved copy; Elias signed them off on 2026-10-09.
 
 - Training week plan: Mon Monday Full-body gym · Tue Tuesday Zone 2 run · Wed Wednesday Full-body gym · Thu Thursday Interval run · Fri Friday Full-body gym · Sat Saturday Zone 2, rower or bike · Sun Sunday Assault bike intervals
-- Weekly Curiosity: Read more ↗ · Image:
+- Weekly Curiosity: Image:
 - GitHub: GitHub, the past year · Use the arrow keys to move between days.
 
-> **Leaves with this section** when the quiet index replaces it: the training row’s “Today · {Thursday}” and “My training week” (now one line), “Zone 2 means slow on purpose.”, Admit one as a row label (it stays on the film’s closer look), the GitHub “busiest stretch” and “swipe” lines, Quiet / Busy (now Less / More), and “{n} more oddities this week ↓” (now a count).
+> **Leaves with this section** when the quiet index replaces it: the training row’s “Today · {Thursday}” and “My training week” (now one line), “Zone 2 means slow on purpose.”, Admit one as a row label (it stays on the film’s closer look), and the clipping’s Read on Wikipedia and Read more links (a closer look has no links).
 
 ## Say hello
 

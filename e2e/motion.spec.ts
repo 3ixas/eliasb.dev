@@ -5,25 +5,17 @@ import { nameFill, tagSwing } from "../src/components/site/signature-springs";
 test.describe("Scroll sway", () => {
   test.use({ reducedMotion: "no-preference" });
 
-  test("cards sway too, the PRD card keeping its own resting tilt", async ({ page, browserName }) => {
+  test("the PRD card sways, keeping its own resting tilt", async ({ page, browserName }) => {
     test.skip(browserName !== "chromium", "Scroll-driven animation, Chromium");
     await page.goto("/things-i-make/threshold");
     const prd = page.locator(".stretch-prd");
     await prd.scrollIntoViewIfNeeded();
     await expect.poll(() => prd.evaluate((element) => getComputedStyle(element).rotate)).not.toBe("none");
     await expect.poll(() => prd.evaluate((element) => getComputedStyle(element).transform), { message: "the resting 1 degree tilt is still there" }).not.toBe("none");
-    await page.goto("/");
-    const card = page.locator("#off-the-clock .stretch-otc__card").first();
-    await card.scrollIntoViewIfNeeded();
-    await expect.poll(() => card.evaluate((element) => getComputedStyle(element).translate)).not.toBe("none");
   });
 
   test("with reduced motion nothing sways", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/");
-    const card = page.locator("#off-the-clock .stretch-otc__card").first();
-    await card.scrollIntoViewIfNeeded();
-    expect(await card.evaluate((element) => ({ translate: getComputedStyle(element).translate, rotate: getComputedStyle(element).rotate }))).toEqual({ translate: "none", rotate: "none" });
     await page.goto("/things-i-make/threshold");
     expect(await page.locator(".stretch-prd").evaluate((element) => getComputedStyle(element).rotate)).toBe("none");
   });

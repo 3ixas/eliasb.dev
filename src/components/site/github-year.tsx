@@ -1,8 +1,8 @@
 "use client";
 
-import { useId, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
+import { useId, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
+import { CountUp } from "@/components/quiet/count-up";
 import {
-  busiestStretch,
   contributionLevel,
   contributionTag,
   createContributionCalendar,
@@ -17,11 +17,11 @@ const copy = offTheClock.github;
 const grouped = (value: number) => String(Math.round(value)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
 /**
- * The GitHub year as squares in the site's ink, with the latest day in cobalt
- * and a bracket under the busiest four weeks. Hover, focus or tap a day to read
- * its count. On phones the grid scrolls inside its own card and opens on today, with its left edge faded and the caption pinned beneath it.
+ * The GitHub year as squares in GitHub's own greens, with today ringed in cobalt. Its total counts up the first
+ * time it is on screen. Hover, focus or tap a day to read its count. On phones the grid scrolls sideways inside its
+ * own column and opens on today, with its left edge faded. `mark` is the source mark that ends the total's line.
  */
-export function GitHubYear({ activity, total }: { activity: ActivityDay[]; total: number }) {
+export function GitHubYear({ activity, total, mark }: { activity: ActivityDay[]; total: number; mark?: ReactNode }) {
   const calendar = createContributionCalendar(activity);
   const [selected, setSelected] = useState<number | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
@@ -36,12 +36,9 @@ export function GitHubYear({ activity, total }: { activity: ActivityDay[]; total
 
   if (!calendar) return null;
   const { days, weekCount } = calendar;
-  const stretch = busiestStretch(calendar);
   const today = days.length - 1;
   const tabStop = selected ?? today;
-  const percent = (columns: number) => `${(columns / weekCount) * 100}%`;
   const totalText = grouped(total);
-  const before = stretch ? (stretch.column + stretch.span) / weekCount > 0.7 : false;
 
   function move(event: KeyboardEvent<HTMLButtonElement>, index: number) {
     if (event.key === "Escape") {
@@ -60,8 +57,11 @@ export function GitHubYear({ activity, total }: { activity: ActivityDay[]; total
   return (
     <>
       <p className="stretch-gh__total">
-        <span className="stretch-display stretch-gh__count">{totalText}</span>{" "}
-        <span className="stretch-gh__beside">{copy.contributions(totalText).slice(totalText.length + 1)}</span>
+        <span className="stretch-gh__count">
+          <CountUp from={0} to={total} format={grouped} whenSeen />
+        </span>{" "}
+        {copy.contributions(totalText).slice(totalText.length + 1)}
+        {mark && <>{"\u00a0· "}{mark}</>}
       </p>
       <p className="stretch-mono stretch-gh__readout" aria-hidden="true" data-readout>
         {selected === null ? " " : contributionTag(days[selected])}
@@ -77,7 +77,7 @@ export function GitHubYear({ activity, total }: { activity: ActivityDay[]; total
           </div>
           <div
             role="group"
-            aria-label={copy.name(totalText, stretch?.when ?? null)}
+            aria-label={copy.name(totalText)}
             aria-describedby={hintId}
             className="stretch-gh__days"
             data-github-days
@@ -107,29 +107,18 @@ export function GitHubYear({ activity, total }: { activity: ActivityDay[]; total
               />
             ))}
           </div>
-          {stretch && (
-            <div className="stretch-gh__stretch" aria-hidden="true" data-busiest>
-              <span className="stretch-gh__bracket" style={{ left: percent(stretch.column), width: percent(stretch.span) }} />
-            </div>
-          )}
         </div>
       </div>
-      {stretch && (
-        <p className="stretch-mono stretch-gh__note" aria-hidden="true" data-align={before ? "end" : "start"}>
-          {before ? copy.busiest(stretch.when) : copy.busiestAfter(stretch.when)}
-        </p>
-      )}
       <p id={hintId} className="sr-only">
         {copy.keys}
       </p>
       <div className="stretch-gh__foot stretch-mono" aria-hidden="true">
-        <span className="stretch-gh__swipe">{copy.swipe}</span>
         <span className="stretch-gh__legend">
-          {copy.legend.quiet}
+          {copy.legend.less}
           {[0, 1, 2, 3, 4].map((level) => (
             <i key={level} className="stretch-gh__day" data-level={level} />
           ))}
-          {copy.legend.busy}
+          {copy.legend.more}
           <i className="stretch-gh__day" data-today="" />
           {copy.legend.today}
         </span>

@@ -75,11 +75,10 @@ for (const [name, module] of Object.entries(modules)) {
 const built = [
   siteCopy.title("Page"),
   thingsIMake.allThings(6),
-  offTheClock.curiosity.more("n"),
+  offTheClock.curiosity.rowLine(3),
+  offTheClock.curiosity.count(1, 3),
   offTheClock.github.contributions("1,221"),
-  offTheClock.github.busiest("September–October"),
-  offTheClock.github.asOf("date"),
-  ...["Goodreads", "Letterboxd", "GitHub"].map(offTheClock.live),
+  ...["Goodreads", "Letterboxd", "GitHub", "Wikipedia"].map(offTheClock.live),
   offTheClock.fromAsOf("Goodreads", "date"),
 ];
 for (const text of built) assert.ok(plain.includes(text), `Built string is not in the approved copy: "${text}"`);

@@ -30,6 +30,12 @@
   /* The greeting's sun: an illustration colour, never an interface colour (docs/design/DESIGN.md "Colour"). */
   --sun: #e39a2d;
   --stretch-dark: 0;
+  /* GitHub's contribution greens, for the GitHub year only (docs/design/DESIGN.md "Colour"). */
+  --gh-0: #e1e4e8;
+  --gh-1: #9be9a8;
+  --gh-2: #40c463;
+  --gh-3: #30a14e;
+  --gh-4: #216e39;
   color-scheme: light;
 
   /* Motion timing (docs/design/DESIGN.md "Motion"): --spring for things that arrive or swing, --out for things that settle. */
@@ -57,6 +63,11 @@
     --stretch-tape: rgba(232, 222, 188, 0.6);
     --sun: #f5b84f;
     --stretch-dark: 1;
+    --gh-0: #1f242c;
+    --gh-1: #0e4429;
+    --gh-2: #006d32;
+    --gh-3: #26a641;
+    --gh-4: #39d353;
     color-scheme: dark;
   }
 }
@@ -73,6 +84,11 @@
   --stretch-tape: rgba(232, 222, 188, 0.6);
   --sun: #f5b84f;
   --stretch-dark: 1;
+  --gh-0: #1f242c;
+  --gh-1: #0e4429;
+  --gh-2: #006d32;
+  --gh-3: #26a641;
+  --gh-4: #39d353;
   color-scheme: dark;
 }
 
@@ -88,5 +104,10 @@
   --stretch-tape: rgba(232, 222, 188, 0.6);
   --sun: #f5b84f;
   --stretch-dark: 1;
+  --gh-0: #1f242c;
+  --gh-1: #0e4429;
+  --gh-2: #006d32;
+  --gh-3: #26a641;
+  --gh-4: #39d353;
   color-scheme: dark;
 }

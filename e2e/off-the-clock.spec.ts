@@ -49,43 +49,39 @@ async function openLook(page: Page, name: string, id: string) {
 }
 
 test.describe("Off the clock: on the homepage", () => {
-  test("training, the book, the film and Now making are rows under the note, in that order", async ({ page }) => {
+  test("training, the GitHub year, the book, the film, the history row and Now making are in the list under the note, in that order", async ({ page }) => {
     await page.goto("/");
     const section = page.locator("#off-the-clock");
     await expect(section.getByRole("heading", { level: 2, name: offTheClock.heading, exact: true })).toHaveCSS("font-size", "17px");
     await expect(section.locator(".qi-note-line")).toHaveText(offTheClock.note);
     const order = await section.locator(".qi-list [data-otc]").evaluateAll((items) => items.map((item) => item.getAttribute("data-otc")));
-    // Now making comes down when GitHub cannot be reached, and the fixtures cover that.
-    expect(order).toEqual(["training", "reading", "film", "making"].slice(0, order.length));
-    expect(order.length).toBeGreaterThanOrEqual(3);
-    // This week's oddity and the GitHub year are still cards until their own ticket turns them into rows.
-    await expect(section.locator(".stretch-otc [data-otc='clipping']")).toHaveCount(1);
+    // The GitHub year and Now making come down when GitHub cannot be reached, and the fixtures cover that.
+    const full = ["training", "github", "reading", "film", "history", "making"];
+    expect(order).toEqual(full.filter((item) => order.includes(item)));
+    expect(order.length).toBeGreaterThanOrEqual(4);
+    await expect(section.locator("details, summary, .stretch-otc")).toHaveCount(0);
   });
 
-  test("the rows are in the server-rendered section, and training names its plan until today is known", async ({ page }) => {
+  test("the list is in the server-rendered section, and training names its plan until today is known", async ({ page }) => {
     await page.route("**/*.js", (route) => route.abort());
     await page.goto("/");
     const section = page.locator("section#off-the-clock");
-    for (const item of ["training", "clipping", "reading", "film"]) await expect(section.locator(`[data-otc='${item}']`)).toHaveCount(1);
+    for (const item of ["training", "history", "reading", "film"]) await expect(section.locator(`[data-otc='${item}']`)).toHaveCount(1);
     await expect(title(section.locator("[data-otc='training']"))).toHaveText(offTheClock.training.week);
     await expect(line(section.locator("[data-otc='training']"))).toHaveText("");
+    await expect(title(section.locator("[data-otc='history']"))).toHaveText(offTheClock.curiosity.label);
   });
 });
 
 test.describe("Off the clock: Fasteners", () => {
-  test("only the history clipping is fastened, with the GitHub card present", async ({ page }) => {
+  test("nothing in Off the clock is fastened: Fasteners retired with the cards", async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
-    const layout = fixture(page, "layout");
-    await expect(layout.locator("[data-otc='github']")).toHaveCount(1);
-    await expect(layout.locator(".stretch-fastener")).toHaveCount(1);
-    await expect(layout.locator("[data-otc='clipping'] .stretch-fastener--push-pin")).toHaveCount(1);
-    for (const item of ["training", "reading", "film", "making", "github"]) await expect(layout.locator(`[data-otc='${item}'] .stretch-fastener`)).toHaveCount(0);
+    await expect(fixture(page, "layout").locator(".stretch-fastener")).toHaveCount(0);
   });
 
-  test("the homepage carries one Fastener: the clipping (the project tiles left with Things I make, the PRD card with How I work, the poster with this ticket)", async ({ page }) => {
+  test("the homepage carries no Fastener", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator(".stretch-fastener")).toHaveCount(1);
-    await expect(page.locator("#off-the-clock .stretch-fastener")).toHaveCount(1);
+    await expect(page.locator(".stretch-fastener")).toHaveCount(0);
   });
 });
 
@@ -228,53 +224,152 @@ test.describe("Off the clock: the book and the film", () => {
   });
 });
 
-test.describe("Off the clock: the clipping", () => {
+test.describe("Off the clock: the history row", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
   });
 
-  test("a live week leads with its pictured oddity, its date, credit and Wikipedia link", async ({ page }) => {
-    const card = fixture(page, "clipping-week");
-    await expect(card.getByText(offTheClock.curiosity.label, { exact: true })).toBeVisible();
-    const lead = card.locator(".stretch-story--lead");
-    await expect(lead.getByText("The first aerial circumnavigation is completed by a team from the US Army.")).toBeVisible();
-    await expect(lead.getByText("28 September 1924")).toBeVisible();
-    await expect(lead.getByRole("img", { name: "Douglas World Cruisers on a beach" })).toBeVisible();
-    await expect(lead.getByRole("link", { name: "The Museum of Flight" })).toHaveAttribute("href", /commons\.wikimedia\.org/);
-    await expect(lead.getByRole("link", { name: "Public domain" })).toBeVisible();
-    await expect(lead.getByRole("link", { name: /Read on Wikipedia/ })).toHaveAttribute("href", "https://en.wikipedia.org/wiki/First_aerial_circumnavigation");
+  const rowOf = (page: Page, name: string) => fixture(page, name).locator("[data-otc='history']");
+  /** Cycles the row the way the screen does it: a click, or a tap on a touch screen. */
+  const cycle = async (page: Page, name: string) => {
+    await hydrated(page);
+    const row = rowOf(page, name).locator("[data-look='history']");
+    if (wide(page)) await row.click();
+    else await tap(page, row);
+  };
+
+  test("the row is a calendar tile, the title, a line that counts the week's oddities and a live Wikipedia mark", async ({ page }) => {
+    const row = rowOf(page, "history-live");
+    await expect(title(row)).toHaveText(offTheClock.curiosity.label);
+    await expect(line(row)).toContainText(`${offTheClock.curiosity.rowLine(3)} · ${offTheClock.live("Wikipedia")}`);
+    await expect(row.locator("[data-now-mark]")).toHaveCount(1);
+    await expect(row.locator(".qi-tile__number")).toHaveText("28");
+    await expect(row.locator("a")).toHaveCount(0);
+    await expect(fixture(page, "history-week").locator("[data-now-mark]")).toHaveCount(0);
   });
 
-  test("the other oddities are behind a disclosure that counts them", async ({ page }) => {
-    const card = fixture(page, "clipping-week");
-    const summary = card.locator("summary");
-    await expect(summary).toContainText("2 more oddities this week");
-    await expect(card.getByText("A cow wanders into a cathedral")).toBeHidden();
-    // Click only while it is still closed, so a retry never toggles it shut again.
-    await expect(async () => {
-      if (!(await card.locator("details").evaluate((element: HTMLDetailsElement) => element.open))) await summary.click();
-      await expect(card.getByText("A cow wanders into a cathedral")).toBeVisible({ timeout: 1500 });
-    }).toPass({ timeout: 8000 });
-    await expect(card.getByText("Born 28 September 1852")).toBeVisible();
-    await expect(card.getByRole("link", { name: "Ada Example" })).toBeVisible();
+  test("the look is the clipping stamped 'This week in history': date, fact, credit and which oddity it is", async ({ page }) => {
+    const look = await openLook(page, "history-week", "history");
+    await expect(look.locator(".qi-clipping__stamp")).toHaveText(offTheClock.curiosity.stamp);
+    await expect(look.locator(".qi-clipping__date")).toHaveText("28 September 1924");
+    await expect(look.locator(".qi-clipping__fact")).toHaveText("The first aerial circumnavigation is completed by a team from the US Army.");
+    await expect(look.locator(".qi-clipping__figure img")).toBeVisible();
+    await expect(look.locator(".qi-clipping__figure figcaption")).toHaveText("Image: The Museum of Flight · Public domain");
+    await expect(look.locator(".qi-clipping__count")).toHaveText("1 of 3");
+    await expect(look.getByRole("link")).toHaveCount(0);
+    await expect(look.locator(".qi-clipping__stamp")).not.toHaveCSS("color", await token(page, "--stretch-cobalt"));
+  });
+
+  test("clicking the row swaps in the next oddity in place and wraps after the last", async ({ page }) => {
+    const look = await openLook(page, "history-week", "history");
+    const fact = look.locator(".qi-clipping__fact");
+    await cycle(page, "history-week");
+    await expect(fact).toHaveText(/^A cow wanders into a cathedral/);
+    await expect(look.locator(".qi-clipping__count")).toHaveText("2 of 3");
+    await expect(look.locator(".qi-clipping__figure")).toHaveCount(0);
+    await cycle(page, "history-week");
+    await expect(look.locator(".qi-clipping__date")).toHaveText("Born 28 September 1852");
+    await expect(look.locator(".qi-clipping__count")).toHaveText("3 of 3");
+    await cycle(page, "history-week");
+    await expect(look.locator(".qi-clipping__count")).toHaveText("1 of 3");
+    await expect(fact).toHaveText(/^The first aerial circumnavigation/);
+    // Nothing opened or closed: it is the same look throughout.
+    await expect(look).toBeVisible();
+  });
+
+  test("Enter and Space cycle the focused row, and the change is announced politely", async ({ page }) => {
+    await hydrated(page);
+    const card = fixture(page, "history-week");
+    const row = card.locator("[data-look='history']");
+    await expect(row).toHaveAttribute("role", "button");
+    const live = card.locator("[aria-live='polite']");
+    await expect(live).toHaveText("");
+    await row.focus();
+    await page.keyboard.press("Enter");
+    await expect(live).toHaveText(/^2 of 3\. 28 September 1781\. A cow wanders into a cathedral/);
+    await page.keyboard.press("Space");
+    await expect(live).toHaveText(/^3 of 3\. Born 28 September 1852\. Henri Moissan/);
+  });
+
+  test.describe("with motion", () => {
+    test.use({ reducedMotion: "no-preference" });
+
+    test("the stamp lands again with each oddity", async ({ page }) => {
+      const look = await openLook(page, "history-week", "history");
+      await expect(look.locator(".qi-clipping__stamp")).toHaveCSS("animation-name", "qi-stamp");
+      await cycle(page, "history-week");
+      await expect(look.locator(".qi-clipping__count")).toHaveText("2 of 3");
+      await expect(look.locator(".qi-clipping__stamp")).toHaveCSS("animation-name", "qi-stamp");
+    });
+  });
+
+  test("a tall picture is cropped so the whole clipping fits a short window", async ({ page }) => {
+    test.skip(!wide(page), "the fixed margin is for wide screens");
+    await page.setViewportSize({ width: page.viewportSize()!.width, height: 600 });
+    const look = await openLook(page, "history-saved", "history");
+    await expect(look.locator(".qi-clipping__count")).toBeVisible();
+    await expect
+      .poll(async () => {
+        const margin = (await page.locator(".qi-margin").boundingBox())!;
+        return margin.y >= 0 && margin.y + margin.height <= 600;
+      })
+      .toBe(true);
+  });
+
+  test("with one oddity it is a plain row: the clipping, with nothing to cycle", async ({ page }) => {
+    const card = fixture(page, "history-one");
+    const row = card.locator("[data-look='history']");
+    await expect(row).toHaveAttribute("role", "group");
+    await expect(card.locator("[data-cycle]")).toHaveCount(0);
+    await expect(card.locator("[aria-live]")).toHaveCount(0);
+    const look = await openLook(page, "history-one", "history");
+    await expect(look.locator(".qi-clipping__stamp")).toBeVisible();
+    await expect(look.locator(".qi-clipping__count")).toHaveCount(0);
+  });
+
+  test("a text-only story has no picture, creator or licence and still reads whole", async ({ page }) => {
+    const look = await openLook(page, "history-text-only", "history");
+    await expect(look.locator(".qi-clipping__figure")).toHaveCount(0);
+    await expect(look.locator(".qi-clipping__fact")).toHaveText(/^A cow wanders into a cathedral/);
+    await expect(look.locator(".qi-clipping__date")).toHaveText("28 September 1781");
   });
 
   test("without a live week it is the archive, and says so", async ({ page }) => {
-    const card = fixture(page, "clipping-saved");
-    await expect(card.locator(".stretch-otc__kicker")).toHaveText(offTheClock.curiosity.fallback);
-    await expect(card.locator("[data-otc='clipping']")).toHaveAttribute("data-state", "archive");
-    await expect(card.locator(".stretch-story--lead")).toBeVisible();
-    const leadImage = card.locator(".stretch-story--lead img");
-    await expect(leadImage).toBeVisible();
-    await leadImage.scrollIntoViewIfNeeded();
-    await expect.poll(() => leadImage.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
-    await card.locator("summary").click();
-    for (const image of await card.locator(".stretch-story img").all()) {
-      await expect(image).toBeVisible();
-      await image.scrollIntoViewIfNeeded();
-      await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
-    }
-    await expect(card.locator(".stretch-story img")).toHaveCount(3);
+    const card = fixture(page, "history-saved");
+    await expect(card.locator("[data-otc='history']")).toHaveAttribute("data-state", "archive");
+    await expect(line(card)).toHaveText(offTheClock.curiosity.fallback);
+    await expect(card.locator("[data-now-mark]")).toHaveCount(0);
+    const look = await openLook(page, "history-saved", "history");
+    await expect(look.locator(".qi-clipping__count")).toHaveText(/^1 of 3$/);
+    const image = look.locator(".qi-clipping__figure img");
+    await expect(image).toBeVisible();
+    await image.scrollIntoViewIfNeeded();
+    await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
+  });
+
+  test("the hidden description lists every oddity for assistive technology", async ({ page }) => {
+    const card = fixture(page, "history-week");
+    const id = await card.locator("[data-look='history']").getAttribute("aria-describedby");
+    const spoken = await card.locator(`#${id}`).textContent();
+    expect(spoken).toContain("1 of 3. 28 September 1924. The first aerial circumnavigation");
+    expect(spoken).toContain("3 of 3. Born 28 September 1852. Henri Moissan");
+  });
+
+  test("on a touch screen the tile opens the clipping, tapping the row cycles it, and an open clipping follows", async ({ page }) => {
+    test.skip(wide(page), "the margin shows the look on hover; there is no tile button");
+    await hydrated(page);
+    const card = fixture(page, "history-week");
+    const slot = card.locator("[data-look-slot='history'] .qi-look");
+    await expect(slot).toHaveCount(0);
+    // Cycling does not open the look.
+    await tap(page, card.locator("[data-look='history']"));
+    await expect(slot).toHaveCount(0);
+    await tap(page, card.locator("[data-look-tap='history']").first());
+    await expect(slot).toBeVisible();
+    await expect(slot.locator(".qi-clipping__count")).toHaveText("2 of 3");
+    await tap(page, card.locator("[data-look='history']"));
+    await expect(slot.locator(".qi-clipping__count")).toHaveText("3 of 3");
+    await expect(slot).toBeVisible();
   });
 });
 
@@ -340,6 +435,7 @@ test.describe("Off the clock: reduced motion", () => {
     ["training-saturday", "training", ".qi-week__days li"],
     ["book", "book", ".qi-pluck"],
     ["film", "film", ".qi-ticket, .qi-stars span, .qi-ticket__stub"],
+    ["history-week", "history", ".qi-clipping, .qi-clipping__stamp"],
   ] as const) {
     test(`${id}: its look fades in and nothing in it moves`, async ({ page }) => {
       const look = await openLook(page, name, id);
@@ -374,7 +470,8 @@ test.describe("Off the clock: the list", () => {
 
   test("only the rows that are links, or have a closer look, take focus", async ({ page }) => {
     const layout = fixture(page, "layout");
-    await expect(layout.locator(".qi-list [tabindex]:not([data-look])")).toHaveCount(0);
+    // The GitHub year's days are its own focus targets (one tab stop), not rows.
+    await expect(layout.locator(".qi-list > li:not(.qi-github) [tabindex]:not([data-look])")).toHaveCount(0);
     await expect(layout.locator(".qi-list a")).toHaveCount(3);
   });
 });
@@ -384,37 +481,94 @@ test.describe("Off the clock: the GitHub year", () => {
     await page.goto("/fixtures/off-the-clock");
   });
 
-  test("the composed calendar stays readable below both independent columns", async ({ page }) => {
-    const layout = fixture(page, "layout");
-    const grid = (await layout.locator(".stretch-otc").boundingBox())!;
-    const calendar = (await layout.locator("[data-otc='github']").boundingBox())!;
-    expect(calendar.x).toBeCloseTo(grid.x, 0);
-    expect(calendar.width).toBeCloseTo(grid.width, 0);
-    for (const column of await layout.locator(".stretch-otc__column").all()) {
-      const box = (await column.boundingBox())!;
-      expect(calendar.y).toBeGreaterThan(box.y + box.height);
-    }
-    const day = (await layout.locator("[data-github-days] button").first().boundingBox())!;
+  const totalOf = async (card: Locator) => /: ([\d,]+)\.$/.exec((await card.locator("[data-github-days]").getAttribute("aria-label"))!)![1];
+
+  test("sits second in the list, between training and the book, and is not a row", async ({ page }) => {
+    const items = fixture(page, "layout").locator(".qi-list > li");
+    await expect(items.nth(1)).toHaveAttribute("data-otc", "github");
+    await expect(items.nth(1).locator(".qi-row")).toHaveCount(0);
+    await expect(items.nth(2)).toHaveAttribute("data-otc", "reading");
+    const day = (await fixture(page, "layout").locator("[data-github-days] button").first().boundingBox())!;
     expect(day.width).toBeGreaterThanOrEqual(6);
   });
 
-  test("draws the year with a total, a text alternative, a busiest stretch and a legend", async ({ page }) => {
+  test("draws the year with a total, a text alternative and a Less / More key", async ({ page }) => {
     const card = fixture(page, "github");
     const days = card.locator("[data-github-days]");
     await expect(days.locator("button")).toHaveCount(365);
-    await expect(days).toHaveAttribute("aria-label", /^GitHub contributions over the past year: [\d,]+, busiest in (early|mid|late)-July\.$/);
-    await expect(card.locator(".stretch-gh__count")).toHaveText(/^[\d,]+$/);
-    await expect(card.locator("[data-busiest]")).toBeVisible();
+    await expect(days).toHaveAttribute("aria-label", /^GitHub contributions over the past year: [\d,]+\.$/);
+    await expect(card.locator(".stretch-gh__total")).toContainText(`${await totalOf(card)} contributions in the past year`);
+    await expect(card.locator(".stretch-gh__legend")).toContainText(`${offTheClock.github.legend.less}`);
+    await expect(card.locator(".stretch-gh__legend")).toContainText(`${offTheClock.github.legend.more}`);
     await expect(card.locator(".stretch-gh__legend")).toContainText(offTheClock.github.legend.today);
+    await expect(card.getByText(/busiest|swipe|Quiet|Busy/)).toHaveCount(0);
   });
 
-  test("today is the last day, in cobalt, and marked once", async ({ page }) => {
+  test("the five levels take GitHub's greens, and a day with none takes the empty tone", async ({ page }) => {
+    const days = fixture(page, "github").locator("[data-github-days] button");
+    for (const level of [0, 1, 2, 3, 4]) {
+      await expect(days.locator(`xpath=self::*[@data-level='${level}' and not(@data-today)]`).first()).toHaveCSS("background-color", await token(page, `--gh-${level}`));
+    }
+  });
+
+  test("today is the last day, ringed in cobalt, not filled, and marked once", async ({ page }) => {
     const card = fixture(page, "github");
     const today = card.locator("[data-github-days] button[data-today]");
+    const cobalt = await token(page, "--stretch-cobalt");
     await expect(today).toHaveCount(1);
     await expect(today).toHaveAttribute("aria-current", "date");
     await expect(today).toHaveAttribute("aria-label", /2 Oct$/);
-    await expect(today).toHaveCSS("background-color", await token(page, "--stretch-cobalt"));
+    await expect(today).not.toHaveCSS("background-color", cobalt);
+    await expect(today).toHaveCSS("background-color", await token(page, `--gh-${await today.getAttribute("data-level")}`));
+    await expect(today).toHaveCSS("box-shadow", new RegExp(cobalt.replace(/[()]/g, "\\$&")));
+  });
+
+  test.describe("with motion", () => {
+    test.use({ reducedMotion: "no-preference" });
+
+    test("the total counts up once, when it first comes into view, and ends on the real number", async ({ page }) => {
+      await page.addInitScript(() => {
+        const seen: string[] = [];
+        Object.assign(window, { __counts: seen });
+        new MutationObserver(() => {
+          const count = document.querySelector("[data-fixture='github'] .stretch-gh__count");
+          if (count?.textContent && seen.at(-1) !== count.textContent) seen.push(count.textContent);
+        }).observe(document, { childList: true, subtree: true, characterData: true });
+      });
+      await page.goto("/fixtures/off-the-clock");
+      await hydrated(page);
+      const card = fixture(page, "github");
+      const total = await totalOf(card);
+      const counts = () => page.evaluate(() => (window as unknown as { __counts: string[] }).__counts);
+      await card.locator(".stretch-gh__count").scrollIntoViewIfNeeded();
+      // The finished total is there before it is seen; the count starts from 0 on arrival and ends back on it.
+        await expect.poll(async () => {
+          const seen = await counts();
+          return seen.includes("0") && seen.at(-1) === total;
+        }).toBe(true);
+      const played = await counts();
+      expect(played, "it started from nothing and passed through other numbers").toContain("0");
+      expect(played.length).toBeGreaterThan(3);
+      // Scrolling away and back does not play it again.
+      await page.evaluate(() => scrollTo(0, 0));
+      await card.locator(".stretch-gh__count").scrollIntoViewIfNeeded();
+      await page.waitForTimeout(400);
+      expect(await counts()).toEqual(played);
+    });
+  });
+
+  test.describe("with reduced motion", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("the total is complete at once and never counts", async ({ page }) => {
+      const card = fixture(page, "github");
+      const total = await totalOf(card);
+      await hydrated(page);
+      await card.locator(".stretch-gh__count").scrollIntoViewIfNeeded();
+      await expect(card.locator(".stretch-gh__count")).toHaveText(total);
+      await page.waitForTimeout(300);
+      await expect(card.locator(".stretch-gh__count")).toHaveText(total);
+    });
   });
 
   test("hovering or focusing a day reads out its count; arrow keys move between days", async ({ page }) => {
@@ -427,36 +581,32 @@ test.describe("Off the clock: the GitHub year", () => {
     await expect(card.locator("[data-readout]")).toHaveText(/1 Oct/);
   });
 
+  test("every day names its count for assistive technology", async ({ page }) => {
+    const labels = await fixture(page, "github").locator("[data-github-days] button").evaluateAll((days) => days.map((day) => day.getAttribute("aria-label")));
+    expect(labels).toHaveLength(365);
+    for (const label of labels) expect(label).toMatch(/^(Nothing on|\d+ contributions? on) \w{3} \d{1,2} \w+$/);
+  });
+
   test("only one day is a tab stop, so the grid costs a keyboard user one Tab", async ({ page }) => {
     const stops = fixture(page, "github").locator("[data-github-days] button:not([tabindex='-1'])");
     await expect(stops).toHaveCount(1);
   });
 
-  test("on phones the busiest-stretch caption is pinned outside the scroller and the left edge fades", async ({ page }) => {
+  test("on phones the left edge fades", async ({ page }) => {
     test.skip(!phone(page), "the grid only scrolls on phones");
-    const card = fixture(page, "github");
-    const scroller = card.locator("[data-github-scroll]");
-    const caption = card.locator(".stretch-gh__note");
-    await expect(caption).toBeVisible();
-    await expect(scroller.locator(".stretch-gh__note")).toHaveCount(0);
-    const inView = async () => {
-      const box = (await caption.boundingBox())!;
-      const cardBox = (await card.boundingBox())!;
-      return box.x >= cardBox.x - 1 && box.x + box.width <= cardBox.x + cardBox.width + 1;
-    };
-    await expect.poll(inView, { message: "caption is fully visible on open" }).toBe(true);
-    await scroller.evaluate((el) => (el.scrollLeft = 0));
-    await expect.poll(inView, { message: "caption is fully visible after scrolling" }).toBe(true);
-    await expect(scroller).not.toHaveCSS("mask-image", "none");
+    await expect(fixture(page, "github").locator("[data-github-scroll]")).not.toHaveCSS("mask-image", "none");
   });
 
-  test("a stale year says when its data is from; a missing year is gone", async ({ page }) => {
-    await expect(fixture(page, "github-stale")).toContainText("as of 28 Sept");
-    await expect(fixture(page, "github")).not.toContainText("as of");
+  test("a live year says so with the dot; a stale one says when its data is from; a missing year is gone", async ({ page }) => {
+    await expect(fixture(page, "github-live").locator(".stretch-gh__total")).toContainText(offTheClock.live("GitHub"));
+    await expect(fixture(page, "github-live").locator("[data-now-mark]")).toHaveCount(1);
+    await expect(fixture(page, "github-stale").locator(".stretch-gh__total")).toContainText(offTheClock.fromAsOf("GitHub", "28 Sept"));
+    await expect(fixture(page, "github-stale").locator("[data-now-mark]")).toHaveCount(0);
+    await expect(fixture(page, "github").locator(".stretch-gh__total")).not.toContainText("as of");
     await expect(fixture(page, "github-unavailable").locator("[data-otc]")).toHaveCount(0);
   });
 
-  test("on phones only the grid scrolls sideways, inside its card, and it opens on today", async ({ page }) => {
+  test("on phones only the grid scrolls sideways, inside the column, and it opens on today", async ({ page }) => {
     const card = fixture(page, "github");
     const scroller = card.locator("[data-github-scroll]");
     // The grid moves to today when the page hydrates, which a slow runner can do after load.
@@ -486,34 +636,26 @@ test.describe("Off the clock: the GitHub year", () => {
 test.describe("Off the clock: contrast, targets and layout", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
-    for (const summary of await page.locator("summary").all()) await summary.click();
+    await hydrated(page);
   });
 
   test("text passes WCAG 2.2 AA", async ({ page }) => {
+    // The clipping's look is shown in the margin or the slot only while a row opens it, so open the history row first.
+    await openLook(page, "history-week", "history");
     for (const selector of [
       ".qi-row__title",
       ".qi-row__line",
       ".qi-source",
-      ".stretch-otc__label",
-      ".stretch-otc__kicker",
-      ".stretch-otc__asof",
-      ".stretch-story__fact",
-      ".stretch-story__date",
-      ".stretch-story__figure figcaption",
-      ".stretch-link",
-      ".stretch-more summary",
-      ".stretch-gh__beside",
-      ".stretch-gh__note",
+      ".qi-clipping__stamp",
+      ".qi-clipping__fact",
+      ".qi-clipping__date",
+      ".qi-clipping__figure figcaption",
+      ".qi-clipping__count",
+      ".stretch-gh__total",
+      ".stretch-gh__months",
       ".stretch-gh__foot",
     ]) {
       for (const reading of await contrastOnPaper(page, selector)) expect(reading.ratio, `${selector}: ${reading.text}`).toBeGreaterThanOrEqual(4.5);
-    }
-  });
-
-  test("links and the disclosure have 44 px targets", async ({ page }) => {
-    for (const target of await page.locator(".stretch-link, .stretch-more summary").all()) {
-      const box = (await target.boundingBox())!;
-      expect(box.height).toBeGreaterThanOrEqual(44);
     }
   });
 
@@ -528,6 +670,7 @@ test.describe("Off the clock: contrast, targets and layout", () => {
   });
 
   test("axe finds no violations", async ({ page }) => {
+    await openLook(page, "history-week", "history");
     const results = await new AxeBuilder({ page }).include("main").analyze();
     expect(results.violations).toEqual([]);
   });
