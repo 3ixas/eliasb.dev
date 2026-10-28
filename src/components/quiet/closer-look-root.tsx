@@ -109,12 +109,14 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     const step = () => {
       const place = held.current;
       // The page is only ever moved from here and from the layout effect below, which record where they left it: any other
-      // movement is the user's own scroll (a wheel scroll can run before its event does), and then nothing is corrected.
+      // movement is the user's own scroll (a wheel scroll can run before its event does), and then nothing is corrected. A scroll the
+      // page clamps (at the very bottom) lands elsewhere than asked and also ends the hold, which is as far as it could have gone.
       if (!place || performance.now() >= until || Math.abs(window.scrollY - place.y) > 0.5) return release();
       const shift = place.trigger.getBoundingClientRect().top - place.top;
       if (Math.abs(shift) >= 0.5) {
+        // Where the page will be once this lands, worked out rather than read back: some engines apply the scroll a frame late.
+        place.y = window.scrollY + shift;
         window.scrollBy({ top: shift, behavior: "instant" });
-        place.y = window.scrollY;
       }
       holding.current = window.requestAnimationFrame(step);
     };
@@ -263,8 +265,8 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     if (!place) return;
     const shift = place.trigger.getBoundingClientRect().top - place.top;
     if (!shift) return;
+    place.y = window.scrollY + shift;
     window.scrollBy({ top: shift, behavior: "instant" });
-    place.y = window.scrollY;
   }, [active]);
 
   // The object button (or reveal word) says what is open to assistive technology (CSS styles an open row from its filled slot).
