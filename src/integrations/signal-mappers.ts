@@ -45,6 +45,11 @@ export function londonWeekday(now = new Date()) {
   return (new Date(londonWallClock(now.getTime())).getUTCDay() + 6) % 7;
 }
 
+/** The day of the month in London. */
+export function londonDayOfMonth(now = new Date()) {
+  return new Date(londonWallClock(now.getTime())).getUTCDate();
+}
+
 /** The fields read from a Goodreads currently-reading item, already decoded. */
 export type GoodreadsItemShape = {
   title?: string;

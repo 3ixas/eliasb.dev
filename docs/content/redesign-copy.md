@@ -235,6 +235,7 @@ The markers cover the deck’s retired list and the old wording of rows it marks
 | --- | --- | --- |
 | Note | What my own time looks like this week. | kept |
 | Training row | {Assault bike intervals} · Today’s session, from my training week | changed: replaces the sketch’s “Today, from my training week” |
+| Training row, before today is known | My training week · Zone 2 means slow on purpose. | new: the page is cached and cannot know the day until the browser has read it, so the row names the plan and says its closing line, both approved strings |
 | Training closer look | The week, today in cobalt · Zone 2 means slow on purpose. · Out on a run, central London. | kept |
 | GitHub year | GitHub, the past year · {1,726} contributions in the past year · Less / More · {12} contributions on {3 June} | kept (the sketch said “last year”); “Less / More” replaces “Quiet / Busy” to match GitHub’s own key |
 | Source marks (live) | Live from Goodreads · Live from Letterboxd · Live from GitHub · Live from Wikipedia | new |

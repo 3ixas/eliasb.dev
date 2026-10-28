@@ -79,6 +79,8 @@ const built = [
   offTheClock.github.contributions("1,221"),
   offTheClock.github.busiest("September–October"),
   offTheClock.github.asOf("date"),
+  ...["Goodreads", "Letterboxd", "GitHub"].map(offTheClock.live),
+  offTheClock.fromAsOf("Goodreads", "date"),
 ];
 for (const text of built) assert.ok(plain.includes(text), `Built string is not in the approved copy: "${text}"`);
 assert.equal(thingsIMake.note, "Products of my own, from a rental calculator to a risk simulator.");

@@ -1,18 +1,14 @@
 import Image from "next/image";
-import Link from "next/link";
 import { useId, type ReactNode } from "react";
-import { NowMark } from "@/components/site/now-mark";
-import { TrainingWeek } from "@/components/site/training-week";
+import { bookEntry, filmEntry, makingEntry, OffTheClockList, trainingEntry } from "@/components/quiet/off-the-clock";
 import { GitHubYear } from "@/components/site/github-year";
-import { nowMakingEntry, offTheClock } from "@/content/stretch/off-the-clock";
-import { projects } from "@/content/projects";
-import { filmLine } from "@/content/stretch/film-line";
+import { offTheClock } from "@/content/stretch/off-the-clock";
 import { getGitHubSignal, getLatestRepositorySignal } from "@/integrations/github";
 import { getReadingSignal } from "@/integrations/goodreads";
 import { getCachedHistorySignal } from "@/integrations/history-cache";
 import { getFilmSignal } from "@/integrations/letterboxd";
 import { asOfDate, pinStatus, type PinStatus } from "@/integrations/pin-rules";
-import type { FilmSignal, GitHubSignal, HistoryEvent, HistorySignal, LatestRepositorySignal, ReadingSignal } from "@/integrations/types";
+import type { GitHubSignal, HistoryEvent, HistorySignal } from "@/integrations/types";
 import { Fastener } from "@/components/site/fastener";
 
 const copy = offTheClock;
@@ -29,11 +25,9 @@ function Label({ text }: { text: string }) {
   );
 }
 
-/** `about` names what the link is for when the visible label is generic; it joins the link's accessible name and tooltip. */
-function ExternalLink({ href, children, about }: { href: string; children: string; about?: string }) {
-  const name = about && `${children.replace(/ [↗↓→]$/, "")}: ${about}`;
+function ExternalLink({ href, children }: { href: string; children: string }) {
   return (
-    <a className="stretch-link stretch-mono" href={href} target="_blank" rel="noreferrer" aria-label={name} title={about}>
+    <a className="stretch-link stretch-mono" href={href} target="_blank" rel="noreferrer">
       <span>
         <Label text={children} />
       </span>
@@ -51,100 +45,6 @@ function AsOf({ status }: { status: PinStatus }) {
         <span className="sr-only">{copy.asOf(status.asOf.long)}</span>
       </time>
     </p>
-  );
-}
-
-/** A cover or poster, or a blank print in its place, so the card keeps its shape. */
-function Print({ src, alt, sizes }: { src: string | null | undefined; alt: string; sizes: string }) {
-  if (!src) return <div className="stretch-otc__print stretch-otc__print--blank" data-print="blank" aria-hidden="true" />;
-  return <Image className="stretch-otc__print" src={src} alt={alt} width={240} height={360} sizes={sizes} />;
-}
-
-/** This week's training, a poster with today marked, over the running photo. */
-export function TrainingPoster({ now }: { now?: string }) {
-  const headingId = useId();
-  const { photo, week, zone2, photoCaption } = copy.training;
-  return (
-    <article className="stretch-otc__card stretch-otc__training" data-otc="training" aria-labelledby={headingId}>
-      <Fastener kind="tape" />
-      <figure className="stretch-otc__photo">
-        <Image src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} sizes="(max-width: 760px) 90vw, 320px" />
-        <figcaption className="stretch-mono">{photoCaption}</figcaption>
-      </figure>
-      <div className="stretch-otc__plan">
-        <h3 id={headingId} className="stretch-display stretch-otc__title">
-          {week}
-        </h3>
-        <TrainingWeek now={now} />
-        <p className="stretch-mono stretch-otc__note">{zone2}</p>
-      </div>
-    </article>
-  );
-}
-
-/** The book on his currently-reading shelf, with its cover. */
-export function BookCard({ reading, now }: { reading: ReadingSignal; now: Date }) {
-  const headingId = useId();
-  const { book } = reading;
-  const status = pinStatus("reading", reading, now);
-  return (
-    <article className="stretch-otc__card stretch-otc__book" data-otc="reading" data-state={status.kind === "stale" ? "stale" : "current"} aria-labelledby={headingId}>
-      <Print src={book?.coverUrl} alt={book ? copy.reading.coverAlt(book.title, book.author) : ""} sizes="(max-width: 760px) 40vw, 200px" />
-      <div className="stretch-otc__text">
-        <h3 id={headingId} className="stretch-mono stretch-otc__label">
-          {copy.reading.label}
-        </h3>
-        {book ? (
-          <>
-            <p className="stretch-otc__name">{book.title}</p>
-            <p className="stretch-otc__by">{book.author}</p>
-            <ExternalLink href={reading.href}>{copy.reading.source}</ExternalLink>
-          </>
-        ) : (
-          <p className="stretch-otc__name">{copy.reading.fallback}</p>
-        )}
-        <AsOf status={status} />
-      </div>
-    </article>
-  );
-}
-
-/** The last film in his Letterboxd diary, as a poster and a ticket. */
-export function FilmCard({ film: signal, now }: { film: FilmSignal; now: Date }) {
-  const headingId = useId();
-  const { film } = signal;
-  const status = pinStatus("film", signal, now);
-  const line = film ? filmLine(film.watchedOn ? asOfDate(new Date(`${film.watchedOn}T12:00:00Z`)) : null, film.rating) : null;
-  return (
-    <article className="stretch-otc__card stretch-otc__film" data-otc="film" data-state={status.kind === "stale" ? "stale" : "current"} aria-labelledby={headingId}>
-      <Print src={film?.posterUrl} alt={film ? copy.watched.posterAlt(film.title, film.year) : ""} sizes="(max-width: 760px) 40vw, 200px" />
-      <div className="stretch-otc__text">
-        <p className="stretch-mono stretch-otc__kicker">{copy.watched.kicker}</p>
-        <h3 id={headingId} className="stretch-mono stretch-otc__label">
-          {copy.watched.label}
-        </h3>
-        {film ? (
-          <>
-            <p className="stretch-otc__name">
-              {film.title}
-              {film.year && <span className="stretch-otc__year"> {film.year}</span>}
-            </p>
-            {line && (
-              <p className="stretch-mono stretch-otc__by">
-                <span aria-hidden="true">{line.shown}</span>
-                <span className="sr-only">{line.spoken}</span>
-              </p>
-            )}
-            <ExternalLink href={film.href} about={film.year ? `${film.title} (${film.year})` : film.title}>
-              {copy.watched.source}
-            </ExternalLink>
-          </>
-        ) : (
-          <p className="stretch-otc__name">{copy.watched.fallback}</p>
-        )}
-        <AsOf status={status} />
-      </div>
-    </article>
   );
 }
 
@@ -209,38 +109,6 @@ export function ClippingCard({ history }: { history: HistorySignal }) {
   );
 }
 
-/**
- * What I'm making now: my latest public repository, with a pulsing cobalt
- * mark. A project of mine shows its name (linked to its case study when it has
- * one); any other repository shows GitHub's name and description. With no
- * repository to show, the card comes down.
- */
-export function NowMakingCard({ latest }: { latest: LatestRepositorySignal }) {
-  const headingId = useId();
-  const entry = nowMakingEntry(latest.repository, projects);
-  if (!entry) return null;
-  const making = copy.nowMaking;
-  return (
-    <article className="stretch-otc__card stretch-otc__making" data-otc="making" aria-labelledby={headingId}>
-      <h3 id={headingId} className="stretch-mono stretch-otc__label">
-        <NowMark />
-        {making.label}
-      </h3>
-      <p className="stretch-otc__name">
-        {entry.internal ? (
-          <Link className="stretch-otc__name-link" href={entry.href}>
-            {entry.name}
-          </Link>
-        ) : (
-          entry.name
-        )}
-      </p>
-      {entry.description && <p className="stretch-otc__by">{entry.description}</p>}
-      {!entry.internal && <ExternalLink href={entry.href}>{making.link}</ExternalLink>}
-    </article>
-  );
-}
-
 /** My GitHub year as a grid of squares. Gone when there is no full year to show. */
 export function GitHubCard({ github, now }: { github: GitHubSignal; now: Date }) {
   const headingId = useId();
@@ -257,37 +125,11 @@ export function GitHubCard({ github, now }: { github: GitHubSignal; now: Date })
   );
 }
 
-/** The six items, in independent columns. `todayAt` fixes the training week's "now" for the fixtures route. */
-export function OffTheClockItems({
-  history,
-  reading,
-  film,
-  latest,
-  github,
-  now,
-  todayAt,
-}: {
-  history: HistorySignal;
-  reading: ReadingSignal;
-  film: FilmSignal;
-  latest: LatestRepositorySignal;
-  github: GitHubSignal;
-  now: Date;
-  todayAt?: string;
-}): ReactNode {
+/** What is still a card: this week's oddity and the GitHub year, until they become rows. */
+export function OffTheClockCards({ history, github, now }: { history: HistorySignal; github: GitHubSignal; now: Date }): ReactNode {
   return (
     <div className="stretch-otc">
-      <div className="stretch-otc__column">
-        <TrainingPoster now={todayAt} />
-        <div className="stretch-otc__media">
-          <BookCard reading={reading} now={now} />
-          <FilmCard film={film} now={now} />
-        </div>
-      </div>
-      <div className="stretch-otc__column">
-        <ClippingCard history={history} />
-        <NowMakingCard latest={latest} />
-      </div>
+      <ClippingCard history={history} />
       <GitHubCard github={github} now={now} />
     </div>
   );
@@ -303,5 +145,15 @@ export async function OffTheClock() {
     getLatestRepositorySignal(),
     getGitHubSignal(),
   ]);
-  return <OffTheClockItems history={history} reading={reading} film={film} latest={latest} github={github} now={now} />;
+  return (
+    <>
+      <OffTheClockList entries={[trainingEntry(), bookEntry(reading, now), filmEntry(film, now), makingEntry(latest)]}>
+        <h2 id="off-the-clock-heading" className="qi-title">
+          {copy.heading}
+        </h2>
+        <p className="qi-note-line">{copy.note}</p>
+      </OffTheClockList>
+      <OffTheClockCards history={history} github={github} now={now} />
+    </>
+  );
 }

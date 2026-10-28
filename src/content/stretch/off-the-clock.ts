@@ -11,14 +11,17 @@ export const offTheClock = {
   note: "What my own time looks like this week.",
   /** Shown on an item whose saved data has gone stale (from the Board's approved states copy). */
   asOf: (date: string) => `as of ${date}`,
+  /** A live row's source mark, and a stale one's (docs/content/redesign-copy.md, "Source marks"). */
+  live: (source: string) => `Live from ${source}`,
+  fromAsOf: (source: string, date: string) => `From ${source}, as of ${date}`,
   training: {
-    today: "Today",
     week: "My training week",
     zone2: "Zone 2 means slow on purpose.",
+    /** The row's line once today's session is its title. */
+    rowLine: "Today’s session, from my training week",
     photoCaption: "Out on a run, central London.",
     photo: {
       src: "/signals/running-central-london.webp",
-      alt: "Elias mid-run on a rainy street in central London",
       width: 960,
       height: 1280,
     },
@@ -35,14 +38,14 @@ export const offTheClock = {
   },
   reading: {
     label: "Now reading",
-    source: "Goodreads ↗",
+    sourceName: "Goodreads",
     fallback: "Between books.",
     coverAlt: (title: string, author: string) => `Cover of ${title} by ${author}`,
   },
   watched: {
     kicker: "Admit one",
     label: "Last watched",
-    source: "Letterboxd ↗",
+    sourceName: "Letterboxd",
     fallback: "Nothing logged yet.",
     posterAlt: (title: string, year: string | null) => (year ? `Poster for ${title} (${year})` : `Poster for ${title}`),
   },
@@ -58,8 +61,7 @@ export const offTheClock = {
   },
   nowMaking: {
     label: "Now making",
-    /** For a repository that is not a project with a case study. */
-    link: "View on GitHub ↗",
+    sourceName: "GitHub",
   },
   github: {
     /** Heard by screen readers only; the visible card leads with the total. */
