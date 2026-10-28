@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type FocusEvent, type Key
 import { createPortal } from "react-dom";
 import { useCycleAdvance } from "@/components/quiet/cycle";
 import { margin as marginSpacing, placeMargin, WIDE } from "@/components/quiet/margin-placement";
+import { correctHold, reportFolding, startHold, stopHold } from "@/components/quiet/scroll-hold";
 
 /** The margin hides this long after the pointer leaves a row or focus leaves it, so crossing the gap between two rows does not flash. */
 const HIDE_MS = 140;
@@ -11,10 +12,6 @@ const HIDE_MS = 140;
 const SHOWING = "qi-closer-look-showing";
 /** An inline look folds away over this long (quiet-index.css, `qi-close`); it is unmounted once it has. */
 const CLOSE_MS = 300;
-/** After a tap the tapped trigger is held in place, frame by frame, for as long as the looks above or below it are still moving. */
-const HOLD_MS = 450;
-/** However slow the page is, the hold ends by this long after the tap. */
-const HOLD_CAP_MS = 1500;
 
 /**
  * The one value that says which closer look is showing: nothing, or one look and what asked for it. The margin
@@ -31,6 +28,22 @@ type Leaving = { id: string; slot: HTMLElement };
  * column and its links and Eclipse sit where a look beside the row would land.
  */
 type Under = { selector: string; column: number };
+
+/** What a controller says as it shows a look: which controller, and where a tapped look opens. */
+type Shown = { root: HTMLElement | null; slot?: HTMLElement };
+
+/** Whether the tapped look `showing` is above `slot` on the page, so closing it moves the row that was tapped. */
+function sitsAbove(showing: Active, slot: HTMLElement | undefined) {
+  return showing?.source === "tap" && !!slot && !!(showing.slot.compareDocumentPosition(slot) & Node.DOCUMENT_POSITION_FOLLOWING);
+}
+
+/** A look that was folding is reopened or closed again: its pending removal goes, and the page no longer waits for it. */
+function cancelRemoval(removals: Map<HTMLElement, number>, slot: HTMLElement) {
+  const timer = removals.get(slot);
+  if (timer === undefined) return;
+  window.clearTimeout(timer);
+  removals.delete(slot);
+}
 
 /**
  * The closer-look controller (GLOSSARY.md, Closer look). It owns the single `active` value and shows it in the
@@ -56,32 +69,31 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
   const now = useRef<Active>(null);
   const [leaving, setLeaving] = useState<Leaving[]>([]);
   const advance = useCycleAdvance();
-  /** The tapped trigger and where it sat, so it can be put back after a look above it closes. */
-  const held = useRef<{ trigger: HTMLElement; top: number } | null>(null);
-  const holding = useRef(0);
-  /** Ends the hold in progress (its frame, its listeners, the held row); a new hold, and unmounting, call it. */
-  const stopHold = useRef<(() => void) | null>(null);
   /** The pending removal of each folding look, by slot: a look that is reopened or closed again takes its earlier removal with it. */
   const removals = useRef(new Map<HTMLElement, number>());
+  /** Names this controller to the page's scroll hold, which counts looks folding across every controller. */
+  const owner = useRef({});
 
   const cancelHide = () => window.clearTimeout(hideTimer.current);
-  const announce = () => window.dispatchEvent(new CustomEvent(SHOWING, { detail: root.current }));
+  /** `slot` is where a tapped look is about to open, so another controller can tell whether the look it closes sits above it. */
+  const announce = (slot?: HTMLElement) => window.dispatchEvent(new CustomEvent<Shown>(SHOWING, { detail: { root: root.current, slot } }));
   /** The one way the showing look changes. A tapped look that goes (or gives way to another) folds away first. */
-  const change = (next: Active) => {
+  const change = (next: Active, instant = false) => {
     const before = now.current;
     if (before === next) return;
     now.current = next;
     setActive(next);
     if (next?.source === "tap") {
-      window.clearTimeout(removals.current.get(next.slot));
-      removals.current.delete(next.slot);
+      cancelRemoval(removals.current, next.slot);
       setLeaving((all) => all.filter(({ id }) => id !== next.id));
     }
     if (before?.source !== "tap" || (next?.source === "tap" && next.id === before.id)) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // A look that closes above the row that was tapped goes at once, with the page corrected in the same commit: it cannot fold without
+    // moving the row, and holding a row still frame by frame through a fold is only as steady as the page is fast.
+    if (instant || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const gone = { id: before.id, slot: before.slot };
     setLeaving((all) => [...all.filter(({ id }) => id !== gone.id), gone]);
-    window.clearTimeout(removals.current.get(gone.slot));
+    cancelRemoval(removals.current, gone.slot);
     removals.current.set(
       gone.slot,
       window.setTimeout(() => {
@@ -89,6 +101,7 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
         setLeaving((all) => all.filter((one) => one.slot !== gone.slot));
       }, CLOSE_MS + 40),
     );
+    reportFolding(owner.current, removals.current.size + 1);
   };
   const hideSoon = () => {
     cancelHide();
@@ -106,56 +119,16 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     return row && root.current?.contains(row) ? row.dataset.look : undefined;
   };
 
-  /** Keeps the tapped trigger where it was on screen while the looks around it open and fold, frame by frame, until the user takes over the scroll. (Browsers that anchor scroll already do most of this; setting `overflow-anchor: none` to stop them makes WebKit throw the scroll position back, so it is left alone.) */
-  const hold = (trigger: HTMLElement) => {
-    stopHold.current?.();
-    held.current = { trigger, top: trigger.getBoundingClientRect().top };
-    const started = performance.now();
-    const until = started + HOLD_MS;
-    let taken = false;
-    const take = () => {
-      taken = true;
-    };
-    window.addEventListener("touchstart", take, { once: true, passive: true });
-    window.addEventListener("wheel", take, { once: true, passive: true });
-    const correct = () => {
-      const place = held.current;
-      // A trigger that has left the page (a link was followed) has no position to hold.
-      if (!place || !place.trigger.isConnected) return;
-      const shift = place.trigger.getBoundingClientRect().top - place.top;
-      if (Math.abs(shift) >= 0.5) window.scrollBy({ top: shift, behavior: "instant" });
-    };
-    const release = () => {
-      window.cancelAnimationFrame(holding.current);
-      window.removeEventListener("touchstart", take);
-      window.removeEventListener("wheel", take);
-      held.current = null;
-      stopHold.current = null;
-    };
-    stopHold.current = release;
-    const step = () => {
-      // The user's own scroll moves the trigger too, so once they have taken over nothing is measured or corrected.
-      if (taken || !held.current?.trigger.isConnected) return release();
-      correct();
-      // The hold lasts until every folding look has been unmounted (its layout effect below corrects in the same commit), however
-      // slowly the page runs, and for at least as long as a look takes to open.
-      const now = performance.now();
-      if (now >= started + HOLD_CAP_MS || (now >= until && removals.current.size === 0)) return release();
-      holding.current = window.requestAnimationFrame(step);
-    };
-    holding.current = window.requestAnimationFrame(step);
-  };
-
   /** Tapping a trigger opens its inline look, or closes it if it is the one showing; opening one closes any other. */
   const toggle = (trigger: HTMLElement) => {
     const id = trigger.dataset.lookTap;
     const slot = id && root.current?.querySelector<HTMLElement>(`[data-look-slot="${CSS.escape(id)}"]`);
     if (!id || !slot) return;
-    hold(trigger);
+    startHold(trigger);
     const open = now.current?.source === "tap" && now.current.id === id;
     // Opening a look closes one in another controller in the same batch, so the correction sees both moves.
-    if (!open) announce();
-    change(open ? null : { id, source: "tap", slot });
+    if (!open) announce(slot);
+    change(open ? null : { id, source: "tap", slot }, !open && sitsAbove(now.current, slot));
   };
   /** A tap on an open look: a cycling look steps on, a look that is a link follows its link, any other closes. */
   const pressLook = (open: HTMLElement) => {
@@ -166,7 +139,7 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     if (steps) advance?.(id, steps);
     else if (!slot.dataset.lookHref) {
       const row = root.current?.querySelector<HTMLElement>(`[data-look-tap="${CSS.escape(id)}"]`);
-      if (row) hold(row);
+      if (row) startHold(row);
       change(null);
     }
   };
@@ -227,9 +200,10 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
 
   useEffect(() => {
     const onShowing = (event: Event) => {
-      if ((event as CustomEvent<HTMLElement | null>).detail === root.current) return;
+      const { root: from, slot } = (event as CustomEvent<Shown>).detail;
+      if (from === root.current) return;
       cancelHide();
-      change(null);
+      change(null, sitsAbove(now.current, slot));
     };
     window.addEventListener(SHOWING, onShowing);
     return () => window.removeEventListener(SHOWING, onShowing);
@@ -241,11 +215,14 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     const onChange = () => change(null);
     wide.addEventListener("change", onChange);
     const timers = removals.current;
+    const counter = owner.current;
     return () => {
       wide.removeEventListener("change", onChange);
       cancelHide();
-      stopHold.current?.();
+      stopHold();
       timers.forEach((timer) => window.clearTimeout(timer));
+      timers.clear();
+      reportFolding(counter, 0);
     };
   }, []);
 
@@ -287,10 +264,9 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
 
   // After a tap changes the page, put the tapped trigger back where it was on screen straight away; `hold` keeps it there while the looks move.
   useLayoutEffect(() => {
-    const place = held.current;
-    if (!place) return;
-    const shift = place.trigger.getBoundingClientRect().top - place.top;
-    if (shift) window.scrollBy({ top: shift, behavior: "instant" });
+    correctHold();
+    // After this commit the looks still folding are those in `leaving`, plus any whose removal is still to come.
+    reportFolding(owner.current, new Set([...removals.current.keys(), ...leaving.map(({ slot }) => slot)]).size);
   }, [active, leaving]);
 
   // The object button (or reveal word) says what is open to assistive technology (CSS styles an open row from its filled slot).

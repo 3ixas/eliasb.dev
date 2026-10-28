@@ -76,6 +76,34 @@ test.describe("Inline closer looks close as smoothly as they open", () => {
       expect(await page.evaluate(() => window.scrollY)).toBeLessThan(40);
     });
 
+    test("a look above the tapped row goes at once and the row does not move, however slow the page", async ({ page, browserName }) => {
+      const cores = page.locator('.qi-word[data-look="cores"]');
+      await cores.scrollIntoViewIfNeeded();
+      await tap(page, cores);
+      const above = page.locator('[data-look-slot="cores"] .qi-inline__in');
+      await expect(above).toBeVisible();
+      const object = page.locator('#work button[data-look-tap="joveen"]');
+      // The look has finished growing once the row below it stops moving down the page.
+      await expect
+        .poll(async () => {
+          const first = (await object.boundingBox())!.y;
+          await page.waitForTimeout(150);
+          return Math.abs((await object.boundingBox())!.y - first);
+        })
+        .toBe(0);
+      await object.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+      const before = (await object.boundingBox())!.y;
+      // Where the engine allows it (Chromium) the page is as slow as it can be made: a fold above the row would be left behind by it,
+      // but a look that goes at once cannot be.
+      const cdp = browserName === "chromium" ? await page.context().newCDPSession(page) : null;
+      await cdp?.send("Emulation.setCPUThrottlingRate", { rate: 6 });
+      await object.click();
+      // Gone in the commit that opens the next look, not after a fold (which takes 340 ms before it is unmounted, and longer on a slow page).
+      await expect(above).toHaveCount(0, { timeout: 250 });
+      await expect.poll(async () => Math.abs((await object.boundingBox())!.y - before)).toBeLessThanOrEqual(1);
+      await cdp?.send("Emulation.setCPUThrottlingRate", { rate: 1 });
+    });
+
     test("closing again while it folds starts a new fold that the first one's timer cannot cut short", async ({ page }) => {
       await page.clock.install();
       await tap(page, row(page));

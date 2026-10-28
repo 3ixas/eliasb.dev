@@ -483,7 +483,7 @@ test.describe("Off the clock: reduced motion", () => {
   // Every closer look fades in over 0.2 s and nothing arrives with motion (docs/design/DESIGN.md, "Reduced motion").
   for (const [name, id, moving] of [
     ["training-saturday", "training", ".qi-week__days li"],
-    ["book", "book", ".qi-pluck"],
+    ["book", "book", ".qi-pluck, .qi-pluck__cover, .qi-book .qi-look__name, .qi-book .qi-look__by"],
     ["film", "film", ".qi-ticket, .qi-stars span, .qi-ticket__stub"],
     ["history-week", "history", ".qi-clipping, .qi-clipping__stamp"],
   ] as const) {
@@ -493,6 +493,14 @@ test.describe("Off the clock: reduced motion", () => {
       for (const element of await look.locator(moving).all()) await expect(element).toHaveCSS("animation-name", "none");
     });
   }
+
+  test("book: nothing covers the cover, which is there from the first frame", async ({ page }) => {
+    const look = await openLook(page, "book", "book");
+    await expect(look.locator(".qi-pluck__cover img")).toBeVisible();
+    // The cloth that starts it as a spine is cleared only by its animation, so with none it must not be drawn.
+    expect(await look.locator(".qi-pluck__cover").evaluate((element) => getComputedStyle(element, "::after").display)).toBe("none");
+    await expect(look.locator(".qi-book .qi-look__name, .qi-look__name")).toBeVisible();
+  });
 
   test("making: its description is there whole, with no typing", async ({ page }) => {
     const look = await openLook(page, "making", "making");

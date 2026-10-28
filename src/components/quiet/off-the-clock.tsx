@@ -103,8 +103,10 @@ function BookLook({ title, author, cover }: { title: string; author: string; cov
         {spines.filter(({ after }) => !after).map((spine) => (
           <Spine key={spine.color} {...spine} />
         ))}
-        <span className="qi-pluck" data-blank={cover ? undefined : ""}>
-          {cover && <Image src={cover} alt="" width={240} height={360} sizes="84px" />}
+        <span className="qi-pluck">
+          <span className="qi-pluck__cover" data-blank={cover ? undefined : ""}>
+            {cover && <Image src={cover} alt="" width={240} height={360} sizes="84px" />}
+          </span>
         </span>
         {spines.filter(({ after }) => after).map((spine) => (
           <Spine key={spine.color} {...spine} />
