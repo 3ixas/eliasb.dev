@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
-import { bookEntry, filmEntry, makingEntry, OffTheClockList, trainingEntry, type Entry } from "@/components/quiet/off-the-clock";
-import { ClippingCard, GitHubCard, OffTheClockCards } from "@/components/site/off-the-clock";
+import { bookEntry, filmEntry, githubEntry, historyEntry, makingEntry, OffTheClockList, trainingEntry, type Entry } from "@/components/quiet/off-the-clock";
 import { savedHistorySignal } from "@/integrations/history";
 import type { ActivityDay, Book, Film, FilmSignal, GitHubSignal, HistorySignal, LatestRepositorySignal, ReadingSignal } from "@/integrations/types";
 
@@ -141,16 +140,20 @@ const items = [
   { name: "making-project", item: row(makingEntry(latest({ state: "curated", repository: projectWithCaseStudy }))) },
   { name: "making-project-code", item: row(makingEntry(latest({ state: "curated", repository: projectWithoutCaseStudy }))) },
   { name: "making-none", item: row(makingEntry(latest({ state: "unavailable", repository: null }))) },
-  { name: "github", item: <GitHubCard github={github({})} now={now} /> },
-  { name: "github-stale", item: <GitHubCard github={github({ updatedAt: daysAgo(4) })} now={now} /> },
-  { name: "github-unavailable", item: <GitHubCard github={github({ state: "unavailable", activity: [], total: 0, updatedAt: null })} now={now} /> },
-  { name: "clipping-week", item: <ClippingCard history={week} /> },
-  { name: "clipping-saved", item: <ClippingCard history={savedHistorySignal()} /> },
+  { name: "github", item: row(githubEntry(github({ state: "curated" }), now)) },
+  { name: "github-live", item: row(githubEntry(github({}), now)) },
+  { name: "github-stale", item: row(githubEntry(github({ updatedAt: daysAgo(4) }), now)) },
+  { name: "github-unavailable", item: row(githubEntry(github({ state: "unavailable", activity: [], total: 0, updatedAt: null }), now)) },
+  { name: "history-week", item: row(historyEntry({ ...week, state: "curated" })) },
+  { name: "history-live", item: row(historyEntry(week)) },
+  { name: "history-one", item: row(historyEntry({ ...week, state: "curated", events: week.events.slice(0, 1) })) },
+  { name: "history-text-only", item: row(historyEntry({ ...week, state: "curated", events: week.events.slice(1, 2) })) },
+  { name: "history-saved", item: row(historyEntry(savedHistorySignal())) },
 ];
 
 /**
  * The Off the clock items from fixture feeds, for the end-to-end suite: the
- * training week at fixed moments, and the book, film and clipping current,
+ * training week at fixed moments, and the book, film, history row and GitHub year current,
  * empty, never fetched, stale and with missing parts. It exists only when the
  * server is started with BOARD_FIXTURES=1.
  */
@@ -169,8 +172,7 @@ export default async function OffTheClockFixtures() {
           </div>
         ))}
         <div data-fixture="layout" className="stretch-section">
-          <OffTheClockList entries={[trainingEntry(), bookEntry(reading({}), now), filmEntry(diary({}), now), makingEntry(latest({}))]} />
-          <OffTheClockCards history={savedHistorySignal()} github={github({})} now={now} />
+          <OffTheClockList entries={[trainingEntry(), githubEntry(github({ state: "curated" }), now), bookEntry(reading({}), now), filmEntry(diary({}), now), historyEntry(savedHistorySignal()), makingEntry(latest({}))]} />
         </div>
       </main>
     </div>

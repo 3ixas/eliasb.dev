@@ -49,12 +49,15 @@ export const offTheClock = {
     posterAlt: (title: string, year: string | null) => (year ? `Poster for ${title} (${year})` : `Poster for ${title}`),
   },
   curiosity: {
+    /** The history row's title. */
     label: "Odd but true, from this week in history",
-    more: (n: number) => `${n} more oddities this week ↓`,
-    source: "Read on Wikipedia ↗",
+    /** The row's line for a week with several oddities. */
+    rowLine: (n: number) => `${n} things that happened this week, some stranger than others.`,
+    /** Stamped on the clipping, which restamps as the row cycles. */
+    stamp: "This week in history",
+    count: (position: number, total: number) => `${position} of ${total}`,
+    sourceName: "Wikipedia",
     fallback: "From the archive",
-    /** From the Board's approved clipping copy. */
-    readMore: "Read more ↗",
     imageCredit: "Image:",
     born: (date: string) => `Born ${date}`,
   },
@@ -63,18 +66,13 @@ export const offTheClock = {
     sourceName: "GitHub",
   },
   github: {
-    /** Heard by screen readers only; the visible card leads with the total. */
+    /** Heard by screen readers only; the visible line leads with the total. */
     heading: "GitHub, the past year",
+    sourceName: "GitHub",
     contributions: (count: string) => `${count} contributions in the past year`,
-    busiest: (stretch: string) => `busiest stretch, ${stretch} →`,
-    /** The same note when the stretch sits to its right. */
-    busiestAfter: (stretch: string) => `← busiest stretch, ${stretch}`,
     keys: "Use the arrow keys to move between days.",
-    name: (count: string, stretch: string | null) =>
-      `GitHub contributions over the past year: ${count}${stretch ? `, busiest in ${stretch}` : ""}.`,
-    swipe: "← swipe for the whole year",
-    legend: { quiet: "Quiet", busy: "Busy", today: "today" },
-    asOf: (date: string) => `as of ${date}`,
+    name: (count: string) => `GitHub contributions over the past year: ${count}.`,
+    legend: { less: "Less", more: "More", today: "today" },
   },
 } as const;
 

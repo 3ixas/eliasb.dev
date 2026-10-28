@@ -15,7 +15,6 @@ import { filmLine } from "../src/content/stretch/film-line.ts";
 import { nowMakingEntry } from "../src/content/stretch/off-the-clock.ts";
 import { getHistorySignal, historyWeekStart, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "../src/integrations/history.ts";
 import {
-  busiestStretch,
   contributionLevel,
   contributionTag,
   createContributionCalendar,
@@ -421,18 +420,7 @@ assert.deepEqual(
   ],
 );
 
-// GitHub: the busiest four weeks, worked out from the data, with "early", "mid" or "late".
 const quietYear = datesForWindow(GITHUB_ACTIVITY_DAYS, new Date("2026-10-02T12:00:00Z")).map(({ date }) => ({ date, count: 0 }));
-assert.equal(busiestStretch(createContributionCalendar(quietYear)), null, "A year with nothing in it has no busiest stretch");
-const januaryYear = quietYear.map(({ date }) => ({ date, count: date >= "2026-01-04" && date <= "2026-01-31" ? 3 : date === "2026-06-10" ? 9 : 0 }));
-const januaryStretch = busiestStretch(createContributionCalendar(januaryYear));
-assert.equal(januaryStretch.total, 84, "Four full weeks of 3 a day beat one busy day");
-assert.equal(januaryStretch.when, "mid-January");
-assert.equal(januaryStretch.span, 4);
-const tiedYear = quietYear.map(({ date }) => ({ date, count: date === "2025-11-03" || date === "2026-08-03" ? 5 : 0 }));
-assert.equal(busiestStretch(createContributionCalendar(tiedYear)).when.endsWith("August"), true, "A tie goes to the most recent stretch");
-const earlyYear = quietYear.map(({ date }) => ({ date, count: date >= "2026-03-01" && date <= "2026-03-07" ? 4 : 0 }));
-assert.match(busiestStretch(createContributionCalendar(earlyYear)).when, /^(early|mid|late)-(February|March)$/);
 // Day tags and month labels are written by the site, the same in every locale.
 assert.equal(contributionTag({ date: "2026-01-15", count: 12 }), "12 contributions on Thu 15 Jan");
 assert.equal(contributionTag({ date: "2026-01-15", count: 1 }), "1 contribution on Thu 15 Jan");

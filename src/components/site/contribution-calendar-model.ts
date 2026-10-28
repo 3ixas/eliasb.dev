@@ -104,35 +104,6 @@ export function formatContributionDate(value: string, options: ContributionDateO
   return `${options.weekday === "short" ? weekday.slice(0, 3) : weekday}, ${day}`;
 }
 
-/** The four-week window the busiest stretch covers. */
-export const BUSIEST_STRETCH_WEEKS = 4;
-
-/**
- * The four consecutive weeks (columns) with the most contributions, and where
- * in the year they fall: "mid-January" by the window's middle day. A tie goes
- * to the most recent stretch. Null when there's nothing to circle.
- */
-export function busiestStretch(calendar: ContributionCalendarModel) {
-  const weekly = Array.from({ length: calendar.weekCount }, (_, week) =>
-    calendar.rows.reduce((total, row) => total + (row[week]?.count ?? 0), 0),
-  );
-  if (calendar.weekCount < BUSIEST_STRETCH_WEEKS) return null;
-
-  let best = { column: 0, total: -1 };
-  for (let column = 0; column + BUSIEST_STRETCH_WEEKS <= calendar.weekCount; column += 1) {
-    const total = weekly.slice(column, column + BUSIEST_STRETCH_WEEKS).reduce((sum, count) => sum + count, 0);
-    if (total >= best.total) best = { column, total };
-  }
-  if (best.total <= 0) return null;
-
-  // The window's middle day, clamped to days that exist in the year.
-  const middle = Math.min(calendar.days.length - 1, Math.max(0, best.column * 7 + 14 - calendar.startWeekday));
-  const date = dateFromIsoDay(calendar.days[middle].date);
-  const day = date.getUTCDate();
-  const part = day <= 10 ? "early" : day <= 20 ? "mid" : "late";
-  return { column: best.column, span: BUSIEST_STRETCH_WEEKS, total: best.total, when: `${part}-${MONTH_NAMES[date.getUTCMonth()]}` };
-}
-
 /** A day's pencilled tag: "12 contributions on Thu 15 Jan", or "Nothing on Thu 15 Jan". */
 export function contributionTag({ date, count }: ActivityDay) {
   const day = dateFromIsoDay(date);

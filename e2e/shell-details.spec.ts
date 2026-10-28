@@ -118,12 +118,3 @@ test.describe("Shell details: hover and height", () => {
     expect(declared).toBe("100svh");
   });
 });
-
-test.describe("Shell details: the History clipping", () => {
-  test("the line under its heading is ink, not cobalt", async ({ page }) => {
-    await page.goto("/fixtures/off-the-clock");
-    const label = page.locator("[data-fixture='clipping-week'] .stretch-otc__label");
-    const ink = await page.locator("[data-stretch-shell]").evaluate((node) => getComputedStyle(node).color);
-    await expect(label).toHaveCSS("border-bottom-color", ink);
-  });
-});
