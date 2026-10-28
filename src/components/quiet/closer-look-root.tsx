@@ -55,7 +55,7 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
   const [leaving, setLeaving] = useState<Leaving[]>([]);
   const advance = useCycleAdvance();
   /** The tapped trigger and where it sat, so it can be put back after a look above it closes. */
-  const held = useRef<{ trigger: HTMLElement; top: number; y: number } | null>(null);
+  const held = useRef<{ trigger: HTMLElement; top: number } | null>(null);
   const holding = useRef(0);
   /** The pending removal of each folding look, by slot: a look that is reopened or closed again takes its earlier removal with it. */
   const removals = useRef(new Map<HTMLElement, number>());
@@ -100,23 +100,27 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
 
   /** Keeps the tapped trigger where it was on screen while the looks around it open and fold, frame by frame, until the user takes over the scroll. (Browsers that anchor scroll already do most of this; setting `overflow-anchor: none` to stop them makes WebKit throw the scroll position back, so it is left alone.) */
   const hold = (trigger: HTMLElement) => {
-    held.current = { trigger, top: trigger.getBoundingClientRect().top, y: window.scrollY };
+    held.current = { trigger, top: trigger.getBoundingClientRect().top };
     window.cancelAnimationFrame(holding.current);
     const until = performance.now() + HOLD_MS;
+    let taken = false;
+    const take = () => {
+      taken = true;
+    };
+    window.addEventListener("touchstart", take, { once: true, passive: true });
+    window.addEventListener("wheel", take, { once: true, passive: true });
     const release = () => {
+      window.removeEventListener("touchstart", take);
+      window.removeEventListener("wheel", take);
       held.current = null;
     };
     const step = () => {
+      // The user's own scroll moves the trigger too, so once they have taken over nothing is measured or corrected.
+      if (taken || performance.now() >= until) return release();
       const place = held.current;
-      // The page is only ever moved from here and from the layout effect below, which record where they left it: any other
-      // movement is the user's own scroll (a wheel scroll can run before its event does), and then nothing is corrected. A scroll the
-      // page clamps (at the very bottom) lands elsewhere than asked and also ends the hold, which is as far as it could have gone.
-      if (!place || performance.now() >= until || Math.abs(window.scrollY - place.y) > 0.5) return release();
-      const shift = place.trigger.getBoundingClientRect().top - place.top;
-      if (Math.abs(shift) >= 0.5) {
-        // Where the page will be once this lands, worked out rather than read back: some engines apply the scroll a frame late.
-        place.y = window.scrollY + shift;
-        window.scrollBy({ top: shift, behavior: "instant" });
+      if (place) {
+        const shift = place.trigger.getBoundingClientRect().top - place.top;
+        if (Math.abs(shift) >= 0.5) window.scrollBy({ top: shift, behavior: "instant" });
       }
       holding.current = window.requestAnimationFrame(step);
     };
@@ -264,9 +268,7 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     const place = held.current;
     if (!place) return;
     const shift = place.trigger.getBoundingClientRect().top - place.top;
-    if (!shift) return;
-    place.y = window.scrollY + shift;
-    window.scrollBy({ top: shift, behavior: "instant" });
+    if (shift) window.scrollBy({ top: shift, behavior: "instant" });
   }, [active]);
 
   // The object button (or reveal word) says what is open to assistive technology (CSS styles an open row from its filled slot).
