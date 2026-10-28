@@ -14,13 +14,13 @@ test.describe("The 404", () => {
     for (const content of robots) expect(content).toMatch(/noindex/);
   });
 
-  test("shows the new header: the portrait and name lead home, the greeting and the Eclipse, and no section links", async ({ page }) => {
+  test("shows the new header: the portrait, the name leading home, the greeting and the Eclipse, and no section links", async ({ page }) => {
     await page.goto("/nothing-here");
     const header = page.locator("[data-stretch-header]");
     const home = header.getByRole("link", { name: "Elias Bennett, home" });
     await expect(home).toHaveAttribute("href", "/");
-    await expect(home.locator(".qi-header__face")).toBeVisible();
-    await expect(home.locator(".qi-header__name")).toHaveText("Elias Bennett");
+    await expect(header.locator(".qi-header__face")).toBeVisible();
+    await expect(home).toHaveText("Elias Bennett");
     expect((await home.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     await expect(header.locator("[data-greeting]")).toBeVisible();
     await expect(header.locator("[data-eclipse]")).toBeVisible();

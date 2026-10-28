@@ -116,6 +116,7 @@ On a long-form page, the closer looks are the real things its prose names in pas
 
 - **When it's used**: on wide screens (from 1180 px) with a hovering pointer. A row or word shows its closer look on pointer enter or focus, and hides it 140 ms after leave or blur.
 - **Placement**: 40 px right of the column, 300 px wide. It lines up with the row's top (minus 6 px), but always fits the window: it rises until it sits 16 px above the bottom edge, and never above 16 px from the top. It keeps fitting as images load (`ResizeObserver`) and while the page scrolls.
+- **The header's portrait** is the one look that does not sit level with its trigger: the header's links and Eclipse fill the margin's height there, so its look hangs 16 px below the header, on the same edge. On phones it opens under the header's row.
 - **Moving between rows**: it glides on the `spring` timing. It takes no pointer events and never covers the column. A closer look has no links; the row is the link.
 
 ### Inline (phones and touch)
