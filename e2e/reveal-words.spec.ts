@@ -317,17 +317,7 @@ test.describe("On phones and narrow windows: inline", () => {
     await expect(slot(page, "cores").locator(".qi-look")).toHaveCount(0);
     await expect(word(page, "cores")).toHaveAttribute("aria-expanded", "false");
     // The look above it closed, and the tapped object is where it was on screen.
-    try {
-      await expect.poll(async () => Math.abs((await boxOf(object)).y - before.y), { timeout: 3000 }).toBeLessThanOrEqual(1);
-    } catch (error) {
-      // TEMP-DIAG
-      const diag = await page.evaluate(() => ({
-        scrollY: Math.round(scrollY), docH: document.documentElement.scrollHeight, innerW: innerWidth, innerH: innerHeight, vv: visualViewport && [visualViewport.scale, visualViewport.width],
-        reduce: matchMedia("(prefers-reduced-motion: reduce)").matches, behaviour: getComputedStyle(document.documentElement).scrollBehavior,
-        looks: document.querySelectorAll(".qi-inline__in").length, log: (window as unknown as { __holdLog?: unknown[] }).__holdLog,
-      }));
-      throw new Error(`tapped object moved: before ${before.y}, ${JSON.stringify(diag)}\n${(error as Error).message}`);
-    }
+    await expect.poll(async () => Math.abs((await boxOf(object)).y - before.y)).toBeLessThanOrEqual(1);
     await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
     await tapWord(page, "engines");
     await expect(slot(page, "engines").locator(".qi-sim")).toBeVisible();
