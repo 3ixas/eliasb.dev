@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
-import { BookCard, ClippingCard, FilmCard, GitHubCard, NowMakingCard, OffTheClockItems, TrainingPoster } from "@/components/site/off-the-clock";
+import { bookEntry, filmEntry, makingEntry, OffTheClockList, trainingEntry, type Entry } from "@/components/quiet/off-the-clock";
+import { ClippingCard, GitHubCard, OffTheClockCards } from "@/components/site/off-the-clock";
 import { savedHistorySignal } from "@/integrations/history";
 import type { ActivityDay, Book, Film, FilmSignal, GitHubSignal, HistorySignal, LatestRepositorySignal, ReadingSignal } from "@/integrations/types";
 
@@ -120,22 +121,26 @@ const trainingAt = [
   { name: "sunday", at: "2026-11-01T23:30:00Z" },
 ];
 
+/** One row alone in its list, with the controller that shows its closer look. */
+const row = (entry: Entry | null) => <OffTheClockList entries={[entry]} />;
+
+// The live source mark's dot rings, and only one ring plays at a time, so the states that are not about the mark are saved data: no dot.
 const items = [
-  ...trainingAt.map(({ name, at }) => ({ name: `training-${name}`, item: <TrainingPoster now={at} /> })),
-  { name: "book", item: <BookCard reading={reading({})} now={now} /> },
-  { name: "book-empty", item: <BookCard reading={reading({ book: null })} now={now} /> },
-  { name: "book-unfetched", item: <BookCard reading={reading({ state: "pending", book: null, updatedAt: null })} now={now} /> },
-  { name: "book-stale", item: <BookCard reading={reading({ updatedAt: daysAgo(61) })} now={now} /> },
-  { name: "film", item: <FilmCard film={diary({})} now={now} /> },
-  { name: "film-empty", item: <FilmCard film={diary({ film: null })} now={now} /> },
-  { name: "film-stale", item: <FilmCard film={diary({ updatedAt: daysAgo(61) })} now={now} /> },
-  { name: "film-long", item: <FilmCard film={diary({ film: { ...film, title: "The Assassination of Jesse James by the Coward Robert Ford", year: "2007", rating: 3.5, watchedOn: "2026-10-09" } })} now={now} /> },
-  { name: "film-unrated", item: <FilmCard film={diary({ film: { ...film, rating: null, posterUrl: null } })} now={now} /> },
-  { name: "making", item: <NowMakingCard latest={latest({})} /> },
-  { name: "making-no-description", item: <NowMakingCard latest={latest({ repository: { ...repository, description: null } })} /> },
-  { name: "making-project", item: <NowMakingCard latest={latest({ repository: projectWithCaseStudy })} /> },
-  { name: "making-project-code", item: <NowMakingCard latest={latest({ repository: projectWithoutCaseStudy })} /> },
-  { name: "making-none", item: <NowMakingCard latest={latest({ state: "unavailable", repository: null })} /> },
+  ...trainingAt.map(({ name, at }) => ({ name: `training-${name}`, item: row(trainingEntry(at)) })),
+  { name: "book", item: row(bookEntry(reading({}), now)) },
+  { name: "book-empty", item: row(bookEntry(reading({ book: null }), now)) },
+  { name: "book-unfetched", item: row(bookEntry(reading({ state: "pending", book: null, updatedAt: null }), now)) },
+  { name: "book-stale", item: row(bookEntry(reading({ updatedAt: daysAgo(61) }), now)) },
+  { name: "film", item: row(filmEntry(diary({}), now)) },
+  { name: "film-empty", item: row(filmEntry(diary({ film: null }), now)) },
+  { name: "film-stale", item: row(filmEntry(diary({ updatedAt: daysAgo(61) }), now)) },
+  { name: "film-long", item: row(filmEntry(diary({ state: "curated", film: { ...film, title: "The Assassination of Jesse James by the Coward Robert Ford", year: "2007", rating: 3.5, watchedOn: "2026-10-09" } }), now)) },
+  { name: "film-unrated", item: row(filmEntry(diary({ state: "curated", film: { ...film, rating: null, posterUrl: null } }), now)) },
+  { name: "making", item: row(makingEntry(latest({}))) },
+  { name: "making-no-description", item: row(makingEntry(latest({ state: "curated", repository: { ...repository, description: null } }))) },
+  { name: "making-project", item: row(makingEntry(latest({ state: "curated", repository: projectWithCaseStudy }))) },
+  { name: "making-project-code", item: row(makingEntry(latest({ state: "curated", repository: projectWithoutCaseStudy }))) },
+  { name: "making-none", item: row(makingEntry(latest({ state: "unavailable", repository: null }))) },
   { name: "github", item: <GitHubCard github={github({})} now={now} /> },
   { name: "github-stale", item: <GitHubCard github={github({ updatedAt: daysAgo(4) })} now={now} /> },
   { name: "github-unavailable", item: <GitHubCard github={github({ state: "unavailable", activity: [], total: 0, updatedAt: null })} now={now} /> },
@@ -164,7 +169,8 @@ export default async function OffTheClockFixtures() {
           </div>
         ))}
         <div data-fixture="layout" className="stretch-section">
-          <OffTheClockItems history={savedHistorySignal()} reading={reading({})} film={diary({})} latest={latest({})} github={github({})} now={now} />
+          <OffTheClockList entries={[trainingEntry(), bookEntry(reading({}), now), filmEntry(diary({}), now), makingEntry(latest({}))]} />
+          <OffTheClockCards history={savedHistorySignal()} github={github({})} now={now} />
         </div>
       </main>
     </div>

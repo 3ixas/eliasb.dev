@@ -508,6 +508,28 @@ test.describe("One self-running motion on screen at a time", () => {
     await expect.poll(async () => [...new Set(await selfRunning(page))]).toEqual(["stretch-now-pulse"]);
   });
 
+  test("live dots that are on screen together take turns: one ring at a time, and each rings in the end", async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.goto("/fixtures/off-the-clock");
+    await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
+    const layout = page.locator("[data-fixture='layout']");
+    await layout.locator("[data-off-the-clock]").scrollIntoViewIfNeeded();
+    await expect(layout.locator("[data-now-mark]")).toHaveCount(3);
+    // Each ring is three plays of 1.8 s, so the three take about sixteen seconds between them.
+    let most = 0;
+    await expect
+      .poll(
+        async () => {
+          most = Math.max(most, (await selfRunning(page)).length);
+          return layout.locator("[data-now-mark][data-rung]").count();
+        },
+        { timeout: 40_000, intervals: [100] },
+      )
+      .toBe(3);
+    expect(most, "rings running on screen at once").toBe(1);
+    await expect.poll(async () => (await selfRunning(page)).length, { timeout: 10_000 }).toBe(0);
+  });
+
   test("a scroll pass down the homepage never has two on screen together", async ({ page }) => {
     await page.goto("/");
     // The arrival reactions (the underline drawing, the greeting's scene) play once on every load and finish by themselves; what the pass looks for is what keeps running.

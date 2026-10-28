@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { CalendarTile } from "@/components/quiet/calendar-tile";
 import { CloserLookRoot } from "@/components/quiet/closer-look-root";
 import { FullPass, MiniPass, PassPins } from "@/components/quiet/finished-pass";
 import { Row } from "@/components/quiet/row";
@@ -62,16 +63,6 @@ function workLooks() {
     [historyId]: <NoteLook />,
     ...Object.fromEntries(work.headed.bars.map((bar) => [strandId(bar.label), <StrandLook key={bar.label} bar={bar} />])),
   };
-}
-
-/** A desk-calendar tile: a band with two binding holes and a number on paper. */
-function CalendarTile({ number }: { number: string }) {
-  return (
-    <span className="qi-tile">
-      <span className="qi-tile__band" />
-      <span className="qi-tile__number">{number}</span>
-    </span>
-  );
 }
 
 /**

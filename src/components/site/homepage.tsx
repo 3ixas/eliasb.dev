@@ -1,6 +1,5 @@
 import { sectionLinks } from "@/components/site/sections";
 import { SayHello } from "@/components/site/say-hello";
-import { SectionHeading } from "@/components/site/section-heading";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { OffTheClock } from "@/components/site/off-the-clock";
@@ -8,7 +7,6 @@ import { HowIWork } from "@/components/quiet/how-i-work";
 import { Opening } from "@/components/quiet/opening";
 import { ThingsIMake } from "@/components/quiet/things-i-make";
 import { Work } from "@/components/quiet/work";
-import { offTheClock } from "@/content/stretch/off-the-clock";
 
 const sayHelloHeadingId = "say-hello-heading";
 
@@ -37,7 +35,6 @@ export function Homepage() {
         </section>
 
         <section id="off-the-clock" className="stretch-wrap stretch-section" aria-labelledby="off-the-clock-heading">
-          <SectionHeading id="off-the-clock-heading" heading={offTheClock.heading} note={offTheClock.note} />
           <OffTheClock />
         </section>
 

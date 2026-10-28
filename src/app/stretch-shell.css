@@ -776,21 +776,13 @@ button.stretch-pill {
   line-height: 1.4;
 }
 
-/* ---- Off the clock: the training poster, the book, the film and the clipping ---- */
+/* ---- Off the clock: the clipping and the GitHub year, until #298 turns them into rows ---- */
 
 .stretch-otc {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 32px;
   margin-top: 40px;
-}
-
-.stretch-otc__column,
-.stretch-otc__media {
-  display: grid;
-  align-content: start;
-  min-width: 0;
-  gap: 32px;
 }
 
 .stretch-otc__card {
@@ -802,13 +794,6 @@ button.stretch-pill {
   border-radius: 12px;
   background-color: var(--stretch-card);
   color: var(--stretch-ink);
-}
-
-.stretch-otc__title {
-  margin: 0;
-  font-size: clamp(40px, 5vw, 56px);
-  line-height: 0.95;
-  letter-spacing: -0.02em;
 }
 
 .stretch-otc__label {
@@ -826,76 +811,11 @@ button.stretch-pill {
   text-transform: uppercase;
 }
 
-.stretch-otc__name {
-  margin: 0;
-  font-size: clamp(26px, 3vw, 34px);
-  font-weight: 700;
-  line-height: 1.1;
-}
-
-.stretch-otc__year {
-  color: var(--stretch-muted);
-  font-weight: 500;
-}
-
-.stretch-otc__by {
-  margin: 0;
-  font-size: var(--text-small);
-  line-height: 1.4;
-}
-
-.stretch-otc__note,
 .stretch-otc__asof {
   margin: 0;
   color: var(--stretch-muted);
   font-size: var(--text-label);
   line-height: 1.4;
-}
-
-/* A cover or poster, tilted a little like a print on the page, or a blank in its place. */
-.stretch-otc__print {
-  display: block;
-  width: 100%;
-  max-width: 200px;
-  height: auto;
-  aspect-ratio: 2 / 3;
-  border: 1px solid var(--stretch-rule);
-  border-radius: 6px;
-  object-fit: cover;
-  transform: rotate(-1.5deg);
-}
-
-.stretch-otc__film .stretch-otc__print {
-  transform: rotate(1.5deg);
-}
-
-.stretch-otc__print--blank {
-  background-color: var(--stretch-rule);
-}
-
-.stretch-otc__book,
-.stretch-otc__film {
-  grid-template-columns: minmax(0, 40%) minmax(0, 1fr);
-  align-items: start;
-  /* Size to content: side by side, the shorter card doesn't stretch to the taller one's height. */
-  align-self: start;
-  gap: 20px;
-}
-
-/* A film title stops at three lines; the whole title stays in the link. */
-.stretch-otc__film .stretch-otc__name {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  overflow: hidden;
-  overflow-wrap: anywhere;
-}
-
-.stretch-otc__text {
-  display: grid;
-  gap: 6px;
-  min-width: 0;
 }
 
 .stretch-link {
@@ -915,148 +835,6 @@ button.stretch-pill {
 @media (hover: hover) {
   .stretch-link:hover {
     color: var(--stretch-cobalt);
-  }
-}
-
-/* A name that is also a link keeps the name's own type, with the link's underline and 44px target. */
-.stretch-otc__name-link {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: inherit;
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
-}
-
-@media (hover: hover) {
-  .stretch-otc__name-link:hover {
-    color: var(--stretch-cobalt);
-  }
-}
-
-/* The training poster. */
-.stretch-otc__training {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.stretch-otc__photo {
-  margin: 0;
-}
-
-.stretch-otc__photo img {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 420px;
-  border-radius: 8px;
-  object-fit: cover;
-  object-position: center top;
-  transform: rotate(-1deg);
-}
-
-.stretch-otc__photo figcaption {
-  margin-top: 12px;
-  color: var(--stretch-muted);
-  font-size: var(--text-label);
-}
-
-.stretch-otc__plan {
-  display: grid;
-  /* A bounded column: left to size itself, it grows to the longest unbreakable
-     word and pushes the page sideways when a visitor forces wider spacing. */
-  grid-template-columns: minmax(0, 1fr);
-  align-content: start;
-  gap: 16px;
-}
-
-.stretch-week {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 16px;
-}
-
-.stretch-week__days {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.stretch-week__day {
-  display: flex;
-  align-items: baseline;
-  gap: 16px;
-  min-height: 44px;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--stretch-rule);
-}
-
-.stretch-week__short {
-  flex: none;
-  width: 3ch;
-  font-size: var(--text-label);
-  text-transform: uppercase;
-}
-
-.stretch-week__session {
-  font-size: var(--text-lead);
-  font-weight: 600;
-}
-
-.stretch-week__tag {
-  margin-left: auto;
-  font-size: var(--text-label);
-  text-transform: uppercase;
-}
-
-/* Today, in cobalt. */
-.stretch-week__day[data-today] {
-  border-radius: 8px;
-  border-bottom-color: transparent;
-  background-color: var(--stretch-cobalt);
-  color: var(--stretch-on-cobalt);
-}
-
-/* On phones, today is also a large card over the week. The space is held until today is known. */
-.stretch-week__today {
-  display: none;
-}
-
-@media (max-width: 760px) {
-  .stretch-week__today {
-    display: grid;
-    align-content: center;
-    gap: 4px;
-    min-height: 168px;
-    padding: 20px;
-    border-radius: 12px;
-    background-color: var(--stretch-cobalt);
-    color: var(--stretch-on-cobalt);
-  }
-
-  .stretch-week__today-label {
-    margin: 0;
-    font-size: var(--text-label);
-    text-transform: uppercase;
-  }
-
-  /* A visitor's wider letter spacing (WCAG 1.4.12) can make "Wednesday" wider than the card; it breaks rather than pushing the page sideways. */
-  .stretch-week__today-day {
-    margin: 0;
-    font-size: 56px;
-    line-height: 0.95;
-    overflow-wrap: anywhere;
-  }
-
-  .stretch-week__today-session {
-    margin: 0;
-    font-size: var(--text-quote);
-    font-weight: 600;
-    overflow-wrap: anywhere;
-  }
-
-  .stretch-week:not([data-today-known]) .stretch-week__today {
-    visibility: hidden;
   }
 }
 
@@ -1162,37 +940,9 @@ button.stretch-pill {
   border-top: 1px solid var(--stretch-rule);
 }
 
-@media (min-width: 761px) {
-  .stretch-otc {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    align-items: start;
-    gap: 40px 32px;
-  }
+/* ---- The live dot and the GitHub year ---- */
 
-  .stretch-otc__github {
-    grid-column: 1 / -1;
-  }
-
-  .stretch-otc__column,
-  .stretch-otc__media {
-    gap: 40px 32px;
-  }
-
-  .stretch-otc__training {
-    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-    gap: 28px;
-  }
-}
-
-@media (min-width: 1100px) {
-  .stretch-otc__media {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-/* ---- Now making and the GitHub year ---- */
-
-/* The Now making mark: a still cobalt dot with a ring behind it. The ring plays
+/* The live dot: a still cobalt dot with a ring behind it. The ring plays
    three times when the card first comes into view (now-mark.tsx sets data-rung),
    moving only transform and opacity, then rests invisible. Reduced motion never
    plays it, so the dot alone is the still form. */
@@ -1379,13 +1129,6 @@ button.stretch-gh__day[data-selected] {
 @media (max-width: 760px) {
   .stretch-gh__swipe {
     display: inline;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .stretch-otc__print,
-  .stretch-otc__photo img {
-    transition: none;
   }
 }
 

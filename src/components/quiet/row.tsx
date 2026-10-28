@@ -6,6 +6,12 @@ import { hostLabel } from "@/components/site/host-label";
 /** A row's closer look: its id (the key of the controller's `looks`) and what it says beyond the row, as the row's accessible description. */
 export type RowLook = { id: string; description: string };
 
+/** A link row's object button is named for its title, so the title of a row with a link and a closer look is text. */
+function nameOf(title: ReactNode) {
+  if (typeof title !== "string") throw new Error("A row with a link and a closer look needs a text title to name its object button");
+  return title;
+}
+
 /**
  * The Row (GLOSSARY.md): the quiet index's only list shape. A 44 px object, a title, one line and optional
  * metadata. A row with a destination is a link; a plain row takes focus only when it has a closer look,
@@ -13,13 +19,14 @@ export type RowLook = { id: string; description: string };
  * A link to another site (`href` starting with http) opens in a new tab, is marked ↗ and says so to assistive
  * technology. A row given a `card` also has a phone shape: the card is an extra element shown only there (a
  * featured project's screenshot), in a list that CSS turns into swipeable cards. `after` is decoration drawn
- * over the row's item but outside the row (How I work's pen arrows between habits).
+ * over the row's item but outside the row (How I work's pen arrows between habits). `attrs` puts data attributes on
+ * the item. A title that is not a string is for a row whose words wait on the visitor's clock (the training row).
  * Rendered by the server in full: the description is hidden text the row points to with `aria-describedby`,
  * and sits beside the row so it is not part of a link's name. The markup is the same on every screen and CSS
  * decides which presentation shows: on phones a link row's object gets its own button beside the link (a button
  * inside a link is invalid), and the empty slot under the row is where the controller opens the inline closer look.
  */
-export function Row({ object, title, line, meta, href, look, card, after, style }: { object: ReactNode; title: string; line: ReactNode; meta?: string; href?: string; look?: RowLook; card?: ReactNode; after?: ReactNode; style?: CSSProperties }) {
+export function Row({ object, title, line, meta, href, look, card, after, style, attrs }: { object: ReactNode; title: ReactNode; line: ReactNode; meta?: string; href?: string; look?: RowLook; card?: ReactNode; after?: ReactNode; style?: CSSProperties; attrs?: Record<`data-${string}`, string> }) {
   const external = href?.startsWith("http") ?? false;
   const descriptionId = look && `${look.id}-description`;
   const props = look ? { "data-look": look.id, "aria-describedby": descriptionId } : {};
@@ -46,7 +53,7 @@ export function Row({ object, title, line, meta, href, look, card, after, style 
     </>
   );
   return (
-    <li className="qi-list__item" data-card={card ? "" : undefined} style={style}>
+    <li className="qi-list__item" data-card={card ? "" : undefined} style={style} {...attrs}>
       <div className="qi-row-box">
         {external ? (
           <a className="qi-row" href={href} target="_blank" rel="noreferrer" {...props}>
@@ -62,9 +69,7 @@ export function Row({ object, title, line, meta, href, look, card, after, style 
             {content}
           </div>
         )}
-        {href && look && (
-          <button type="button" className="qi-row__tap" data-look-tap={look.id} aria-expanded="false" aria-label={`A closer look at ${title}`} />
-        )}
+        {href && look && <button type="button" className="qi-row__tap" data-look-tap={look.id} aria-expanded="false" aria-label={`A closer look at ${nameOf(title)}`} />}
       </div>
       {after}
       {look && (

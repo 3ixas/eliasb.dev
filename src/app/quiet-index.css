@@ -271,6 +271,14 @@
     var(--stretch-muted);
 }
 
+/* Today's tile has a cobalt band; its holes stay punched through it. */
+.qi-tile[data-today] .qi-tile__band {
+  background:
+    radial-gradient(circle at 9px 5px, var(--stretch-page) 0 2px, transparent 2.5px),
+    radial-gradient(circle at 25px 5px, var(--stretch-page) 0 2px, transparent 2.5px),
+    var(--stretch-cobalt);
+}
+
 .qi-tile__number {
   display: block;
   color: var(--stretch-ink);
@@ -1269,5 +1277,289 @@
   .qi-margin[data-glide],
   .qi-row__arrow {
     transition: none;
+  }
+}
+
+/* ---------- Off the clock: covers, source marks, the week, the shelf, the ticket and the dot ---------- */
+
+/* A cover or poster at 44 px (30 × 44): the real print with a spine crease and a shadow. Blank when there is none. */
+.qi-cover {
+  position: relative;
+  display: block;
+  width: 30px;
+  height: 44px;
+  overflow: hidden;
+  border-radius: 2px 4px 4px 2px;
+  background: color-mix(in srgb, var(--stretch-ink) 10%, var(--stretch-page));
+  box-shadow:
+    inset 3px 0 0 rgb(0 0 0 / 0.3),
+    inset 4px 0 0 rgb(255 255 255 / 0.14),
+    inset 0 0 0 1px rgb(0 0 0 / 0.18),
+    0 1px 1px rgb(0 0 0 / 0.3),
+    0 6px 10px -4px rgb(0 0 0 / 0.45);
+}
+
+.qi-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The cover catches the crease light over its print. */
+.qi-cover:not([data-blank])::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 3px 0 0 rgb(0 0 0 / 0.3), inset 4px 0 0 rgb(255 255 255 / 0.14);
+}
+
+/* "Live from Goodreads": the dot, then the words, on the row's line. */
+.qi-source {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.qi-source .stretch-now {
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+}
+
+/* Now making's object: the cobalt "now" dot, centred in its slot. */
+.qi-dot {
+  display: block;
+  width: 12px;
+  height: 12px;
+  margin: 16px;
+  border-radius: 50%;
+  background: var(--stretch-cobalt);
+}
+
+.qi-look__name {
+  margin: 0;
+  font-size: var(--text-body);
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.qi-look__by {
+  margin: 2px 0 0;
+  color: var(--stretch-muted);
+  font-size: var(--text-small);
+  line-height: 1.45;
+}
+
+/* The training week: the run, then seven days that fill in one by one, today last and in cobalt. */
+.qi-week {
+  display: grid;
+  gap: 12px;
+}
+
+.qi-week__photo {
+  margin: 0;
+}
+
+.qi-week__photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.qi-week__photo figcaption {
+  margin-top: 6px;
+  color: var(--stretch-muted);
+  font-size: var(--text-label);
+}
+
+.qi-week__days {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  font-size: var(--text-small);
+  list-style: none;
+}
+
+.qi-week__days li {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  padding: 6px 0;
+  border-top: 1px solid var(--stretch-rule);
+  animation: qi-fill 0.35s var(--out) backwards;
+  animation-delay: calc(var(--i) * 45ms);
+}
+
+.qi-week__days li span {
+  color: var(--stretch-muted);
+  font-size: var(--text-label);
+}
+
+.qi-week__days li[data-today] {
+  color: var(--stretch-cobalt);
+  font-weight: 600;
+  animation-delay: calc(7 * 45ms);
+}
+
+.qi-week__days li[data-today] span {
+  color: inherit;
+}
+
+.qi-week__note {
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: var(--text-small);
+}
+
+@keyframes qi-fill {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* The book: a shelf of spines, and its cover lifting out and turning to face you. */
+.qi-book {
+  display: grid;
+  gap: 12px;
+}
+
+.qi-shelf {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 150px;
+  padding: 0 8px;
+  perspective: 600px;
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--stretch-rule) 80%, var(--stretch-ink)), 0 7px 10px -5px rgb(0 0 0 / 0.45);
+}
+
+.qi-spine {
+  flex: none;
+  width: 18px;
+  height: var(--h);
+  border-radius: 2px 2px 0 0;
+  background:
+    linear-gradient(90deg, rgb(0 0 0 / 0.22), rgb(255 255 255 / 0.1) 28%, transparent 55%, rgb(0 0 0 / 0.24)),
+    var(--c);
+  box-shadow:
+    inset 0 9px 0 -7px rgb(255 255 255 / 0.28),
+    inset 0 -12px 0 -10px rgb(255 255 255 / 0.2);
+}
+
+.qi-pluck {
+  position: relative;
+  flex: none;
+  width: 84px;
+  height: 126px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  border-radius: 2px 4px 4px 2px;
+  transform-origin: 0 50%;
+  background: color-mix(in srgb, var(--stretch-ink) 10%, var(--stretch-page));
+  box-shadow: 0 14px 26px -12px rgb(0 0 0 / 0.6);
+  animation: qi-pluck 1.1s var(--out) both;
+}
+
+.qi-pluck img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@keyframes qi-pluck {
+  0% {
+    transform: translateY(8px) rotateY(80deg);
+  }
+  45% {
+    transform: translateY(-14px) rotateY(80deg);
+  }
+  100% {
+    transform: translateY(0) rotateY(0);
+  }
+}
+
+/* The film: a cream ticket with the poster and the stars, and a stub that tears off. */
+.qi-ticket {
+  position: relative;
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 12px 76px 12px 12px;
+  border-radius: 10px;
+  background: linear-gradient(#f8f4ea, #efe9da);
+  color: #1c1a16;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.25)) drop-shadow(0 10px 14px rgb(0 0 0 / 0.3));
+  animation: qi-ticket 0.7s var(--spring) both;
+}
+
+.qi-ticket__poster {
+  width: 72px;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 10px 20px -10px rgb(0 0 0 / 0.6);
+}
+
+.qi-ticket .qi-look__by {
+  color: #5f594e;
+}
+
+.qi-stars {
+  margin: 4px 0 0;
+  color: #9a4313;
+  letter-spacing: 2px;
+}
+
+.qi-stars span {
+  display: inline-block;
+  animation: qi-pop 0.35s var(--spring) backwards;
+  animation-delay: calc(0.35s + var(--i) * 90ms);
+}
+
+.qi-ticket__stub {
+  position: absolute;
+  inset: 0 0 0 auto;
+  display: grid;
+  width: 64px;
+  place-items: center;
+  border-left: 2px dotted rgb(28 26 22 / 0.3);
+  color: #5f594e;
+  font-size: var(--text-label);
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+  animation: qi-tear 0.6s 1s var(--out) forwards;
+}
+
+@keyframes qi-ticket {
+  from {
+    opacity: 0;
+    transform: translateY(22px) rotate(4deg);
+  }
+}
+
+@keyframes qi-tear {
+  to {
+    transform: translate(20px, 12px) rotate(12deg);
+  }
+}
+
+.qi-making {
+  display: grid;
+  gap: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qi-week__days li,
+  .qi-pluck,
+  .qi-ticket,
+  .qi-stars span,
+  .qi-ticket__stub {
+    animation: none;
   }
 }

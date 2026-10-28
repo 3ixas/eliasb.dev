@@ -40,18 +40,14 @@ test.describe("Homepage shell", () => {
     await expect(section.locator(".qi-note-line").first()).toHaveText(work.note);
   });
 
-  for (const { id, heading, note } of sections.filter(({ id }) => id !== "say-hello" && id !== "work" && id !== "things-i-make" && id !== "how-i-work")) {
-    test(`${heading} has its giant heading${note ? ", mono note and true count" : ""}`, async ({ page }) => {
-      await page.goto("/");
-      const section = page.locator(`section#${id}`);
-      const title = section.getByRole("heading", { level: 2, name: heading, exact: true });
-      await expect(title).toHaveCSS("text-transform", "uppercase");
-      await expect(title).toHaveCSS("font-weight", "800");
-      expect(await title.evaluate((element) => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(64);
-      if (note) await expect(section.locator(".stretch-note")).toHaveText(note);
-      else await expect(section.locator(".stretch-note")).toHaveCount(0);
-    });
-  }
+  test("Off the clock has a quiet title and its note", async ({ page }) => {
+    await page.goto("/");
+    const section = page.locator("section#off-the-clock");
+    const title = section.getByRole("heading", { level: 2, name: offTheClock.heading, exact: true });
+    await expect(title).toHaveCSS("font-size", "17px");
+    await expect(title).toHaveCSS("font-weight", "650");
+    await expect(section.locator(".qi-note-line").first()).toHaveText(offTheClock.note);
+  });
 
   test("Things I make has a quiet title and its note", async ({ page }) => {
     await page.goto("/");

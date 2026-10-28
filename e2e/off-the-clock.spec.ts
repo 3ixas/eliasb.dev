@@ -2,10 +2,13 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { offTheClock } from "../src/content/stretch/off-the-clock";
 import { contrastOnPaper } from "./support/contrast";
+import { tap } from "./support/tap";
 
 const phone = (page: Page) => (page.viewportSize()?.width ?? 0) < 761;
 const fixture = (page: Page, name: string) => page.locator(`[data-fixture='${name}']`);
 const { days } = offTheClock.training;
+/** The margin is for wide screens with a hovering pointer; below that a closer look opens inline, when tapped. */
+const wide = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1180;
 
 /** The colour the page paints for a token, read the way the browser resolves it. */
 const token = (page: Page, name: string) =>
@@ -19,106 +22,116 @@ const token = (page: Page, name: string) =>
   }, name);
 
 const links = (card: Locator) => card.getByRole("link");
+const title = (card: Locator) => card.locator(".qi-row__title");
+const line = (card: Locator) => card.locator(".qi-row__line");
 
-test.describe("Off the clock: on the homepage", () => {
-  test("reading follows training without waiting for the history card", async ({ page }) => {
-    await page.goto("/");
-    const section = page.locator("#off-the-clock");
-    const training = section.locator("[data-otc='training']");
-    const reading = section.locator("[data-otc='reading']");
-    const clipping = section.locator("[data-otc='clipping']");
-    // Polled: until the display font swaps in, the fallback sets the cards at other heights.
-    const gap = async () => {
-      const [trainingBox, readingBox] = [(await training.boundingBox())!, (await reading.boundingBox())!];
-      return readingBox.y - trainingBox.y - trainingBox.height;
-    };
-    await expect.poll(gap).toBeCloseTo(phone(page) ? 32 : 40, 0);
-    const trainingBox = (await training.boundingBox())!;
-    if (phone(page)) {
-      const filmBox = (await section.locator("[data-otc='film']").boundingBox())!;
-      expect((await clipping.boundingBox())!.y).toBeGreaterThan(filmBox.y + filmBox.height);
-    } else {
-      expect((await clipping.boundingBox())!.x).toBeGreaterThan(trainingBox.x + trainingBox.width);
-      const readingTop = await reading.evaluate((element) => element.getBoundingClientRect().top + scrollY);
-      await clipping.locator("summary").click();
-      expect(await reading.evaluate((element) => element.getBoundingClientRect().top + scrollY)).toBeCloseTo(readingTop, 0);
-    }
+/** The controller listens through React's props on the column, which exist only once it has hydrated; a tap before that does nothing. */
+const hydrated = (page: Page) =>
+  page.waitForFunction(() => {
+    const columns = [...document.querySelectorAll("[data-quiet-column]")];
+    return columns.length > 0 && columns.every((column) => Object.keys(column).some((key) => key.startsWith("__reactProps$")));
   });
 
-  test("the four items are in the server-rendered section", async ({ page }) => {
+/** Opens a row's closer look the way the screen does it (hover for the margin, a tap for the inline look) and returns the look. */
+async function openLook(page: Page, name: string, id: string) {
+  await hydrated(page);
+  const card = fixture(page, name);
+  if (wide(page)) {
+    await card.locator(`[data-look="${id}"]`).hover();
+    const look = page.locator(".qi-margin .qi-look");
+    await expect(look).toBeVisible();
+    return look;
+  }
+  await tap(page, card.locator(`[data-look-tap="${id}"]`).first());
+  const look = card.locator(`[data-look-slot="${id}"] .qi-look`);
+  await expect(look).toBeVisible();
+  return look;
+}
+
+test.describe("Off the clock: on the homepage", () => {
+  test("training, the book, the film and Now making are rows under the note, in that order", async ({ page }) => {
+    await page.goto("/");
+    const section = page.locator("#off-the-clock");
+    await expect(section.getByRole("heading", { level: 2, name: offTheClock.heading, exact: true })).toHaveCSS("font-size", "17px");
+    await expect(section.locator(".qi-note-line")).toHaveText(offTheClock.note);
+    const order = await section.locator(".qi-list [data-otc]").evaluateAll((items) => items.map((item) => item.getAttribute("data-otc")));
+    // Now making comes down when GitHub cannot be reached, and the fixtures cover that.
+    expect(order).toEqual(["training", "reading", "film", "making"].slice(0, order.length));
+    expect(order.length).toBeGreaterThanOrEqual(3);
+    // This week's oddity and the GitHub year are still cards until their own ticket turns them into rows.
+    await expect(section.locator(".stretch-otc [data-otc='clipping']")).toHaveCount(1);
+  });
+
+  test("the rows are in the server-rendered section, and training names its plan until today is known", async ({ page }) => {
     await page.route("**/*.js", (route) => route.abort());
     await page.goto("/");
     const section = page.locator("section#off-the-clock");
     for (const item of ["training", "clipping", "reading", "film"]) await expect(section.locator(`[data-otc='${item}']`)).toHaveCount(1);
+    await expect(title(section.locator("[data-otc='training']"))).toHaveText(offTheClock.training.week);
+    await expect(line(section.locator("[data-otc='training']"))).toHaveText(offTheClock.training.zone2);
   });
 });
 
 test.describe("Off the clock: Fasteners", () => {
-  test("only the training poster and the history clipping are fastened, with the GitHub card present", async ({ page }) => {
+  test("only the history clipping is fastened, with the GitHub card present", async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
     const layout = fixture(page, "layout");
     await expect(layout.locator("[data-otc='github']")).toHaveCount(1);
-    await expect(layout.locator(".stretch-fastener")).toHaveCount(2);
-    await expect(layout.locator("[data-otc='training'] .stretch-fastener--tape")).toHaveCount(1);
+    await expect(layout.locator(".stretch-fastener")).toHaveCount(1);
     await expect(layout.locator("[data-otc='clipping'] .stretch-fastener--push-pin")).toHaveCount(1);
-    for (const item of ["reading", "film", "making", "github"]) await expect(layout.locator(`[data-otc='${item}'] .stretch-fastener`)).toHaveCount(0);
+    for (const item of ["training", "reading", "film", "making", "github"]) await expect(layout.locator(`[data-otc='${item}'] .stretch-fastener`)).toHaveCount(0);
   });
 
-  test("the homepage carries two Fasteners: the poster and the clipping (the project tiles left with Things I make, the PRD card with How I work)", async ({ page }) => {
+  test("the homepage carries one Fastener: the clipping (the project tiles left with Things I make, the PRD card with How I work, the poster with this ticket)", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator(".stretch-fastener")).toHaveCount(2);
-    await expect(page.locator("#off-the-clock .stretch-fastener")).toHaveCount(2);
+    await expect(page.locator(".stretch-fastener")).toHaveCount(1);
+    await expect(page.locator("#off-the-clock .stretch-fastener")).toHaveCount(1);
   });
 });
 
-test.describe("Off the clock: the training poster", () => {
+test.describe("Off the clock: training", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
   });
 
-  test("lists the approved week with its photo, caption and Zone 2 note", async ({ page }) => {
-    const poster = fixture(page, "training-saturday");
-    await expect(poster.getByRole("heading", { level: 3 })).toHaveText(offTheClock.training.week);
-    const rows = poster.locator(".stretch-week__day");
-    await expect(rows).toHaveCount(7);
-    for (const [index, day] of days.entries()) {
-      await expect(rows.nth(index)).toContainText(day.session);
-      await expect(rows.nth(index)).toContainText(day.long);
-    }
-    await expect(poster.getByRole("img", { name: offTheClock.training.photo.alt })).toBeVisible();
-    await expect(poster.getByText(offTheClock.training.photoCaption)).toBeVisible();
-    await expect(poster.getByText(offTheClock.training.zone2)).toBeVisible();
-  });
+  for (const [name, index, date] of [["monday", 0, "5"], ["saturday", 5, "3"], ["sunday", 6, "1"]] as const) {
+    test(`today is ${days[index].long} in London (${name} fixture): its session is the row, on a tile with today's date`, async ({ page }) => {
+      const row = fixture(page, `training-${name}`).locator("[data-otc='training']");
+      await expect(title(row)).toHaveText(days[index].session);
+      await expect(line(row)).toHaveText(offTheClock.training.rowLine);
+      const tile = row.locator(".qi-tile");
+      await expect(tile.locator(".qi-tile__number")).toHaveText(date);
+      await expect(tile.locator(".qi-tile__band")).toHaveCSS("background-color", await token(page, "--stretch-cobalt"));
+    });
 
-  for (const [name, index] of [["monday", 0], ["saturday", 5], ["sunday", 6]] as const) {
-    test(`today is ${days[index].long} in London (${name} fixture), marked once and in cobalt`, async ({ page }) => {
-      const rows = fixture(page, `training-${name}`).locator(".stretch-week__day");
-      await expect(rows.locator("xpath=self::*[@data-today]")).toHaveCount(1);
-      const today = rows.nth(index);
-      await expect(today).toHaveAttribute("data-today", "");
-      await expect(today).toHaveAttribute("aria-current", "date");
-      await expect(today).toContainText(offTheClock.training.today);
-      await expect(today).toHaveCSS("background-color", await token(page, "--stretch-cobalt"));
-      await expect(today).toHaveCSS("color", await token(page, "--stretch-on-cobalt"));
+    test(`${name}: the week fills in with today marked once and in cobalt, and the list carries the week for assistive technology`, async ({ page }) => {
+      const look = await openLook(page, `training-${name}`, "training");
+      const rows = look.locator(".qi-week__days li");
+      await expect(rows).toHaveCount(7);
+      for (const [position, day] of days.entries()) await expect(rows.nth(position)).toContainText(day.session);
+      await expect(look.locator(".qi-week__days li[data-today]")).toHaveCount(1);
+      await expect(rows.nth(index)).toHaveAttribute("data-today", "");
+      await expect(rows.nth(index)).toHaveAttribute("aria-current", "date");
+      await expect(rows.nth(index)).toHaveCSS("color", await token(page, "--stretch-cobalt"));
+      // The fixtures page holds several training rows, each with the id the live page has once, so the description is read inside its own fixture.
+      const row = fixture(page, `training-${name}`);
+      const description = await row.locator("[data-look='training']").getAttribute("aria-describedby");
+      const spoken = await row.locator(`#${description}`).textContent();
+      for (const day of days) expect(spoken).toContain(`${day.long}: ${day.session}.`);
     });
   }
 
-  test("on phones today is also a large card over the week; on wide screens it is not", async ({ page }) => {
-    const poster = fixture(page, "training-saturday");
-    const card = poster.locator(".stretch-week__today");
-    if (phone(page)) {
-      await expect(card).toBeVisible();
-      await expect(card).toContainText("Saturday");
-      await expect(card).toContainText("Zone 2, rower or bike");
-      const [cardBox, listBox] = [await card.boundingBox(), await poster.locator(".stretch-week__days").boundingBox()];
-      expect(cardBox!.y + cardBox!.height).toBeLessThanOrEqual(listBox!.y);
-    } else {
-      await expect(card).toBeHidden();
-    }
+  test("the look carries the run's photo, its caption and the Zone 2 note", async ({ page }) => {
+    const look = await openLook(page, "training-saturday", "training");
+    await expect(look.locator(".qi-week__photo img")).toBeVisible();
+    await expect(look.getByText(offTheClock.training.photoCaption)).toBeVisible();
+    await expect(look.getByText(offTheClock.training.zone2)).toBeVisible();
   });
 
-  test("the pill and card are decorative to assistive technology: the list carries the week", async ({ page }) => {
-    await expect(fixture(page, "training-saturday").locator(".stretch-week__today")).toHaveAttribute("aria-hidden", "true");
+  test("today fills in last", async ({ page }) => {
+    const look = await openLook(page, "training-saturday", "training");
+    const delays = await look.locator(".qi-week__days li").evaluateAll((items) => items.map((item) => parseFloat(getComputedStyle(item).animationDelay)));
+    expect(delays.at(5)).toBeGreaterThan(Math.max(...delays.filter((_, position) => position !== 5)));
   });
 });
 
@@ -127,73 +140,92 @@ test.describe("Off the clock: the book and the film", () => {
     await page.goto("/fixtures/off-the-clock");
   });
 
-  test("the book shows its cover, title, author and Goodreads link", async ({ page }) => {
-    const card = fixture(page, "book");
-    await expect(card.getByText(offTheClock.reading.label, { exact: true })).toBeVisible();
-    await expect(card.getByRole("img", { name: offTheClock.reading.coverAlt("Dark Age", "Pierce Brown") })).toBeVisible();
-    await expect(card.getByText("Dark Age", { exact: true })).toBeVisible();
-    await expect(card.getByText("Pierce Brown", { exact: true })).toBeVisible();
-    await expect(links(card)).toHaveText("Goodreads ↗");
-    await expect(links(card)).toHaveAttribute("href", /goodreads\.com/);
+  test("the book is a row: cover, title, Now reading, author and a live mark, linking to Goodreads", async ({ page }) => {
+    const row = fixture(page, "book").locator("[data-otc='reading']");
+    await expect(row.locator(".qi-cover img")).toBeVisible();
+    await expect(title(row)).toHaveText("Dark Age");
+    await expect(line(row)).toContainText(`${offTheClock.reading.label} · Pierce Brown · ${offTheClock.live("Goodreads")}`);
+    await expect(row.locator("[data-now-mark]")).toHaveCount(1);
+    await expect(links(row)).toHaveAttribute("href", /goodreads\.com/);
+    await expect(links(row)).toHaveAttribute("target", "_blank");
+  });
+
+  test("the cover lifts off a row of spines, then the title and author", async ({ page }) => {
+    const look = await openLook(page, "book", "book");
+    await expect(look.locator(".qi-spine")).toHaveCount(6);
+    await expect(look.locator(".qi-pluck img")).toBeVisible();
+    await expect(look.getByText("Dark Age", { exact: true })).toBeVisible();
+    await expect(look.getByText("Pierce Brown", { exact: true })).toBeVisible();
   });
 
   for (const name of ["book-empty", "book-unfetched"]) {
-    test(`${name}: written fallback in the book's shape`, async ({ page }) => {
-      const card = fixture(page, name);
-      await expect(card.getByText(offTheClock.reading.fallback)).toBeVisible();
-      await expect(card.locator("[data-print='blank']")).toBeVisible();
-      await expect(links(card)).toHaveCount(0);
+    test(`${name}: written fallback in the book's shape, with nothing to open`, async ({ page }) => {
+      const row = fixture(page, name).locator("[data-otc='reading']");
+      await expect(title(row)).toHaveText(offTheClock.reading.fallback);
+      await expect(row.locator(".qi-cover[data-blank]")).toBeVisible();
+      await expect(links(row)).toHaveCount(0);
+      await expect(row.locator("[data-look]")).toHaveCount(0);
+      await expect(row.locator("[data-now-mark]")).toHaveCount(0);
     });
   }
 
-  test("a stale book says when its data is from", async ({ page }) => {
-    await expect(fixture(page, "book-stale")).toContainText("as of 2 Aug");
+  test("a stale book says when its data is from, and has no live dot; a live one does not say it", async ({ page }) => {
+    const stale = fixture(page, "book-stale");
+    await expect(line(stale)).toContainText(offTheClock.fromAsOf("Goodreads", "2 Aug"));
+    await expect(stale.locator("[data-now-mark]")).toHaveCount(0);
     await expect(fixture(page, "book")).not.toContainText("as of");
   });
 
-  test("the film shows its poster, title, year, watched date, stars and Letterboxd link", async ({ page }) => {
-    const card = fixture(page, "film");
-    await expect(card.getByText(offTheClock.watched.kicker)).toBeVisible();
-    await expect(card.getByText(offTheClock.watched.label, { exact: true })).toBeVisible();
-    await expect(card.getByRole("img", { name: offTheClock.watched.posterAlt("The Invite", "2026") })).toBeVisible();
-    await expect(card.locator(".stretch-otc__name")).toHaveText("The Invite 2026");
-    await expect(card.getByText("Watched 14 Sept · ★★★★½")).toBeVisible();
-    await expect(card.getByText("Watched 14 September, rated 4.5 out of 5")).toBeAttached();
-    await expect(links(card)).toHaveText("Letterboxd ↗");
+  test("the film is a row: poster, title, Last watched with its date and stars, a live mark, linking to Letterboxd", async ({ page }) => {
+    const row = fixture(page, "film").locator("[data-otc='film']");
+    await expect(row.locator(".qi-cover img")).toBeVisible();
+    await expect(title(row)).toHaveText("The Invite");
+    await expect(row.getByText("Last watched 14 Sept · ★★★★½")).toBeVisible();
+    await expect(row.getByText("Last watched 14 September, rated 4.5 out of 5")).toBeAttached();
+    await expect(line(row)).toContainText(offTheClock.live("Letterboxd"));
+    await expect(links(row)).toHaveAttribute("href", /letterboxd\.com/);
   });
 
-  test("a long film title stops at three lines, the date and rating stay together, and the link carries the whole title", async ({ page }) => {
-    const card = fixture(page, "film-long");
-    const title = "The Assassination of Jesse James by the Coward Robert Ford";
-    const name = card.locator(".stretch-otc__name");
-    await expect(name).toContainText(title);
-    // Three lines at the name's line height, never more.
-    await expect
-      .poll(() => name.evaluate((el) => el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight)))
-      .toBeLessThanOrEqual(3.05);
-    // The rating can't wrap alone after the separator: the dot binds to it.
-    const line = card.locator(".stretch-otc__by [aria-hidden='true']");
-    await expect(line).toHaveText(/\u00a0·\u00a0★★★½$/);
-    await expect(links(card)).toHaveAttribute("aria-label", new RegExp(`Letterboxd.*${title}`));
+  test("the ticket: Admit one, the poster, title, year and date, the stars, and a stub that tears off", async ({ page }) => {
+    const look = await openLook(page, "film", "film");
+    await expect(look.locator(".qi-ticket__poster")).toBeVisible();
+    await expect(look.locator(".qi-ticket__stub")).toHaveText(offTheClock.watched.kicker);
+    await expect(look.getByText("The Invite", { exact: true })).toBeVisible();
+    await expect(look.getByText("2026 · Watched 14 Sept")).toBeVisible();
+    await expect(look.locator(".qi-stars span")).toHaveCount(5);
+    await expect(look.locator(".qi-stars span").last()).toHaveText("½");
   });
 
-  test("an empty diary shows the written fallback in the poster's shape", async ({ page }) => {
-    const card = fixture(page, "film-empty");
-    await expect(card.getByText(offTheClock.watched.fallback)).toBeVisible();
-    await expect(card.locator("[data-print='blank']")).toBeVisible();
-    await expect(links(card)).toHaveCount(0);
+  test("a long film title wraps in its row, the date and rating stay together, and the link carries the whole title", async ({ page }) => {
+    const row = fixture(page, "film-long").locator("[data-otc='film']");
+    const name = "The Assassination of Jesse James by the Coward Robert Ford";
+    await expect(title(row)).toHaveText(name);
+    await expect(row.locator(".qi-row__line [aria-hidden='true']:not([data-now-mark])")).toHaveText(/\u00a0·\u00a0★★★½$/);
+    await expect(links(row)).toHaveAccessibleName(new RegExp(name));
   });
 
-  test("a film without a poster or rating keeps its card and shows only what it has", async ({ page }) => {
-    const card = fixture(page, "film-unrated");
-    await expect(card.locator("[data-print='blank']")).toBeVisible();
-    await expect(card.getByText("The Invite")).toBeVisible();
-    await expect(card.getByText(/★/)).toHaveCount(0);
-    await expect(card.getByText("Watched 14 Sept", { exact: true })).toBeVisible();
+  test("an empty diary shows the written fallback in the poster's shape, with nothing to open", async ({ page }) => {
+    const row = fixture(page, "film-empty").locator("[data-otc='film']");
+    await expect(title(row)).toHaveText(offTheClock.watched.fallback);
+    await expect(row.locator(".qi-cover[data-blank]")).toBeVisible();
+    await expect(links(row)).toHaveCount(0);
+    await expect(row.locator("[data-look]")).toHaveCount(0);
+  });
+
+  test("a film without a poster or rating keeps its row and shows only what it has", async ({ page }) => {
+    const row = fixture(page, "film-unrated").locator("[data-otc='film']");
+    await expect(row.locator(".qi-cover[data-blank]")).toBeVisible();
+    await expect(title(row)).toHaveText("The Invite");
+    await expect(row.getByText(/★/)).toHaveCount(0);
+    await expect(row.getByText("Last watched 14 Sept", { exact: true })).toBeVisible();
+    const look = await openLook(page, "film-unrated", "film");
+    await expect(look.locator(".qi-ticket__poster")).toHaveCount(0);
+    await expect(look.locator(".qi-stars")).toHaveCount(0);
   });
 
   test("a stale film says when its data is from", async ({ page }) => {
-    await expect(fixture(page, "film-stale")).toContainText("as of 2 Aug");
+    await expect(line(fixture(page, "film-stale"))).toContainText(offTheClock.fromAsOf("Letterboxd", "2 Aug"));
+    await expect(fixture(page, "film-stale").locator("[data-now-mark]")).toHaveCount(0);
   });
 });
 
@@ -254,91 +286,97 @@ test.describe("Off the clock: Now making", () => {
 
   const { nowMaking } = offTheClock;
 
-  test("shows a repository that is not a project by name and description, linked to GitHub", async ({ page }) => {
-    const card = fixture(page, "making");
-    await expect(card.getByRole("heading", { level: 3 })).toHaveText(nowMaking.label);
-    await expect(card.getByText("eliasb.dev", { exact: true })).toBeVisible();
-    await expect(card.getByText("Personal site for Elias B.")).toBeVisible();
-    await expect(links(card)).toHaveText(nowMaking.link);
-    await expect(links(card)).toHaveAttribute("href", "https://github.com/3ixas/eliasb.dev");
-    await expect(card.locator("[data-now-mark]")).toHaveCSS("background-color", await token(page, "--stretch-cobalt"));
+  test("a repository that is not a project is a row: its name, Now making, GitHub's description and a live mark, linked to GitHub", async ({ page }) => {
+    const row = fixture(page, "making").locator("[data-otc='making']");
+    await expect(title(row)).toHaveText("eliasb.dev");
+    await expect(line(row)).toContainText(`${nowMaking.label} · Personal site for Elias B. · ${offTheClock.live("GitHub")}`);
+    await expect(links(row)).toHaveAttribute("href", "https://github.com/3ixas/eliasb.dev");
+    await expect(row.locator("[data-now-mark]")).toHaveCSS("background-color", await token(page, "--stretch-cobalt"));
+    await expect(row.locator(".qi-dot")).toHaveCSS("background-color", await token(page, "--stretch-cobalt"));
   });
 
-  test("with no description it shows the name alone", async ({ page }) => {
-    const card = fixture(page, "making-no-description");
-    await expect(card.getByText("eliasb.dev", { exact: true })).toBeVisible();
-    await expect(card.locator(".stretch-otc__by")).toHaveCount(0);
-    await expect(links(card)).toHaveAttribute("href", "https://github.com/3ixas/eliasb.dev");
+  test("its closer look types the description itself", async ({ page }) => {
+    const look = await openLook(page, "making", "making");
+    await expect(look.getByText("eliasb.dev", { exact: true })).toBeVisible();
+    await expect.poll(() => look.locator(".qi-look__by").innerText()).toBe("Personal site for Elias B.");
+  });
+
+  test("with no description it is a row with no closer look", async ({ page }) => {
+    const row = fixture(page, "making-no-description").locator("[data-otc='making']");
+    await expect(title(row)).toHaveText("eliasb.dev");
+    await expect(line(row)).not.toContainText("Personal site");
+    await expect(row.locator("[data-look]")).toHaveCount(0);
+    await expect(links(row)).toHaveAttribute("href", "https://github.com/3ixas/eliasb.dev");
   });
 
   test("a project with a case study shows the project's name, linked to the case study", async ({ page }) => {
-    const card = fixture(page, "making-project");
-    await expect(links(card)).toHaveCount(1);
-    await expect(links(card)).toHaveText("Threshold");
-    await expect(links(card)).toHaveAttribute("href", "/things-i-make/threshold");
-    await expect(links(card)).not.toHaveAttribute("target", /.+/);
-    // The name keeps the card's name type rather than the small uppercase link type.
-    const [linkSize, nameSize, linkTransform] = await Promise.all([
-      links(card).evaluate((element) => getComputedStyle(element).fontSize),
-      card.locator(".stretch-otc__name").evaluate((element) => getComputedStyle(element).fontSize),
-      links(card).evaluate((element) => getComputedStyle(element).textTransform),
-    ]);
-    expect(linkSize).toBe(nameSize);
-    expect(linkTransform).toBe("none");
-    await expect(card.getByText("A repository description")).toHaveCount(0);
+    const row = fixture(page, "making-project").locator("[data-otc='making']");
+    await expect(links(row)).toHaveCount(1);
+    await expect(title(row)).toHaveText("Threshold");
+    await expect(links(row)).toHaveAttribute("href", "/things-i-make/threshold");
+    await expect(links(row)).not.toHaveAttribute("target", /.+/);
+    await expect(row.getByText("A repository description")).toHaveCount(0);
   });
 
   test("a project without a case study shows the project's name, linked to GitHub", async ({ page }) => {
-    const card = fixture(page, "making-project-code");
-    await expect(card.getByText("Risk Event Tracker", { exact: true })).toBeVisible();
-    await expect(links(card)).toHaveText(nowMaking.link);
-    await expect(links(card)).toHaveAttribute("href", "https://github.com/3ixas/risk-event-tracker");
+    const row = fixture(page, "making-project-code").locator("[data-otc='making']");
+    await expect(title(row)).toHaveText("Risk Event Tracker");
+    await expect(links(row)).toHaveAttribute("href", "https://github.com/3ixas/risk-event-tracker");
   });
 
-  test("with no repository the card is gone", async ({ page }) => {
+  test("with no repository the row is gone", async ({ page }) => {
     await expect(fixture(page, "making-none").locator("[data-otc]")).toHaveCount(0);
   });
 });
 
-test.describe("Off the clock: card sizes and heading roles", () => {
+test.describe("Off the clock: reduced motion", () => {
+  test.use({ reducedMotion: "reduce" });
+
   test.beforeEach(async ({ page }) => {
-    // The sizes below are the desktop ones: 40-56 px display, a two-column card.
-    await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/fixtures/off-the-clock");
   });
 
-  test("the book and film cards size to their content, with no empty lower half", async ({ page }) => {
-    const layout = fixture(page, "layout");
-    for (const item of ["reading", "film"]) {
-      const card = layout.locator(`[data-otc='${item}']`);
-      await expect
-        .poll(() =>
-          card.evaluate((el) => {
-            const bottom = Math.max(...[...el.children].filter((child) => getComputedStyle(child).position !== "absolute").map((child) => child.getBoundingClientRect().bottom));
-            // Card padding is 24px below the content, plus the 1px border.
-            return el.getBoundingClientRect().bottom - bottom;
-          }),
-          { message: `${item} card has no space below its content` },
-        )
-        .toBeLessThanOrEqual(28);
-    }
+  // Every closer look fades in over 0.2 s and nothing arrives with motion (docs/design/DESIGN.md, "Reduced motion").
+  for (const [name, id, moving] of [
+    ["training-saturday", "training", ".qi-week__days li"],
+    ["book", "book", ".qi-pluck"],
+    ["film", "film", ".qi-ticket, .qi-stars span, .qi-ticket__stub"],
+  ] as const) {
+    test(`${id}: its look fades in and nothing in it moves`, async ({ page }) => {
+      const look = await openLook(page, name, id);
+      await expect(look).toHaveCSS("animation-duration", "0.2s");
+      for (const element of await look.locator(moving).all()) await expect(element).toHaveCSS("animation-name", "none");
+    });
+  }
+
+  test("making: its description is there whole, with no typing", async ({ page }) => {
+    const look = await openLook(page, "making", "making");
+    await expect(look.locator(".qi-look__by")).toHaveText("Personal site for Elias B.");
+    await expect(look.locator(".qi-caret")).toBeHidden();
+  });
+});
+
+test.describe("Off the clock: the list", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/fixtures/off-the-clock");
   });
 
-  test("headings use two roles: display for the leading card, the small mono label for the rest", async ({ page }) => {
+  test("a row is 68 px or more with a 44 px object, and the text starts at one edge down the list", async ({ page }) => {
+    const edges = new Set<number>();
+    for (const row of await fixture(page, "layout").locator(".qi-row").all()) {
+      const box = (await row.boundingBox())!;
+      expect(box.height).toBeGreaterThanOrEqual(68);
+      const object = (await row.locator(".qi-row__object").boundingBox())!;
+      expect([object.width, object.height]).toEqual([44, 44]);
+      edges.add(Math.round((await row.locator(".qi-row__text").boundingBox())!.x));
+    }
+    expect(edges.size, "every row's text starts at the same edge").toBe(1);
+  });
+
+  test("only the rows that are links, or have a closer look, take focus", async ({ page }) => {
     const layout = fixture(page, "layout");
-    const font = (selector: string) =>
-      layout.locator(selector).evaluate((el) => {
-        const style = getComputedStyle(el);
-        return { size: style.fontSize, transform: style.textTransform, family: style.fontFamily, weight: style.fontWeight, stretch: style.fontStretch };
-      });
-    const book = await font("[data-otc='reading'] h3");
-    expect(book.size).toBe("13px");
-    expect(book.transform).toBe("uppercase");
-    for (const item of ["film", "clipping", "making"]) expect(await font(`[data-otc='${item}'] h3`)).toEqual(book);
-    // The leading card's heading is the display role: Bricolage Grotesque condensed and extra-bold, at the title size (56 px at 1440).
-    const leading = await font("[data-otc='training'] h3");
-    expect(leading).toMatchObject({ size: "56px", transform: "uppercase", weight: "800", stretch: "75%" });
-    expect(leading.family).not.toBe(book.family);
+    await expect(layout.locator(".qi-list [tabindex]:not([data-look])")).toHaveCount(0);
+    await expect(layout.locator(".qi-list a")).toHaveCount(3);
   });
 });
 
@@ -454,17 +492,12 @@ test.describe("Off the clock: contrast, targets and layout", () => {
 
   test("text passes WCAG 2.2 AA", async ({ page }) => {
     for (const selector of [
-      ".stretch-otc__title",
+      ".qi-row__title",
+      ".qi-row__line",
+      ".qi-source",
       ".stretch-otc__label",
       ".stretch-otc__kicker",
-      ".stretch-otc__name",
-      ".stretch-otc__by",
-      ".stretch-otc__note",
       ".stretch-otc__asof",
-      ".stretch-otc__photo figcaption",
-      ".stretch-week__session",
-      ".stretch-week__tag",
-      ".stretch-week__today-day",
       ".stretch-story__fact",
       ".stretch-story__date",
       ".stretch-story__figure figcaption",
