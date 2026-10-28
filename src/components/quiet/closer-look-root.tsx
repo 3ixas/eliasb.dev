@@ -13,6 +13,8 @@ const SHOWING = "qi-closer-look-showing";
 const CLOSE_MS = 300;
 /** After a tap the tapped trigger is held in place, frame by frame, for as long as the looks above or below it are still moving. */
 const HOLD_MS = 450;
+/** However slow the page is, the hold ends by this long after the tap. */
+const HOLD_CAP_MS = 1500;
 
 /**
  * The one value that says which closer look is showing: nothing, or one look and what asked for it. The margin
@@ -70,6 +72,7 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     setActive(next);
     if (next?.source === "tap") {
       window.clearTimeout(removals.current.get(next.slot));
+      removals.current.delete(next.slot);
       setLeaving((all) => all.filter(({ id }) => id !== next.id));
     }
     if (before?.source !== "tap" || (next?.source === "tap" && next.id === before.id)) return;
@@ -79,7 +82,10 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     window.clearTimeout(removals.current.get(gone.slot));
     removals.current.set(
       gone.slot,
-      window.setTimeout(() => setLeaving((all) => all.filter((one) => one.slot !== gone.slot)), CLOSE_MS + 40),
+      window.setTimeout(() => {
+        removals.current.delete(gone.slot);
+        setLeaving((all) => all.filter((one) => one.slot !== gone.slot));
+      }, CLOSE_MS + 40),
     );
   };
   const hideSoon = () => {
@@ -102,7 +108,8 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
   const hold = (trigger: HTMLElement) => {
     held.current = { trigger, top: trigger.getBoundingClientRect().top };
     window.cancelAnimationFrame(holding.current);
-    const until = performance.now() + HOLD_MS;
+    const started = performance.now();
+    const until = started + HOLD_MS;
     let taken = false;
     const take = () => {
       taken = true;
@@ -124,8 +131,10 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
       // The user's own scroll moves the trigger too, so once they have taken over nothing is measured or corrected.
       if (taken) return release();
       correct();
-      // The last change to the page (a folded look being unmounted) can come just before the end, so the hold ends on one more correction.
-      if (performance.now() >= until) return release();
+      // The hold lasts until every folding look has been unmounted (its layout effect below corrects in the same commit), however
+      // slowly the page runs, and for at least as long as a look takes to open.
+      const now = performance.now();
+      if (now >= started + HOLD_CAP_MS || (now >= until && removals.current.size === 0)) return release();
       holding.current = window.requestAnimationFrame(step);
     };
     holding.current = window.requestAnimationFrame(step);
@@ -273,7 +282,7 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     if (!place) return;
     const shift = place.trigger.getBoundingClientRect().top - place.top;
     if (shift) window.scrollBy({ top: shift, behavior: "instant" });
-  }, [active]);
+  }, [active, leaving]);
 
   // The object button (or reveal word) says what is open to assistive technology (CSS styles an open row from its filled slot).
   useEffect(() => {
