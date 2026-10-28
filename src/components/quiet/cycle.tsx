@@ -33,7 +33,7 @@ export function useCycleAdvance() {
  * The row that cycles (docs/design/DESIGN.md, "The history row cycles"): on a wide screen with a pointer, clicking it, or
  * pressing Enter or Space, moves to the next of its `announcements` and says so politely; nothing opens or closes. On a
  * phone the closer-look controller owns the taps (the row has `data-look-tap`): the row opens and closes its look like any
- * other row, and only a tap on the look itself steps it on. The text of the row is the
+ * other row, and only a tap on the look itself steps it on, or Right or Down arrow on the row while it is open (the look is aria-hidden, so it has no control of its own). The text of the row is the
  * same server-rendered markup as any plain row, so `children` is the row's content. The live region says nothing until
  * the position changes, so a page load announces nothing, and it says it however the step was made.
  */
@@ -59,8 +59,18 @@ export function CycleTrigger({ id, announcements, labelledBy, describedBy, child
         data-look-tap={id}
         data-cycle=""
         onClick={() => wide() && advance()}
+        aria-keyshortcuts="ArrowRight ArrowDown"
         onKeyDown={(event) => {
-          if ((event.key !== "Enter" && event.key !== " ") || !wide()) return;
+          // On a phone-sized window Enter and Space open and close the look (the controller's), so stepping on is the arrow keys', while it is open.
+          if (!wide()) {
+            const open = event.currentTarget.closest("li")?.querySelector(".qi-inline__in:not([data-leaving])");
+            if (open && (event.key === "ArrowRight" || event.key === "ArrowDown")) {
+              event.preventDefault();
+              advance();
+            }
+            return;
+          }
+          if (event.key !== "Enter" && event.key !== " ") return;
           event.preventDefault();
           advance();
         }}

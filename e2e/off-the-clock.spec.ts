@@ -300,7 +300,7 @@ test.describe("Off the clock: the history row", () => {
     await expect(look).toBeVisible();
   });
 
-  test("Enter and Space step the focused row on, and the change is announced politely", async ({ page }) => {
+  test("the keyboard steps the focused row on (Enter and Space on a wide screen, the arrows on a phone), and the change is announced politely", async ({ page }) => {
     await hydrated(page);
     const card = fixture(page, "history-week");
     const row = card.locator("[data-look='history']");
@@ -308,15 +308,27 @@ test.describe("Off the clock: the history row", () => {
     const live = card.locator("[aria-live='polite']");
     await expect(live).toHaveText("");
     await row.focus();
-    // On a phone Enter opens the look like any row, and the clipping steps it on; here a click on the clipping stands in.
+    // On a phone Enter opens the look like any row, and the arrow keys step it on.
     if (!wide(page)) {
       await page.keyboard.press("Enter");
-      await tap(page, card.locator("[data-look-slot='history'] .qi-look"));
+      await expect(card.locator("[data-look-slot='history'] .qi-look")).toBeVisible();
+      await page.keyboard.press("ArrowRight");
     } else await page.keyboard.press("Enter");
     await expect(live).toHaveText(/^2 of 3\. 28 September 1781\. A cow wanders into a cathedral/);
-    if (!wide(page)) await tap(page, card.locator("[data-look-slot='history'] .qi-look"));
-    else await page.keyboard.press("Space");
+    await page.keyboard.press(wide(page) ? "Space" : "ArrowDown");
     await expect(live).toHaveText(/^3 of 3\. Born 28 September 1852\. Henri Moissan/);
+  });
+
+  test("on a phone the arrow keys do nothing until the clipping is open", async ({ page }) => {
+    test.skip(wide(page), "a wide screen steps with Enter and Space");
+    await hydrated(page);
+    const card = fixture(page, "history-week");
+    await expect(card.locator("[data-look='history']")).toHaveAttribute("aria-keyshortcuts", "ArrowRight ArrowDown");
+    await card.locator("[data-look='history']").focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(card.locator("[aria-live='polite']")).toHaveText("");
+    await page.keyboard.press("Enter");
+    await expect(card.locator("[data-look-slot='history'] .qi-clipping__count")).toHaveText("1 of 3");
   });
 
   test.describe("with motion", () => {

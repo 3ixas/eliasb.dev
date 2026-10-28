@@ -111,7 +111,7 @@ On a long-form page, the closer looks are the real things its prose names in pas
 
 **BNP Paribas** in the opening line is the exception: it reacts where it is. It turns BNP green, and a small pass drops below it on its strap. On phones, tapping it plays that reaction only; the BNP Paribas row in Work holds its closer look.
 
-**The history row cycles.** Clicking it, or pressing Enter, swaps in the week's next oddity in place: the clipping restamps and "1 of 3" moves on. Nothing opens or closes. The change is announced politely. On phones the row opens and closes the clipping like any other row, and a tap on the clipping itself swaps in the next oddity.
+**The history row cycles.** Clicking it, or pressing Enter, swaps in the week's next oddity in place: the clipping restamps and "1 of 3" moves on. Nothing opens or closes. The change is announced politely. On phones the row opens and closes the clipping like any other row, and a tap on the clipping itself swaps in the next oddity; from the keyboard, Right or Down arrow on the open row does the same (it says so in `aria-keyshortcuts`).
 
 ### The margin (desktop)
 
