@@ -12,7 +12,7 @@ const SHOWING = "qi-closer-look-showing";
 /** An inline look folds away over this long (quiet-index.css, `qi-close`); it is unmounted once it has. */
 const CLOSE_MS = 300;
 /** After a tap the tapped trigger is held in place, frame by frame, for as long as the looks above or below it are still moving. */
-const HOLD_MS = 400;
+const HOLD_MS = 450;
 
 /**
  * The one value that says which closer look is showing: nothing, or one look and what asked for it. The margin
@@ -109,6 +109,12 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     };
     window.addEventListener("touchstart", take, { once: true, passive: true });
     window.addEventListener("wheel", take, { once: true, passive: true });
+    const correct = () => {
+      const place = held.current;
+      if (!place) return;
+      const shift = place.trigger.getBoundingClientRect().top - place.top;
+      if (Math.abs(shift) >= 0.5) window.scrollBy({ top: shift, behavior: "instant" });
+    };
     const release = () => {
       window.removeEventListener("touchstart", take);
       window.removeEventListener("wheel", take);
@@ -116,12 +122,10 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     };
     const step = () => {
       // The user's own scroll moves the trigger too, so once they have taken over nothing is measured or corrected.
-      if (taken || performance.now() >= until) return release();
-      const place = held.current;
-      if (place) {
-        const shift = place.trigger.getBoundingClientRect().top - place.top;
-        if (Math.abs(shift) >= 0.5) window.scrollBy({ top: shift, behavior: "instant" });
-      }
+      if (taken) return release();
+      correct();
+      // The last change to the page (a folded look being unmounted) can come just before the end, so the hold ends on one more correction.
+      if (performance.now() >= until) return release();
       holding.current = window.requestAnimationFrame(step);
     };
     holding.current = window.requestAnimationFrame(step);
