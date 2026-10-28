@@ -137,7 +137,7 @@ Strings added while building, shipped, and recorded here on 2026-10-09 so `verif
 - Weekly Curiosity: Read more ↗ · Image:
 - GitHub: GitHub, the past year · Use the arrow keys to move between days.
 
-> **Leaves with this section** when the quiet index replaces it: the training row’s “Today · {Thursday}” and “My training week” (now one line), Admit one as a row label (it stays on the film’s closer look), the GitHub “busiest stretch” and “swipe” lines, Quiet / Busy (now Less / More), and “{n} more oddities this week ↓” (now a count).
+> **Leaves with this section** when the quiet index replaces it: the training row’s “Today · {Thursday}” and “My training week” (now one line), “Zone 2 means slow on purpose.”, Admit one as a row label (it stays on the film’s closer look), the GitHub “busiest stretch” and “swipe” lines, Quiet / Busy (now Less / More), and “{n} more oddities this week ↓” (now a count).
 
 ## Say hello
 
@@ -235,8 +235,8 @@ The markers cover the deck’s retired list and the old wording of rows it marks
 | --- | --- | --- |
 | Note | What my own time looks like this week. | kept |
 | Training row | {Assault bike intervals} · Today’s session, from my training week | changed: replaces the sketch’s “Today, from my training week” |
-| Training row, before today is known | My training week · Zone 2 means slow on purpose. | new: the page is cached and cannot know the day until the browser has read it, so the row names the plan and says its closing line, both approved strings |
-| Training closer look | The week, today in cobalt · Zone 2 means slow on purpose. · Out on a run, central London. | kept |
+| Training row, before today is known | My training week (no line) | new: until the browser tells the page what day it is, and when there is no script, the row shows the plan's name and nothing under it. The name was already approved |
+| Training closer look | The week, today in cobalt · Out on a run, central London. | changed: “Zone 2 means slow on purpose.” is dropped (Elias, 28 October 2026) |
 | GitHub year | GitHub, the past year · {1,726} contributions in the past year · Less / More · {12} contributions on {3 June} | kept (the sketch said “last year”); “Less / More” replaces “Quiet / Busy” to match GitHub’s own key |
 | Source marks (live) | Live from Goodreads · Live from Letterboxd · Live from GitHub · Live from Wikipedia | new |
 | Source marks (saved data gone stale) | From Goodreads, as of {date} (and so on) | new: built on the approved “as of {date}” |

@@ -16,7 +16,6 @@ export const offTheClock = {
   fromAsOf: (source: string, date: string) => `From ${source}, as of ${date}`,
   training: {
     week: "My training week",
-    zone2: "Zone 2 means slow on purpose.",
     /** The row's line once today's session is its title. */
     rowLine: "Today’s session, from my training week",
     photoCaption: "Out on a run, central London.",

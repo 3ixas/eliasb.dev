@@ -6,7 +6,7 @@ import { CalendarTile } from "@/components/quiet/calendar-tile";
 import { offTheClock } from "@/content/stretch/off-the-clock";
 import { londonDayOfMonth, londonWeekday } from "@/integrations/signal-mappers";
 
-const { days, photo, photoCaption, week, zone2, rowLine } = offTheClock.training;
+const { days, photo, photoCaption, week, rowLine } = offTheClock.training;
 
 function subscribe(onChange: () => void) {
   const timer = window.setInterval(onChange, 60_000);
@@ -44,9 +44,9 @@ export function TrainingTitle({ now }: { now?: string }) {
   return today ? days[today.weekday].session : week;
 }
 
-/** The training row's line, in step with its title. */
+/** The training row's line, in step with its title: there is none until the day is known. */
 export function TrainingLine({ now }: { now?: string }) {
-  return useToday(now) ? rowLine : zone2;
+  return useToday(now) ? rowLine : null;
 }
 
 /** The training week's closer look: the run, then the week filling in one day at a time, today last and in cobalt. */
@@ -68,7 +68,6 @@ export function TrainingLook({ now }: { now?: string }) {
           </li>
         ))}
       </ol>
-      <p className="qi-week__note">{zone2}</p>
     </div>
   );
 }

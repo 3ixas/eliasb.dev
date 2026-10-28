@@ -1407,12 +1407,6 @@
   color: inherit;
 }
 
-.qi-week__note {
-  margin: 0;
-  color: var(--stretch-muted);
-  font-size: var(--text-small);
-}
-
 @keyframes qi-fill {
   from {
     opacity: 0;
