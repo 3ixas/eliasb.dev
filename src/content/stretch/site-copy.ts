@@ -48,7 +48,6 @@ export const siteCopy = {
     evening: "Good evening",
     late: "Still up?",
   },
-  footer: "Made by Elias",
 } as const;
 
 export const notFound = {

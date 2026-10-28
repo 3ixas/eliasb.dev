@@ -1,4 +1,3 @@
-import { SiteFooter } from "@/components/site/site-footer";
 import { SubpageHeader } from "@/components/site/subpage-header";
 import { WorkArchive } from "@/components/site/work-archive";
 import type { Project } from "@/content/projects";
@@ -25,7 +24,6 @@ export function WorkArchivePage({ catalogue }: { catalogue: readonly Project[] }
           <WorkArchive catalogue={catalogue} />
         </section>
       </main>
-      <SiteFooter />
     </div>
   );
 }

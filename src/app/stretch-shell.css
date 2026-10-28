@@ -1,6 +1,6 @@
 /*
  * The Stretch homepage shell (docs/design/history/STRETCH.md): page surface, header,
- * theme button, section headings and footer. Everything is scoped to
+ * theme button and section headings. Everything is scoped to
  * [data-stretch-shell]; only the page surface reaches up to html and body,
  * through :has().
  */
@@ -30,17 +30,9 @@ html:has([data-stretch-shell]) body {
   }
 }
 
-/* Short pages keep the footer at the foot of the window instead of mid-screen. */
-[data-not-found],
-[data-work-archive] {
-  display: flex;
-  flex-direction: column;
-  min-height: 100svh;
-}
-
-[data-not-found] > main,
-[data-work-archive] > main {
-  flex: 1 0 auto;
+/* No page has a footer: each ends on its own last content, with room to breathe below it. */
+[data-stretch-shell] main {
+  padding-bottom: clamp(80px, 12vw, 128px);
 }
 
 [data-stretch-shell] ::selection {
@@ -237,58 +229,6 @@ button.stretch-pill {
   color: var(--stretch-muted);
   font-size: var(--text-small);
   line-height: 1.4;
-}
-
-/* ---- Footer: "Made by Elias", with Elias filling on hover (#216, #299) ---- */
-
-/*
- * The footer is quiet: 80% of the opening line's size (clamp(34px, 5.4vw, 50px)), so it is never the largest
- * type on a page. It is the same display face, and "Elias" fills with cobalt on hover.
- */
-.stretch-footer {
-  margin-top: 96px;
-  padding-block: 28px 32px;
-  border-top: 1px solid var(--stretch-rule);
-}
-
-.stretch-footer p {
-  margin: 0;
-  font-size: clamp(27px, 4.32vw, 40px);
-  line-height: 0.9;
-  letter-spacing: 0;
-  white-space: nowrap;
-}
-
-.stretch-footer__made {
-  color: var(--stretch-muted);
-}
-
-.stretch-footer__name {
-  position: relative;
-  display: inline-block;
-  color: var(--stretch-ink);
-}
-
-/* The fill is a cobalt copy of the word, revealed from the baseline up (a clip, so the glyphs stay solid text). */
-.stretch-footer__name::after {
-  content: attr(data-text) / "";
-  position: absolute;
-  inset: 0;
-  color: var(--stretch-cobalt);
-  clip-path: inset(100% 0 0 0);
-  transition: clip-path var(--fill-ms) var(--fill-ease);
-}
-
-@media (hover: hover) {
-  .stretch-footer:hover .stretch-footer__name::after {
-    clip-path: inset(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .stretch-footer__name::after {
-    transition: none;
-  }
 }
 
 /* ---- A project screenshot on a tile (the Next project tile): tilted, with a shadow ---- */

@@ -200,7 +200,7 @@
 }
 
 /*
- * Cmd-P gives the sheet: the desk, the header, the button and the footer stay behind. The A4 page is a
+ * Cmd-P gives the sheet: the desk, the header and the button stay behind. The A4 page is a
  * named page that only the sheet uses (`page: resume` below), so no other route's print is touched.
  */
 @page resume {
@@ -216,7 +216,6 @@
   }
 
   [data-resume] .stretch-header,
-  [data-resume] .stretch-footer,
   [data-resume] .stretch-resume__download {
     display: none;
   }

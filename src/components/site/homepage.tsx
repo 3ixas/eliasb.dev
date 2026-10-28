@@ -1,5 +1,4 @@
 import { sectionLinks } from "@/components/site/sections";
-import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { OffTheClock } from "@/components/site/off-the-clock";
 import { HowIWork } from "@/components/quiet/how-i-work";
@@ -12,7 +11,7 @@ const sayHelloHeadingId = "say-hello-heading";
 
 /**
  * The Stretch homepage shell: the header, the opening line and five anchored sections
- * (Work first) with their headings, notes and true counts, and the footer. The
+ * (Work first) with their headings, notes and true counts. The page ends on Say hello: no footer. The
  * page is complete from its first frame: nothing is held, faded or played in.
  */
 export function Homepage() {
@@ -43,7 +42,6 @@ export function Homepage() {
         </section>
       </main>
 
-      <SiteFooter />
     </div>
   );
 }

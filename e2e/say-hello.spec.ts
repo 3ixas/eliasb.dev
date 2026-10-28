@@ -1,10 +1,10 @@
 import { expect, test, type Page } from "@playwright/test";
 import { profile } from "../src/content/site";
-import { sayHello, siteCopy } from "../src/content/stretch/site-copy";
+import { sayHello } from "../src/content/stretch/site-copy";
 import { contrastOnPaper } from "./support/contrast";
 
 /*
- * Say hello and the footer (docs/design/DESIGN.md, "The homepage, in order" 7 and 8): the heading with no line after
+ * Say hello, where the page ends (docs/design/DESIGN.md, "The homepage, in order" 7): the heading with no line after
  * it, the email with its Copy button, then Résumé, GitHub and LinkedIn as rows; and "Made by Elias", filling with
  * cobalt on hover only.
  */
@@ -63,7 +63,6 @@ test.describe("Say hello", () => {
     await page.reload();
     await expect(section(page).getByRole("link", { name: address, exact: true })).toHaveAttribute("href", profile.links.email);
     await expect(copyButton(page)).toBeHidden();
-    await expect(page.getByRole("contentinfo")).toHaveText(siteCopy.footer);
     await expect(rows(page)).toHaveCount(3);
   });
 
@@ -130,7 +129,7 @@ test.describe("Say hello", () => {
 
   test("text passes WCAG 2.2 AA contrast", async ({ page }) => {
     await expect(copyButton(page)).toBeVisible();
-    for (const selector of ["#say-hello .qi-title", "#say-hello .qi-email__address", "#say-hello .qi-copy", "#say-hello .qi-row__title", ".stretch-footer__made", ".stretch-footer__name"]) {
+    for (const selector of ["#say-hello .qi-title", "#say-hello .qi-email__address", "#say-hello .qi-copy", "#say-hello .qi-row__title"]) {
       const readings = await contrastOnPaper(page, selector);
       expect(readings.length, selector).toBeGreaterThan(0);
       for (const reading of readings) expect(reading.ratio, `${selector}: ${reading.text}`).toBeGreaterThanOrEqual(4.5);
@@ -138,48 +137,18 @@ test.describe("Say hello", () => {
   });
 });
 
-test.describe("The footer", () => {
-  test("says Made by Elias and is quieter than the opening line, with Elias in the display face", async ({ page }) => {
-    await page.goto("/");
-    await expect(page.getByRole("contentinfo")).toHaveText(siteCopy.footer);
-    const size = (selector: string) => page.locator(selector).first().evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
-    await expect.poll(async () => (await size(".stretch-footer p")) < (await size(".qi-opening__line"))).toBe(true);
-  });
-});
-
-// The footer is on every page, so it must fit at every width, and never be the largest type on the page.
-test.describe("The footer at every width", () => {
-  for (const width of [320, 390, 760, 1100, 1440, 1920]) {
-    test(`at ${width} px`, async ({ page }, testInfo) => {
-      test.skip(!/-1440-light$/.test(testInfo.project.name), "Sweeps its own widths: once per engine");
-      await page.setViewportSize({ width, height: 900 });
-      await page.goto("/");
-      await expect.poll(async () => page.locator(".stretch-footer p").evaluate((element) => parseFloat(getComputedStyle(element).fontSize))).toBeLessThanOrEqual(
-        Math.min(Math.max(width * 0.054, 34), 50) * 0.8 + 0.5,
-      );
+// No page has a footer: each ends on its own last content, with room to breathe below it.
+test.describe("No footer", () => {
+  for (const path of ["/", "/things-i-make", "/things-i-make/threshold", "/work/joveen", "/resume", "/this-page-does-not-exist"]) {
+    test(`${path} ends on its content`, async ({ page }, testInfo) => {
+      test.skip(!/-(390|1440)-light$/.test(testInfo.project.name), "Sweeps its own pages: once per engine and width");
+      await page.goto(path);
+      await expect(page.getByRole("contentinfo")).toHaveCount(0);
+      await expect(page.locator(".stretch-footer")).toHaveCount(0);
+      await expect(page.getByText("Made by Elias")).toHaveCount(0);
+      const main = page.locator("main").first();
+      await expect.poll(() => main.evaluate((element) => parseFloat(getComputedStyle(element).paddingBottom))).toBeGreaterThanOrEqual(80);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     });
-  }
-});
-
-// The footer is on every page, so it must also fit on a page that is not the homepage.
-test.describe("The footer away from the homepage", () => {
-  for (const path of ["/things-i-make/threshold", "/this-page-does-not-exist"]) {
-    for (const width of [320, 390]) {
-      test(`${path} at ${width} px`, async ({ page }, testInfo) => {
-        test.skip(!/-1440-light$/.test(testInfo.project.name), "Sweeps its own widths: once per engine");
-        await page.setViewportSize({ width, height: 900 });
-        await page.goto(path);
-        const footer = page.getByRole("contentinfo");
-        await expect(footer).toHaveText(siteCopy.footer);
-        await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-        await expect
-          .poll(async () => {
-            const box = await footer.locator("p").boundingBox();
-            return box !== null && box.x >= 0 && box.x + box.width <= width;
-          })
-          .toBe(true);
-      });
-    }
   }
 });
