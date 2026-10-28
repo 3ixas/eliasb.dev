@@ -258,7 +258,6 @@ The markers cover the deck’s retired list and the old wording of rows it marks
 | Heading | Say hello, with no line after it: the email and its Copy button are the line | changed: none of 21 experienced engineers’ sites asks the reader a question (#283) |
 | Email | {eliasthebennett@gmail.com} · Copy → Copied | new (the copy button) |
 | Links | Résumé → · GitHub ↗ · LinkedIn ↗ | kept |
-| Résumé closer look | One page, with a PDF to download. | changed: shorter than the sketch’s line |
 
 **Not drafted:** a “what to write to me about” line in Say hello. It would need Elias to say what he wants to hear about.
 

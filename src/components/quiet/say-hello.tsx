@@ -1,27 +1,11 @@
-import { CloserLookRoot } from "@/components/quiet/closer-look-root";
 import { CopyEmail } from "@/components/quiet/copy-email";
 import { Row } from "@/components/quiet/row";
 import { Sheet } from "@/components/quiet/sheet";
 import { sectionLabel } from "@/components/site/sections";
 import { profile } from "@/content/site";
 import { sayHello } from "@/content/stretch/site-copy";
-import { resumeSheet } from "@/content/resume";
 
 const address = profile.links.email.replace(/^mailto:/, "");
-
-/** The Résumé row's closer look: the sheet sliding up, with its real name and role over ruled lines, and the line about the PDF. */
-function ResumeLook() {
-  const { name, role } = resumeSheet();
-  return (
-    <figure className="qi-resume-look">
-      <div className="qi-resume-look__sheet" aria-hidden="true">
-        <strong>{name}</strong>
-        <span>{role}</span>
-      </div>
-      <figcaption>{sayHello.resumeLook}</figcaption>
-    </figure>
-  );
-}
 
 /** GitHub's object: a little contribution calendar, five by five, in GitHub's own levels (the pattern is authored, not data). */
 const levels = [0, 1, 0, 2, 0, 1, 3, 2, 0, 1, 0, 2, 4, 3, 2, 1, 0, 3, 4, 2, 0, 1, 2, 3, 4];
@@ -51,12 +35,12 @@ const objects = { github: <ContributionTile />, linkedin: <NameCard /> } as cons
 
 /**
  * The Say hello section (GLOSSARY.md): its heading with no line after it, then the email (not a row) with its
- * Copy button, then Résumé, GitHub and LinkedIn as rows. The Résumé is this site's page (same tab, closer look);
+ * Copy button, then Résumé, GitHub and LinkedIn as rows. The Résumé is this site's page (same tab);
  * the others leave it. Rendered by the server in full: without script the email is still a working link.
  */
 export function SayHello({ headingId }: { headingId: string }) {
   return (
-    <CloserLookRoot looks={{ resume: <ResumeLook /> }} className="qi-column">
+    <div className="qi-column">
       <h2 id={headingId} className="qi-title">
         {sectionLabel["say-hello"]}
       </h2>
@@ -74,10 +58,9 @@ export function SayHello({ headingId }: { headingId: string }) {
             object={id === "resume" ? <Sheet /> : objects[id]}
             title={label}
             line=""
-            look={id === "resume" ? { id, description: sayHello.resumeLook } : undefined}
           />
         ))}
       </ul>
-    </CloserLookRoot>
+    </div>
   );
 }

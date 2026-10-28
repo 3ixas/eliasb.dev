@@ -10,7 +10,7 @@ const HIDE_MS = 140;
 /** Fired on `window` when a controller shows a look, so the others hide theirs: only one look is showing on the page. */
 const SHOWING = "qi-closer-look-showing";
 /** An inline look folds away over this long (quiet-index.css, `qi-close`); it is unmounted once it has. */
-const CLOSE_MS = 220;
+const CLOSE_MS = 300;
 /** After a tap the tapped trigger is held in place, frame by frame, for as long as the looks above or below it are still moving. */
 const HOLD_MS = 400;
 

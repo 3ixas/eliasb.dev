@@ -49,21 +49,21 @@ test.describe("Inline closer looks close as smoothly as they open", () => {
       await row(page).click();
       await expect(open(page)).not.toHaveAttribute("data-leaving", "");
       // It is the same look, still there well after the first fold's removal would have fired.
-      await page.waitForTimeout(400);
+      await page.waitForTimeout(500);
       await expect(open(page)).toBeVisible();
     });
 
     test("closing again while it folds starts a new fold that the first one's timer cannot cut short", async ({ page }) => {
       await tap(page, row(page));
       await expect(open(page)).toBeVisible();
-      // Close, reopen at once, then close again 120 ms after the first close: the first fold's removal is due at about 260 ms, the second's at 380.
+      // Close, reopen at once, then close again 120 ms after the first close: the first fold's removal is due at about 340 ms, the second's at 460.
       await row(page).evaluate(async (element: HTMLElement) => {
         element.click();
         element.click();
         await new Promise((resolve) => setTimeout(resolve, 120));
         element.click();
       });
-      await page.waitForTimeout(190);
+      await page.waitForTimeout(280);
       await expect(open(page)).toHaveAttribute("data-leaving", "", { timeout: 100 });
       await expect(open(page)).toHaveCount(0);
     });

@@ -105,7 +105,6 @@ Facts come only from the Role stories, `src/content/resume.ts` and the project c
 | Heading | Say hello, with no line after it: the email and its Copy button are the line | changed: none of 21 experienced engineers' sites asks the reader a question (#283) |
 | Email | {eliasthebennett@gmail.com} · Copy → Copied | new (the copy button) |
 | Links | Résumé → · GitHub ↗ · LinkedIn ↗ | kept |
-| Résumé closer look | One page, with a PDF to download. | changed: shorter than the sketch's line |
 
 ## Retired with the old homepage
 

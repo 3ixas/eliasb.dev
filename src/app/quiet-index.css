@@ -788,14 +788,14 @@
   animation: qi-open 0.3s var(--out) both;
 }
 
-/* A closed look folds back the way it opened, a little quicker (CLOSE_MS in closer-look-root.tsx), fading as it goes. */
+/* A closed look folds back the way it opened, at the same pace (CLOSE_MS in closer-look-root.tsx), fading as it goes. */
 .qi-inline:has(> .qi-inline__in[data-leaving]) {
-  animation: qi-close 0.22s var(--out) both;
+  animation: qi-close 0.3s var(--out) both;
 }
 
 .qi-inline__in[data-leaving] .qi-look {
   opacity: 0;
-  transition: opacity 0.14s linear;
+  transition: opacity 0.2s linear;
 }
 
 @keyframes qi-open {
@@ -1511,19 +1511,32 @@
   }
 }
 
-/* The film: a cream ticket with the poster and the stars, and a stub that tears off. */
+/*
+ * The film: a cream ticket with the poster and the stars, and a stub that tears off. The ticket is two pieces of paper
+ * (the body behind the text, and the stub) cut along one zigzag, so they sit together as one ticket until the stub is
+ * ripped away and the body is left with its torn edge.
+ */
 .qi-ticket {
   position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: 72px minmax(0, 1fr);
   gap: 14px;
   align-items: center;
   padding: 12px 76px 12px 12px;
-  border-radius: 10px;
-  background: linear-gradient(#f8f4ea, #efe9da);
   color: #1c1a16;
   filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.25)) drop-shadow(0 10px 14px rgb(0 0 0 / 0.3));
   animation: qi-ticket 0.7s var(--spring) both;
+}
+
+.qi-ticket::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0 64px 0 0;
+  border-radius: 10px 0 0 10px;
+  background: linear-gradient(#f8f4ea, #efe9da);
+  clip-path: polygon(0 0, 100% 0%, calc(100% - 4px) 6.25%, 100% 12.5%, calc(100% - 4px) 18.75%, 100% 25%, calc(100% - 4px) 31.25%, 100% 37.5%, calc(100% - 4px) 43.75%, 100% 50%, calc(100% - 4px) 56.25%, 100% 62.5%, calc(100% - 4px) 68.75%, 100% 75%, calc(100% - 4px) 81.25%, 100% 87.5%, calc(100% - 4px) 93.75%, 100% 100%, 0 100%);
 }
 
 .qi-ticket__poster {
@@ -1551,18 +1564,24 @@
 
 .qi-ticket__stub {
   position: absolute;
+  z-index: -1;
   inset: 0 0 0 auto;
   display: grid;
-  width: 64px;
+  width: 68px;
+  margin-right: 0;
+  padding-left: 4px;
   place-items: center;
-  border-left: 2px dotted rgb(28 26 22 / 0.3);
+  border-radius: 0 10px 10px 0;
+  background: linear-gradient(#f8f4ea, #efe9da);
+  clip-path: polygon(4px 0%, 0 6.25%, 4px 12.5%, 0 18.75%, 4px 25%, 0 31.25%, 4px 37.5%, 0 43.75%, 4px 50%, 0 56.25%, 4px 62.5%, 0 68.75%, 4px 75%, 0 81.25%, 4px 87.5%, 0 93.75%, 4px 100%, 100% 100%, 100% 0);
   color: #5f594e;
   font-size: var(--text-label);
   letter-spacing: 0.08em;
   line-height: 1.1;
   text-transform: uppercase;
   writing-mode: vertical-rl;
-  animation: qi-tear 0.6s 1s var(--out) forwards;
+  transform-origin: 100% 100%;
+  animation: qi-tear 0.7s 1s cubic-bezier(0.5, 0, 0.9, 0.6) forwards;
 }
 
 @keyframes qi-ticket {
@@ -1572,9 +1591,15 @@
   }
 }
 
+/* The rip: a short tug against the paper, then the stub lets go, swings down off its bottom corner and fades. */
 @keyframes qi-tear {
+  20% {
+    transform: translate(2px, -1px) rotate(-2.5deg);
+  }
+
   to {
-    transform: translate(20px, 12px) rotate(12deg);
+    transform: translate(10px, 22px) rotate(16deg);
+    opacity: 0;
   }
 }
 
@@ -1958,47 +1983,7 @@ button.stretch-gh__day[data-selected] {
   background: color-mix(in srgb, var(--stretch-ink) 28%, transparent);
 }
 
-/* The Résumé's closer look: a sheet of paper with the name and role over ruled lines, sliding up. */
-.qi-resume-look {
-  margin: 0;
-  animation: qi-slide-up 0.55s var(--out) both;
-}
-
-.qi-resume-look__sheet {
-  display: grid;
-  gap: 2px;
-  min-height: 170px;
-  padding: 18px 18px 14px;
-  border-radius: 6px;
-  background:
-    repeating-linear-gradient(to bottom, transparent 0 21px, color-mix(in srgb, var(--stretch-ink) 16%, transparent) 21px 22px) 18px 78px / calc(100% - 36px) 80px no-repeat,
-    light-dark(#fffdf6, #26262f);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.4),
-    0 1px 1px rgb(0 0 0 / 0.2),
-    0 8px 18px -8px rgb(0 0 0 / 0.35);
-  align-content: start;
-}
-
-.qi-resume-look__sheet strong {
-  font-size: var(--text-body);
-  font-weight: 650;
-}
-
-.qi-resume-look__sheet span {
-  color: var(--stretch-muted);
-  font-size: var(--text-small);
-}
-
-.qi-resume-look figcaption {
-  margin-top: 8px;
-  color: var(--stretch-muted);
-  font-size: var(--text-label);
-  line-height: 1.4;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .qi-resume-look,
   .qi-copy {
     animation: none;
     transition: none;

@@ -2,7 +2,6 @@ import { expect, test, type Page } from "@playwright/test";
 import { profile } from "../src/content/site";
 import { sayHello, siteCopy } from "../src/content/stretch/site-copy";
 import { contrastOnPaper } from "./support/contrast";
-import { tap } from "./support/tap";
 
 /*
  * Say hello and the footer (docs/design/DESIGN.md, "The homepage, in order" 7 and 8): the heading with no line after
@@ -12,7 +11,6 @@ import { tap } from "./support/tap";
 
 const section = (page: Page) => page.locator("section#say-hello");
 const address = profile.links.email.replace(/^mailto:/, "");
-const wide = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1180;
 /** Found by class, not name: its name changes to "Copied". */
 const copyButton = (page: Page) => section(page).locator(".qi-copy");
 const rows = (page: Page) => section(page).locator("a.qi-row");
@@ -89,19 +87,13 @@ test.describe("Say hello", () => {
     }
   });
 
-  test("the Résumé row's closer look is the sheet, with the line about the PDF", async ({ page }) => {
+  test("the Résumé row is a plain link to the page, with no closer look to open first", async ({ page }) => {
     const row = rows(page).filter({ hasText: "Résumé" });
-    await expect(row).toHaveAccessibleDescription(sayHello.resumeLook);
-    if (wide(page)) {
-      await row.hover();
-      await expect(page.locator(".qi-margin")).toBeVisible();
-      await expect(page.locator(".qi-margin .qi-resume-look figcaption")).toHaveText(sayHello.resumeLook);
-      await expect(page.locator(".qi-margin a")).toHaveCount(0);
-    } else {
-      await tap(page, section(page).getByRole("button", { name: "A closer look at Résumé" }));
-      await expect(section(page).locator(".qi-inline__in .qi-resume-look figcaption")).toHaveText(sayHello.resumeLook);
-      await expect(page).toHaveURL(/\/$/);
-    }
+    await expect(row).toHaveAttribute("href", "/resume");
+    await expect(row).not.toHaveAttribute("target", /.*/);
+    await expect(row).not.toHaveAttribute("data-look", /.*/);
+    await expect(section(page).getByRole("button", { name: "A closer look at Résumé" })).toHaveCount(0);
+    await expect(section(page).locator("[data-look-slot]")).toHaveCount(0);
   });
 
   test("the header's Say hello link lands on this section", async ({ page }) => {
