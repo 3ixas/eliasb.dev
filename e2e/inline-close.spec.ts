@@ -53,6 +53,14 @@ test.describe("Inline closer looks close as smoothly as they open", () => {
       await expect(open(page)).toBeVisible();
     });
 
+    test("scrolling while a look opens is the user's: the page is not pulled back to the tapped row", async ({ page }) => {
+      const before = await page.evaluate(() => window.scrollY);
+      await row(page).click();
+      await page.mouse.wheel(0, 240);
+      await page.waitForTimeout(600);
+      expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(before + 120);
+    });
+
     test("closing again while it folds starts a new fold that the first one's timer cannot cut short", async ({ page }) => {
       await tap(page, row(page));
       await expect(open(page)).toBeVisible();

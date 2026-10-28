@@ -111,20 +111,21 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     };
     window.addEventListener("touchstart", take, { once: true, passive: true });
     window.addEventListener("wheel", take, { once: true, passive: true });
+    const release = () => {
+      window.removeEventListener("touchstart", take);
+      window.removeEventListener("wheel", take);
+      held.current = null;
+      document.documentElement.style.removeProperty("overflow-anchor");
+    };
     const step = () => {
+      // The user's own scroll moves the trigger too, so once they have taken over nothing is measured or corrected.
+      if (taken || performance.now() >= until) return release();
       const place = held.current;
       if (place) {
         const shift = place.trigger.getBoundingClientRect().top - place.top;
         if (Math.abs(shift) >= 0.5) window.scrollBy({ top: shift, behavior: "instant" });
       }
-      if (!taken && performance.now() < until) {
-        holding.current = window.requestAnimationFrame(step);
-        return;
-      }
-      window.removeEventListener("touchstart", take);
-      window.removeEventListener("wheel", take);
-      held.current = null;
-      document.documentElement.style.removeProperty("overflow-anchor");
+      holding.current = window.requestAnimationFrame(step);
     };
     holding.current = window.requestAnimationFrame(step);
   };
