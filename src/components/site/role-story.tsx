@@ -11,7 +11,6 @@ import {
 import { FocusHashTarget } from "@/components/site/focus-hash-target";
 import { RoleStoryFigureBlock } from "@/components/site/role-story-figures";
 import { StaffPass } from "@/components/site/staff-pass";
-import { SiteFooter } from "@/components/site/site-footer";
 import { SubpageHeader } from "@/components/site/subpage-header";
 import { bindDots } from "@/components/site/bind-dots";
 import { roleStories } from "@/content/stretch/role-stories";
@@ -96,7 +95,6 @@ export function RoleStoryPage({ story }: { story: RoleStory }) {
         )}
       </main>
 
-      <SiteFooter />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 // Fails when `stretch-fastener` is written in any source file but the Fastener component
 // (src/components/site/fastener.tsx), which owns the markup and the rule that a Fastener goes only
 // on a tile or a sheet (GLOSSARY.md, "Fastener"). The stylesheets define the class and are exempt.
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import { sep } from "node:path";
 
 const root = new URL("../src/", import.meta.url);
@@ -11,6 +11,8 @@ const problems = [];
 for (const entry of readdirSync(root, { recursive: true })) {
   const file = String(entry).split(sep).join("/");
   if (!/\.(tsx?|jsx?|mdx?)$/.test(file) || file === owner) continue;
+  // A route folder can be named like a file (app/index.md/route.ts), so only files are read.
+  if (!statSync(new URL(file, root)).isFile()) continue;
   readFileSync(new URL(file, root), "utf8").split("\n").forEach((line, index) => {
     if (line.includes("stretch-fastener")) problems.push(`src/${file}:${index + 1} writes stretch-fastener; render <Fastener kind="..." /> from ${owner} instead`);
   });

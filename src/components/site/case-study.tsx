@@ -9,7 +9,6 @@ import {
   StorySectionLinks,
   storyColours,
 } from "@/components/site/story";
-import { SiteFooter } from "@/components/site/site-footer";
 import { SubpageHeader } from "@/components/site/subpage-header";
 import { bindDots } from "@/components/site/bind-dots";
 import { projects, type Project } from "@/content/projects";
@@ -56,7 +55,6 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
         <NextProject next={next} />
       </main>
 
-      <SiteFooter />
     </div>
   );
 }

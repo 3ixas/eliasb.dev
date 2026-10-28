@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { SiteFooter } from "@/components/site/site-footer";
 import { SiteLink } from "@/components/site/site-link";
 import { SubpageHeader } from "@/components/site/subpage-header";
 import { resumeCopy, resumePdf, resumeSheet } from "@/content/resume";
@@ -129,7 +128,6 @@ export function ResumePage() {
           </section>
         </article>
       </main>
-      <SiteFooter />
     </div>
   );
 }

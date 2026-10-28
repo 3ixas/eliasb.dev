@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LostPropertyTag } from "@/components/site/lost-property-tag";
-import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { pageTitle } from "@/content/site";
 import { notFound as copy, siteCopy } from "@/content/stretch/site-copy";
@@ -57,7 +56,6 @@ export default function NotFound() {
           </ol>
         </nav>
       </main>
-      <SiteFooter />
     </div>
   );
 }

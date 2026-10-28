@@ -158,11 +158,6 @@ test.describe("Homepage shell", () => {
     await expect(page.locator("[data-stretch-header]")).toBeInViewport();
   });
 
-  test("the footer says who made it", async ({ page }) => {
-    await page.goto("/");
-    await expect(page.getByRole("contentinfo")).toHaveText(siteCopy.footer);
-  });
-
   test("the Board is no longer served at /", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("[data-board-header], [data-board-surface], [data-pin]")).toHaveCount(0);

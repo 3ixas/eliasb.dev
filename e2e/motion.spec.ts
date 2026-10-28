@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { nameFill, tagSwing } from "../src/components/site/signature-springs";
+import { tagSwing } from "../src/components/site/signature-springs";
 
 // Motion on the finished page: scroll sway, and hover that only moves things where there is a hover.
 test.describe("Scroll sway", () => {
@@ -327,60 +327,6 @@ test.describe("404 lost-property tag", () => {
       expect(rest.length).toBeGreaterThan(10);
       // Every frame: rotated -4deg, with nothing animating it.
       expect(new Set(rest)).toEqual(new Set(["-4deg/0"]));
-    });
-  });
-});
-
-test.describe("Footer name fill", () => {
-  const fill = (page: Page) => page.locator(".stretch-footer__name").evaluate((el) => getComputedStyle(el, "::after").clipPath);
-  const filled = (page: Page) => expect.poll(() => fill(page), { timeout: 5000 });
-
-  test.describe("with motion", () => {
-    test.use({ reducedMotion: "no-preference" });
-
-    test("Elias fills on footer hover and drains when the pointer leaves", async ({ page }) => {
-      await page.goto("/");
-      await page.locator(".stretch-footer").scrollIntoViewIfNeeded();
-      await expect.poll(() => fill(page)).toContain("100%");
-      await page.locator(".stretch-footer p").hover();
-      await filled(page).not.toContain("100%");
-      await page.mouse.move(2, 2);
-      await filled(page).toContain("100%");
-    });
-
-    test("it runs on the nameFill spring", async ({ page }) => {
-      await page.goto("/");
-      const timing = () =>
-        page.locator(".stretch-footer__name").evaluate((el) => {
-          const style = getComputedStyle(el, "::after");
-          return { duration: parseFloat(style.transitionDuration) * 1000, easing: style.transitionTimingFunction };
-        });
-      // The transition lasts the spring's whole settle time (the spring's 0.7 s is its visual duration, which spring.ts stretches to settle), so it is the spring's own value, not a loose lower bound.
-      await expect.poll(async () => (await timing()).duration, { timeout: 5000 }).toBeCloseTo(nameFill.duration, 0);
-      await expect.poll(async () => (await timing()).easing).toContain("linear(");
-    });
-
-    test("keyboard focus on Say hello does not fill it, and the footer text has no tab stop", async ({ page, browserName }) => {
-      test.skip(browserName === "webkit", "Safari does not Tab to links by default");
-      await page.goto("/");
-      // The Copy button shows once the page has hydrated.
-      await expect(page.locator("#say-hello .qi-copy")).toBeVisible();
-      await page.locator("#say-hello .qi-email__address").focus();
-      await page.keyboard.press("Tab");
-      await expect(page.locator("#say-hello .qi-copy")).toBeFocused();
-      await expect.poll(() => fill(page)).toContain("100%");
-      expect(await page.locator(".stretch-footer, .stretch-footer *").evaluateAll((els) => els.filter((el) => el.hasAttribute("tabindex")).length)).toBe(0);
-    });
-  });
-
-  test.describe("with reduced motion", () => {
-    test.use({ reducedMotion: "reduce" });
-
-    test("the fill is a cut: no transition", async ({ page }) => {
-      await page.goto("/");
-      await expect.poll(() => page.locator(".stretch-footer__name").evaluate((el) => getComputedStyle(el, "::after").transitionDuration)).toBe("0s");
-      await page.locator(".stretch-footer p").hover();
-      await filled(page).not.toContain("100%");
     });
   });
 });

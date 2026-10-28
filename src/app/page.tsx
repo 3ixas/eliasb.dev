@@ -5,6 +5,8 @@ import { siteCopy } from "@/content/stretch/site-copy";
 export const metadata: Metadata = {
   title: { absolute: siteCopy.titleHome },
   description: siteCopy.description,
+  // The homepage as Markdown (src/content/markdown.ts): found by tools in the head, with no link on the page.
+  alternates: { canonical: "/", types: { "text/markdown": "/index.md" } },
 };
 
 export default function Home() {

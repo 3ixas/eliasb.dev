@@ -1,6 +1,6 @@
 # DESIGN.md: the quiet index
 
-The design contract for all of eliasb.dev: the homepage, the shell (header, theme, footer), the Case studies, the Role stories, the Work archive, the Résumé and the 404. It is the only live design reference. When this file and anything else disagree, this file wins.
+The design contract for all of eliasb.dev: the homepage, the shell (header and theme), the Case studies, the Role stories, the Work archive, the Résumé and the 404. It is the only live design reference. When this file and anything else disagree, this file wins.
 
 **Keeping it current.** A tweak edits this file in place, in the same pull request as the change. A new direction first copies this file into `history/` with a superseded note at the top, then rewrites it. The directions it replaced are in `history/`: the Stretch direction (`STRETCH.md`), the Board (`BOARD.md`) and the Cabinet of Curiosities (`SELECTED-DIRECTION.md`).
 
@@ -145,7 +145,6 @@ Decided in [Closer looks on phones: the dock, or inline under the row](https://g
 | GitHub year | The cells fill in and the total counts up when it first comes into view. A day shows its count on hover |
 | Live signals | "Live from Goodreads / Letterboxd / GitHub" with a cobalt dot that pulses three times, then rests |
 | Say hello | The email copies in place: the button turns cobalt and says "Copied" |
-| Footer | "Made by Elias" fills with cobalt on hover only (not on focus: it has no tab stop). It is set at 80% of the opening line's size, so it is never the largest type on a page |
 
 ## The arrival
 
@@ -168,8 +167,7 @@ One header on every page, in the same place, so following a row never moves it. 
 4. **Things I make**: the three featured projects, the other projects newest first (at most ten), and the link to the Work archive with the true count.
 5. **How I work**: four habit rows with the pen (real problem, write it down, safe to undo, measure), then Threshold's PRD.
 6. **Off the clock**: today's training, the GitHub year, the book, the film, the history row and Now making.
-7. **Say hello**: the line, the email with Copy, then Résumé, GitHub and LinkedIn.
-8. **Footer**: "Made by Elias".
+7. **Say hello**: the line, the email with Copy, then Résumé, GitHub and LinkedIn. The page ends here: **no page has a footer** ("Made by Elias" is retired). Each page ends on its own last content, with 80 to 128 px of room below it.
 
 Anchors stay `#work`, `#things-i-make`, `#how-i-work`, `#off-the-clock` and `#say-hello`, so the redirects, the 404's rows and each Role story's "← Work" keep working.
 

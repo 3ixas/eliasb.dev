@@ -249,9 +249,9 @@ function verifyHomepage(markup) {
 
   // Say hello: the email, then the résumé, GitHub and LinkedIn as rows, in that order.
   const helloStart = markup.indexOf('id="say-hello"');
-  const helloEnd = markup.indexOf("<footer", helloStart);
+  const helloEnd = markup.indexOf("</main>", helloStart);
   const helloSection = helloStart >= 0 && helloEnd > helloStart ? markup.slice(helloStart, helloEnd) : "";
-  check(Boolean(helloSection), "Homepage should render Say hello before the footer");
+  check(Boolean(helloSection), "Homepage should render Say hello last in the page");
   const emailAction = hrefs(helloSection).find(({ href }) => href?.startsWith("mailto:"));
   check(emailAction, "Say hello should keep the email action");
   equal(emailAction?.href, "mailto:eliasthebennett@gmail.com", "The email action should write to Elias");
@@ -262,8 +262,7 @@ function verifyHomepage(markup) {
   equal(attribute(resumeCard?.[1] ?? "", "href"), "/resume", "Say hello's Résumé should open /resume on this site");
   check(attribute(resumeCard?.[1] ?? "", "target") === null, "Say hello's Résumé should open in the same tab");
   check(cards.filter((card) => card !== resumeCard).every(([, tag]) => attribute(tag, "target") === "_blank"), "GitHub and LinkedIn should open in a new tab");
-  const footer = markup.slice(markup.indexOf("<footer"), markup.indexOf("</footer>"));
-  equal(plainText(footer), "Made by Elias", "The footer should be my signature");
+  check(!/<footer\b[^>]*stretch-footer/.test(markup) && !text.includes("Made by Elias"), "The page should have no footer");
 
   check(markup.includes('href="/things-i-make"'), "Homepage should link to the complete Things I make archive");
   check(markup.includes('href="/things-i-make/threshold"'), "Homepage should link to the Threshold case study");
