@@ -7,8 +7,8 @@ import { hostLabel } from "@/components/site/host-label";
 /**
  * A row's closer look: its id (the key of the controller's `looks`) and what it says beyond the row, as the row's
  * accessible description. A row with `cycle` (what each step of the cycle says, for the live region) steps through
- * its look's pages when clicked instead of opening it; on phones its first tap opens the look and each one after
- * steps it on, and its object button opens and closes it.
+ * its look's pages when clicked instead of opening it; on phones the row opens and closes its look like any other,
+ * and a tap on the look steps it on.
  */
 export type RowLook = { id: string; description: string; cycle?: string[] };
 

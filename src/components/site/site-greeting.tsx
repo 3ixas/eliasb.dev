@@ -96,7 +96,11 @@ export function SiteGreeting() {
       <span className="qi-greeting__words" data-longest={longest}>
         <span>{siteCopy.greeting[key]}</span>
       </span>
-      <span className="qi-greeting__more">{london && siteCopy.header.londonTime(london)}</span>
+      <span className="qi-greeting__more">
+        <span>
+          <span>{london && siteCopy.header.londonTime(london)}</span>
+        </span>
+      </span>
     </p>
   );
 }

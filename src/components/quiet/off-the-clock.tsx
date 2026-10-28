@@ -250,7 +250,7 @@ export function makingEntry(latest: LatestRepositorySignal): Entry | null {
         href={entry.href}
         object={<Brackets />}
         title={entry.name}
-        line={joined([copy.nowMaking.label, entry.description, mark?.shown])}
+        line={joined([copy.nowMaking.label, mark?.shown])}
         look={entry.description ? { id, description: entry.description } : undefined}
       />
     ),

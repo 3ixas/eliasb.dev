@@ -191,6 +191,8 @@ a.qi-header__name {
 @media not all and (hover: hover) and (min-width: 900px) {
   .qi-greeting {
     flex-wrap: wrap;
+    align-content: center;
+    row-gap: 0;
     cursor: pointer;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
@@ -199,12 +201,33 @@ a.qi-header__name {
 
 /* London's time never takes room on a wide screen: it hangs beyond the words and lets the pointer through. Elsewhere it opens on a line of its own. */
 .qi-greeting__more {
-  display: none;
+  display: grid;
+  flex-basis: 100%;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows 0.3s var(--out),
+    opacity 0.3s var(--out),
+    visibility 0s 0.3s;
+}
+
+/* The line's own space is inside the part that folds, so a closed greeting is exactly its words. */
+.qi-greeting__more > span {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.qi-greeting__more > span > span {
+  display: block;
+  padding-top: 6px;
 }
 
 .qi-greeting[data-open] .qi-greeting__more {
-  display: block;
-  flex-basis: 100%;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
 }
 
 .qi-scene {
@@ -396,8 +419,17 @@ a.qi-header__name {
     display: block;
     padding-left: 4px;
     opacity: 0;
+    visibility: visible;
     pointer-events: none;
     transition: opacity 0.3s;
+  }
+
+  .qi-greeting__more > span {
+    overflow: visible;
+  }
+
+  .qi-greeting__more > span > span {
+    padding-top: 0;
   }
 
   .qi-greeting:is(:hover, :focus-visible) .qi-greeting__more {

@@ -256,9 +256,9 @@ test.describe("Off the clock: the history row", () => {
   /** Cycles the row the way the screen does it: a click, or a tap on a touch screen. */
   const cycle = async (page: Page, name: string) => {
     await hydrated(page);
-    const row = rowOf(page, name).locator("[data-look='history']");
-    if (wide(page)) await row.click();
-    else await tap(page, row);
+    // On a wide screen a click on the row steps it on; on a phone the row opens and closes, and the clipping steps.
+    if (wide(page)) await rowOf(page, name).locator("[data-look='history']").click();
+    else await tap(page, rowOf(page, name).locator("[data-look-slot='history'] .qi-look"));
   };
 
   test("the row is a calendar tile, the title, a line that counts the week's oddities and a live Wikipedia mark", async ({ page }) => {
@@ -283,7 +283,7 @@ test.describe("Off the clock: the history row", () => {
     await expect(look.locator(".qi-clipping__stamp")).not.toHaveCSS("color", await token(page, "--stretch-cobalt"));
   });
 
-  test("clicking the row swaps in the next oddity in place and wraps after the last", async ({ page }) => {
+  test("clicking the row (a phone: the clipping) swaps in the next oddity in place and wraps after the last", async ({ page }) => {
     const look = await openLook(page, "history-week", "history");
     const fact = look.locator(".qi-clipping__fact");
     await cycle(page, "history-week");
@@ -308,11 +308,14 @@ test.describe("Off the clock: the history row", () => {
     const live = card.locator("[aria-live='polite']");
     await expect(live).toHaveText("");
     await row.focus();
-    // On a phone the first press opens the look, as the first tap does; every press after steps it on.
-    if (!wide(page)) await page.keyboard.press("Enter");
-    await page.keyboard.press("Enter");
+    // On a phone Enter opens the look like any row, and the clipping steps it on; here a click on the clipping stands in.
+    if (!wide(page)) {
+      await page.keyboard.press("Enter");
+      await tap(page, card.locator("[data-look-slot='history'] .qi-look"));
+    } else await page.keyboard.press("Enter");
     await expect(live).toHaveText(/^2 of 3\. 28 September 1781\. A cow wanders into a cathedral/);
-    await page.keyboard.press("Space");
+    if (!wide(page)) await tap(page, card.locator("[data-look-slot='history'] .qi-look"));
+    else await page.keyboard.press("Space");
     await expect(live).toHaveText(/^3 of 3\. Born 28 September 1852\. Henri Moissan/);
   });
 
@@ -380,28 +383,29 @@ test.describe("Off the clock: the history row", () => {
     expect(spoken).toContain("3 of 3. Born 28 September 1852. Henri Moissan");
   });
 
-  test("on a touch screen the row opens the clipping, every tap after steps it on, and the tile closes it", async ({ page }) => {
+  test("on a touch screen the row opens and closes the clipping, and only a tap on the clipping steps it on", async ({ page }) => {
     test.skip(wide(page), "the margin shows the look on hover; there is no tile button");
     await hydrated(page);
     const card = fixture(page, "history-week");
     const slot = card.locator("[data-look-slot='history'] .qi-look");
     await expect(slot).toHaveCount(0);
-    // The first tap anywhere on the row opens the look without stepping it.
     await tap(page, card.locator("[data-look='history']"));
     await expect(slot).toBeVisible();
     await expect(slot.locator(".qi-clipping__count")).toHaveText("1 of 3");
-    // Every tap after steps it on: the row, then the clipping itself.
+    // The row's own taps never step it on: they close it, and open it again where it was.
     await tap(page, card.locator("[data-look='history']"));
+    await expect(slot).toHaveCount(0);
+    await tap(page, card.locator("[data-look='history']"));
+    await expect(slot.locator(".qi-clipping__count")).toHaveText("1 of 3");
+    // The clipping steps it on, wrapping after the last, and stays open.
+    await tap(page, slot);
     await expect(slot.locator(".qi-clipping__count")).toHaveText("2 of 3");
     await tap(page, slot);
     await expect(slot.locator(".qi-clipping__count")).toHaveText("3 of 3");
     await expect(slot).toBeVisible();
-    // The calendar tile's button closes it.
+    // The calendar tile's button closes it too.
     await tap(page, card.locator("button[data-look-tap='history']"));
     await expect(slot).toHaveCount(0);
-    // And opens it again at the place it was left.
-    await tap(page, card.locator("button[data-look-tap='history']"));
-    await expect(slot.locator(".qi-clipping__count")).toHaveText("3 of 3");
   });
 });
 
@@ -415,7 +419,9 @@ test.describe("Off the clock: Now making", () => {
   test("a repository that is not a project is a row: its name, Now making, GitHub's description and a live mark, linked to GitHub", async ({ page }) => {
     const row = fixture(page, "making").locator("[data-otc='making']");
     await expect(title(row)).toHaveText("eliasb.dev");
-    await expect(line(row)).toContainText(`${nowMaking.label} · Personal site for Elias B. · ${offTheClock.live("GitHub")}`);
+    await expect(line(row)).toHaveText(`${nowMaking.label}\u00a0· ${offTheClock.live("GitHub")}`);
+    // The description is said once, in the closer look, and is the row's accessible description.
+    await expect(row.locator("[data-look]")).toHaveAccessibleDescription("Personal site for Elias B.");
     await expect(links(row)).toHaveAttribute("href", "https://github.com/3ixas/eliasb.dev");
     await expect(row.locator("[data-now-mark]")).toHaveCSS("background-color", await token(page, "--stretch-cobalt"));
     await expect(row.locator(".qi-brackets__slash")).toHaveCSS("stroke", await token(page, "--stretch-cobalt"));

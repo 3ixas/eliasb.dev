@@ -53,12 +53,16 @@ test.describe("Inline closer looks close as smoothly as they open", () => {
       await expect(open(page)).toBeVisible();
     });
 
-    test("scrolling while a look opens is the user's: the page is not pulled back to the tapped row", async ({ page }) => {
+    test("scrolling while a look opens is the user's: the page is not pulled back to the tapped row", async ({ page, browserName }) => {
+      // Headless WebKit's own scroll anchoring moves the page a moment after a synthetic wheel scroll while the look grows, with no
+      // call to scrollBy from the page, so what this guards (the page's own correction) can only be told apart in Chromium.
+      test.skip(browserName === "webkit", "WebKit moves the page itself while a look opens");
       const before = await page.evaluate(() => window.scrollY);
       await row(page).click();
       await page.mouse.wheel(0, 240);
+      // Wheel scrolling can take a moment to run its course, and the hold lasts 400 ms: it must end with the page where the user took it.
       await page.waitForTimeout(600);
-      expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(before + 120);
+      await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 3000 }).toBeGreaterThan(before + 120);
     });
 
     test("closing again while it folds starts a new fold that the first one's timer cannot cut short", async ({ page }) => {

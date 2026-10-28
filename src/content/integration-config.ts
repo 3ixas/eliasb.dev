@@ -11,7 +11,8 @@ export const integrationConfig = {
   goodreads: {
     userId: "171686303",
     profileUrl: "https://www.goodreads.com/user/show/171686303-elias-bennett",
-    currentlyReadingFeedUrl:
-      "https://www.goodreads.com/review/list_rss/171686303?shelf=currently-reading",
+    // Goodreads' public shelf widget: the RSS feed needs a private key, this needs none.
+    currentlyReadingWidgetUrl:
+      "https://www.goodreads.com/review/custom_widget/171686303.currently-reading?num_books=1&order=d&shelf=currently-reading&show_author=1&show_cover=1&show_title=1&sort=date_added",
   },
 } as const;

@@ -32,8 +32,8 @@ export function useCycleAdvance() {
 /**
  * The row that cycles (docs/design/DESIGN.md, "The history row cycles"): on a wide screen with a pointer, clicking it, or
  * pressing Enter or Space, moves to the next of its `announcements` and says so politely; nothing opens or closes. On a
- * phone the closer-look controller owns the taps (the row has `data-look-tap`): the first opens the look, and each one
- * after steps it on, as does a tap on the look itself; the object's button opens and closes. The text of the row is the
+ * phone the closer-look controller owns the taps (the row has `data-look-tap`): the row opens and closes its look like any
+ * other row, and only a tap on the look itself steps it on. The text of the row is the
  * same server-rendered markup as any plain row, so `children` is the row's content. The live region says nothing until
  * the position changes, so a page load announces nothing, and it says it however the step was made.
  */
@@ -57,7 +57,6 @@ export function CycleTrigger({ id, announcements, labelledBy, describedBy, child
         aria-describedby={describedBy}
         data-look={id}
         data-look-tap={id}
-        data-look-cycle={announcements.length}
         data-cycle=""
         onClick={() => wide() && advance()}
         onKeyDown={(event) => {

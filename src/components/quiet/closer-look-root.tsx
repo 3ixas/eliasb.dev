@@ -41,7 +41,7 @@ type Under = { selector: string; column: number };
  * in the `data-look-slot="<id>"` the server rendered under its row. Tapping the same trigger, or the look itself,
  * closes it, and both fold away rather than vanish. Two kinds of look answer a tap on themselves differently, as
  * the slot says: one with `data-look-href` is a link to the row's destination (a row that leaves the site opens
- * its look first), and one with `data-look-cycle` steps its cycling row on.
+ * its look first), and one with `data-look-cycle` steps its cycling row on, so the row only opens and closes it.
  */
 export function CloserLookRoot({ looks, className, under, children }: { looks: Record<string, ReactNode>; className?: string; under?: Under; children: ReactNode }) {
   const root = useRef<HTMLDivElement>(null);
@@ -55,7 +55,7 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
   const [leaving, setLeaving] = useState<Leaving[]>([]);
   const advance = useCycleAdvance();
   /** The tapped trigger and where it sat, so it can be put back after a look above it closes. */
-  const held = useRef<{ trigger: HTMLElement; top: number } | null>(null);
+  const held = useRef<{ trigger: HTMLElement; top: number; y: number } | null>(null);
   const holding = useRef(0);
   /** The pending removal of each folding look, by slot: a look that is reopened or closed again takes its earlier removal with it. */
   const removals = useRef(new Map<HTMLElement, number>());
@@ -98,32 +98,23 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     return row && root.current?.contains(row) ? row.dataset.look : undefined;
   };
 
-  /** Keeps the tapped trigger where it was on screen while the looks around it open and fold, frame by frame, until the user takes over the scroll. */
+  /** Keeps the tapped trigger where it was on screen while the looks around it open and fold, frame by frame, until the user takes over the scroll. (Browsers that anchor scroll already do most of this; setting `overflow-anchor: none` to stop them makes WebKit throw the scroll position back, so it is left alone.) */
   const hold = (trigger: HTMLElement) => {
-    // Closing a look above the trigger moves it; the browser's own scroll anchoring would fight the correction below.
-    document.documentElement.style.overflowAnchor = "none";
-    held.current = { trigger, top: trigger.getBoundingClientRect().top };
+    held.current = { trigger, top: trigger.getBoundingClientRect().top, y: window.scrollY };
     window.cancelAnimationFrame(holding.current);
     const until = performance.now() + HOLD_MS;
-    let taken = false;
-    const take = () => {
-      taken = true;
-    };
-    window.addEventListener("touchstart", take, { once: true, passive: true });
-    window.addEventListener("wheel", take, { once: true, passive: true });
     const release = () => {
-      window.removeEventListener("touchstart", take);
-      window.removeEventListener("wheel", take);
       held.current = null;
-      document.documentElement.style.removeProperty("overflow-anchor");
     };
     const step = () => {
-      // The user's own scroll moves the trigger too, so once they have taken over nothing is measured or corrected.
-      if (taken || performance.now() >= until) return release();
       const place = held.current;
-      if (place) {
-        const shift = place.trigger.getBoundingClientRect().top - place.top;
-        if (Math.abs(shift) >= 0.5) window.scrollBy({ top: shift, behavior: "instant" });
+      // The page is only ever moved from here and from the layout effect below, which record where they left it: any other
+      // movement is the user's own scroll (a wheel scroll can run before its event does), and then nothing is corrected.
+      if (!place || performance.now() >= until || Math.abs(window.scrollY - place.y) > 0.5) return release();
+      const shift = place.trigger.getBoundingClientRect().top - place.top;
+      if (Math.abs(shift) >= 0.5) {
+        window.scrollBy({ top: shift, behavior: "instant" });
+        place.y = window.scrollY;
       }
       holding.current = window.requestAnimationFrame(step);
     };
@@ -140,13 +131,6 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     // Opening a look closes one in another controller in the same batch, so the correction sees both moves.
     if (!open) announce();
     change(open ? null : { id, source: "tap", slot });
-  };
-  /** A cycling row opens its look on the first tap and steps it on with every tap after; its object button opens and closes. */
-  const press = (trigger: HTMLElement) => {
-    const id = trigger.dataset.lookTap;
-    const steps = Number(trigger.dataset.lookCycle);
-    if (id && steps && trigger.tagName !== "BUTTON" && now.current?.source === "tap" && now.current.id === id) advance?.(id, steps);
-    else toggle(trigger);
   };
   /** A tap on an open look: a cycling look steps on, a look that is a link follows its link, any other closes. */
   const pressLook = (open: HTMLElement) => {
@@ -176,7 +160,7 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
       if (event.detail === 0) return;
       event.preventDefault();
     }
-    press(trigger);
+    toggle(trigger);
   };
   /** A plain row is a focusable group, not a button, so Enter and Space tap it. */
   const onKeyDown = (event: KeyboardEvent) => {
@@ -184,7 +168,7 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     if (!trigger || trigger !== event.target || trigger.tagName === "BUTTON" || trigger.tagName === "A" || (event.key !== "Enter" && event.key !== " ")) return;
     if (window.matchMedia(WIDE).matches) return;
     event.preventDefault();
-    press(trigger);
+    toggle(trigger);
   };
 
   const onPointerOver = (event: PointerEvent) => {
@@ -278,7 +262,9 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     const place = held.current;
     if (!place) return;
     const shift = place.trigger.getBoundingClientRect().top - place.top;
-    if (shift) window.scrollBy({ top: shift, behavior: "instant" });
+    if (!shift) return;
+    window.scrollBy({ top: shift, behavior: "instant" });
+    place.y = window.scrollY;
   }, [active]);
 
   // The object button (or reveal word) says what is open to assistive technology (CSS styles an open row from its filled slot).

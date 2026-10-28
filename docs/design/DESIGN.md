@@ -97,7 +97,7 @@ A **closer look** is a row's detail: on desktop it appears in the margin, and on
 | The book | The cover pulled from a row of spines, then the title, author and a "Live from Goodreads" line | Lifting off the shelf and turning to face you |
 | The film | A ticket with the poster, title, date and stars | Arriving, the stars filling in, the stub tearing |
 | This week in history | A newspaper clipping with the image, date, fact and credit | Unfolding, then being stamped "This week in history" |
-| Now making | The repository and its description | The description typing itself |
+| Now making | The repository and its description (the row says only "Now making" and "Live from GitHub") | The description typing itself |
 | Your face (header) | The full white-tux portrait, "Based in London" | Sliding in |
 | "pricing and risk engines" | Illustrative simulated paths, one in BNP green, with the Role story's line about simulation-based calculations | The paths fanning out |
 | "CPU and GPU" | A CPU with a few cores taking turns and a GPU with many lighting at once, with the line about running the same tests on both | The cores lighting |
@@ -111,7 +111,7 @@ On a long-form page, the closer looks are the real things its prose names in pas
 
 **BNP Paribas** in the opening line is the exception: it reacts where it is. It turns BNP green, and a small pass drops below it on its strap. On phones, tapping it plays that reaction only; the BNP Paribas row in Work holds its closer look.
 
-**The history row cycles.** Clicking it, or pressing Enter, swaps in the week's next oddity in place: the clipping restamps and "1 of 3" moves on. Nothing opens or closes. The change is announced politely. On phones the first tap on the row opens the clipping, and every tap after, on the row or on the clipping, swaps in the next oddity; the calendar tile opens and closes it.
+**The history row cycles.** Clicking it, or pressing Enter, swaps in the week's next oddity in place: the clipping restamps and "1 of 3" moves on. Nothing opens or closes. The change is announced politely. On phones the row opens and closes the clipping like any other row, and a tap on the clipping itself swaps in the next oddity.
 
 ### The margin (desktop)
 
