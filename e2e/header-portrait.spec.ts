@@ -10,7 +10,7 @@ import { tap } from "./support/tap";
 
 const { portrait } = siteCopy.header;
 const wide = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1180;
-const face = (page: Page) => page.getByRole("button", { name: "A closer look at Elias" });
+const face = (page: Page) => page.getByRole("button", { name: "A closer look at Elias", exact: true });
 const margin = (page: Page) => page.locator(".qi-margin");
 const inline = (page: Page) => page.locator(".qi-header .qi-inline__in");
 
@@ -130,4 +130,20 @@ test("on the 404 the name still leads home, and the portrait does not", async ({
   expect((await home.boundingBox())!.height).toBeGreaterThanOrEqual(44);
   await home.click();
   await expect(page).toHaveURL(/\/$/);
+});
+
+test("between 900 and 1179 px the tapped look opens on its own row under the header, at full size", async ({ page }) => {
+  // No project is this wide, so the window is set: wide enough for the one row, too narrow for the margin.
+  await page.setViewportSize({ width: 1000, height: 800 });
+  await page.goto("/");
+  await expect(page.locator("[data-greeting]")).toBeVisible();
+  const header = (await page.locator(".qi-header__inner").boundingBox())!;
+  await tap(page, face(page));
+  await expect(inline(page)).toBeVisible();
+  const row = (await page.locator(".qi-header__slot").boundingBox())!;
+  const image = (await inline(page).locator("img").boundingBox())!;
+  expect(row.width).toBeGreaterThan(300);
+  expect(image.width).toBeGreaterThan(150);
+  expect(image.y).toBeGreaterThanOrEqual(header.y + 40);
+  expect(row.x + row.width).toBeLessThanOrEqual(header.x + header.width + 1);
 });

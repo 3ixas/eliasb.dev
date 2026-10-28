@@ -125,7 +125,7 @@ test.describe("Homepage shell", () => {
     await page.keyboard.press("Tab");
     await expect(page.locator(".stretch-skip")).toBeFocused();
     await page.keyboard.press("Tab");
-    await expect(page.getByRole("button", { name: "A closer look at Elias" })).toBeFocused();
+    await expect(page.getByRole("button", { name: "A closer look at Elias", exact: true })).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(page.locator("[data-eclipse]")).toBeFocused();
   });

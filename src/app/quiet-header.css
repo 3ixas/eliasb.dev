@@ -94,6 +94,7 @@ a.qi-header__name {
 }
 
 .qi-header__links {
+  grid-area: links;
   display: none;
 }
 
@@ -323,11 +324,14 @@ a.qi-header__name {
 /* ---------- from 900 px: one row, and quiet links to the page's sections ---------- */
 
 @media (min-width: 900px) {
+  /* One row of four areas, and under it the full-width row where a tapped portrait's look opens (a page with no links leaves the third area empty). */
   .qi-header__inner {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    row-gap: 0;
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "who greet links eclipse"
+      "look look look look";
+    column-gap: 16px;
     width: min(100% - 40px, 940px);
     padding-block: 12px;
   }
