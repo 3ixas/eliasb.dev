@@ -27,10 +27,17 @@ const stillFolding = () => [...folding.values()].some((count) => count > 0);
 
 /** Puts the held row back where it was on screen, if the page has moved it. Run in a commit, so the correction lands with the layout change. */
 export function correctHold() {
+  // TEMP-DIAG
+  const log = ((window as unknown as { __holdLog?: unknown[] }).__holdLog ??= []);
   // A trigger that has left the page (a link was followed) has no position to hold.
-  if (!current || !current.trigger.isConnected) return;
+  if (!current || !current.trigger.isConnected) {
+    log.push({ skipped: !current ? "no hold" : "disconnected" });
+    return;
+  }
   const shift = current.trigger.getBoundingClientRect().top - current.top;
+  const y0 = window.scrollY;
   if (Math.abs(shift) >= 0.5) window.scrollBy({ top: shift, behavior: "instant" });
+  log.push({ shift: Math.round(shift * 10) / 10, y0: Math.round(y0), y1: Math.round(window.scrollY), top: Math.round(current.trigger.getBoundingClientRect().top * 10) / 10 });
 }
 
 /** Ends the hold in progress: its frame, its listeners and the held row. A new hold and an unmounting controller call it. */
