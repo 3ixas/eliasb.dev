@@ -1672,6 +1672,11 @@
   .qi-ticket__stub {
     animation: none;
   }
+
+  /* The cloth only covers the cover until its animation clears it, so without the animation it is not there at all. */
+  .qi-pluck__cover::after {
+    display: none;
+  }
 }
 
 /* ---------- the history row: it cycles, and its look is a newsprint clipping stamped in ink ---------- */

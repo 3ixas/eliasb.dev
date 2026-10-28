@@ -494,6 +494,14 @@ test.describe("Off the clock: reduced motion", () => {
     });
   }
 
+  test("book: nothing covers the cover, which is there from the first frame", async ({ page }) => {
+    const look = await openLook(page, "book", "book");
+    await expect(look.locator(".qi-pluck__cover img")).toBeVisible();
+    // The cloth that starts it as a spine is cleared only by its animation, so with none it must not be drawn.
+    expect(await look.locator(".qi-pluck__cover").evaluate((element) => getComputedStyle(element, "::after").display)).toBe("none");
+    await expect(look.locator(".qi-book .qi-look__name, .qi-look__name")).toBeVisible();
+  });
+
   test("making: its description is there whole, with no typing", async ({ page }) => {
     const look = await openLook(page, "making", "making");
     await expect(look.locator(".qi-look__by")).toHaveText("Personal site for Elias B.");
