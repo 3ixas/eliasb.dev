@@ -84,8 +84,11 @@ export const thingsIMake = {
 } as const;
 
 export const sayHello = {
-  bigLink: "Say hello ↗",
-  line: "Got an idea, a project, or just want to talk about building things? Email’s the best way to reach me.",
+  /** The email's button, and what it says for two seconds once the address is on the clipboard. */
+  copy: "Copy",
+  copied: "Copied",
+  /** The Résumé row's closer look: the sheet, and this beneath it (also the row's accessible description). */
+  resumeLook: "One page, with a PDF to download.",
   /** In the order shown. `id` names the profile link (src/content/site.ts) each one opens. */
   links: [
     { id: "resume", label: "Résumé" },

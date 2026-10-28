@@ -1,10 +1,10 @@
 import { sectionLinks } from "@/components/site/sections";
-import { SayHello } from "@/components/site/say-hello";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { OffTheClock } from "@/components/site/off-the-clock";
 import { HowIWork } from "@/components/quiet/how-i-work";
 import { Opening } from "@/components/quiet/opening";
+import { SayHello } from "@/components/quiet/say-hello";
 import { ThingsIMake } from "@/components/quiet/things-i-make";
 import { Work } from "@/components/quiet/work";
 

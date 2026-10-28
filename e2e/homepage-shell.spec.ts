@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { howIWork } from "../src/content/stretch/how-i-work";
 import { offTheClock } from "../src/content/stretch/off-the-clock";
 import { opening } from "../src/content/stretch/opening";
-import { sayHello, siteCopy, thingsIMake } from "../src/content/stretch/site-copy";
+import { siteCopy, thingsIMake } from "../src/content/stretch/site-copy";
 import { work } from "../src/content/stretch/work";
 import { renderedContrast } from "./support/rendered-contrast";
 
@@ -27,7 +27,7 @@ test.describe("Homepage shell", () => {
       ...sections.map((section) => section.id),
     ]);
     await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName(opening.headline);
-    await expect(page.getByRole("heading", { level: 2 })).toHaveText(sections.map((section) => section.id === "say-hello" ? sayHello.bigLink : section.heading));
+    await expect(page.getByRole("heading", { level: 2 })).toHaveText(sections.map((section) => section.id === "say-hello" ? "Say hello" : section.heading));
   });
 
   // Work is the first section in the quiet index's language: a 17 px title and a 15 px note, not a giant heading (#291).

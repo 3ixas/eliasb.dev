@@ -360,15 +360,15 @@ test.describe("Footer name fill", () => {
       await expect.poll(async () => (await timing()).easing).toContain("linear(");
     });
 
-    test("it fills while a Say hello link has keyboard focus, and not for the footer text itself", async ({ page, browserName }) => {
+    test("keyboard focus on Say hello does not fill it, and the footer text has no tab stop", async ({ page, browserName }) => {
       test.skip(browserName === "webkit", "Safari does not Tab to links by default");
       await page.goto("/");
-      await page.locator("#say-hello .stretch-hello__big").focus();
-      await page.keyboard.press("Shift+Tab");
+      // The Copy button shows once the page has hydrated.
+      await expect(page.locator("#say-hello .qi-copy")).toBeVisible();
+      await page.locator("#say-hello .qi-email__address").focus();
       await page.keyboard.press("Tab");
-      await filled(page).not.toContain("100%");
-      await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
-      await filled(page).toContain("100%");
+      await expect(page.locator("#say-hello .qi-copy")).toBeFocused();
+      await expect.poll(() => fill(page)).toContain("100%");
       expect(await page.locator(".stretch-footer, .stretch-footer *").evaluateAll((els) => els.filter((el) => el.hasAttribute("tabindex")).length)).toBe(0);
     });
   });

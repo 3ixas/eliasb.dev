@@ -64,7 +64,8 @@ An object is drawn to be read at 44 px. It is never a whole page shrunk down.
 | Calendar tile | Training, history, History at uni | A desk-calendar tile: a band with two binding holes, and a number on paper. The band is cobalt for today. It turns over to a second face (the year, the week) as a reaction |
 | Thread | Where I'm headed | A 4 px line in the colour of the strand's source |
 | Number | How I work | The habit's number, ringed by the pen (below) |
-| Sheet | Threshold's PRD; Say hello on the 404 | A small page of ruled lines with a folded corner |
+| Sheet | Threshold's PRD; Say hello and the 404 | A small page of ruled lines with a folded corner |
+| Badge | Say hello | A 36 px tile with the destination's own letters in mono ("GH", "in"), for the GitHub and LinkedIn rows. Plain, so no logo is redrawn |
 | Dot | Now making | The cobalt "now" dot |
 | Empty slot | The 404's missing row | A dashed 44 px outline with nothing in it |
 
@@ -143,7 +144,7 @@ Decided in [Closer looks on phones: the dock, or inline under the row](https://g
 | GitHub year | The cells fill in and the total counts up when it first comes into view. A day shows its count on hover |
 | Live signals | "Live from Goodreads / Letterboxd / GitHub" with a cobalt dot that pulses three times, then rests |
 | Say hello | The email copies in place: the button turns cobalt and says "Copied" |
-| Footer | "Made by Elias" fills with cobalt on hover |
+| Footer | "Made by Elias" fills with cobalt on hover only (not on focus: it has no tab stop). It is set at 80% of the opening line's size, so it is never the largest type on a page |
 
 ## The arrival
 
