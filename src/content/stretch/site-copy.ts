@@ -40,12 +40,12 @@ export const siteCopy = {
     /** The portrait's closer look caption (moved from the old hero label). Its button is named "A closer look at Elias", as every object button is named for what it shows. */
     portrait: { caption: "Based in London" },
   },
-  /** The header's greeting, by the visitor's own time of day. `hello` is the line before the browser has read it, and without script. */
+  /** The header's greeting, by the visitor's own time of day. `hello` is the line before the browser has read it, and without script. The afternoon alone knows the day: Saturday and Sunday are the visitor's own. */
   greeting: {
     hello: "Hello",
-    morning: "Good morning",
-    afternoon: "Good afternoon",
-    evening: "Good evening",
+    morning: "Kettle’s on.",
+    afternoon: { weekday: "Nearly five?", weekend: "Nowhere to be?" },
+    evening: "Home yet?",
     late: "Still up?",
   },
 } as const;

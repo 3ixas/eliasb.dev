@@ -3,6 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { howIWork } from "../src/content/stretch/how-i-work";
 import { offTheClock } from "../src/content/stretch/off-the-clock";
 import { opening } from "../src/content/stretch/opening";
+import { greetingLine } from "../src/content/stretch/greeting";
 import { siteCopy, thingsIMake } from "../src/content/stretch/site-copy";
 import { work } from "../src/content/stretch/work";
 import { renderedContrast } from "./support/rendered-contrast";
@@ -173,23 +174,58 @@ test.describe("Homepage shell", () => {
 test.describe("The header greeting", () => {
   const greeting = (page: Page) => page.locator("[data-greeting]");
   const shownText = (page: Page) => greeting(page).locator(".qi-greeting__words > span");
-  const sunShift = (page: Page) =>
-    page.locator(".qi-scene__sun").evaluate((element) => new DOMMatrix(getComputedStyle(element).transform).f);
+  /** The animation a part of the scene is running now ("none" when it rests). */
+  const playing = (page: Page, part: string) => page.locator(`.qi-scene__${part}`).evaluate((element) => getComputedStyle(element).animationName);
 
-  // Whole hours in a zone with no daylight saving, so the visitor's hour is exactly the hour asked for.
+  // Whole hours in a zone with no daylight saving, so the visitor's hour is exactly the hour asked for. 15 October 2026 is a Thursday.
   for (const [hour, key] of [
     [4, "late"], [5, "morning"], [11, "morning"], [12, "afternoon"], [17, "afternoon"], [18, "evening"], [21, "evening"], [22, "late"],
   ] as const) {
-    test(`${String(hour).padStart(2, "0")}:30 on the visitor's clock says "${siteCopy.greeting[key]}"`, async ({ browser }) => {
+    test(`${String(hour).padStart(2, "0")}:30 on the visitor's clock says "${greetingLine(key, false)}"`, async ({ browser }) => {
       const context = await browser.newContext({ timezoneId: "Etc/GMT" });
       const page = await context.newPage();
       await page.clock.setFixedTime(new Date(Date.UTC(2026, 9, 15, hour, 30)));
       await page.goto("/");
       await expect(greeting(page)).toHaveAttribute("data-greeting", key);
-      await expect(shownText(page)).toHaveText(siteCopy.greeting[key]);
+      await expect(shownText(page)).toHaveText(greetingLine(key, false));
       await context.close();
     });
   }
+
+  // Only the afternoon knows the day, and it is the visitor's own: 16 October 2026 is a Friday, 17 a Saturday, 18 a Sunday.
+  for (const [at, key, line] of [
+    ["2026-10-16T17:30:00Z", "afternoon", "Nearly five?"],
+    ["2026-10-16T18:00:00Z", "evening", "Home yet?"],
+    ["2026-10-17T11:59:00Z", "morning", "Kettle’s on."],
+    ["2026-10-17T12:00:00Z", "afternoon", "Nowhere to be?"],
+    ["2026-10-17T14:00:00Z", "afternoon", "Nowhere to be?"],
+    ["2026-10-18T17:59:00Z", "afternoon", "Nowhere to be?"],
+    ["2026-10-18T18:00:00Z", "evening", "Home yet?"],
+    ["2026-10-17T23:00:00Z", "late", "Still up?"],
+  ] as const) {
+    test(`${at} on the visitor's clock says "${line}"`, async ({ browser }) => {
+      const context = await browser.newContext({ timezoneId: "Etc/GMT" });
+      const page = await context.newPage();
+      await page.clock.setFixedTime(new Date(at));
+      await page.goto("/");
+      await expect(greeting(page)).toHaveAttribute("data-greeting", key);
+      await expect(shownText(page)).toHaveText(line);
+      await context.close();
+    });
+  }
+
+  test("the day is the visitor's own, not London's", async ({ browser }) => {
+    // 12:00 on Saturday in Auckland is 16:00 on Friday in Los Angeles, and midnight in London.
+    const at = new Date("2026-10-16T23:00:00Z");
+    for (const [timezoneId, line] of [["Pacific/Auckland", "Nowhere to be?"], ["America/Los_Angeles", "Nearly five?"]] as const) {
+      const context = await browser.newContext({ timezoneId });
+      const page = await context.newPage();
+      await page.clock.setFixedTime(at);
+      await page.goto("/");
+      await expect(shownText(page), timezoneId).toHaveText(line);
+      await context.close();
+    }
+  });
 
   test("follows the visitor's time zone, not London's", async ({ browser }) => {
     const at = new Date("2026-10-15T20:00:00Z");
@@ -209,9 +245,10 @@ test.describe("The header greeting", () => {
     await page.goto("/");
     await expect(greeting(page)).toHaveAttribute("data-greeting", "hello");
     await expect(shownText(page)).toHaveText(siteCopy.greeting.hello);
-    // Hello has no scene yet, only the room for it.
+    // Hello has a terminal prompt with a cursor, and nothing of the day.
     await expect(page.locator(".qi-scene")).toBeVisible();
-    await expect(page.locator(".qi-scene > *")).toHaveCount(0);
+    await expect(page.locator(".qi-scene > *")).toHaveCount(2);
+    await expect(page.locator(".qi-scene__cursor")).toHaveCount(1);
   });
 
   test("the words are the same width before and after the greeting appears", async ({ browser }) => {
@@ -220,16 +257,19 @@ test.describe("The header greeting", () => {
     await without.route("**/*.js", (route) => route.abort());
     await without.goto("/");
     const before = await greeting(without).boundingBox();
-    const page = await context.newPage();
-    await page.clock.setFixedTime(new Date("2026-10-15T14:00:00Z"));
-    await page.goto("/");
-    await expect(greeting(page)).toHaveAttribute("data-greeting", "afternoon");
-    const after = await greeting(page).boundingBox();
-    expect(after!.width).toBeCloseTo(before!.width, 1);
-    expect(after!.height).toBeCloseTo(before!.height, 1);
-    // The shown text shares the reservation's cell, so it sits in the middle, not a row below.
-    const text = (await shownText(page).boundingBox())!;
-    expect(text.y + text.height / 2).toBeCloseTo(after!.y + after!.height / 2, 0);
+    // The longest line is the weekend afternoon's, so every line, on every day, takes the same room.
+    for (const [at, key] of [["2026-10-15T14:00:00Z", "afternoon"], ["2026-10-17T14:00:00Z", "afternoon"], ["2026-10-15T08:00:00Z", "morning"], ["2026-10-15T23:00:00Z", "late"]] as const) {
+      const page = await context.newPage();
+      await page.clock.setFixedTime(new Date(at));
+      await page.goto("/");
+      await expect(greeting(page)).toHaveAttribute("data-greeting", key);
+      const after = await greeting(page).boundingBox();
+      expect(after!.width, at).toBeCloseTo(before!.width, 1);
+      expect(after!.height, at).toBeCloseTo(before!.height, 1);
+      // The shown text shares the reservation's cell, so it sits in the middle, not a row below.
+      const text = (await shownText(page).boundingBox())!;
+      expect(text.y + text.height / 2, at).toBeCloseTo(after!.y + after!.height / 2, 0);
+    }
     await context.close();
   });
 
@@ -237,39 +277,78 @@ test.describe("The header greeting", () => {
     await page.goto("/");
     expect(await greeting(page).evaluate((element) => element.closest("[aria-live], [role=status], [role=alert], [role=log]") === null)).toBe(true);
     // The text the page holds is the one greeting; the width reservation is not in the document.
-    await expect(greeting(page)).toHaveText(/^(Hello|Good morning|Good afternoon|Good evening|Still up\?)$/);
+    await expect(greeting(page)).toHaveText(/^(Hello|Kettle’s on\.|Nearly five\?|Nowhere to be\?|Home yet\?|Still up\?)$/);
   });
 
-  // The scene for each time of day: morning and evening have a horizon, afternoon is high, late has the moon and three stars.
-  for (const [hour, key, parts] of [
-    [8, "morning", { sun: 1, horizon: 1, moon: 0, stars: 0 }],
-    [14, "afternoon", { sun: 1, horizon: 0, moon: 0, stars: 0 }],
-    [19, "evening", { sun: 1, horizon: 1, moon: 0, stars: 0 }],
-    [23, "late", { sun: 0, horizon: 0, moon: 1, stars: 3 }],
+  // The scene for each line: its own object, and none of another's.
+  const parts = ["ink", "cursor", "steam", "minute", "pool", "lit", "horizon", "moon", "star"] as const;
+  for (const [at, key, drawn] of [
+    ["2026-10-15T08:00:00Z", "morning", { ink: 2, steam: 1, horizon: 1 }],
+    ["2026-10-15T14:00:00Z", "afternoon", { ink: 3, minute: 1, lit: 1 }],
+    ["2026-10-17T14:00:00Z", "afternoon", { ink: 3, minute: 1, lit: 1 }],
+    ["2026-10-15T19:00:00Z", "evening", { ink: 2, pool: 1, lit: 1, horizon: 1 }],
+    ["2026-10-15T23:00:00Z", "late", { moon: 1, star: 3 }],
   ] as const) {
-    test(`the ${key} scene is drawn for ${String(hour).padStart(2, "0")}:00`, async ({ browser }) => {
+    test(`the ${key} scene is drawn for ${at}`, async ({ browser }) => {
       const context = await browser.newContext({ timezoneId: "Etc/GMT" });
       const page = await context.newPage();
-      await page.clock.setFixedTime(new Date(Date.UTC(2026, 9, 15, hour, 0)));
+      await page.clock.setFixedTime(new Date(at));
       await page.goto("/");
       await expect(greeting(page)).toHaveAttribute("data-greeting", key);
-      await expect(page.locator(".qi-scene__sun")).toHaveCount(parts.sun);
-      await expect(page.locator(".qi-scene__horizon")).toHaveCount(parts.horizon);
-      await expect(page.locator(".qi-scene__moon")).toHaveCount(parts.moon);
-      await expect(page.locator(".qi-scene__star")).toHaveCount(parts.stars);
+      for (const part of parts) await expect(page.locator(`.qi-scene__${part}`), part).toHaveCount((drawn as Record<string, number>)[part] ?? 0);
       await context.close();
     });
   }
 
-  test("the morning scene plays on load: the sun rises from the line, and rests again with reduced motion", async ({ browser }) => {
+  test("the amber is the lamp's bulb and pool and the clock's pivot, and the cursor is cobalt", async ({ browser }) => {
+    const context = await browser.newContext({ timezoneId: "Etc/GMT" });
+    const fillOf = (page: Page, part: string) => page.locator(`.qi-scene__${part}`).evaluate((element) => getComputedStyle(element).fill);
+    const sun = (page: Page) => page.evaluate(() => {
+      const probe = document.createElement("i");
+      probe.style.color = getComputedStyle(document.documentElement).getPropertyValue("--sun");
+      document.body.append(probe);
+      const colour = getComputedStyle(probe).color;
+      probe.remove();
+      return colour;
+    });
+    const evening = await context.newPage();
+    await evening.clock.setFixedTime(new Date("2026-10-15T19:00:00Z"));
+    await evening.goto("/");
+    await expect(greeting(evening)).toHaveAttribute("data-greeting", "evening");
+    expect(await fillOf(evening, "lit")).toBe(await sun(evening));
+    expect(await fillOf(evening, "pool")).toBe(await sun(evening));
+    const afternoon = await context.newPage();
+    await afternoon.clock.setFixedTime(new Date("2026-10-15T14:00:00Z"));
+    await afternoon.goto("/");
+    await expect(greeting(afternoon)).toHaveAttribute("data-greeting", "afternoon");
+    expect(await fillOf(afternoon, "lit")).toBe(await sun(afternoon));
+    const hello = await context.newPage();
+    await hello.route("**/*.js", (route) => route.abort());
+    await hello.goto("/");
+    const cursor = await hello.locator(".qi-scene__cursor").evaluate((element) => getComputedStyle(element).stroke);
+    const cobalt = await hello.evaluate(() => {
+      const probe = document.createElement("i");
+      probe.style.color = getComputedStyle(document.documentElement).getPropertyValue("--stretch-cobalt");
+      document.body.append(probe);
+      const colour = getComputedStyle(probe).color;
+      probe.remove();
+      return colour;
+    });
+    expect(cursor).toBe(cobalt);
+    await context.close();
+  });
+
+  test("the morning scene plays on load: the steam curls, and rests again with reduced motion", async ({ browser }) => {
     const context = await browser.newContext({ timezoneId: "Etc/GMT", reducedMotion: "no-preference" });
     const page = await context.newPage();
     await page.clock.setFixedTime(new Date("2026-10-15T08:00:00Z"));
     await page.goto("/");
     await expect(greeting(page)).toHaveAttribute("data-greeting", "morning");
-    // The sun starts 7px down behind the line and ends 1px up.
-    await expect.poll(() => sunShift(page)).toBeCloseTo(-1, 0);
-    await expect(greeting(page)).not.toHaveAttribute("data-playing", /.*/);
+    await expect(greeting(page)).toHaveAttribute("data-playing", "true");
+    expect(await playing(page, "steam")).toBe("qi-steam");
+    // When the play is over the kettle is just drawn, and nothing is left running.
+    await expect(greeting(page)).not.toHaveAttribute("data-playing", /.*/, { timeout: 8000 });
+    expect(await playing(page, "steam")).toBe("none");
     await context.close();
 
     const calm = await browser.newContext({ timezoneId: "Etc/GMT", reducedMotion: "reduce" });
@@ -278,25 +357,40 @@ test.describe("The header greeting", () => {
     await resting.goto("/");
     await expect(resting.locator("[data-greeting]")).toHaveAttribute("data-playing", "true");
     // It was told to play, and it stayed where it was.
-    expect(await sunShift(resting)).toBe(7);
+    expect(await playing(resting, "steam")).toBe("none");
     await resting.locator("[data-greeting]").hover();
-    expect(await sunShift(resting)).toBe(7);
+    expect(await playing(resting, "steam")).toBe("none");
     await calm.close();
   });
 
-  test("hover replays the scene", async ({ browser }) => {
+  test("the clock's minute hand ticks up on load, and the lamp's pool fades in again on hover", async ({ browser }) => {
     const context = await browser.newContext({ timezoneId: "Etc/GMT", reducedMotion: "no-preference" });
-    const page = await context.newPage();
-    await page.clock.setFixedTime(new Date("2026-10-15T19:00:00Z"));
-    await page.goto("/");
-    await expect(greeting(page)).toHaveAttribute("data-greeting", "evening");
-    // Wait out the load play, where the sun has set behind the line, then back to rest.
-    await expect(greeting(page)).toHaveAttribute("data-playing", "true");
-    await expect(greeting(page)).not.toHaveAttribute("data-playing", /.*/, { timeout: 8000 });
-    await expect.poll(() => sunShift(page)).toBeCloseTo(0, 0);
-    await greeting(page).hover();
-    await expect.poll(() => sunShift(page)).toBeCloseTo(9, 0);
+    const clock = await context.newPage();
+    await clock.clock.setFixedTime(new Date("2026-10-15T14:00:00Z"));
+    await clock.goto("/");
+    await expect(greeting(clock)).toHaveAttribute("data-playing", "true");
+    expect(await playing(clock, "minute")).toBe("qi-minute");
+
+    const lamp = await context.newPage();
+    await lamp.clock.setFixedTime(new Date("2026-10-15T19:00:00Z"));
+    await lamp.goto("/");
+    await expect(greeting(lamp)).toHaveAttribute("data-greeting", "evening");
+    await expect(greeting(lamp)).not.toHaveAttribute("data-playing", /.*/, { timeout: 8000 });
+    expect(await playing(lamp, "pool")).toBe("none");
+    await greeting(lamp).hover();
+    expect(await playing(lamp, "pool")).toBe("qi-pool");
     await context.close();
+  });
+
+  test("Hello's cursor blinks, and holds still with reduced motion", async ({ browser }) => {
+    for (const [reducedMotion, name] of [["no-preference", "qi-cursor"], ["reduce", "none"]] as const) {
+      const context = await browser.newContext({ reducedMotion });
+      const page = await context.newPage();
+      await page.route("**/*.js", (route) => route.abort());
+      await page.goto("/");
+      expect(await playing(page, "cursor"), reducedMotion).toBe(name);
+      await context.close();
+    }
   });
 
   test("on a wide screen hover adds London's time without widening anything", async ({ browser }) => {

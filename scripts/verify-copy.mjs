@@ -22,7 +22,7 @@ import {
 } from "../src/content/stretch/role-story.ts";
 import { currentPassStatus, passLinkLabel, passProblems, passRecords } from "../src/content/stretch/staff-pass.ts";
 import { howIWork } from "../src/content/stretch/how-i-work.ts";
-import { greetingKey } from "../src/content/stretch/greeting.ts";
+import { greetingKey, greetingLine } from "../src/content/stretch/greeting.ts";
 import { offTheClock } from "../src/content/stretch/off-the-clock.ts";
 import { opening } from "../src/content/stretch/opening.ts";
 import { notFound, sayHello, siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy.ts";
@@ -95,13 +95,16 @@ for (const line of [
 ]) assert.ok(raw.includes(line), `The 404 copy lacks the line "${line}"`);
 
 // The header greeting follows the visitor's own hour, with the approved edges.
-const greetingAt = (hour) => siteCopy.greeting[greetingKey(hour)];
+const greetingAt = (hour, weekend = false) => greetingLine(greetingKey(hour), weekend);
 for (const [hour, line] of [
-  [0, "Still up?"], [4, "Still up?"], [5, "Good morning"], [11, "Good morning"], [12, "Good afternoon"],
-  [17, "Good afternoon"], [18, "Good evening"], [21, "Good evening"], [22, "Still up?"], [23, "Still up?"],
+  [0, "Still up?"], [4, "Still up?"], [5, "Kettle’s on."], [11, "Kettle’s on."], [12, "Nearly five?"],
+  [17, "Nearly five?"], [18, "Home yet?"], [21, "Home yet?"], [22, "Still up?"], [23, "Still up?"],
 ]) {
   assert.equal(greetingAt(hour), line, `The greeting at ${hour}:00 to ${hour}:59`);
 }
+// The afternoon alone changes with the day.
+for (const hour of [12, 17]) assert.equal(greetingAt(hour, true), "Nowhere to be?", `The weekend greeting at ${hour}:00`);
+for (const hour of [0, 5, 11, 18, 21, 22]) assert.equal(greetingAt(hour, true), greetingAt(hour), `The greeting at ${hour}:00 is the same every day`);
 assert.equal(siteCopy.greeting.hello, "Hello");
 for (let hour = 0; hour < 24; hour += 1) assert.notEqual(greetingKey(hour), "hello", "Only the browser's clock picks a greeting; hello is the line before it");
 

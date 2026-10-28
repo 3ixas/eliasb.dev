@@ -101,8 +101,8 @@ test("a remembered choice beats the device setting, in both directions", async (
   }
 });
 
-// DESIGN.md: --sun is the greeting's sun and nothing else, an illustration colour and never an interface colour.
-test("--sun is read only by the greeting's sun and rays", () => {
+// DESIGN.md: --sun is the greeting's amber and nothing else, an illustration colour and never an interface colour.
+test("--sun is read only by the lamp's bulb and pool and the clock's pivot", () => {
   const readers: string[] = [];
   for (const file of readdirSync("src/app").filter((name) => name.endsWith(".css"))) {
     let selector = "";
@@ -111,5 +111,5 @@ test("--sun is read only by the greeting's sun and rays", () => {
       if (line.includes("var(--sun)")) readers.push(`${file} ${selector}`);
     }
   }
-  expect(readers.sort()).toEqual(["quiet-header.css .qi-scene__rays", "quiet-header.css .qi-scene__sun"]);
+  expect(readers.sort()).toEqual(["quiet-header.css .qi-scene__lit", "quiet-header.css .qi-scene__pool"]);
 });
