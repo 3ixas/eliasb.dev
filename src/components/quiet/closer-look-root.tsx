@@ -57,6 +57,8 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
   /** The tapped trigger and where it sat, so it can be put back after a look above it closes. */
   const held = useRef<{ trigger: HTMLElement; top: number } | null>(null);
   const holding = useRef(0);
+  /** The pending removal of each folding look, by slot: a look that is reopened or closed again takes its earlier removal with it. */
+  const removals = useRef(new Map<HTMLElement, number>());
 
   const cancelHide = () => window.clearTimeout(hideTimer.current);
   const announce = () => window.dispatchEvent(new CustomEvent(SHOWING, { detail: root.current }));
@@ -66,12 +68,19 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     if (before === next) return;
     now.current = next;
     setActive(next);
-    if (next?.source === "tap") setLeaving((all) => all.filter(({ id }) => id !== next.id));
+    if (next?.source === "tap") {
+      window.clearTimeout(removals.current.get(next.slot));
+      setLeaving((all) => all.filter(({ id }) => id !== next.id));
+    }
     if (before?.source !== "tap" || (next?.source === "tap" && next.id === before.id)) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const gone = { id: before.id, slot: before.slot };
     setLeaving((all) => [...all.filter(({ id }) => id !== gone.id), gone]);
-    window.setTimeout(() => setLeaving((all) => all.filter((one) => one.slot !== gone.slot)), CLOSE_MS + 40);
+    window.clearTimeout(removals.current.get(gone.slot));
+    removals.current.set(
+      gone.slot,
+      window.setTimeout(() => setLeaving((all) => all.filter((one) => one.slot !== gone.slot)), CLOSE_MS + 40),
+    );
   };
   const hideSoon = () => {
     cancelHide();

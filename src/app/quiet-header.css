@@ -348,20 +348,6 @@ a.qi-header__name {
     margin: 0;
   }
 
-  .qi-greeting__more {
-    position: absolute;
-    left: 100%;
-    display: block;
-    padding-left: 4px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-  }
-
-  .qi-greeting:is(:hover, :focus-visible) .qi-greeting__more {
-    opacity: 1;
-  }
-
   .qi-header__links {
     display: block;
     margin-left: auto;
@@ -371,12 +357,6 @@ a.qi-header__name {
   /* A page with no links (the 404) has the Eclipse right after the greeting, so the Eclipse takes the right edge, and London's time has the room between. */
   .qi-greeting + .stretch-eclipse {
     margin-left: auto;
-  }
-
-  /* London's time is said where the links would be: they step aside while it is, so the two never overprint. */
-  .qi-greeting:is(:hover, :focus-visible) ~ .qi-header__links {
-    opacity: 0;
-    pointer-events: none;
   }
 
   .qi-header__links ul {
@@ -409,6 +389,27 @@ a.qi-header__name {
 }
 
 @media (hover: hover) and (min-width: 900px) {
+  /* London's time hangs beyond the words and says itself on hover or focus; elsewhere the greeting is a button (above). */
+  .qi-greeting__more {
+    position: absolute;
+    left: 100%;
+    display: block;
+    padding-left: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .qi-greeting:is(:hover, :focus-visible) .qi-greeting__more {
+    opacity: 1;
+  }
+
+  /* London's time is said where the links would be: they step aside while it is, so the two never overprint. */
+  .qi-greeting:is(:hover, :focus-visible) ~ .qi-header__links {
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .qi-header__links a:hover {
     color: var(--stretch-ink);
   }
