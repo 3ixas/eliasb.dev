@@ -483,7 +483,7 @@ test.describe("Off the clock: reduced motion", () => {
   // Every closer look fades in over 0.2 s and nothing arrives with motion (docs/design/DESIGN.md, "Reduced motion").
   for (const [name, id, moving] of [
     ["training-saturday", "training", ".qi-week__days li"],
-    ["book", "book", ".qi-pluck"],
+    ["book", "book", ".qi-pluck, .qi-pluck__cover, .qi-book .qi-look__name, .qi-book .qi-look__by"],
     ["film", "film", ".qi-ticket, .qi-stars span, .qi-ticket__stub"],
     ["history-week", "history", ".qi-clipping, .qi-clipping__stamp"],
   ] as const) {

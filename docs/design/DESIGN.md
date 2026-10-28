@@ -94,7 +94,7 @@ A **closer look** is a row's detail: on desktop it appears in the margin, and on
 | A Where I'm headed strand | "So far" with its source and proof | Its thread drawing down from the source |
 | Threshold's PRD | The quote | Typing itself, with a caret. Typing is time-based and smooth: characters appear on the animation frame at a steady rate (about 45 a second), never one timer per character |
 | Today's training | The run photo and the week, today in cobalt | The days filling in one by one, today last |
-| The book | The cover pulled from a row of spines, then the title, author and a "Live from Goodreads" line | Lifting off the shelf and turning to face you |
+| The book | The cover pulled from a row of spines, then the title, author and a "Live from Goodreads" line | It starts as a spine in line, is pulled up, widens as its neighbours part, and turns to face you; then the title and author arrive in turn (about 1.4 s) |
 | The film | A ticket with the poster, title, date and stars | Arriving, the stars filling in, the stub tearing |
 | This week in history | A newspaper clipping with the image, date, fact and credit | Unfolding, then being stamped "This week in history" |
 | Now making | The repository and its description (the row says only "Now making" and "Live from GitHub") | The description typing itself |
