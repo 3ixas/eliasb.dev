@@ -59,6 +59,8 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
   /** The tapped trigger and where it sat, so it can be put back after a look above it closes. */
   const held = useRef<{ trigger: HTMLElement; top: number } | null>(null);
   const holding = useRef(0);
+  /** Ends the hold in progress (its frame, its listeners, the held row); a new hold, and unmounting, call it. */
+  const stopHold = useRef<(() => void) | null>(null);
   /** The pending removal of each folding look, by slot: a look that is reopened or closed again takes its earlier removal with it. */
   const removals = useRef(new Map<HTMLElement, number>());
 
@@ -106,8 +108,8 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
 
   /** Keeps the tapped trigger where it was on screen while the looks around it open and fold, frame by frame, until the user takes over the scroll. (Browsers that anchor scroll already do most of this; setting `overflow-anchor: none` to stop them makes WebKit throw the scroll position back, so it is left alone.) */
   const hold = (trigger: HTMLElement) => {
+    stopHold.current?.();
     held.current = { trigger, top: trigger.getBoundingClientRect().top };
-    window.cancelAnimationFrame(holding.current);
     const started = performance.now();
     const until = started + HOLD_MS;
     let taken = false;
@@ -118,18 +120,22 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     window.addEventListener("wheel", take, { once: true, passive: true });
     const correct = () => {
       const place = held.current;
-      if (!place) return;
+      // A trigger that has left the page (a link was followed) has no position to hold.
+      if (!place || !place.trigger.isConnected) return;
       const shift = place.trigger.getBoundingClientRect().top - place.top;
       if (Math.abs(shift) >= 0.5) window.scrollBy({ top: shift, behavior: "instant" });
     };
     const release = () => {
+      window.cancelAnimationFrame(holding.current);
       window.removeEventListener("touchstart", take);
       window.removeEventListener("wheel", take);
       held.current = null;
+      stopHold.current = null;
     };
+    stopHold.current = release;
     const step = () => {
       // The user's own scroll moves the trigger too, so once they have taken over nothing is measured or corrected.
-      if (taken) return release();
+      if (taken || !held.current?.trigger.isConnected) return release();
       correct();
       // The hold lasts until every folding look has been unmounted (its layout effect below corrects in the same commit), however
       // slowly the page runs, and for at least as long as a look takes to open.
@@ -234,9 +240,12 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     // The two presentations never mix: crossing the breakpoint either way closes whatever is showing.
     const onChange = () => change(null);
     wide.addEventListener("change", onChange);
+    const timers = removals.current;
     return () => {
       wide.removeEventListener("change", onChange);
       cancelHide();
+      stopHold.current?.();
+      timers.forEach((timer) => window.clearTimeout(timer));
     };
   }, []);
 

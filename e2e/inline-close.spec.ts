@@ -65,18 +65,32 @@ test.describe("Inline closer looks close as smoothly as they open", () => {
       await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 3000 }).toBeGreaterThan(before + 120);
     });
 
+    test("following the employer's link right after opening its look leaves the next page where it loads", async ({ page }) => {
+      const object = page.locator('#work button[data-look-tap="joveen"]');
+      await object.scrollIntoViewIfNeeded();
+      await object.click();
+      await page.locator('#work a.qi-row[href="/work/joveen"]').click();
+      await expect(page).toHaveURL(/\/work\/joveen$/);
+      // The hold's frame loop is gone with the controller: nothing scrolls the new page afterwards.
+      await page.waitForTimeout(700);
+      expect(await page.evaluate(() => window.scrollY)).toBeLessThan(40);
+    });
+
     test("closing again while it folds starts a new fold that the first one's timer cannot cut short", async ({ page }) => {
+      await page.clock.install();
       await tap(page, row(page));
       await expect(open(page)).toBeVisible();
-      // Close, reopen at once, then close again 120 ms after the first close: the first fold's removal is due at about 340 ms, the second's at 460.
-      await row(page).evaluate(async (element: HTMLElement) => {
+      // On a clock the test drives: close and reopen at once, then close again 120 ms later. The first fold's removal is due 340 ms
+      // after the first close and the second's 120 ms after that, so at 350 ms only the second fold is still going.
+      await row(page).evaluate((element: HTMLElement) => {
         element.click();
-        element.click();
-        await new Promise((resolve) => setTimeout(resolve, 120));
         element.click();
       });
-      await page.waitForTimeout(280);
-      await expect(open(page)).toHaveAttribute("data-leaving", "", { timeout: 100 });
+      await page.clock.runFor(120);
+      await row(page).evaluate((element: HTMLElement) => element.click());
+      await page.clock.runFor(230);
+      await expect(open(page)).toHaveAttribute("data-leaving", "");
+      await page.clock.runFor(200);
       await expect(open(page)).toHaveCount(0);
     });
   });
