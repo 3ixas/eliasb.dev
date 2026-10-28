@@ -7,7 +7,8 @@ import { hostLabel } from "@/components/site/host-label";
 /**
  * A row's closer look: its id (the key of the controller's `looks`) and what it says beyond the row, as the row's
  * accessible description. A row with `cycle` (what each step of the cycle says, for the live region) steps through
- * its look's pages when clicked instead of opening it; on phones its object button opens the look.
+ * its look's pages when clicked instead of opening it; on phones the row opens and closes its look like any other,
+ * and a tap on the look steps it on.
  */
 export type RowLook = { id: string; description: string; cycle?: string[] };
 
@@ -30,6 +31,7 @@ function nameOf(title: ReactNode) {
  * and sits beside the row so it is not part of a link's name. The markup is the same on every screen and CSS
  * decides which presentation shows: on phones a link row's object gets its own button beside the link (a button
  * inside a link is invalid), and the empty slot under the row is where the controller opens the inline closer look.
+ * A row that leaves the site opens its look when tapped on a phone, and the look is the link (`data-look-href`).
  */
 export function Row({ object, title, line, meta, href, look, card, after, style, attrs }: { object: ReactNode; title: ReactNode; line: ReactNode; meta?: string; href?: string; look?: RowLook; card?: ReactNode; after?: ReactNode; style?: CSSProperties; attrs?: Record<`data-${string}`, string> }) {
   const external = href?.startsWith("http") ?? false;
@@ -61,7 +63,7 @@ export function Row({ object, title, line, meta, href, look, card, after, style,
     <li className="qi-list__item" data-card={card ? "" : undefined} style={style} {...attrs}>
       <div className="qi-row-box">
         {external ? (
-          <a className="qi-row" href={href} target="_blank" rel="noreferrer" {...props}>
+          <a className="qi-row" href={href} target="_blank" rel="noreferrer" data-look-tap={look?.id} {...props}>
             {content}
           </a>
         ) : href ? (
@@ -86,7 +88,7 @@ export function Row({ object, title, line, meta, href, look, card, after, style,
           <p id={descriptionId} hidden>
             {look.description}
           </p>
-          <div className="qi-inline" data-look-slot={look.id} aria-hidden="true" />
+          <div className="qi-inline" data-look-slot={look.id} data-look-href={external ? href : undefined} data-look-cycle={look.cycle?.length} aria-hidden="true" />
         </>
       )}
     </li>

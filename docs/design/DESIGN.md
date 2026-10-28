@@ -65,8 +65,9 @@ An object is drawn to be read at 44 px. It is never a whole page shrunk down.
 | Thread | Where I'm headed | A 4 px line in the colour of the strand's source |
 | Number | How I work | The habit's number, ringed by the pen (below) |
 | Sheet | Threshold's PRD; Say hello and the 404 | A small page of ruled lines with a folded corner |
-| Badge | Say hello | A 36 px tile with the destination's own letters in mono ("GH", "in"), for the GitHub and LinkedIn rows. Plain, so no logo is redrawn |
-| Dot | Now making | The cobalt "now" dot |
+| Contribution tile | Say hello (GitHub) | A 38 px card holding a five by five contribution calendar in GitHub's own levels; the pattern is authored, not data. No logo is drawn |
+| Name card | Say hello (LinkedIn) | A 40 by 28 px business card: a cobalt portrait dot and two printed lines. No logo is drawn |
+| Brackets | Now making | Code brackets in ink with a cobalt slash; the live dot is left to "Live from GitHub" |
 | Empty slot | The 404's missing row | A dashed 44 px outline with nothing in it |
 
 ## Finish
@@ -96,13 +97,12 @@ A **closer look** is a row's detail: on desktop it appears in the margin, and on
 | The book | The cover pulled from a row of spines, then the title, author and a "Live from Goodreads" line | Lifting off the shelf and turning to face you |
 | The film | A ticket with the poster, title, date and stars | Arriving, the stars filling in, the stub tearing |
 | This week in history | A newspaper clipping with the image, date, fact and credit | Unfolding, then being stamped "This week in history" |
-| Now making | The repository and its description | The description typing itself |
+| Now making | The repository and its description (the row says only "Now making" and "Live from GitHub") | The description typing itself |
 | Your face (header) | The full white-tux portrait, "Based in London" | Sliding in |
 | "pricing and risk engines" | Illustrative simulated paths, one in BNP green, with the Role story's line about simulation-based calculations | The paths fanning out |
 | "CPU and GPU" | A CPU with a few cores taking turns and a GPU with many lighting at once, with the line about running the same tests on both | The cores lighting |
 | "digitisation competition" | Its award pin, its Résumé line, and two bars: 30–40 min and under 5 | The pin popping on and the bar shrinking |
 | "Take Ownership award" | The certificate | Sliding up like a sheet of paper |
-| Résumé (Say hello) | The one-page sheet | Sliding up |
 | "joveen.com" (Joveen's Role story) | The site as it is today, on Shopify, with the caption saying it isn't Elias's UI | Sliding in and settling |
 
 On a long-form page, the closer looks are the real things its prose names in passing (rule 7). The Role stories' and case studies' own figures are inline, not closer looks.
@@ -111,7 +111,7 @@ On a long-form page, the closer looks are the real things its prose names in pas
 
 **BNP Paribas** in the opening line is the exception: it reacts where it is. It turns BNP green, and a small pass drops below it on its strap. On phones, tapping it plays that reaction only; the BNP Paribas row in Work holds its closer look.
 
-**The history row cycles.** Clicking it, or pressing Enter, swaps in the week's next oddity in place: the clipping restamps and "1 of 3" moves on. Nothing opens or closes. The change is announced politely. On phones, tapping the row cycles and tapping its calendar tile opens the clipping; an open clipping follows the cycle.
+**The history row cycles.** Clicking it, or pressing Enter, swaps in the week's next oddity in place: the clipping restamps and "1 of 3" moves on. Nothing opens or closes. The change is announced politely. On phones the row opens and closes the clipping like any other row, and a tap on the clipping itself swaps in the next oddity; from the keyboard, Right or Down arrow on the open row does the same (it says so in `aria-keyshortcuts`).
 
 ### The margin (desktop)
 
@@ -125,9 +125,10 @@ On a long-form page, the closer looks are the real things its prose names in pas
 Decided in [Closer looks on phones: the dock, or inline under the row](https://github.com/3ixas/eliasb.dev/issues/302), with both options built on the prototypes at phone size. It replaces the dock and the reading line.
 
 - **When it's used**: below 1180 px, or without hover.
-- **Only when tapped.** Nothing appears as the page scrolls. A row's closer look opens when its 44 px object is tapped; a plain row's or a dotted word's when it is tapped anywhere. Tapping the rest of a link row opens its page in one tap.
+- **Only when tapped.** Nothing appears as the page scrolls. A plain row's, a cycling row's, a row that leaves the site's or a dotted word's closer look opens when it is tapped anywhere; for a row that links to another page of this site (Work, Things I make, Résumé), only its 44 px object opens the look, and tapping the rest follows the link in one tap.
+- **A row that leaves the site opens its look first, and the look is the link.** The book, the film and Now making open their look when the row is tapped; tapping the look opens the book on Goodreads, the film on Letterboxd or the repository on GitHub, in a new tab. Pressing Enter on the row's link still follows it.
 - **Where it opens**: under the tapped row, starting on the row's text edge, or under the paragraph that holds the tapped word. It pushes the text below it down. It is the full closer look, as the margin shows it, at up to 300 px wide; there is no compact form.
-- **Closing**: tapping the same object or word again closes it, and opening another one closes the first, so only one is ever open. Tapping elsewhere does nothing. When a closer look above the tapped row closes, the tapped row stays where it was on screen.
+- **Closing**: tapping the same row, object or word again closes it, and so does tapping the look itself (a look that is a link follows its link instead, and a cycling look steps on). Opening another one closes the first, so only one is ever open. Both opening and closing animate: a look folds back the way it opened, at the same 0.3 s, fading as it goes; with reduced motion it just goes. Tapping elsewhere does nothing. When a closer look above the tapped row closes, the tapped row stays where it was on screen.
 - **Nothing extra inside**: no hint and no link. The row is the link.
 - **Reactions**: a row's object plays its reaction when it is tapped, never as it scrolls into view.
 - **Featured work**: the three featured projects become swipeable cards (82% wide, snapping to the gutter) with their screenshots at a readable size. Tapping a card opens its page; it has no closer look, because the card already shows the work. The other projects stay rows. Markup is one list that changes shape, not two.
@@ -137,7 +138,7 @@ Decided in [Closer looks on phones: the dock, or inline under the row](https://g
 | Where | Reaction |
 |---|---|
 | "products of my own." | It draws its cobalt underline once on arrival. On hover, the letters lift in a short wave and the underline scribbles out and back |
-| Greeting | A small scene for the visitor's own time of day: morning (the sun comes up), afternoon (the rays turn), evening (the sun sets), late (the moon rocks and the stars come out). Hover or focus plays it and adds "it's HH:MM here in London". Phones play it once on arrival, without the extra words |
+| Greeting | A small scene for the visitor's own time of day: morning (the sun comes up), afternoon (the rays turn), evening (the sun sets), late (the moon rocks and the stars come out). Hover or focus plays it and adds "it's HH:MM here in London". On a phone it plays once on arrival, and tapping the greeting plays it again and says London's time beneath, on its own line; tapping it again hides it |
 | The Eclipse (theme) | The icon turns over when pressed. The page crossfades (see Motion) |
 | Rows' objects | Projects lift and tilt 3°, Flowtime's icon counts seconds, passes swing, covers open on their spine, calendar tiles turn over |
 | How I work's pen | Rings around the numbers, arrows between habits, and underlines under each proof's strongest phrase draw as they scroll up the screen and un-draw on the way back (CSS scroll-driven animations; drawn when unsupported) |
@@ -247,7 +248,7 @@ Every text pair passes WCAG 2.2 AA; `e2e/stretch-tokens.spec.ts` measures them o
 
 ## Colour rules
 
-- **Cobalt** marks "products of my own", today, now (the live dots, Now making), the way to say hello, focus and a hovered row's arrow. **Pass pins** take their own enamel colours, inside the pass. On the GitHub year it is a ring around today, never a fill, so the greens stay true. Elias's name is no longer cobalt: the opening line leads.
+- **Cobalt** marks "products of my own", today, now (the live dots, and the slash in Now making's brackets), the way to say hello, focus and a hovered row's arrow. **Pass pins** take their own enamel colours, inside the pass. On the GitHub year it is a ring around today, never a fill, so the greens stay true. Elias's name is no longer cobalt: the opening line leads.
 - **Employer and Project colours** appear only inside objects, figures and closer looks (and on BNP Paribas when hovered), on every page. A Role story's pass and a case study's screenshots carry them; the page around them stays neutral, with no coloured opening band. A page's share card keeps its colour.
 - **GitHub's greens** appear only on the GitHub year.
 - **Colour never carries meaning alone.** A level of the GitHub year has a count on hover and a text alternative; today is marked by a ring as well as colour.

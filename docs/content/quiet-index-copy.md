@@ -96,7 +96,7 @@ Facts come only from the Role stories, `src/content/resume.ts` and the project c
 | History row line | {3} things that happened this week, some stranger than others. | new: says it's weekly and meant to be fun, using only live values |
 | History closer look | The clipping stamped **This week in history**, then {date}, {fact}, the image credit, and **{1} of {3}** | changed: "{n} more oddities this week ↓" becomes a count, because clicking the row now cycles them in place |
 | History fallback | From the archive | kept |
-| Now making row | {eliasb.dev} · Now making · {GitHub description} | kept |
+| Now making row | {eliasb.dev} · Now making · Live from GitHub (the description is in the closer look) | changed: the description is said once, in the look |
 
 ## Say hello
 
@@ -105,7 +105,6 @@ Facts come only from the Role stories, `src/content/resume.ts` and the project c
 | Heading | Say hello, with no line after it: the email and its Copy button are the line | changed: none of 21 experienced engineers' sites asks the reader a question (#283) |
 | Email | {eliasthebennett@gmail.com} · Copy → Copied | new (the copy button) |
 | Links | Résumé → · GitHub ↗ · LinkedIn ↗ | kept |
-| Résumé closer look | One page, with a PDF to download. | changed: shorter than the sketch's line |
 
 ## Retired with the old homepage
 

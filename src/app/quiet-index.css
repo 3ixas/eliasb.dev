@@ -785,13 +785,37 @@
 }
 
 .qi-inline:has(> .qi-inline__in) {
-  animation: qi-open 0.34s var(--out) both;
+  animation: qi-open 0.3s var(--out) both;
+}
+
+/* A closed look folds back the way it opened, at the same pace (CLOSE_MS in closer-look-root.tsx), fading as it goes. */
+.qi-inline:has(> .qi-inline__in[data-leaving]) {
+  animation: qi-close 0.3s var(--out) both;
+}
+
+.qi-inline__in[data-leaving] .qi-look {
+  opacity: 0;
+  transition: opacity 0.2s linear;
 }
 
 @keyframes qi-open {
   from {
     grid-template-rows: 0fr;
   }
+}
+
+@keyframes qi-close {
+  to {
+    grid-template-rows: 0fr;
+  }
+}
+
+/* A look that is a link, for a row that leaves the site. */
+.qi-look-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .qi-inline__in {
@@ -818,8 +842,14 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  .qi-list__item:has(.qi-inline__in) .qi-row {
+  .qi-list__item:has(.qi-inline__in:not([data-leaving])) .qi-row {
     background: var(--stretch-card);
+  }
+
+  /* An open look is closed by tapping it, so it says so to a thumb as a row does. */
+  .qi-inline .qi-look {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
@@ -1055,15 +1085,15 @@
 
 /* On touch there is no hover: a row's object plays its reaction when the row is tapped open, never as it scrolls into view. */
 @media (prefers-reduced-motion: no-preference) {
-  .qi-list__item:has(.qi-inline__in) .qi-mini {
+  .qi-list__item:has(.qi-inline__in:not([data-leaving])) .qi-mini {
     animation: qi-swing 0.9s var(--out);
   }
 
-  .qi-list__item:has(.qi-inline__in) .qi-tile {
+  .qi-list__item:has(.qi-inline__in:not([data-leaving])) .qi-tile {
     animation: qi-turn 0.6s var(--spring);
   }
 
-  .qi-list__item:has(.qi-inline__in) .qi-crop {
+  .qi-list__item:has(.qi-inline__in:not([data-leaving])) .qi-crop {
     transform: translateY(-2px) rotate(3deg);
     transition: transform 0.4s var(--spring);
   }
@@ -1327,14 +1357,19 @@
   margin-right: 6px;
 }
 
-/* Now making's object: the cobalt "now" dot, centred in its slot. */
-.qi-dot {
+/* Now making's object: code brackets in ink with a cobalt slash. The live dot belongs to "Live from GitHub". */
+.qi-brackets {
   display: block;
-  width: 12px;
-  height: 12px;
-  margin: 16px;
-  border-radius: 50%;
-  background: var(--stretch-cobalt);
+  width: 44px;
+  height: 44px;
+}
+
+.qi-brackets__angle {
+  stroke: var(--stretch-ink);
+}
+
+.qi-brackets__slash {
+  stroke: var(--stretch-cobalt);
 }
 
 .qi-look__name {
@@ -1476,19 +1511,32 @@
   }
 }
 
-/* The film: a cream ticket with the poster and the stars, and a stub that tears off. */
+/*
+ * The film: a cream ticket with the poster and the stars, and a stub that tears off. The ticket is two pieces of paper
+ * (the body behind the text, and the stub) cut along one zigzag, so they sit together as one ticket until the stub is
+ * ripped away and the body is left with its torn edge.
+ */
 .qi-ticket {
   position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: 72px minmax(0, 1fr);
   gap: 14px;
   align-items: center;
   padding: 12px 76px 12px 12px;
-  border-radius: 10px;
-  background: linear-gradient(#f8f4ea, #efe9da);
   color: #1c1a16;
   filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.25)) drop-shadow(0 10px 14px rgb(0 0 0 / 0.3));
   animation: qi-ticket 0.7s var(--spring) both;
+}
+
+.qi-ticket::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0 64px 0 0;
+  border-radius: 10px 0 0 10px;
+  background: linear-gradient(#f8f4ea, #efe9da);
+  clip-path: polygon(0 0, 100% 0%, calc(100% - 4px) 6.25%, 100% 12.5%, calc(100% - 4px) 18.75%, 100% 25%, calc(100% - 4px) 31.25%, 100% 37.5%, calc(100% - 4px) 43.75%, 100% 50%, calc(100% - 4px) 56.25%, 100% 62.5%, calc(100% - 4px) 68.75%, 100% 75%, calc(100% - 4px) 81.25%, 100% 87.5%, calc(100% - 4px) 93.75%, 100% 100%, 0 100%);
 }
 
 .qi-ticket__poster {
@@ -1516,18 +1564,24 @@
 
 .qi-ticket__stub {
   position: absolute;
+  z-index: -1;
   inset: 0 0 0 auto;
   display: grid;
-  width: 64px;
+  width: 68px;
+  margin-right: 0;
+  padding-left: 4px;
   place-items: center;
-  border-left: 2px dotted rgb(28 26 22 / 0.3);
+  border-radius: 0 10px 10px 0;
+  background: linear-gradient(#f8f4ea, #efe9da);
+  clip-path: polygon(4px 0%, 0 6.25%, 4px 12.5%, 0 18.75%, 4px 25%, 0 31.25%, 4px 37.5%, 0 43.75%, 4px 50%, 0 56.25%, 4px 62.5%, 0 68.75%, 4px 75%, 0 81.25%, 4px 87.5%, 0 93.75%, 4px 100%, 100% 100%, 100% 0);
   color: #5f594e;
   font-size: var(--text-label);
   letter-spacing: 0.08em;
   line-height: 1.1;
   text-transform: uppercase;
   writing-mode: vertical-rl;
-  animation: qi-tear 0.6s 1s var(--out) forwards;
+  transform-origin: 100% 100%;
+  animation: qi-tear 0.7s 1s cubic-bezier(0.5, 0, 0.9, 0.6) forwards;
 }
 
 @keyframes qi-ticket {
@@ -1537,9 +1591,15 @@
   }
 }
 
+/* The rip: a short tug against the paper, then the stub lets go, swings down off its bottom corner and fades. */
 @keyframes qi-tear {
+  20% {
+    transform: translate(2px, -1px) rotate(-2.5deg);
+  }
+
   to {
-    transform: translate(20px, 12px) rotate(12deg);
+    transform: translate(10px, 22px) rotate(16deg);
+    opacity: 0;
   }
 }
 
@@ -1847,61 +1907,83 @@ button.stretch-gh__day[data-selected] {
 }
 
 /* GitHub's and LinkedIn's object: its own letters in a quiet tile. */
-.qi-badge {
+/* GitHub's object: a five by five contribution calendar on a card, in GitHub's own levels. */
+.qi-contrib {
   display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--stretch-rule);
-  border-radius: 10px;
-  color: var(--stretch-ink);
-  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
-  font-size: var(--text-label);
-  font-weight: 700;
-  line-height: 1;
-}
-
-/* The Résumé's closer look: a sheet of paper with the name and role over ruled lines, sliding up. */
-.qi-resume-look {
-  margin: 0;
-  animation: qi-slide-up 0.55s var(--out) both;
-}
-
-.qi-resume-look__sheet {
-  display: grid;
+  grid-template-columns: repeat(5, 1fr);
   gap: 2px;
-  min-height: 170px;
-  padding: 18px 18px 14px;
-  border-radius: 6px;
-  background:
-    repeating-linear-gradient(to bottom, transparent 0 21px, color-mix(in srgb, var(--stretch-ink) 16%, transparent) 21px 22px) 18px 78px / calc(100% - 36px) 80px no-repeat,
-    light-dark(#fffdf6, #26262f);
+  width: 38px;
+  height: 38px;
+  padding: 4px;
+  border-radius: 7px;
+  background: var(--stretch-card);
+  box-shadow:
+    inset 0 0 0 1px var(--stretch-rule),
+    0 1px 1px rgb(0 0 0 / 0.18);
+}
+
+.qi-contrib > span {
+  border-radius: 1.5px;
+  background: var(--gh-0);
+}
+
+.qi-contrib > [data-level="1"] { background: var(--gh-1); }
+.qi-contrib > [data-level="2"] { background: var(--gh-2); }
+.qi-contrib > [data-level="3"] { background: var(--gh-3); }
+.qi-contrib > [data-level="4"] { background: var(--gh-4); }
+
+/* LinkedIn's object: a landscape business card (40 by 28) with a portrait dot and two printed lines. */
+.qi-namecard {
+  position: relative;
+  display: block;
+  width: 40px;
+  height: 28px;
+  margin-block: 8px;
+  border-radius: 3px;
+  background: light-dark(#fffdf6, #26262f);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.4),
-    0 1px 1px rgb(0 0 0 / 0.2),
-    0 8px 18px -8px rgb(0 0 0 / 0.35);
-  align-content: start;
+    0 1px 1px rgb(0 0 0 / 0.25),
+    0 3px 5px -1px rgb(0 0 0 / 0.3);
 }
 
-.qi-resume-look__sheet strong {
-  font-size: var(--text-body);
-  font-weight: 650;
+.qi-namecard__face {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--stretch-cobalt);
 }
 
-.qi-resume-look__sheet span {
-  color: var(--stretch-muted);
-  font-size: var(--text-small);
+.qi-namecard__line {
+  position: absolute;
+  left: 19px;
+  top: 8px;
+  width: 15px;
+  height: 2px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--stretch-ink) 55%, transparent);
 }
 
-.qi-resume-look figcaption {
-  margin-top: 8px;
-  color: var(--stretch-muted);
-  font-size: var(--text-label);
-  line-height: 1.4;
+.qi-namecard__line--short {
+  top: 13px;
+  width: 9px;
+  background: color-mix(in srgb, var(--stretch-ink) 28%, transparent);
+}
+
+.qi-namecard::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 5px;
+  height: 1px;
+  background: color-mix(in srgb, var(--stretch-ink) 28%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .qi-resume-look,
   .qi-copy {
     animation: none;
     transition: none;

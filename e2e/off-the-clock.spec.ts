@@ -181,6 +181,29 @@ test.describe("Off the clock: the book and the film", () => {
     await expect(links(row)).toHaveAttribute("href", /letterboxd\.com/);
   });
 
+  test("on a touch screen tapping the film's row opens the ticket, and the ticket is the link to Letterboxd", async ({ page }) => {
+    test.skip(wide(page), "the margin shows the look on hover; a click on the row follows its link");
+    await hydrated(page);
+    const card = fixture(page, "film");
+    const row = card.locator("a[data-look-tap='film']");
+    const look = card.locator("[data-look-slot='film'] .qi-look");
+    // The tap opens the look and does not leave the page.
+    await tap(page, row);
+    await expect(look).toBeVisible();
+    await expect(page).toHaveURL(/\/fixtures\/off-the-clock$/);
+    // The ticket is a link out, in a new tab.
+    await expect(card.locator("[data-look-slot='film'] a.qi-look-link")).toHaveAttribute("href", /letterboxd\.com/);
+    await expect(card.locator("[data-look-slot='film'] a.qi-look-link")).toHaveAttribute("target", "_blank");
+    // Tapping the row again closes it, and Enter on the link still follows it.
+    await tap(page, row);
+    await expect(look).toHaveCount(0);
+    await row.focus();
+    await page.context().route("**/letterboxd.com/**", (route) => route.fulfill({ body: "<title>Letterboxd</title>", contentType: "text/html" }));
+    const popup = page.waitForEvent("popup");
+    await page.keyboard.press("Enter");
+    expect((await popup).url()).toMatch(/letterboxd\.com/);
+  });
+
   test("the ticket: Admit one, the poster, title, year and date, the stars, and a stub that tears off", async ({ page }) => {
     const look = await openLook(page, "film", "film");
     await expect(look.locator(".qi-ticket__poster")).toBeVisible();
@@ -233,9 +256,9 @@ test.describe("Off the clock: the history row", () => {
   /** Cycles the row the way the screen does it: a click, or a tap on a touch screen. */
   const cycle = async (page: Page, name: string) => {
     await hydrated(page);
-    const row = rowOf(page, name).locator("[data-look='history']");
-    if (wide(page)) await row.click();
-    else await tap(page, row);
+    // On a wide screen a click on the row steps it on; on a phone the row opens and closes, and the clipping steps.
+    if (wide(page)) await rowOf(page, name).locator("[data-look='history']").click();
+    else await tap(page, rowOf(page, name).locator("[data-look-slot='history'] .qi-look"));
   };
 
   test("the row is a calendar tile, the title, a line that counts the week's oddities and a live Wikipedia mark", async ({ page }) => {
@@ -260,7 +283,7 @@ test.describe("Off the clock: the history row", () => {
     await expect(look.locator(".qi-clipping__stamp")).not.toHaveCSS("color", await token(page, "--stretch-cobalt"));
   });
 
-  test("clicking the row swaps in the next oddity in place and wraps after the last", async ({ page }) => {
+  test("clicking the row (a phone: the clipping) swaps in the next oddity in place and wraps after the last", async ({ page }) => {
     const look = await openLook(page, "history-week", "history");
     const fact = look.locator(".qi-clipping__fact");
     await cycle(page, "history-week");
@@ -277,7 +300,7 @@ test.describe("Off the clock: the history row", () => {
     await expect(look).toBeVisible();
   });
 
-  test("Enter and Space cycle the focused row, and the change is announced politely", async ({ page }) => {
+  test("the keyboard steps the focused row on (Enter and Space on a wide screen, the arrows on a phone), and the change is announced politely", async ({ page }) => {
     await hydrated(page);
     const card = fixture(page, "history-week");
     const row = card.locator("[data-look='history']");
@@ -285,10 +308,27 @@ test.describe("Off the clock: the history row", () => {
     const live = card.locator("[aria-live='polite']");
     await expect(live).toHaveText("");
     await row.focus();
-    await page.keyboard.press("Enter");
+    // On a phone Enter opens the look like any row, and the arrow keys step it on.
+    if (!wide(page)) {
+      await page.keyboard.press("Enter");
+      await expect(card.locator("[data-look-slot='history'] .qi-look")).toBeVisible();
+      await page.keyboard.press("ArrowRight");
+    } else await page.keyboard.press("Enter");
     await expect(live).toHaveText(/^2 of 3\. 28 September 1781\. A cow wanders into a cathedral/);
-    await page.keyboard.press("Space");
+    await page.keyboard.press(wide(page) ? "Space" : "ArrowDown");
     await expect(live).toHaveText(/^3 of 3\. Born 28 September 1852\. Henri Moissan/);
+  });
+
+  test("on a phone the arrow keys do nothing until the clipping is open", async ({ page }) => {
+    test.skip(wide(page), "a wide screen steps with Enter and Space");
+    await hydrated(page);
+    const card = fixture(page, "history-week");
+    await expect(card.locator("[data-look='history']")).toHaveAttribute("aria-keyshortcuts", "ArrowRight ArrowDown");
+    await card.locator("[data-look='history']").focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(card.locator("[aria-live='polite']")).toHaveText("");
+    await page.keyboard.press("Enter");
+    await expect(card.locator("[data-look-slot='history'] .qi-clipping__count")).toHaveText("1 of 3");
   });
 
   test.describe("with motion", () => {
@@ -355,21 +395,29 @@ test.describe("Off the clock: the history row", () => {
     expect(spoken).toContain("3 of 3. Born 28 September 1852. Henri Moissan");
   });
 
-  test("on a touch screen the tile opens the clipping, tapping the row cycles it, and an open clipping follows", async ({ page }) => {
+  test("on a touch screen the row opens and closes the clipping, and only a tap on the clipping steps it on", async ({ page }) => {
     test.skip(wide(page), "the margin shows the look on hover; there is no tile button");
     await hydrated(page);
     const card = fixture(page, "history-week");
     const slot = card.locator("[data-look-slot='history'] .qi-look");
     await expect(slot).toHaveCount(0);
-    // Cycling does not open the look.
+    await tap(page, card.locator("[data-look='history']"));
+    await expect(slot).toBeVisible();
+    await expect(slot.locator(".qi-clipping__count")).toHaveText("1 of 3");
+    // The row's own taps never step it on: they close it, and open it again where it was.
     await tap(page, card.locator("[data-look='history']"));
     await expect(slot).toHaveCount(0);
-    await tap(page, card.locator("[data-look-tap='history']").first());
-    await expect(slot).toBeVisible();
-    await expect(slot.locator(".qi-clipping__count")).toHaveText("2 of 3");
     await tap(page, card.locator("[data-look='history']"));
+    await expect(slot.locator(".qi-clipping__count")).toHaveText("1 of 3");
+    // The clipping steps it on, wrapping after the last, and stays open.
+    await tap(page, slot);
+    await expect(slot.locator(".qi-clipping__count")).toHaveText("2 of 3");
+    await tap(page, slot);
     await expect(slot.locator(".qi-clipping__count")).toHaveText("3 of 3");
     await expect(slot).toBeVisible();
+    // The calendar tile's button closes it too.
+    await tap(page, card.locator("button[data-look-tap='history']"));
+    await expect(slot).toHaveCount(0);
   });
 });
 
@@ -383,10 +431,12 @@ test.describe("Off the clock: Now making", () => {
   test("a repository that is not a project is a row: its name, Now making, GitHub's description and a live mark, linked to GitHub", async ({ page }) => {
     const row = fixture(page, "making").locator("[data-otc='making']");
     await expect(title(row)).toHaveText("eliasb.dev");
-    await expect(line(row)).toContainText(`${nowMaking.label} · Personal site for Elias B. · ${offTheClock.live("GitHub")}`);
+    await expect(line(row)).toHaveText(`${nowMaking.label}\u00a0· ${offTheClock.live("GitHub")}`);
+    // The description is said once, in the closer look, and is the row's accessible description.
+    await expect(row.locator("[data-look]")).toHaveAccessibleDescription("Personal site for Elias B.");
     await expect(links(row)).toHaveAttribute("href", "https://github.com/3ixas/eliasb.dev");
     await expect(row.locator("[data-now-mark]")).toHaveCSS("background-color", await token(page, "--stretch-cobalt"));
-    await expect(row.locator(".qi-dot")).toHaveCSS("background-color", await token(page, "--stretch-cobalt"));
+    await expect(row.locator(".qi-brackets__slash")).toHaveCSS("stroke", await token(page, "--stretch-cobalt"));
   });
 
   test("its closer look types the description itself", async ({ page }) => {

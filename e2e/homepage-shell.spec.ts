@@ -114,11 +114,11 @@ test.describe("Homepage shell", () => {
     expect(greeting.y).toBeGreaterThanOrEqual(name.y + name.height - 1);
     // In line with the name, not with the portrait: the greeting's scene starts a few px left of the name's text.
     expect(greeting.x).toBeGreaterThanOrEqual(name.x - 14);
-    // The greeting is not a tab stop on a phone.
-    await expect(page.locator("[data-greeting]")).not.toHaveAttribute("tabindex", /.*/);
+    // The greeting is a button on a phone, so it is a tab stop.
+    await expect(page.locator("[data-greeting]")).toHaveAttribute("tabindex", "0");
   });
 
-  test("on a phone Tab walks the page's own controls: the skip link, the portrait, then the Eclipse, and nothing traps focus", async ({ page, browserName }) => {
+  test("on a phone Tab walks the page's own controls: the skip link, the portrait, the greeting, then the Eclipse, and nothing traps focus", async ({ page, browserName }) => {
     test.skip((page.viewportSize()?.width ?? 0) >= 900, "Phone header");
     test.skip(browserName === "webkit", "Safari does not Tab to links by default");
     await page.goto("/");
@@ -126,6 +126,8 @@ test.describe("Homepage shell", () => {
     await expect(page.locator(".stretch-skip")).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(page.getByRole("button", { name: "A closer look at Elias", exact: true })).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(page.locator("[data-greeting]")).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(page.locator("[data-eclipse]")).toBeFocused();
   });
@@ -333,23 +335,22 @@ test.describe("The header greeting", () => {
     await context.close();
   });
 
-  test("below 900 px there is no London time to show", async ({ browser }) => {
-    const context = await browser.newContext({ viewport: { width: 820, height: 900 } });
-    const page = await context.newPage();
-    await page.goto("/");
-    await expect(greeting(page)).toHaveAttribute("data-greeting", /^(morning|afternoon|evening|late)$/);
-    await greeting(page).hover();
-    await expect(page.locator(".qi-greeting__more")).toHaveCount(0);
-    await expect(greeting(page)).not.toHaveAttribute("tabindex", /.*/);
-    await context.close();
-  });
-
-  test("on touch the scene plays once, on load: the greeting ignores the pointer, so a tap cannot replay it", async ({ browser }) => {
+  test("below a wide screen the greeting is a button: a tap opens London's time on its own line, and a second tap puts it away", async ({ browser }) => {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
     const page = await context.newPage();
     await page.goto("/");
     await expect(greeting(page)).toHaveAttribute("data-greeting", /^(morning|afternoon|evening|late)$/);
-    await expect(greeting(page)).toHaveCSS("pointer-events", "none");
+    await expect(greeting(page)).toHaveAttribute("role", "button");
+    await expect(greeting(page)).toHaveAttribute("aria-expanded", "false");
+    await expect(page.locator(".qi-greeting__more")).toBeHidden();
+    await greeting(page).tap();
+    await expect(greeting(page)).toHaveAttribute("aria-expanded", "true");
+    await expect(page.locator(".qi-greeting__more")).toHaveText(/^it’s \d\d:\d\d here in London$/);
+    const [words, more] = await Promise.all([page.locator(".qi-greeting__words").boundingBox(), page.locator(".qi-greeting__more").boundingBox()]);
+    expect(more!.y).toBeGreaterThanOrEqual(words!.y + words!.height - 1);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+    await greeting(page).tap();
+    await expect(page.locator(".qi-greeting__more")).toBeHidden();
     await context.close();
   });
 });

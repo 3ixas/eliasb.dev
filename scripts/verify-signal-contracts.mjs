@@ -9,6 +9,7 @@ import {
   latestRepository,
   londonWeekday,
 } from "../src/integrations/signal-mappers.ts";
+import { bookFromGoodreadsWidget } from "../src/integrations/goodreads-widget.ts";
 import { integrationConfig } from "../src/content/integration-config.ts";
 import { asOfDate, pinStatus, staleAfterDays } from "../src/integrations/pin-rules.ts";
 import { filmLine } from "../src/content/stretch/film-line.ts";
@@ -323,6 +324,19 @@ assert.equal(bookFromGoodreads({ title: "Dark Age", author: "Pierce Brown", date
 assert.equal(bookFromGoodreads({ title: "Dark Age", author: "Pierce Brown" }).coverUrl, null);
 assert.equal(bookFromGoodreads({ title: "Dark Age" }), null);
 assert.equal(bookFromGoodreads({ author: "Pierce Brown" }), null);
+
+// Goodreads' widget: a script that assigns the shelf's HTML to widget_code.
+const widgetScript = (body) => `  var widget_code = '${body}';\n  document.write(widget_code);`;
+const widgetBook = `  <div class=\\"gr_custom_container_\\">\\n    <div class=\\"gr_custom_each_container_\\">\\n <div class=\\"gr_custom_book_container_\\">\\n <a title=\\"Dark Age (Red Rising Saga, #5)\\" href=\\"https:\\/\\/www.goodreads.com\\/review\\/show\\/1\\"><img alt=\\"Dark Age\\" border=\\"0\\" src=\\"https:\\/\\/i.gr-assets.com\\/images\\/S\\/books\\/29226553._SY75_.jpg\\" \\/><\\/a>\\n <\\/div>\\n <div class=\\"gr_custom_title_\\">\\n <a rel=\\"nofollow\\" href=\\"https:\\/\\/x\\">Dark Age<\\/a>\\n <\\/div>\\n <div class=\\"gr_custom_author_\\">\\n by <a rel=\\"nofollow\\" href=\\"https:\\/\\/y\\">Pierce Brown<\\/a>\\n <\\/div>\\n <\\/div>\\n <\\/div>`;
+assert.deepEqual(bookFromGoodreadsWidget(widgetScript(widgetBook)), {
+  title: "Dark Age",
+  author: "Pierce Brown",
+  startedAt: null,
+  coverUrl: "https://i.gr-assets.com/images/S/books/29226553._SX300_.jpg",
+});
+assert.equal(bookFromGoodreadsWidget(widgetScript('  <div class=\\"gr_custom_container_\\">\\n <\\/div>')), null, "An empty shelf is no book");
+assert.throws(() => bookFromGoodreadsWidget("<html>Page not found</html>"), /other than its widget/);
+assert.throws(() => bookFromGoodreadsWidget(widgetScript("not the shelf")), /other than its widget/);
 
 // Letterboxd: half-star ratings and the diary date, or nothing where they're missing or malformed.
 const letterboxdProfile = "https://letterboxd.com/3lxas/";

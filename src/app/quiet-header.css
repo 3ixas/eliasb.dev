@@ -187,16 +187,47 @@ a.qi-header__name {
   visibility: hidden;
 }
 
-/* On touch a tap would leave :hover on the greeting and replay its scene, which plays once, on load. */
-@media (hover: none) {
+/* Below a wide screen with a pointer the greeting is a button: a tap plays its scene and opens London's time under it. */
+@media not all and (hover: hover) and (min-width: 900px) {
   .qi-greeting {
-    pointer-events: none;
+    flex-wrap: wrap;
+    align-content: center;
+    row-gap: 0;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
-/* London's time never takes room: from 900 px it hangs beyond the words and lets the pointer through. */
+/* London's time never takes room on a wide screen: it hangs beyond the words and lets the pointer through. Elsewhere it opens on a line of its own. */
 .qi-greeting__more {
-  display: none;
+  display: grid;
+  flex-basis: 100%;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows 0.3s var(--out),
+    opacity 0.3s var(--out),
+    visibility 0s 0.3s;
+}
+
+/* The line's own space is inside the part that folds, so a closed greeting is exactly its words. */
+.qi-greeting__more > span {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.qi-greeting__more > span > span {
+  display: block;
+  padding-top: 6px;
+}
+
+.qi-greeting[data-open] .qi-greeting__more {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
 }
 
 .qi-scene {
@@ -340,20 +371,6 @@ a.qi-header__name {
     margin: 0;
   }
 
-  .qi-greeting__more {
-    position: absolute;
-    left: 100%;
-    display: block;
-    padding-left: 4px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-  }
-
-  .qi-greeting:is(:hover, :focus-visible) .qi-greeting__more {
-    opacity: 1;
-  }
-
   .qi-header__links {
     display: block;
     margin-left: auto;
@@ -363,12 +380,6 @@ a.qi-header__name {
   /* A page with no links (the 404) has the Eclipse right after the greeting, so the Eclipse takes the right edge, and London's time has the room between. */
   .qi-greeting + .stretch-eclipse {
     margin-left: auto;
-  }
-
-  /* London's time is said where the links would be: they step aside while it is, so the two never overprint. */
-  .qi-greeting:is(:hover, :focus-visible) ~ .qi-header__links {
-    opacity: 0;
-    pointer-events: none;
   }
 
   .qi-header__links ul {
@@ -401,6 +412,36 @@ a.qi-header__name {
 }
 
 @media (hover: hover) and (min-width: 900px) {
+  /* London's time hangs beyond the words and says itself on hover or focus; elsewhere the greeting is a button (above). */
+  .qi-greeting__more {
+    position: absolute;
+    left: 100%;
+    display: block;
+    padding-left: 4px;
+    opacity: 0;
+    visibility: visible;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .qi-greeting__more > span {
+    overflow: visible;
+  }
+
+  .qi-greeting__more > span > span {
+    padding-top: 0;
+  }
+
+  .qi-greeting:is(:hover, :focus-visible) .qi-greeting__more {
+    opacity: 1;
+  }
+
+  /* London's time is said where the links would be: they step aside while it is, so the two never overprint. */
+  .qi-greeting:is(:hover, :focus-visible) ~ .qi-header__links {
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .qi-header__links a:hover {
     color: var(--stretch-ink);
   }

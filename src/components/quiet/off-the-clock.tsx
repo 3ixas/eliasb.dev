@@ -207,6 +207,17 @@ export function filmEntry(signal: FilmSignal, now: Date): Entry {
   };
 }
 
+/** Now making's object: code brackets with a cobalt slash, drawn to read at 44 px. The live dot stays for "Live from GitHub" beside it. */
+function Brackets() {
+  return (
+    <svg className="qi-brackets" viewBox="0 0 44 44" fill="none" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path className="qi-brackets__angle" d="M14 15 L7 22 L14 29" />
+      <path className="qi-brackets__angle" d="M30 15 L37 22 L30 29" />
+      <path className="qi-brackets__slash" d="M25 12 L19 32" />
+    </svg>
+  );
+}
+
 /** Now making's closer look: the repository's description typing itself. */
 function MakingLook({ name, description }: { name: string; description: string }) {
   return (
@@ -237,9 +248,9 @@ export function makingEntry(latest: LatestRepositorySignal): Entry | null {
         key={id}
         attrs={{ "data-otc": id }}
         href={entry.href}
-        object={<span className="qi-dot" />}
+        object={<Brackets />}
         title={entry.name}
-        line={joined([copy.nowMaking.label, entry.description, mark?.shown])}
+        line={joined([copy.nowMaking.label, mark?.shown])}
         look={entry.description ? { id, description: entry.description } : undefined}
       />
     ),

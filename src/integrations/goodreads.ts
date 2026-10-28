@@ -1,35 +1,20 @@
 import { unstable_cache } from "next/cache";
 import { integrationConfig } from "@/content/integration-config";
-import { rssItems, rssValue } from "@/integrations/rss";
-import { trustedHttpsUrl } from "@/integrations/safe-url";
-import { bookFromGoodreads } from "@/integrations/signal-mappers";
+import { bookFromGoodreadsWidget } from "@/integrations/goodreads-widget";
 import type { ReadingSignal } from "@/integrations/types";
 
-const { currentlyReadingFeedUrl, profileUrl } = integrationConfig.goodreads;
+const { currentlyReadingWidgetUrl, profileUrl } = integrationConfig.goodreads;
 
 // Throwing keeps Next's last successful fetch during revalidation, so a
 // Goodreads outage never replaces the book with an empty shelf.
 const fetchReading = unstable_cache(
   async (): Promise<ReadingSignal> => {
-    const response = await fetch(currentlyReadingFeedUrl, { signal: AbortSignal.timeout(3500) });
+    const response = await fetch(currentlyReadingWidgetUrl, { signal: AbortSignal.timeout(3500) });
     if (!response.ok) throw new Error(`Goodreads returned ${response.status}`);
-    const feed = await response.text();
-    if (!/<rss\b/i.test(feed)) throw new Error("Goodreads returned something other than its feed");
-
-    const [item] = rssItems(feed);
-    const book = item
-      ? bookFromGoodreads({
-          title: rssValue(item, "title"),
-          author: rssValue(item, "author_name"),
-          dateAdded: rssValue(item, "user_date_added"),
-          coverUrl: trustedHttpsUrl(rssValue(item, "book_large_image_url") ?? rssValue(item, "book_image_url"), ["i.gr-assets.com"]),
-        })
-      : null;
-    if (item && !book) throw new Error("Goodreads listed a book without a title or author");
-
+    const book = bookFromGoodreadsWidget(await response.text());
     return { state: "live", book, href: profileUrl, updatedAt: new Date().toISOString() };
   },
-  ["goodreads-reading-v2"],
+  ["goodreads-reading-v3"],
   { revalidate: 1800, tags: ["goodreads-signal"] },
 );
 

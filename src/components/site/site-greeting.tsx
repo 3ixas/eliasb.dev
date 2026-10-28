@@ -41,13 +41,15 @@ const longest = Object.values(siteCopy.greeting).reduce((a, b) => (b.length > a.
  *
  * The scene plays once on every load (data-playing), and again on hover or focus. With reduced motion it rests:
  * quiet-header.css moves nothing. On a wide screen, hover or focus also adds London's time, read when the pointer
- * arrives and placed absolutely, so it can never widen the header. Phones get neither the extra words nor a tab stop.
+ * arrives and placed absolutely, so it can never widen the header. Anywhere else the greeting is a button: a tap
+ * plays the scene again and says London's time on a line of its own beneath, and a second tap puts it away.
  */
 export function SiteGreeting() {
   const key = useSyncExternalStore(subscribe, readGreeting, () => "hello" as const);
   const wide = useSyncExternalStore(subscribeWide, readWide, () => false);
   const [playing, setPlaying] = useState(false);
   const [london, setLondon] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const start = window.setTimeout(() => setPlaying(true), PLAY_AFTER);
@@ -59,21 +61,46 @@ export function SiteGreeting() {
   }, []);
 
   const readLondon = () => setLondon(londonClock.format(new Date()));
+  const toggle = () => {
+    if (!open) {
+      readLondon();
+      setPlaying(true);
+      window.setTimeout(() => setPlaying(false), PLAY_FOR);
+    }
+    setOpen(!open);
+  };
 
   return (
     <p
       className="qi-greeting"
       data-greeting={key}
       data-playing={playing || undefined}
-      tabIndex={wide ? 0 : undefined}
+      data-open={open || undefined}
+      tabIndex={0}
+      role={wide ? undefined : "button"}
+      aria-expanded={wide ? undefined : open}
       onPointerEnter={wide ? readLondon : undefined}
       onFocus={wide ? readLondon : undefined}
+      onClick={wide ? undefined : toggle}
+      onKeyDown={
+        wide
+          ? undefined
+          : (event) => {
+              if (event.key !== "Enter" && event.key !== " ") return;
+              event.preventDefault();
+              toggle();
+            }
+      }
     >
       <GreetingScene period={key} />
       <span className="qi-greeting__words" data-longest={longest}>
         <span>{siteCopy.greeting[key]}</span>
       </span>
-      {wide && <span className="qi-greeting__more">{london && siteCopy.header.londonTime(london)}</span>}
+      <span className="qi-greeting__more">
+        <span>
+          <span>{london && siteCopy.header.londonTime(london)}</span>
+        </span>
+      </span>
     </p>
   );
 }
