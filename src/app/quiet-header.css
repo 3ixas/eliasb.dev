@@ -18,7 +18,8 @@
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
     "who eclipse"
-    "greet eclipse";
+    "greet eclipse"
+    "look look";
   align-items: center;
   column-gap: 12px;
   width: min(100% - 40px, 600px);
@@ -35,6 +36,23 @@
   min-height: 44px;
   color: var(--stretch-ink);
   text-decoration: none;
+}
+
+/* The portrait is its own 44 px button, a sibling of the name; its margin keeps the name where the 40 px circle put it. */
+.qi-header__facebtn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin: 0 -4px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .qi-header__face {
@@ -54,6 +72,15 @@
   white-space: nowrap;
 }
 
+/* On the 404 the name leads home: a 44 px link. On the homepage it is text. */
+a.qi-header__name {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  text-decoration: none;
+}
+
 .qi-header .stretch-eclipse {
   grid-area: eclipse;
   margin-right: -10px;
@@ -68,6 +95,55 @@
 
 .qi-header__links {
   display: none;
+}
+
+/* Where a tapped portrait's look opens inline, under the whole header row and on the portrait's edge. */
+.qi-header__slot {
+  grid-area: look;
+  margin-left: 52px;
+}
+
+/* The portrait's closer look: the full portrait, and the caption under it as a certificate's is. */
+.qi-face-look {
+  margin: 0;
+}
+
+.qi-face-look img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  box-shadow:
+    0 1px 1px rgb(0 0 0 / 0.2),
+    0 8px 18px -8px rgb(0 0 0 / 0.35);
+}
+
+.qi-face-look figcaption {
+  margin-top: 8px;
+  color: var(--stretch-muted);
+  font-size: var(--text-label);
+  line-height: 1.4;
+}
+
+/* Inline, the portrait never takes more than 40% of the screen's height, so the sticky header it opens in leaves room to read. */
+.qi-header__slot .qi-face-look img {
+  width: auto;
+  max-width: 100%;
+  max-height: 40svh;
+}
+
+/* It slides in toward the margin, and with reduced motion only the 0.2 s fade of every closer look remains. */
+@media (prefers-reduced-motion: no-preference) {
+  .qi-face-look {
+    animation: qi-face-slide 0.5s var(--out) both;
+  }
+}
+
+@keyframes qi-face-slide {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
 }
 
 /* ---------- the greeting: words, and a small scene for the time of day ---------- */
@@ -249,7 +325,9 @@
 @media (min-width: 900px) {
   .qi-header__inner {
     display: flex;
+    flex-wrap: wrap;
     gap: 16px;
+    row-gap: 0;
     width: min(100% - 40px, 940px);
     padding-block: 12px;
   }

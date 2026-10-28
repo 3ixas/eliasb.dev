@@ -118,12 +118,14 @@ test.describe("Homepage shell", () => {
     await expect(page.locator("[data-greeting]")).not.toHaveAttribute("tabindex", /.*/);
   });
 
-  test("on a phone Tab walks the page's own controls: the skip link, then the Eclipse, and nothing traps focus", async ({ page, browserName }) => {
+  test("on a phone Tab walks the page's own controls: the skip link, the portrait, then the Eclipse, and nothing traps focus", async ({ page, browserName }) => {
     test.skip((page.viewportSize()?.width ?? 0) >= 900, "Phone header");
     test.skip(browserName === "webkit", "Safari does not Tab to links by default");
     await page.goto("/");
     await page.keyboard.press("Tab");
     await expect(page.locator(".stretch-skip")).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("button", { name: "A closer look at Elias" })).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(page.locator("[data-eclipse]")).toBeFocused();
   });

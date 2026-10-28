@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState, type FocusEvent, type KeyboardEvent, type MouseEvent, type PointerEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { placeMargin } from "@/components/quiet/margin-placement";
+import { margin as marginSpacing, placeMargin } from "@/components/quiet/margin-placement";
 
 /** The margin hides this long after the pointer leaves a row or focus leaves it, so crossing the gap between two rows does not flash. */
 const HIDE_MS = 140;
@@ -18,6 +18,13 @@ const WIDE = "(min-width: 1180px) and (hover: hover)";
 type Active = { id: string; source: "pointer" | "focus" } | { id: string; source: "tap"; slot: HTMLElement } | null;
 
 /**
+ * A root that is not a column: its looks hang in the margin below the ancestor matching `selector`, at the edge
+ * of a `column` of that width from the root's left. The header uses it, because its row is wider than the
+ * column and its links and Eclipse sit where a look beside the row would land.
+ */
+type Under = { selector: string; column: number };
+
+/**
  * The closer-look controller (GLOSSARY.md, Closer look). It owns the single `active` value and shows it in the
  * Margin. Rows and words are server-rendered and carry `data-look="<id>"`; this component listens for the
  * pointer and focus arriving at one, so no row holds state of its own. `looks` maps each id to its visual closer
@@ -27,7 +34,7 @@ type Active = { id: string; source: "pointer" | "focus" } | { id: string; source
  * Below that, or on touch, nothing shows until a trigger (`data-look-tap="<id>"`) is tapped: the look then opens
  * in the `data-look-slot="<id>"` the server rendered under its row, and tapping the same trigger closes it.
  */
-export function CloserLookRoot({ looks, className, children }: { looks: Record<string, ReactNode>; className?: string; children: ReactNode }) {
+export function CloserLookRoot({ looks, className, under, children }: { looks: Record<string, ReactNode>; className?: string; under?: Under; children: ReactNode }) {
   const root = useRef<HTMLDivElement>(null);
   const margin = useRef<HTMLDivElement>(null);
   const hideTimer = useRef(0);
@@ -138,9 +145,11 @@ export function CloserLookRoot({ looks, className, children }: { looks: Record<s
       return;
     }
     const place = () => {
+      const box = root.current!.getBoundingClientRect();
+      const hang = under && root.current!.closest(under.selector)?.getBoundingClientRect();
       const { top, left } = placeMargin({
-        row: row.getBoundingClientRect(),
-        column: root.current!.getBoundingClientRect(),
+        row: hang ? { top: hang.bottom + marginSpacing.rowLift + marginSpacing.inset } : row.getBoundingClientRect(),
+        column: under ? { right: box.left + under.column } : box,
         marginHeight: element.offsetHeight,
         viewportHeight: window.innerHeight,
       });
@@ -161,7 +170,7 @@ export function CloserLookRoot({ looks, className, children }: { looks: Record<s
       window.removeEventListener("scroll", place);
       window.removeEventListener("resize", place);
     };
-  }, [active]);
+  }, [active, under]);
 
   // After a tap changes the page, put the tapped trigger back where it was on screen: the page would otherwise jump when a look above it closes.
   useLayoutEffect(() => {

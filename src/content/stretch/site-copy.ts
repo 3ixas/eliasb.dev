@@ -37,6 +37,8 @@ export const siteCopy = {
     londonTime: (time: string) => `it’s ${time} here in London`,
     /** The header's links, named for the page they belong to. */
     linksLabel: "On this page",
+    /** The portrait's closer look caption (moved from the old hero label). Its button is named "A closer look at Elias", as every object button is named for what it shows. */
+    portrait: { caption: "Based in London" },
   },
   /** The header's greeting, by the visitor's own time of day. `hello` is the line before the browser has read it, and without script. */
   greeting: {

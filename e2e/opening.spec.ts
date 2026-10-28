@@ -71,7 +71,8 @@ test.describe("The opening line", () => {
   test("the hero's name, tilted portrait, label and actions are gone", async ({ page }) => {
     await expect(page.locator(".stretch-hero, .stretch-name, .stretch-portrait, .stretch-hero__role")).toHaveCount(0);
     await expect(page.getByText("See my work")).toHaveCount(0);
-    await expect(page.getByText("Based in London")).toHaveCount(0);
+    // It is the header portrait's caption now, shown only in that closer look (header-portrait.spec.ts).
+    await expect(page.getByText("Based in London")).toBeHidden();
   });
 
   test("a visitor's wider letter spacing does not push the page sideways", async ({ page }) => {
