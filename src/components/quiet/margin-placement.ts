@@ -7,6 +7,9 @@
 /** The margin's 300 px width is in quiet-index.css (`.qi-margin`), where the layout needs it; only what placement computes lives here. */
 export const margin = { gap: 40, inset: 16, rowLift: 6 } as const;
 
+/** The margin is for wide screens with a hovering pointer; below that, or on touch, a closer look opens inline instead. */
+export const WIDE = "(min-width: 1180px) and (hover: hover)";
+
 export type MarginPlacement = { top: number; left: number };
 
 export function placeMargin({

@@ -181,6 +181,29 @@ test.describe("Off the clock: the book and the film", () => {
     await expect(links(row)).toHaveAttribute("href", /letterboxd\.com/);
   });
 
+  test("on a touch screen tapping the film's row opens the ticket, and the ticket is the link to Letterboxd", async ({ page }) => {
+    test.skip(wide(page), "the margin shows the look on hover; a click on the row follows its link");
+    await hydrated(page);
+    const card = fixture(page, "film");
+    const row = card.locator("a[data-look-tap='film']");
+    const look = card.locator("[data-look-slot='film'] .qi-look");
+    // The tap opens the look and does not leave the page.
+    await tap(page, row);
+    await expect(look).toBeVisible();
+    await expect(page).toHaveURL(/\/fixtures\/off-the-clock$/);
+    // The ticket is a link out, in a new tab.
+    await expect(card.locator("[data-look-slot='film'] a.qi-look-link")).toHaveAttribute("href", /letterboxd\.com/);
+    await expect(card.locator("[data-look-slot='film'] a.qi-look-link")).toHaveAttribute("target", "_blank");
+    // Tapping the row again closes it, and Enter on the link still follows it.
+    await tap(page, row);
+    await expect(look).toHaveCount(0);
+    await row.focus();
+    await page.context().route("**/letterboxd.com/**", (route) => route.fulfill({ body: "<title>Letterboxd</title>", contentType: "text/html" }));
+    const popup = page.waitForEvent("popup");
+    await page.keyboard.press("Enter");
+    expect((await popup).url()).toMatch(/letterboxd\.com/);
+  });
+
   test("the ticket: Admit one, the poster, title, year and date, the stars, and a stub that tears off", async ({ page }) => {
     const look = await openLook(page, "film", "film");
     await expect(look.locator(".qi-ticket__poster")).toBeVisible();
@@ -277,7 +300,7 @@ test.describe("Off the clock: the history row", () => {
     await expect(look).toBeVisible();
   });
 
-  test("Enter and Space cycle the focused row, and the change is announced politely", async ({ page }) => {
+  test("Enter and Space step the focused row on, and the change is announced politely", async ({ page }) => {
     await hydrated(page);
     const card = fixture(page, "history-week");
     const row = card.locator("[data-look='history']");
@@ -285,6 +308,8 @@ test.describe("Off the clock: the history row", () => {
     const live = card.locator("[aria-live='polite']");
     await expect(live).toHaveText("");
     await row.focus();
+    // On a phone the first press opens the look, as the first tap does; every press after steps it on.
+    if (!wide(page)) await page.keyboard.press("Enter");
     await page.keyboard.press("Enter");
     await expect(live).toHaveText(/^2 of 3\. 28 September 1781\. A cow wanders into a cathedral/);
     await page.keyboard.press("Space");
@@ -355,21 +380,28 @@ test.describe("Off the clock: the history row", () => {
     expect(spoken).toContain("3 of 3. Born 28 September 1852. Henri Moissan");
   });
 
-  test("on a touch screen the tile opens the clipping, tapping the row cycles it, and an open clipping follows", async ({ page }) => {
+  test("on a touch screen the row opens the clipping, every tap after steps it on, and the tile closes it", async ({ page }) => {
     test.skip(wide(page), "the margin shows the look on hover; there is no tile button");
     await hydrated(page);
     const card = fixture(page, "history-week");
     const slot = card.locator("[data-look-slot='history'] .qi-look");
     await expect(slot).toHaveCount(0);
-    // Cycling does not open the look.
+    // The first tap anywhere on the row opens the look without stepping it.
     await tap(page, card.locator("[data-look='history']"));
-    await expect(slot).toHaveCount(0);
-    await tap(page, card.locator("[data-look-tap='history']").first());
     await expect(slot).toBeVisible();
-    await expect(slot.locator(".qi-clipping__count")).toHaveText("2 of 3");
+    await expect(slot.locator(".qi-clipping__count")).toHaveText("1 of 3");
+    // Every tap after steps it on: the row, then the clipping itself.
     await tap(page, card.locator("[data-look='history']"));
+    await expect(slot.locator(".qi-clipping__count")).toHaveText("2 of 3");
+    await tap(page, slot);
     await expect(slot.locator(".qi-clipping__count")).toHaveText("3 of 3");
     await expect(slot).toBeVisible();
+    // The calendar tile's button closes it.
+    await tap(page, card.locator("button[data-look-tap='history']"));
+    await expect(slot).toHaveCount(0);
+    // And opens it again at the place it was left.
+    await tap(page, card.locator("button[data-look-tap='history']"));
+    await expect(slot.locator(".qi-clipping__count")).toHaveText("3 of 3");
   });
 });
 
@@ -386,7 +418,7 @@ test.describe("Off the clock: Now making", () => {
     await expect(line(row)).toContainText(`${nowMaking.label} · Personal site for Elias B. · ${offTheClock.live("GitHub")}`);
     await expect(links(row)).toHaveAttribute("href", "https://github.com/3ixas/eliasb.dev");
     await expect(row.locator("[data-now-mark]")).toHaveCSS("background-color", await token(page, "--stretch-cobalt"));
-    await expect(row.locator(".qi-dot")).toHaveCSS("background-color", await token(page, "--stretch-cobalt"));
+    await expect(row.locator(".qi-brackets__slash")).toHaveCSS("stroke", await token(page, "--stretch-cobalt"));
   });
 
   test("its closer look types the description itself", async ({ page }) => {

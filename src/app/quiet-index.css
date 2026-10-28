@@ -785,13 +785,37 @@
 }
 
 .qi-inline:has(> .qi-inline__in) {
-  animation: qi-open 0.34s var(--out) both;
+  animation: qi-open 0.3s var(--out) both;
+}
+
+/* A closed look folds back the way it opened, a little quicker (CLOSE_MS in closer-look-root.tsx), fading as it goes. */
+.qi-inline:has(> .qi-inline__in[data-leaving]) {
+  animation: qi-close 0.22s var(--out) both;
+}
+
+.qi-inline__in[data-leaving] .qi-look {
+  opacity: 0;
+  transition: opacity 0.14s linear;
 }
 
 @keyframes qi-open {
   from {
     grid-template-rows: 0fr;
   }
+}
+
+@keyframes qi-close {
+  to {
+    grid-template-rows: 0fr;
+  }
+}
+
+/* A look that is a link, for a row that leaves the site. */
+.qi-look-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .qi-inline__in {
@@ -818,8 +842,14 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  .qi-list__item:has(.qi-inline__in) .qi-row {
+  .qi-list__item:has(.qi-inline__in:not([data-leaving])) .qi-row {
     background: var(--stretch-card);
+  }
+
+  /* An open look is closed by tapping it, so it says so to a thumb as a row does. */
+  .qi-inline .qi-look {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
@@ -1055,15 +1085,15 @@
 
 /* On touch there is no hover: a row's object plays its reaction when the row is tapped open, never as it scrolls into view. */
 @media (prefers-reduced-motion: no-preference) {
-  .qi-list__item:has(.qi-inline__in) .qi-mini {
+  .qi-list__item:has(.qi-inline__in:not([data-leaving])) .qi-mini {
     animation: qi-swing 0.9s var(--out);
   }
 
-  .qi-list__item:has(.qi-inline__in) .qi-tile {
+  .qi-list__item:has(.qi-inline__in:not([data-leaving])) .qi-tile {
     animation: qi-turn 0.6s var(--spring);
   }
 
-  .qi-list__item:has(.qi-inline__in) .qi-crop {
+  .qi-list__item:has(.qi-inline__in:not([data-leaving])) .qi-crop {
     transform: translateY(-2px) rotate(3deg);
     transition: transform 0.4s var(--spring);
   }
@@ -1327,14 +1357,19 @@
   margin-right: 6px;
 }
 
-/* Now making's object: the cobalt "now" dot, centred in its slot. */
-.qi-dot {
+/* Now making's object: code brackets in ink with a cobalt slash. The live dot belongs to "Live from GitHub". */
+.qi-brackets {
   display: block;
-  width: 12px;
-  height: 12px;
-  margin: 16px;
-  border-radius: 50%;
-  background: var(--stretch-cobalt);
+  width: 44px;
+  height: 44px;
+}
+
+.qi-brackets__angle {
+  stroke: var(--stretch-ink);
+}
+
+.qi-brackets__slash {
+  stroke: var(--stretch-cobalt);
 }
 
 .qi-look__name {
@@ -1847,6 +1882,12 @@ button.stretch-gh__day[data-selected] {
 }
 
 /* GitHub's and LinkedIn's object: its own letters in a quiet tile. */
+.qi-badge__mark {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
 .qi-badge {
   display: grid;
   place-items: center;

@@ -187,16 +187,24 @@ a.qi-header__name {
   visibility: hidden;
 }
 
-/* On touch a tap would leave :hover on the greeting and replay its scene, which plays once, on load. */
-@media (hover: none) {
+/* Below a wide screen with a pointer the greeting is a button: a tap plays its scene and opens London's time under it. */
+@media not all and (hover: hover) and (min-width: 900px) {
   .qi-greeting {
-    pointer-events: none;
+    flex-wrap: wrap;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
-/* London's time never takes room: from 900 px it hangs beyond the words and lets the pointer through. */
+/* London's time never takes room on a wide screen: it hangs beyond the words and lets the pointer through. Elsewhere it opens on a line of its own. */
 .qi-greeting__more {
   display: none;
+}
+
+.qi-greeting[data-open] .qi-greeting__more {
+  display: block;
+  flex-basis: 100%;
 }
 
 .qi-scene {

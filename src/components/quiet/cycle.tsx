@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { WIDE } from "@/components/quiet/margin-placement";
 
 type Cycles = { positions: Record<string, number>; advance: (id: string, total: number) => void };
 
@@ -23,19 +24,29 @@ export function useCycle(id: string, total: number): [number, () => void] {
   return [(cycles.positions[id] ?? 0) % total, () => cycles.advance(id, total)];
 }
 
+/** The function that steps a cycling row on, for a closer-look controller inside a CycleScope; null outside one. */
+export function useCycleAdvance() {
+  return useContext(CycleContext)?.advance ?? null;
+}
+
 /**
- * The row that cycles (docs/design/DESIGN.md, "The history row cycles"): clicking it, or pressing Enter or Space,
- * moves to the next of its `announcements` and says so politely; nothing opens or closes. The text of the row is
- * the same server-rendered markup as any plain row, so `children` is the row's content. The live region says
- * nothing until the first change, so a page load announces nothing.
+ * The row that cycles (docs/design/DESIGN.md, "The history row cycles"): on a wide screen with a pointer, clicking it, or
+ * pressing Enter or Space, moves to the next of its `announcements` and says so politely; nothing opens or closes. On a
+ * phone the closer-look controller owns the taps (the row has `data-look-tap`): the first opens the look, and each one
+ * after steps it on, as does a tap on the look itself; the object's button opens and closes. The text of the row is the
+ * same server-rendered markup as any plain row, so `children` is the row's content. The live region says nothing until
+ * the position changes, so a page load announces nothing, and it says it however the step was made.
  */
 export function CycleTrigger({ id, announcements, labelledBy, describedBy, children }: { id: string; announcements: string[]; labelledBy: string; describedBy: string; children: ReactNode }) {
   const [position, advance] = useCycle(id, announcements.length);
   const [cycled, setCycled] = useState(false);
-  const next = () => {
-    advance();
+  const last = useRef(position);
+  useEffect(() => {
+    if (position === last.current) return;
+    last.current = position;
     setCycled(true);
-  };
+  }, [position]);
+  const wide = () => window.matchMedia(WIDE).matches;
   return (
     <>
       <div
@@ -45,12 +56,14 @@ export function CycleTrigger({ id, announcements, labelledBy, describedBy, child
         aria-labelledby={labelledBy}
         aria-describedby={describedBy}
         data-look={id}
+        data-look-tap={id}
+        data-look-cycle={announcements.length}
         data-cycle=""
-        onClick={next}
+        onClick={() => wide() && advance()}
         onKeyDown={(event) => {
-          if (event.key !== "Enter" && event.key !== " ") return;
+          if ((event.key !== "Enter" && event.key !== " ") || !wide()) return;
           event.preventDefault();
-          next();
+          advance();
         }}
       >
         {children}
