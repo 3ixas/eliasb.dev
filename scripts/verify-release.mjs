@@ -247,7 +247,7 @@ function verifyHomepage(markup) {
   // so the release check cannot depend on it; its states are covered by the Off the clock fixtures.
   check(text.includes("Off the clock"), "Homepage should show Off the clock");
 
-  // Say hello: the email is the big link; the résumé, GitHub and LinkedIn follow, in that order.
+  // Say hello: the email, then the résumé, GitHub and LinkedIn as rows, in that order.
   const helloStart = markup.indexOf('id="say-hello"');
   const helloEnd = markup.indexOf("<footer", helloStart);
   const helloSection = helloStart >= 0 && helloEnd > helloStart ? markup.slice(helloStart, helloEnd) : "";
@@ -255,9 +255,10 @@ function verifyHomepage(markup) {
   const emailAction = hrefs(helloSection).find(({ href }) => href?.startsWith("mailto:"));
   check(emailAction, "Say hello should keep the email action");
   equal(emailAction?.href, "mailto:eliasthebennett@gmail.com", "The email action should write to Elias");
-  const cards = [...helloSection.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].filter(([, tag]) => (attribute(tag, "class") ?? "").includes("stretch-hello__link"));
-  equal(cards.map(([, , body]) => plainText(body).split(" ")[0]).join("|"), "Résumé|GitHub|LinkedIn", "The links should be the résumé, GitHub and LinkedIn, in that order");
-  const resumeCard = cards.find(([, , body]) => plainText(body).startsWith("Résumé"));
+  const cards = [...helloSection.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].filter(([, tag]) => (attribute(tag, "class") ?? "").includes("qi-row"));
+  const titleOf = ([, , body]) => plainText(body.match(/class="qi-row__title"[^>]*>([\s\S]*?)<\/span>/)?.[1] ?? "");
+  equal(cards.map(titleOf).join("|"), "Résumé|GitHub|LinkedIn", "The links should be the résumé, GitHub and LinkedIn, in that order");
+  const resumeCard = cards.find((card) => titleOf(card) === "Résumé");
   equal(attribute(resumeCard?.[1] ?? "", "href"), "/resume", "Say hello's Résumé should open /resume on this site");
   check(attribute(resumeCard?.[1] ?? "", "target") === null, "Say hello's Résumé should open in the same tab");
   check(cards.filter((card) => card !== resumeCard).every(([, tag]) => attribute(tag, "target") === "_blank"), "GitHub and LinkedIn should open in a new tab");
