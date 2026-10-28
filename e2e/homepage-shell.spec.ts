@@ -375,10 +375,12 @@ test.describe("The header greeting", () => {
     await lamp.clock.setFixedTime(new Date("2026-10-15T19:00:00Z"));
     await lamp.goto("/");
     await expect(greeting(lamp)).toHaveAttribute("data-greeting", "evening");
+    // The arrival play starts after a moment and ends by itself; hover is tested once it is over.
+    await expect(greeting(lamp)).toHaveAttribute("data-playing", "true");
     await expect(greeting(lamp)).not.toHaveAttribute("data-playing", /.*/, { timeout: 8000 });
-    expect(await playing(lamp, "pool")).toBe("none");
+    await expect.poll(() => playing(lamp, "pool")).toBe("none");
     await greeting(lamp).hover();
-    expect(await playing(lamp, "pool")).toBe("qi-pool");
+    await expect.poll(() => playing(lamp, "pool")).toBe("qi-pool");
     await context.close();
   });
 
