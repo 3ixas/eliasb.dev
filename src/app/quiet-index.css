@@ -1621,10 +1621,14 @@
   margin: 0;
 }
 
+/* The margin is fixed and does not scroll, so a tall picture is cropped to the window rather than pushing the stamp and fact off it. */
 .qi-clipping__figure img {
   display: block;
   width: 100%;
   height: auto;
+  max-height: min(320px, 38svh);
+  object-fit: cover;
+  object-position: top;
   border-radius: 2px;
   filter: grayscale(1) contrast(1.08);
 }

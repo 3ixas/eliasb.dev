@@ -303,6 +303,19 @@ test.describe("Off the clock: the history row", () => {
     });
   });
 
+  test("a tall picture is cropped so the whole clipping fits a short window", async ({ page }) => {
+    test.skip(!wide(page), "the fixed margin is for wide screens");
+    await page.setViewportSize({ width: page.viewportSize()!.width, height: 600 });
+    const look = await openLook(page, "history-saved", "history");
+    await expect(look.locator(".qi-clipping__count")).toBeVisible();
+    await expect
+      .poll(async () => {
+        const margin = (await page.locator(".qi-margin").boundingBox())!;
+        return margin.y >= 0 && margin.y + margin.height <= 600;
+      })
+      .toBe(true);
+  });
+
   test("with one oddity it is a plain row: the clipping, with nothing to cycle", async ({ page }) => {
     const card = fixture(page, "history-one");
     const row = card.locator("[data-look='history']");
