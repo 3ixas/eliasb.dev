@@ -1,4 +1,5 @@
-import type { FastenerKind } from "@/content/projects";
+/** The single small prop on a card's edge (see the Fastener in GLOSSARY.md). */
+export type FastenerKind = "tape" | "paperclip" | "push-pin";
 
 /**
  * The one small prop on a tile's or a sheet's edge; decorative, so hidden from assistive technology.

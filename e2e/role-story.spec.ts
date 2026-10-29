@@ -41,8 +41,6 @@ for (const slug of roleStorySlugs) {
       if (story.setting) await expect(opening).toContainText(story.setting);
       await expect(opening).toContainText(story.dates);
       await expect(page.getByRole("link", { name: "Work", exact: true }).first()).toHaveAttribute("href", roleStoryBack.href);
-      // The old opening band, its number and the numbered section bar are gone.
-      await expect(page.locator(".stretch-cs-open, .stretch-cs-links-row")).toHaveCount(0);
     });
 
     test("the header is the shared one, and its links are this page's six sections", async ({ page }) => {
@@ -339,8 +337,6 @@ for (const slug of roleStorySlugs) {
         await expect(row).toContainText(passRecords[next.slug].short);
         await expect(row).toContainText(next.role);
         await expect(row).toContainText(next.dates);
-        // The old coloured Next tile is gone.
-        await expect(page.locator(".stretch-cs-next")).toHaveCount(0);
         expect((await row.boundingBox())!.height).toBeGreaterThanOrEqual(44);
         await row.click();
         await expect(page).toHaveURL(new RegExp(`/work/${next.slug}$`));

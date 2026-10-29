@@ -1,18 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
-import {
-  Arrowed,
-  StoryEvidence,
-  StoryNext,
-  StoryOpening,
-  StorySection,
-  StorySectionLinks,
-  storyColours,
-} from "@/components/site/story";
-import { SubpageHeader } from "@/components/site/subpage-header";
-import { bindDots } from "@/components/site/bind-dots";
-import { projects, type Project } from "@/content/projects";
-import { caseStudies } from "@/content/stretch/case-studies";
+import { ProjectObject, projectColours } from "@/components/quiet/project-object";
+import { Arrowed, BackLink, LongForm, LongFormOpening, LongFormSectionBlock, NextRow } from "@/components/site/long-form";
+import { projects } from "@/content/projects";
 import {
   caseStudyCopy,
   caseStudyOpening,
@@ -20,164 +9,111 @@ import {
   caseStudySectionLabels,
   type CaseStudy,
   type CaseStudyOpening,
-  type CaseStudySectionKey,
 } from "@/content/stretch/case-study";
-import { Fastener } from "@/components/site/fastener";
 
 /**
- * A case study (docs/specs/STRETCH-REDESIGN-SPEC.md, "Case studies and the
- * archive"): an opening band in the project's colour, a row of section links,
- * a neutral reading column about 720 px wide with the six sections in their
- * fixed order, wide figures framed in the project's colour, the PRD card with
- * the evidence strip, and the Next-project tile. The
- * server renders all of it, so it is readable from the first frame. The only
- * cobalt on the page is the focus ring and selection; the spec keeps the
- * accent for Say hello.
+ * A case study (docs/design/DESIGN.md, "Long-form pages") on the shared template: the header with the six
+ * sections as links, a back link to the Work archive, the project as the title with its outcome as the line, its
+ * type, year and stack, the links it has, and its landing screenshot on its Project colour. Then the six sections
+ * in their fixed order (the PRD as one inline Sheet under "On paper") and one row to the next project. The server
+ * renders all of it.
  */
 export function CaseStudyPage({ study }: { study: CaseStudy }) {
   const opening = caseStudyOpening(study, projects);
-  const next = nextProject(study);
+  const next = projects.find(({ slug }) => slug === study.next);
+  if (!next) throw new Error(`Case study "${study.slug}" ends with "${study.next}", which is not a project.`);
 
   return (
-    <div data-stretch-shell data-case-study={study.slug}>
-      <SubpageHeader />
+    <LongForm
+      attrs={{ "data-case-study": study.slug }}
+      sections={caseStudySectionKeys.map((key) => ({ id: key, label: caseStudySectionLabels[key] }))}
+    >
+      <article className="stretch-wrap qi-long" aria-labelledby="case-study-title">
+        <div className="qi-column">
+          <BackLink href="/things-i-make" label={caseStudyCopy.back} />
+          <LongFormOpening titleId="case-study-title" title={opening.name} line={opening.outcome} meta={opening.meta} below={<OpeningBelow opening={opening} />} />
+          {caseStudySectionKeys.map((key) => {
+            const { heading, paragraphs, points, figure } = study.sections[key];
+            return (
+              <LongFormSectionBlock key={key} id={key} title={heading ?? caseStudySectionLabels[key]}>
+                {paragraphs?.map((paragraph) => (
+                  <p key={paragraph} className="qi-long__p">
+                    {paragraph}
+                  </p>
+                ))}
+                {points?.map(({ lead, text }) => (
+                  <p key={lead} className="qi-long__p">
+                    <strong>{lead}</strong> {text}
+                  </p>
+                ))}
+                {key === "written-down-first" && <Sheet study={study} />}
+                {figure && (
+                  <figure className="qi-figure">
+                    <div className="qi-case__shot" style={projectColours(opening)}>
+                      <Image src={figure.src} alt={figure.alt} width={figure.width} height={figure.height} sizes="(max-width: 760px) calc(100vw - 32px), 560px" />
+                    </div>
+                    <figcaption className="qi-figure__caption stretch-mono">{figure.caption}</figcaption>
+                  </figure>
+                )}
+              </LongFormSectionBlock>
+            );
+          })}
+          <NextRow label={caseStudyCopy.nextProject} href={`/things-i-make/${next.slug}`} object={<ProjectObject project={next} />} title={next.name} line={next.outcome} />
+        </div>
+      </article>
+    </LongForm>
+  );
+}
 
-      <main id="main-content" tabIndex={-1}>
-        <article aria-labelledby="case-study-title">
-          <Opening opening={opening} />
-          <StorySectionLinks sections={caseStudySections} />
-          <div className="stretch-cs-body stretch-wrap">
-            {caseStudySectionKeys.map((key, position) => (
-              <CaseStudySectionBlock key={key} study={study} sectionKey={key} position={position} colours={opening.colours} />
-            ))}
-          </div>
-        </article>
-        <NextProject next={next} />
-      </main>
-
+/** The links the project has (a project with no live site or no code shows only the other), the note beside them, and the landing screenshot on the project's colour. */
+function OpeningBelow({ opening }: { opening: CaseStudyOpening }) {
+  const { links, screenshot, note } = opening;
+  return (
+    <div className="qi-case__below">
+      {(links.live || links.code || note) && (
+        <div className="qi-case__links">
+          {links.live && (
+            <a href={links.live} target="_blank" rel="noreferrer">
+              <Arrowed label={caseStudyCopy.live} />
+            </a>
+          )}
+          {links.code && (
+            <a href={links.code} target="_blank" rel="noreferrer">
+              <Arrowed label={caseStudyCopy.code} />
+            </a>
+          )}
+          {note && <p className="qi-case__note">{note}</p>}
+        </div>
+      )}
+      <div className="qi-case__shot" style={projectColours(opening)}>
+        <Image src={screenshot.src} alt={screenshot.alt} width={screenshot.width} height={screenshot.height} sizes="(max-width: 760px) calc(100vw - 32px), 560px" preload />
+      </div>
     </div>
   );
 }
 
-function nextProject(study: CaseStudy): { project: Project; colours: CaseStudyOpening["colours"]; number: string } {
-  const project = projects.find((entry) => entry.slug === study.next);
-  if (!project?.colours) throw new Error(`Case study "${study.slug}" ends with "${study.next}", which needs a project with colours.`);
-  return { project, colours: project.colours, number: caseStudies[study.next].number };
-}
-
-function Opening({ opening }: { opening: CaseStudyOpening }) {
-  const { links, screenshot } = opening;
-  return (
-    <StoryOpening
-      colours={opening.colours}
-      back={
-        <Link className="stretch-cs-back" href="/things-i-make">
-          <Arrowed label={caseStudyCopy.back} />
-        </Link>
-      }
-      number={opening.number}
-      titleId="case-study-title"
-      name={opening.name}
-      lead={opening.outcome}
-      aside={
-        <div className="stretch-cs-open__shot">
-          <Image
-            src={screenshot.src}
-            alt={screenshot.alt}
-            width={screenshot.width}
-            height={screenshot.height}
-            sizes="(max-width: 760px) calc(100vw - 32px), 640px"
-            preload
-          />
-        </div>
-      }
-    >
-      <p className="stretch-mono stretch-cs-open__meta">{bindDots(opening.metadata)}</p>
-      <p className="stretch-mono stretch-cs-open__meta">{opening.stack}</p>
-      <div className="stretch-cs-links">
-        {links.live && (
-          <a className="stretch-cs-button stretch-cs-button--solid" href={links.live} target="_blank" rel="noreferrer">
-            <Arrowed label={caseStudyCopy.live} />
-          </a>
-        )}
-        {links.code && (
-          <a className="stretch-cs-button" href={links.code} target="_blank" rel="noreferrer">
-            <Arrowed label={caseStudyCopy.code} />
-          </a>
-        )}
-      </div>
-      {opening.note && <p className="stretch-cs-open__note">{opening.note}</p>}
-    </StoryOpening>
-  );
-}
-
-const caseStudySections = caseStudySectionKeys.map((key) => ({ key, label: caseStudySectionLabels[key] }));
-
-function CaseStudySectionBlock({
-  study,
-  sectionKey,
-  position,
-  colours,
-}: {
-  study: CaseStudy;
-  sectionKey: CaseStudySectionKey;
-  position: number;
-  colours: CaseStudyOpening["colours"];
-}) {
-  const section = study.sections[sectionKey];
-
-  return (
-    <StorySection id={sectionKey} label={caseStudySectionLabels[sectionKey]} position={position} section={section}>
-      {sectionKey === "written-down-first" && <Prd study={study} />}
-
-      {section.figure && (
-        <figure className="stretch-cs-figure" style={storyColours(colours)}>
-          <div className="stretch-cs-figure__frame">
-            <Image
-              src={section.figure.src}
-              alt={section.figure.alt}
-              width={section.figure.width}
-              height={section.figure.height}
-              sizes="(max-width: 760px) calc(100vw - 32px), 1000px"
-            />
-          </div>
-          <figcaption className="stretch-mono">{section.figure.caption}</figcaption>
-        </figure>
-      )}
-    </StorySection>
-  );
-}
-
-/** The line from the project's own spec, then the figures from its own records. */
-function Prd({ study }: { study: CaseStudy }) {
+/** The line from the project's own spec on one inline Sheet, then its figures from its own records as a quiet line. */
+function Sheet({ study }: { study: CaseStudy }) {
   const { prd, evidence } = study;
   return (
-    <div className="stretch-cs-prd-group">
-      <figure className="stretch-prd stretch-cs-prd">
-        <Fastener kind="tape" />
-        {prd.lead && <p className="stretch-cs-prd__around">{prd.lead}</p>}
-        <blockquote className="stretch-prd__quote">{prd.quote}</blockquote>
-        {prd.after && <p className="stretch-cs-prd__around">{prd.after}</p>}
-        {prd.date && <figcaption className="stretch-mono stretch-prd__caption">The spec, {prd.date}</figcaption>}
+    <div className="qi-case__sheet">
+      <figure>
+        {prd.lead && <p className="qi-case__around">{prd.lead}</p>}
+        <blockquote className="qi-case__quote">“{prd.quote}”</blockquote>
+        {prd.after && <p className="qi-case__around">{prd.after}</p>}
+        <figcaption className="qi-figure__caption stretch-mono">
+          From the PRD{prd.date && ` · ${prd.date}`}
+        </figcaption>
       </figure>
-      {evidence.length > 0 && <StoryEvidence evidence={evidence} />}
+      {evidence.length > 0 && (
+        <ul className="qi-case__evidence" aria-label="Evidence">
+          {evidence.map(({ value, label }) => (
+            <li key={label}>
+              <strong>{value}</strong> <span className="stretch-mono">{label}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
-  );
-}
-
-function NextProject({ next }: { next: ReturnType<typeof nextProject> }) {
-  const { project, colours } = next;
-  const { screenshot, fastener } = project;
-  if (!screenshot) throw new Error(`Case study "${project.slug}" is a next project, so it needs a screenshot.`);
-  return (
-    <StoryNext
-      label={caseStudyCopy.nextProject}
-      href={`/things-i-make/${project.slug}`}
-      colours={colours}
-      number={next.number}
-      name={project.name}
-      outcome={project.outcome}
-      media={{ screenshot, fastener }}
-    />
   );
 }

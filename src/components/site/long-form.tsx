@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Fragment, type ReactNode } from "react";
 import { Row } from "@/components/quiet/row";
+import { bindDots } from "@/components/site/bind-dots";
 import { FocusHashTarget } from "@/components/site/focus-hash-target";
 import { SiteHeader } from "@/components/site/site-header";
-import { Arrowed } from "@/components/site/story";
 
 /*
  * The long-form template (docs/design/DESIGN.md, "Long-form pages"): what a Role story and a case study share.
@@ -12,6 +12,18 @@ import { Arrowed } from "@/components/site/story";
  * to one (the pass, the screenshot, the figures) is passed in. Server-rendered in full, so it reads the same
  * with no script.
  */
+
+/** "Live site ↗" as a visible label and a decorative arrow: the link's name is the words. */
+export function Arrowed({ label }: { label: string }) {
+  const [, before, words, after] = label.match(/^(?:([←↗]) )?(.*?)(?: ([←↗]))?$/) ?? [];
+  return (
+    <>
+      {before && <span aria-hidden="true">{before}</span>}
+      {words}
+      {after && <span aria-hidden="true">{after}</span>}
+    </>
+  );
+}
 
 /** The header's links on a long-form page: the page's own sections, in reading order. */
 export type LongFormSection = { readonly id: string; readonly label: string };
@@ -54,8 +66,8 @@ export function LongFormOpening({ titleId, title, line, meta, long, aside, below
         <p className="qi-long__meta stretch-mono">
           {meta.map((part, index) => (
             <Fragment key={part}>
-              {index > 0 && " · "}
-              <span className="qi-long__nowrap">{part}</span>
+              {index > 0 && "\u00a0· "}
+              <span className="qi-long__nowrap">{bindDots(part)}</span>
             </Fragment>
           ))}
         </p>

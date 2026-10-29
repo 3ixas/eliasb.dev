@@ -57,11 +57,11 @@
     gap: 0 24px;
   }
 
-  .qi-long__heading {
+  .qi-long__open[data-aside] .qi-long__heading {
     grid-area: head;
   }
 
-  .qi-long__pass {
+  .qi-long__open[data-aside] .qi-long__pass {
     grid-area: pass;
   }
 
@@ -320,4 +320,119 @@
   overflow-wrap: anywhere;
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+/* ---------- a case study: its links, screenshots on the project's colour, and its Sheet ---------- */
+
+.qi-case__below {
+  display: grid;
+  gap: 24px;
+}
+
+.qi-case__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 20px;
+  margin-top: -14px;
+}
+
+.qi-case__links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0 4px;
+  min-height: 44px;
+  color: var(--stretch-ink);
+  font-size: var(--text-small);
+  text-decoration: underline;
+  text-decoration-color: var(--stretch-rule);
+  text-underline-offset: 4px;
+}
+
+.qi-case__links a:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid var(--stretch-cobalt);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .qi-case__links a:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+.qi-case__note {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--stretch-muted);
+  font-size: var(--text-label);
+  line-height: 1.4;
+}
+
+/* A screenshot of the work sits on the project's own colour, never edited. */
+.qi-case__shot {
+  padding: 18px;
+  border-radius: 14px;
+  background: var(--project-field, var(--stretch-card));
+}
+
+.qi-case__shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.qi-case__below .qi-case__shot {
+  padding: 22px;
+}
+
+/* The PRD: one Sheet with the spec's own line at 19 px, then the project's figures as a quiet line. */
+.qi-case__sheet {
+  margin-top: 18px;
+  padding: 18px 20px;
+  border: 1px solid var(--stretch-rule);
+  border-radius: 14px;
+  background: var(--stretch-card);
+}
+
+.qi-case__sheet figure {
+  margin: 0;
+}
+
+.qi-case__quote {
+  margin: 0;
+  font-size: var(--text-lead);
+  line-height: 1.45;
+}
+
+.qi-case__around {
+  margin: 0 0 10px;
+  font-size: var(--text-small);
+  line-height: 1.5;
+}
+
+.qi-case__quote ~ .qi-case__around {
+  margin: 10px 0 0;
+}
+
+.qi-case__evidence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.qi-case__evidence strong {
+  margin-right: 4px;
+  font-size: var(--text-body);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.qi-case__evidence span {
+  color: var(--stretch-muted);
+  font-size: var(--text-label);
 }

@@ -12,9 +12,6 @@
  * contract script) as well as Next.
  */
 
-/** The single small prop on a card's edge (see the Fastener in GLOSSARY.md). */
-export type FastenerKind = "tape" | "paperclip" | "push-pin";
-
 /** What the /things-i-make filters group by: Products, Systems or Experiments. */
 export const PROJECT_CATEGORIES = ["products", "systems", "experiments"] as const;
 export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number];
@@ -50,12 +47,11 @@ export type Project = {
   crop?: ProjectCrop;
   /** The project's own colours, carried by its tile. Needed to be featured. */
   colours?: { field: string; ink: string; swatch: string };
-  fastener?: FastenerKind;
 };
 
 /*
  * Ties in `year` keep this order, so list the newer of two same-year projects
- * first. The colours and fasteners come from the chosen Stretch boards.
+ * first. The colours come from the chosen Stretch boards.
  */
 const entries = [
   {
@@ -78,7 +74,6 @@ const entries = [
     },
     crop: { x: 0.18, y: 0.245, zoom: 5.5 },
     colours: { field: "#1a1714", ink: "#f2efe9", swatch: "#c08a5a" },
-    fastener: "tape",
   },
   {
     slug: "argus-risk",
@@ -99,7 +94,6 @@ const entries = [
     },
     crop: { x: 0.5, y: 0.472, zoom: 4.5 },
     colours: { field: "#0a0a0a", ink: "#f2f2f2", swatch: "#4f86f7" },
-    fastener: "paperclip",
   },
   {
     slug: "flowtime",
@@ -121,7 +115,6 @@ const entries = [
     },
     crop: { x: 0.38, y: 0.49, zoom: 4.5 },
     colours: { field: "#1e1915", ink: "#ece4d8", swatch: "#c0876a" },
-    fastener: "push-pin",
   },
   {
     slug: "home-secretary",
