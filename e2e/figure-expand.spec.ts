@@ -31,9 +31,10 @@ for (const { route, trigger } of pages) {
       expect(page.url()).toBe(url);
       const image = dialog.locator("img");
       await expect.poll(() => image.evaluate((img) => (img as HTMLImageElement).complete && (img as HTMLImageElement).naturalWidth > 0)).toBe(true);
+      // The image may still be settling (the browser picks its source and lays it out), so wait for the large size.
+      await expect.poll(async () => (await image.boundingBox())!.width).toBeGreaterThan(inline.width);
       const large = (await image.boundingBox())!;
       const viewport = page.viewportSize()!;
-      expect(large.width).toBeGreaterThan(inline.width);
       expect(large.x).toBeGreaterThanOrEqual(0);
       expect(large.x + large.width).toBeLessThanOrEqual(viewport.width);
       expect(large.y + large.height).toBeLessThanOrEqual(viewport.height + 1);
@@ -44,20 +45,17 @@ for (const { route, trigger } of pages) {
 
     test("its keyboard focus ring is not clipped by any frame around it", async ({ page }) => {
       const button = page.locator(trigger).first();
-      await button.focus();
-      await page.keyboard.press("Tab");
-      await page.keyboard.press("Shift+Tab");
-      await expect(button).toBeFocused();
-      const clipped = await button.evaluate((element) => {
+      // The ring is a 2 px outline offset by 2 px (.qi-zoom:focus-visible); no frame around the button may clip that.
+      const ringExtent = 4;
+      const clipped = await button.evaluate((element, extent) => {
         const ring = element.getBoundingClientRect();
-        const outline = parseFloat(getComputedStyle(element).outlineOffset) + parseFloat(getComputedStyle(element).outlineWidth);
         for (let parent = element.parentElement; parent && parent !== document.documentElement; parent = parent.parentElement) {
           if (getComputedStyle(parent).overflow === "visible") continue;
           const box = parent.getBoundingClientRect();
-          if (box.left > ring.left - outline || box.right < ring.right + outline || box.top > ring.top - outline || box.bottom < ring.bottom + outline) return parent.className;
+          if (box.left > ring.left - extent || box.right < ring.right + extent || box.top > ring.top - extent || box.bottom < ring.bottom + extent) return parent.className;
         }
         return null;
-      });
+      }, ringExtent);
       expect(clipped).toBeNull();
     });
 

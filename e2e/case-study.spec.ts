@@ -41,7 +41,7 @@ for (const slug of caseStudySlugs) {
 
     test("the landing screenshot sits at column width on the project's colour with a 14 px radius", async ({ page }) => {
       const shot = page.locator(".qi-case__below .qi-case__shot");
-      await expect(shot.locator("img")).toHaveAttribute("alt", project.screenshot!.alt);
+      await expect(shot.locator(".qi-zoom img")).toHaveAttribute("alt", project.screenshot!.alt);
       await expect(shot).toHaveCSS("background-color", rgb(project.colours!.field));
       await expect(shot).toHaveCSS("border-top-left-radius", "14px");
       const [box, column] = await Promise.all([shot.boundingBox(), page.locator(".qi-long .qi-column").first().boundingBox()]);
@@ -141,7 +141,7 @@ for (const slug of caseStudySlugs) {
       const column = await page.locator(".qi-long .qi-column").first().boundingBox();
       for (const { key, figure } of figures) {
         const frame = page.locator(`section#${key} .qi-figure`);
-        await expect(frame.locator("img")).toHaveAttribute("alt", figure.alt);
+        await expect(frame.locator(".qi-zoom img")).toHaveAttribute("alt", figure.alt);
         await expect(frame.locator("figcaption")).toHaveText(figure.caption);
         await expect(frame.locator("figcaption")).toHaveCSS("font-size", "13px");
         const shot = frame.locator(".qi-case__shot");
