@@ -18,8 +18,8 @@ import { pageTitle } from "../src/content/site";
 import { contrastOnPaper } from "./support/contrast";
 
 const schemes = ["light", "dark"] as const;
-/** From this width the header carries the section links, and a closer look arrives in the margin. */
-const LINKS_FROM = 980;
+/** From this width the header carries the section links (on a row of their own), and from MARGIN_FROM a closer look arrives in the margin. */
+const LINKS_FROM = 900;
 const MARGIN_FROM = 1180;
 
 for (const slug of roleStorySlugs) {
@@ -60,13 +60,26 @@ for (const slug of roleStorySlugs) {
         return;
       }
       await expect(links.first()).toBeVisible();
-      // The links fit on one row beside the name, the greeting's object and the Eclipse, and nothing scrolls sideways.
+      // The header is the column wide: it shares the title's left edge, and the links run along a row of their own beneath the name,
+      // from that edge to the column's right edge, on one line.
       await expect
         .poll(async () => {
-          const [last, eclipse] = [await links.last().boundingBox(), await page.locator("[data-eclipse]").boundingBox()];
-          return eclipse!.x - (last!.x + last!.width);
-        }, { message: "the last link ends before the Eclipse" })
-        .toBeGreaterThanOrEqual(0);
+          const [title, header, first, last, greeting, column] = await Promise.all([
+            page.getByRole("heading", { level: 1 }).boundingBox(),
+            page.locator(".qi-header__inner").boundingBox(),
+            links.first().boundingBox(),
+            links.last().boundingBox(),
+            page.locator("[data-greeting]").boundingBox(),
+            page.locator(".qi-long .qi-column").first().boundingBox(),
+          ]);
+          return {
+            sharedLeftEdge: Math.abs(header!.x - title!.x) <= 1 && Math.abs(first!.x - title!.x) <= 1,
+            insideColumn: last!.x + last!.width <= column!.x + column!.width + 1,
+            oneLine: Math.abs(first!.y - last!.y) <= 1,
+            below: first!.y >= greeting!.y + greeting!.height - 1,
+          };
+        })
+        .toEqual({ sharedLeftEdge: true, insideColumn: true, oneLine: true, below: true });
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await links.last().click();
       await expect(page).toHaveURL(/#what-i-took-with-me$/);
@@ -401,25 +414,3 @@ for (const slug of roleStorySlugs) {
     });
   });
 }
-
-// A touch screen wide enough for the links (an iPad on its side): tapping the greeting shows its words, which take the links' room.
-test.describe("The greeting on a wide touch screen", () => {
-  test.use({ hasTouch: true, isMobile: true, viewport: { width: 1100, height: 800 } });
-
-  test("tapping it shows its words and steps the section links aside, and tapping again brings them back", async ({ page, browserName }) => {
-    test.skip(browserName !== "chromium", "Touch emulation, Chromium");
-    await page.goto("/work/bnp-paribas");
-    const greeting = page.locator("[data-greeting]");
-    const links = page.locator(".qi-header__links");
-    await expect(greeting).toHaveAttribute("role", "button");
-    await expect(links).toHaveCSS("opacity", "1");
-    await greeting.tap();
-    await expect(greeting).toHaveAttribute("aria-expanded", "true");
-    await expect(links).toHaveCSS("opacity", "0");
-    await expect(links).toHaveCSS("pointer-events", "none");
-    // Nothing runs past the Eclipse while it shows.
-    await expect.poll(async () => (await greeting.boundingBox())!.x + (await greeting.boundingBox())!.width).toBeLessThanOrEqual((await page.locator("[data-eclipse]").boundingBox())!.x);
-    await greeting.tap();
-    await expect(links).toHaveCSS("opacity", "1");
-  });
-});

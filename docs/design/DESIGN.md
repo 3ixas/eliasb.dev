@@ -156,9 +156,9 @@ One header on every page, in the same place, so following a row never moves it. 
 
 - **Its links are the sections of the page you're on, or none.** On the homepage they are its five sections (Work, Things I make, How I work, Off the clock, Say hello). On a Role story or case study they are that page's own sections, which replaces the numbered section bar. The Work archive, the Résumé and the 404 have no sections, so they have no links.
 - **Style**: 15 px, muted, turning ink on hover, and underlined while their section is in view (`aria-current`). They sit in a navigation landmark named "On this page".
-- **Width**: on wide screens the header spans the column and the margin (940 px), because a long-form page's section names don't fit in 600 px. Its left edge is the column's.
+- **Width**: on wide screens the homepage's header spans the column and the margin (940 px), and its left edge is the column's. A long-form page's header is the column wide, because its six links go on a row of their own (below).
 - **Phones**: no links and no menu, and the greeting moves under the name. A long-form page is read top to bottom, with its back link at the top.
-- **A long-form page's six links need the row.** Beside the name, the greeting's object and the Eclipse they fill the 940 px, so on a long-form page the greeting keeps its object and shows its words on hover, focus or tap (the links already step aside then, for London's time). The links are 15 px with 8 px padding. Below 980 px the row is too short for six links, so they are not shown, as on a phone. The homepage's five links fit beside the full greeting, which keeps its words.
+- **A long-form page's header is the column wide.** The six links do not fit beside the name, the greeting and the Eclipse, so on a Role story or case study the header is the page's 600 px column (not 940), sharing its left edge, with the name, greeting and Eclipse on the top row and the links on a row of their own beneath, spread from the column's left edge to its right. The greeting keeps its words, and London's time shows without the links stepping aside. The links are 15 px, with no padding between them. The homepage's five links fit beside the greeting on one row, as before.
 
 ## The homepage, in order
 

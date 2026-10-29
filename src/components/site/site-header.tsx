@@ -33,8 +33,8 @@ function FaceLook() {
  * with its scene, quiet links to the page's sections on a wide screen, and the Eclipse. There is no phone menu:
  * below 900 px the links are not shown and the greeting sits under the name (quiet-header.css). The links are
  * in the server HTML, so they work without script. The portrait is a button that shows its closer look. A
- * long-form page (`long`) has six links, which do not fit beside the greeting's words: its greeting keeps its object
- * and shows its words on hover or focus, as London's time appears, and below 980 px the links are not shown.
+ * long-form page (`long`) has six links, which do not fit on the row beside the name and greeting: its header is the
+ * page's 600 px column wide, with the links on a row of their own under the name.
  */
 export function SiteHeader(props: HeaderProps) {
   return (

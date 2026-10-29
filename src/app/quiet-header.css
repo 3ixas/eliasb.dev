@@ -421,7 +421,7 @@ a.qi-header__name {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
-    padding-inline: 8px;
+    padding-inline: 10px;
     border-radius: 8px;
     color: var(--stretch-muted);
     font-size: var(--text-small);
@@ -437,34 +437,42 @@ a.qi-header__name {
   }
 
   /*
-   * A long-form page's six links need the row the greeting's words use: its object stays, its words show on hover,
-   * focus or tap (the links already step aside then, for London's time). Below 980 px the row is too short for
-   * six links, so they are not shown, as on a phone.
+   * A long-form page's header is the page's column wide (600 px), so the page and its header share one left edge,
+   * with the six links on a row of their own under the name, spread from the column's left edge to its right.
+   * The greeting keeps its words, and London's time can show without the links stepping aside.
    */
-  .qi-header[data-long] .qi-greeting {
-    gap: 0;
+  .qi-header[data-long] .qi-header__inner {
+    width: min(100% - 40px, 600px);
+    grid-template-areas:
+      "who greet . eclipse"
+      "links links links links"
+      "look look look look";
   }
 
-  .qi-header[data-long] .qi-greeting__words {
-    max-width: 0;
-    margin-left: 8px;
-    overflow: hidden;
+  .qi-header[data-long] .qi-header__links {
+    grid-area: links;
+    margin: 0;
   }
 
-  .qi-header[data-long] .qi-greeting:is(:hover, :focus-visible, [data-open]) .qi-greeting__words {
-    max-width: none;
+  .qi-header[data-long] .qi-header__links ul {
+    justify-content: space-between;
+    gap: 0 12px;
   }
 
-  /* Its words take the links' room, so the links step aside while they show, whatever the pointer (hover has its own rule below). */
-  .qi-header[data-long] .qi-greeting:is(:focus-visible, [data-open]) ~ .qi-header__links {
-    opacity: 0;
-    pointer-events: none;
+  .qi-header[data-long] .qi-header__links a {
+    min-height: 40px;
+    padding-inline: 0;
+  }
+
+  .qi-header[data-long] .qi-greeting:is(:hover, :focus-visible) ~ .qi-header__links {
+    opacity: 1;
+    pointer-events: auto;
   }
 }
 
-@media (min-width: 900px) and (max-width: 979px) {
-  .qi-header[data-long] .qi-header__links {
-    display: none;
+@media (min-width: 1180px) {
+  .qi-header[data-long] .qi-header__inner {
+    width: 600px;
   }
 }
 
