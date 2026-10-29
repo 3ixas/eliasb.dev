@@ -179,7 +179,7 @@ The two share one template. Each is the header, a back link, an opening, then it
 - **Back link**: "← Work" on a Role story (to `/#work`), "← Things I make" on a case study (to the Work archive). 15 px, muted.
 - **Title**: the page's `h1`, in the opening line's treatment (`clamp(34px, 5.4vw, 50px)`, weight 650). It is the loudest text on the page, except that a name too long for the display size (Optegra Eye Healthcare & Kensington Medical) is set at 30 to 34 px so its longest word fits beside the pass. A supporting line follows at 17 px, muted, then quiet metadata in 13 px mono.
 - **Sections**: a 17 px title (weight 650) and the prose at 17 px, as on the homepage. No numbers, no giant headings, no condensed display type. A case study's header links use short labels (Where it started, On paper, Decisions, How it’s built, Where it stands, What’s next) so the six fit one row of the column; each section's own title is its bold line.
-- **Figures** (rule 7): inline at column width with a 13 px mono caption beneath. Screenshots sit on their Project colour with a 14 px radius. The to-scale bars and the flag figure are drawn on the card surface (`--stretch-card`). Every figure keeps its alt text.
+- **Figures** (rule 7): inline at column width with a 13 px mono caption beneath. Screenshots sit on their Project colour with a 14 px radius. The to-scale bars and the flag figure are drawn on the card surface (`--stretch-card`). Every figure keeps its alt text. A screenshot is also a button: a click or tap opens the same image large in a modal dialog in the same window (centred, up to 1400 px wide, the page dimmed behind it), and a click anywhere on it, its Close button or Esc closes it and returns focus to the screenshot. The to-scale bars and the flag figure are not screenshots and do not expand.
 - **Ending**: one row, under "Next role" or "Next project", with the next page's 44 px object, its name and its one line. The order is unchanged (Role stories newest to oldest; case studies in the Things I make order).
 
 ### A Role story's opening
@@ -196,7 +196,7 @@ A case study's PRD is one inline **Sheet**: the quote at 19 px, "From the PRD" a
 
 ### Motion on long-form pages
 
-The pass swings to rest once on arrival; the to-scale bars shrink once when they scroll into view; closer looks arrive as on the homepage. Nothing else moves.
+The pass swings to rest once on arrival; the to-scale bars shrink once when they scroll into view; closer looks arrive as on the homepage; an expanded screenshot fades in over 0.2 s (not at all with reduced motion). Nothing else moves.
 
 ## The Work archive
 

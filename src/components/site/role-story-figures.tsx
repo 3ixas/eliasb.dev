@@ -1,5 +1,5 @@
-import Image from "next/image";
 import type { CSSProperties } from "react";
+import { ZoomableImage } from "@/components/site/zoomable-image";
 import { ShrinkOnView } from "@/components/site/shrink-on-view";
 import type { RoleStoryFigure } from "@/content/stretch/role-story";
 
@@ -79,7 +79,7 @@ function ScreensFigure({ figure }: { figure: Extract<RoleStoryFigure, { kind: "s
       <div className="qi-screens__row">
         {figure.images.map(({ src, alt, width, height, device }) => (
           <div key={src} className="qi-screens__shot" data-device={device}>
-            <Image src={src} alt={alt} width={width} height={height} sizes={device === "phone" ? "(min-width: 761px) 130px, 24vw" : "(min-width: 761px) 430px, 72vw"} />
+            <ZoomableImage src={src} alt={alt} width={width} height={height} sizes={device === "phone" ? "(min-width: 761px) 130px, 24vw" : "(min-width: 761px) 430px, 72vw"} />
           </div>
         ))}
       </div>

@@ -436,3 +436,100 @@
   color: var(--stretch-muted);
   font-size: var(--text-label);
 }
+
+/* ---------- a screenshot that opens large in the same window ---------- */
+
+.qi-zoom {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: none;
+  color: inherit;
+  cursor: zoom-in;
+}
+
+.qi-zoom:focus-visible {
+  outline: 2px solid var(--stretch-cobalt);
+  outline-offset: 2px;
+}
+
+.qi-zoom__dialog {
+  /* The site's reset zeroes margins; a modal dialog is centred by its auto margins. */
+  margin: auto;
+  width: fit-content;
+  max-width: 96vw;
+  max-height: 96dvh;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: var(--stretch-card);
+  overflow: hidden;
+  cursor: zoom-out;
+}
+
+.qi-zoom__dialog::backdrop {
+  background: rgb(0 0 0 / 0.72);
+}
+
+.qi-zoom__dialog img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(96vw, 1400px);
+  max-height: 96dvh;
+}
+
+.qi-zoom__dialog form {
+  margin: 0;
+}
+
+.qi-zoom__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 22px;
+  background: rgb(0 0 0 / 0.72);
+  color: #fff;
+  font: inherit;
+  font-size: var(--text-small);
+  cursor: pointer;
+}
+
+.qi-zoom__close:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* The page behind a modal does not scroll. */
+body:has(.qi-zoom__dialog[open]) {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .qi-zoom__dialog[open] {
+    animation: qi-zoom-in 0.2s var(--out);
+  }
+
+  .qi-zoom__dialog[open]::backdrop {
+    animation: qi-zoom-fade 0.2s var(--out);
+  }
+}
+
+@keyframes qi-zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+@keyframes qi-zoom-fade {
+  from {
+    opacity: 0;
+  }
+}

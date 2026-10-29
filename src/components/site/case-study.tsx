@@ -1,6 +1,6 @@
-import Image from "next/image";
 import { ProjectObject, projectColours } from "@/components/quiet/project-object";
 import { Arrowed, BackLink, LongForm, LongFormOpening, LongFormSectionBlock, NextRow } from "@/components/site/long-form";
+import { ZoomableImage } from "@/components/site/zoomable-image";
 import { projects } from "@/content/projects";
 import {
   caseStudyCopy,
@@ -50,7 +50,7 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
                 {figure && (
                   <figure className="qi-figure">
                     <div className="qi-case__shot" style={projectColours(opening)}>
-                      <Image src={figure.src} alt={figure.alt} width={figure.width} height={figure.height} sizes="(max-width: 760px) calc(100vw - 32px), 560px" />
+                      <ZoomableImage src={figure.src} alt={figure.alt} width={figure.width} height={figure.height} sizes="(max-width: 760px) calc(100vw - 32px), 560px" />
                     </div>
                     <figcaption className="qi-figure__caption stretch-mono">{figure.caption}</figcaption>
                   </figure>
@@ -86,7 +86,7 @@ function OpeningBelow({ opening }: { opening: CaseStudyOpening }) {
         </div>
       )}
       <div className="qi-case__shot" style={projectColours(opening)}>
-        <Image src={screenshot.src} alt={screenshot.alt} width={screenshot.width} height={screenshot.height} sizes="(max-width: 760px) calc(100vw - 32px), 560px" preload />
+        <ZoomableImage src={screenshot.src} alt={screenshot.alt} width={screenshot.width} height={screenshot.height} sizes="(max-width: 760px) calc(100vw - 32px), 560px" preload />
       </div>
     </div>
   );
