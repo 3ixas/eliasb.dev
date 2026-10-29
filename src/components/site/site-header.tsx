@@ -13,7 +13,7 @@ type Section = { readonly id: string; readonly label: string };
  * The homepage's header has its five sections and the portrait's closer look. An `inner` page (every other page)
  * leads home by its name and shows the portrait as a picture only; it has its own `sections`, or none.
  */
-type HeaderProps = { sections: readonly Section[]; inner?: never; long?: never } | { inner: true; sections?: readonly Section[]; long?: boolean };
+type HeaderProps = { sections: readonly Section[]; inner?: never } | { inner: true; sections?: readonly Section[] };
 
 const name = "Elias Bennett";
 const { portrait } = siteCopy.header;
@@ -36,9 +36,9 @@ function FaceLook() {
  * with its scene, quiet links to the page's sections on a wide screen, and the Eclipse. There is no phone menu:
  * below 900 px the links are not shown and the greeting sits under the name (quiet-header.css). The links are
  * in the server HTML, so they work without script. On the homepage the portrait is a button that shows its closer
- * look; on every other page it is a picture and the name is the link home. A long-form page (`long`) has six
- * links, which do not fit on the row beside the name and greeting: its header is the page's 600 px column wide,
- * with the links on a row of their own under the name.
+ * look; on every other page it is a picture and the name is the link home. An inner page with sections (a
+ * long-form page) has six links, which do not fit on the row beside the name and greeting: its header is the
+ * page's 600 px column wide, with the links on a row of their own under the name.
  */
 export function SiteHeader(props: HeaderProps) {
   const portraitImage = <Image className="qi-header__face" src={heroPortrait.src} alt="" width={80} height={80} sizes="40px" />;
@@ -75,7 +75,7 @@ export function SiteHeader(props: HeaderProps) {
     </>
   );
   return (
-    <header className="qi-header" data-stretch-header data-long={props.long ? "" : undefined}>
+    <header className="qi-header" data-stretch-header data-long={props.inner && props.sections ? "" : undefined}>
       <a className="stretch-skip" href="#main-content">
         Skip to content
       </a>

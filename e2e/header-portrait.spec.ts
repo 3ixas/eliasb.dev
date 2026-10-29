@@ -126,6 +126,8 @@ const innerPages = ["/things-i-make", "/things-i-make/threshold", "/work/bnp-par
 for (const path of innerPages) {
   test(`on ${path} the name leads home and the portrait is only a picture`, async ({ page }) => {
     await page.goto(path);
+    // The greeting is hydrated with the page, so a handler that would open a look is listening by now.
+    await expect(page.locator("[data-greeting]")).toBeVisible();
     const header = page.locator("[data-stretch-header]");
     const home = header.getByRole("link", { name: "Elias Bennett, home" });
     await expect(home).toHaveAttribute("href", "/");
@@ -134,7 +136,9 @@ for (const path of innerPages) {
     await expect(header.locator(".qi-header__face")).toBeVisible();
     await expect(face(page)).toHaveCount(0);
     await expect(header.locator("[data-look], [data-look-tap], [data-look-slot]")).toHaveCount(0);
-    // Hovering or tapping it shows nothing, wherever the pointer is.
+    // Hovering or clicking it shows nothing, wherever the pointer is.
+    await header.locator(".qi-header__face").hover();
+    await expect(margin(page)).toHaveCount(0);
     await header.locator(".qi-header__face").click();
     await expect(margin(page)).toHaveCount(0);
     await expect(inline(page)).toHaveCount(0);

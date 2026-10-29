@@ -204,7 +204,7 @@ The pass swings to rest once on arrival; the to-scale bars shrink once when they
 
 ## The Résumé
 
-The sheet is unchanged: it is what prints and what `public/Elias-Bennett-Resume.pdf` holds, so `verify:resume` and the committed PDF stay valid. The page around it takes the shared header (no links), the desk, and Download PDF above the sheet.
+The sheet is unchanged: it is what prints and what `public/Elias-Bennett-Resume.pdf` holds, so `verify:resume` and the committed PDF stay valid. The page around it takes the shared header (no links), the desk, and Download PDF above the sheet. The header's row is as wide as the sheet, so the portrait and name start at the paper's left edge and the Eclipse ends at its right.
 
 ## The 404
 
