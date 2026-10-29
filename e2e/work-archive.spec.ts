@@ -140,6 +140,23 @@ test.describe("Work archive: a catalogue above ten (fixtures)", () => {
     await expect(rows(page)).toHaveCount(12);
   });
 
+  test("a closer look open when a filter removes its row does not leave the restored row stuck", async ({ page }) => {
+    const wide = await page.evaluate(() => matchMedia("(min-width: 1180px) and (hover: hover)").matches);
+    test.skip(wide, "Taps open the look inline below 1180 px or without a hover");
+    await page.waitForFunction(() => Object.keys(document.querySelector(".qi-archive")!).some((key) => key.startsWith("__reactProps$")));
+    const row = rows(page).filter({ has: page.locator('[data-look="project-fixture-1"]') });
+    const look = page.locator('[data-look-slot="project-fixture-1"] .qi-project');
+    await row.locator(".qi-row__tap").click();
+    await expect(look).toBeVisible();
+    await filters(page).getByRole("button", { name: "Systems", exact: true }).click();
+    await expect(row).toHaveCount(0);
+    await filters(page).getByRole("button", { name: "All", exact: true }).click();
+    await expect(row).toHaveCount(1);
+    await expect(look).toHaveCount(0);
+    await row.locator(".qi-row__tap").click();
+    await expect(look).toBeVisible();
+  });
+
   test("filters are at least 44 px tall, with no sideways scroll and no axe violations", async ({ page }) => {
     for (const button of await filters(page).getByRole("button").all()) {
       const box = await button.boundingBox();

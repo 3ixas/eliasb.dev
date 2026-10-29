@@ -1,4 +1,3 @@
-import { CloserLookRoot } from "@/components/quiet/closer-look-root";
 import { ProjectRow, projectLooks } from "@/components/quiet/project-rows";
 import { LongForm, LongFormOpening } from "@/components/site/long-form";
 import { WorkArchiveList } from "@/components/site/work-archive";
@@ -16,10 +15,10 @@ export function WorkArchivePage({ catalogue }: { catalogue: readonly Project[] }
   return (
     <LongForm attrs={{ "data-work-archive": "" }}>
       <section className="stretch-wrap qi-long" aria-labelledby="work-archive-title">
-        <CloserLookRoot looks={projectLooks(ordered)} className="qi-column">
+        <div className="qi-column">
           <LongFormOpening titleId="work-archive-title" title={workArchive.heading} line={workArchive.note} />
-          <WorkArchiveList items={ordered.map((project) => ({ slug: project.slug, category: project.category, row: <ProjectRow project={project} /> }))} />
-        </CloserLookRoot>
+          <WorkArchiveList looks={projectLooks(ordered)} items={ordered.map((project) => ({ slug: project.slug, category: project.category, row: <ProjectRow project={project} /> }))} />
+        </div>
       </section>
     </LongForm>
   );

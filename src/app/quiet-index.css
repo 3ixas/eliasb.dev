@@ -994,12 +994,12 @@
   color: var(--stretch-page);
 }
 
-/* The list under the opening needs room above it; under the filters it sits closer. */
-.qi-long__open + .qi-list {
+/* The rows' controller under the opening needs room above it; under the filters it sits closer. */
+.qi-archive {
   margin-top: 28px;
 }
 
-.qi-filters + .qi-list {
+.qi-filters + .qi-archive {
   margin-top: 16px;
 }
 
