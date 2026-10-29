@@ -98,14 +98,6 @@ _Avoid_: Fine print, small print as an exception to the floor
 The homepage section for Elias's own projects: **Featured work** above the **Project index**, with a count of what he has built, introduced by what the hero used to say: making complicated things feel simple, and taking ideas all the way through ([#159](https://github.com/3ixas/eliasb.dev/issues/159)). It follows **Work**: reordered, not reduced, and keeping its product edge. The **Work archive** and every **Case study** live under `/things-i-make`, and `/work` and the old case-study paths redirect there permanently, one path at a time, since `/work/[employer]` now holds the **Role story** pages ([#157](https://github.com/3ixas/eliasb.dev/issues/157), [#158](https://github.com/3ixas/eliasb.dev/issues/158)).
 _Avoid_: Work (that means employment), On my own
 
-**How I got here** (superseded):
-Superseded by the **Staff passes** ([#194](https://github.com/3ixas/eliasb.dev/issues/194)); its note survives under the Work heading. Was the last part of **Work**: the earlier roles as compact rows, newest first, in the **Project index** style (dates, role, organisation, a one-line note), each linking to its **Role story**. History has a row but no link. A one-line note frames the changes of craft as evidence for the direction rather than as a record. It replaces the **Career ruler** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
-_Avoid_: Timeline, oldest first, the full CV
-
-**Where I've been** (superseded):
-The homepage section that told Elias's path on a **Career ruler**, with his story as one-line notes and CV-level milestones as markers. It replaced the **About section**. Superseded on 11 October 2026 by **Work**, with **Where I'm headed** and **How I got here** inside it ([#157](https://github.com/3ixas/eliasb.dev/issues/157)); kept for history.
-_Avoid_: About, long biography
-
 **Off the clock**:
 The homepage section for Elias's own time: his training week, what he is reading and last watched, the weekly history clipping, **Now making**, and his GitHub contributions. Each item is a **Live signal** with a fallback.
 _Avoid_: Library, Personal signals, Board
@@ -113,23 +105,6 @@ _Avoid_: Library, Personal signals, Board
 **Now making**:
 The **Off the clock** item that follows Elias's latest pushed public GitHub repository (not forks, archives, the profile repository or `personal-portfolio-v1`), refreshed with the page and cached for six hours. A repository that is one of his projects shows the project's name and links to its case study; any other shows its name and GitHub description and links to GitHub. Hidden when GitHub can't be reached. It replaces the **Making pin**.
 _Avoid_: Experiments, Lab
-
-**Fastener**:
-The single small prop on a card's edge: tape, a paperclip, or a push pin. It fastens only what would be held to a surface (a screenshot on its tile, a sheet of paper on a wall), so a card that is simply a card has none ([#242](https://github.com/3ixas/eliasb.dev/issues/242)). There is at most one per object, the card itself stays clean, and the image carries the colour.
-Retired from the homepage by the **Quiet index** ([#278](https://github.com/3ixas/eliasb.dev/issues/278)), and from every other page on 26 October 2026 ([#301](https://github.com/3ixas/eliasb.dev/issues/301)).
-_Avoid_: Prop that stands in for content, more than one per card, a Fastener on every card, "pin" alone (say push pin, or award pin)
-
-**Career ruler** (superseded):
-Where I've been, shown as a vertical log, oldest first: each stage has its dates, a bar (cobalt for the current role), the role, and the organisation, with story beats as one-line notes and milestones as marked lines beneath it ([#110](https://github.com/3ixas/eliasb.dev/issues/110)). Superseded on 11 October 2026 by **How I got here** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)); kept for history.
-_Avoid_: Red string, timeline pins
-
-**Board** (superseded):
-The site's organising metaphor: a well-kept studio wall where Elias pins things he is making, reading, watching, and thinking about. Pins sit at slight angles, can overlap a little, and are swapped as life changes. Replaces Cabinet of Curiosities as the name of the visual direction. Superseded on 8 October 2026 by the **Stretch direction** ([#107](https://github.com/3ixas/eliasb.dev/issues/107)); kept for history.
-_Avoid_: Cabinet, dashboard, widget grid
-
-**Pin** (superseded):
-One item placed on the Board, such as a project, a book, a film, a playlist, or this week's history clipping. A pin earns its place only while it has something current or meaningful to show; a stale or empty pin is removed rather than displayed. Superseded on 8 October 2026 by the **Stretch direction** ([#107](https://github.com/3ixas/eliasb.dev/issues/107)); kept for history.
-_Avoid_: Widget, card (when meaning the Board item)
 
 **One-page home**:
 The canonical scrollable homepage where the primary navigation moves between six authored sections of one narrative: Hero, **Work**, **Things I make**, **How I work**, **Off the clock**, and Say hello ([#106](https://github.com/3ixas/eliasb.dev/issues/106), reordered in [#157](https://github.com/3ixas/eliasb.dev/issues/157)). **How I work** follows **Things I make** because its proofs come from Elias's own projects.
@@ -164,40 +139,9 @@ The one motion a surface is remembered by, and the only motion that belongs to i
 Superseded on the homepage: the **Quiet index**'s signature is the **Margin** itself, and each **Closer look** moves the way its own thing would ([#279](https://github.com/3ixas/eliasb.dev/issues/279)). The inner pages followed on 26 October 2026 ([#301](https://github.com/3ixas/eliasb.dev/issues/301)): a Role story's pass keeps its lean, and nothing else on a long-form page has a signature.
 _Avoid_: Calling shared or feedback motion a section's signature, two signatures on one surface
 
-**Living area** (superseded):
-The parts of the site that can grow through notes, experiments, cultural entries, or discoveries without a publishing schedule. Superseded on 8 October 2026 by the **Stretch direction** ([#107](https://github.com/3ixas/eliasb.dev/issues/107)); kept for history.
-_Avoid_: Blog, feed
-
-**Lab** (superseded):
-The legacy name for experiments, works in progress, making notes, and playful technical experiences. Superseded on 8 October 2026 by **Now making** under **Off the clock** ([#107](https://github.com/3ixas/eliasb.dev/issues/107)); kept for history.
-_Avoid_: Treating Lab as a separate publishing destination or confusing it with the main Work archive.
-
-**Making pin** (superseded):
-The Pin showing what Elias is building right now, in one line with one image. It replaces the Experiments section. When nothing is current, it shows his latest public repository instead. Superseded on 8 October 2026 by the **Stretch direction** ([#107](https://github.com/3ixas/eliasb.dev/issues/107)); kept for history.
-_Avoid_: Experiments section, Lab
-
-**Weekly clipping** (superseded):
-This week's history Pin: one surprising, source-linked fact shown like a newspaper cutting, which opens to reveal the week's other two. Superseded on 8 October 2026 by the **Stretch direction** ([#107](https://github.com/3ixas/eliasb.dev/issues/107)); kept for history.
-_Avoid_: History widget, history panel
-
 **Maker of clarity**:
 Elias's positioning. He builds everyday software, end to end, that makes complicated things simple, useful, and beautiful. It is an aspiration, never a claim of adoption or impact. Since [#159](https://github.com/3ixas/eliasb.dev/issues/159) it introduces **Things I make** rather than heading the hero.
 _Avoid_: Claims of users, traction, or "can't live without" as a fact
-
-**Experiments section** (retired):
-A former compact homepage section for Lab material. It is replaced by **Now making**.
-
-**Library** (superseded):
-The public primary-navigation label for the unified Personal signals section. It takes visitors to the existing one-page collection and does not create a separate Library page. Superseded on 8 October 2026 by the six-section homepage ([#106](https://github.com/3ixas/eliasb.dev/issues/106)); kept for history.
-_Avoid_: Treating the legacy `/library` path as a separate content system.
-
-**Personal signals section** (superseded):
-The single homepage section reached by the **Library** navigation item. Its stable anchor remains #outside-work. It gathers current building, London status, training, fantasy football, reading, cinema, music, and history as personal signals alongside the case studies. Its cards can be grouped and arranged according to the material rather than a fixed taxonomy. Superseded on 8 October 2026 by the six-section homepage ([#106](https://github.com/3ixas/eliasb.dev/issues/106)); kept for history.
-_Avoid_: Splitting personality across separate Now and Library sections, or presenting science fiction as a standalone category without enough material to support it.
-
-**About section** (superseded):
-The homepage's long-form personal section containing Elias's professional context, connecting thread, interests, portrait, and contact links. The white-tux portrait is the chosen primary image for this section. Superseded on 8 October 2026 by the six-section homepage ([#106](https://github.com/3ixas/eliasb.dev/issues/106)); kept for history.
-_Avoid_: A detached profile page that repeats the homepage story.
 
 **Live signal**:
 A recently refreshed piece of personal or professional activity, displayed with its update time and a deliberate fallback when its source is unavailable.
@@ -217,7 +161,7 @@ _Avoid_: CMS content
 
 ## History
 
-Homepage terms the **Quiet index** retired ([#300](https://github.com/3ixas/eliasb.dev/issues/300)). They stay here so older issues and `docs/design/history/` still read.
+Terms the **Quiet index** retired, from the homepage and the Stretch-era pages ([#300](https://github.com/3ixas/eliasb.dev/issues/300)). They stay here so older issues and `docs/design/history/` still read.
 
 **First glance**:
 What a skimming recruiter takes from the first screen at a glance: who Elias is, what he does now, and his strongest proof. The **Signature entrance** names BNP Paribas within about a second and completes the First glance at about 4 s ([#160](https://github.com/3ixas/eliasb.dev/issues/160)). It reuses the hero's slots ([#159](https://github.com/3ixas/eliasb.dev/issues/159)): the headline "I build pricing and risk engines at BNP Paribas, and *products of my own.*", so it lands in the entrance's first beat; under the name, the role line "Software Engineer"; a supporting line with the stack and both awards; and the portrait label "Based in London". On the screen the headline is the only line that names the employer; the others refer back to it ("the bank's") rather than repeat it ([#243](https://github.com/3ixas/eliasb.dev/issues/243)). It serves a second audience alongside the **Primary audience** without replacing it, and never repeats the proofs that lead Work's Now. The same story carries off the page: the home title is "Elias Bennett, software engineer at BNP Paribas", and the description and social image lead with the BNP pricing and risk engines and products of my own, so a search result or a shared link does the First glance's job ([#162](https://github.com/3ixas/eliasb.dev/issues/162)).
@@ -241,3 +185,59 @@ _Avoid_: Tile, card (for a **Row**)
 **Pass rail** (retired):
 The rail on the homepage's Work section from which every employer's **Staff pass** hung, the current one largest, with the History note beneath. Retired from the homepage ([#279](https://github.com/3ixas/eliasb.dev/issues/279)): each employer is a **Row** with a mini pass, and the full pass arrives as its **Closer look**. A **Role story** still opens on the full pass.
 _Avoid_: Timeline, a rail on any other surface
+
+**How I got here** (superseded):
+Superseded by the **Staff passes** ([#194](https://github.com/3ixas/eliasb.dev/issues/194)); its note survives under the Work heading. Was the last part of **Work**: the earlier roles as compact rows, newest first, in the **Project index** style (dates, role, organisation, a one-line note), each linking to its **Role story**. History has a row but no link. A one-line note frames the changes of craft as evidence for the direction rather than as a record. It replaces the **Career ruler** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
+_Avoid_: Timeline, oldest first, the full CV
+
+**Where I've been** (superseded):
+The homepage section that told Elias's path on a **Career ruler**, with his story as one-line notes and CV-level milestones as markers. It replaced the **About section**. Superseded on 11 October 2026 by **Work**, with **Where I'm headed** and **How I got here** inside it ([#157](https://github.com/3ixas/eliasb.dev/issues/157)); kept for history.
+_Avoid_: About, long biography
+
+**Fastener** (retired):
+The single small prop on a card's edge: tape, a paperclip, or a push pin. It fastens only what would be held to a surface (a screenshot on its tile, a sheet of paper on a wall), so a card that is simply a card has none ([#242](https://github.com/3ixas/eliasb.dev/issues/242)). There is at most one per object, the card itself stays clean, and the image carries the colour.
+Retired from the homepage by the **Quiet index** ([#278](https://github.com/3ixas/eliasb.dev/issues/278)), and from every other page on 26 October 2026 ([#301](https://github.com/3ixas/eliasb.dev/issues/301)).
+_Avoid_: Prop that stands in for content, more than one per card, a Fastener on every card, "pin" alone (say push pin, or award pin)
+
+**Career ruler** (superseded):
+Where I've been, shown as a vertical log, oldest first: each stage has its dates, a bar (cobalt for the current role), the role, and the organisation, with story beats as one-line notes and milestones as marked lines beneath it ([#110](https://github.com/3ixas/eliasb.dev/issues/110)). Superseded on 11 October 2026 by **How I got here** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)); kept for history.
+_Avoid_: Red string, timeline pins
+
+**Board** (superseded):
+The site's organising metaphor: a well-kept studio wall where Elias pins things he is making, reading, watching, and thinking about. Pins sit at slight angles, can overlap a little, and are swapped as life changes. Replaces Cabinet of Curiosities as the name of the visual direction. Superseded on 8 October 2026 by the **Stretch direction** ([#107](https://github.com/3ixas/eliasb.dev/issues/107)); kept for history.
+_Avoid_: Cabinet, dashboard, widget grid
+
+**Pin** (superseded):
+One item placed on the Board, such as a project, a book, a film, a playlist, or this week's history clipping. A pin earns its place only while it has something current or meaningful to show; a stale or empty pin is removed rather than displayed. Superseded on 8 October 2026 by the **Stretch direction** ([#107](https://github.com/3ixas/eliasb.dev/issues/107)); kept for history.
+_Avoid_: Widget, card (when meaning the Board item)
+
+**Living area** (superseded):
+The parts of the site that can grow through notes, experiments, cultural entries, or discoveries without a publishing schedule. Superseded on 8 October 2026 by the **Stretch direction** ([#107](https://github.com/3ixas/eliasb.dev/issues/107)); kept for history.
+_Avoid_: Blog, feed
+
+**Lab** (superseded):
+The legacy name for experiments, works in progress, making notes, and playful technical experiences. Superseded on 8 October 2026 by **Now making** under **Off the clock** ([#107](https://github.com/3ixas/eliasb.dev/issues/107)); kept for history.
+_Avoid_: Treating Lab as a separate publishing destination or confusing it with the main Work archive.
+
+**Making pin** (superseded):
+The Pin showing what Elias is building right now, in one line with one image. It replaces the Experiments section. When nothing is current, it shows his latest public repository instead. Superseded on 8 October 2026 by the **Stretch direction** ([#107](https://github.com/3ixas/eliasb.dev/issues/107)); kept for history.
+_Avoid_: Experiments section, Lab
+
+**Weekly clipping** (superseded):
+This week's history Pin: one surprising, source-linked fact shown like a newspaper cutting, which opens to reveal the week's other two. Superseded on 8 October 2026 by the **Stretch direction** ([#107](https://github.com/3ixas/eliasb.dev/issues/107)); kept for history.
+_Avoid_: History widget, history panel
+
+**Experiments section** (retired):
+A former compact homepage section for Lab material. It is replaced by **Now making**.
+
+**Library** (superseded):
+The public primary-navigation label for the unified Personal signals section. It takes visitors to the existing one-page collection and does not create a separate Library page. Superseded on 8 October 2026 by the six-section homepage ([#106](https://github.com/3ixas/eliasb.dev/issues/106)); kept for history.
+_Avoid_: Treating the legacy `/library` path as a separate content system.
+
+**Personal signals section** (superseded):
+The single homepage section reached by the **Library** navigation item. Its stable anchor remains #outside-work. It gathers current building, London status, training, fantasy football, reading, cinema, music, and history as personal signals alongside the case studies. Its cards can be grouped and arranged according to the material rather than a fixed taxonomy. Superseded on 8 October 2026 by the six-section homepage ([#106](https://github.com/3ixas/eliasb.dev/issues/106)); kept for history.
+_Avoid_: Splitting personality across separate Now and Library sections, or presenting science fiction as a standalone category without enough material to support it.
+
+**About section** (superseded):
+The homepage's long-form personal section containing Elias's professional context, connecting thread, interests, portrait, and contact links. The white-tux portrait is the chosen primary image for this section. Superseded on 8 October 2026 by the six-section homepage ([#106](https://github.com/3ixas/eliasb.dev/issues/106)); kept for history.
+_Avoid_: A detached profile page that repeats the homepage story.

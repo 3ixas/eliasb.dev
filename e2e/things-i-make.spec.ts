@@ -45,8 +45,8 @@ test.describe("Things I make: the rows", () => {
     await expect(items(page)).toHaveCount(shown.length);
   });
 
-  test("the Featured tiles, their tilt and their Fasteners are gone from the homepage", async ({ page }) => {
-    await expect(section(page).locator(".stretch-tile, .stretch-tiles, .stretch-fastener, .stretch-index, .stretch-intro")).toHaveCount(0);
+  test("the Featured tiles and their tilt are gone from the homepage", async ({ page }) => {
+    await expect(section(page).locator(".stretch-tile, .stretch-tiles, .stretch-index, .stretch-intro")).toHaveCount(0);
   });
 
   test("a project row goes to its case study, else its live site, else its code; external ones are marked ↗ and open in a new tab", async ({ page }) => {
