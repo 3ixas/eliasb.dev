@@ -288,8 +288,8 @@
   gap: 14px;
 }
 
+/* The frame does not clip: a screenshot's focus ring sits outside it. The image rounds its own corners. */
 .qi-screens__shot {
-  overflow: hidden;
   border: 1px solid var(--stretch-rule);
   border-radius: 14px;
   background: var(--stretch-card);
@@ -308,6 +308,7 @@
   display: block;
   width: 100%;
   height: auto;
+  border-radius: 13px;
 }
 
 /* On its own line, so the link is a 44 px target. */
@@ -369,11 +370,18 @@
   line-height: 1.4;
 }
 
-/* A screenshot of the work sits on the project's own colour, never edited. */
+/*
+ * A screenshot of the work sits on the project's own colour, never edited. The button that expands it fills the
+ * frame (it holds the padding), so its focus ring lands on the page and not on the project's colour, where it
+ * would not stand out at 3:1.
+ */
 .qi-case__shot {
-  padding: 18px;
   border-radius: 14px;
   background: var(--project-field, var(--stretch-card));
+}
+
+.qi-case__shot > .qi-zoom {
+  padding: 18px;
 }
 
 .qi-case__shot img {
@@ -383,7 +391,7 @@
   border-radius: 8px;
 }
 
-.qi-case__below .qi-case__shot {
+.qi-case__below .qi-case__shot > .qi-zoom {
   padding: 22px;
 }
 
@@ -435,4 +443,100 @@
 .qi-case__evidence span {
   color: var(--stretch-muted);
   font-size: var(--text-label);
+}
+
+/* ---------- a screenshot that opens large in the same window ---------- */
+
+.qi-zoom {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: none;
+  color: inherit;
+  cursor: zoom-in;
+}
+
+.qi-zoom:focus-visible {
+  outline: 2px solid var(--stretch-cobalt);
+  outline-offset: 2px;
+}
+
+.qi-zoom__dialog {
+  /* The site's reset zeroes margins; a modal dialog is centred by its auto margins. */
+  margin: auto;
+  width: fit-content;
+  max-width: 96vw;
+  max-height: 96dvh;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: var(--stretch-card);
+  overflow: hidden;
+  cursor: zoom-out;
+}
+
+.qi-zoom__dialog::backdrop {
+  background: rgb(0 0 0 / 0.72);
+}
+
+/* As wide as the window allows (up to 1400 px and the image's own width), and no taller than the window; --w and --ar are the image's declared width and aspect ratio. */
+.qi-zoom__dialog img {
+  display: block;
+  width: min(96vw, 1400px, calc(96dvh * var(--ar)), calc(var(--w) * 1px));
+  height: auto;
+}
+
+.qi-zoom__dialog form {
+  margin: 0;
+}
+
+.qi-zoom__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 22px;
+  background: rgb(0 0 0 / 0.72);
+  color: #fff;
+  font: inherit;
+  font-size: var(--text-small);
+  cursor: pointer;
+}
+
+.qi-zoom__close:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* The page behind a modal does not scroll. */
+body:has(.qi-zoom__dialog[open]) {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .qi-zoom__dialog[open] {
+    animation: qi-zoom-in 0.2s var(--out);
+  }
+
+  .qi-zoom__dialog[open]::backdrop {
+    animation: qi-zoom-fade 0.2s var(--out);
+  }
+}
+
+@keyframes qi-zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+@keyframes qi-zoom-fade {
+  from {
+    opacity: 0;
+  }
 }

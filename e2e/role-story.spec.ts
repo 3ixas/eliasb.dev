@@ -211,9 +211,10 @@ for (const slug of roleStorySlugs) {
           await expect(block.locator("figcaption")).toHaveText(`${figure.source.label} ↗`);
           await expect(block.locator("figcaption a")).toHaveAttribute("href", figure.source.href);
           await expect(block.locator("figcaption a")).toHaveText(`${figure.source.label} ↗`);
-          await expect(block.locator("img")).toHaveCount(figure.images.length);
+          // Each screenshot is a button holding its inline image; the dialog beside it holds the large copy.
+          await expect(block.locator(".qi-zoom img")).toHaveCount(figure.images.length);
           for (const [index, image] of figure.images.entries()) {
-            const img = block.locator("img").nth(index);
+            const img = block.locator(".qi-zoom img").nth(index);
             await img.scrollIntoViewIfNeeded();
             await expect(img).toHaveAttribute("alt", image.alt);
             await expect.poll(() => img.evaluate((el: HTMLImageElement) => (el.complete ? el.naturalWidth : 0))).toBeGreaterThan(0);
