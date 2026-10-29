@@ -100,6 +100,19 @@ test.describe("The Résumé", () => {
     expect(download!.y + download!.height).toBeLessThanOrEqual(paper!.y);
   });
 
+  test("the header lines up with the sheet: its row has the paper's left and right edges", async ({ page }) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 900, "Below 900 px the header is the narrow column, not the sheet's width");
+    await expect(sheet(page)).toBeVisible();
+    const edges = () =>
+      page.evaluate(() => {
+        const paper = document.querySelector(".stretch-resume__sheet")!.getBoundingClientRect();
+        const row = document.querySelector(".qi-header__inner")!.getBoundingClientRect();
+        return { left: Math.abs(row.left - paper.left), right: Math.abs(row.right - paper.right) };
+      });
+    await expect.poll(async () => (await edges()).left).toBeLessThanOrEqual(1);
+    await expect.poll(async () => (await edges()).right).toBeLessThanOrEqual(1);
+  });
+
   test("is complete without script: the header, its skip link, Download PDF and the sheet are in the server HTML", async ({ page }) => {
     await page.route("**/*.js", (route) => route.abort());
     await page.reload();

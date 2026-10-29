@@ -13,6 +13,12 @@
   padding: 24px var(--stretch-gutter) 64px;
 }
 
+/* The header lines up with the sheet it sits above: the name at the paper's left edge, the Eclipse at its right. */
+[data-resume] .qi-header__inner {
+  width: min(100% - 40px, 210mm);
+  margin-inline: auto;
+}
+
 .stretch-resume__sheet {
   --sheet-paper: #ffffff;
   --sheet-ink: #111114;

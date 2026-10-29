@@ -32,7 +32,7 @@ export type LongFormSection = { readonly id: string; readonly label: string };
 export function LongForm({ sections, attrs, children }: { sections?: readonly LongFormSection[]; attrs: Record<`data-${string}`, string>; children: ReactNode }) {
   return (
     <div data-stretch-shell {...attrs}>
-      {sections ? <SiteHeader sections={sections} long /> : <SiteHeader home />}
+      <SiteHeader inner sections={sections} />
       <FocusHashTarget />
       <main id="main-content" tabIndex={-1}>
         {children}

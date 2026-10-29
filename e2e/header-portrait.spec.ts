@@ -14,10 +14,8 @@ const face = (page: Page) => page.getByRole("button", { name: "A closer look at 
 const margin = (page: Page) => page.locator(".qi-margin");
 const inline = (page: Page) => page.locator(".qi-header .qi-inline__in");
 
-const pages = [
-  { name: "the homepage", path: "/" },
-  { name: "the 404", path: "/nothing-here" },
-];
+// The portrait's closer look is the homepage's alone; every other page shows it as a picture (below).
+const pages = [{ name: "the homepage", path: "/" }];
 
 for (const { name, path } of pages) {
   test.describe(`The portrait on ${name}`, () => {
@@ -122,15 +120,33 @@ for (const { name, path } of pages) {
   });
 }
 
-test("on the 404 the name still leads home, and the portrait does not", async ({ page }) => {
-  await page.goto("/nothing-here");
-  const home = page.locator("[data-stretch-header]").getByRole("link", { name: "Elias Bennett, home" });
-  await expect(home).toHaveAttribute("href", "/");
-  await expect(home.locator(".qi-header__face")).toHaveCount(0);
-  expect((await home.boundingBox())!.height).toBeGreaterThanOrEqual(44);
-  await home.click();
-  await expect(page).toHaveURL(/\/$/);
-});
+// Every page but the homepage: the name leads home, and the portrait is a picture with no closer look.
+const innerPages = ["/things-i-make", "/things-i-make/threshold", "/work/bnp-paribas", "/resume", "/nothing-here"];
+
+for (const path of innerPages) {
+  test(`on ${path} the name leads home and the portrait is only a picture`, async ({ page }) => {
+    await page.goto(path);
+    // The greeting is hydrated with the page, so a handler that would open a look is listening by now.
+    await expect(page.locator("[data-greeting]")).toBeVisible();
+    const header = page.locator("[data-stretch-header]");
+    const home = header.getByRole("link", { name: "Elias Bennett, home" });
+    await expect(home).toHaveAttribute("href", "/");
+    await expect(home.locator(".qi-header__face")).toHaveCount(0);
+    expect((await home.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    await expect(header.locator(".qi-header__face")).toBeVisible();
+    await expect(face(page)).toHaveCount(0);
+    await expect(header.locator("[data-look], [data-look-tap], [data-look-slot]")).toHaveCount(0);
+    // Hovering or clicking it shows nothing, wherever the pointer is.
+    await header.locator(".qi-header__face").hover();
+    await expect(margin(page)).toHaveCount(0);
+    await header.locator(".qi-header__face").click();
+    await expect(margin(page)).toHaveCount(0);
+    await expect(inline(page)).toHaveCount(0);
+    await expect(page).toHaveURL(new RegExp(`${path}$`));
+    await home.click();
+    await expect(page).toHaveURL(/\/$/);
+  });
+}
 
 test("between 900 and 1179 px the tapped look opens on its own row under the header, at full size", async ({ page }) => {
   // No project is this wide, so the window is set: wide enough for the one row, too narrow for the margin.

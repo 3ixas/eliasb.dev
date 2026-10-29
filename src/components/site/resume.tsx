@@ -13,7 +13,7 @@ export function ResumePage() {
   const sheet = resumeSheet();
   return (
     <div data-stretch-shell data-resume>
-      <SiteHeader home />
+      <SiteHeader inner />
       <main id="main-content" tabIndex={-1} className="stretch-resume__desk">
         <a className="stretch-pill stretch-resume__download" href={resumePdf.href} download>
           {resumeCopy.download}
