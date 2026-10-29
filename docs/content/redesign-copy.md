@@ -272,6 +272,8 @@ The markers cover the deck’s retired list and the old wording of rows it marks
 
 ## Case studies
 
+Voice rule: frame everything positively. Say what exists and what I did, and what I want to do next; do not say what is missing, unfinished or unmeasured (no "not launched", "not measured yet", "I haven’t…"). What is next belongs in "What’s next".
+
 Shared labels: ← Things I make · Live site ↗ · Code ↗ · Next project · From the PRD. The header’s section links are the short labels below (On paper, What’s next), so the six fit one row of the column; a section’s own title is its bold line. Row numbers 01–06 are this deck’s, not the page’s.
 
 ### Threshold
@@ -283,7 +285,7 @@ Shared labels: ← Things I make · Live site ↗ · Code ↗ · Next project ·
 | 02 On paper | **The problem, on paper.** “People in their 20s and 30s make the decision to move out … without a clear, honest view of what it will actually cost.” · Evidence: 57 user stories · 13 slices, built in a day · 182 tests · 3 cities |
 | 03 Decisions | **Two totals and a straight answer.** *Upfront and monthly stay separate.* You can often afford the monthly costs long before you’ve saved the upfront ones. *The answer is one of three.* Move now; not yet, and how many months of saving; or your income doesn’t cover the monthly costs. *Each city keeps its own rules.* Different deposits, local charges, and transport passes, and every default can be changed. *Suggestions show what would help.* A cheaper district, a smaller place, or a flatmate, and how much each would save. |
 | 04 How it’s built | **The link is the save file.** Everything you choose lives in the URL: no account, no backend. The calculations are plain functions with no state of their own, covered by 182 tests. The maps use real boundaries: 33 London boroughs, Zurich’s 12 Kreise, and Basel in seven areas. |
-| 05 Where it stands | **Used, not launched.** I used it during my own flat hunt, and friends have used it too. I didn’t record what changed from what they told me, and it isn’t launched or measured yet. |
+| 05 Where it stands | **Used for real.** I used it during my own flat hunt, and friends have used it too. |
 | 06 What’s next | *Keep the data fresh.* Move the April 2026 snapshot to a scheduled refresh where the sources allow it. *Show the sources in the app.* Link every default to its source. *Finer areas in Basel.* Use its 19 Wohnviertel rather than seven areas. |
 | Meta description | A rental calculator for London, Basel, and Zurich that shows what a move really costs: upfront, monthly, and how long until you can afford it. |
 
@@ -296,7 +298,7 @@ Shared labels: ← Things I make · Live site ↗ · Code ↗ · Next project ·
 | 02 On paper | **Two users, on paper.** The spec names the simulated user, a risk or portfolio manager, and the real audience: “hiring managers and engineers at banks, hedge funds, and trading firms”. · Evidence: 5 currencies · 4 services · 126 .NET tests · 1 command to run it |
 | 03 Decisions | **Show the number with its history.** *Every change is an event.* Replay them and you can see any position at any point in time. *Freshness sits next to the value.* If a feed stalls, you see what failed and how old the number is. *The maths is plain functions.* FIFO cost basis, P&L, and Value at Risk: same inputs, same answer. *Check the answer.* A reconciliation run replays history and compares it with the live state. |
 | 04 How it’s built | **Four services and a stream.** Two simulators publish prices, FX rates, and trades to Kafka (Redpanda locally). The risk engine publishes a snapshot every second, and SignalR pushes it to a Next.js dashboard. Marten keeps position events in PostgreSQL, so history replays at up to 60 times speed. |
-| 05 Where it stands | **Runs locally, not measured yet.** It only runs locally, so looking at it means cloning the repo. I designed for under 500 ms from a price change to the dashboard, but I haven’t measured it. |
+| 05 Where it stands | **Runs locally with one command.** One Docker command runs the whole stack on your machine. I designed it for under 500 ms from a price change to the dashboard. |
 | 06 What’s next | *Measure the latency.* Add a benchmark and publish the result. *Make it easier to see.* A recorded replay or a hosted read-only demo. *Stress testing.* Let you shock a currency or a sector and watch the portfolio react. |
 | Meta description | A local simulator for a multi-currency risk platform, where every number on the dashboard shows where it came from and how old it is. |
 
@@ -309,7 +311,7 @@ Shared labels: ← Things I make · Live site ↗ · Code ↗ · Next project ·
 | 02 On paper | **The problem, on paper.** “Practitioners manually time sessions with phone stopwatches, calculate break durations mentally.” The spec’s test: finish a first full cycle within two minutes of landing. · Evidence: 6 timer states · 189 unit tests · ⅕ default break · 2-minute first cycle (the target) |
 | 03 Decisions | **Count from a fixed point, and ask instead of guessing.** *Time comes from a timestamp,* so a sleeping tab never loses minutes. *The break follows the focus:* a fifth by default, adjustable from a third to an eighth. *Every state has a name:* six of them, so the interface always knows what to show. *Ask, don’t assume:* come back to an unfinished session and Flowtime asks what to do. |
 | 04 How it’s built | **Everything stays in your browser.** Sessions, tags, notes, and settings live on your device, with a CSV export. A service worker keeps it working offline. It works from the keyboard and announces changes to screen readers. |
-| 05 Where it stands | **Used, not launched.** I use it for my own focused work, and friends have used it too. I didn’t record what changed from what they said, and it isn’t launched or measured yet. |
+| 05 Where it stands | **Used for my own focus.** I use it for my own focused work, and friends have used it too. |
 | 06 What’s next | *Move between devices,* keeping local storage as the default. *Show when you focus best,* like the time of day you tend to focus longest. |
 | Meta description | A focus timer that counts up, sets breaks in proportion to your focus, and keeps your history on your device. |
 

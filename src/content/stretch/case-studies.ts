@@ -61,9 +61,9 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
         },
       },
       "where-it-stands": {
-        heading: "Used, not launched.",
+        heading: "Used for real.",
         paragraphs: [
-          "I used it during my own flat hunt, and friends have used it too. I didn’t record what changed from what they told me, and it isn’t launched or measured yet.",
+          "I used it during my own flat hunt, and friends have used it too.",
         ],
       },
       "whats-next": {
@@ -139,9 +139,9 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
         ],
       },
       "where-it-stands": {
-        heading: "Runs locally, not measured yet.",
+        heading: "Runs locally with one command.",
         paragraphs: [
-          "It only runs locally, so looking at it means cloning the repo. I designed for under 500 ms from a price change to the dashboard, but I haven’t measured it.",
+          "One Docker command runs the whole stack on your machine. I designed it for under 500 ms from a price change to the dashboard.",
         ],
       },
       "whats-next": {
@@ -205,9 +205,9 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
         ],
       },
       "where-it-stands": {
-        heading: "Used, not launched.",
+        heading: "Used for my own focus.",
         paragraphs: [
-          "I use it for my own focused work, and friends have used it too. I didn’t record what changed from what they said, and it isn’t launched or measured yet.",
+          "I use it for my own focused work, and friends have used it too.",
         ],
       },
       "whats-next": {
