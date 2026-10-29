@@ -958,6 +958,51 @@
   }
 }
 
+/* The Work archive's filters, above the list once there are more than ten projects. */
+.qi-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.qi-filters__button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--stretch-rule);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--stretch-ink);
+  font-size: var(--text-small);
+  cursor: pointer;
+}
+
+.qi-filters__button:focus-visible {
+  outline: 2px solid var(--stretch-cobalt);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .qi-filters__button:hover {
+    border-color: var(--stretch-ink);
+  }
+}
+
+.qi-filters__button[aria-pressed="true"] {
+  border-color: var(--stretch-ink);
+  background-color: var(--stretch-ink);
+  color: var(--stretch-page);
+}
+
+/* The rows' controller under the opening needs room above it; under the filters it sits closer. */
+.qi-archive {
+  margin-top: 28px;
+}
+
+.qi-filters + .qi-archive {
+  margin-top: 16px;
+}
+
 /* The phone card's screenshot exists in the markup for every screen and shows on phones only. */
 .qi-card__shot {
   display: none;

@@ -14,16 +14,15 @@ declare global {
 /**
  * Lists every element a visitor would see that is faded or hidden, and every
  * hold mark left on the document. It skips what is meant to be out of sight
- * until asked for: aria-hidden decoration (the mini marks, a row's arrow), the
- * hover preview on an index row, London's time beside the greeting (shown on
- * hover or focus), and hidden, template or closed-dialog content.
+ * until asked for: aria-hidden decoration (the mini marks, a row's arrow), London's time beside the greeting
+ * (shown on hover or focus), and hidden, template or closed-dialog content.
  * It runs in the page, so it is self-contained.
  */
 const findHeld = (): Sample => {
   const describe = (element: Element) => element.tagName.toLowerCase() + (element.className ? `.${String(element.className).split(" ")[0]}` : "");
   const held: string[] = [];
   for (const element of document.querySelectorAll("body *")) {
-    if (element.closest("[hidden], dialog, noscript, template, [aria-hidden='true'], .stretch-index__shot, .qi-greeting__more")) continue;
+    if (element.closest("[hidden], dialog, noscript, template, [aria-hidden='true'], .qi-greeting__more")) continue;
     const style = getComputedStyle(element);
     if (style.display === "none") continue;
     if (Number(style.opacity) < 1 || style.visibility === "hidden") held.push(describe(element));
