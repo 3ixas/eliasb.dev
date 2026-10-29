@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { resumeCopy, resumePdf, resumeSheet, resumeText } from "../src/content/resume";
 import { roleStories, roleStorySlugs } from "../src/content/stretch/role-stories";
+import { siteCopy } from "../src/content/stretch/site-copy";
 import { work } from "../src/content/stretch/work";
 
 // The Résumé is an A4 sheet on the desk (GLOSSARY.md). The page is hydrated and laid out after load,
@@ -89,6 +90,16 @@ test.describe("The Résumé", () => {
       .toEqual({ pageOverflow: false, clipped: [], sheetFits: true });
   });
 
+  test("takes the shared header with the way home and no section links, and Download PDF sits above the sheet", async ({ page }) => {
+    await expect(page.locator("header.qi-header")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Elias Bennett, home" })).toHaveAttribute("href", "/");
+    await expect(page.getByRole("navigation", { name: siteCopy.header.linksLabel })).toHaveCount(0);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+    await expect(sheet(page)).toBeVisible();
+    const [download, paper] = await Promise.all([page.getByRole("link", { name: resumeCopy.download }).boundingBox(), sheet(page).boundingBox()]);
+    expect(download!.y + download!.height).toBeLessThanOrEqual(paper!.y);
+  });
+
   test("keeps Download PDF on the desk, off the sheet and out of print", async ({ page }) => {
     const download = page.getByRole("link", { name: resumeCopy.download });
     await expect(download).toHaveAttribute("href", resumePdf.href);
@@ -100,7 +111,7 @@ test.describe("The Résumé", () => {
 
     await page.emulateMedia({ media: "print" });
     await expect(download).toBeHidden();
-    await expect(page.locator("header.stretch-header")).toBeHidden();
+    await expect(page.locator("header.qi-header")).toBeHidden();
     await expect(page.locator("footer")).toBeHidden();
     // The room below the content is for the screen: paper has none to leave, so it must not push a blank page.
     await expect(page.locator("[data-resume] main")).toHaveCSS("padding-bottom", "0px");

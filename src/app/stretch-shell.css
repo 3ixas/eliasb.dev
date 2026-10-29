@@ -101,23 +101,6 @@ html:has([data-stretch-shell]) body {
   transform: none;
 }
 
-.stretch-header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background-color: var(--stretch-page);
-  border-bottom: 1px solid var(--stretch-rule);
-}
-
-.stretch-header__inner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px 16px;
-  padding-block: 12px;
-}
-
 .stretch-pill {
   display: inline-flex;
   align-items: center;
@@ -447,14 +430,6 @@ button.stretch-pill {
     opacity: 0;
     transform: scale(2.6);
   }
-}
-
-/* ---- The header pill on the Work archive and the Résumé ---- */
-
-.stretch-cs-home {
-  text-decoration: none;
-  font-weight: 700;
-  font-size: var(--text-small);
 }
 
 /* ---- The 404: a heading, one line and a way home ---- */
