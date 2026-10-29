@@ -215,7 +215,7 @@
     background: #ffffff;
   }
 
-  [data-resume] .stretch-header,
+  [data-resume] .qi-header,
   [data-resume] .stretch-resume__download {
     display: none;
   }
