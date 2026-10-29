@@ -10,7 +10,6 @@ import type { CaseStudy } from "./case-study";
 export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
   threshold: {
     slug: "threshold",
-    number: "01",
     stack: ["React 19", "TypeScript", "MapLibre"],
     sections: {
       "where-it-started": {
@@ -95,7 +94,6 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
   },
   "argus-risk": {
     slug: "argus-risk",
-    number: "02",
     stack: [".NET 8", "Kafka", "PostgreSQL", "SignalR"],
     note: "Runs locally with one Docker command.",
     sections: {
@@ -173,7 +171,6 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
   },
   flowtime: {
     slug: "flowtime",
-    number: "03",
     stack: ["Next.js", "TypeScript", "Service Worker"],
     sections: {
       "where-it-started": {

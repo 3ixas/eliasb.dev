@@ -43,7 +43,7 @@ const arrowGap = (page: Page, selector: string) =>
 test.describe("Shell details: arrows", () => {
   test("the case study's back link and buttons keep a gap between label and arrow, with no literal space", async ({ page }) => {
     await page.goto("/things-i-make/threshold");
-    for (const selector of [".stretch-cs-back", ".stretch-cs-button:has([aria-hidden='true'])"]) {
+    for (const selector of [".qi-long__back", ".qi-case__links a:has([aria-hidden='true'])"]) {
       await expect.poll(() => arrowGap(page, selector)).toBeGreaterThanOrEqual(3);
       expect(await page.locator(selector).first().textContent()).not.toMatch(/[←↗]\s|\s[←↗]/);
     }
@@ -72,7 +72,7 @@ test.describe("Shell details: separators", () => {
   test("every dot in a metadata line is bound to the item before it", async ({ page }) => {
     for (const route of ["/", "/things-i-make/threshold"]) {
       await page.goto(route);
-      const lines = await page.locator(".stretch-cs-open__meta, .stretch-index__meta, .stretch-tile__meta, .qi-row__line").allTextContents();
+      const lines = await page.locator(".qi-long__meta, .stretch-index__meta, .stretch-tile__meta, .qi-row__line").allTextContents();
       expect(lines.length).toBeGreaterThan(0);
       for (const line of lines) expect(line).not.toMatch(/[^\u00a0]·/u);
     }

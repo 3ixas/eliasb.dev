@@ -226,7 +226,7 @@ for (const study of studies) {
   const table = Object.fromEntries(rows(copyFor(names[study.slug]), "### ").map(([label, text]) => [label, text]));
   const opening = caseStudyOpening(study, projects);
   assert.equal(
-    [opening.outcome, opening.metadata, opening.stack, opening.note].filter(Boolean).join(" · "),
+    [opening.outcome, ...opening.meta, opening.note].filter(Boolean).join(" · "),
     table.Opening,
     `${study.slug}: opening`,
   );
@@ -279,7 +279,6 @@ for (const story of roles) {
 assert.deepEqual(caseStudyProblems(studies, projects), []);
 for (const slug of featuredSlugs) assert.ok(caseStudies[slug], `${slug} is featured and has a case study`);
 assert.deepEqual(studies.map((study) => study.next), ["argus-risk", "flowtime", "threshold"], "Next project follows the featured order");
-assert.deepEqual(studies.map((study) => study.number), ["01", "02", "03"]);
 
 // The problems are reported by name.
 const [threshold] = studies;

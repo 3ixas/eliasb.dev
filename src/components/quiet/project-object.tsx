@@ -32,6 +32,6 @@ export function ProjectObject({ project }: { project: Project }) {
 }
 
 /** The project's own colours as the properties the object, its closer look and its phone card read; a project without them takes the page's. */
-export function projectColours({ colours }: Project) {
+export function projectColours({ colours }: Pick<Project, "colours">) {
   return colours ? ({ "--project-field": colours.field, "--project-ink": colours.ink } as CSSProperties) : undefined;
 }

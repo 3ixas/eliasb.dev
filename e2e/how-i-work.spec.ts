@@ -142,7 +142,7 @@ test.describe("How I work: Threshold's PRD", () => {
     await expect(row.locator(".qi-row__line")).toHaveText(date);
     await expect(row.locator(".qi-row__object .qi-sheet")).toHaveCount(1);
     await expect(section(page).locator(".qi-list__item").last().locator('[data-look="threshold-prd"]')).toHaveCount(1);
-    await expect(section(page).locator(".stretch-prd, .stretch-fastener")).toHaveCount(0);
+    await expect(section(page).locator(".stretch-fastener")).toHaveCount(0);
   });
 
   test.describe("with motion", () => {

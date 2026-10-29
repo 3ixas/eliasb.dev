@@ -1,26 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { tagSwing } from "../src/components/site/signature-springs";
 
-// Motion on the finished page: scroll sway, and hover that only moves things where there is a hover.
-test.describe("Scroll sway", () => {
-  test.use({ reducedMotion: "no-preference" });
-
-  test("the PRD card sways, keeping its own resting tilt", async ({ page, browserName }) => {
-    test.skip(browserName !== "chromium", "Scroll-driven animation, Chromium");
-    await page.goto("/things-i-make/threshold");
-    const prd = page.locator(".stretch-prd");
-    await prd.scrollIntoViewIfNeeded();
-    await expect.poll(() => prd.evaluate((element) => getComputedStyle(element).rotate)).not.toBe("none");
-    await expect.poll(() => prd.evaluate((element) => getComputedStyle(element).transform), { message: "the resting 1 degree tilt is still there" }).not.toBe("none");
-  });
-
-  test("with reduced motion nothing sways", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/things-i-make/threshold");
-    expect(await page.locator(".stretch-prd").evaluate((element) => getComputedStyle(element).rotate)).toBe("none");
-  });
-});
-
+// Motion on the finished page: hover that only moves things where there is a hover.
 test.describe("Margin notes", () => {
   const strokes = (page: Page) => page.locator("#how-i-work path[pathLength]");
   // The first habit's circle, a stroke that is on screen at every width.
