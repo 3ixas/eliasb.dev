@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { LostPropertyTag } from "@/components/site/lost-property-tag";
-import { SiteHeader } from "@/components/site/site-header";
+import { MiniPass } from "@/components/quiet/finished-pass";
+import { HabitNumber } from "@/components/quiet/how-i-work";
+import { ProjectObject } from "@/components/quiet/project-object";
+import { Row } from "@/components/quiet/row";
+import { Sheet } from "@/components/quiet/sheet";
+import { TodayTile } from "@/components/quiet/today-tile";
+import { LongForm, LongFormOpening } from "@/components/site/long-form";
+import { MissingAddress } from "@/components/site/missing-address";
 import { pageTitle } from "@/content/site";
+import { projects } from "@/content/projects";
 import { notFound as copy, siteCopy } from "@/content/stretch/site-copy";
 
 export const metadata: Metadata = {
@@ -17,45 +23,47 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
+const threshold = projects.find(({ slug }) => slug === "threshold");
+if (!threshold) throw new Error("The 404 shows Threshold's object, so Threshold has to be in the catalogue");
+
+/** Each homepage section's own object, by its anchor (docs/design/DESIGN.md, Objects). */
+const objects = {
+  work: <MiniPass slug="bnp-paribas" />,
+  "things-i-make": <ProjectObject project={threshold} />,
+  "how-i-work": <HabitNumber position={0} />,
+  "off-the-clock": <TodayTile />,
+  "say-hello": <Sheet />,
+} as const;
+
 /**
- * The 404 (docs/content/redesign-copy.md): the header, a short heading
- * and line, one link home, a lost-property tag naming the address asked for
- * (beside them, below on phones) and a row for each homepage section. It has
- * no cobalt beyond focus, selection and hover.
+ * The 404 (docs/design/DESIGN.md, "The 404"): it says what didn't work, then what to try. The shared header with no
+ * links, "This page doesn't exist." as the opening line, the missing row (the address asked for, struck through,
+ * with an empty slot as its object; not a link), then the homepage's five sections as rows with their own objects.
  */
 export default function NotFound() {
   return (
-    <div data-stretch-shell data-not-found>
-      <SiteHeader inner />
-      <main id="main-content" tabIndex={-1} className="stretch-wrap stretch-404">
-        <div className="stretch-404__copy">
-          <h1 className="stretch-display stretch-h2">{copy.heading}</h1>
-          <p className="stretch-404__line">{copy.line}</p>
-          <Link className="stretch-404__home" href="/">
-            {copy.button.replace(/ →$/, "")}
-            <span aria-hidden="true">→</span>
-          </Link>
+    <LongForm attrs={{ "data-not-found": "" }}>
+      <section className="stretch-wrap qi-long" aria-labelledby="not-found-title">
+        <div className="qi-column">
+          <LongFormOpening titleId="not-found-title" title={copy.heading} line={copy.line} />
+          <div className="qi-long__section">
+            <ul className="qi-list" data-missing="">
+              <Row object={<span className="qi-empty" />} title={<MissingAddress />} line={copy.missing.line} meta={copy.missing.meta} />
+            </ul>
+          </div>
+          <section className="qi-long__section" aria-labelledby="try-title">
+            <h2 id="try-title" className="qi-title">
+              {copy.tryTitle}
+            </h2>
+            <p className="qi-note-line">{copy.tryNote}</p>
+            <ul className="qi-list">
+              {siteCopy.menu.map(({ id, label }) => (
+                <Row key={id} href={`/#${id}`} object={objects[id]} title={label} line={copy.tryLines[id]} />
+              ))}
+            </ul>
+          </section>
         </div>
-        <LostPropertyTag />
-        <nav aria-label={copy.orTry} className="stretch-404__rows">
-          <p className="stretch-mono stretch-404__or-try">{copy.orTry}</p>
-          <ol className="stretch-index__list">
-            {siteCopy.menu.map(({ id, label }, index) => (
-              <li key={id} className="stretch-index__row">
-                <Link href={`/#${id}`} className="stretch-index__link">
-                  <span className="stretch-index__number stretch-mono">{String(index + 1).padStart(2, "0")}</span>
-                  <span className="stretch-index__text">
-                    <span className="stretch-index__name">{label}</span>
-                  </span>
-                  <span className="stretch-index__arrow" aria-hidden="true">
-                    →
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ol>
-        </nav>
-      </main>
-    </div>
+      </section>
+    </LongForm>
   );
 }

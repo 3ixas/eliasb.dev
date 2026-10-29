@@ -307,7 +307,6 @@ Elias agreed these on 26 October 2026, when the draft was reviewed:
 
 ## Still to come
 
-- **Copy for the 404's rows** and the "Try one of these" note, through the copy deck.
 - **The build**: the homepage is specified in [Spec: build the quiet index homepage](https://github.com/3ixas/eliasb.dev/issues/288); a follow-on spec covers the inner pages, on the same integration branch. Moving the specs and copy checks across follows the checklist in [#277](https://github.com/3ixas/eliasb.dev/issues/277).
 
 ## Exploration record

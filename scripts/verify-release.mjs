@@ -369,7 +369,7 @@ async function verifyNotFound(baseUrl) {
   const heading = markup.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? "";
   equal(plainText(heading), "This page doesn’t exist.", "404 heading");
   check(plainText(markup).includes("It’s moved, or it never did. Everything else is where you left it."), "404 line");
-  check(hrefs(markup).some(({ tag, href }) => href === "/" && plainText(markup.slice(markup.indexOf(tag))).startsWith("Back to the homepage")), "The 404 should link back to the homepage");
+  check(hrefs(markup).some(({ href }) => href === "/#work"), "The 404 should link to the homepage's sections");
 }
 
 async function verifyWorkSocialMetadata(baseUrl, document, route) {

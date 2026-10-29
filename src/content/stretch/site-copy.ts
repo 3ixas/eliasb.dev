@@ -54,19 +54,18 @@ export const notFound = {
   title: "Nothing here",
   heading: "This page doesn’t exist.",
   line: "It’s moved, or it never did. Everything else is where you left it.",
-  button: "Back to the homepage →",
-  /** The lost-property tag hung beside the heading (#217): the address asked for, stamped. */
-  tag: {
-    title: "Lost property",
-    item: "Item",
-    foundAt: "Found at",
-    foundAtValue: "eliasb.dev",
-    returnTo: "Return to",
-    returnToValue: "the homepage",
-    stamp: "Not on file",
+  /** The missing row: the address asked for is its title, struck through; these are its line and its metadata. */
+  missing: { line: "Not on file", meta: "404" },
+  /** The section title and note above the five homepage sections, and each section's line, by its anchor. */
+  tryTitle: "Try one of these",
+  tryNote: "The homepage, a section at a time.",
+  tryLines: {
+    work: "BNP Paribas, Joveen and Optegra",
+    "things-i-make": "Threshold, Argus Risk, Flowtime and more",
+    "how-i-work": "Four habits, and the proof for each",
+    "off-the-clock": "Training, a book, a film, this week in history",
+    "say-hello": "The email, the résumé, GitHub and LinkedIn",
   },
-  /** The lead-in to the five homepage sections, listed under the line. */
-  orTry: "Or try",
 } as const;
 
 /** The homepage section for Elias's own projects, at #things-i-make. */

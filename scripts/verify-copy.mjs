@@ -85,14 +85,20 @@ for (const text of built) assert.ok(plain.includes(text), `Built string is not i
 assert.equal(thingsIMake.note, "Products of my own, from a rental calculator to a risk simulator.");
 assert.equal(thingsIMake.allThings(projects.length), "Everything I’ve built (06) →");
 
-// The 404's lost-property tag and section rows are listed field by field, not just as stray words.
-const tag = notFound.tag;
+// The 404's missing row, section title and note are listed field by field, and each section's line is in the deck's table.
 for (const line of [
-  `- Tag title: ${tag.title}`,
-  `- Tag fields: ${tag.item} (the address asked for, shortened in the middle at about 48 characters) · ${tag.foundAt} ${tag.foundAtValue} · ${tag.returnTo} ${tag.returnToValue}`,
-  `- Tag stamp: ${tag.stamp}`,
-  `- Lead-in to the section rows: ${notFound.orTry}`,
+  `- Section title: ${notFound.tryTitle}`,
+  `- Section note: ${notFound.tryNote}`,
+  `Its line is ${notFound.missing.line} and its metadata is ${notFound.missing.meta}.`,
 ]) assert.ok(raw.includes(line), `The 404 copy lacks the line "${line}"`);
+assert.deepEqual(
+  siteCopy.menu.map(({ id }) => id),
+  Object.keys(notFound.tryLines),
+  "The 404 has a line for each homepage section, in the homepage's order",
+);
+for (const { id, label } of siteCopy.menu) {
+  assert.ok(raw.includes(`| ${label} | ${notFound.tryLines[id]} |`), `The 404 copy lacks the row "${label}": ${notFound.tryLines[id]}`);
+}
 
 // The header greeting follows the visitor's own hour, with the approved edges.
 const greetingAt = (hour, weekend = false) => greetingLine(greetingKey(hour), weekend);
