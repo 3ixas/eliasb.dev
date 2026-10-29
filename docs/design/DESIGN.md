@@ -138,7 +138,7 @@ Decided in [Closer looks on phones: the dock, or inline under the row](https://g
 | Where | Reaction |
 |---|---|
 | "products of my own." | It draws its cobalt underline once on arrival. On hover, the letters lift in a short wave and the underline scribbles out and back |
-| Greeting | A small scene for the visitor's own time of day: morning (the sun comes up), afternoon (the rays turn), evening (the sun sets), late (the moon rocks and the stars come out). Hover or focus plays it and adds "it's HH:MM here in London". On a phone it plays once on arrival, and tapping the greeting plays it again and says London's time beneath, on its own line; tapping it again hides it |
+| Greeting | A line and a small object for the visitor's own time of day, all drawn for 30 × 22 px: "Hello" (before the clock is read, and without script) a terminal prompt with a blinking cobalt cursor; morning, "Kettle’s on.", a kettle whose steam curls; afternoon, a clock a few minutes short of five whose minute hand ticks up, saying "Nearly five?" on a weekday and "Nowhere to be?" on Saturday and Sunday (the visitor's own day; only the afternoon changes with it); evening, "Home yet?", a desk lamp whose pool of light fades in; late, "Still up?", the moon rocking as the stars come out. Hover or focus plays it and adds "it's HH:MM here in London". On a phone it plays once on arrival, and tapping the greeting plays it again and says London's time beneath, on its own line; tapping it again hides it. The width is reserved for the longest line, so no line moves the header |
 | The Eclipse (theme) | The icon turns over when pressed. The page crossfades (see Motion) |
 | Rows' objects | Projects lift and tilt 3°, Flowtime's icon counts seconds, passes swing, covers open on their spine, calendar tiles turn over |
 | How I work's pen | Rings around the numbers, arrows between habits, and underlines under each proof's strongest phrase draw as they scroll up the screen and un-draw on the way back (CSS scroll-driven animations; drawn when unsupported) |
@@ -232,7 +232,7 @@ Defined in `src/app/stretch-tokens.css` as `--stretch-*` variables. Dark follows
 | `--stretch-tile-edge` | none | `#2a2a33` | Hairline that keeps objects visible in dark |
 | `--gh-0` | `#e1e4e8` | `#1f242c` | GitHub year, no contributions. Light is a step darker than GitHub's own, so it shows on the card |
 | `--gh-1` … `--gh-4` | `#9be9a8` `#40c463` `#30a14e` `#216e39` | `#0e4429` `#006d32` `#26a641` `#39d353` | GitHub's contribution greens |
-| `--sun` | `#e39a2d` | `#f5b84f` | The greeting's sun, and nothing else: an illustration colour, never an interface colour |
+| `--sun` | `#e39a2d` | `#f5b84f` | The greeting's amber, and nothing else: the lamp's bulb and pool of light and the clock's pivot. An illustration colour, never an interface colour |
 
 Every text pair passes WCAG 2.2 AA; `e2e/stretch-tokens.spec.ts` measures them on the rendered page. Rules are decorative and are not held to the text ratio. `--stretch-tape`, the Fasteners' tape, retires with them.
 
@@ -262,7 +262,7 @@ Every text pair passes WCAG 2.2 AA; `e2e/stretch-tokens.spec.ts` measures them o
 
 - **A closer look is supplementary.** Anything a closer look says that isn't on the row or on the row's destination page is also the row's accessible description, through visually hidden text referenced by `aria-describedby`. The margin and the inline closer look are themselves `aria-hidden`.
 - **Keyboard**: every row and dotted word with a closer look is focusable, and focus shows it as hover does. Escape hides the margin, and focus stays put. The GitHub year keeps today's single tab stop and arrow keys.
-- **Reduced motion** shows each closer look with a 0.2 s fade and no arrival motion. The pen is drawn, the underline is drawn, nothing counts or types, and the greeting's scene rests.
+- **Reduced motion** shows each closer look with a 0.2 s fade and no arrival motion. The pen is drawn, the underline is drawn, nothing counts or types, and the greeting's scene rests, finished (the steam drawn, the lamp's pool lit, the cursor still).
 - **The standing checks** in the "keep" rows of [#277](https://github.com/3ixas/eliasb.dev/issues/277) all hold. That means one `h1` (the opening line), the skip link, content in the server HTML and complete without script, axe, AA contrast, 3:1 focus rings, external links marked `↗` that open in a new tab, the theme rules, and the home title, description and social image.
 - **Every page has one `h1`**: the opening line on the homepage, the title elsewhere. Section titles are `h2`.
 - **Figures** keep their alt text and captions; a closer look's words are also its word's accessible description.
@@ -299,7 +299,7 @@ These go from the inner pages and their checks:
 
 Elias agreed these on 26 October 2026, when the draft was reviewed:
 
-1. **The sun's amber stays**, as `--sun`, only in the greeting's illustration.
+1. **The amber stays**, as `--sun`, only in the greeting's illustration (the lamp and the clock, since the sun left).
 2. **Navigation**: quiet section links in the desktop header, and no phone menu. The release check's five navigation targets and labels stay.
 3. **The simulation gets a caption** saying the paths are illustrative, worded in the copy pass ([#281](https://github.com/3ixas/eliasb.dev/issues/281)).
 4. **This file was the contract** for the homepage and shell only, as `QUIET-INDEX.md`. On 26 October 2026 the inner pages joined it ([#301](https://github.com/3ixas/eliasb.dev/issues/301)), and it became `DESIGN.md`, the one contract for the site.
