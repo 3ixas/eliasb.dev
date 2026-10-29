@@ -401,3 +401,25 @@ for (const slug of roleStorySlugs) {
     });
   });
 }
+
+// A touch screen wide enough for the links (an iPad on its side): tapping the greeting shows its words, which take the links' room.
+test.describe("The greeting on a wide touch screen", () => {
+  test.use({ hasTouch: true, isMobile: true, viewport: { width: 1100, height: 800 } });
+
+  test("tapping it shows its words and steps the section links aside, and tapping again brings them back", async ({ page, browserName }) => {
+    test.skip(browserName !== "chromium", "Touch emulation, Chromium");
+    await page.goto("/work/bnp-paribas");
+    const greeting = page.locator("[data-greeting]");
+    const links = page.locator(".qi-header__links");
+    await expect(greeting).toHaveAttribute("role", "button");
+    await expect(links).toHaveCSS("opacity", "1");
+    await greeting.tap();
+    await expect(greeting).toHaveAttribute("aria-expanded", "true");
+    await expect(links).toHaveCSS("opacity", "0");
+    await expect(links).toHaveCSS("pointer-events", "none");
+    // Nothing runs past the Eclipse while it shows.
+    await expect.poll(async () => (await greeting.boundingBox())!.x + (await greeting.boundingBox())!.width).toBeLessThanOrEqual((await page.locator("[data-eclipse]").boundingBox())!.x);
+    await greeting.tap();
+    await expect(links).toHaveCSS("opacity", "1");
+  });
+});

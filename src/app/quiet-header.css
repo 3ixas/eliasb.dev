@@ -454,6 +454,12 @@ a.qi-header__name {
   .qi-header[data-long] .qi-greeting:is(:hover, :focus-visible, [data-open]) .qi-greeting__words {
     max-width: none;
   }
+
+  /* Its words take the links' room, so the links step aside while they show, whatever the pointer (hover has its own rule below). */
+  .qi-header[data-long] .qi-greeting:is(:focus-visible, [data-open]) ~ .qi-header__links {
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
 @media (min-width: 900px) and (max-width: 979px) {
