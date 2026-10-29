@@ -22,15 +22,21 @@ Approved by Elias on 8 October 2026 for [#113](https://github.com/3ixas/eliasb.d
 - Title: Nothing here
 - Heading: This page doesn’t exist.
 - Line: It’s moved, or it never did. Everything else is where you left it.
-- Button: Back to the homepage →
+- Missing row: the address asked for (shortened in the middle at about 48 characters), struck through. Its line is Not on file and its metadata is 404.
+- Section title: Try one of these
+- Section note: The homepage, a section at a time.
 
-The lost-property tag hung beside the heading, and the five sections under the line ([#217](https://github.com/3ixas/eliasb.dev/issues/217), from the prototype B chosen for [#197](https://github.com/3ixas/eliasb.dev/issues/197)):
+The five homepage sections as rows, each with that section’s own object ([#334](https://github.com/3ixas/eliasb.dev/issues/334)). Each line restates what the section already shows:
 
-- Tag title: Lost property
-- Tag fields: Item (the address asked for, shortened in the middle at about 48 characters) · Found at eliasb.dev · Return to the homepage
-- Tag stamp: Not on file
-- Lead-in to the section rows: Or try
-- Rows: the five Menu entries, numbered 01–05, each linking to its homepage section
+| Section | Line |
+| --- | --- |
+| Work | BNP Paribas, Joveen and Optegra |
+| Things I make | Threshold, Argus Risk, Flowtime and more |
+| How I work | Four habits, and the proof for each |
+| Off the clock | Training, a book, a film, this week in history |
+| Say hello | The email, the résumé, GitHub and LinkedIn |
+
+The lost-property tag, the “Or try” lead-in and the numbered rows retired with the quiet index ([#301](https://github.com/3ixas/eliasb.dev/issues/301)).
 
 ## Hero
 

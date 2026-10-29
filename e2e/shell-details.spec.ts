@@ -53,11 +53,6 @@ test.describe("Shell details: arrows", () => {
     await page.goto(`/work/${Object.keys(roleStories)[0]}`);
     await expect.poll(() => arrowGap(page, ".qi-long__back")).toBeGreaterThanOrEqual(3);
   });
-
-  test("the 404's link home has the gap", async ({ page }) => {
-    await page.goto("/nothing-here");
-    await expect.poll(() => arrowGap(page, ".stretch-404__home")).toBeGreaterThanOrEqual(3);
-  });
 });
 
 test.describe("Shell details: separators", () => {

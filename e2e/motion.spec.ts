@@ -1,5 +1,4 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { tagSwing } from "../src/components/site/signature-springs";
 
 // Motion on the finished page: hover that only moves things where there is a hover.
 test.describe("Margin notes", () => {
@@ -136,86 +135,6 @@ test.describe("Staff pass with reduced motion", () => {
     const samples = await leanSamples(page, rolePass(page), 1200);
     expect(samples.length).toBeGreaterThan(20);
     expect(Math.max(...samples.map(([, angle]) => Math.abs(angle)))).toBe(0);
-  });
-});
-
-// The 404's lost-property tag (#217): it swings in on spring(0.4, 0.6), from 14° to a resting -4°, from the first
-// paint; reduced motion shows it at rest. The swing is CSS, so none of this waits for hydration.
-type TagSample = [time: number, angle: number];
-
-/** Samples the tag's CSS animation clock and `rotate` (degrees) every frame from the start of the page, for `ms`. */
-async function tagSamples(page: Page, ms: number) {
-  await page.addInitScript((duration) => {
-    const store = window as unknown as { __tag: TagSample[]; __tagDone?: boolean };
-    store.__tag = [];
-    const start = performance.now();
-    const tick = () => {
-      const tag = document.querySelector("[data-lost-property]");
-      const swing = tag?.getAnimations()[0];
-      if (tag && swing) store.__tag.push([Number(swing.currentTime), Number.parseFloat(getComputedStyle(tag).rotate)]);
-      if (performance.now() - start < duration) requestAnimationFrame(tick);
-      else store.__tagDone = true;
-    };
-    requestAnimationFrame(tick);
-  }, ms);
-  await page.goto("/nothing-here");
-  await expect.poll(() => page.evaluate(() => (window as unknown as { __tagDone?: boolean }).__tagDone === true), { timeout: ms + 8000 }).toBe(true);
-  return page.evaluate(() => (window as unknown as { __tag: TagSample[] }).__tag);
-}
-
-/** The tag's spring at `time` ms: its `linear()` easing, read back as the angle it should show between 14° and -4°. */
-function swingAngle(time: number) {
-  const points = tagSwing.easing.slice("linear(".length, -1).split(",").map(Number);
-  const at = Math.min(Math.max(time / tagSwing.duration, 0), 1) * (points.length - 1);
-  const low = Math.floor(at);
-  const progress = points[low] + ((points[Math.min(low + 1, points.length - 1)] - points[low]) * (at - low));
-  return 14 + (-4 - 14) * progress;
-}
-
-test.describe("404 lost-property tag", () => {
-  test.describe("with motion", () => {
-    test.use({ reducedMotion: "no-preference" });
-
-    test("swings in from 14 degrees on its spring, overshoots and settles at -4 degrees", async ({ page, browserName }) => {
-      test.skip(browserName !== "chromium", "Frame sampling, Chromium");
-      const samples = await tagSamples(page, 1600);
-      expect(samples.length).toBeGreaterThan(20);
-      // It starts swung out, every frame follows the spring's own curve, it passes -4 to the far side, and it rests at -4.
-      expect(samples[0][1]).toBeGreaterThan(10);
-      for (const [time, angle] of samples) expect(Math.abs(angle - swingAngle(time)), `at ${Math.round(time)} ms`).toBeLessThan(1);
-      expect(Math.min(...samples.map(([, angle]) => angle)), "the spring overshoots -4°").toBeLessThan(-5);
-      expect(samples.at(-1)![1]).toBeCloseTo(-4, 1);
-      const timing = await page.locator("[data-lost-property]").evaluate((element) => element.getAnimations()[0]?.effect?.getComputedTiming().duration);
-      // After the swing ends nothing animates, so the animation is gone; before then its length is the spring's.
-      expect([undefined, tagSwing.duration]).toContain(timing);
-      await expect(page.locator("[data-lost-property]")).toHaveCSS("rotate", "-4deg");
-    });
-  });
-
-  test.describe("with reduced motion", () => {
-    test.use({ reducedMotion: "reduce" });
-
-    test("shows the tag at rest at -4 degrees and never swings", async ({ page, browserName }) => {
-      test.skip(browserName !== "chromium", "Frame sampling, Chromium");
-      await page.addInitScript(() => {
-        const store = window as unknown as { __rest: string[]; __restDone?: boolean };
-        store.__rest = [];
-        const start = performance.now();
-        const tick = () => {
-          const tag = document.querySelector("[data-lost-property]");
-          if (tag) store.__rest.push(`${getComputedStyle(tag).rotate}/${tag.getAnimations().length}`);
-          if (performance.now() - start < 1200) requestAnimationFrame(tick);
-          else store.__restDone = true;
-        };
-        requestAnimationFrame(tick);
-      });
-      await page.goto("/nothing-here");
-      await expect.poll(() => page.evaluate(() => (window as unknown as { __restDone?: boolean }).__restDone === true), { timeout: 9000 }).toBe(true);
-      const rest = await page.evaluate(() => (window as unknown as { __rest: string[] }).__rest);
-      expect(rest.length).toBeGreaterThan(10);
-      // Every frame: rotated -4deg, with nothing animating it.
-      expect(new Set(rest)).toEqual(new Set(["-4deg/0"]));
-    });
   });
 });
 

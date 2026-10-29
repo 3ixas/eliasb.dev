@@ -48,53 +48,41 @@ test.describe("The 404", () => {
     expect(Math.abs(eclipse.x + eclipse.width - (inner.x + inner.width))).toBeLessThanOrEqual(12);
   });
 
-  test("the link home is a 44 px target and works", async ({ page }) => {
-    await page.goto("/nothing-here");
-    const back = page.getByRole("link", { name: "Back to the homepage" });
-    expect((await back.boundingBox())?.height).toBeGreaterThanOrEqual(44);
-    await back.click();
-    await expect(page).toHaveURL(/\/$/);
-  });
-
-  test("the lost-property tag shows the address asked for", async ({ page }) => {
+  test("the missing row shows the address asked for, struck through, and is not a link", async ({ page }) => {
     await page.goto("/nothing-here/at-all");
-    const tag = page.locator("[data-lost-property]");
-    await expect(tag.getByText(notFound.tag.title)).toBeVisible();
-    await expect(tag.locator("dt", { hasText: notFound.tag.item })).toBeVisible();
-    await expect(tag.locator(".stretch-404__address")).toHaveText("/nothing-here/at-all");
-    await expect(tag.getByText(notFound.tag.foundAtValue)).toBeVisible();
-    await expect(tag.getByText(notFound.tag.returnToValue)).toBeVisible();
-    await expect(tag.getByText(notFound.tag.stamp)).toBeVisible();
-    // It hangs beside the text on a wide screen and below it on a phone.
-    const phone = (page.viewportSize()?.width ?? 0) <= 760;
-    await expect
-      .poll(async () => {
-        const copy = (await page.locator(".stretch-404__copy").boundingBox())!;
-        const hang = (await page.locator(".stretch-404__hang").boundingBox())!;
-        return phone ? hang.y >= copy.y + copy.height : hang.x >= copy.x + copy.width - 1;
-      })
-      .toBe(true);
+    const row = page.locator("[data-missing] .qi-row");
+    await expect(row.locator(".qi-missing__address")).toHaveText("/nothing-here/at-all");
+    await expect(row.locator(".qi-missing__address")).toHaveCSS("text-decoration-line", "line-through");
+    await expect(row.locator(".qi-empty")).toBeVisible();
+    await expect(row.locator(".qi-row__line")).toHaveText(notFound.missing.line);
+    // The status is cobalt metadata, kept on a phone too.
+    const status = row.locator(".qi-row__meta");
+    await expect(status).toHaveText(notFound.missing.meta);
+    await expect(status).toBeVisible();
+    // Not a link, and not a tab stop.
+    await expect(page.locator("[data-missing] a")).toHaveCount(0);
+    await expect(row).not.toHaveAttribute("tabindex", /.*/);
   });
 
   test("the prerendered HTML never names a wrong address", async ({ request }) => {
     const html = await (await request.get("/nothing-here/at-all")).text();
-    // The page is built once for every missing address, so the tag fills its address in the browser.
-    expect(html).not.toContain("_not-found</dd>");
-    expect(html).toContain("stretch-404__address");
+    // The page is built once for every missing address, so the row fills its address in the browser.
+    expect(html).not.toContain("_not-found</span>");
+    expect(html).toContain("qi-missing__address");
   });
 
   test("a 100-character address is shortened in the middle and stays readable", async ({ page }) => {
     const long = `/${"a-very-long-lost-address-".repeat(5)}end`.slice(0, 100);
     expect(long).toHaveLength(100);
     await page.goto(long);
-    const address = page.locator("[data-lost-property] .stretch-404__address");
+    const address = page.locator(".qi-missing__address");
     // The first 23 and last 23 characters around one ellipsis.
     await expect(address).toHaveText(`${long.slice(0, 23)}…${long.slice(-23)}`);
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
-    // The whole tag stays on screen, so no part of the address is cut off.
+    // The whole row stays on screen, so no part of the address is cut off.
     await expect
       .poll(async () => {
-        const box = (await page.locator("[data-lost-property]").boundingBox())!;
+        const box = (await address.boundingBox())!;
         return box.x >= 0 && box.x + box.width <= page.viewportSize()!.width;
       })
       .toBe(true);
@@ -104,20 +92,37 @@ test.describe("The 404", () => {
     // The 23rd character is an emoji: two UTF-16 units that must stay together.
     const address = `/${"a".repeat(21)}😀${"b".repeat(60)}`;
     await page.goto(encodeURI(address));
-    await expect(page.locator("[data-lost-property] .stretch-404__address")).toHaveText(`/${"a".repeat(21)}😀…${"b".repeat(23)}`);
+    await expect(page.locator(".qi-missing__address")).toHaveText(`/${"a".repeat(21)}😀…${"b".repeat(23)}`);
   });
 
-  test("five rows lead to the homepage's sections, in the page's order", async ({ page }) => {
+  test("says what to try: the five homepage sections as rows, in the page's order, each with its object", async ({ page }) => {
     await page.goto("/nothing-here");
-    const rows = page.getByRole("navigation", { name: notFound.orTry }).getByRole("link");
-    await expect(rows).toHaveText(siteCopy.menu.map(({ label }, index) => `${String(index + 1).padStart(2, "0")}${label}→`));
+    await expect(page.getByRole("heading", { level: 2, name: notFound.tryTitle })).toBeVisible();
+    await expect(page.getByText(notFound.tryNote)).toBeVisible();
+    const rows = page.locator("main a.qi-row");
     await expect(rows).toHaveCount(5);
-    for (const [index, { id }] of siteCopy.menu.entries()) await expect(rows.nth(index)).toHaveAttribute("href", `/#${id}`);
+    // The object is a picture; the words are the row's title and line.
+    await expect(rows.locator(".qi-row__text")).toHaveText(siteCopy.menu.map(({ id, label }) => `${label}${notFound.tryLines[id]}`));
+    for (const [index, { id }] of siteCopy.menu.entries()) {
+      await expect(rows.nth(index)).toHaveAttribute("href", `/#${id}`);
+      await expect.poll(async () => (await rows.nth(index).locator(".qi-row__object").boundingBox())?.width).toBe(44);
+    }
     for (const index of [0, 4]) await expect.poll(async () => (await rows.nth(index).boundingBox())?.height).toBeGreaterThanOrEqual(44);
-    // The phone rules share a class with the Project index; the rows still lay out as a number, a name and an arrow.
-    await expect(rows.first()).toHaveCSS("grid-template-columns", /^\S+ \S+ \S+$/);
+    // The objects: the BNP mini pass, Threshold's crop, the ringed number, today's tile and the Sheet.
+    for (const object of [".qi-mini", ".qi-crop", ".qi-number .qi-ink", ".qi-tile[data-today]", ".qi-sheet"]) await expect(page.locator(`main a.qi-row ${object}`)).toHaveCount(1);
     await rows.nth(2).click();
     await expect(page).toHaveURL(/\/#how-i-work$/);
+  });
+
+  test("today's tile shows the visitor's own day", async ({ page }) => {
+    await page.goto("/nothing-here");
+    await expect(page.locator(".qi-tile[data-today] .qi-tile__number")).toHaveText(await page.evaluate(() => String(new Date().getDate())));
+  });
+
+  test("the lost-property tag and the numbered rows are gone, and there is one h1", async ({ page }) => {
+    await page.goto("/nothing-here");
+    await expect(page.locator("[data-lost-property], .stretch-404, .stretch-index")).toHaveCount(0);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
   });
 
   test("has no sideways scroll and no axe violations", async ({ page }) => {

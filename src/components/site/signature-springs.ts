@@ -7,10 +7,7 @@ import { spring } from "./spring.ts";
  */
 
 /** Each spring's `[bounce, visualDuration]`, so `scripts/verify-springs.mjs` checks the pairs actually played. */
-export const signatureSpringPairs = { passLean: [0.4, 0.7], tagSwing: [0.4, 0.6] } as const;
+export const signatureSpringPairs = { passLean: [0.4, 0.7] } as const;
 
 /** The employer Staff pass leaning away from the pointer and settling. */
 export const passLean = spring(...signatureSpringPairs.passLean);
-
-/** The 404's lost-property tag swinging in on its string and settling (#217). */
-export const tagSwing = spring(...signatureSpringPairs.tagSwing);

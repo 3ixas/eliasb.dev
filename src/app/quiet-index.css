@@ -1249,6 +1249,46 @@
   }
 }
 
+/* The 404 never scrolls to the ring, so it is drawn in full rather than left where the scroll timeline finds it. */
+[data-not-found] .qi-ink {
+  animation: none;
+}
+
+/* The empty slot: the 404's missing row has nothing to show, so its object is an outline with nothing in it. */
+.qi-empty {
+  width: 44px;
+  height: 44px;
+  border: 1.5px dashed color-mix(in srgb, var(--stretch-muted) 70%, transparent);
+  border-radius: 11px;
+}
+
+/* The 404's missing row: the address asked for, struck through, and not a link, so it has no hover. */
+.qi-missing__address {
+  color: var(--stretch-muted);
+  font-size: var(--text-small);
+  font-weight: 400;
+  overflow-wrap: anywhere;
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+}
+
+[data-missing] .qi-row__meta {
+  color: var(--stretch-cobalt);
+}
+
+/* The 404 is the one place the metadata stays on a phone: it is the status, "404". */
+@media (max-width: 760px) {
+  [data-missing] .qi-row__meta {
+    display: inline;
+  }
+}
+
+@media (hover: hover) {
+  [data-missing] .qi-row:hover {
+    background: none;
+  }
+}
+
 /* The Sheet: a small page of ruled lines with a folded corner. */
 .qi-sheet {
   position: relative;

@@ -37,7 +37,7 @@ function Underlined({ proof, phrase }: { proof: string; phrase: string }): React
 }
 
 /** A habit's object: its number, ringed by the pen. */
-function HabitNumber({ position }: { position: number }) {
+export function HabitNumber({ position }: { position: number }) {
   return (
     <span className="qi-number">
       {String(position + 1).padStart(2, "0")}
