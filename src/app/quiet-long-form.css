@@ -312,8 +312,9 @@
 
 /* On its own line, so the link is a 44 px target. */
 .qi-screens__source {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  gap: 0 6px;
   min-height: 44px;
   color: var(--stretch-ink);
   overflow-wrap: anywhere;

@@ -196,7 +196,8 @@ for (const slug of roleStorySlugs) {
         for (const [key, figure] of Object.entries(story.figures ?? {})) {
           if (figure.kind !== "screens") throw new Error(`${slug}'s figures are screenshots`);
           const block = page.locator(`section#${key} figure`);
-          await expect(block.locator("figcaption")).toContainText(figure.caption);
+          // No caption of its own: just the link, in plain words.
+          await expect(block.locator("figcaption")).toHaveText(`${figure.source.label} ↗`);
           await expect(block.locator("figcaption a")).toHaveAttribute("href", figure.source.href);
           await expect(block.locator("figcaption a")).toHaveText(`${figure.source.label} ↗`);
           await expect(block.locator("img")).toHaveCount(figure.images.length);
@@ -212,14 +213,14 @@ for (const slug of roleStorySlugs) {
     }
 
     if (slug === "joveen") {
-      test("the Joveen hero sits desktop beside phone, and is captioned as the live site today", async ({ page }) => {
+      test("the Joveen hero sits desktop beside phone, with only the link to the live site beneath", async ({ page }) => {
         const shots = page.locator("section#the-role .qi-screens__shot");
         await expect(shots).toHaveCount(2);
         const desktop = shots.first();
         const phone = shots.last();
         await expect(desktop).toHaveAttribute("data-device", "desktop");
         await expect(phone).toHaveAttribute("data-device", "phone");
-        await expect(page.locator("section#the-role figcaption")).toContainText("the live site, not my UI");
+        await expect(page.locator("section#the-role figcaption")).toHaveText("joveen.com ↗");
         await expect
           .poll(async () => {
             const [a, b] = [await desktop.boundingBox(), await phone.boundingBox()];
@@ -230,11 +231,13 @@ for (const slug of roleStorySlugs) {
     }
 
     if (slug === "optegra") {
-      test("the Optegra captions give their Wayback URL and June 2024 date", async ({ page }) => {
-        for (const [key, date] of [["the-role", "5 June 2024"], ["what-changed", "13 June 2024"]]) {
-          const caption = page.locator(`section#${key} figcaption`);
-          await expect(caption).toContainText(date);
-          await expect(caption.locator("a")).toHaveAttribute("href", /^https:\/\/web\.archive\.org\/web\/202406\d{8}\/https:\/\/www\.optegra\.com\//);
+      test("the Optegra links say in plain words what and when, and go to their Wayback snapshot", async ({ page }) => {
+        for (const key of ["the-role", "what-changed"]) {
+          const link = page.locator(`section#${key} figcaption a`);
+          await expect(link).toContainText("June 2024");
+          await expect(link).toContainText("Wayback Machine");
+          await expect(link).not.toContainText("web.archive.org");
+          await expect(link).toHaveAttribute("href", /^https:\/\/web\.archive\.org\/web\/202406\d{8}\/https:\/\/www\.optegra\.com\//);
         }
       });
     }

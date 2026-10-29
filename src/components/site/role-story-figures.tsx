@@ -72,7 +72,7 @@ function ScaleBar({ kind, label, share }: { kind: "before" | "after"; label: str
   );
 }
 
-/** Screenshots of a public page, never edited: the caption says when, and links to where, they were taken. */
+/** Screenshots of a public page, never edited: the link beneath says what and when they are, and goes to where they were taken. */
 function ScreensFigure({ figure }: { figure: Extract<RoleStoryFigure, { kind: "screens" }> }) {
   return (
     <figure className="qi-figure qi-screens">
@@ -84,7 +84,6 @@ function ScreensFigure({ figure }: { figure: Extract<RoleStoryFigure, { kind: "s
         ))}
       </div>
       <figcaption className="qi-figure__caption stretch-mono">
-        {figure.caption} ·{" "}
         <a className="qi-screens__source" href={figure.source.href}>
           {figure.source.label} <span aria-hidden="true">↗</span>
         </a>

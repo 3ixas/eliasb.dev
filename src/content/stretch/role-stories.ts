@@ -202,7 +202,6 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
             device: "phone",
           },
         ],
-        caption: "joveen.com today, 16 October 2026. It now runs on Shopify: the live site, not my UI",
         source: { href: "https://www.joveen.com/", label: "joveen.com" },
       },
     },
@@ -287,10 +286,9 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
             device: "desktop",
           },
         ],
-        caption: "Optegra homepage, Wayback Machine snapshot of 5 June 2024",
         source: {
           href: "https://web.archive.org/web/20240605112227/https://www.optegra.com/",
-          label: "web.archive.org/web/20240605112227/https://www.optegra.com/",
+          label: "Optegra’s homepage in June 2024, on the Wayback Machine",
         },
       },
       "what-changed": {
@@ -304,10 +302,9 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
             device: "desktop",
           },
         ],
-        caption: "Optegra dry AMD treatment launch page, Wayback Machine snapshot of 13 June 2024",
         source: {
           href: "https://web.archive.org/web/20240613032246/https://www.optegra.com/dry-amd-treatment/",
-          label: "web.archive.org/web/20240613032246/https://www.optegra.com/dry-amd-treatment/",
+          label: "Optegra’s dry AMD page in June 2024, on the Wayback Machine",
         },
       },
     },
