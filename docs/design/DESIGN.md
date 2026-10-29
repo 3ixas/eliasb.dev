@@ -98,7 +98,7 @@ A **closer look** is a row's detail: on desktop it appears in the margin, and on
 | The film | A ticket with the poster, title, date and stars | Arriving, the stars filling in, the stub tearing |
 | This week in history | A newspaper clipping with the image, date, fact and credit | Unfolding, then being stamped "This week in history" |
 | Now making | The repository and its description (the row says only "Now making" and "Live from GitHub") | The description typing itself |
-| Your face (header) | The full white-tux portrait, "Based in London" | Sliding in |
+| Your face (header, homepage only) | The full white-tux portrait, "Based in London" | Sliding in |
 | "pricing and risk engines" | Illustrative simulated paths, one in BNP green, with the Role story's line about simulation-based calculations | The paths fanning out |
 | "CPU and GPU" | A CPU with a few cores taking turns and a GPU with many lighting at once, with the line about running the same tests on both | The cores lighting |
 | "digitisation competition" | Its award pin, its Résumé line, and two bars: 30–40 min and under 5 | The pin popping on and the bar shrinking |
@@ -152,7 +152,7 @@ No hold. The page is complete and usable in its first frame, and nothing waits f
 
 ## The header (every page)
 
-One header on every page, in the same place, so following a row never moves it. It has the white-tux portrait as a 40 px circle (it opens the full portrait), "Elias Bennett", the greeting and the Eclipse. The portrait and name lead to the homepage from every other page.
+One header on every page, in the same place, so following a row never moves it. It has the white-tux portrait as a 40 px circle, "Elias Bennett", the greeting and the Eclipse. On the homepage the portrait opens the full portrait, and that closer look belongs to the homepage alone. On every other page the portrait is a picture, with no hover, focus or tap behaviour, and the name is the link that leads to the homepage.
 
 - **Its links are the sections of the page you're on, or none.** On the homepage they are its five sections (Work, Things I make, How I work, Off the clock, Say hello). On a Role story or case study they are that page's own sections, which replaces the numbered section bar. The Work archive, the Résumé and the 404 have no sections, so they have no links.
 - **Style**: 15 px, muted, turning ink on hover, and underlined while their section is in view (`aria-current`). They sit in a navigation landmark named "On this page".

@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <div data-stretch-shell data-not-found>
-      <SiteHeader home />
+      <SiteHeader inner />
       <main id="main-content" tabIndex={-1} className="stretch-wrap stretch-404">
         <div className="stretch-404__copy">
           <h1 className="stretch-display stretch-h2">{copy.heading}</h1>
