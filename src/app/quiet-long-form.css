@@ -370,11 +370,18 @@
   line-height: 1.4;
 }
 
-/* A screenshot of the work sits on the project's own colour, never edited. */
+/*
+ * A screenshot of the work sits on the project's own colour, never edited. The button that expands it fills the
+ * frame (it holds the padding), so its focus ring lands on the page and not on the project's colour, where it
+ * would not stand out at 3:1.
+ */
 .qi-case__shot {
-  padding: 18px;
   border-radius: 14px;
   background: var(--project-field, var(--stretch-card));
+}
+
+.qi-case__shot > .qi-zoom {
+  padding: 18px;
 }
 
 .qi-case__shot img {
@@ -384,7 +391,7 @@
   border-radius: 8px;
 }
 
-.qi-case__below .qi-case__shot {
+.qi-case__below .qi-case__shot > .qi-zoom {
   padding: 22px;
 }
 
