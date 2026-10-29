@@ -421,7 +421,7 @@ a.qi-header__name {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
-    padding-inline: 10px;
+    padding-inline: 8px;
     border-radius: 8px;
     color: var(--stretch-muted);
     font-size: var(--text-small);
@@ -434,6 +434,31 @@ a.qi-header__name {
   .qi-header__links a[aria-current] {
     color: var(--stretch-ink);
     text-decoration-line: underline;
+  }
+
+  /*
+   * A long-form page's six links need the row the greeting's words use: its object stays, its words show on hover,
+   * focus or tap (the links already step aside then, for London's time). Below 980 px the row is too short for
+   * six links, so they are not shown, as on a phone.
+   */
+  .qi-header[data-long] .qi-greeting {
+    gap: 0;
+  }
+
+  .qi-header[data-long] .qi-greeting__words {
+    max-width: 0;
+    margin-left: 8px;
+    overflow: hidden;
+  }
+
+  .qi-header[data-long] .qi-greeting:is(:hover, :focus-visible, [data-open]) .qi-greeting__words {
+    max-width: none;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 979px) {
+  .qi-header[data-long] .qi-header__links {
+    display: none;
   }
 }
 

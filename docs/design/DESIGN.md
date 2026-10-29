@@ -158,6 +158,7 @@ One header on every page, in the same place, so following a row never moves it. 
 - **Style**: 15 px, muted, turning ink on hover, and underlined while their section is in view (`aria-current`). They sit in a navigation landmark named "On this page".
 - **Width**: on wide screens the header spans the column and the margin (940 px), because a long-form page's section names don't fit in 600 px. Its left edge is the column's.
 - **Phones**: no links and no menu, and the greeting moves under the name. A long-form page is read top to bottom, with its back link at the top.
+- **A long-form page's six links need the row.** Beside the name, the greeting's object and the Eclipse they fill the 940 px, so on a long-form page the greeting keeps its object and shows its words on hover, focus or tap (the links already step aside then, for London's time). The links are 15 px with 8 px padding. Below 980 px the row is too short for six links, so they are not shown, as on a phone. The homepage's five links fit beside the full greeting, which keeps its words.
 
 ## The homepage, in order
 
@@ -176,14 +177,14 @@ Anchors stay `#work`, `#things-i-make`, `#how-i-work`, `#off-the-clock` and `#sa
 The two share one template. Each is the header, a back link, an opening, then its sections in the column, then one row to the next page. The removal rule holds, with rule 7 for figures; there is no length budget.
 
 - **Back link**: "← Work" on a Role story (to `/#work`), "← Things I make" on a case study (to the Work archive). 15 px, muted.
-- **Title**: the page's `h1`, in the opening line's treatment (`clamp(34px, 5.4vw, 50px)`, weight 650). It is the loudest text on the page. A supporting line follows at 17 px, muted, then quiet metadata in 13 px mono.
+- **Title**: the page's `h1`, in the opening line's treatment (`clamp(34px, 5.4vw, 50px)`, weight 650). It is the loudest text on the page, except that a name too long for the display size (Optegra Eye Healthcare & Kensington Medical) is set at 30 to 34 px so its longest word fits beside the pass. A supporting line follows at 17 px, muted, then quiet metadata in 13 px mono.
 - **Sections**: a 17 px title (weight 650) and the prose at 17 px, as on the homepage. No numbers, no giant headings, no condensed display type.
 - **Figures** (rule 7): inline at column width with a 13 px mono caption beneath. Screenshots sit on their Project colour with a 14 px radius. The to-scale bars and the flag figure are drawn on the card surface (`--stretch-card`). Every figure keeps its alt text.
 - **Ending**: one row, under "Next role" or "Next project", with the next page's 44 px object, its name and its one line. The order is unchanged (Role stories newest to oldest; case studies in the Things I make order).
 
 ### A Role story's opening
 
-The title (the employer), the role and setting as its line, and the dates. Beside them in the column hangs the employer's full **Staff pass** with its lean and its Pass pins, as the homepage's closer look shows it. On phones the pass falls below the title. On arrival the pass swings to rest once, over a page that is already readable.
+The title (the employer), the role and setting as its line, and the dates. Beside them in the column hangs the employer's full **Staff pass** (the same finished pass as the homepage's closer look, leaning away from a fine pointer) with its three Pass pins under the title, in the room the pass leaves on the left (on a phone: title, pass, then pins). The pins are not links: the pass, the evidence and the text are all on the page. On phones the pass falls below the title. On arrival the pass swings to rest once, over a page that is already readable.
 
 ### A case study's opening
 

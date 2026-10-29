@@ -51,7 +51,7 @@ test.describe("Shell details: arrows", () => {
 
   test("a Role story's back link has the gap too", async ({ page }) => {
     await page.goto(`/work/${Object.keys(roleStories)[0]}`);
-    await expect.poll(() => arrowGap(page, ".stretch-cs-back")).toBeGreaterThanOrEqual(3);
+    await expect.poll(() => arrowGap(page, ".qi-long__back")).toBeGreaterThanOrEqual(3);
   });
 
   test("the 404's link home has the gap", async ({ page }) => {

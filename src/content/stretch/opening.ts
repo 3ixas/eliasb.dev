@@ -77,3 +77,11 @@ export const opening = {
     ownership: { certificate },
   },
 } as const;
+
+/** What each reveal word's closer look says beyond the sentence, as the text its accessible description reads. */
+export const revealDescription: Record<RevealId, string> = {
+  engines: `${opening.looks.engines.caption} ${opening.looks.engines.note}`,
+  cores: opening.looks.cores.caption,
+  digitisation: `${opening.looks.digitisation.pin.label}. ${opening.looks.digitisation.pin.detail}. ${opening.looks.digitisation.line}`,
+  ownership: opening.looks.ownership.certificate.caption,
+};

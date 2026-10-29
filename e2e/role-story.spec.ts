@@ -1,63 +1,193 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { revealDescription } from "../src/content/stretch/opening";
 import { roleStories, roleStorySlugs } from "../src/content/stretch/role-stories";
 import {
+  evidenceBeyondPass,
   roleStoryBack,
   roleStoryCopy,
   roleStoryDescription,
-  roleStoryMetadata,
   roleStoryName,
+  roleStoryReveals,
   roleStorySectionKeys,
   roleStorySectionLabels,
 } from "../src/content/stretch/role-story";
 import { passRecords } from "../src/content/stretch/staff-pass";
+import { work } from "../src/content/stretch/work";
 import { pageTitle } from "../src/content/site";
 import { contrastOnPaper } from "./support/contrast";
 
-const rgb = (hex: string) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
 const schemes = ["light", "dark"] as const;
+/** From this width the header carries the section links, and a closer look arrives in the margin. */
+const LINKS_FROM = 980;
+const MARGIN_FROM = 1180;
 
 for (const slug of roleStorySlugs) {
   const story = roleStories[slug];
   const next = story.next ? roleStories[story.next] : null;
+  const employer = work.employers.find((entry) => entry.slug === slug)!;
+  const reveals = roleStoryReveals[slug] ?? [];
 
   test.describe(`Role story: ${story.employer}`, () => {
     test.beforeEach(async ({ page }) => {
       await page.goto(`/work/${slug}`);
     });
 
-    test("the opening band carries the number, employer, role, metadata and back link", async ({ page }) => {
+    test("the opening has the employer as the one h1, its role and dates, and the back link to Work", async ({ page }) => {
       await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(story.employer);
-      const band = page.getByRole("region", { name: "Overview" });
-      await expect(band.locator(".stretch-cs-open__number")).toHaveText(story.number);
-      await expect(band).toContainText(story.role);
-      await expect(band).toContainText(roleStoryMetadata(story));
-      await expect(band.getByRole("link", { name: "Work", exact: true })).toHaveAttribute("href", roleStoryBack.href);
-      // The only picture in the band is the pass's ID photo, never a screenshot as on a Case study.
-      await expect(band.locator("img")).toHaveCount(1);
-      await expect(band.locator(".stretch-pass img")).toHaveCount(1);
+      const opening = page.locator("article > div > header");
+      await expect(opening).toContainText(story.role);
+      if (story.setting) await expect(opening).toContainText(story.setting);
+      await expect(opening).toContainText(story.dates);
+      await expect(page.getByRole("link", { name: "Work", exact: true }).first()).toHaveAttribute("href", roleStoryBack.href);
+      // The old opening band, its number and the numbered section bar are gone.
+      await expect(page.locator(".stretch-cs-open, .stretch-cs-links-row")).toHaveCount(0);
     });
 
-    for (const scheme of schemes) {
-      test(`the band's Staff pass is not a link and wears the other theme's pair, ${scheme}`, async ({ page }) => {
-        await page.emulateMedia({ colorScheme: scheme });
-        const other = story.colours[scheme === "light" ? "dark" : "light"];
-        const band = page.getByRole("region", { name: "Overview" });
-        const pass = band.locator(".stretch-pass");
-        await expect(pass).toHaveCount(1);
-        await expect(pass.locator(".stretch-pass__card")).toHaveJSProperty("tagName", "DIV");
-        await expect(pass.locator(".stretch-pass__card")).toHaveCSS("background-color", rgb(other.field));
-        await expect(pass.locator(".stretch-pass__card")).toHaveCSS("color", rgb(other.ink));
-        await expect(pass.locator(".stretch-pass__strap")).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-        // A faint edge: the on-band shadow is a 1 px ring (spread, no blur) and then a deep drop, which no other pass has.
-        await expect
-          .poll(() => pass.locator(".stretch-pass__card").evaluate((card) => getComputedStyle(card).boxShadow))
-          .toMatch(/0px 0px 0px 1px.*0px 24px 48px -16px/);
-        // It is the same pass as on Work: this employer's, and not a link to the page it opens.
-        await expect(pass.locator(".stretch-pass__title")).toHaveText(passRecords[slug].short);
-        await expect(pass.locator(`a[href="/work/${slug}"]`)).toHaveCount(0);
-        await expect(pass.locator(".stretch-pass__foot")).not.toContainText("story →");
+    test("the header is the shared one, and its links are this page's six sections", async ({ page }) => {
+      const width = page.viewportSize()?.width ?? 0;
+      await expect(page.locator("header.qi-header")).toHaveCount(1);
+      await expect(page.locator(".stretch-header")).toHaveCount(0);
+      await expect(page.locator('nav[aria-label="On this page"]')).toHaveCount(1);
+      const links = page.locator(".qi-header__links a");
+      await expect(links).toHaveText(roleStorySectionKeys.map((key) => roleStorySectionLabels[key]));
+      for (const key of roleStorySectionKeys) await expect(links.filter({ hasText: roleStorySectionLabels[key] })).toHaveAttribute("href", `#${key}`);
+      const ids = await page.locator("article section[id]").evaluateAll((sections) => sections.map((section) => section.id));
+      expect(ids).toEqual([...roleStorySectionKeys]);
+      if (width < LINKS_FROM) {
+        await expect(links.first()).toBeHidden();
+        return;
+      }
+      await expect(links.first()).toBeVisible();
+      // The links fit on one row beside the name, the greeting's object and the Eclipse, and nothing scrolls sideways.
+      await expect
+        .poll(async () => {
+          const [last, eclipse] = [await links.last().boundingBox(), await page.locator("[data-eclipse]").boundingBox()];
+          return eclipse!.x - (last!.x + last!.width);
+        }, { message: "the last link ends before the Eclipse" })
+        .toBeGreaterThanOrEqual(0);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await links.last().click();
+      await expect(page).toHaveURL(/#what-i-took-with-me$/);
+      await expect(page.locator("section#what-i-took-with-me")).toBeInViewport();
+      // The link of the section in view is marked, and underlined.
+      await expect(links.last()).toHaveAttribute("aria-current", "location");
+    });
+
+    test("the employer's pass hangs in the column with its three Pass pins, and is not a link", async ({ page }) => {
+      const pass = page.locator(".qi-long .qi-pass");
+      await expect(pass).toHaveCount(1);
+      await expect(pass.locator(".qi-pass__wordmark")).toHaveText(passRecords[slug].short);
+      await expect(pass.locator(".qi-pass__role")).toHaveText(story.role);
+      await expect(pass.locator("a")).toHaveCount(0);
+      const pins = page.locator(".qi-long .qi-pins li");
+      await expect(pins).toHaveCount(3);
+      for (const [index, pin] of employer.pins.entries()) {
+        await expect(pins.nth(index)).toContainText(pin.label);
+        await expect(pins.nth(index)).toContainText(pin.detail);
+      }
+    });
+
+    test("the title has the opening line's treatment, sections are 17 px, and the evidence is 17 px / 600 over 13 px mono", async ({ page }) => {
+      await expect(page.getByRole("heading", { level: 1 })).toHaveClass(/qi-opening__line/);
+      await expect(page.getByRole("heading", { level: 1 })).toHaveCSS("font-weight", "650");
+      for (const heading of await page.locator("article h2").all()) {
+        await expect(heading).toHaveCSS("font-size", "17px");
+        await expect(heading).toHaveCSS("font-weight", "650");
+      }
+      const value = page.locator(".qi-long__evidence strong").first();
+      if (await value.count()) {
+        await expect(value).toHaveCSS("font-size", "17px");
+        await expect(value).toHaveCSS("font-weight", "600");
+        await expect(page.locator(".qi-long__evidence span").first()).toHaveCSS("font-size", "13px");
+      }
+    });
+
+    test("a section's address opens on that section, below the header, and focuses it", async ({ page }) => {
+      await page.goto(`/work/${slug}#decisions`);
+      await expect(page.locator("section#decisions")).toBeInViewport();
+      await expect(page.locator("section#decisions")).toBeFocused();
+      const headerBottom = await page.locator("header.qi-header").evaluate((header) => header.getBoundingClientRect().bottom);
+      await expect.poll(() => page.locator("section#decisions h2").evaluate((element) => element.getBoundingClientRect().top)).toBeGreaterThanOrEqual(headerBottom - 1);
+    });
+
+    test("the pass drops on its strap once on arrival, and not at all with reduced motion", async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await page.goto(`/work/${slug}`);
+      const animation = () => page.locator(".qi-long .qi-pass").evaluate((pass) => pass.getAnimations().map((a) => `${(a as CSSAnimation).animationName}:${a.effect?.getComputedTiming().iterations}`));
+      await expect.poll(animation).toEqual(["qi-drop:1"]);
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.reload();
+      await expect.poll(animation).toEqual([]);
+    });
+
+    test("the pins fill the room under the title beside the pass from 640 px, and follow the pass on a phone", async ({ page }) => {
+      const beside = (page.viewportSize()?.width ?? 0) >= 640;
+      await expect
+        .poll(async () => {
+          const [title, pass, pins] = [await page.getByRole("heading", { level: 1 }).boundingBox(), await page.locator(".qi-long .qi-pass").boundingBox(), await page.locator(".qi-long .qi-pins").boundingBox()];
+          // Beside: left of the pass, in the title's column, below the title. Phone: below the pass.
+          return beside ? pins!.x + pins!.width <= pass!.x + 1 && Math.abs(pins!.x - title!.x) <= 6 && pins!.y >= title!.y + title!.height : pins!.y >= pass!.y + pass!.height - 1;
+        })
+        .toBe(true);
+    });
+
+    test("the pass sits under the title on a phone and beside it from 640 px", async ({ page }) => {
+      const beside = (page.viewportSize()?.width ?? 0) >= 640;
+      await expect
+        .poll(async () => {
+          const [title, pass] = [await page.getByRole("heading", { level: 1 }).boundingBox(), await page.locator(".qi-long .qi-pass").boundingBox()];
+          return beside ? pass!.x - (title!.x + title!.width) : pass!.y - (title!.y + title!.height);
+        }, { message: beside ? "beside the title" : "under the title" })
+        .toBeGreaterThanOrEqual(-1);
+    });
+
+    test("the evidence sits beneath Summary and leaves out what the pass's pins already show", async ({ page }) => {
+      const onPass = [passRecords[slug].headline.value, passRecords[slug].headline.label, ...employer.pins.flatMap(({ label, detail }) => [label, detail])];
+      const shown = evidenceBeyondPass(story.evidence, onPass);
+      expect(shown.length).toBeLessThanOrEqual(4);
+      const list = page.locator("section#summary").getByRole("list", { name: "Evidence" });
+      await expect(page.getByRole("list", { name: "Evidence" })).toHaveCount(shown.length ? 1 : 0);
+      if (shown.length) await expect(list.getByRole("listitem")).toHaveText(shown.map(({ value, label }) => `${value}${label}`));
+    });
+
+    if (slug === "bnp-paribas") {
+      test("the evidence is what the pins do not say: the six months, not the competition they already show", async ({ page }) => {
+        await expect(page.locator("section#summary").getByRole("listitem")).toHaveText(["6months from zero C# to production code"]);
+      });
+
+      test("its flag and its to-scale bars sit inline under their sections with their captions, and the certificate is not drawn inline", async ({ page }) => {
+        const flag = page.locator("section#decisions figure");
+        await expect(flag.locator(".qi-flag__on")).toHaveText("on");
+        await expect(flag.locator(".qi-flag__toggle")).toHaveCount(1);
+        await expect(flag).toContainText("off by default");
+        await expect(flag.locator("figcaption")).toHaveText("Protect the blast radius");
+        const scale = page.locator("section#what-changed figure");
+        await expect(scale.locator("figcaption")).toHaveText("Bars to scale. Two weeks is taken as ten working days.");
+        await expect(scale).toContainText("Before · about two weeks, experienced");
+        await expect(scale).toContainText("After · under 5 min");
+        await expect(page.locator("section#what-i-took-with-me figure")).toHaveCount(0);
+      });
+
+      test("the before-and-after bars are to scale, and drawn at their share once they have come into view", async ({ page }) => {
+        const rows = page.locator("section#what-changed .qi-scale__row");
+        await expect(rows).toHaveCount(2);
+        await rows.first().scrollIntoViewIfNeeded();
+        // About ten working days against a couple (2 in 10); 30–40 min drawn at 40 against under 5 (5 in 40).
+        for (const [index, ratio] of [0.2, 0.125].entries()) {
+          const before = rows.nth(index).locator('[data-kind="before"] .qi-scale__fill');
+          const after = rows.nth(index).locator('[data-kind="after"] .qi-scale__fill');
+          await expect.poll(async () => (await after.boundingBox())!.width / (await before.boundingBox())!.width).toBeCloseTo(ratio, 2);
+        }
+      });
+
+      test("the bars are drawn at their share, not shrunk, with reduced motion", async ({ page }) => {
+        await page.emulateMedia({ reducedMotion: "reduce" });
+        await page.reload();
+        const after = page.locator('section#what-changed [data-kind="after"] .qi-scale__fill').first();
+        const before = page.locator('section#what-changed [data-kind="before"] .qi-scale__fill').first();
+        await expect.poll(async () => (await after.boundingBox())!.width / (await before.boundingBox())!.width).toBeCloseTo(0.2, 2);
       });
     }
 
@@ -83,17 +213,19 @@ for (const slug of roleStorySlugs) {
 
     if (slug === "joveen") {
       test("the Joveen hero sits desktop beside phone, and is captioned as the live site today", async ({ page }) => {
-        const shots = page.locator("section#the-role .stretch-role-screens__shot");
+        const shots = page.locator("section#the-role .qi-screens__shot");
         await expect(shots).toHaveCount(2);
         const desktop = shots.first();
         const phone = shots.last();
-        await expect(desktop).toHaveClass(/--desktop/);
-        await expect(phone).toHaveClass(/--phone/);
+        await expect(desktop).toHaveAttribute("data-device", "desktop");
+        await expect(phone).toHaveAttribute("data-device", "phone");
         await expect(page.locator("section#the-role figcaption")).toContainText("the live site, not my UI");
-        await expect.poll(async () => {
-          const [a, b] = [await desktop.boundingBox(), await phone.boundingBox()];
-          return a && b ? a.x + a.width <= b.x && Math.abs(a.y + a.height - (b.y + b.height)) < 2 : false;
-        }).toBe(true);
+        await expect
+          .poll(async () => {
+            const [a, b] = [await desktop.boundingBox(), await phone.boundingBox()];
+            return a && b ? a.x + a.width <= b.x && Math.abs(a.y + a.height - (b.y + b.height)) < 2 : false;
+          })
+          .toBe(true);
       });
     }
 
@@ -107,95 +239,30 @@ for (const slug of roleStorySlugs) {
       });
     }
 
-    if (slug === "bnp-paribas") {
-      test("its three figures sit under their sections with their captions", async ({ page }) => {
-        const flag = page.locator("section#decisions figure");
-        await expect(flag.locator(".stretch-role-flag__on")).toHaveText("on");
-        await expect(flag.locator(".stretch-role-flag__toggle")).toHaveCount(1);
-        await expect(flag).toContainText("off by default");
-        await expect(flag.locator("figcaption")).toHaveText("Protect the blast radius");
-        const scale = page.locator("section#what-changed figure");
-        await expect(scale.locator("figcaption")).toHaveText("Bars to scale. Two weeks is taken as ten working days.");
-        await expect(scale).toContainText("Before · about two weeks, experienced");
-        await expect(scale).toContainText("After · under 5 min");
-        const certificate = page.locator("section#what-i-took-with-me figure");
-        await expect(certificate.locator("figcaption")).toHaveText("Take Ownership · _nology · Q1 2026 · awarded May 2026");
-        await expect(certificate).toHaveAttribute("id", "take-ownership-certificate");
-      });
-
-      test("the before-and-after bars are to scale", async ({ page }) => {
-        const rows = page.locator("section#what-changed .stretch-role-scale__row");
-        await expect(rows).toHaveCount(2);
-        // About ten working days against a couple (2 in 10); 30–40 min drawn at 40 against under 5 (5 in 40).
-        for (const [index, ratio] of [0.2, 0.125].entries()) {
-          const before = rows.nth(index).locator(".stretch-role-scale__bar--before .stretch-role-scale__fill");
-          const after = rows.nth(index).locator(".stretch-role-scale__bar--after .stretch-role-scale__fill");
-          await expect.poll(async () => (await after.boundingBox())!.width / (await before.boundingBox())!.width).toBeCloseTo(ratio, 2);
-        }
-      });
-
-      test("the certificate is shown whole and untinted, from a committed asset", async ({ page }) => {
-        const figure = story.figures!["what-i-took-with-me"];
-        if (figure?.kind !== "certificate") throw new Error("BNP's last figure is the certificate");
-        const image = page.locator("#take-ownership-certificate img");
-        await image.scrollIntoViewIfNeeded();
-        await expect(image).toBeVisible();
-        // The optimiser may resize it for the screen, but the picture stays whole: the same 16:9 at any size.
-        await expect.poll(() => image.evaluate((img: HTMLImageElement) => (img.complete ? img.naturalWidth / img.naturalHeight : 0))).toBeCloseTo(16 / 9, 2);
-        // Layout size, which the frame's slight tilt does not change: shown at its own proportions, so not cropped.
-        await expect.poll(() => image.evaluate((img: HTMLImageElement) => img.offsetWidth / img.offsetHeight)).toBeCloseTo(16 / 9, 1);
-        await expect(image).toHaveCSS("filter", "none");
-        await expect(image).toHaveCSS("object-fit", "fill");
-        await expect(image).toHaveCSS("opacity", "1");
-        await expect(image).toHaveCSS("mix-blend-mode", "normal");
-        expect((await page.request.get(figure.src)).status()).toBe(200);
-      });
-
-      test("BNP's three award pins hang on its pass, and the ones that lead into this story arrive there", async ({ page }) => {
-        const pins = page.getByRole("region", { name: "Overview" }).getByRole("list", { name: "Awards" });
-        const items = pins.getByRole("listitem");
-        await expect(items).toHaveCount(3);
-        for (const [index, pin] of (passRecords[slug].pins ?? []).entries()) {
-          await expect(items.nth(index)).toContainText(pin.label);
-          await expect(items.nth(index)).toContainText(pin.detail);
-          if (pin.href) await expect(items.nth(index).getByRole("link")).toHaveAttribute("href", pin.href);
-        }
-        // Each pin that has a target takes focus and scroll to its evidence.
-        for (const [index, id] of [[0, "what-changed"], [1, "take-ownership-certificate"], [2, "what-i-took-with-me"]] as const) {
-          await page.goto(`/work/${slug}`);
-          const pin = items.nth(index).getByRole("link");
-          // The certificate pin by keyboard, the others by pointer: both land focus on the evidence.
-          if (index === 1) {
-            await pin.focus();
-            await page.keyboard.press("Enter");
-          } else await pin.click();
-          await expect(page).toHaveURL(new RegExp(`#${id}$`));
-          await expect(page.locator(`#${id}`)).toBeInViewport();
-          await expect(page.locator(`#${id}`)).toBeFocused();
-        }
-      });
-
-      test("Back and Forward between pin targets carry focus with them", async ({ page }) => {
-        const links = page.getByRole("region", { name: "Overview" }).getByRole("list", { name: "Awards" }).getByRole("link");
-        await links.first().click();
-        await expect(page.locator("#what-changed")).toBeFocused();
-        await links.last().click();
-        await expect(page.locator("#what-i-took-with-me")).toBeFocused();
-        await page.goBack();
-        await expect(page.locator("#what-changed")).toBeFocused();
-      });
-    } else {
-      test("the pass wears no pins", async ({ page }) => {
-        await expect(page.getByRole("region", { name: "Overview" }).getByRole("list", { name: "Awards" })).toHaveCount(0);
+    if (reveals.length === 0) {
+      test("it names nothing it cannot show, so it has no reveal words", async ({ page }) => {
+        await expect(page.locator(".qi-word")).toHaveCount(0);
       });
     }
 
-    test("the pass sits under the text on a phone and beside it from 761 px", async ({ page }) => {
-      const text = await page.locator(".stretch-cs-open__text").boundingBox();
-      const pass = await page.locator(".stretch-cs-open .stretch-pass").boundingBox();
-      if ((page.viewportSize()?.width ?? 0) < 761) expect(pass!.y, "under the text").toBeGreaterThanOrEqual(text!.y + text!.height - 1);
-      else expect(pass!.x, "beside the text").toBeGreaterThanOrEqual(text!.x + text!.width - 1);
-    });
+    for (const { id, phrase, section } of reveals) {
+      test(`"${phrase}" shows its closer look: in the margin on a wide screen, inline when tapped`, async ({ page }) => {
+        const word = page.locator(`section#${section} .qi-word[data-look="${id}"]`);
+        await expect(word).toHaveText(phrase);
+        await word.scrollIntoViewIfNeeded();
+        const width = page.viewportSize()?.width ?? 0;
+        const hovers = await page.evaluate(() => matchMedia("(hover: hover)").matches);
+        const look = hovers && width >= MARGIN_FROM ? page.locator(".qi-margin .qi-look") : page.locator(`[data-look-slot="${id}"] .qi-look`);
+        if (hovers && width >= MARGIN_FROM) await word.hover();
+        else await word.click();
+        await expect(look).toBeVisible();
+        if (id === "cores") await expect(look).toContainText("CPU");
+        else await expect(look.locator("img")).toHaveCount(1);
+        // What it says beyond the sentence is also the word's accessible description.
+        await expect(page.locator(`#${id}-description`)).toHaveText(revealDescription[id]);
+        await expect(word).toHaveAttribute("aria-describedby", `${id}-description`);
+      });
+    }
 
     test("it is titled and described for search and sharing", async ({ page }) => {
       await expect(page).toHaveTitle(pageTitle(roleStoryName(story)));
@@ -208,42 +275,8 @@ for (const slug of roleStorySlugs) {
       expect(response.headers()["content-type"]).toBe("image/png");
     });
 
-    for (const scheme of schemes) {
-      test(`the band is in the employer's ${scheme} colours`, async ({ page }) => {
-        await page.emulateMedia({ colorScheme: scheme });
-        const colours = story.colours[scheme];
-        const band = page.locator(".stretch-cs-open");
-        await expect(band).toHaveCSS("background-color", rgb(colours.field));
-        await expect(band).toHaveCSS("color", rgb(colours.ink));
-        await expect(page.locator(".stretch-cs-evidence__value").first()).toHaveCSS("color", rgb(colours.swatch));
-      });
-    }
-
-    test("a remembered theme beats the device setting for the band", async ({ page }) => {
-      await page.emulateMedia({ colorScheme: "light" });
-      await page.evaluate(() => document.documentElement.setAttribute("data-theme", "dark"));
-      await expect(page.locator(".stretch-cs-open")).toHaveCSS("background-color", rgb(story.colours.dark.field));
-      await page.evaluate(() => document.documentElement.setAttribute("data-theme", "light"));
-      await page.emulateMedia({ colorScheme: "dark" });
-      await expect(page.locator(".stretch-cs-open")).toHaveCSS("background-color", rgb(story.colours.light.field));
-    });
-
-    test("six sections in the keyed order, each reachable from the row of section links", async ({ page }) => {
-      const links = page.getByRole("navigation", { name: "Sections" }).getByRole("link");
-      await expect(links).toHaveText(roleStorySectionKeys.map((key, index) => `0${index + 1} ${roleStorySectionLabels[key]}`));
-      const ids = await page.locator("article section[id]").evaluateAll((sections) => sections.map((section) => section.id));
-      expect(ids).toEqual([...roleStorySectionKeys]);
-      for (const key of roleStorySectionKeys) {
-        await expect(page.locator(`section#${key} h2`)).toHaveCount(1);
-        await expect(links.filter({ hasText: roleStorySectionLabels[key] })).toHaveAttribute("href", `#${key}`);
-      }
-      await links.last().click();
-      await expect(page).toHaveURL(/#what-i-took-with-me$/);
-      await expect(page.locator("section#what-i-took-with-me")).toBeInViewport();
-    });
-
-    // #219: the title and the section links share the case study's rules, so a long employer name (Optegra's) must not split mid-word either.
-    for (const width of [320, 390, 820]) {
+    // #219: a long employer name (Optegra's) must not split mid-word, and neither may the section links.
+    for (const width of [320, 390, 820, 1440]) {
       test(`the title and the section links break only between words at ${width} px`, async ({ page }, testInfo) => {
         test.skip(!/-1440-light$/.test(testInfo.project.name), "Sweeps its own widths: once per engine");
         await page.setViewportSize({ width, height: 900 });
@@ -266,50 +299,34 @@ for (const slug of roleStorySlugs) {
           return widest <= holder.clientWidth + 0.5;
         };
         await expect.poll(() => page.getByRole("heading", { level: 1 }).evaluate(widestWordFits)).toBe(true);
-        const links = page.getByRole("navigation", { name: "Sections" }).getByRole("link");
+        const links = page.locator(".qi-header__links a");
         await expect(links).toHaveCount(roleStorySectionKeys.length);
-        for (const link of await links.all()) await expect.poll(() => link.evaluate(widestWordFits)).toBe(true);
+        if (width >= LINKS_FROM) for (const link of await links.all()) await expect.poll(() => link.evaluate(widestWordFits)).toBe(true);
       });
     }
 
     test("section copy is the approved copy", async ({ page }) => {
       for (const key of roleStorySectionKeys) {
-        const { heading, paragraphs, points } = story.sections[key];
+        const { paragraphs, points } = story.sections[key];
         const section = page.locator(`section#${key}`);
-        await expect(section.getByRole("heading", { level: 2 })).toHaveText(heading ?? roleStorySectionLabels[key]);
+        await expect(section.getByRole("heading", { level: 2 })).toHaveText(roleStorySectionLabels[key]);
         for (const paragraph of paragraphs ?? []) await expect(section).toContainText(paragraph);
         for (const { lead, text } of points ?? []) await expect(section).toContainText(`${lead} ${text}`);
       }
     });
 
-    test("the evidence strip, at most four, sits under What changed", async ({ page }) => {
-      expect(story.evidence.length).toBeLessThanOrEqual(4);
-      await expect(page.getByRole("list", { name: "Evidence" })).toHaveCount(1);
-      const items = page.locator("section#what-changed").getByRole("list", { name: "Evidence" }).getByRole("listitem");
-      await expect(items).toHaveText(story.evidence.map(({ value, label }) => `${value}${label}`));
-    });
-
-    if (slug === "bnp-paribas") {
-      test("the evidence strip leaves out the awards the pins already show", async ({ page }) => {
-        const items = page.locator("section#what-changed").getByRole("list", { name: "Evidence" }).getByRole("listitem");
-        await expect(items).toHaveText(["Nov 2025won the bank’s digitisation competition", "6months from zero C# to production code"]);
-      });
-    }
-
-    test(next ? "it ends on the next role, in that role's colours" : "it ends on the way back to Work", async ({ page }) => {
+    test(next ? "it ends on one row to the next role, and following it opens that story" : "it ends on the way back to Work", async ({ page }) => {
       if (next) {
-        const tile = page.getByRole("region", { name: roleStoryCopy.nextRole }).getByRole("link");
-        await expect(tile).toHaveAttribute("href", `/work/${next.slug}`);
-        await expect(tile).toContainText(next.employer);
-        await expect(tile).toContainText(next.role);
-        await expect(tile).toContainText(next.number);
-        for (const scheme of schemes) {
-          await page.emulateMedia({ colorScheme: scheme });
-          await expect(tile, scheme).toHaveCSS("background-color", rgb(next.colours[scheme].field));
-          await expect(tile, scheme).toHaveCSS("color", rgb(next.colours[scheme].ink));
-        }
-        expect((await tile.boundingBox())!.height).toBeGreaterThanOrEqual(44);
-        await tile.click();
+        const row = page.getByRole("region", { name: roleStoryCopy.nextRole }).getByRole("link");
+        await expect(page.getByRole("region", { name: roleStoryCopy.nextRole }).getByRole("link")).toHaveCount(1);
+        await expect(row).toHaveAttribute("href", `/work/${next.slug}`);
+        await expect(row).toContainText(passRecords[next.slug].short);
+        await expect(row).toContainText(next.role);
+        await expect(row).toContainText(next.dates);
+        // The old coloured Next tile is gone.
+        await expect(page.locator(".stretch-cs-next")).toHaveCount(0);
+        expect((await row.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+        await row.click();
         await expect(page).toHaveURL(new RegExp(`/work/${next.slug}$`));
         await expect(page.getByRole("heading", { level: 1 })).toHaveText(next.employer);
         return;
@@ -320,60 +337,40 @@ for (const slug of roleStorySlugs) {
       expect((await end.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     });
 
-    test("cobalt is used only by focus, selection and the pass's award pins", async ({ page }) => {
-      const cobalt = await page.evaluate(() => {
-        const probe = document.createElement("span");
-        probe.style.color = "var(--stretch-cobalt)";
-        document.body.appendChild(probe);
-        const colour = getComputedStyle(probe).color;
-        probe.remove();
-        return colour;
-      });
-      const used = await page.locator("[data-stretch-shell] *").evaluateAll((elements, colour) => {
-        return elements.filter((element) => {
-          // The skip link is cobalt, but only when focused; it waits off-screen.
-          if (element.classList.contains("stretch-skip")) return false;
-          // The award pins are the one approved exception (docs/design/DESIGN.md, Colour rules).
-          if (element.closest(".stretch-pass__pins")) return false;
-          const style = getComputedStyle(element);
-          return [style.color, style.backgroundColor, style.borderTopColor].includes(colour) && element.checkVisibility();
-        }).length;
-      }, cobalt);
-      expect(used).toBe(0);
+    test("there is no footer, and the page ends on its last row or link with room beneath it", async ({ page }) => {
+      // The pass has a foot of its own; the page has none.
+      await expect(page.locator("[data-role-story] > footer, main > footer")).toHaveCount(0);
     });
 
     test("opens at once, even with motion on", async ({ page }) => {
       await page.emulateMedia({ reducedMotion: "no-preference" });
       await page.goto(`/work/${slug}`);
       await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
-      expect(await page.evaluate(() => Number(getComputedStyle(document.querySelector("main")!).opacity))).toBe(1);
+      await expect(page.locator("main")).toHaveCSS("opacity", "1");
     });
 
     test("it is in the server-rendered page", async ({ page }) => {
       await page.route("**/*.js", (route) => route.abort());
       await page.reload();
-      await expect(page.locator("article section[id]")).toHaveCount(6);
-      await expect(page.getByRole("list", { name: "Evidence" }).getByRole("listitem")).toHaveCount(story.evidence.length);
+      await expect(page.locator("article section[id]")).toHaveCount(roleStorySectionKeys.length);
+      await expect(page.locator('nav[aria-label="On this page"] a')).toHaveCount(roleStorySectionKeys.length);
+      await expect(page.locator(".qi-long .qi-pass")).toHaveCount(1);
+      for (const { phrase } of reveals) await expect(page.locator("article")).toContainText(phrase);
     });
 
     for (const scheme of schemes) {
-      test(`text passes WCAG 2.2 AA contrast over the employer's colours and the page, ${scheme}`, async ({ page }) => {
+      test(`text passes WCAG 2.2 AA contrast, ${scheme}`, async ({ page }) => {
         await page.emulateMedia({ colorScheme: scheme });
         const selectors = [
-          ".stretch-cs-back",
-          ".stretch-cs-open__name",
-          ".stretch-cs-open__outcome",
-          ".stretch-cs-open__meta",
-          ".stretch-cs-links-row a",
-          ".stretch-cs-h2",
-          ".stretch-cs-p",
-          ".stretch-cs-lead",
-          ".stretch-cs-evidence__value",
-          ".stretch-cs-evidence__label",
-          ".stretch-pass__title",
-          ".stretch-pass__role",
-          ".stretch-pass__value",
-          ...(next ? [".stretch-cs-next__label", ".stretch-cs-next__name", ".stretch-cs-next__outcome"] : []),
+          ".qi-long__back",
+          ".qi-long__title",
+          ".qi-long__line",
+          ".qi-long__meta",
+          ".qi-title",
+          ".qi-long__p",
+          ".qi-long__p strong",
+          ".qi-pins__text",
+          ...(next ? [".qi-row__title", ".qi-row__line"] : []),
         ];
         for (const selector of selectors) {
           const readings = await contrastOnPaper(page, selector);
@@ -389,17 +386,15 @@ for (const slug of roleStorySlugs) {
       });
     }
 
-    test("renders without sideways scroll, and every link is at least 44 px tall", async ({ page }) => {
+    test("renders without sideways scroll, and every link in the column is at least 44 px tall", async ({ page }) => {
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       const width = page.viewportSize()?.width ?? 0;
       for (const box of await Promise.all((await page.locator("[data-role-story] main *").all()).map((item) => item.boundingBox()))) {
         if (box) expect(box.x + box.width).toBeLessThanOrEqual(width + 1);
       }
-      for (const target of await page.locator("[data-role-story] a:visible, [data-role-story] button:visible").all()) {
-        if (await target.evaluate((element) => element.classList.contains("stretch-skip"))) continue;
+      for (const target of await page.locator("[data-role-story] main a:visible, [data-role-story] main button:visible").all()) {
         expect((await target.boundingBox())!.height, (await target.textContent()) ?? "").toBeGreaterThanOrEqual(44);
       }
     });
   });
 }
-

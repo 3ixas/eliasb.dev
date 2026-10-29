@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { caseStudies } from "../src/content/stretch/case-studies";
+import { roleStorySlugs } from "../src/content/stretch/role-stories";
 import { passRecords } from "../src/content/stretch/staff-pass";
 import { work } from "../src/content/stretch/work";
 import { focusContrast, minimumChanged, minimumShare, type FocusReading } from "./support/focus-contrast";
@@ -10,18 +11,16 @@ import { renderedContrast } from "./support/rendered-contrast";
 // by day and by night (the project's colour scheme sets the lights).
 test.use({ reducedMotion: "reduce" });
 
-const routes = ["/", "/resume", "/things-i-make", ...Object.keys(caseStudies).map((slug) => `/things-i-make/${slug}`), "/nothing-pinned-here"];
-/** Pages that are not the site's own routes but must meet the same bar: every state of the Staff pass. */
-const fixtureRoutes = ["/fixtures/staff-pass"];
-/** Fewest text runs a page shows; the 404 has five now that the theme button carries no text, and the Staff pass fixture dozens. */
-const minimumRuns = (route: string) => (route === "/nothing-pinned-here" ? 5 : fixtureRoutes.includes(route) ? 30 : 6);
+const routes = ["/", "/resume", "/things-i-make", ...roleStorySlugs.map((slug) => `/work/${slug}`), ...Object.keys(caseStudies).map((slug) => `/things-i-make/${slug}`), "/nothing-pinned-here"];
+/** Fewest text runs a page shows; the 404 has five now that the theme button carries no text. */
+const minimumRuns = (route: string) => (route === "/nothing-pinned-here" ? 5 : 6);
 
 test.describe("Contrast, measured from the rendered page", () => {
   test.beforeEach(({ browserName }) => {
     test.skip(browserName !== "chromium", "Measured in Chromium");
   });
 
-  for (const route of [...routes, ...fixtureRoutes]) {
+  for (const route of routes) {
     test(`every text run on ${route} meets WCAG 2.2 AA`, async ({ page }) => {
       await page.goto(route);
       const readings = await renderedContrast(page);
