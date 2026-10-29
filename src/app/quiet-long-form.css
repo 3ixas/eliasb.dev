@@ -288,8 +288,8 @@
   gap: 14px;
 }
 
+/* The frame does not clip: a screenshot's focus ring sits outside it. The image rounds its own corners. */
 .qi-screens__shot {
-  overflow: hidden;
   border: 1px solid var(--stretch-rule);
   border-radius: 14px;
   background: var(--stretch-card);
@@ -308,6 +308,7 @@
   display: block;
   width: 100%;
   height: auto;
+  border-radius: 13px;
 }
 
 /* On its own line, so the link is a 44 px target. */

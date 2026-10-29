@@ -42,6 +42,25 @@ for (const { route, trigger } of pages) {
       await expect(button).toBeFocused();
     });
 
+    test("its keyboard focus ring is not clipped by any frame around it", async ({ page }) => {
+      const button = page.locator(trigger).first();
+      await button.focus();
+      await page.keyboard.press("Tab");
+      await page.keyboard.press("Shift+Tab");
+      await expect(button).toBeFocused();
+      const clipped = await button.evaluate((element) => {
+        const ring = element.getBoundingClientRect();
+        const outline = parseFloat(getComputedStyle(element).outlineOffset) + parseFloat(getComputedStyle(element).outlineWidth);
+        for (let parent = element.parentElement; parent && parent !== document.documentElement; parent = parent.parentElement) {
+          if (getComputedStyle(parent).overflow === "visible") continue;
+          const box = parent.getBoundingClientRect();
+          if (box.left > ring.left - outline || box.right < ring.right + outline || box.top > ring.top - outline || box.bottom < ring.bottom + outline) return parent.className;
+        }
+        return null;
+      });
+      expect(clipped).toBeNull();
+    });
+
     test("Enter opens it from the keyboard; a click on it and its Close button close it", async ({ page }) => {
       const button = page.locator(trigger).first();
       const dialog = page.getByRole("dialog");
