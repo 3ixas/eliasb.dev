@@ -1,0 +1,323 @@
+/*
+ * The long-form pages (docs/design/DESIGN.md, "Long-form pages: Role stories and case studies"): one 600 px column
+ * of back link, opening, sections and a next row, with figures inline at column width. The column, the title's
+ * treatment (.qi-opening__line), the section titles (.qi-title), the rows and the closer looks belong to
+ * quiet-index.css and quiet-opening.css; this file adds only what a long page needs. Nothing here moves except
+ * the to-scale bars, which shrink once as they come into view.
+ */
+
+.qi-long {
+  padding-block: 20px 0;
+}
+
+/* ---------- the back link ---------- */
+
+.qi-long__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: var(--stretch-muted);
+  font-size: var(--text-small);
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  .qi-long__back:hover {
+    color: var(--stretch-ink);
+  }
+}
+
+.qi-long__back:focus-visible {
+  border-radius: 6px;
+  outline: 2px solid var(--stretch-cobalt);
+  outline-offset: 2px;
+}
+
+.qi-long__end {
+  margin-top: 56px;
+}
+
+/* ---------- the opening ---------- */
+
+.qi-long__open {
+  display: grid;
+  gap: 28px;
+  margin-top: 8px;
+}
+
+/* The pass hangs on the right; the title block and, under it, the pass's pins fill the room it leaves on the left. */
+@media (min-width: 640px) {
+  .qi-long__open[data-aside] {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    grid-template-areas:
+      "head pass"
+      "pins pass";
+    grid-template-rows: auto 1fr;
+    gap: 0 24px;
+  }
+
+  .qi-long__heading {
+    grid-area: head;
+  }
+
+  .qi-long__pass {
+    grid-area: pass;
+  }
+
+  .qi-long__open[data-aside] .qi-pins {
+    grid-area: pins;
+    align-self: start;
+    margin-top: 28px;
+  }
+}
+
+.qi-long__title {
+  overflow-wrap: break-word;
+}
+
+/* An employer's name too long for the display size is set smaller, so its longest word still fits. */
+.qi-long__title[data-long] {
+  font-size: clamp(30px, 4.6vw, 34px);
+}
+
+.qi-long__line {
+  margin: 16px 0 0;
+  color: var(--stretch-muted);
+  font-size: var(--text-body);
+  line-height: 1.5;
+}
+
+.qi-long__meta {
+  margin: 10px 0 0;
+  color: var(--stretch-muted);
+  font-size: var(--text-label);
+  line-height: 1.4;
+}
+
+/* The pass hangs from its strap and leans away from a pointer; on a phone it is centred under the title. */
+.qi-long__pass {
+  justify-self: center;
+  transform-origin: 50% 0;
+}
+
+.qi-long__open .qi-pins {
+  margin: 0;
+}
+
+.qi-long__nowrap {
+  white-space: nowrap;
+}
+
+/* ---------- sections ---------- */
+
+.qi-long__section {
+  margin-top: 56px;
+  scroll-margin-top: 136px;
+}
+
+.qi-long__section:focus {
+  outline: none;
+}
+
+.qi-long__p {
+  margin: 12px 0 0;
+  font-size: var(--text-body);
+  line-height: 1.6;
+}
+
+.qi-long__p strong {
+  font-weight: 650;
+}
+
+/* A role story's evidence: each value at 17 px, weight 600, its label in 13 px mono beneath. */
+.qi-long__evidence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 36px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.qi-long__evidence li {
+  display: grid;
+  gap: 2px;
+}
+
+.qi-long__evidence strong {
+  font-size: var(--text-body);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.qi-long__evidence span {
+  max-width: 24ch;
+  color: var(--stretch-muted);
+  font-size: var(--text-label);
+  line-height: 1.35;
+}
+
+/* ---------- figures: inline at column width, on the card surface, with a caption beneath ---------- */
+
+.qi-figure {
+  margin: 28px 0 0;
+}
+
+.qi-figure__card {
+  padding: 14px 16px;
+  border: 1px solid var(--stretch-tile-edge);
+  border-radius: 14px;
+  background: var(--stretch-card);
+}
+
+.qi-figure__caption {
+  margin-top: 10px;
+  color: var(--stretch-muted);
+  font-size: var(--text-label);
+  line-height: 1.4;
+}
+
+.qi-flag__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 10px 0;
+  font-size: var(--text-small);
+}
+
+.qi-flag__row + .qi-flag__row {
+  border-top: 1px solid var(--stretch-rule);
+}
+
+.qi-flag__path {
+  flex: 1 1 180px;
+  font-weight: 600;
+}
+
+.qi-flag__on,
+.qi-flag__state {
+  color: var(--stretch-muted);
+  font-size: var(--text-label);
+}
+
+/* A switch in the off position: the knob sits at the left. */
+.qi-flag__toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--stretch-rule);
+}
+
+.qi-flag__toggle::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--stretch-page);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+}
+
+.qi-scale__row + .qi-scale__row {
+  margin-top: 18px;
+}
+
+.qi-scale__what {
+  margin: 0 0 8px;
+  font-size: var(--text-small);
+  font-weight: 650;
+}
+
+.qi-scale__bar {
+  display: grid;
+  grid-template-columns: minmax(0, 12.5em) minmax(0, 1fr);
+  align-items: center;
+  gap: 4px 14px;
+  margin-top: 6px;
+}
+
+.qi-scale__label {
+  color: var(--stretch-muted);
+  font-size: var(--text-label);
+  line-height: 1.3;
+}
+
+.qi-scale__track {
+  display: block;
+}
+
+/* A bar's fill is its share of the row's full width; a sliver stays visible. */
+.qi-scale__fill {
+  display: block;
+  width: max(calc(var(--share) * 100%), 8px);
+  height: 10px;
+  border-radius: 999px;
+  background: var(--stretch-rule);
+  transform-origin: left;
+}
+
+.qi-scale__bar[data-kind="after"] .qi-scale__fill {
+  background: var(--stretch-cobalt);
+}
+
+@media (max-width: 479px) {
+  .qi-scale__bar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The bars shrink to their share once, as they scroll into view (ShrinkOnView sets data-armed on bars that start below the fold). */
+@media (prefers-reduced-motion: no-preference) {
+  .qi-scale__fill {
+    transition: width 0.9s var(--out);
+  }
+
+  [data-armed] .qi-scale__fill {
+    width: 100%;
+  }
+}
+
+.qi-screens__row {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.qi-screens__shot {
+  overflow: hidden;
+  border: 1px solid var(--stretch-rule);
+  border-radius: 14px;
+  background: var(--stretch-card);
+}
+
+.qi-screens__shot[data-device="desktop"] {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.qi-screens__shot[data-device="phone"] {
+  flex: 0 0 22%;
+}
+
+.qi-screens__shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* On its own line, so the link is a 44 px target. */
+.qi-screens__source {
+  display: inline-flex;
+  align-items: center;
+  gap: 0 6px;
+  min-height: 44px;
+  color: var(--stretch-ink);
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

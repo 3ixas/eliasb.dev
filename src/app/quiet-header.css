@@ -435,6 +435,45 @@ a.qi-header__name {
     color: var(--stretch-ink);
     text-decoration-line: underline;
   }
+
+  /*
+   * A long-form page's header is the page's column wide (600 px), so the page and its header share one left edge,
+   * with the six links on a row of their own under the name, spread from the column's left edge to its right.
+   * The greeting keeps its words, and London's time can show without the links stepping aside.
+   */
+  .qi-header[data-long] .qi-header__inner {
+    width: min(100% - 40px, 600px);
+    grid-template-areas:
+      "who greet . eclipse"
+      "links links links links"
+      "look look look look";
+  }
+
+  .qi-header[data-long] .qi-header__links {
+    grid-area: links;
+    margin: 0;
+  }
+
+  .qi-header[data-long] .qi-header__links ul {
+    justify-content: space-between;
+    gap: 0 12px;
+  }
+
+  .qi-header[data-long] .qi-header__links a {
+    min-height: 40px;
+    padding-inline: 0;
+  }
+
+  .qi-header[data-long] .qi-greeting:is(:hover, :focus-visible) ~ .qi-header__links {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@media (min-width: 1180px) {
+  .qi-header[data-long] .qi-header__inner {
+    width: 600px;
+  }
 }
 
 @media (hover: hover) and (min-width: 900px) {

@@ -115,7 +115,7 @@ test.describe("Work: the rows", () => {
   test("a Role story's ← Work lands on this section, below the header", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/work/bnp-paribas");
-    await page.getByRole("region", { name: "Overview" }).getByRole("link", { name: "Work", exact: true }).click();
+    await page.locator("article").getByRole("link", { name: "Work", exact: true }).first().click();
     await expect(page).toHaveURL(/\/#work$/);
     const headerBottom = await page.locator("[data-stretch-header]").evaluate((header) => header.getBoundingClientRect().bottom);
     await expect.poll(() => page.locator("#work h2").evaluate((element) => element.getBoundingClientRect().top)).toBeGreaterThanOrEqual(headerBottom - 1);

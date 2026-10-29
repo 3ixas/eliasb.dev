@@ -2,17 +2,10 @@ import type { CSSProperties } from "react";
 import { CloserLookRoot } from "@/components/quiet/closer-look-root";
 import { MiniPass } from "@/components/quiet/finished-pass";
 import { openingLooks } from "@/components/quiet/opening-looks";
-import { opening, type RevealId, type Run } from "@/content/stretch/opening";
+import { RevealWord } from "@/components/quiet/reveal-word";
+import { opening, revealDescription, type RevealId, type Run } from "@/content/stretch/opening";
 
-/** What each reveal word's closer look says beyond the sentence, as the text its accessible description reads. */
-const descriptions: Record<RevealId, string> = {
-  engines: `${opening.looks.engines.caption} ${opening.looks.engines.note}`,
-  cores: opening.looks.cores.caption,
-  digitisation: `${opening.looks.digitisation.pin.label}. ${opening.looks.digitisation.pin.detail}. ${opening.looks.digitisation.line}`,
-  ownership: opening.looks.ownership.certificate.caption,
-};
-
-const revealIds = Object.keys(descriptions) as RevealId[];
+const revealIds = Object.keys(revealDescription) as RevealId[];
 
 /** The cobalt tail of the opening line: it draws its underline on arrival, and its letters lift on hover. The letters stay inline (they lift by offset, not by transform), so the line is plain text to assistive technology and keeps its kerning. */
 function Tail({ text }: { text: string }) {
@@ -52,21 +45,7 @@ function RunView({ run }: { run: Run }) {
       </span>
     );
   }
-  if (run.mark) {
-    return (
-      <span
-        className="qi-word"
-        role="button"
-        tabIndex={0}
-        data-look={run.mark}
-        data-look-tap={run.mark}
-        aria-describedby={`${run.mark}-description`}
-        aria-expanded="false"
-      >
-        {run.text}
-      </span>
-    );
-  }
+  if (run.mark) return <RevealWord id={run.mark}>{run.text}</RevealWord>;
   return run.text;
 }
 
@@ -101,7 +80,7 @@ export function Opening() {
           ))}
         {revealIds.map((id) => (
           <p key={id} id={`${id}-description`} hidden>
-            {descriptions[id]}
+            {revealDescription[id]}
           </p>
         ))}
       </CloserLookRoot>

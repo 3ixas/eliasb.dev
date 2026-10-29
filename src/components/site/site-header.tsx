@@ -10,7 +10,7 @@ import { siteCopy } from "@/content/stretch/site-copy";
 type Section = { readonly id: string; readonly label: string };
 
 /** A page's own sections, or `home` on a page that leads back to the homepage (the portrait and name become the link). */
-type HeaderProps = { sections: readonly Section[]; home?: never } | { sections?: never; home: true };
+type HeaderProps = { sections: readonly Section[]; home?: never; long?: boolean } | { sections?: never; home: true; long?: never };
 
 const name = "Elias Bennett";
 const { portrait } = siteCopy.header;
@@ -32,11 +32,13 @@ function FaceLook() {
  * The header (docs/design/DESIGN.md "The header"): the white-tux portrait as a 40 px circle, the name, the greeting
  * with its scene, quiet links to the page's sections on a wide screen, and the Eclipse. There is no phone menu:
  * below 900 px the links are not shown and the greeting sits under the name (quiet-header.css). The links are
- * in the server HTML, so they work without script. The portrait is a button that shows its closer look.
+ * in the server HTML, so they work without script. The portrait is a button that shows its closer look. A
+ * long-form page (`long`) has six links, which do not fit on the row beside the name and greeting: its header is the
+ * page's 600 px column wide, with the links on a row of their own under the name.
  */
 export function SiteHeader(props: HeaderProps) {
   return (
-    <header className="qi-header" data-stretch-header>
+    <header className="qi-header" data-stretch-header data-long={props.long ? "" : undefined}>
       <a className="stretch-skip" href="#main-content">
         Skip to content
       </a>
