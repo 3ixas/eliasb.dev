@@ -100,6 +100,15 @@ test.describe("The Résumé", () => {
     expect(download!.y + download!.height).toBeLessThanOrEqual(paper!.y);
   });
 
+  test("is complete without script: the header, its skip link, Download PDF and the sheet are in the server HTML", async ({ page }) => {
+    await page.route("**/*.js", (route) => route.abort());
+    await page.reload();
+    await expect(page.locator("header.qi-header")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Skip to content" })).toHaveCount(1);
+    await expect(page.getByRole("link", { name: resumeCopy.download })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: resumeSheet().name })).toBeVisible();
+  });
+
   test("keeps Download PDF on the desk, off the sheet and out of print", async ({ page }) => {
     const download = page.getByRole("link", { name: resumeCopy.download });
     await expect(download).toHaveAttribute("href", resumePdf.href);
