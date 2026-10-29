@@ -1,29 +1,26 @@
-import { SubpageHeader } from "@/components/site/subpage-header";
-import { WorkArchive } from "@/components/site/work-archive";
-import type { Project } from "@/content/projects";
+import { CloserLookRoot } from "@/components/quiet/closer-look-root";
+import { ProjectRow, projectLooks } from "@/components/quiet/project-rows";
+import { LongForm, LongFormOpening } from "@/components/site/long-form";
+import { WorkArchiveList } from "@/components/site/work-archive";
+import { projectIndex, type Project } from "@/content/projects";
 import { workArchive } from "@/content/stretch/site-copy";
 
 /**
- * The /things-i-make page (docs/specs/STRETCH-REDESIGN-SPEC.md, "Case studies and the
- * archive"): the slim header, the heading and note, and every project in the
- * catalogue as Project index rows, newest first. Like a case study it has no
- * cobalt beyond focus, selection and hover.
+ * The Work archive (docs/design/DESIGN.md, "The Work archive"): the homepage's Things I make, unabridged. The
+ * shared header with no links, "Things I make" as the `h1` in the opening line's treatment with its note beneath,
+ * then every project in the catalogue as the homepage's rows, newest first, with the same closer looks. The server
+ * renders all of it.
  */
 export function WorkArchivePage({ catalogue }: { catalogue: readonly Project[] }) {
+  const ordered = projectIndex(catalogue, []);
   return (
-    <div data-stretch-shell data-work-archive>
-      <SubpageHeader />
-      <main id="main-content" tabIndex={-1}>
-        <section className="stretch-wrap stretch-section stretch-archive" aria-labelledby="work-archive-title">
-          <div className="stretch-section__head">
-            <h1 id="work-archive-title" className="stretch-display stretch-h2">
-              {workArchive.heading}
-            </h1>
-            <p className="stretch-mono stretch-note">{workArchive.note}</p>
-          </div>
-          <WorkArchive catalogue={catalogue} />
-        </section>
-      </main>
-    </div>
+    <LongForm attrs={{ "data-work-archive": "" }}>
+      <section className="stretch-wrap qi-long" aria-labelledby="work-archive-title">
+        <CloserLookRoot looks={projectLooks(ordered)} className="qi-column">
+          <LongFormOpening titleId="work-archive-title" title={workArchive.heading} line={workArchive.note} />
+          <WorkArchiveList items={ordered.map((project) => ({ slug: project.slug, category: project.category, row: <ProjectRow project={project} /> }))} />
+        </CloserLookRoot>
+      </section>
+    </LongForm>
   );
 }

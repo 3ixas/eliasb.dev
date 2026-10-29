@@ -72,7 +72,7 @@ test.describe("Shell details: separators", () => {
   test("every dot in a metadata line is bound to the item before it", async ({ page }) => {
     for (const route of ["/", "/things-i-make/threshold"]) {
       await page.goto(route);
-      const lines = await page.locator(".qi-long__meta, .stretch-index__meta, .stretch-tile__meta, .qi-row__line").allTextContents();
+      const lines = await page.locator(".qi-long__meta, .stretch-tile__meta, .qi-row__line").allTextContents();
       expect(lines.length).toBeGreaterThan(0);
       for (const line of lines) expect(line).not.toMatch(/[^\u00a0]·/u);
     }

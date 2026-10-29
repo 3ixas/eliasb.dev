@@ -317,18 +317,6 @@ button.stretch-pill {
   letter-spacing: -0.02em;
 }
 
-.stretch-index__outcome {
-  color: var(--stretch-muted);
-  font-size: var(--text-body);
-  line-height: 1.35;
-}
-
-.stretch-index__meta {
-  color: var(--stretch-muted);
-  font-size: var(--text-label);
-  white-space: nowrap;
-}
-
 .stretch-index__arrow {
   font-size: var(--text-quote);
   line-height: 1;
@@ -344,29 +332,7 @@ button.stretch-pill {
   }
 }
 
-.stretch-index__all {
-  margin: 24px 0 0;
-}
-
-.stretch-index__all a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: var(--stretch-ink);
-  font-size: var(--text-small);
-}
-
-.stretch-index__all a:focus-visible {
-  color: var(--stretch-cobalt);
-}
-
-@media (hover: hover) {
-  .stretch-index__all a:hover {
-    color: var(--stretch-cobalt);
-  }
-}
-
-/* Desktop: the rows keep the left of the list and the screenshot previews on the right. */
+/* Desktop: the rows keep the left of the list. */
 @media (min-width: 761px) {
   .stretch-index__row {
     position: relative;
@@ -379,83 +345,13 @@ button.stretch-pill {
     border-bottom: 1px solid var(--stretch-rule);
   }
 
-  .stretch-index__meta {
-    grid-column: 2;
-    grid-row: 2;
-    white-space: normal;
-  }
-
   .stretch-index__arrow {
     grid-column: 3;
     grid-row: 1;
   }
-
-  .stretch-index__shot {
-    position: absolute;
-    top: 50%;
-    right: 0;
-    width: calc(38% - 32px);
-    translate: 0 -50%;
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-
-  /* End rows keep the preview inside the list; middle rows centre it. */
-  .stretch-index__row:first-child .stretch-index__shot {
-    top: 20px;
-    translate: none;
-  }
-
-  .stretch-index__row:last-child:not(:first-child) .stretch-index__shot {
-    top: auto;
-    bottom: 20px;
-    translate: none;
-  }
-
-  .stretch-index__link:is(:hover, :focus-visible) .stretch-index__shot {
-    visibility: visible;
-    opacity: 1;
-  }
 }
 
-/* Resting preview: until a row is hovered or focused, the first screenshot fills the stage. */
-@media (min-width: 761px) {
-  .stretch-index__shot[data-resting] {
-    visibility: visible;
-    opacity: 1;
-  }
-
-  /* The resting shot belongs to the list's stage, not to its row: when the first rows have no screenshot it still sits at the top of the right column. */
-  .stretch-index__row:has(> .stretch-index__link > .stretch-index__shot[data-resting]) {
-    position: static;
-  }
-
-  .stretch-index__list > .stretch-index__row .stretch-index__link .stretch-index__shot[data-resting] {
-    top: 20px;
-    bottom: auto;
-    translate: none;
-  }
-
-  /* A selector list, not :is(), inside :has(): WebKit does not restyle on :is() there. */
-  :where(.stretch-index__list:has(.stretch-index__link:hover, .stretch-index__link:focus-visible)) .stretch-index__shot[data-resting] {
-    visibility: hidden;
-    opacity: 0;
-  }
-}
-
-.stretch-index__shot img {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 10;
-  border: 1px solid var(--stretch-rule);
-  border-radius: 12px;
-  object-fit: cover;
-  object-position: top left;
-}
-
-/* Phones have no hover: the screenshot is a small thumbnail and a row is one tap. */
+/* Phones have no hover: a row is one tap. */
 @media (max-width: 760px) {
   .stretch-index__link {
     grid-template-columns: 96px minmax(0, 1fr) 20px;
@@ -471,19 +367,8 @@ button.stretch-pill {
     grid-column: 2;
   }
 
-  .stretch-index__meta {
-    grid-column: 2;
-    grid-row: 2;
-    white-space: normal;
-  }
-
   .stretch-index__arrow {
     grid-column: 3;
-    grid-row: 1 / span 2;
-  }
-
-  .stretch-index__shot {
-    grid-column: 1;
     grid-row: 1 / span 2;
   }
 
@@ -491,16 +376,12 @@ button.stretch-pill {
     font-size: 26px;
   }
 
-  .stretch-index__outcome {
-    font-size: var(--text-small);
-  }
-
   /* A row without a thumbnail uses the full width. */
   .stretch-index__link:not(:has(.stretch-index__shot)) {
     grid-template-columns: minmax(0, 1fr) 20px;
   }
 
-  .stretch-index__link:not(:has(.stretch-index__shot)) :is(.stretch-index__text, .stretch-index__meta) {
+  .stretch-index__link:not(:has(.stretch-index__shot))  .stretch-index__text {
     grid-column: 1;
   }
 
@@ -522,12 +403,6 @@ button.stretch-pill {
 @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
   .stretch-index__link:hover .stretch-index__arrow {
     transform: translateX(6px);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .stretch-index__shot {
-    transition: none;
   }
 }
 
@@ -580,56 +455,6 @@ button.stretch-pill {
   text-decoration: none;
   font-weight: 700;
   font-size: var(--text-small);
-}
-
-/* ---- Work archive: /things-i-make, the full Project index with filters above ten projects ---- */
-
-.stretch-archive .stretch-index {
-  margin-top: 40px;
-}
-
-.stretch-archive__filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 32px;
-}
-
-.stretch-archive__filter {
-  min-height: 44px;
-  padding: 0 18px;
-  border: 1px solid var(--stretch-rule);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--stretch-ink);
-  font-size: var(--text-small);
-  cursor: pointer;
-}
-
-.stretch-archive__filter:is(:hover, :focus-visible) {
-  border-color: var(--stretch-ink);
-}
-
-.stretch-archive__filter[aria-pressed="true"] {
-  border-color: var(--stretch-ink);
-  background-color: var(--stretch-ink);
-  color: var(--stretch-page);
-}
-
-.stretch-archive__filters + .stretch-index {
-  margin-top: 24px;
-}
-
-/* Read out by assistive technology when a filter changes the list; never seen. */
-.stretch-archive__count {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
 }
 
 /* ---- The 404: a heading, one line and a way home ---- */

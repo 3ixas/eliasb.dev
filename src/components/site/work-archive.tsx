@@ -1,44 +1,39 @@
 "use client";
 
-import { useState } from "react";
-import { ProjectIndex } from "@/components/site/project-index";
-import { projectIndex, type Project, type ProjectCategory } from "@/content/projects";
+import { Fragment, useState, type ReactNode } from "react";
+import type { ProjectCategory } from "@/content/projects";
 import { workArchive } from "@/content/stretch/site-copy";
 
 /**
- * The archive's list: every project in the catalogue, newest first, as Project
- * index rows. The filters (All, Products, Systems, Experiments) exist only once
- * the catalogue is longer than `workArchive.filtersAfter`; before that the
- * visitor can already see everything. Rows are server-rendered for "All", so
- * the full list is on the page before any script runs.
+ * The archive's list: every project's row, already rendered by the server, with the filters above it (All,
+ * Products, Systems, Experiments) once the catalogue is longer than `workArchive.filtersAfter`; before that the
+ * visitor can already see everything and nothing here is a button. The list is complete in the server's HTML
+ * ("All"), so the page reads the same before any script runs.
  */
-export function WorkArchive({ catalogue }: { catalogue: readonly Project[] }) {
+export function WorkArchiveList({ items }: { items: readonly { slug: string; category: ProjectCategory; row: ReactNode }[] }) {
   const [category, setCategory] = useState<ProjectCategory | null>(null);
-  const ordered = projectIndex(catalogue, []);
-  const filtered = catalogue.length > workArchive.filtersAfter;
-  const rows = category ? ordered.filter((project) => project.category === category) : ordered;
+  const filtered = items.length > workArchive.filtersAfter;
+  const shown = category ? items.filter((item) => item.category === category) : items;
 
   return (
     <>
       {filtered && (
-        <div className="stretch-archive__filters" role="group" aria-label="Filter projects">
+        <div className="qi-filters" role="group" aria-label="Filter projects">
           {workArchive.filters.map((filter) => (
-            <button
-              key={filter.label}
-              type="button"
-              className="stretch-archive__filter stretch-mono"
-              aria-pressed={category === filter.category}
-              onClick={() => setCategory(filter.category)}
-            >
+            <button key={filter.label} type="button" className="qi-filters__button stretch-mono" aria-pressed={category === filter.category} onClick={() => setCategory(filter.category)}>
               {filter.label}
             </button>
           ))}
         </div>
       )}
-      <ProjectIndex rows={rows} firstNumber={1} limit={Infinity} />
+      <ul className="qi-list">
+        {shown.map(({ slug, row }) => (
+          <Fragment key={slug}>{row}</Fragment>
+        ))}
+      </ul>
       {filtered && (
-        <p className="stretch-archive__count" role="status">
-          {workArchive.count(rows.length)}
+        <p className="sr-only" role="status">
+          {workArchive.count(shown.length)}
         </p>
       )}
     </>

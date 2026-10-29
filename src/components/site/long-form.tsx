@@ -28,11 +28,11 @@ export function Arrowed({ label }: { label: string }) {
 /** The header's links on a long-form page: the page's own sections, in reading order. */
 export type LongFormSection = { readonly id: string; readonly label: string };
 
-/** The page: the shared header, the column's room, and the skip link's target. */
-export function LongForm({ sections, attrs, children }: { sections: readonly LongFormSection[]; attrs: Record<`data-${string}`, string>; children: ReactNode }) {
+/** The page: the shared header, the column's room, and the skip link's target. A page with no `sections` has no links but the way home. */
+export function LongForm({ sections, attrs, children }: { sections?: readonly LongFormSection[]; attrs: Record<`data-${string}`, string>; children: ReactNode }) {
   return (
     <div data-stretch-shell {...attrs}>
-      <SiteHeader sections={sections} long />
+      {sections ? <SiteHeader sections={sections} long /> : <SiteHeader home />}
       <FocusHashTarget />
       <main id="main-content" tabIndex={-1}>
         {children}
@@ -55,7 +55,7 @@ export function BackLink({ href, label }: { href: string; label: string }) {
  * the page's object beside it (below the title on a phone), and what hangs from the object under the title, in
  * the room the object leaves (after it on a phone). `long` sets a name too long for the display size smaller.
  */
-export function LongFormOpening({ titleId, title, line, meta, long, aside, below }: { titleId: string; title: string; line: string; meta: readonly string[]; long?: boolean; aside?: ReactNode; below?: ReactNode }) {
+export function LongFormOpening({ titleId, title, line, meta, long, aside, below }: { titleId: string; title: string; line: string; meta?: readonly string[]; long?: boolean; aside?: ReactNode; below?: ReactNode }) {
   return (
     <header className="qi-long__open" data-aside={aside ? "" : undefined}>
       <div className="qi-long__heading">
@@ -63,14 +63,16 @@ export function LongFormOpening({ titleId, title, line, meta, long, aside, below
           {title}
         </h1>
         <p className="qi-long__line">{line}</p>
-        <p className="qi-long__meta stretch-mono">
-          {meta.map((part, index) => (
-            <Fragment key={part}>
-              {index > 0 && "\u00a0· "}
-              <span className="qi-long__nowrap">{bindDots(part)}</span>
-            </Fragment>
-          ))}
-        </p>
+        {meta && (
+          <p className="qi-long__meta stretch-mono">
+            {meta.map((part, index) => (
+              <Fragment key={part}>
+                {index > 0 && "\u00a0· "}
+                <span className="qi-long__nowrap">{bindDots(part)}</span>
+              </Fragment>
+            ))}
+          </p>
+        )}
       </div>
       {aside}
       {below}
