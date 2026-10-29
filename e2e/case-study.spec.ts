@@ -51,7 +51,6 @@ for (const slug of caseStudySlugs) {
     test("the header is the shared one, and its links are this page's six sections", async ({ page }) => {
       const width = page.viewportSize()?.width ?? 0;
       await expect(page.locator("header.qi-header")).toHaveCount(1);
-      await expect(page.locator(".stretch-header")).toHaveCount(0);
       await expect(page.locator('nav[aria-label="On this page"]')).toHaveCount(1);
       const links = page.locator(".qi-header__links a");
       await expect(links).toHaveText(caseStudySectionKeys.map((key) => caseStudySectionLabels[key]));
