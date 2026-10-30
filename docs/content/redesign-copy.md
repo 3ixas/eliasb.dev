@@ -14,7 +14,7 @@ Approved by Elias on 8 October 2026 for [#113](https://github.com/3ixas/eliasb.d
 | Social image | ELIAS BENNETT · I build pricing and risk engines at BNP Paribas, and *products of my own.* |
 | Menu | Work · Things I make · How I work · Off the clock · Say hello |
 | Header | Dark theme · ← Work |
-| Greeting (header) | Kettle’s on. (05:00 to 11:59) · Nearly five? (12:00 to 17:59 on a weekday) / Nowhere to be? (12:00 to 17:59 on Saturday and Sunday) · Home yet? (18:00 to 21:59) · Still up? (22:00 to 04:59), by the visitor’s own clock and day. Hello before the browser has read it, and without script. Replaced Good morning · Good afternoon · Good evening on 28 October 2026 ([#300](https://github.com/3ixas/eliasb.dev/issues/300)); the edges are from [#180](https://github.com/3ixas/eliasb.dev/issues/180) |
+| Greeting (header) | Kettle’s on. (05:00 to 11:59) · Nearly five? (12:00 to 16:59 on a weekday) / Nowhere to be? (12:00 to 16:59 on Saturday and Sunday) · Home yet? (17:00 to 21:59) · Still up? (22:00 to 04:59), by the visitor’s own clock and day. Hello before the browser has read it, and without script. Replaced Good morning · Good afternoon · Good evening on 28 October 2026 ([#300](https://github.com/3ixas/eliasb.dev/issues/300)); the edges are from [#180](https://github.com/3ixas/eliasb.dev/issues/180) |
 | Footer | Made by Elias |
 
 **404**
