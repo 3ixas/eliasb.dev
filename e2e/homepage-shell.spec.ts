@@ -179,7 +179,7 @@ test.describe("The header greeting", () => {
 
   // Whole hours in a zone with no daylight saving, so the visitor's hour is exactly the hour asked for. 15 October 2026 is a Thursday.
   for (const [hour, key] of [
-    [4, "late"], [5, "morning"], [11, "morning"], [12, "afternoon"], [17, "afternoon"], [18, "evening"], [21, "evening"], [22, "late"],
+    [4, "late"], [5, "morning"], [11, "morning"], [12, "afternoon"], [16, "afternoon"], [17, "evening"], [21, "evening"], [22, "late"],
   ] as const) {
     test(`${String(hour).padStart(2, "0")}:30 on the visitor's clock says "${greetingLine(key, false)}"`, async ({ browser }) => {
       const context = await browser.newContext({ timezoneId: "Etc/GMT" });
@@ -194,13 +194,13 @@ test.describe("The header greeting", () => {
 
   // Only the afternoon knows the day, and it is the visitor's own: 16 October 2026 is a Friday, 17 a Saturday, 18 a Sunday.
   for (const [at, key, line] of [
-    ["2026-10-16T17:30:00Z", "afternoon", "Nearly five?"],
-    ["2026-10-16T18:00:00Z", "evening", "Home yet?"],
+    ["2026-10-16T16:59:00Z", "afternoon", "Nearly five?"],
+    ["2026-10-16T17:00:00Z", "evening", "Home yet?"],
     ["2026-10-17T11:59:00Z", "morning", "Kettle’s on."],
     ["2026-10-17T12:00:00Z", "afternoon", "Nowhere to be?"],
     ["2026-10-17T14:00:00Z", "afternoon", "Nowhere to be?"],
-    ["2026-10-18T17:59:00Z", "afternoon", "Nowhere to be?"],
-    ["2026-10-18T18:00:00Z", "evening", "Home yet?"],
+    ["2026-10-18T16:59:00Z", "afternoon", "Nowhere to be?"],
+    ["2026-10-18T17:00:00Z", "evening", "Home yet?"],
     ["2026-10-17T23:00:00Z", "late", "Still up?"],
   ] as const) {
     test(`${at} on the visitor's clock says "${line}"`, async ({ browser }) => {

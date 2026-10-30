@@ -15,7 +15,7 @@ Facts come only from the Role stories, `src/content/resume.ts` and the project c
 | Page title, meta description, social image | As in `redesign-copy.md` | kept |
 | Header links (desktop) | Work · Things I make · How I work · Off the clock · Say hello | kept (the Menu entries) |
 | Theme button name | Dark theme | kept |
-| Greeting | Kettle’s on. (05:00 to 11:59) · Nearly five? (12:00 to 17:59 on a weekday) / Nowhere to be? (12:00 to 17:59 on Saturday and Sunday) · Home yet? (18:00 to 21:59) · Still up? (22:00 to 04:59), by the visitor's own clock and day; Hello before script | changed: was Good morning · Good afternoon · Good evening · Still up? |
+| Greeting | Kettle’s on. (05:00 to 11:59) · Nearly five? (12:00 to 16:59 on a weekday) / Nowhere to be? (12:00 to 16:59 on Saturday and Sunday) · Home yet? (17:00 to 21:59) · Still up? (22:00 to 04:59), by the visitor's own clock and day; Hello before script | changed: was Good morning · Good afternoon · Good evening · Still up? |
 | Greeting, on hover | it’s {14:28} here in London | new: London's time, from Elias's side of the screen |
 | Footer | Made by Elias | kept |
 

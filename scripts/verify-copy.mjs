@@ -104,13 +104,13 @@ for (const { id, label } of siteCopy.menu) {
 const greetingAt = (hour, weekend = false) => greetingLine(greetingKey(hour), weekend);
 for (const [hour, line] of [
   [0, "Still up?"], [4, "Still up?"], [5, "Kettle’s on."], [11, "Kettle’s on."], [12, "Nearly five?"],
-  [17, "Nearly five?"], [18, "Home yet?"], [21, "Home yet?"], [22, "Still up?"], [23, "Still up?"],
+  [16, "Nearly five?"], [17, "Home yet?"], [21, "Home yet?"], [22, "Still up?"], [23, "Still up?"],
 ]) {
   assert.equal(greetingAt(hour), line, `The greeting at ${hour}:00 to ${hour}:59`);
 }
 // The afternoon alone changes with the day.
-for (const hour of [12, 17]) assert.equal(greetingAt(hour, true), "Nowhere to be?", `The weekend greeting at ${hour}:00`);
-for (const hour of [0, 5, 11, 18, 21, 22]) assert.equal(greetingAt(hour, true), greetingAt(hour), `The greeting at ${hour}:00 is the same every day`);
+for (const hour of [12, 16]) assert.equal(greetingAt(hour, true), "Nowhere to be?", `The weekend greeting at ${hour}:00`);
+for (const hour of [0, 5, 11, 17, 21, 22]) assert.equal(greetingAt(hour, true), greetingAt(hour), `The greeting at ${hour}:00 is the same every day`);
 assert.equal(siteCopy.greeting.hello, "Hello");
 for (let hour = 0; hour < 24; hour += 1) assert.notEqual(greetingKey(hour), "hello", "Only the browser's clock picks a greeting; hello is the line before it");
 
