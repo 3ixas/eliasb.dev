@@ -26,11 +26,12 @@ A pull request merges into `main` only when the main ruleset is satisfied: `qual
 
 ## Failing end-to-end shards
 
-Playwright runs with no retries, so a timing flake fails its shard.
+In CI, Playwright runs a failing test again, twice at most (`retries: 2`), so a one-off timing flake or a rare renderer stall passes as "flaky" instead of failing the shard. A shard still fails when a test fails all three times. Locally there are no retries.
 
 1. Read the failing test names. `gh run view <run-id> --log-failed` returns nothing until the whole run has finished; until then, check-run annotations show only the exit code.
-2. If the pull request cannot affect the failing tests (for example, it changes only workflows or docs) or the same test has failed on other branches, re-run the failed shards once with `gh run rerun <run-id> --failed`.
-3. If it fails again, or the pull request touches what the test covers, treat it as a real failure.
+2. A test that failed three times in a row is a real failure, or a flake worse than a retry can absorb. Reproduce it with `--repeat-each` on the one project, and fix its cause (the margin's scroll check was one: a pointer left off its row) rather than re-running the shard.
+3. Only if the pull request cannot affect the failing test (for example, it changes only workflows or docs) and the same test has failed on other branches, re-run the failed shards once with `gh run rerun <run-id> --failed`.
+4. Find the flaky tests the retries are hiding: `gh run view <run-id> --log | grep -i flaky` lists a run's flaky tests. A test that keeps appearing is a ticket.
 
 ## Requiring a new check
 
