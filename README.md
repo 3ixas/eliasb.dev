@@ -1,10 +1,10 @@
 # eliasb.dev
 
-The source of [eliasb.dev](https://www.eliasb.dev), Elias Bennett's personal site: what he builds, how he works, and what his time looks like away from the keyboard.
+The source of [eliasb.dev](https://www.eliasb.dev), my personal site: what I build, how I work, and what my time looks like away from the keyboard.
 
 ![The homepage at desktop width in the light theme: the headline "I build pricing and risk engines at BNP Paribas, and products of my own." above a Work section with a row for each employer, each with a small staff pass.](docs/screenshots/quiet-index-desktop-light.webp)
 
-The site is a **quiet index**: simplicity and focus first, character for whoever looks closer. Every page is one reading column. Anything that names something real (an employer, a project, a book, a film, a habit) is a row, and pointing at the row brings a closer look into the margin; on a phone, tapping it opens the closer look in place. The page is complete from its first frame, and nothing moves unless it means something. The terms used in the code and docs are defined in [`GLOSSARY.md`](GLOSSARY.md), and the design contract is [`docs/design/DESIGN.md`](docs/design/DESIGN.md).
+I designed the site as a **quiet index**: simplicity and focus first, with character for anyone who looks closer. Every page is one reading column. Anything that names something real (an employer, a project, a book, a film, a habit) is a row. Point at a row and a closer look appears in the margin; on a phone, tap it and the closer look opens in place. The page is complete from its first frame, and nothing moves unless it means something. The terms I use in the code and docs are defined in [`GLOSSARY.md`](GLOSSARY.md), and the design contract is [`docs/design/DESIGN.md`](docs/design/DESIGN.md).
 
 | Light | Dark |
 | --- | --- |
@@ -14,31 +14,31 @@ The site is a **quiet index**: simplicity and focus first, character for whoever
 
 ## How the site changed
 
-The site has been rebuilt five times. Each version below is shown as it stood at its last commit, at 1440 px wide, in the version's own default theme with its entrance finished. The written contract for each of the last four is in [`docs/design/history/`](docs/design/history).
+I have rebuilt the site five times. Each version below is shown as it stood at its last commit, at 1440 px wide, in its own default theme with its entrance finished. The written design for each of the last three is in [`docs/design/history/`](docs/design/history).
 
 ### V1: the first coding project (January 2025)
 
 ![V1: a dark page with a nav bar, the greeting "Good afternoon, I'm Elias!" and the headline "A Full Stack Software Engineer based in the UK."](docs/screenshots/history/v1.webp)
 
-Hand-written HTML, SCSS and JavaScript, built as Elias's first coding project: a time-of-day greeting, a skills grid, tabbed experience and a projects grid. It lives on in its own repository, [`3ixas/personal-portfolio-v1`](https://github.com/3ixas/personal-portfolio-v1), and the screenshot is its last content commit. It was archived on 14 September 2026, the day the Cabinet of Curiosities began.
+My first coding project, written by hand in HTML, SCSS and JavaScript: a greeting for the time of day, a skills grid, tabbed experience and a projects grid. It lives on in its own repository, [`3ixas/personal-portfolio-v1`](https://github.com/3ixas/personal-portfolio-v1), and the screenshot is its last content commit. I archived it on 14 September 2026, the day the Cabinet of Curiosities began.
 
 ### The Cabinet of Curiosities (September 2026)
 
 ![The Cabinet of Curiosities: a cream page with a dotted grid, a large serif headline "I build software to make everyday things easier, and more enjoyable.", and a tilted yellow note with a photograph.](docs/screenshots/history/cabinet.webp)
 
-The first Next.js build, chosen on 14 September 2026. Clear editorial hierarchy, with tactile objects, real artefacts and a serif display face layered on top for personality. Its refinement brief judged the site good-looking but "not fully there", and the Board was the answer.
+The first Next.js build, chosen on 14 September 2026: a clear editorial layout, with tactile objects, real artefacts and a serif display face on top for personality. When I came back to refine it, I judged that it looked good but was "not fully there", and the Board was my answer.
 
 ### The Board (September to October 2026)
 
 ![The Board: a cream page with a headline on a pinned card, "I build everyday software, and make complicated things feel simple.", a taped polaroid portrait under a desk lamp, and a light switch in the header.](docs/screenshots/history/board.webp)
 
-A well-kept studio wall that Elias pins things to: the work pinned carefully and clearly, the life around it pinned more loosely, with a typed headline, a lamp and a light switch for the theme. It shipped on 8 October 2026 and was replaced two days later, because Elias chose a complete redesign over refining it: the design he first wanted resembled his reference sites, and the build had drifted away from them.
+A well-kept studio wall that I pin things to: the work pinned carefully and clearly, the life around it pinned more loosely, with a typed headline, a lamp and a light switch for the theme. It shipped on 8 October 2026 and I replaced it two days later. I chose a complete redesign over refining it, because the design I first wanted resembled my reference sites and the build had drifted away from them.
 
 ### Stretch (October 2026)
 
 ![Stretch: a neutral page with "ELIAS BENNETT" in huge cobalt condensed capitals, the headline "I build pricing and risk engines at BNP Paribas, and products of my own.", and a tilted portrait labelled "Based in London".](docs/screenshots/history/stretch.webp)
 
-A neutral page with one cobalt accent used large, a condensed display face at poster scale, each project in the colours of its own interface, and a two-act typed entrance. Employment came to lead the site, with Role stories for each employer. It grew by addition: every pass added a well-made object and none took one away, until the homepage was a stack of set pieces. It was replaced by the quiet index, which keeps the content and the data layer and adds a [removal rule](docs/design/DESIGN.md#the-removal-rule) so the page stays small.
+A neutral page with one cobalt accent used large, a condensed display face at poster scale, each project in the colours of its own interface, and a two-act typed entrance. My employment came to lead the site, with a Role story for each employer. It grew by addition: every pass added a well-made object and none took one away, until the homepage was a stack of set pieces. The quiet index keeps the content and the data layer, and adds a [removal rule](docs/design/DESIGN.md#the-removal-rule) so the page stays small.
 
 ### The quiet index (October 2026 to now)
 
@@ -58,7 +58,7 @@ The live site, at the top of this page. One 600 px reading column, one 300 px ma
 
 `/about` redirects to `/#work`, and `/lab` and `/library` redirect to `/#off-the-clock`, so old links keep working.
 
-**Off the clock** is the only section driven by outside data. It shows a training week (authored), what Elias is reading (Goodreads), what he last watched (Letterboxd), a curiosity from this week in history (Wikipedia's "On this day" feeds), what he is making now, and a year of GitHub contributions.
+**Off the clock** is the only section driven by outside data. It shows my training week (authored), what I'm reading (Goodreads), what I last watched (Letterboxd), a curiosity from this week in history (Wikipedia's "On this day" feeds), what I'm making now, and a year of my GitHub contributions.
 
 ## Stack
 
@@ -96,7 +96,7 @@ Copy `.env.example` to `.env.local` if you want either of these.
 
 | Variable | Default | What it does |
 | --- | --- | --- |
-| `GITHUB_SIGNAL_TOKEN` | unset | Optional, server-only, `read:user` scope. Lets the GitHub year show the contribution calendar shown on the profile. Without it the site uses public events, or an authored fallback. |
+| `GITHUB_SIGNAL_TOKEN` | unset | Optional, server-only, `read:user` scope. Lets the GitHub year show the contribution calendar from my profile. Without it the site uses public events, or an authored fallback. |
 | `SITE_INDEXABLE` | `false` | Set `true` only for the production deployment. When false, the site is served with `noindex` and robots disallows crawling. |
 
 Public source identifiers (GitHub, Letterboxd and Goodreads accounts) live in `src/content/integration-config.ts`.
@@ -127,7 +127,7 @@ pnpm exec playwright test --project=chromium-1440-light e2e/work-archive.spec.ts
 
 Playwright starts `pnpm start` itself on port 3100 (change it with `E2E_PORT`) and sets `BOARD_FIXTURES=1`, which turns on the `/fixtures` pages some specs use. Locally it runs one worker at a time; [`docs/runbooks/local-testing.md`](docs/runbooks/local-testing.md) says what to run and what to avoid on a laptop.
 
-The removal rule is enforced by tests: `e2e/homepage-signoff.spec.ts` fails if the homepage outgrows its length budget or anything but the margin is wider than the column, and `pnpm verify:retired` fails if a retired part of an earlier design returns.
+The removal rule is enforced by tests: `e2e/homepage-signoff.spec.ts` fails if the homepage outgrows its length budget or anything but the margin is wider than the column, and `pnpm verify:retired` fails if a retired part of an earlier design comes back.
 
 Other checks, which CI also runs. `pnpm check` runs the first group together:
 
@@ -157,4 +157,4 @@ CI (`.github/workflows/quality.yml`) builds with webpack (`SITE_INDEXABLE=true p
 
 ## Licence and images
 
-This repository has no licence file, so nothing here is offered for reuse. The photographs and project screenshots are Elias's own; credits are in [`docs/content/IMAGE-CREDITS.md`](docs/content/IMAGE-CREDITS.md).
+This repository has no licence file, so nothing here is offered for reuse. The photographs and project screenshots are my own; credits are in [`docs/content/IMAGE-CREDITS.md`](docs/content/IMAGE-CREDITS.md).
