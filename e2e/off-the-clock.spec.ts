@@ -73,18 +73,6 @@ test.describe("Off the clock: on the homepage", () => {
   });
 });
 
-test.describe("Off the clock: Fasteners", () => {
-  test("nothing in Off the clock is fastened: Fasteners retired with the cards", async ({ page }) => {
-    await page.goto("/fixtures/off-the-clock");
-    await expect(fixture(page, "layout").locator(".stretch-fastener")).toHaveCount(0);
-  });
-
-  test("the homepage carries no Fastener", async ({ page }) => {
-    await page.goto("/");
-    await expect(page.locator(".stretch-fastener")).toHaveCount(0);
-  });
-});
-
 test.describe("Off the clock: training", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");

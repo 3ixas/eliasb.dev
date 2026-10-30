@@ -26,7 +26,6 @@
   --stretch-cobalt: #2340ff;
   --stretch-on-cobalt: #ffffff;
   --stretch-tile-edge: transparent;
-  --stretch-tape: rgba(232, 222, 188, 0.85);
   /* The greeting's sun: an illustration colour, never an interface colour (docs/design/DESIGN.md "Colour"). */
   --sun: #e39a2d;
   --stretch-dark: 0;
@@ -60,7 +59,6 @@
     --stretch-cobalt: #8b9cff;
     --stretch-on-cobalt: #0d0d12;
     --stretch-tile-edge: #2a2a33;
-    --stretch-tape: rgba(232, 222, 188, 0.6);
     --sun: #f5b84f;
     --stretch-dark: 1;
     --gh-0: #1f242c;
@@ -81,7 +79,6 @@
   --stretch-cobalt: #8b9cff;
   --stretch-on-cobalt: #0d0d12;
   --stretch-tile-edge: #2a2a33;
-  --stretch-tape: rgba(232, 222, 188, 0.6);
   --sun: #f5b84f;
   --stretch-dark: 1;
   --gh-0: #1f242c;
@@ -101,7 +98,6 @@
   --stretch-cobalt: #8b9cff;
   --stretch-on-cobalt: #0d0d12;
   --stretch-tile-edge: #2a2a33;
-  --stretch-tape: rgba(232, 222, 188, 0.6);
   --sun: #f5b84f;
   --stretch-dark: 1;
   --gh-0: #1f242c;

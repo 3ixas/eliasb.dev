@@ -65,12 +65,11 @@ test.describe("The Résumé", () => {
     }
   });
 
-  test("is light paper with no Fastener, in either theme", async ({ page }) => {
+  test("is light paper, in either theme", async ({ page }) => {
     await expect(sheet(page)).toBeVisible();
     await expect
       .poll(() => sheet(page).evaluate((el) => ({ paper: getComputedStyle(el).backgroundColor, ink: getComputedStyle(el).color })))
       .toEqual({ paper: "rgb(255, 255, 255)", ink: "rgb(17, 17, 20)" });
-    await expect(sheet(page).locator("[class*='fastener']")).toHaveCount(0);
   });
 
   test("fits the screen: no sideways scroll, and nothing clipped", async ({ page }) => {

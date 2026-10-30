@@ -305,10 +305,6 @@ Elias agreed these on 26 October 2026, when the draft was reviewed:
 3. **The simulation gets a caption** saying the paths are illustrative, worded in the copy pass ([#281](https://github.com/3ixas/eliasb.dev/issues/281)).
 4. **This file was the contract** for the homepage and shell only, as `QUIET-INDEX.md`. On 26 October 2026 the inner pages joined it ([#301](https://github.com/3ixas/eliasb.dev/issues/301)), and it became `DESIGN.md`, the one contract for the site.
 
-## Still to come
-
-- **The build**: the homepage is specified in [Spec: build the quiet index homepage](https://github.com/3ixas/eliasb.dev/issues/288); a follow-on spec covers the inner pages, on the same integration branch. Moving the specs and copy checks across follows the checklist in [#277](https://github.com/3ixas/eliasb.dev/issues/277).
-
 ## Exploration record
 
 The options rounds behind the inner pages ([#301](https://github.com/3ixas/eliasb.dev/issues/301)), each drawn on real content in the inner pages prototype:

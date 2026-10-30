@@ -212,7 +212,9 @@ test.describe("Work: the margin", () => {
         return m.y >= 16 - 1 && m.y + m.height <= height - 16 + 1;
       })
       .toBe(true);
-    await page.mouse.wheel(0, 120);
+    // A scroll small enough that the pointer, which does not move, stays over the row: a browser re-reports the pointer
+    // after a scroll, and one that lands off the row hides the margin (or shows the next row's), which is the design.
+    await page.mouse.wheel(0, 24);
     await expect
       .poll(async () => {
         const [m, r, height] = await Promise.all([boxOf(margin(page)), boxOf(row), page.evaluate(() => innerHeight)]);

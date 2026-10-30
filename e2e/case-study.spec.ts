@@ -127,8 +127,8 @@ for (const slug of caseStudySlugs) {
       await expect(items.first().locator("strong")).toHaveCSS("font-size", "17px");
       await expect(items.first().locator("strong")).toHaveCSS("font-weight", "600");
       await expect(items.first().locator("span")).toHaveCSS("font-size", "13px");
-      // The old card, its separate strip and its tape are gone.
-      await expect(page.locator(".stretch-prd, .stretch-cs-prd-group, .stretch-fastener")).toHaveCount(0);
+      // The old card and its separate strip are gone.
+      await expect(page.locator(".stretch-prd, .stretch-cs-prd-group")).toHaveCount(0);
     });
 
     test("figures sit inline at column width on the project's colour, with their captions", async ({ page }) => {
