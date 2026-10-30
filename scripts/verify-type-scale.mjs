@@ -11,11 +11,8 @@ const displayFrom = 24;
 
 /** Display sizes the patterns above can't read, each with why it never gets small. */
 const display = new Map([
-  ["var(--say-hello-size)", "Say hello: clamp(56px, 11vw, 160px), clamp(46px, 14.4vw, 56px) on a phone"],
-  ["min(var(--footer-size), calc(var(--say-hello-size) * 0.85))", "the footer name: 12vw or clamp(44px, 7vw, 104px), against Say hello"],
   ["min(clamp(56px, 13vw, 128px), var(--cs-name-fit))", "a case study's name, fitted to its column's width"],
   ["min(clamp(36px, 7.5vw, 76px), var(--cs-name-fit))", "a Role story's name, fitted to its column's width"],
-  ["min(31.5vw, 28svh)", "the hero name: about 100 px on a 320 px phone"],
 ]);
 
 const problems = [];

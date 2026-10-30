@@ -3,25 +3,48 @@ import { expect, test, type Page } from "@playwright/test";
 import { projectIndex, projects } from "../src/content/projects";
 import { caseStudies } from "../src/content/stretch/case-studies";
 import { roleStorySlugs } from "../src/content/stretch/role-stories";
-import { workArchive } from "../src/content/stretch/site-copy";
+import { siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy";
 
-const rows = (page: Page) => page.locator(".stretch-index__row");
-const names = (page: Page) => rows(page).locator(".stretch-index__name").allTextContents();
-const years = async (page: Page) =>
-  (await rows(page).locator(".stretch-index__meta").allTextContents()).map((text) => Number(text.slice(-4)));
+/*
+ * The Work archive (docs/design/DESIGN.md, "The Work archive"): the homepage's Things I make, unabridged. Its rows
+ * are the homepage's own (one implementation, covered in things-i-make.spec.ts); this file checks what the archive
+ * adds: every project, newest first, the opening, no header links, and the filters only above ten projects.
+ */
+
+const rows = (page: Page) => page.locator(".qi-list__item");
+const names = (page: Page) => rows(page).locator(".qi-row__title").allTextContents();
+const years = async (page: Page) => (await rows(page).locator(".qi-row__meta").allTextContents()).map(Number);
 const filters = (page: Page) => page.getByRole("group", { name: "Filter projects" });
 const newestFirst = (list: number[]) => expect(list).toEqual([...list].sort((a, b) => b - a));
+const noOverflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+const rgb = (hex: string) => `rgb(${[1, 3, 5].map((start) => parseInt(hex.slice(start, start + 2), 16)).join(", ")})`;
 
 test.describe("Work archive: the catalogue", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/things-i-make");
   });
 
-  test("names the page and lists every catalogue project, newest first", async ({ page }) => {
-    await expect(page.getByRole("heading", { level: 1, name: workArchive.heading })).toBeVisible();
-    await expect(page.getByText(workArchive.note)).toBeVisible();
+  test("the h1 is the page's only one, with its note beneath, in the opening line's treatment", async ({ page }) => {
+    await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+    const title = page.getByRole("heading", { level: 1, name: workArchive.heading });
+    await expect(title).toBeVisible();
+    await expect(title).toHaveClass(/qi-opening__line/);
+    const note = page.getByText(workArchive.note);
+    await expect(note).toBeVisible();
+    expect((await note.boundingBox())!.y).toBeGreaterThan((await title.boundingBox())!.y);
+  });
+
+  test("lists every project, newest first, and the homepage's link shows the same count", async ({ page }) => {
     expect(await names(page)).toEqual(projectIndex(projects, []).map((project) => project.name));
     newestFirst(await years(page));
+    const listed = await rows(page).count();
+    await page.goto("/");
+    await expect(page.getByRole("link", { name: thingsIMake.allThings(listed) })).toHaveAttribute("href", "/things-i-make");
+  });
+
+  test("the header has the way home and no section links", async ({ page }) => {
+    await expect(page.getByRole("link", { name: "Elias Bennett, home" })).toHaveAttribute("href", "/");
+    await expect(page.getByRole("navigation", { name: siteCopy.header.linksLabel })).toHaveCount(0);
   });
 
   test("has no filters at ten or fewer projects", async ({ page }) => {
@@ -30,47 +53,62 @@ test.describe("Work archive: the catalogue", () => {
     await expect(page.getByRole("button", { name: "Products" })).toHaveCount(0);
   });
 
-  test("renders without script and has no entrance", async ({ page }) => {
+  test("renders without script", async ({ page }) => {
     await page.route("**/*.js", (route) => route.abort());
     await page.reload();
+    await expect(page.getByRole("heading", { level: 1, name: workArchive.heading })).toBeVisible();
+    await expect(page.getByText(workArchive.note)).toBeVisible();
     await expect(rows(page)).toHaveCount(projects.length);
-    await expect(page.locator("[data-entrance-layer]")).toHaveCount(0);
   });
 
-  test("links home, and each row goes to its case study, live site or code", async ({ page }) => {
-    await expect(page.getByRole("link", { name: "Elias Bennett, home" })).toHaveAttribute("href", "/");
+  test("each row goes to its case study, live site or code, and an external one says it opens in a new tab", async ({ page }) => {
     for (const [index, project] of projectIndex(projects, []).entries()) {
-      await expect(rows(page).nth(index).getByRole("link")).toHaveAttribute(
-        "href",
-        project.links.caseStudy ?? project.links.live ?? project.links.code!,
-      );
+      const link = rows(page).nth(index).locator(".qi-row-box > a");
+      const href = project.links.caseStudy ?? project.links.live ?? project.links.code!;
+      await expect(link).toHaveAttribute("href", href);
+      if (href.startsWith("http")) {
+        const where = new URL(href).hostname === "github.com" ? "GitHub" : new URL(href).hostname.replace(/^www\./, "");
+        await expect(link).toHaveAccessibleName(new RegExp(`^${project.name}.* opens ${where} in a new tab$`));
+      } else {
+        await expect(link).not.toHaveAccessibleName(/new tab/);
+      }
     }
   });
 
-  test("desktop fills the right column at rest with the first screenshot and swaps it on hover", async ({ page }) => {
-    test.skip((page.viewportSize()?.width ?? 0) < 761, "Phones use inline thumbnails");
-    const resting = page.locator(".stretch-index__shot[data-resting]");
-    await expect(resting).toHaveCount(1);
-    await expect(resting).toBeVisible();
-    const [list, box] = await Promise.all([page.locator(".stretch-index__list").boundingBox(), resting.boundingBox()]);
-    expect(box!.x).toBeGreaterThan(list!.x + list!.width * 0.55);
-    const second = rows(page).nth(1).locator(".stretch-index__shot");
-    await rows(page).nth(1).getByRole("link").hover();
-    await expect(second).toBeVisible();
-    await expect(resting).toBeHidden();
-    await page.mouse.move(0, 0);
-    await expect(resting).toBeVisible();
+  test("a row's closer look is the homepage's: the margin from 1180 px with a hover, inline when tapped", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.reload();
+    const project = projectIndex(projects, [])[0];
+    const row = rows(page).filter({ has: page.locator(`[data-look="project-${project.slug}"]`) });
+    const wide = await page.evaluate(() => matchMedia("(min-width: 1180px) and (hover: hover)").matches);
+    await page.waitForFunction(() => Object.keys(document.querySelector(".qi-column")!).some((key) => key.startsWith("__reactProps$")));
+    const look = wide ? page.locator(".qi-margin .qi-project") : page.locator(`[data-look-slot="project-${project.slug}"] .qi-project`);
+    if (wide) await row.locator(".qi-row").hover();
+    else await row.locator(".qi-row__tap").click();
+    await expect(look).toBeVisible();
+    await expect(look.locator("figcaption")).toHaveText(`${project.type} · ${project.year}`);
+    if (project.colours) await expect(look).toHaveCSS("background-color", rgb(project.colours.field));
   });
 
   test("has no sideways scroll, 44 px rows, and passes axe", async ({ page }) => {
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
-    expect(overflow).toBeLessThanOrEqual(0);
+    expect(await noOverflow(page)).toBeLessThanOrEqual(0);
     for (const index of Array.from({ length: await rows(page).count() }, (_, i) => i)) {
-      const box = await rows(page).nth(index).getByRole("link").boundingBox();
+      const box = await rows(page).nth(index).locator(".qi-row").boundingBox();
       expect(box!.height).toBeGreaterThanOrEqual(44);
     }
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);
+  });
+});
+
+test.describe("Work archive: either side of the filters' threshold (fixtures)", () => {
+  test("ten projects have no filters and eleven have them", async ({ page }) => {
+    await page.goto(`/fixtures/work-archive?count=${workArchive.filtersAfter}`);
+    await expect(rows(page)).toHaveCount(workArchive.filtersAfter);
+    await expect(filters(page)).toHaveCount(0);
+    await page.goto(`/fixtures/work-archive?count=${workArchive.filtersAfter + 1}`);
+    await expect(rows(page)).toHaveCount(workArchive.filtersAfter + 1);
+    await expect(filters(page)).toBeVisible();
   });
 });
 
@@ -82,8 +120,7 @@ test.describe("Work archive: a catalogue above ten (fixtures)", () => {
   test("lists all twelve, newest first, with the filters", async ({ page }) => {
     await expect(rows(page)).toHaveCount(12);
     newestFirst(await years(page));
-    const buttons = filters(page).getByRole("button");
-    await expect(buttons).toHaveText(workArchive.filters.map(({ label }) => label));
+    await expect(filters(page).getByRole("button")).toHaveText(workArchive.filters.map(({ label }) => label));
     await expect(filters(page).getByRole("button", { name: "All", exact: true })).toHaveAttribute("aria-pressed", "true");
   });
 
@@ -103,13 +140,29 @@ test.describe("Work archive: a catalogue above ten (fixtures)", () => {
     await expect(rows(page)).toHaveCount(12);
   });
 
-  test("filters are reachable and at least 44 px tall, with no sideways scroll", async ({ page }) => {
+  test("a closer look open when a filter removes its row does not leave the restored row stuck", async ({ page }) => {
+    const wide = await page.evaluate(() => matchMedia("(min-width: 1180px) and (hover: hover)").matches);
+    test.skip(wide, "Taps open the look inline below 1180 px or without a hover");
+    await page.waitForFunction(() => Object.keys(document.querySelector(".qi-archive")!).some((key) => key.startsWith("__reactProps$")));
+    const row = rows(page).filter({ has: page.locator('[data-look="project-fixture-1"]') });
+    const look = page.locator('[data-look-slot="project-fixture-1"] .qi-project');
+    await row.locator(".qi-row__tap").click();
+    await expect(look).toBeVisible();
+    await filters(page).getByRole("button", { name: "Systems", exact: true }).click();
+    await expect(row).toHaveCount(0);
+    await filters(page).getByRole("button", { name: "All", exact: true }).click();
+    await expect(row).toHaveCount(1);
+    await expect(look).toHaveCount(0);
+    await row.locator(".qi-row__tap").click();
+    await expect(look).toBeVisible();
+  });
+
+  test("filters are at least 44 px tall, with no sideways scroll and no axe violations", async ({ page }) => {
     for (const button of await filters(page).getByRole("button").all()) {
       const box = await button.boundingBox();
       expect(box!.height).toBeGreaterThanOrEqual(44);
     }
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
-    expect(overflow).toBeLessThanOrEqual(0);
+    expect(await noOverflow(page)).toBeLessThanOrEqual(0);
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);
   });

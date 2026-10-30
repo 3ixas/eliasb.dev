@@ -3,7 +3,7 @@ status: accepted
 date: 2026-10-08
 supersedes: 0003-one-page-personal-surface.md (section list, navigation, Library label, About section)
 amends: 0004-motion-library-and-token-styling.md (first-paint constraint)
-amended: 2026-10-15 (#157, #175): Work leads the homepage and replaces Where I've been and the Career ruler; see "Amended in October 2026" below; 2026-10-20 (#241): any intent ends the signature entrance early
+amended: 2026-10-15 (#157, #175): Work leads the homepage and replaces Where I've been and the Career ruler; see "Amended in October 2026" below; 2026-10-20 (#241): any intent ends the signature entrance early; 2026-10-27 (#280, #290): the hold allowance is withdrawn
 ---
 
 # Rebuild the front end in the Stretch direction
@@ -39,6 +39,8 @@ Motion, design tokens and Tailwind v4 remain the presentation architecture. Its 
 The entrance is allowed to hold the page visually because it is the designed opening, not a loader. Three guards make that safe. The hold begins only when reduced motion is off and the page was not restored from the back-forward cache. Held content stays in the accessibility tree, and the real `h1` is complete throughout. A 7 second safety timeout, or any script error, releases the hold. Case studies, the archive and the 404 have no entrance, and returning to `/` client-side never replays it.
 
 **Amended on 20 October 2026 ([#241](https://github.com/3ixas/eliasb.dev/issues/241)).** The constraint now reads: "…only the homepage's signature entrance may hold the page, for about 5 seconds, and any intent from the visitor ends it at once; nothing else ever gates content." A scroll, wheel, touch, pointer down or key press fast-forwards the entrance to the finished page in about 200 ms, and the action that ended it still happens. A Tab is the exception: it ends the entrance at once, with no fade, even during the fade, so focus never lands on a control that is still transparent. Mouse movement does not count. The entrance still plays in full on every load and reload. Rauno Freiberg's review asked for it to go ("dont block my intent"), but it was kept because the replayable opening is the point. Being able to end it is what answers his objection.
+
+**Amended on 27 October 2026 ([#280](https://github.com/3ixas/eliasb.dev/issues/280), built in [#290](https://github.com/3ixas/eliasb.dev/issues/290)). The hold is withdrawn.** The Quiet index retires the signature entrance, so no surface may hold the page visually, for any length of time. ADR 0004's first-paint rule is restored as written: all content is present in the HTML and visible from first paint, and motion only enhances visible content and never gates it. The guard and player scripts, the `data-entering` mark, the hold and its seven second safety timeout are deleted, and `verify:opening` goes with them (the spring check it also carried is now `verify:springs`). The reduced-motion, back-forward and no-script guards above have nothing left to guard. The homepage is readable and usable in its first frame on every load, with or without script and with or without reduced motion.
 
 ## What does not change
 

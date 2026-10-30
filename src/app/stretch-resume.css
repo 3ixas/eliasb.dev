@@ -13,6 +13,12 @@
   padding: 24px var(--stretch-gutter) 64px;
 }
 
+/* The header lines up with the sheet it sits above: the name at the paper's left edge, the Eclipse at its right. */
+[data-resume] .qi-header__inner {
+  width: min(100% - 40px, 210mm);
+  margin-inline: auto;
+}
+
 .stretch-resume__sheet {
   --sheet-paper: #ffffff;
   --sheet-ink: #111114;
@@ -200,7 +206,7 @@
 }
 
 /*
- * Cmd-P gives the sheet: the desk, the header, the button and the footer stay behind. The A4 page is a
+ * Cmd-P gives the sheet: the desk, the header and the button stay behind. The A4 page is a
  * named page that only the sheet uses (`page: resume` below), so no other route's print is touched.
  */
 @page resume {
@@ -215,8 +221,7 @@
     background: #ffffff;
   }
 
-  [data-resume] .stretch-header,
-  [data-resume] .stretch-footer,
+  [data-resume] .qi-header,
   [data-resume] .stretch-resume__download {
     display: none;
   }

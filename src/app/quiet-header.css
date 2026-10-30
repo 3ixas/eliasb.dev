@@ -1,0 +1,534 @@
+/*
+ * The quiet index's header (docs/design/DESIGN.md "The header"): the portrait, the name, the greeting with its
+ * scene, quiet links to the page's sections from 900 px, and the Eclipse. No phone menu. The clock's pivot and the
+ * lamp's bulb and pool are the only places --sun is read.
+ */
+
+.qi-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--stretch-page);
+  border-bottom: 1px solid var(--stretch-rule);
+}
+
+/* Phones: no links and no menu. The portrait and name lead; the greeting sits under the name, in line with it. */
+.qi-header__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "who eclipse"
+    "greet eclipse"
+    "look look";
+  align-items: center;
+  column-gap: 12px;
+  width: min(100% - 40px, 600px);
+  margin-inline: auto;
+  padding-block: 8px;
+}
+
+.qi-header__who {
+  grid-area: who;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 44px;
+  color: var(--stretch-ink);
+  text-decoration: none;
+}
+
+/* The portrait is its own 44 px button, a sibling of the name; its margin keeps the name where the 40 px circle put it. */
+.qi-header__facebtn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin: 0 -4px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Off the homepage the portrait is a picture, not a button. */
+span.qi-header__facebtn {
+  cursor: default;
+}
+
+.qi-header__face {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--stretch-rule);
+  object-fit: cover;
+  object-position: 52% 20%;
+}
+
+.qi-header__name {
+  font-size: var(--text-body);
+  font-weight: 650;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+/* Off the homepage the name leads home: a 44 px link. On the homepage it is text. */
+a.qi-header__name {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.qi-header .stretch-eclipse {
+  grid-area: eclipse;
+  margin-right: -10px;
+  color: var(--stretch-muted);
+}
+
+@media (hover: hover) {
+  .qi-header .stretch-eclipse:hover {
+    color: var(--stretch-ink);
+  }
+}
+
+.qi-header__links {
+  grid-area: links;
+  display: none;
+}
+
+/* Where a tapped portrait's look opens inline, under the whole header row and on the portrait's edge. */
+.qi-header__slot {
+  grid-area: look;
+  margin-left: 52px;
+}
+
+/* The portrait's closer look: the full portrait, and the caption under it as a certificate's is. */
+.qi-face-look {
+  margin: 0;
+}
+
+.qi-face-look img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  box-shadow:
+    0 1px 1px rgb(0 0 0 / 0.2),
+    0 8px 18px -8px rgb(0 0 0 / 0.35);
+}
+
+.qi-face-look figcaption {
+  margin-top: 8px;
+  color: var(--stretch-muted);
+  font-size: var(--text-label);
+  line-height: 1.4;
+}
+
+/* Inline, the portrait never takes more than 40% of the screen's height, so the sticky header it opens in leaves room to read. */
+.qi-header__slot .qi-face-look img {
+  width: auto;
+  max-width: 100%;
+  max-height: 40svh;
+}
+
+/* It slides in toward the margin, and with reduced motion only the 0.2 s fade of every closer look remains. */
+@media (prefers-reduced-motion: no-preference) {
+  .qi-face-look {
+    animation: qi-face-slide 0.5s var(--out) both;
+  }
+}
+
+@keyframes qi-face-slide {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+}
+
+/* ---------- the greeting: words, and a small scene for the time of day ---------- */
+
+.qi-greeting {
+  grid-area: greet;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: start;
+  min-height: 28px;
+  margin: -8px 0 0 52px;
+  color: var(--stretch-muted);
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: var(--text-label);
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.qi-greeting:focus-visible {
+  border-radius: 8px;
+  outline: 2px solid var(--stretch-cobalt);
+  outline-offset: 2px;
+}
+
+/* The longest greeting is laid out unseen in the same cell as the shown one, so the words are the same width whichever shows. */
+.qi-greeting__words {
+  display: inline-grid;
+}
+
+.qi-greeting__words > span,
+.qi-greeting__words::after {
+  grid-area: 1 / 1;
+}
+
+.qi-greeting__words::after {
+  content: attr(data-longest);
+  visibility: hidden;
+}
+
+/* Below a wide screen with a pointer the greeting is a button: a tap plays its scene and opens London's time under it. */
+@media not all and (hover: hover) and (min-width: 900px) {
+  .qi-greeting {
+    flex-wrap: wrap;
+    align-content: center;
+    row-gap: 0;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* London's time never takes room on a wide screen: it hangs beyond the words and lets the pointer through. Elsewhere it opens on a line of its own. */
+.qi-greeting__more {
+  display: grid;
+  flex-basis: 100%;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows 0.3s var(--out),
+    opacity 0.3s var(--out),
+    visibility 0s 0.3s;
+}
+
+/* The line's own space is inside the part that folds, so a closed greeting is exactly its words. */
+.qi-greeting__more > span {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.qi-greeting__more > span > span {
+  display: block;
+  padding-top: 6px;
+}
+
+.qi-greeting[data-open] .qi-greeting__more {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.qi-scene {
+  flex: none;
+  width: 30px;
+  height: 22px;
+  overflow: visible;
+}
+
+.qi-scene__horizon {
+  fill: none;
+  stroke: var(--stretch-rule);
+  stroke-width: 1.5;
+}
+
+/* The heavy line every object is drawn with, and the finer one for the clock's marks. */
+.qi-scene__ink,
+.qi-scene__cursor,
+.qi-scene__tick,
+.qi-scene__steam {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.qi-scene__ink {
+  stroke: currentColor;
+  stroke-width: 1.9;
+}
+
+.qi-scene__tick {
+  stroke: currentColor;
+  stroke-width: 1.2;
+}
+
+.qi-scene__dot,
+.qi-scene__moon,
+.qi-scene__star {
+  fill: currentColor;
+}
+
+.qi-scene__steam {
+  stroke: currentColor;
+  stroke-width: 1.3;
+  stroke-dasharray: 1;
+}
+
+.qi-scene__cursor {
+  stroke: var(--stretch-cobalt);
+  stroke-width: 2;
+}
+
+/* The amber: the clock's pivot, the lamp's bulb and the pool of light under it. */
+.qi-scene__lit {
+  fill: var(--sun);
+}
+
+.qi-scene__pool {
+  fill: var(--sun);
+  opacity: 0.24;
+}
+
+.qi-scene__minute {
+  transform-origin: 15px 11px;
+}
+
+.qi-scene__moon {
+  transform-origin: 15px 11px;
+}
+
+.qi-scene__star {
+  opacity: 0.35;
+}
+
+/*
+ * The scene plays on every load (data-playing, set for a few seconds by the greeting) and on hover or focus. Each
+ * object is finished at rest and plays by animating from a lesser state to it, so with reduced motion, where none
+ * of this applies, the scene is the whole drawing.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .qi-scene__moon {
+    transition: transform 0.8s var(--spring);
+  }
+
+  .qi-scene__star {
+    transition: opacity 0.3s;
+  }
+
+  /* Hello: the cursor blinks, for as long as it is the line. */
+  [data-greeting="hello"] .qi-scene__cursor {
+    animation: qi-cursor 1.1s steps(1, end) infinite;
+  }
+
+  /* Morning: the steam curls up out of the spout. */
+  [data-greeting="morning"]:is(:hover, :focus-visible, [data-playing]) .qi-scene__steam {
+    animation: qi-steam 1.4s var(--out);
+  }
+
+  /* Afternoon: the minute hand ticks up towards the hour. */
+  [data-greeting="afternoon"]:is(:hover, :focus-visible, [data-playing]) .qi-scene__minute {
+    animation: qi-minute 1.2s steps(4, end);
+  }
+
+  /* Evening: the light pool comes on. */
+  [data-greeting="evening"]:is(:hover, :focus-visible, [data-playing]) .qi-scene__pool {
+    animation: qi-pool 1.2s var(--out);
+  }
+
+  /* Late: the moon rocks and the stars come out one by one. */
+  [data-greeting="late"]:is(:hover, :focus-visible, [data-playing]) .qi-scene__moon {
+    transform: rotate(-18deg);
+  }
+
+  [data-greeting="late"]:is(:hover, :focus-visible, [data-playing]) .qi-scene__star {
+    opacity: 1;
+  }
+
+  [data-greeting="late"]:is(:hover, :focus-visible, [data-playing]) .qi-scene__star:nth-of-type(2) {
+    transition-delay: 0.3s;
+  }
+
+  [data-greeting="late"]:is(:hover, :focus-visible, [data-playing]) .qi-scene__star:nth-of-type(3) {
+    transition-delay: 0.6s;
+  }
+}
+
+@keyframes qi-cursor {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes qi-steam {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes qi-minute {
+  from {
+    transform: rotate(-12deg);
+  }
+}
+
+@keyframes qi-pool {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---------- from 900 px: one row, and quiet links to the page's sections ---------- */
+
+@media (min-width: 900px) {
+  /* One row of four areas, and under it the full-width row where a tapped portrait's look opens (a page with no links leaves the third area empty). */
+  .qi-header__inner {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "who greet links eclipse"
+      "look look look look";
+    column-gap: 16px;
+    width: min(100% - 40px, 940px);
+    padding-block: 12px;
+  }
+
+  .qi-greeting {
+    margin: 0;
+  }
+
+  .qi-header__links {
+    display: block;
+    margin-left: auto;
+    transition: opacity 0.3s;
+  }
+
+  /* A page with no links (the 404) has the Eclipse right after the greeting, so the Eclipse takes the right edge, and London's time has the room between. */
+  .qi-greeting + .stretch-eclipse {
+    margin-left: auto;
+  }
+
+  .qi-header__links ul {
+    display: flex;
+    align-items: center;
+    gap: 0 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .qi-header__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 10px;
+    border-radius: 8px;
+    color: var(--stretch-muted);
+    font-size: var(--text-small);
+    white-space: nowrap;
+    text-decoration: none;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 6px;
+  }
+
+  .qi-header__links a[aria-current] {
+    color: var(--stretch-ink);
+    text-decoration-line: underline;
+  }
+
+  /*
+   * A long-form page's header is the page's column wide (600 px), so the page and its header share one left edge,
+   * with the six links on a row of their own under the name, spread from the column's left edge to its right.
+   * The greeting keeps its words, and London's time can show without the links stepping aside.
+   */
+  .qi-header[data-long] .qi-header__inner {
+    width: min(100% - 40px, 600px);
+    grid-template-areas:
+      "who greet . eclipse"
+      "links links links links"
+      "look look look look";
+  }
+
+  .qi-header[data-long] .qi-header__links {
+    grid-area: links;
+    margin: 0;
+  }
+
+  .qi-header[data-long] .qi-header__links ul {
+    justify-content: space-between;
+    gap: 0 12px;
+  }
+
+  .qi-header[data-long] .qi-header__links a {
+    min-height: 40px;
+    padding-inline: 0;
+  }
+
+  .qi-header[data-long] .qi-greeting:is(:hover, :focus-visible) ~ .qi-header__links {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@media (min-width: 1180px) {
+  .qi-header[data-long] .qi-header__inner {
+    width: 600px;
+  }
+}
+
+@media (hover: hover) and (min-width: 900px) {
+  /* London's time hangs beyond the words and says itself on hover or focus; elsewhere the greeting is a button (above). */
+  .qi-greeting__more {
+    position: absolute;
+    left: 100%;
+    display: block;
+    padding-left: 4px;
+    opacity: 0;
+    visibility: visible;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .qi-greeting__more > span {
+    overflow: visible;
+  }
+
+  .qi-greeting__more > span > span {
+    padding-top: 0;
+  }
+
+  .qi-greeting:is(:hover, :focus-visible) .qi-greeting__more {
+    opacity: 1;
+  }
+
+  /* London's time is said where the links would be: they step aside while it is, so the two never overprint. */
+  .qi-greeting:is(:hover, :focus-visible) ~ .qi-header__links {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .qi-header__links a:hover {
+    color: var(--stretch-ink);
+  }
+}
+
+/* From 1180 px the header spans the column and the margin, and its left edge is the column's. */
+@media (min-width: 1180px) {
+  .qi-header__inner {
+    width: 940px;
+    margin-left: calc((100% - 600px) / 2 - max(0px, 656px - 50vw));
+    margin-right: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qi-greeting__more,
+  .qi-header__links {
+    transition: none;
+  }
+}

@@ -43,7 +43,7 @@ const arrowGap = (page: Page, selector: string) =>
 test.describe("Shell details: arrows", () => {
   test("the case study's back link and buttons keep a gap between label and arrow, with no literal space", async ({ page }) => {
     await page.goto("/things-i-make/threshold");
-    for (const selector of [".stretch-cs-back", ".stretch-cs-button:has([aria-hidden='true'])"]) {
+    for (const selector of [".qi-long__back", ".qi-case__links a:has([aria-hidden='true'])"]) {
       await expect.poll(() => arrowGap(page, selector)).toBeGreaterThanOrEqual(3);
       expect(await page.locator(selector).first().textContent()).not.toMatch(/[←↗]\s|\s[←↗]/);
     }
@@ -51,12 +51,7 @@ test.describe("Shell details: arrows", () => {
 
   test("a Role story's back link has the gap too", async ({ page }) => {
     await page.goto(`/work/${Object.keys(roleStories)[0]}`);
-    await expect.poll(() => arrowGap(page, ".stretch-cs-back")).toBeGreaterThanOrEqual(3);
-  });
-
-  test("the 404's link home has the gap", async ({ page }) => {
-    await page.goto("/nothing-here");
-    await expect.poll(() => arrowGap(page, ".stretch-404__home")).toBeGreaterThanOrEqual(3);
+    await expect.poll(() => arrowGap(page, ".qi-long__back")).toBeGreaterThanOrEqual(3);
   });
 });
 
@@ -72,17 +67,18 @@ test.describe("Shell details: separators", () => {
   test("every dot in a metadata line is bound to the item before it", async ({ page }) => {
     for (const route of ["/", "/things-i-make/threshold"]) {
       await page.goto(route);
-      const lines = await page.locator(".stretch-cs-open__meta, .stretch-index__meta, .stretch-tile__meta, .stretch-work__history").allTextContents();
+      const lines = await page.locator(".qi-long__meta, .stretch-tile__meta, .qi-row__line").allTextContents();
       expect(lines.length).toBeGreaterThan(0);
       for (const line of lines) expect(line).not.toMatch(/[^\u00a0]·/u);
     }
   });
 
-  test("the History line stays inside its dashed box, even at the narrowest width", async ({ page }) => {
+  test("a Work row's line stays inside its row, even at the narrowest width", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => document.fonts.ready);
-    const history = page.locator(".stretch-work__history");
-    await expect.poll(() => history.evaluate((node) => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(0);
+    const rows = page.locator("#work .qi-row");
+    await expect(rows.first()).toBeVisible();
+    await expect.poll(() => rows.evaluateAll((all) => all.filter((row) => row.scrollWidth > row.clientWidth).length)).toBe(0);
   });
 });
 
@@ -115,14 +111,5 @@ test.describe("Shell details: hover and height", () => {
       return null;
     });
     expect(declared).toBe("100svh");
-  });
-});
-
-test.describe("Shell details: the History clipping", () => {
-  test("the line under its heading is ink, not cobalt", async ({ page }) => {
-    await page.goto("/fixtures/off-the-clock");
-    const label = page.locator("[data-fixture='clipping-week'] .stretch-otc__label");
-    const ink = await page.locator("[data-stretch-shell]").evaluate((node) => getComputedStyle(node).color);
-    await expect(label).toHaveCSS("border-bottom-color", ink);
   });
 });

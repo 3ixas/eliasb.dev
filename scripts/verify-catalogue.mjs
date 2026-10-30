@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { caseStudies } from "../src/content/stretch/case-studies.ts";
 import {
+  HOMEPAGE_INDEX_ROWS,
   MAX_FEATURED,
   assertCatalogue,
   catalogueProblems,
@@ -10,13 +11,14 @@ import {
   projectIndex,
   projects,
 } from "../src/content/projects.ts";
+import { thingsIMake } from "../src/content/stretch/site-copy.ts";
 
 const caseStudySlugs = Object.keys(caseStudies);
-const base = (slug, year = 2025, overrides = {}) => ({ slug, name: slug, outcome: "o", type: "t", year, category: "products", links: {}, ...overrides });
+const shot = { src: "/x.webp", alt: "x", width: 1, height: 1 };
+const base = (slug, year = 2025, overrides = {}) => ({ slug, name: slug, outcome: "o", type: "t", year, category: "products", links: {}, screenshot: shot, crop: { x: 0.5, y: 0.5, zoom: 2 }, ...overrides });
 const featurable = (slug) =>
   base(slug, 2026, {
     links: { caseStudy: `/things-i-make/${slug}` },
-    screenshot: { src: "/x.webp", alt: "x", width: 1, height: 1 },
     colours: { field: "#000000", ink: "#ffffff", swatch: "#808080" },
   });
 
@@ -37,7 +39,22 @@ assert.deepEqual(projectIndex(shuffled, []).map((project) => project.slug), ["ne
 assert.deepEqual(projectIndex(shuffled, ["new-a", "old"]).map((project) => project.slug), ["new-b", "mid"], "Featured projects leave the index");
 assert.deepEqual(projectIndex(shuffled, ["new-a", "new-b", "mid", "old"]), [], "An index can be empty");
 
-// Adding a project is one entry: an index project needs no case study, screenshot or colours.
+// Every project shown has a screenshot and a crop of it inside the image, zoomed in.
+assert.ok(projects.every((project) => project.screenshot && project.crop), "Every project has a screenshot and a crop");
+assert.match(catalogueProblems([base("a", 2025, { crop: undefined })], [], [])[0], /"a" needs a screenshot and a crop/);
+assert.match(catalogueProblems([base("a", 2025, { screenshot: undefined })], [], [])[0], /needs a screenshot and a crop/);
+assert.match(catalogueProblems([base("a", 2025, { crop: { x: 1.2, y: 0.5, zoom: 2 } })], [], [])[0], /needs a screenshot and a crop/);
+assert.match(catalogueProblems([base("a", 2025, { crop: { x: 0.5, y: 0.5, zoom: 0.5 } })], [], [])[0], /needs a screenshot and a crop/);
+
+// The homepage shows the three featured, then the others newest first, at most ten, and the archive link counts them all.
+assert.equal(HOMEPAGE_INDEX_ROWS, 10);
+assert.equal(thingsIMake.allThings(projects.length), "Everything I’ve built (06) →");
+assert.deepEqual([...featuredProjects(projects, featuredSlugs), ...projectIndex(projects, featuredSlugs).slice(0, HOMEPAGE_INDEX_ROWS)].map((project) => project.slug), ["threshold", "argus-risk", "flowtime", "home-secretary", "risk-event-tracker", "ask-professor-past"]);
+const many = Array.from({ length: 14 }, (_, index) => base(`p${index}`, 2000 + index));
+assert.equal(projectIndex(many, []).slice(0, HOMEPAGE_INDEX_ROWS).length, 10);
+assert.equal(projectIndex(many, [])[0].slug, "p13", "Newest first");
+
+// Adding a project is one entry: an index project needs no case study or colours.
 assert.deepEqual(catalogueProblems([...projects, base("one-more")], featuredSlugs, caseStudySlugs), []);
 
 // The featured rule, each part failing alone with a message that names the project.
@@ -47,10 +64,10 @@ const failing = (project, slugs = ["a"]) => catalogueProblems([project], ["a"], 
 assert.match(failing(base("a"), [])[0], /Featured project "a" needs a case study/);
 assert.match(failing(featurable("a"), [])[0], /needs a case study/, "A link alone is not a case study");
 assert.match(failing({ ...featurable("a"), links: {} })[0], /needs a case study/, "A case study with no link is not shown");
-assert.match(failing({ ...featurable("a"), screenshot: undefined })[0], /Featured project "a" needs a screenshot/);
+assert.match(failing({ ...featurable("a"), screenshot: undefined }).join(" "), /Featured project "a" needs a screenshot/);
 assert.match(failing({ ...featurable("a"), colours: undefined })[0], /Featured project "a" needs its colours/);
 assert.match(failing({ ...featurable("a"), colours: { field: "red", ink: "#ffffff", swatch: "#808080" } })[0], /needs its colours/);
-assert.equal(failing({ ...featurable("a"), screenshot: undefined, colours: undefined }).length, 2, "Every problem is reported");
+assert.equal(failing({ ...featurable("a"), screenshot: undefined, colours: undefined }).length, 3, "Every problem is reported");
 assert.match(catalogueProblems([], ["ghost"], [])[0], /"ghost" is not in the catalogue/);
 
 // At most three, none twice, no duplicate slugs.

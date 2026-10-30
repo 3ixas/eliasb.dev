@@ -1,60 +1,108 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { projects } from "../src/content/projects";
 import { caseStudies, caseStudySlugs } from "../src/content/stretch/case-studies";
-import { caseStudySectionKeys, caseStudySectionLabels } from "../src/content/stretch/case-study";
+import { caseStudyCopy, caseStudySectionKeys, caseStudySectionLabels } from "../src/content/stretch/case-study";
 import { contrastOnPaper } from "./support/contrast";
 
-const slugs = caseStudySlugs;
+const schemes = ["light", "dark"] as const;
+/** From this width the header carries the section links, on a row of their own. */
+const LINKS_FROM = 900;
+const rgb = (hex: string) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
 
-const article = (page: Page, name: string) => page.getByRole("article", { name });
-
-for (const slug of slugs) {
+for (const slug of caseStudySlugs) {
   const study = caseStudies[slug];
   const project = projects.find((entry) => entry.slug === slug)!;
+  const next = projects.find((entry) => entry.slug === study.next)!;
 
   test.describe(`Case study: ${project.name}`, () => {
     test.beforeEach(async ({ page }) => {
       await page.goto(`/things-i-make/${slug}`);
     });
 
-    test("the opening band carries the number, name, outcome, metadata, stack and links", async ({ page }) => {
+    test("the opening has the project as the one h1, its outcome, type, year and stack, the links it has, and the back link", async ({ page }) => {
       await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(project.name);
-      const band = page.getByRole("region", { name: "Overview" });
-      await expect(band.locator(".stretch-cs-open__number")).toHaveText(study.number);
-      await expect(band).toContainText(project.outcome);
-      await expect(band).toContainText(`${project.type} · ${project.year}`);
-      await expect(band).toContainText(study.stack.join(", "));
-      if (study.note) await expect(band).toContainText(study.note);
-      const live = band.getByRole("link", { name: "Live site", exact: true });
+      const opening = page.locator("article header");
+      await expect(opening).toContainText(project.outcome);
+      await expect(opening.locator(".qi-long__meta")).toHaveText(`${project.type} · ${project.year} · ${study.stack.join(", ")}`);
+      if (study.note) await expect(opening).toContainText(study.note);
+      // A project with no live site or no code shows only the links it has.
+      const live = opening.getByRole("link", { name: "Live site", exact: true });
       if (project.links.live) await expect(live).toHaveAttribute("href", project.links.live);
       else await expect(live).toHaveCount(0);
-      await expect(band.getByRole("link", { name: "Code", exact: true })).toHaveAttribute("href", project.links.code!);
-      await expect(band.getByRole("link", { name: "Things I make", exact: true })).toHaveAttribute("href", "/things-i-make");
-      await expect(band.locator("img")).toHaveAttribute("alt", project.screenshot!.alt);
+      const code = opening.getByRole("link", { name: "Code", exact: true });
+      if (project.links.code) await expect(code).toHaveAttribute("href", project.links.code);
+      else await expect(code).toHaveCount(0);
+      await expect(page.getByRole("link", { name: "Things I make", exact: true }).first()).toHaveAttribute("href", "/things-i-make");
+      // The old opening band, its number and the numbered section bar are gone.
+      await expect(page.locator(".stretch-cs-open, .stretch-cs-links-row, .stretch-cs-evidence, .stretch-cs-next")).toHaveCount(0);
     });
 
-    test("the band is in the project's colours", async ({ page }) => {
-      const colours = project.colours!;
-      const band = page.locator(".stretch-cs-open");
-      const rgb = (hex: string) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
-      await expect(band).toHaveCSS("background-color", rgb(colours.field));
-      await expect(band).toHaveCSS("color", rgb(colours.ink));
+    test("the landing screenshot sits at column width on the project's colour with a 14 px radius", async ({ page }) => {
+      const shot = page.locator(".qi-case__below .qi-case__shot");
+      await expect(shot.locator(".qi-zoom img")).toHaveAttribute("alt", project.screenshot!.alt);
+      await expect(shot).toHaveCSS("background-color", rgb(project.colours!.field));
+      await expect(shot).toHaveCSS("border-top-left-radius", "14px");
+      const [box, column] = await Promise.all([shot.boundingBox(), page.locator(".qi-long .qi-column").first().boundingBox()]);
+      expect(Math.abs(box!.width - column!.width)).toBeLessThanOrEqual(1);
     });
 
-    test("six sections in the keyed order, each reachable from the row of section links", async ({ page }) => {
-      const links = page.getByRole("navigation", { name: "Sections" }).getByRole("link");
-      await expect(links).toHaveText(caseStudySectionKeys.map((key, index) => `0${index + 1} ${caseStudySectionLabels[key]}`));
+    test("the header is the shared one, and its links are this page's six sections", async ({ page }) => {
+      const width = page.viewportSize()?.width ?? 0;
+      await expect(page.locator("header.qi-header")).toHaveCount(1);
+      await expect(page.locator('nav[aria-label="On this page"]')).toHaveCount(1);
+      const links = page.locator(".qi-header__links a");
+      await expect(links).toHaveText(caseStudySectionKeys.map((key) => caseStudySectionLabels[key]));
+      for (const key of caseStudySectionKeys) await expect(links.filter({ hasText: caseStudySectionLabels[key] })).toHaveAttribute("href", `#${key}`);
       const ids = await page.locator("article section[id]").evaluateAll((sections) => sections.map((section) => section.id));
       expect(ids).toEqual([...caseStudySectionKeys]);
-      for (const key of caseStudySectionKeys) {
-        await expect(page.locator(`section#${key} h2`)).toHaveCount(1);
-        await expect(links.filter({ hasText: caseStudySectionLabels[key] })).toHaveAttribute("href", `#${key}`);
+      for (const key of caseStudySectionKeys) await expect(page.locator(`section#${key} h2`)).toHaveCount(1);
+      if (width < LINKS_FROM) {
+        await expect(links.first()).toBeHidden();
+        return;
       }
+      await expect(links.first()).toBeVisible();
+      // The header is the column wide: the links share the title's left edge and run along one row beneath the name.
+      await expect
+        .poll(async () => {
+          const [title, first, last, greeting, column] = await Promise.all([
+            page.getByRole("heading", { level: 1 }).boundingBox(),
+            links.first().boundingBox(),
+            links.last().boundingBox(),
+            page.locator("[data-greeting]").boundingBox(),
+            page.locator(".qi-long .qi-column").first().boundingBox(),
+          ]);
+          return {
+            sharedLeftEdge: Math.abs(first!.x - title!.x) <= 1,
+            insideColumn: last!.x + last!.width <= column!.x + column!.width + 1,
+            oneLine: Math.abs(first!.y - last!.y) <= 1,
+            below: first!.y >= greeting!.y + greeting!.height - 1,
+          };
+        })
+        .toEqual({ sharedLeftEdge: true, insideColumn: true, oneLine: true, below: true });
       await links.last().click();
       await expect(page).toHaveURL(/#whats-next$/);
       await expect(page.locator("section#whats-next")).toBeInViewport();
+      await expect(links.last()).toHaveAttribute("aria-current", "location");
+    });
+
+    test("the title has the opening line's treatment, sections are 17 px, and the metadata is 13 px mono", async ({ page }) => {
+      await expect(page.getByRole("heading", { level: 1 })).toHaveClass(/qi-opening__line/);
+      await expect(page.getByRole("heading", { level: 1 })).toHaveCSS("font-weight", "650");
+      for (const heading of await page.locator("article h2").all()) {
+        await expect(heading).toHaveCSS("font-size", "17px");
+        await expect(heading).toHaveCSS("font-weight", "650");
+      }
+      await expect(page.locator(".qi-long__meta")).toHaveCSS("font-size", "13px");
+    });
+
+    test("a section's address opens on that section, below the header, and focuses it", async ({ page }) => {
+      await page.goto(`/things-i-make/${slug}#decisions`);
+      await expect(page.locator("section#decisions")).toBeInViewport();
+      await expect(page.locator("section#decisions")).toBeFocused();
+      const headerBottom = await page.locator("header.qi-header").evaluate((header) => header.getBoundingClientRect().bottom);
+      await expect.poll(() => page.locator("section#decisions h2").evaluate((element) => element.getBoundingClientRect().top)).toBeGreaterThanOrEqual(headerBottom - 1);
     });
 
     test("section copy is the approved copy", async ({ page }) => {
@@ -67,239 +115,148 @@ for (const slug of slugs) {
       }
     });
 
-    test("the PRD card and the evidence strip show only the project's own figures", async ({ page }) => {
+    test("the PRD is one inline Sheet: the quote at 19 px, From the PRD and its date, the project's own figures as a quiet line", async ({ page }) => {
       const section = page.locator("section#written-down-first");
-      await expect(section.locator("blockquote")).toHaveText(study.prd.quote);
+      await expect(section.locator(".qi-case__sheet")).toHaveCount(1);
+      await expect(section.locator("blockquote")).toHaveText(`“${study.prd.quote}”`);
+      await expect(section.locator("blockquote")).toHaveCSS("font-size", "19px");
       for (const around of [study.prd.lead, study.prd.after]) if (around) await expect(section).toContainText(around);
-      if (study.prd.date) await expect(section.locator("figcaption")).toContainText(study.prd.date);
-      else await expect(section.locator("figcaption")).toHaveCount(0);
+      await expect(section.locator("figcaption")).toHaveText(study.prd.date ? `From the PRD · ${study.prd.date}` : "From the PRD");
       const items = section.getByRole("list", { name: "Evidence" }).getByRole("listitem");
-      await expect(items).toHaveText(study.evidence.map(({ value, label }) => `${value}${label}`));
+      await expect(items).toHaveText(study.evidence.map(({ value, label }) => `${value} ${label}`));
+      await expect(items.first().locator("strong")).toHaveCSS("font-size", "17px");
+      await expect(items.first().locator("strong")).toHaveCSS("font-weight", "600");
+      await expect(items.first().locator("span")).toHaveCSS("font-size", "13px");
+      // The old card and its separate strip are gone.
+      await expect(page.locator(".stretch-prd, .stretch-cs-prd-group")).toHaveCount(0);
     });
 
-    test("wide figures are framed in the project's colour, with their captions", async ({ page }) => {
+    test("figures sit inline at column width on the project's colour, with their captions", async ({ page }) => {
       const figures = caseStudySectionKeys.flatMap((key) => {
         const figure = study.sections[key].figure;
         return figure ? [{ key, figure }] : [];
       });
-      await expect(article(page, project.name).locator(".stretch-cs-figure")).toHaveCount(figures.length);
+      await expect(page.locator("article section .qi-figure")).toHaveCount(figures.length);
+      const column = await page.locator(".qi-long .qi-column").first().boundingBox();
       for (const { key, figure } of figures) {
-        const frame = page.locator(`section#${key} .stretch-cs-figure`);
-        await expect(frame.locator("img")).toHaveAttribute("alt", figure.alt);
+        const frame = page.locator(`section#${key} .qi-figure`);
+        await expect(frame.locator(".qi-zoom img")).toHaveAttribute("alt", figure.alt);
         await expect(frame.locator("figcaption")).toHaveText(figure.caption);
-        const box = await frame.locator(".stretch-cs-figure__frame").boundingBox();
-        const text = await page.locator(`section#${key} .stretch-cs-section__text`).boundingBox();
-        expect(text!.width).toBeLessThanOrEqual(720);
-        expect(box!.width).toBeGreaterThanOrEqual(Math.min(text!.width, 720));
+        await expect(frame.locator("figcaption")).toHaveCSS("font-size", "13px");
+        const shot = frame.locator(".qi-case__shot");
+        await expect(shot).toHaveCSS("background-color", rgb(project.colours!.field));
+        await expect(shot).toHaveCSS("border-top-left-radius", "14px");
+        expect(Math.abs((await shot.boundingBox())!.width - column!.width)).toBeLessThanOrEqual(1);
       }
     });
 
-    test("the Next project tile links to the next case study", async ({ page }) => {
-      const tile = page.getByRole("region", { name: "Next project" }).getByRole("link");
-      const next = projects.find((entry) => entry.slug === study.next)!;
-      await expect(tile).toHaveAttribute("href", `/things-i-make/${study.next}`);
-      await expect(tile).toContainText(next.name);
-      await expect(tile).toContainText(caseStudies[study.next].number);
-      expect((await tile.boundingBox())!.height).toBeGreaterThanOrEqual(44);
-      await tile.click();
+    test("it ends on one row to the next project, and following it opens that case study", async ({ page }) => {
+      const region = page.getByRole("region", { name: caseStudyCopy.nextProject });
+      const row = region.getByRole("link");
+      await expect(row).toHaveCount(1);
+      await expect(row).toHaveAttribute("href", `/things-i-make/${study.next}`);
+      await expect(row).toContainText(next.name);
+      await expect(row).toContainText(next.outcome);
+      await expect(row.locator(".qi-row__object .qi-crop img")).toHaveCount(1);
+      expect((await row.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+      await row.click();
       await expect(page).toHaveURL(new RegExp(`/things-i-make/${study.next}$`));
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(next.name);
     });
 
-    test("the Next project tile carries the next project's screenshot, tilted, with its one Fastener if it has one", async ({ page }) => {
-      const tile = page.getByRole("region", { name: "Next project" }).getByRole("link");
-      const next = projects.find((entry) => entry.slug === study.next)!;
-      await expect(tile.locator("img")).toHaveAttribute("alt", next.screenshot!.alt);
-      // A project without a Fastener is valid in the catalogue, so the tile then carries none.
-      await expect(tile.locator(".stretch-fastener")).toHaveCount(next.fastener ? 1 : 0);
-      if (next.fastener) {
-        await expect(tile.locator(".stretch-fastener")).toHaveClass(new RegExp(`stretch-fastener--${next.fastener}`));
-        await expect(tile.locator(".stretch-fastener")).toHaveAttribute("aria-hidden", "true");
-      }
-      await expect(tile).toHaveAttribute("href", `/things-i-make/${study.next}`);
-      if ((page.viewportSize()?.width ?? 0) > 760) {
-        // From 761 px the screenshot sits on the right of the text, at a slight tilt.
-        const shot = tile.locator(".stretch-tile__shot");
-        await expect
-          .poll(async () => {
-            const [text, picture] = await Promise.all([tile.locator(".stretch-cs-next__text").boundingBox(), shot.boundingBox()]);
-            return picture!.x >= text!.x + text!.width;
-          })
-          .toBe(true);
-        await expect(shot).not.toHaveCSS("transform", "none");
-      } else {
-        // On a phone the screenshot stacks below the text, and is still tilted.
-        const shot = tile.locator(".stretch-tile__shot");
-        await expect
-          .poll(async () => {
-            const [text, picture] = await Promise.all([tile.locator(".stretch-cs-next__text").boundingBox(), shot.boundingBox()]);
-            return picture!.y >= text!.y + text!.height;
-          })
-          .toBe(true);
-        await expect(shot).not.toHaveCSS("transform", "none");
-      }
+    test("there is no footer", async ({ page }) => {
+      await expect(page.locator("main > footer, [data-case-study] > footer")).toHaveCount(0);
     });
 
-    test("cobalt is not used on the page", async ({ page }) => {
-      const cobalt = await page.evaluate(() => {
-        const probe = document.createElement("span");
-        probe.style.color = "var(--stretch-cobalt)";
-        document.body.appendChild(probe);
-        const colour = getComputedStyle(probe).color;
-        probe.remove();
-        return colour;
-      });
-      const used = await page.locator("[data-stretch-shell] *").evaluateAll((elements, colour) => {
-        return elements.filter((element) => {
-          // The skip link is cobalt, but only when focused; it waits off-screen.
-          if (element.classList.contains("stretch-skip")) return false;
-          const style = getComputedStyle(element);
-          return [style.color, style.backgroundColor, style.borderTopColor].includes(colour) && element.checkVisibility();
-        }).length;
-      }, cobalt);
-      expect(used).toBe(0);
-    });
-
-    test("opens at once: no entrance holds the page, even with motion on", async ({ page }) => {
+    test("opens at once, even with motion on", async ({ page }) => {
       await page.emulateMedia({ reducedMotion: "no-preference" });
       await page.goto(`/things-i-make/${slug}`);
-      expect(await page.evaluate(() => document.documentElement.hasAttribute("data-entering"))).toBe(false);
       await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
-      expect(await page.evaluate(() => Number(getComputedStyle(document.querySelector("main")!).opacity))).toBe(1);
+      await expect(page.locator("main")).toHaveCSS("opacity", "1");
     });
 
     test("it is in the server-rendered page", async ({ page }) => {
       await page.route("**/*.js", (route) => route.abort());
       await page.reload();
-      await expect(page.locator("article section[id]")).toHaveCount(6);
+      await expect(page.locator("article section[id]")).toHaveCount(caseStudySectionKeys.length);
+      await expect(page.locator('nav[aria-label="On this page"] a')).toHaveCount(caseStudySectionKeys.length);
       await expect(page.getByRole("list", { name: "Evidence" }).getByRole("listitem")).toHaveCount(study.evidence.length);
+      await expect(page.locator(".qi-case__shot img")).not.toHaveCount(0);
     });
 
-    test("text passes WCAG 2.2 AA contrast over the project's colours and the page", async ({ page }) => {
-      const selectors = [
-        ".stretch-cs-back",
-        ".stretch-cs-open__name",
-        ".stretch-cs-open__outcome",
-        ".stretch-cs-open__meta",
-        ".stretch-cs-button",
-        ".stretch-cs-links-row a",
-        ".stretch-cs-h2",
-        ".stretch-cs-p",
-        ".stretch-cs-lead",
-        ".stretch-cs-kicker",
-        ".stretch-prd__quote",
-        ".stretch-cs-evidence__value",
-        ".stretch-cs-evidence__label",
-        ".stretch-cs-figure figcaption",
-        ".stretch-cs-next__label",
-        ".stretch-cs-next__name",
-        ".stretch-cs-next__outcome",
-      ];
-      for (const selector of selectors) {
-        // A study without figures has no captions to read.
-        if ((await page.locator(selector).count()) === 0 && selector.includes("figure")) continue;
-        const readings = await contrastOnPaper(page, selector);
-        expect(readings.length, selector).toBeGreaterThan(0);
-        for (const reading of readings) expect(reading.ratio, `${selector}: ${reading.text}`).toBeGreaterThanOrEqual(4.5);
-      }
-    });
+    for (const scheme of schemes) {
+      test(`text passes WCAG 2.2 AA contrast, ${scheme}`, async ({ page }) => {
+        await page.emulateMedia({ colorScheme: scheme });
+        const selectors = [
+          ".qi-long__back",
+          ".qi-long__title",
+          ".qi-long__line",
+          ".qi-long__meta",
+          ".qi-case__links a",
+          ".qi-title",
+          ".qi-long__p",
+          ".qi-long__p strong",
+          ".qi-case__quote",
+          ".qi-case__evidence strong",
+          ".qi-case__evidence span",
+          ".qi-figure__caption",
+          ".qi-row__title",
+          ".qi-row__line",
+          ...(study.note ? [".qi-case__note"] : []),
+        ];
+        for (const selector of selectors) {
+          const readings = await contrastOnPaper(page, selector);
+          expect(readings.length, selector).toBeGreaterThan(0);
+          for (const reading of readings) expect(reading.ratio, `${selector}: ${reading.text}`).toBeGreaterThanOrEqual(4.5);
+        }
+      });
 
-    test("has no axe violations", async ({ page }) => {
-      const results = await new AxeBuilder({ page }).analyze();
-      expect(results.violations).toEqual([]);
-    });
-  });
-}
+      test(`has no axe violations, ${scheme}`, async ({ page }) => {
+        await page.emulateMedia({ colorScheme: scheme });
+        const results = await new AxeBuilder({ page }).analyze();
+        expect(results.violations).toEqual([]);
+      });
+    }
 
-for (const slug of slugs) {
-  test.describe(`Case study layout: ${slug}`, () => {
-    test("renders all six sections, the evidence and a different Next project, without sideways scroll", async ({ page }) => {
+    test("renders without sideways scroll, and every link in the column is at least 44 px tall", async ({ page }) => {
       const response = await page.goto(`/things-i-make/${slug}`);
       expect(response?.status()).toBe(200);
-      await expect(page.locator("article section[id]")).toHaveCount(6);
-      await expect(page.getByRole("list", { name: "Evidence" }).getByRole("listitem")).toHaveCount(caseStudies[slug].evidence.length);
-      await expect(page.getByRole("region", { name: "Next project" }).getByRole("link")).toHaveAttribute("href", `/things-i-make/${caseStudies[slug].next}`);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       const width = page.viewportSize()?.width ?? 0;
       for (const box of await Promise.all((await page.locator("[data-case-study] main *").all()).map((item) => item.boundingBox()))) {
         if (box) expect(box.x + box.width).toBeLessThanOrEqual(width + 1);
       }
-    });
-
-    test("every link and button is at least 44 px tall", async ({ page }) => {
-      await page.goto(`/things-i-make/${slug}`);
-      for (const target of await page.locator("[data-case-study] a:visible, [data-case-study] button:visible").all()) {
-        if (await target.evaluate((element) => element.classList.contains("stretch-skip"))) continue;
-        const box = await target.boundingBox();
-        expect(box!.height, (await target.textContent()) ?? "").toBeGreaterThanOrEqual(44);
+      for (const target of await page.locator("[data-case-study] main a:visible, [data-case-study] main button:visible").all()) {
+        expect((await target.boundingBox())!.height, (await target.textContent()) ?? "").toBeGreaterThanOrEqual(44);
       }
     });
-  });
-}
 
-for (const slug of slugs) {
-  test.describe(`Case study opening: ${slug}`, () => {
-    // 761 to 1099 px is where the band's column is narrowest against its display title.
-    for (const width of [320, 390, 761, 820, 1000, 1099, 1440]) {
-      test(`the title breaks only between words at ${width} px`, async ({ page }, testInfo) => {
+    for (const width of [320, 390, 820, 1440]) {
+      test(`the title and the section links break only between words at ${width} px`, async ({ page }, testInfo) => {
         test.skip(!/-1440-light$/.test(testInfo.project.name), "Sweeps its own widths: once per engine");
         await page.setViewportSize({ width, height: 900 });
         await page.goto(`/things-i-make/${slug}`);
-        const title = page.getByRole("heading", { level: 1 });
-        await expect(title).toBeVisible();
         await page.evaluate(() => document.fonts.ready);
-        // A word never splits if the heading has no more lines than words and no word is wider than the heading.
-        await expect
-          .poll(() =>
-            title.evaluate((heading) => {
-              const words = heading.textContent!.trim().split(/\s+/);
-              const lineHeight = parseFloat(getComputedStyle(heading).lineHeight);
-              const lines = Math.round(heading.getBoundingClientRect().height / lineHeight);
-              const widest = Math.max(
-                ...words.map((word) => {
-                  const probe = document.createElement("span");
-                  probe.textContent = word;
-                  probe.style.cssText = "position:absolute;white-space:nowrap;visibility:hidden";
-                  heading.appendChild(probe);
-                  const wide = probe.getBoundingClientRect().width;
-                  probe.remove();
-                  return wide;
-                }),
-              );
-              return { lines: lines <= words.length, fits: widest <= heading.clientWidth + 0.5 };
+        // A word never splits if no word is wider than the box that holds it (a link is inline, so its list item is the box).
+        const widestWordFits = (element: Element) => {
+          const holder = getComputedStyle(element).display === "inline" ? element.parentElement! : element;
+          const widest = Math.max(
+            ...element.textContent!.trim().split(/\s+/).map((word) => {
+              const probe = document.createElement("span");
+              probe.textContent = word;
+              probe.style.cssText = "position:absolute;white-space:nowrap;visibility:hidden";
+              element.appendChild(probe);
+              const wide = probe.getBoundingClientRect().width;
+              probe.remove();
+              return wide;
             }),
-          )
-          .toEqual({ lines: true, fits: true });
-      });
-    }
-  });
-
-  test.describe(`Case study section links: ${slug}`, () => {
-    for (const width of [390, 820]) {
-      test(`the six links sit in two columns, the first on the page gutter, at ${width} px`, async ({ page }, testInfo) => {
-        test.skip(!/-1440-light$/.test(testInfo.project.name), "Sweeps its own widths: once per engine");
-        await page.setViewportSize({ width, height: 900 });
-        await page.goto(`/things-i-make/${slug}`);
-        const links = page.getByRole("navigation", { name: "Sections" }).getByRole("link");
-        await expect(links).toHaveCount(6);
-        // The page gutter: 16 px on a phone, wider on a tablet. The heading sits on it.
-        const gutter = Math.round((await page.getByRole("heading", { level: 1 }).boundingBox())!.x);
-        if (width === 390) expect(gutter).toBe(16);
-        await expect
-          .poll(async () => {
-            const boxes = await links.evaluateAll((items) =>
-              items.map((item) => {
-                const range = document.createRange();
-                range.selectNodeContents(item);
-                const text = range.getBoundingClientRect();
-                return { left: Math.round(text.left), top: Math.round(item.getBoundingClientRect().top) };
-              }),
-            );
-            const columns = new Set(boxes.map((box) => box.left));
-            const rows = new Set(boxes.map((box) => box.top));
-            return { columns: columns.size, rows: rows.size, first: boxes[0].left };
-          })
-          .toEqual({ columns: 2, rows: 3, first: gutter });
+          );
+          return widest <= holder.clientWidth + 0.5;
+        };
+        await expect.poll(() => page.getByRole("heading", { level: 1 }).evaluate(widestWordFits)).toBe(true);
+        const links = page.locator(".qi-header__links a");
+        await expect(links).toHaveCount(caseStudySectionKeys.length);
+        if (width >= LINKS_FROM) for (const link of await links.all()) await expect.poll(() => link.evaluate(widestWordFits)).toBe(true);
       });
     }
   });

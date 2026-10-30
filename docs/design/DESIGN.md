@@ -1,6 +1,6 @@
 # DESIGN.md: the quiet index
 
-The design contract for all of eliasb.dev: the homepage, the shell (header, theme, footer), the Case studies, the Role stories, the Work archive, the Résumé and the 404. It is the only live design reference. When this file and anything else disagree, this file wins.
+The design contract for all of eliasb.dev: the homepage, the shell (header and theme), the Case studies, the Role stories, the Work archive, the Résumé and the 404. It is the only live design reference. When this file and anything else disagree, this file wins.
 
 **Keeping it current.** A tweak edits this file in place, in the same pull request as the change. A new direction first copies this file into `history/` with a superseded note at the top, then rewrites it. The directions it replaced are in `history/`: the Stretch direction (`STRETCH.md`), the Board (`BOARD.md`) and the Cabinet of Curiosities (`SELECTED-DIRECTION.md`).
 
@@ -64,8 +64,10 @@ An object is drawn to be read at 44 px. It is never a whole page shrunk down.
 | Calendar tile | Training, history, History at uni | A desk-calendar tile: a band with two binding holes, and a number on paper. The band is cobalt for today. It turns over to a second face (the year, the week) as a reaction |
 | Thread | Where I'm headed | A 4 px line in the colour of the strand's source |
 | Number | How I work | The habit's number, ringed by the pen (below) |
-| Sheet | Threshold's PRD; Say hello on the 404 | A small page of ruled lines with a folded corner |
-| Dot | Now making | The cobalt "now" dot |
+| Sheet | Threshold's PRD; Say hello and the 404 | A small page of ruled lines with a folded corner |
+| Contribution tile | Say hello (GitHub) | A 38 px card holding a five by five contribution calendar in GitHub's own levels; the pattern is authored, not data. No logo is drawn |
+| Name card | Say hello (LinkedIn) | A 40 by 28 px business card: a cobalt portrait dot and two printed lines. No logo is drawn |
+| Brackets | Now making | Code brackets in ink with a cobalt slash; the live dot is left to "Live from GitHub" |
 | Empty slot | The 404's missing row | A dashed 44 px outline with nothing in it |
 
 ## Finish
@@ -88,20 +90,19 @@ A **closer look** is a row's detail: on desktop it appears in the margin, and on
 |---|---|---|
 | A project | Its screenshot on its Project colour, then type and year | Sliding in and settling |
 | An employer | Its full Staff pass, then that role's three **Pass pins** in the same form for every employer: BNP Paribas's three awards, and Joveen's and Optegra's three best points from the copy deck, then the Résumé lines that explain its figure | Dropping on its strap and swinging to rest; the points pop on; the figure counts up (Optegra 62% → 88%, Joveen's page load cut by 40%) |
-| History at uni | A note: University of Essex, Diploma of Higher Education, History, July 2021 | Unfolding |
+| History at uni | A note: University of Essex, Diploma of Higher Education, History, Jul 2021 | Unfolding |
 | A Where I'm headed strand | "So far" with its source and proof | Its thread drawing down from the source |
 | Threshold's PRD | The quote | Typing itself, with a caret. Typing is time-based and smooth: characters appear on the animation frame at a steady rate (about 45 a second), never one timer per character |
 | Today's training | The run photo and the week, today in cobalt | The days filling in one by one, today last |
-| The book | The cover pulled from a row of spines, then the title, author and a "Live from Goodreads" line | Lifting off the shelf and turning to face you |
+| The book | The cover pulled from a row of spines, then the title, author and a "Live from Goodreads" line | It starts as a spine in line, is pulled up, widens as its neighbours part, and turns to face you; then the title and author arrive in turn (about 1.4 s) |
 | The film | A ticket with the poster, title, date and stars | Arriving, the stars filling in, the stub tearing |
 | This week in history | A newspaper clipping with the image, date, fact and credit | Unfolding, then being stamped "This week in history" |
-| Now making | The repository and its description | The description typing itself |
-| Your face (header) | The full white-tux portrait, "Based in London" | Sliding in |
+| Now making | The repository and its description (the row says only "Now making" and "Live from GitHub") | The description typing itself |
+| Your face (header, homepage only) | The full white-tux portrait, "Based in London" | Sliding in |
 | "pricing and risk engines" | Illustrative simulated paths, one in BNP green, with the Role story's line about simulation-based calculations | The paths fanning out |
 | "CPU and GPU" | A CPU with a few cores taking turns and a GPU with many lighting at once, with the line about running the same tests on both | The cores lighting |
 | "digitisation competition" | Its award pin, its Résumé line, and two bars: 30–40 min and under 5 | The pin popping on and the bar shrinking |
 | "Take Ownership award" | The certificate | Sliding up like a sheet of paper |
-| Résumé (Say hello) | The one-page sheet | Sliding up |
 | "joveen.com" (Joveen's Role story) | The site as it is today, on Shopify, with the caption saying it isn't Elias's UI | Sliding in and settling |
 
 On a long-form page, the closer looks are the real things its prose names in passing (rule 7). The Role stories' and case studies' own figures are inline, not closer looks.
@@ -110,12 +111,13 @@ On a long-form page, the closer looks are the real things its prose names in pas
 
 **BNP Paribas** in the opening line is the exception: it reacts where it is. It turns BNP green, and a small pass drops below it on its strap. On phones, tapping it plays that reaction only; the BNP Paribas row in Work holds its closer look.
 
-**The history row cycles.** Clicking it, or pressing Enter, swaps in the week's next oddity in place: the clipping restamps and "1 of 3" moves on. Nothing opens or closes. The change is announced politely. On phones, tapping the row cycles and tapping its calendar tile opens the clipping; an open clipping follows the cycle.
+**The history row cycles.** Clicking it, or pressing Enter, swaps in the week's next oddity in place: the clipping restamps and "1 of 3" moves on. Nothing opens or closes. The change is announced politely. On phones the row opens and closes the clipping like any other row, and a tap on the clipping itself swaps in the next oddity; from the keyboard, Right or Down arrow on the open row does the same (it says so in `aria-keyshortcuts`).
 
 ### The margin (desktop)
 
 - **When it's used**: on wide screens (from 1180 px) with a hovering pointer. A row or word shows its closer look on pointer enter or focus, and hides it 140 ms after leave or blur.
 - **Placement**: 40 px right of the column, 300 px wide. It lines up with the row's top (minus 6 px), but always fits the window: it rises until it sits 16 px above the bottom edge, and never above 16 px from the top. It keeps fitting as images load (`ResizeObserver`) and while the page scrolls.
+- **The header's portrait** is the one look that does not sit level with its trigger: the header's links and Eclipse fill the margin's height there, so its look hangs 16 px below the header, on the same edge. On phones it opens under the header's row.
 - **Moving between rows**: it glides on the `spring` timing. It takes no pointer events and never covers the column. A closer look has no links; the row is the link.
 
 ### Inline (phones and touch)
@@ -123,9 +125,10 @@ On a long-form page, the closer looks are the real things its prose names in pas
 Decided in [Closer looks on phones: the dock, or inline under the row](https://github.com/3ixas/eliasb.dev/issues/302), with both options built on the prototypes at phone size. It replaces the dock and the reading line.
 
 - **When it's used**: below 1180 px, or without hover.
-- **Only when tapped.** Nothing appears as the page scrolls. A row's closer look opens when its 44 px object is tapped; a plain row's or a dotted word's when it is tapped anywhere. Tapping the rest of a link row opens its page in one tap.
+- **Only when tapped.** Nothing appears as the page scrolls. A plain row's, a cycling row's, a row that leaves the site's or a dotted word's closer look opens when it is tapped anywhere; for a row that links to another page of this site (Work, Things I make, Résumé), only its 44 px object opens the look, and tapping the rest follows the link in one tap.
+- **A row that leaves the site opens its look first, and the look is the link.** The book, the film and Now making open their look when the row is tapped; tapping the look opens the book on Goodreads, the film on Letterboxd or the repository on GitHub, in a new tab. Pressing Enter on the row's link still follows it.
 - **Where it opens**: under the tapped row, starting on the row's text edge, or under the paragraph that holds the tapped word. It pushes the text below it down. It is the full closer look, as the margin shows it, at up to 300 px wide; there is no compact form.
-- **Closing**: tapping the same object or word again closes it, and opening another one closes the first, so only one is ever open. Tapping elsewhere does nothing. When a closer look above the tapped row closes, the tapped row stays where it was on screen.
+- **Closing**: tapping the same row, object or word again closes it, and so does tapping the look itself (a look that is a link follows its link instead, and a cycling look steps on). Opening another one closes the first, so only one is ever open. Both opening and closing animate: a look folds back the way it opened, at the same 0.3 s, fading as it goes; with reduced motion it just goes. Tapping elsewhere does nothing. When a closer look above the tapped row closes, the tapped row stays where it was on screen.
 - **Nothing extra inside**: no hint and no link. The row is the link.
 - **Reactions**: a row's object plays its reaction when it is tapped, never as it scrolls into view.
 - **Featured work**: the three featured projects become swipeable cards (82% wide, snapping to the gutter) with their screenshots at a readable size. Tapping a card opens its page; it has no closer look, because the card already shows the work. The other projects stay rows. Markup is one list that changes shape, not two.
@@ -135,14 +138,13 @@ Decided in [Closer looks on phones: the dock, or inline under the row](https://g
 | Where | Reaction |
 |---|---|
 | "products of my own." | It draws its cobalt underline once on arrival. On hover, the letters lift in a short wave and the underline scribbles out and back |
-| Greeting | A small scene for the visitor's own time of day: morning (the sun comes up), afternoon (the rays turn), evening (the sun sets), late (the moon rocks and the stars come out). Hover or focus plays it and adds "it's HH:MM here in London". Phones play it once on arrival, without the extra words |
+| Greeting | A line and a small object for the visitor's own time of day, all drawn for 30 × 22 px: "Hello" (before the clock is read, and without script) a terminal prompt with a blinking cobalt cursor; morning, "Kettle’s on.", a kettle whose steam curls; afternoon, a clock a few minutes short of five whose minute hand ticks up, saying "Nearly five?" on a weekday and "Nowhere to be?" on Saturday and Sunday (the visitor's own day; only the afternoon changes with it); evening, "Home yet?", a desk lamp whose pool of light fades in; late, "Still up?", the moon rocking as the stars come out. Hover or focus plays it and adds "it's HH:MM here in London". On a phone it plays once on arrival, and tapping the greeting plays it again and says London's time beneath, on its own line; tapping it again hides it. The width is reserved for the longest line, so no line moves the header |
 | The Eclipse (theme) | The icon turns over when pressed. The page crossfades (see Motion) |
 | Rows' objects | Projects lift and tilt 3°, Flowtime's icon counts seconds, passes swing, covers open on their spine, calendar tiles turn over |
 | How I work's pen | Rings around the numbers, arrows between habits, and underlines under each proof's strongest phrase draw as they scroll up the screen and un-draw on the way back (CSS scroll-driven animations; drawn when unsupported) |
 | GitHub year | The cells fill in and the total counts up when it first comes into view. A day shows its count on hover |
 | Live signals | "Live from Goodreads / Letterboxd / GitHub" with a cobalt dot that pulses three times, then rests |
 | Say hello | The email copies in place: the button turns cobalt and says "Copied" |
-| Footer | "Made by Elias" fills with cobalt on hover |
 
 ## The arrival
 
@@ -150,12 +152,13 @@ No hold. The page is complete and usable in its first frame, and nothing waits f
 
 ## The header (every page)
 
-One header on every page, in the same place, so following a row never moves it. It has the white-tux portrait as a 40 px circle (it opens the full portrait), "Elias Bennett", the greeting and the Eclipse. The portrait and name lead to the homepage from every other page.
+One header on every page, in the same place, so following a row never moves it. It has the white-tux portrait as a 40 px circle, "Elias Bennett", the greeting and the Eclipse. On the homepage the portrait opens the full portrait, and that closer look belongs to the homepage alone. On every other page the portrait is a picture, with no hover, focus or tap behaviour, and the name is the link that leads to the homepage.
 
 - **Its links are the sections of the page you're on, or none.** On the homepage they are its five sections (Work, Things I make, How I work, Off the clock, Say hello). On a Role story or case study they are that page's own sections, which replaces the numbered section bar. The Work archive, the Résumé and the 404 have no sections, so they have no links.
 - **Style**: 15 px, muted, turning ink on hover, and underlined while their section is in view (`aria-current`). They sit in a navigation landmark named "On this page".
-- **Width**: on wide screens the header spans the column and the margin (940 px), because a long-form page's section names don't fit in 600 px. Its left edge is the column's.
+- **Width**: on wide screens the homepage's header spans the column and the margin (940 px), and its left edge is the column's. A long-form page's header is the column wide, because its six links go on a row of their own (below).
 - **Phones**: no links and no menu, and the greeting moves under the name. A long-form page is read top to bottom, with its back link at the top.
+- **A long-form page's header is the column wide.** The six links do not fit beside the name, the greeting and the Eclipse, so on a Role story or case study the header is the page's 600 px column (not 940), sharing its left edge, with the name, greeting and Eclipse on the top row and the links on a row of their own beneath, spread from the column's left edge to its right. The greeting keeps its words, and London's time shows without the links stepping aside. The links are 15 px, with no padding between them. The homepage's five links fit beside the greeting on one row, as before.
 
 ## The homepage, in order
 
@@ -165,8 +168,7 @@ One header on every page, in the same place, so following a row never moves it. 
 4. **Things I make**: the three featured projects, the other projects newest first (at most ten), and the link to the Work archive with the true count.
 5. **How I work**: four habit rows with the pen (real problem, write it down, safe to undo, measure), then Threshold's PRD.
 6. **Off the clock**: today's training, the GitHub year, the book, the film, the history row and Now making.
-7. **Say hello**: the line, the email with Copy, then Résumé, GitHub and LinkedIn.
-8. **Footer**: "Made by Elias".
+7. **Say hello**: the line, the email with Copy, then Résumé, GitHub and LinkedIn. The page ends here: **no page has a footer** ("Made by Elias" is retired). Each page ends on its own last content, with 80 to 128 px of room below it.
 
 Anchors stay `#work`, `#things-i-make`, `#how-i-work`, `#off-the-clock` and `#say-hello`, so the redirects, the 404's rows and each Role story's "← Work" keep working.
 
@@ -175,14 +177,14 @@ Anchors stay `#work`, `#things-i-make`, `#how-i-work`, `#off-the-clock` and `#sa
 The two share one template. Each is the header, a back link, an opening, then its sections in the column, then one row to the next page. The removal rule holds, with rule 7 for figures; there is no length budget.
 
 - **Back link**: "← Work" on a Role story (to `/#work`), "← Things I make" on a case study (to the Work archive). 15 px, muted.
-- **Title**: the page's `h1`, in the opening line's treatment (`clamp(34px, 5.4vw, 50px)`, weight 650). It is the loudest text on the page. A supporting line follows at 17 px, muted, then quiet metadata in 13 px mono.
-- **Sections**: a 17 px title (weight 650) and the prose at 17 px, as on the homepage. No numbers, no giant headings, no condensed display type.
-- **Figures** (rule 7): inline at column width with a 13 px mono caption beneath. Screenshots sit on their Project colour with a 14 px radius. The to-scale bars and the flag figure are drawn on the card surface (`--stretch-card`). Every figure keeps its alt text.
+- **Title**: the page's `h1`, in the opening line's treatment (`clamp(34px, 5.4vw, 50px)`, weight 650). It is the loudest text on the page, except that a name too long for the display size (Optegra Eye Healthcare & Kensington Medical) is set at 30 to 34 px so its longest word fits beside the pass. A supporting line follows at 17 px, muted, then quiet metadata in 13 px mono.
+- **Sections**: a 17 px title (weight 650) and the prose at 17 px, as on the homepage. No numbers, no giant headings, no condensed display type. A case study's header links use short labels (Where it started, On paper, Decisions, How it’s built, Where it stands, What’s next) so the six fit one row of the column; each section's own title is its bold line.
+- **Figures** (rule 7): inline at column width with a 13 px mono caption beneath. Screenshots sit on their Project colour with a 14 px radius. The to-scale bars and the flag figure are drawn on the card surface (`--stretch-card`). Every figure keeps its alt text. A screenshot is also a button: a click or tap opens the same image large in a modal dialog in the same window (centred, up to 1400 px wide, the page dimmed behind it), and a click anywhere on it, its Close button or Esc closes it and returns focus to the screenshot. The to-scale bars and the flag figure are not screenshots and do not expand.
 - **Ending**: one row, under "Next role" or "Next project", with the next page's 44 px object, its name and its one line. The order is unchanged (Role stories newest to oldest; case studies in the Things I make order).
 
 ### A Role story's opening
 
-The title (the employer), the role and setting as its line, and the dates. Beside them in the column hangs the employer's full **Staff pass** with its lean and its Pass pins, as the homepage's closer look shows it. On phones the pass falls below the title. On arrival the pass swings to rest once, over a page that is already readable.
+The title (the employer), the role and setting as its line, and the dates. Beside them in the column hangs the employer's full **Staff pass** (the same finished pass as the homepage's closer look, leaning away from a fine pointer) with its three Pass pins under the title, in the room the pass leaves on the left (on a phone: title, pass, then pins). The pins are not links: the pass, the evidence and the text are all on the page. On phones the pass falls below the title. On arrival the pass swings to rest once, over a page that is already readable.
 
 ### A case study's opening
 
@@ -194,7 +196,7 @@ A case study's PRD is one inline **Sheet**: the quote at 19 px, "From the PRD" a
 
 ### Motion on long-form pages
 
-The pass swings to rest once on arrival; the to-scale bars shrink once when they scroll into view; closer looks arrive as on the homepage. Nothing else moves.
+The pass swings to rest once on arrival; the to-scale bars shrink once when they scroll into view; closer looks arrive as on the homepage; an expanded screenshot fades in over 0.2 s (not at all with reduced motion). Nothing else moves.
 
 ## The Work archive
 
@@ -202,7 +204,7 @@ The pass swings to rest once on arrival; the to-scale bars shrink once when they
 
 ## The Résumé
 
-The sheet is unchanged: it is what prints and what `public/Elias-Bennett-Resume.pdf` holds, so `verify:resume` and the committed PDF stay valid. The page around it takes the shared header (no links), the desk, and Download PDF above the sheet.
+The sheet is unchanged: it is what prints and what `public/Elias-Bennett-Resume.pdf` holds, so `verify:resume` and the committed PDF stay valid. The page around it takes the shared header (no links), the desk, and Download PDF above the sheet. The header's row is as wide as the sheet, so the portrait and name start at the paper's left edge and the Eclipse ends at its right.
 
 ## The 404
 
@@ -231,7 +233,7 @@ Defined in `src/app/stretch-tokens.css` as `--stretch-*` variables. Dark follows
 | `--stretch-tile-edge` | none | `#2a2a33` | Hairline that keeps objects visible in dark |
 | `--gh-0` | `#e1e4e8` | `#1f242c` | GitHub year, no contributions. Light is a step darker than GitHub's own, so it shows on the card |
 | `--gh-1` … `--gh-4` | `#9be9a8` `#40c463` `#30a14e` `#216e39` | `#0e4429` `#006d32` `#26a641` `#39d353` | GitHub's contribution greens |
-| `--sun` | `#e39a2d` | `#f5b84f` | The greeting's sun, and nothing else: an illustration colour, never an interface colour |
+| `--sun` | `#e39a2d` | `#f5b84f` | The greeting's amber, and nothing else: the lamp's bulb and pool of light and the clock's pivot. An illustration colour, never an interface colour |
 
 Every text pair passes WCAG 2.2 AA; `e2e/stretch-tokens.spec.ts` measures them on the rendered page. Rules are decorative and are not held to the text ratio. `--stretch-tape`, the Fasteners' tape, retires with them.
 
@@ -245,7 +247,7 @@ Every text pair passes WCAG 2.2 AA; `e2e/stretch-tokens.spec.ts` measures them o
 
 ## Colour rules
 
-- **Cobalt** marks "products of my own", today, now (the live dots, Now making), the way to say hello, focus and a hovered row's arrow. **Pass pins** take their own enamel colours, inside the pass. On the GitHub year it is a ring around today, never a fill, so the greens stay true. Elias's name is no longer cobalt: the opening line leads.
+- **Cobalt** marks "products of my own", today, now (the live dots, and the slash in Now making's brackets), the way to say hello, focus and a hovered row's arrow. **Pass pins** take their own enamel colours, inside the pass. On the GitHub year it is a ring around today, never a fill, so the greens stay true. Elias's name is no longer cobalt: the opening line leads.
 - **Employer and Project colours** appear only inside objects, figures and closer looks (and on BNP Paribas when hovered), on every page. A Role story's pass and a case study's screenshots carry them; the page around them stays neutral, with no coloured opening band. A page's share card keeps its colour.
 - **GitHub's greens** appear only on the GitHub year.
 - **Colour never carries meaning alone.** A level of the GitHub year has a count on hover and a text alternative; today is marked by a ring as well as colour.
@@ -261,7 +263,7 @@ Every text pair passes WCAG 2.2 AA; `e2e/stretch-tokens.spec.ts` measures them o
 
 - **A closer look is supplementary.** Anything a closer look says that isn't on the row or on the row's destination page is also the row's accessible description, through visually hidden text referenced by `aria-describedby`. The margin and the inline closer look are themselves `aria-hidden`.
 - **Keyboard**: every row and dotted word with a closer look is focusable, and focus shows it as hover does. Escape hides the margin, and focus stays put. The GitHub year keeps today's single tab stop and arrow keys.
-- **Reduced motion** shows each closer look with a 0.2 s fade and no arrival motion. The pen is drawn, the underline is drawn, nothing counts or types, and the greeting's scene rests.
+- **Reduced motion** shows each closer look with a 0.2 s fade and no arrival motion. The pen is drawn, the underline is drawn, nothing counts or types, and the greeting's scene rests, finished (the steam drawn, the lamp's pool lit, the cursor still).
 - **The standing checks** in the "keep" rows of [#277](https://github.com/3ixas/eliasb.dev/issues/277) all hold. That means one `h1` (the opening line), the skip link, content in the server HTML and complete without script, axe, AA contrast, 3:1 focus rings, external links marked `↗` that open in a new tab, the theme rules, and the home title, description and social image.
 - **Every page has one `h1`**: the opening line on the homepage, the title elsewhere. Section titles are `h2`.
 - **Figures** keep their alt text and captions; a closer look's words are also its word's accessible description.
@@ -298,15 +300,10 @@ These go from the inner pages and their checks:
 
 Elias agreed these on 26 October 2026, when the draft was reviewed:
 
-1. **The sun's amber stays**, as `--sun`, only in the greeting's illustration.
+1. **The amber stays**, as `--sun`, only in the greeting's illustration (the lamp and the clock, since the sun left).
 2. **Navigation**: quiet section links in the desktop header, and no phone menu. The release check's five navigation targets and labels stay.
 3. **The simulation gets a caption** saying the paths are illustrative, worded in the copy pass ([#281](https://github.com/3ixas/eliasb.dev/issues/281)).
 4. **This file was the contract** for the homepage and shell only, as `QUIET-INDEX.md`. On 26 October 2026 the inner pages joined it ([#301](https://github.com/3ixas/eliasb.dev/issues/301)), and it became `DESIGN.md`, the one contract for the site.
-
-## Still to come
-
-- **Copy for the 404's rows** and the "Try one of these" note, through the copy deck.
-- **The build**: the homepage is specified in [Spec: build the quiet index homepage](https://github.com/3ixas/eliasb.dev/issues/288); a follow-on spec covers the inner pages, on the same integration branch. Moving the specs and copy checks across follows the checklist in [#277](https://github.com/3ixas/eliasb.dev/issues/277).
 
 ## Exploration record
 

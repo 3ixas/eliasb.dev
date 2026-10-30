@@ -9,13 +9,13 @@ import {
   latestRepository,
   londonWeekday,
 } from "../src/integrations/signal-mappers.ts";
+import { bookFromGoodreadsWidget } from "../src/integrations/goodreads-widget.ts";
 import { integrationConfig } from "../src/content/integration-config.ts";
 import { asOfDate, pinStatus, staleAfterDays } from "../src/integrations/pin-rules.ts";
 import { filmLine } from "../src/content/stretch/film-line.ts";
 import { nowMakingEntry } from "../src/content/stretch/off-the-clock.ts";
 import { getHistorySignal, historyWeekStart, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "../src/integrations/history.ts";
 import {
-  busiestStretch,
   contributionLevel,
   contributionTag,
   createContributionCalendar,
@@ -325,6 +325,19 @@ assert.equal(bookFromGoodreads({ title: "Dark Age", author: "Pierce Brown" }).co
 assert.equal(bookFromGoodreads({ title: "Dark Age" }), null);
 assert.equal(bookFromGoodreads({ author: "Pierce Brown" }), null);
 
+// Goodreads' widget: a script that assigns the shelf's HTML to widget_code.
+const widgetScript = (body) => `  var widget_code = '${body}';\n  document.write(widget_code);`;
+const widgetBook = `  <div class=\\"gr_custom_container_\\">\\n    <div class=\\"gr_custom_each_container_\\">\\n <div class=\\"gr_custom_book_container_\\">\\n <a title=\\"Dark Age (Red Rising Saga, #5)\\" href=\\"https:\\/\\/www.goodreads.com\\/review\\/show\\/1\\"><img alt=\\"Dark Age\\" border=\\"0\\" src=\\"https:\\/\\/i.gr-assets.com\\/images\\/S\\/books\\/29226553._SY75_.jpg\\" \\/><\\/a>\\n <\\/div>\\n <div class=\\"gr_custom_title_\\">\\n <a rel=\\"nofollow\\" href=\\"https:\\/\\/x\\">Dark Age<\\/a>\\n <\\/div>\\n <div class=\\"gr_custom_author_\\">\\n by <a rel=\\"nofollow\\" href=\\"https:\\/\\/y\\">Pierce Brown<\\/a>\\n <\\/div>\\n <\\/div>\\n <\\/div>`;
+assert.deepEqual(bookFromGoodreadsWidget(widgetScript(widgetBook)), {
+  title: "Dark Age",
+  author: "Pierce Brown",
+  startedAt: null,
+  coverUrl: "https://i.gr-assets.com/images/S/books/29226553._SX300_.jpg",
+});
+assert.equal(bookFromGoodreadsWidget(widgetScript('  <div class=\\"gr_custom_container_\\">\\n <\\/div>')), null, "An empty shelf is no book");
+assert.throws(() => bookFromGoodreadsWidget("<html>Page not found</html>"), /other than its widget/);
+assert.throws(() => bookFromGoodreadsWidget(widgetScript("not the shelf")), /other than its widget/);
+
 // Letterboxd: half-star ratings and the diary date, or nothing where they're missing or malformed.
 const letterboxdProfile = "https://letterboxd.com/3lxas/";
 assert.deepEqual(
@@ -421,18 +434,7 @@ assert.deepEqual(
   ],
 );
 
-// GitHub: the busiest four weeks, worked out from the data, with "early", "mid" or "late".
 const quietYear = datesForWindow(GITHUB_ACTIVITY_DAYS, new Date("2026-10-02T12:00:00Z")).map(({ date }) => ({ date, count: 0 }));
-assert.equal(busiestStretch(createContributionCalendar(quietYear)), null, "A year with nothing in it has no busiest stretch");
-const januaryYear = quietYear.map(({ date }) => ({ date, count: date >= "2026-01-04" && date <= "2026-01-31" ? 3 : date === "2026-06-10" ? 9 : 0 }));
-const januaryStretch = busiestStretch(createContributionCalendar(januaryYear));
-assert.equal(januaryStretch.total, 84, "Four full weeks of 3 a day beat one busy day");
-assert.equal(januaryStretch.when, "mid-January");
-assert.equal(januaryStretch.span, 4);
-const tiedYear = quietYear.map(({ date }) => ({ date, count: date === "2025-11-03" || date === "2026-08-03" ? 5 : 0 }));
-assert.equal(busiestStretch(createContributionCalendar(tiedYear)).when.endsWith("August"), true, "A tie goes to the most recent stretch");
-const earlyYear = quietYear.map(({ date }) => ({ date, count: date >= "2026-03-01" && date <= "2026-03-07" ? 4 : 0 }));
-assert.match(busiestStretch(createContributionCalendar(earlyYear)).when, /^(early|mid|late)-(February|March)$/);
 // Day tags and month labels are written by the site, the same in every locale.
 assert.equal(contributionTag({ date: "2026-01-15", count: 12 }), "12 contributions on Thu 15 Jan");
 assert.equal(contributionTag({ date: "2026-01-15", count: 1 }), "1 contribution on Thu 15 Jan");

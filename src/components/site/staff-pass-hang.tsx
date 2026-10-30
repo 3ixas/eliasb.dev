@@ -15,7 +15,7 @@ const KICK_MS = 120;
  * tilt. Touch has no pointer to lean from; its pendulum is CSS, driven by
  * scroll. The markup inside is rendered by the server.
  */
-export function PassHang({ className, style, pass, children }: { className: string; style: CSSProperties; pass: string; children: ReactNode }) {
+export function PassHang({ className, style, pass, children }: { className: string; style?: CSSProperties; pass: string; children: ReactNode }) {
   const hang = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import type { siteCopy } from "./site-copy";
+import { siteCopy } from "./site-copy.ts";
 
 export type GreetingKey = keyof typeof siteCopy.greeting;
 
@@ -9,3 +9,15 @@ export function greetingKey(hour: number): Exclude<GreetingKey, "hello"> {
   if (hour >= 18 && hour < 22) return "evening";
   return "late";
 }
+
+/** Saturday and Sunday, from `Date.getDay()` on the visitor's own clock. */
+export const isWeekend = (day: number) => day === 0 || day === 6;
+
+/** The words for a greeting: only the afternoon changes with the day. */
+export function greetingLine(key: GreetingKey, weekend: boolean): string {
+  const line = siteCopy.greeting[key];
+  return typeof line === "string" ? line : weekend ? line.weekend : line.weekday;
+}
+
+/** Every line the greeting can say, for reserving the width of the longest. */
+export const greetingLines = Object.values(siteCopy.greeting).flatMap((line) => (typeof line === "string" ? [line] : Object.values(line)));

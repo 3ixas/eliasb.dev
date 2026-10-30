@@ -1,5 +1,5 @@
 /*
- * The Stretch redesign's site-wide copy: hero, section headings, Say hello, the
+ * The Stretch redesign's site-wide copy: section headings, Say hello, the
  * Work archive and the 404. Every string is from docs/content/redesign-copy.md
  * (approved 8 October 2026); `scripts/verify-copy.mjs` checks that.
  *
@@ -32,67 +32,59 @@ export const siteCopy = {
   ],
   header: {
     darkTheme: "Dark theme",
-    menu: "Menu",
-    close: "Close",
     backToWork: "← Work",
+    /** Said beside the greeting on a wide screen while it is hovered or focused: London's time, as {HH:MM}. */
+    londonTime: (time: string) => `it’s ${time} here in London`,
+    /** The header's links, named for the page they belong to. */
+    linksLabel: "On this page",
+    /** The portrait's closer look caption (moved from the old hero label). Its button is named "A closer look at Elias", as every object button is named for what it shows. */
+    portrait: { caption: "Based in London" },
   },
-  /** The header's greeting, by the visitor's own time of day. `hello` is the line before the browser has read it, and without script. */
+  /** The header's greeting, by the visitor's own time of day. `hello` is the line before the browser has read it, and without script. The afternoon alone knows the day: Saturday and Sunday are the visitor's own. */
   greeting: {
     hello: "Hello",
-    morning: "Good morning",
-    afternoon: "Good afternoon",
-    evening: "Good evening",
+    morning: "Kettle’s on.",
+    afternoon: { weekday: "Nearly five?", weekend: "Nowhere to be?" },
+    evening: "Home yet?",
     late: "Still up?",
   },
-  footer: "Made by Elias",
 } as const;
 
 export const notFound = {
   title: "Nothing here",
   heading: "This page doesn’t exist.",
   line: "It’s moved, or it never did. Everything else is where you left it.",
-  button: "Back to the homepage →",
-  /** The lost-property tag hung beside the heading (#217): the address asked for, stamped. */
-  tag: {
-    title: "Lost property",
-    item: "Item",
-    foundAt: "Found at",
-    foundAtValue: "eliasb.dev",
-    returnTo: "Return to",
-    returnToValue: "the homepage",
-    stamp: "Not on file",
+  /** The missing row: the address asked for is its title, struck through; these are its line and its metadata. */
+  missing: { line: "Not on file", meta: "404" },
+  /** The section title and note above the five homepage sections, and each section's line, by its anchor. */
+  tryTitle: "Try one of these",
+  tryNote: "The homepage, a section at a time.",
+  tryLines: {
+    work: "BNP Paribas, Joveen and Optegra",
+    "things-i-make": "Threshold, Argus Risk, Flowtime and more",
+    "how-i-work": "Four habits, and the proof for each",
+    "off-the-clock": "Training, a book, a film, this week in history",
+    "say-hello": "The email, the résumé, GitHub and LinkedIn",
   },
-  /** The lead-in to the five homepage sections, listed under the line. */
-  orTry: "Or try",
-} as const;
-
-export const hero = {
-  name: { first: "Elias", last: "Bennett" },
-  /** Plain text directly under the name. */
-  role: "Software Engineer",
-  portraitLabel: "Based in London",
-  headline: { lead: "I build pricing and risk engines at BNP Paribas, and", emphasis: "products of my own." },
-  support: "In C# and Java, on CPU and GPU. I’ve won the bank’s digitisation competition and a Take Ownership award.",
-  actions: { work: "See my work ↓", hello: "Say hello" },
 } as const;
 
 /** The homepage section for Elias's own projects, at #things-i-make. */
 export const thingsIMake = {
   heading: "Things I make",
-  /** What the hero used to say: the Maker of clarity line, then taking ideas all the way through. */
-  intro: {
-    lead: "I build everyday software, and make complicated things feel simple.",
-    support: "I take ideas all the way through: deciding what’s worth making, designing it, building it across the stack, and finding out whether it actually works.",
-  },
-  /** "06 things I’ve built · 03 I’m proudest of", from the catalogue's counts. */
-  note: (built: number, proudest: number) => `${pad(built)} things I’ve built · ${pad(proudest)} I’m proudest of`,
+  note: "Products of my own, from a rental calculator to a risk simulator.",
+  /** Rows whose line is shorter than the project's own outcome, which the inner pages keep. */
+  rowOutcomes: {
+    "argus-risk": "A risk simulator where every number shows its source and age.",
+    "home-secretary": "A household coordination prototype, built for coursework.",
+  } as Readonly<Record<string, string>>,
   /** The link to the archive, with the true count. */
   allThings: (built: number) => `Everything I’ve built (${pad(built)}) →`,
 } as const;
 
 export const sayHello = {
-  bigLink: "Say hello ↗",
-  line: "Got an idea, a project, or just want to talk about building things? Email’s the best way to reach me.",
+  /** The email's button, and what it says for two seconds once the address is on the clipboard. */
+  copy: "Copy",
+  copied: "Copied",
   /** In the order shown. `id` names the profile link (src/content/site.ts) each one opens. */
   links: [
     { id: "resume", label: "Résumé" },

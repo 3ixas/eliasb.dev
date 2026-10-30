@@ -2,7 +2,7 @@
 
 The copy deck for the quiet index homepage ([#281](https://github.com/3ixas/eliasb.dev/issues/281); layout in `docs/design/DESIGN.md`). It covers every string the new homepage shows, including the closer looks.
 
-It doesn't replace `docs/content/redesign-copy.md` yet. `verify:copy` checks the live code against that file, so this deck is merged into it when the homepage is built. The inner pages' copy is unchanged.
+**Merged** into `docs/content/redesign-copy.md`, under The quiet index homepage, for [#289](https://github.com/3ixas/eliasb.dev/issues/289) on 27 October 2026. That file is the source from now on: change the copy there, not here. This deck stays as the record of how the copy was decided. The inner pages' copy is unchanged.
 
 Facts come only from the Role stories, `src/content/resume.ts` and the project catalogue. The voice follows Elias's voice profile: the position first, something concrete behind every claim, plain words, British spelling and few dashes.
 
@@ -15,7 +15,7 @@ Facts come only from the Role stories, `src/content/resume.ts` and the project c
 | Page title, meta description, social image | As in `redesign-copy.md` | kept |
 | Header links (desktop) | Work · Things I make · How I work · Off the clock · Say hello | kept (the Menu entries) |
 | Theme button name | Dark theme | kept |
-| Greeting | Good morning · Good afternoon · Good evening · Still up? (Hello before script) | kept |
+| Greeting | Kettle’s on. (05:00 to 11:59) · Nearly five? (12:00 to 17:59 on a weekday) / Nowhere to be? (12:00 to 17:59 on Saturday and Sunday) · Home yet? (18:00 to 21:59) · Still up? (22:00 to 04:59), by the visitor's own clock and day; Hello before script | changed: was Good morning · Good afternoon · Good evening · Still up? |
 | Greeting, on hover | it’s {14:28} here in London | new: London's time, from Elias's side of the screen |
 | Footer | Made by Elias | kept |
 
@@ -83,7 +83,7 @@ Facts come only from the Role stories, `src/content/resume.ts` and the project c
 |---|---|---|
 | Note | What my own time looks like this week. | kept |
 | Training row | {Assault bike intervals} · Today’s session, from my training week | changed: replaces the sketch's "Today, from my training week" |
-| Training closer look | The week, today in cobalt · Zone 2 means slow on purpose. · Out on a run, central London. | kept |
+| Training closer look | The week, today in cobalt · Out on a run, central London. | changed: “Zone 2 means slow on purpose.” is dropped (Elias, 28 October 2026) |
 | GitHub year | GitHub, the past year · {1,726} contributions in the past year · Less / More · {12} contributions on {3 June} | kept (the sketch said "last year"); "Less / More" replaces "Quiet / Busy" to match GitHub's own key |
 | Source marks (live) | Live from Goodreads · Live from Letterboxd · Live from GitHub · Live from Wikipedia | new |
 | Source marks (saved data gone stale) | From Goodreads, as of {date} (and so on) | new: built on the approved "as of {date}" |
@@ -96,7 +96,7 @@ Facts come only from the Role stories, `src/content/resume.ts` and the project c
 | History row line | {3} things that happened this week, some stranger than others. | new: says it's weekly and meant to be fun, using only live values |
 | History closer look | The clipping stamped **This week in history**, then {date}, {fact}, the image credit, and **{1} of {3}** | changed: "{n} more oddities this week ↓" becomes a count, because clicking the row now cycles them in place |
 | History fallback | From the archive | kept |
-| Now making row | {eliasb.dev} · Now making · {GitHub description} | kept |
+| Now making row | {eliasb.dev} · Now making · Live from GitHub (the description is in the closer look) | changed: the description is said once, in the look |
 
 ## Say hello
 
@@ -105,7 +105,6 @@ Facts come only from the Role stories, `src/content/resume.ts` and the project c
 | Heading | Say hello, with no line after it: the email and its Copy button are the line | changed: none of 21 experienced engineers' sites asks the reader a question (#283) |
 | Email | {eliasthebennett@gmail.com} · Copy → Copied | new (the copy button) |
 | Links | Résumé → · GitHub ↗ · LinkedIn ↗ | kept |
-| Résumé closer look | One page, with a PDF to download. | changed: shorter than the sketch's line |
 
 ## Retired with the old homepage
 

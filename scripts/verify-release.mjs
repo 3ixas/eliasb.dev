@@ -212,12 +212,12 @@ function verifyHomepage(markup) {
   verifyPageShell(markup, "/");
   const fullOpening = "I build pricing and risk engines at BNP Paribas, and products of my own.";
   const headlineContent = markup.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? "";
-  equal(plainText(headlineContent), fullOpening, "Homepage headline should be one complete, server-rendered sentence");
-  // The entrance holds the page only after its guard script has run in a browser.
-  check(!/data-entering/.test(markup), "Homepage content should never wait for the entrance in the server HTML");
+  // The headline holds only inline markup (reveal words, the employer, the tail's letters), which adds no space between words; plainText would put one at every tag.
+  equal(plainText(headlineContent.replace(/<[^>]+>/g, "")), fullOpening, "Homepage headline should be one complete, server-rendered sentence");
+  check(!/data-entering|data-entrance/.test(markup), "Homepage content should never be held or marked for an entrance in the server HTML");
   check(/Elias\s+Bennett/.test(plainText(markup)), "Homepage should carry the name as plain text");
 
-  const nav = markup.match(/<nav aria-label="Primary navigation"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] ?? "";
+  const nav = markup.match(/<nav aria-label="On this page"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] ?? "";
   const navHrefs = hrefs(nav).map(({ href }) => href);
   equal(navHrefs.join("|"), "#work|#things-i-make|#how-i-work|#off-the-clock|#say-hello", "Homepage primary navigation targets");
   const navLabels = [...nav.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/gi)].map(([, content]) => plainText(content));
@@ -247,22 +247,22 @@ function verifyHomepage(markup) {
   // so the release check cannot depend on it; its states are covered by the Off the clock fixtures.
   check(text.includes("Off the clock"), "Homepage should show Off the clock");
 
-  // Say hello: the email is the big link; the résumé, GitHub and LinkedIn follow, in that order.
+  // Say hello: the email, then the résumé, GitHub and LinkedIn as rows, in that order.
   const helloStart = markup.indexOf('id="say-hello"');
-  const helloEnd = markup.indexOf("<footer", helloStart);
+  const helloEnd = markup.indexOf("</main>", helloStart);
   const helloSection = helloStart >= 0 && helloEnd > helloStart ? markup.slice(helloStart, helloEnd) : "";
-  check(Boolean(helloSection), "Homepage should render Say hello before the footer");
+  check(Boolean(helloSection), "Homepage should render Say hello last in the page");
   const emailAction = hrefs(helloSection).find(({ href }) => href?.startsWith("mailto:"));
   check(emailAction, "Say hello should keep the email action");
   equal(emailAction?.href, "mailto:eliasthebennett@gmail.com", "The email action should write to Elias");
-  const cards = [...helloSection.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].filter(([, tag]) => (attribute(tag, "class") ?? "").includes("stretch-hello__link"));
-  equal(cards.map(([, , body]) => plainText(body).split(" ")[0]).join("|"), "Résumé|GitHub|LinkedIn", "The links should be the résumé, GitHub and LinkedIn, in that order");
-  const resumeCard = cards.find(([, , body]) => plainText(body).startsWith("Résumé"));
+  const cards = [...helloSection.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].filter(([, tag]) => (attribute(tag, "class") ?? "").includes("qi-row"));
+  const titleOf = ([, , body]) => plainText(body.match(/class="qi-row__title"[^>]*>([\s\S]*?)<\/span>/)?.[1] ?? "");
+  equal(cards.map(titleOf).join("|"), "Résumé|GitHub|LinkedIn", "The links should be the résumé, GitHub and LinkedIn, in that order");
+  const resumeCard = cards.find((card) => titleOf(card) === "Résumé");
   equal(attribute(resumeCard?.[1] ?? "", "href"), "/resume", "Say hello's Résumé should open /resume on this site");
   check(attribute(resumeCard?.[1] ?? "", "target") === null, "Say hello's Résumé should open in the same tab");
   check(cards.filter((card) => card !== resumeCard).every(([, tag]) => attribute(tag, "target") === "_blank"), "GitHub and LinkedIn should open in a new tab");
-  const footer = markup.slice(markup.indexOf("<footer"), markup.indexOf("</footer>"));
-  equal(plainText(footer), "Made by Elias", "The footer should be my signature");
+  check(!/<footer\b[^>]*stretch-footer/.test(markup) && !text.includes("Made by Elias"), "The page should have no footer");
 
   check(markup.includes('href="/things-i-make"'), "Homepage should link to the complete Things I make archive");
   check(markup.includes('href="/things-i-make/threshold"'), "Homepage should link to the Threshold case study");
@@ -369,7 +369,7 @@ async function verifyNotFound(baseUrl) {
   const heading = markup.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? "";
   equal(plainText(heading), "This page doesn’t exist.", "404 heading");
   check(plainText(markup).includes("It’s moved, or it never did. Everything else is where you left it."), "404 line");
-  check(hrefs(markup).some(({ tag, href }) => href === "/" && plainText(markup.slice(markup.indexOf(tag))).startsWith("Back to the homepage")), "The 404 should link back to the homepage");
+  check(hrefs(markup).some(({ href }) => href === "/#work"), "The 404 should link to the homepage's sections");
 }
 
 async function verifyWorkSocialMetadata(baseUrl, document, route) {

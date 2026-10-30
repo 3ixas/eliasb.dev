@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { flipLights, readPreference, systemTheme, watchSystemTheme } from "@/components/site/theme";
 import { siteCopy } from "@/content/stretch/site-copy";
 
@@ -16,13 +16,24 @@ function subscribe(onChange: () => void) {
   return () => observer.disconnect();
 }
 
+/** The icon turns over as it is pressed: it starts turned back and small, and springs upright. */
+const TURN_OVER = [{ transform: "rotate(-120deg) scale(0.6)" }, { transform: "none" }];
+const TURN_OVER_TIMING = { duration: 600, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" };
+
 /**
  * The Eclipse: an icon-only theme button, named "Dark theme" and pressed while
  * the dark theme is in force. Which icon shows comes from the theme in CSS, so
  * it is right from the first paint; the pressed state follows once script runs.
+ * Pressing it also turns the whole icon over (not with reduced motion).
  */
 export function EclipseToggle() {
   const dark = useSyncExternalStore(subscribe, darkIsOn, () => null);
+  const icon = useRef<SVGSVGElement>(null);
+
+  function press() {
+    flipLights();
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) icon.current?.animate(TURN_OVER, TURN_OVER_TIMING);
+  }
 
   useEffect(() => watchSystemTheme(), []);
 
@@ -32,10 +43,10 @@ export function EclipseToggle() {
       data-eclipse
       aria-label={siteCopy.header.darkTheme}
       aria-pressed={dark ?? undefined}
-      onClick={flipLights}
+      onClick={press}
       className="stretch-eclipse"
     >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
+      <svg ref={icon} viewBox="0 0 24 24" aria-hidden="true">
         <mask id="stretch-eclipse-bite">
           <rect x="-4" y="-4" width="32" height="32" fill="#fff" />
           <circle className="stretch-eclipse__shadow" cx="12" cy="12" r="6.8" fill="#000" />

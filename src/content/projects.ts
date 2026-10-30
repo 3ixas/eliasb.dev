@@ -12,14 +12,18 @@
  * contract script) as well as Next.
  */
 
-/** The single small prop on a card's edge (see the Fastener in GLOSSARY.md). */
-export type FastenerKind = "tape" | "paperclip" | "push-pin";
-
 /** What the /things-i-make filters group by: Products, Systems or Experiments. */
 export const PROJECT_CATEGORIES = ["products", "systems", "experiments"] as const;
 export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number];
 
 export type ProjectImage = { src: string; alt: string; width: number; height: number };
+
+/**
+ * The one legible detail of a screenshot that is the project's object at 44 px: where it sits in the image
+ * (`x` and `y`, as fractions of its width and height) and how far the image is zoomed beyond covering the
+ * 44 px square (`zoom`, at least 1).
+ */
+export type ProjectCrop = { x: number; y: number; zoom: number };
 
 export type Project = {
   slug: string;
@@ -39,14 +43,15 @@ export type Project = {
   };
   /** Needed to be featured; index rows without one ship with no preview. */
   screenshot?: ProjectImage;
+  /** Which detail of the screenshot is the project's object. Every project shown on the homepage has one. */
+  crop?: ProjectCrop;
   /** The project's own colours, carried by its tile. Needed to be featured. */
   colours?: { field: string; ink: string; swatch: string };
-  fastener?: FastenerKind;
 };
 
 /*
  * Ties in `year` keep this order, so list the newer of two same-year projects
- * first. The colours and fasteners come from the chosen Stretch boards.
+ * first. The colours come from the chosen Stretch boards.
  */
 const entries = [
   {
@@ -67,8 +72,8 @@ const entries = [
       width: 2294,
       height: 1750,
     },
+    crop: { x: 0.18, y: 0.245, zoom: 5.5 },
     colours: { field: "#1a1714", ink: "#f2efe9", swatch: "#c08a5a" },
-    fastener: "tape",
   },
   {
     slug: "argus-risk",
@@ -87,8 +92,8 @@ const entries = [
       width: 2854,
       height: 1716,
     },
+    crop: { x: 0.5, y: 0.472, zoom: 4.5 },
     colours: { field: "#0a0a0a", ink: "#f2f2f2", swatch: "#4f86f7" },
-    fastener: "paperclip",
   },
   {
     slug: "flowtime",
@@ -108,8 +113,8 @@ const entries = [
       width: 1280,
       height: 640,
     },
+    crop: { x: 0.38, y: 0.49, zoom: 4.5 },
     colours: { field: "#1e1915", ink: "#ece4d8", swatch: "#c0876a" },
-    fastener: "push-pin",
   },
   {
     slug: "home-secretary",
@@ -125,6 +130,7 @@ const entries = [
       width: 1280,
       height: 800,
     },
+    crop: { x: 0.5, y: 0.455, zoom: 3 },
   },
   {
     slug: "risk-event-tracker",
@@ -140,6 +146,7 @@ const entries = [
       width: 1600,
       height: 1000,
     },
+    crop: { x: 0.05, y: 0.38, zoom: 6 },
   },
   {
     // Version 1 has no live link: askprofessorpast.com no longer serves it, and
@@ -157,6 +164,7 @@ const entries = [
       width: 1600,
       height: 1000,
     },
+    crop: { x: 0.119, y: 0.71, zoom: 7 },
   },
 ] as const satisfies readonly Project[];
 
@@ -174,7 +182,7 @@ export const featuredSlugs: readonly ProjectSlug[] = ["threshold", "argus-risk",
 
 export const MAX_FEATURED = 3;
 
-/** The homepage Project index stops here; the rest is on /things-i-make behind "Everything I’ve built". */
+/** The homepage lists at most this many projects after the featured ones; the rest is on /things-i-make behind "Everything I’ve built". */
 export const HOMEPAGE_INDEX_ROWS = 10;
 
 /** The featured projects, in the order of `featured`. Slugs not in the catalogue are skipped. */
@@ -211,6 +219,10 @@ export function catalogueProblems(
     seen.add(slug);
   }
   for (const project of catalogue) {
+    const { crop } = project;
+    if (!project.screenshot || !crop || crop.x < 0 || crop.x > 1 || crop.y < 0 || crop.y > 1 || !(crop.zoom >= 1)) {
+      problems.push(`"${project.slug}" needs a screenshot and a crop of it (x and y between 0 and 1, zoom at least 1).`);
+    }
     if (!Number.isInteger(project.year)) problems.push(`"${project.slug}" needs a whole-number year.`);
     if (!PROJECT_CATEGORIES.includes(project.category)) {
       problems.push(`"${project.slug}" needs a category: ${PROJECT_CATEGORIES.join(", ")}.`);

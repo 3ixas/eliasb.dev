@@ -26,14 +26,14 @@ export const caseStudySectionKeys = [
 
 export type CaseStudySectionKey = (typeof caseStudySectionKeys)[number];
 
-/** The section links and headings: "01 Where it started" and so on. */
+/** The header's section links, short enough for the six to share one row of the 600 px column. */
 export const caseStudySectionLabels: Record<CaseStudySectionKey, string> = {
   "where-it-started": "Where it started",
-  "written-down-first": "What I wrote down first",
+  "written-down-first": "On paper",
   decisions: "Decisions",
   "how-its-built": "How it’s built",
   "where-it-stands": "Where it stands",
-  "whats-next": "What I’d do next",
+  "whats-next": "What’s next",
 };
 
 /** The labels every case study shares. */
@@ -52,7 +52,7 @@ export type CaseStudySection = StorySectionBody & {
   figure?: SectionFigure;
 };
 
-/** A line from the project's own spec, shown on the PRD card. */
+/** A line from the project's own spec, shown on the inline Sheet. */
 export type PrdCard = {
   /** Text before the quote, when the section reads on from it. */
   lead?: string;
@@ -66,8 +66,6 @@ export type PrdCard = {
 export type CaseStudy = {
   /** Matches the project's slug in the catalogue. */
   slug: CaseStudySlug;
-  /** The number on the opening, "01". */
-  number: string;
   stack: readonly string[];
   /** Said beside the links, for example why there is no live site. */
   note?: string;
@@ -81,14 +79,12 @@ export type CaseStudy = {
   description: string;
 };
 
-/** What the opening band shows: the study's own fields joined with its catalogue entry. */
+/** What the opening shows: the study's own fields joined with its catalogue entry. */
 export type CaseStudyOpening = {
-  number: string;
   name: string;
   outcome: string;
-  /** "Product · Data visualisation · 2026". */
-  metadata: string;
-  stack: string;
+  /** Type, year and stack: "Product · Data visualisation", "2026", "React 19, TypeScript, MapLibre". */
+  meta: readonly string[];
   note?: string;
   links: Project["links"];
   screenshot: ProjectImage;
@@ -102,11 +98,9 @@ export function caseStudyOpening(study: CaseStudy, catalogue: readonly Project[]
     throw new Error(`Case study "${study.slug}" needs its project's screenshot and colours.`);
   }
   return {
-    number: study.number,
     name: project.name,
     outcome: project.outcome,
-    metadata: `${project.type} · ${project.year}`,
-    stack: study.stack.join(", "),
+    meta: [project.type, String(project.year), study.stack.join(", ")],
     note: study.note,
     links: project.links,
     screenshot: project.screenshot,

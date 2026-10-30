@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { resumeCopy, resumePdf, resumeSheet, resumeText } from "../src/content/resume";
 import { roleStories, roleStorySlugs } from "../src/content/stretch/role-stories";
+import { siteCopy } from "../src/content/stretch/site-copy";
 import { work } from "../src/content/stretch/work";
 
 // The Résumé is an A4 sheet on the desk (GLOSSARY.md). The page is hydrated and laid out after load,
@@ -19,8 +20,8 @@ test.describe("The Résumé", () => {
   });
 
   test("lists the Role stories' employers, roles and dates, newest first", async ({ page }) => {
-    // Work's rail is the order the site calls newest first, and the Résumé must follow it.
-    expect(roleStorySlugs).toEqual(work.rail.map(({ slug }) => slug));
+    // Work's rows are the order the site calls newest first, and the Résumé must follow it.
+    expect(roleStorySlugs).toEqual(work.employers.map(({ slug }) => slug));
     const entries = page.locator("[data-resume-entry]");
     await expect
       .poll(() =>
@@ -64,12 +65,11 @@ test.describe("The Résumé", () => {
     }
   });
 
-  test("is light paper with no Fastener, in either theme", async ({ page }) => {
+  test("is light paper, in either theme", async ({ page }) => {
     await expect(sheet(page)).toBeVisible();
     await expect
       .poll(() => sheet(page).evaluate((el) => ({ paper: getComputedStyle(el).backgroundColor, ink: getComputedStyle(el).color })))
       .toEqual({ paper: "rgb(255, 255, 255)", ink: "rgb(17, 17, 20)" });
-    await expect(sheet(page).locator("[class*='fastener']")).toHaveCount(0);
   });
 
   test("fits the screen: no sideways scroll, and nothing clipped", async ({ page }) => {
@@ -89,6 +89,38 @@ test.describe("The Résumé", () => {
       .toEqual({ pageOverflow: false, clipped: [], sheetFits: true });
   });
 
+  test("takes the shared header with the way home and no section links, and Download PDF sits above the sheet", async ({ page }) => {
+    await expect(page.locator("header.qi-header")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Elias Bennett, home" })).toHaveAttribute("href", "/");
+    await expect(page.getByRole("navigation", { name: siteCopy.header.linksLabel })).toHaveCount(0);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+    await expect(sheet(page)).toBeVisible();
+    const [download, paper] = await Promise.all([page.getByRole("link", { name: resumeCopy.download }).boundingBox(), sheet(page).boundingBox()]);
+    expect(download!.y + download!.height).toBeLessThanOrEqual(paper!.y);
+  });
+
+  test("the header lines up with the sheet: its row has the paper's left and right edges", async ({ page }) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 900, "Below 900 px the header is the narrow column, not the sheet's width");
+    await expect(sheet(page)).toBeVisible();
+    const edges = () =>
+      page.evaluate(() => {
+        const paper = document.querySelector(".stretch-resume__sheet")!.getBoundingClientRect();
+        const row = document.querySelector(".qi-header__inner")!.getBoundingClientRect();
+        return { left: Math.abs(row.left - paper.left), right: Math.abs(row.right - paper.right) };
+      });
+    await expect.poll(async () => (await edges()).left).toBeLessThanOrEqual(1);
+    await expect.poll(async () => (await edges()).right).toBeLessThanOrEqual(1);
+  });
+
+  test("is complete without script: the header, its skip link, Download PDF and the sheet are in the server HTML", async ({ page }) => {
+    await page.route("**/*.js", (route) => route.abort());
+    await page.reload();
+    await expect(page.locator("header.qi-header")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Skip to content" })).toHaveCount(1);
+    await expect(page.getByRole("link", { name: resumeCopy.download })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: resumeSheet().name })).toBeVisible();
+  });
+
   test("keeps Download PDF on the desk, off the sheet and out of print", async ({ page }) => {
     const download = page.getByRole("link", { name: resumeCopy.download });
     await expect(download).toHaveAttribute("href", resumePdf.href);
@@ -100,8 +132,10 @@ test.describe("The Résumé", () => {
 
     await page.emulateMedia({ media: "print" });
     await expect(download).toBeHidden();
-    await expect(page.locator("header.stretch-header")).toBeHidden();
+    await expect(page.locator("header.qi-header")).toBeHidden();
     await expect(page.locator("footer")).toBeHidden();
+    // The room below the content is for the screen: paper has none to leave, so it must not push a blank page.
+    await expect(page.locator("[data-resume] main")).toHaveCSS("padding-bottom", "0px");
     await expect(sheet(page)).toBeVisible();
     await expect
       .poll(() => sheet(page).evaluate((el) => ({ paper: getComputedStyle(el).backgroundColor, ink: getComputedStyle(el).color })))
@@ -109,7 +143,7 @@ test.describe("The Résumé", () => {
   });
 });
 
-test("Say hello is the only way in: the header and the hero do not link /resume", async ({ page }) => {
+test("Say hello is the only way in: the header and the opening do not link /resume", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(`header a[href="/resume"], .stretch-hero a[href="/resume"]`)).toHaveCount(0);
+  await expect(page.locator(`header a[href="/resume"], .qi-opening a[href="/resume"]`)).toHaveCount(0);
 });

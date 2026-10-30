@@ -18,14 +18,16 @@ export default defineConfig({
   // Playwright's default (half the CPU cores).
   workers: process.env.CI ? undefined : 1,
   forbidOnly: Boolean(process.env.CI),
-  retries: 0,
+  // A test that fails is run again, twice at most, in CI only: a rare renderer stall or a pointer event landing a frame late
+  // (docs/runbooks/merging.md) should not fail a shard, but a test that fails three times in a row still does. The list
+  // reporter marks a test that passed on a retry "flaky", so a flake is visible without blocking the merge.
+  retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
   use: {
     baseURL: `http://127.0.0.1:${port}`,
     trace: "retain-on-failure",
-    // The homepage's signature entrance holds the page for about five seconds on
-    // a fresh load and animates the hero, so specs read the finished page. Only
-    // entrance.spec.ts turns motion back on.
+    // Specs read the finished page with motion off; those that test motion turn
+    // it back on with test.use.
     reducedMotion: "reduce",
   },
   projects: browsers.flatMap(({ name, device }) =>

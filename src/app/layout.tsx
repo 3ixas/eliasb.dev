@@ -5,7 +5,10 @@ import "./base.css";
 import "./stretch-tokens.css";
 import "./stretch-type.css";
 import "./stretch-shell.css";
-import "./stretch-pass.css";
+import "./quiet-index.css";
+import "./quiet-opening.css";
+import "./quiet-header.css";
+import "./quiet-long-form.css";
 import "./stretch-resume.css";
 
 // Self-hosted at build time by next/font, so no request goes to Google when a
