@@ -51,7 +51,6 @@ export function homepageMarkdown(): string {
     work.note,
     "",
     ...employers,
-    `- ${work.history.title}: ${work.history.line} (${work.history.note.course}, ${work.history.note.school}, ${work.history.note.date})`,
     "",
     `### ${work.headed.heading}`,
     "",

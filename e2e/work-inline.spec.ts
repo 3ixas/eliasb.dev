@@ -112,20 +112,20 @@ test.describe("Work: inline closer looks", () => {
   });
 
   test("a plain row opens from anywhere on it and closes when tapped again; Enter does the same from the keyboard", async ({ page }) => {
-    const row = plainRow(page, "history-at-uni");
+    const row = plainRow(page, strandIds[0]);
     await row.click({ position: { x: 20, y: 10 } });
-    await expect(inlineLook(page, "history-at-uni").locator(".qi-note")).toBeVisible();
+    await expect(inlineLook(page, strandIds[0]).locator(".qi-strand")).toBeVisible();
     // WebKit folds a second click inside its double-click interval into the first; a person's second tap comes later.
     await page.waitForTimeout(600);
     await row.click({ position: { x: 300, y: 10 } });
     await expect(openLooks(page)).toHaveCount(0);
     await row.focus();
     await page.keyboard.press("Enter");
-    await expect(inlineLook(page, "history-at-uni")).toBeVisible();
+    await expect(inlineLook(page, strandIds[0])).toBeVisible();
     await page.keyboard.press("Space");
     await expect(openLooks(page)).toHaveCount(0);
     await page.keyboard.press("Enter");
-    await expect(inlineLook(page, "history-at-uni")).toBeVisible();
+    await expect(inlineLook(page, strandIds[0])).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(openLooks(page)).toHaveCount(0);
   });
@@ -134,7 +134,7 @@ test.describe("Work: inline closer looks", () => {
     const link = section(page).locator('a[data-look="optegra"]');
     const describedBefore = await link.evaluate((element) => document.getElementById(element.getAttribute("aria-describedby")!)!.textContent);
     await expect(link).toHaveAccessibleDescription(describedBefore!);
-    for (const [id, kind] of [["optegra", ".qi-pass"], ["history-at-uni", ".qi-note"], [strandIds[1], ".qi-strand__thread"]] as const) {
+    for (const [id, kind] of [["optegra", ".qi-pass"], [strandIds[1], ".qi-strand__thread"]] as const) {
       await tap(page, id === "optegra" ? tapObject(page, id) : plainRow(page, id));
       await expect(inlineLook(page, id).locator(kind)).toBeVisible();
       await expect(page.locator(`[data-look-slot="${id}"]`)).toHaveAttribute("aria-hidden", "true");
@@ -152,7 +152,7 @@ test.describe("Work: inline closer looks", () => {
       expect(box.height).toBeGreaterThanOrEqual(44);
     }
     for (const row of await section(page).locator(".qi-row[data-look-tap]").all()) expect((await boxOf(row)).height).toBeGreaterThanOrEqual(44);
-    const ids = [...work.employers.map((employer) => employer.slug), "history-at-uni", ...strandIds];
+    const ids = [...work.employers.map((employer) => employer.slug), ...strandIds];
     for (const id of ids) {
       await tap(page, id in passRecords ? tapObject(page, id) : plainRow(page, id));
       const look = inlineLook(page, id);
@@ -170,9 +170,6 @@ test.describe("Work: inline closer looks", () => {
     await expect(mini).toHaveCSS("animation-name", "none");
     await tap(page, tapObject(page, "joveen"));
     await expect(mini).toHaveCSS("animation-name", "qi-swing");
-    await expect(section(page).locator('[data-look="history-at-uni"] .qi-tile')).toHaveCSS("animation-name", "none");
-    await tap(page, plainRow(page, "history-at-uni"));
-    await expect(section(page).locator('[data-look="history-at-uni"] .qi-tile')).toHaveCSS("animation-name", "qi-turn");
   });
 
   test("reduced motion: a closer look fades in over 0.2 s with no height animation or arrival motion", async ({ page }) => {

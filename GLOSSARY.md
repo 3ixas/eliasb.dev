@@ -74,7 +74,7 @@ The homepage section of four habits (start from a real problem, write it down fi
 _Avoid_: Claims of users or impact, colour fields (colour belongs to Work and Things I make)
 
 **Work**:
-On the **Quiet index**, the first section after the opening line: one **Row** per employer (each with a mini **Staff pass**, whose full pass is its **Closer look**), then History at uni, then **Where I'm headed** as three strand rows. The **Pass rail** is in the history below. Employment leads, so Work comes before **Things I make** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
+On the **Quiet index**, the first section after the opening line: one **Row** per employer (each with a mini **Staff pass**, whose full pass is its **Closer look**), then **Where I'm headed** as three strand rows. The **Pass rail** is in the history below. Employment leads, so Work comes before **Things I make** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
 _Avoid_: Experience, CV, calling Elias's own projects "Work"
 
 **Staff pass**:

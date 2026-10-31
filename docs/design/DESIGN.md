@@ -48,7 +48,7 @@ The Stretch homepage grew by addition: every pass added a well-made object, and 
 | Line | 15 px, muted, line height 1.45 |
 | Metadata | 13 px mono, muted (a year, a source). Hidden on phones |
 | Hover / focus | Card fill (`--stretch-card`), and an arrow that appears beside the metadata (opacity and 4 px travel) and turns cobalt. A 2 px cobalt focus ring inside the row |
-| States | A link row goes to its page. A plain row (History at uni, a habit, a strand) is focusable only if it has a closer look. On phones a link row with a closer look has two targets: its object opens the closer look, the rest of the row opens the page |
+| States | A link row goes to its page. A plain row (a habit, a strand) is focusable only if it has a closer look. On phones a link row with a closer look has two targets: its object opens the closer look, the rest of the row opens the page |
 
 Every row's text starts at the same edge down the whole page; that alignment is what makes the page read as one list.
 
@@ -61,7 +61,7 @@ An object is drawn to be read at 44 px. It is never a whole page shrunk down.
 | Project | Things I make | One legible detail of the project's own screenshot (Threshold's serif "Th", Argus Risk's donut, Flowtime's timer, Home Secretary's button, Risk Event Tracker's method badges, Ask Professor Past's portrait), on its **Project colour**, 11 px radius. The crop is data on the project: focal point and zoom |
 | Mini pass | Work | A 28 × 38 **Staff pass**, portrait, on a short strap and metal clip in its **Employer colour**: a punched slot, the photo, two lines and a barcode. It carries no marks of its own: its **Pass pins** belong to its closer look |
 | Cover | Off the clock | The real book cover or film poster, 30 × 44, with a spine crease and shadow |
-| Calendar tile | Training, history, History at uni | A desk-calendar tile: a band with two binding holes, and a number on paper. The band is cobalt for today. It turns over to a second face (the year, the week) as a reaction |
+| Calendar tile | Training, history | A desk-calendar tile: a band with two binding holes, and a number on paper. The band is cobalt for today. It turns over to a second face (the year, the week) as a reaction |
 | Thread | Where I'm headed | A 4 px line in the colour of the strand's source |
 | Number | How I work | The habit's number, ringed by the pen (below) |
 | Sheet | Threshold's PRD; Say hello and the 404 | A small page of ruled lines with a folded corner |
@@ -90,7 +90,6 @@ A **closer look** is a row's detail: on desktop it appears in the margin, and on
 |---|---|---|
 | A project | Its screenshot on its Project colour, then type and year | Sliding in and settling |
 | An employer | Its full Staff pass, then that role's three **Pass pins** in the same form for every employer: BNP Paribas's three awards, and Joveen's and Optegra's three best points from the copy deck, then the Résumé lines that explain its figure | Dropping on its strap and swinging to rest; the points pop on; the figure counts up (Optegra 62% → 88%, Joveen's page load cut by 40%) |
-| History at uni | A note: University of Essex, Diploma of Higher Education, History, Jul 2021 | Unfolding |
 | A Where I'm headed strand | "So far" with its source and proof | Its thread drawing down from the source |
 | Threshold's PRD | The quote | Typing itself, with a caret. Typing is time-based and smooth: characters appear on the animation frame at a steady rate (about 45 a second), never one timer per character |
 | Today's training | The run photo and the week, today in cobalt | The days filling in one by one, today last |
@@ -164,7 +163,7 @@ One header on every page, in the same place, so following a row never moves it. 
 
 1. **Header**, as above.
 2. **The opening line**, as an `h1`: "I build pricing and risk engines at BNP Paribas, and products of my own." It is set in Bricolage at `clamp(34px, 5.4vw, 50px)`, weight 650, line height 1.1, −0.03 em tracking, and it is the loudest thing on the page. The supporting line follows at 17 px, muted.
-3. **Work**: BNP Paribas, Joveen, Optegra, then History at uni. Then **Where I'm headed**: its line, and three strand rows (Judgement, Depth, Range).
+3. **Work**: BNP Paribas, Joveen, Optegra. Then **Where I'm headed**: its line, and three strand rows (Judgement, Depth, Range).
 4. **Things I make**: the three featured projects, the other projects newest first (at most ten), and the link to the Work archive with the true count.
 5. **How I work**: four habit rows with the pen (real problem, write it down, safe to undo, measure), then Threshold's PRD.
 6. **Off the clock**: today's training, the GitHub year, the book, the film, the history row and Now making.

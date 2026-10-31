@@ -1,6 +1,6 @@
 /*
  * Work, the homepage section straight after the hero (see Work in GLOSSARY.md):
- * a row for each employer, History at uni, and Where I'm headed with its three
+ * a row for each employer, then Where I'm headed with its three
  * strand rows. Copy is from docs/content/redesign-copy.md ("Quiet index · Work"), approved by Elias; scripts/verify-copy.mjs
  * checks it. BNP Paribas detail stays at CV level: no colleague names, internal
  * system names or review context.
@@ -169,11 +169,5 @@ export const work = {
         source: { project: "threshold" },
       },
     ] satisfies readonly HeadedBar[],
-  },
-  /** History at uni: a row whose closer look is a note. */
-  history: {
-    title: "History at uni",
-    line: "Before 2021 · Because I loved it, and I still do.",
-    note: { school: "University of Essex", course: "Diploma of Higher Education, History", date: "Jul 2021" },
   },
 } as const;

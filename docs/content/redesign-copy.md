@@ -71,13 +71,9 @@ Three strands (#211, settled on the map on 16 October 2026), shown as rows. Each
 
 ### How I got here
 
-The employers are rows (role and dates from their Role stories). What is text of its own is the note under the Work heading and the History at uni row (#210).
+The employers are rows (role and dates from their Role stories). What is text of its own is the note under the Work heading (#210).
 
 - Note: History, then marketing, then code. Each move was towards the work I liked most.
-
-| Dates | Role | Note |
-| --- | --- | --- |
-| Before 2021 | History at uni | Because I loved it, and I still do. |
 
 ## Things I make
 
@@ -196,8 +192,6 @@ The markers cover the deck’s retired list and the old wording of rows it marks
 | Joveen closer look | The pass, then three points, each a bold result and its cause: **Page load, cut by 40%** · Cut page load by 40% by refactoring React components and lazy-loading assets. **Key API p95, 520 ms → 230 ms** · Added indexes and rewrote slow queries, starting with the API that mattered most. **Mobile retention, up 30%** · Fixed mobile layout and browser bugs found by a cross-browser testing pipeline. | changed: the bare “−40% page load” becomes three explained results, in the form of BNP’s pins (#283) |
 | Optegra row | Marketing executive · Sep 2021 – Aug 2024 | kept |
 | Optegra closer look | The pass, then: **Core Web Vitals pass rate, 62% → 88%** · Scoped performance fixes with the engineers and ticketed them. **p95 page load, cut by 30%** · The same scoped, ticketed fixes. **Where the switch started** · The best part of the job was working with the engineers who built our website. | changed: three points (#283). Its 15% conversion is How I work’s Measure proof, so it isn’t repeated here |
-| History at uni row | Before 2021 · Because I loved it, and I still do. | kept |
-| History at uni closer look | University of Essex · Diploma of Higher Education, History · Jul 2021 | new: from the Résumé’s education |
 | Where I’m headed: heading and line | Where I’m headed · Building a whole product well: what to make, why it works, and getting it to production. How far I’ve got on each. | changed: the aim as a job, not a feeling (#283) |
 | Strand rows (title · line) | Knowing what’s worth building. · Judgement · Knowing why it works, not just that it does. · Depth · The whole way, from idea to running in production. · Range | kept (the bars’ titles and labels) |
 | Strand closer looks | So far · {Optegra / BNP Paribas / Threshold}, then its “So far” line from today’s Where I’m headed | kept |

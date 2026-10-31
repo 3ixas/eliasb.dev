@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import { CalendarTile } from "@/components/quiet/calendar-tile";
 import { CloserLookRoot } from "@/components/quiet/closer-look-root";
 import { FullPass, MiniPass, PassPins } from "@/components/quiet/finished-pass";
 import { Row } from "@/components/quiet/row";
@@ -7,7 +6,6 @@ import { roleStories } from "@/content/stretch/role-stories";
 import { passRecords } from "@/content/stretch/staff-pass";
 import { shownSource, work, type Employer } from "@/content/stretch/work";
 
-const historyId = "history-at-uni";
 const strandId = (label: string) => `strand-${label.toLowerCase()}`;
 
 /** What an employer's closer look says beyond its row, as the text the row's accessible description reads. */
@@ -30,18 +28,6 @@ function EmployerLook({ employer }: { employer: Employer }) {
   );
 }
 
-/** History at uni's closer look: a note that unfolds, with the diploma. */
-function NoteLook() {
-  const { school, course, date } = work.history.note;
-  return (
-    <div className="qi-note">
-      <strong className="qi-note__school">{school}</strong>
-      <span>{course}</span>
-      <span className="qi-note__date stretch-mono">{date}</span>
-    </div>
-  );
-}
-
 /** A strand's closer look: "So far" with its source, its thread drawing down from the source. */
 function StrandLook({ bar }: { bar: (typeof work.headed.bars)[number] }) {
   const source = shownSource(bar.source);
@@ -60,17 +46,16 @@ function StrandLook({ bar }: { bar: (typeof work.headed.bars)[number] }) {
 function workLooks() {
   return {
     ...Object.fromEntries(work.employers.map((employer) => [employer.slug, <EmployerLook key={employer.slug} employer={employer} />])),
-    [historyId]: <NoteLook />,
     ...Object.fromEntries(work.headed.bars.map((bar) => [strandId(bar.label), <StrandLook key={bar.label} bar={bar} />])),
   };
 }
 
 /**
- * The body of the Work section (GLOSSARY.md): a row for each employer, History at uni, then Where I'm headed
+ * The body of the Work section (GLOSSARY.md): a row for each employer, then Where I'm headed
  * with its three strand rows. The server renders all of it; the controller shows the closer looks.
  */
 export function Work() {
-  const { headed, history } = work;
+  const { headed } = work;
   return (
     <CloserLookRoot looks={workLooks()} className="qi-column">
       <h2 id="work-heading" className="qi-title">
@@ -91,12 +76,6 @@ export function Work() {
             />
           );
         })}
-        <Row
-          object={<CalendarTile number="21" />}
-          title={history.title}
-          line={history.line}
-          look={{ id: historyId, description: `${history.note.school}. ${history.note.course}. ${history.note.date}.` }}
-        />
       </ul>
 
       <div role="group" aria-labelledby="headed-heading" className="qi-group">
