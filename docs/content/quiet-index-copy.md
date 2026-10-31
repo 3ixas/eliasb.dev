@@ -82,9 +82,9 @@ The engines' look is also described as: “Illustrative simulated paths fanning 
 | Where | Copy | Status |
 |---|---|---|
 | Note | What my own time looks like this week. | kept |
+| GitHub year | GitHub, the past year · {1,726} contributions in the past year · Less / More · {12} contributions on {3 June} | kept (the sketch said "last year"); "Less / More" replaces "Quiet / Busy" to match GitHub's own key |
 | Training row | {Assault bike intervals} · Today’s session, from my training week | changed: replaces the sketch's "Today, from my training week" |
 | Training closer look | The week, today in cobalt · Out on a run, central London. | changed: “Zone 2 means slow on purpose.” is dropped (Elias, 28 October 2026) |
-| GitHub year | GitHub, the past year · {1,726} contributions in the past year · Less / More · {12} contributions on {3 June} | kept (the sketch said "last year"); "Less / More" replaces "Quiet / Busy" to match GitHub's own key |
 | Source marks (live) | Live from Goodreads · Live from Letterboxd · Live from GitHub · Live from Wikipedia | new |
 | Source marks (saved data gone stale) | From Goodreads, as of {date} (and so on) | new: built on the approved "as of {date}" |
 | Book row | {Dark Age} · Now reading · {Pierce Brown} | kept |

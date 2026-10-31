@@ -172,7 +172,7 @@ export default async function OffTheClockFixtures() {
           </div>
         ))}
         <div data-fixture="layout" className="stretch-section">
-          <OffTheClockList entries={[trainingEntry(), githubEntry(github({ state: "curated" }), now), bookEntry(reading({}), now), filmEntry(diary({}), now), historyEntry(savedHistorySignal()), makingEntry(latest({}))]} />
+          <OffTheClockList entries={[githubEntry(github({ state: "curated" }), now), trainingEntry(), bookEntry(reading({}), now), filmEntry(diary({}), now), historyEntry(savedHistorySignal()), makingEntry(latest({}))]} />
         </div>
       </main>
     </div>

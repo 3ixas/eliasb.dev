@@ -11,7 +11,7 @@ import { work } from "@/content/stretch/work";
  * The site as Markdown, for people and agents who would rather read text than a page: `/index.md` is the homepage, and
  * `/llms.txt` is the short index that points at it and the pages under it (the llms.txt convention, https://llmstxt.org).
  * Both are built from the same typed content the pages are, so they cannot drift from them. Only what is authored goes in:
- * the live signals (the book, the film, the history row, the GitHub year, Now making) are on the page, which says where
+ * the live signals (the GitHub year, the book, the film, the history row, Now making) are on the page, which says where
  * they come from.
  */
 export const siteUrl = "https://www.eliasb.dev";
@@ -75,11 +75,11 @@ export function homepageMarkdown(): string {
     "",
     `## ${offTheClock.heading}`,
     "",
-    `${offTheClock.note} My training week:`,
+    `${offTheClock.note} The section opens with my GitHub year, then my training week:`,
     "",
     ...week,
     "",
-    `The page also shows what I am reading, the last film I watched, an odd fact from this week in history, my GitHub year and what I am making now, live from ${offTheClock.reading.sourceName}, ${offTheClock.watched.sourceName}, ${offTheClock.curiosity.sourceName} and GitHub.`,
+    `The page also shows what I am reading, the last film I watched, an odd fact from this week in history and what I am making now, live from ${offTheClock.reading.sourceName}, ${offTheClock.watched.sourceName}, ${offTheClock.curiosity.sourceName} and GitHub.`,
     "",
     "## Say hello",
     "",

@@ -16,7 +16,7 @@ export async function OffTheClock() {
     getGitHubSignal(),
   ]);
   return (
-    <OffTheClockList entries={[trainingEntry(), githubEntry(github, now), bookEntry(reading, now), filmEntry(film, now), historyEntry(history), makingEntry(latest)]}>
+    <OffTheClockList entries={[githubEntry(github, now), trainingEntry(), bookEntry(reading, now), filmEntry(film, now), historyEntry(history), makingEntry(latest)]}>
       <h2 id="off-the-clock-heading" className="qi-title">
         {offTheClock.heading}
       </h2>
