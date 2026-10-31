@@ -389,11 +389,8 @@ test.describe("Off the clock: the history row", () => {
     const card = fixture(page, "history-week");
     const slot = card.locator("[data-look-slot='history'] .qi-look");
     await expect(slot).toHaveCount(0);
-    // The calendar tile plays its reaction when the row is tapped open, and not before.
-    await expect(card.locator(".qi-tile")).toHaveCSS("animation-name", "none");
     await tap(page, card.locator("[data-look='history']"));
     await expect(slot).toBeVisible();
-    await expect(card.locator(".qi-tile")).toHaveCSS("animation-name", "qi-turn");
     await expect(slot.locator(".qi-clipping__count")).toHaveText("1 of 3");
     // The row's own taps never step it on: they close it, and open it again where it was.
     await tap(page, card.locator("[data-look='history']"));

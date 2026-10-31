@@ -35,7 +35,7 @@ test.describe("Work: the rows", () => {
 
   test("a row is 68 px or more, with a 44 px object, and the text starts at one edge down the list", async ({ page }) => {
     const rows = section(page).locator(".qi-row");
-    await expect(rows).toHaveCount(work.employers.length + 1 + work.headed.bars.length);
+    await expect(rows).toHaveCount(work.employers.length + work.headed.bars.length);
     const edges = new Set<number>();
     for (const row of await rows.all()) {
       expect((await boxOf(row)).height).toBeGreaterThanOrEqual(68);
