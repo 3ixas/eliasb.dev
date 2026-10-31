@@ -39,9 +39,9 @@ const paths = (() => {
   });
 })();
 
-/** "pricing and risk engines": simulated paths on graph paper, fanning out from one level, with the caption that says they are illustrative. */
+/** "pricing and risk engines": simulated paths on graph paper, fanning out from one level, that the word's accessible description says are illustrative. */
 function Simulation() {
-  const { caption, note } = opening.looks.engines;
+  const { caption } = opening.looks.engines;
   return (
     <figure className="qi-sim">
       <svg viewBox={`0 0 ${SIM.width} ${SIM.height}`} aria-hidden="true">
@@ -49,9 +49,7 @@ function Simulation() {
           <path key={d} d={d} className="qi-sim__path" data-highlight={index === HIGHLIGHT ? "" : undefined} style={{ "--i": index } as CSSProperties} />
         ))}
       </svg>
-      <figcaption>
-        {caption} <em>{note}</em>
-      </figcaption>
+      <figcaption>{caption}</figcaption>
     </figure>
   );
 }

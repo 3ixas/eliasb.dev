@@ -139,14 +139,16 @@ for (const [name, runs, text] of [["headline", opening.headlineRuns, opening.hea
 }
 
 // The reveal words are the deck's, in reading order, each with the closer look the deck describes.
-const reveals = Object.fromEntries(rows(raw, "### Quiet index · The reveal words in the opening").map(([word, caption]) => [word, caption.replaceAll("*", "")]));
+const revealRows = rows(raw, "### Quiet index · The reveal words in the opening");
+const reveals = Object.fromEntries(revealRows.map(([word, caption]) => [word, caption.replaceAll("*", "")]));
 assert.deepEqual(
   [...opening.headlineRuns, ...opening.supportRuns].filter((run) => run.mark && run.mark !== "employer" && run.mark !== "emphasis").map((run) => run.text),
   Object.keys(reveals),
   "The opening's reveal words are the deck's",
 );
 const { engines, cores, digitisation, ownership } = opening.looks;
-assert.equal(`${engines.caption} · ${engines.note}`, reveals["pricing and risk engines"], "The simulation's caption says the paths are illustrative");
+assert.equal(engines.caption, reveals["pricing and risk engines"], "The simulation's caption");
+assert.ok(raw.includes(`The engines' look is also described as: “${engines.alt}”`), "The deck gives the simulation's accessible description, which says the paths are illustrative");
 assert.equal(cores.caption, reveals["CPU and GPU"], "The cores' caption");
 assert.equal(
   `${digitisation.pin.label} · ${digitisation.pin.detail}, then: ${digitisation.line} Bars: ${digitisation.bars.map((bar) => bar.label).join(" · ")}`,

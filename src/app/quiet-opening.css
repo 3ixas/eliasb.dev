@@ -261,11 +261,6 @@
   line-height: 1.4;
 }
 
-.qi-sim em {
-  display: block;
-  margin-top: 4px;
-}
-
 /* ---------- "CPU and GPU": a few cores taking turns, and many lighting at once ---------- */
 
 .qi-cores {
