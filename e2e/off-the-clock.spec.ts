@@ -49,14 +49,14 @@ async function openLook(page: Page, name: string, id: string) {
 }
 
 test.describe("Off the clock: on the homepage", () => {
-  test("training, the GitHub year, the book, the film, the history row and Now making are in the list under the note, in that order", async ({ page }) => {
+  test("the GitHub year, training, the book, the film, the history row and Now making are in the list under the note, in that order", async ({ page }) => {
     await page.goto("/");
     const section = page.locator("#off-the-clock");
     await expect(section.getByRole("heading", { level: 2, name: offTheClock.heading, exact: true })).toHaveCSS("font-size", "17px");
     await expect(section.locator(".qi-note-line")).toHaveText(offTheClock.note);
     const order = await section.locator(".qi-list [data-otc]").evaluateAll((items) => items.map((item) => item.getAttribute("data-otc")));
     // The GitHub year and Now making come down when GitHub cannot be reached, and the fixtures cover that.
-    const full = ["training", "github", "reading", "film", "history", "making"];
+    const full = ["github", "training", "reading", "film", "history", "making"];
     expect(order).toEqual(full.filter((item) => order.includes(item)));
     expect(order.length).toBeGreaterThanOrEqual(4);
     await expect(section.locator("details, summary, .stretch-otc")).toHaveCount(0);
@@ -529,11 +529,13 @@ test.describe("Off the clock: the GitHub year", () => {
 
   const totalOf = async (card: Locator) => /: ([\d,]+)\.$/.exec((await card.locator("[data-github-days]").getAttribute("aria-label"))!)![1];
 
-  test("sits second in the list, between training and the book, and is not a row", async ({ page }) => {
+  test("sits first in the list, before training, and is not a row", async ({ page }) => {
     const items = fixture(page, "layout").locator(".qi-list > li");
-    await expect(items.nth(1)).toHaveAttribute("data-otc", "github");
-    await expect(items.nth(1).locator(".qi-row")).toHaveCount(0);
-    await expect(items.nth(2)).toHaveAttribute("data-otc", "reading");
+    await expect(items).toHaveCount(6);
+    expect(await items.evaluateAll((all) => all.map((item) => item.getAttribute("data-otc")))).toEqual(["github", "training", "reading", "film", "history", "making"]);
+    // The year is the only item that is not a row.
+    await expect(items.first().locator(".qi-row")).toHaveCount(0);
+    for (const item of (await items.all()).slice(1)) await expect(item.locator(".qi-row")).toHaveCount(1);
     const day = (await fixture(page, "layout").locator("[data-github-days] button").first().boundingBox())!;
     expect(day.width).toBeGreaterThanOrEqual(6);
   });

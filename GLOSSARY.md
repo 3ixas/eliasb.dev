@@ -99,7 +99,7 @@ The homepage section for Elias's own projects: **Featured work** above the **Pro
 _Avoid_: Work (that means employment), On my own
 
 **Off the clock**:
-The homepage section for Elias's own time: his training week, what he is reading and last watched, the weekly history clipping, **Now making**, and his GitHub contributions. Each item is a **Live signal** with a fallback.
+The homepage section for Elias's own time: his GitHub contributions first, then his training week, what he is reading and last watched, the weekly history clipping and **Now making**. Each item is a **Live signal** with a fallback.
 _Avoid_: Library, Personal signals, Board
 
 **Now making**:

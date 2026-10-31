@@ -58,7 +58,7 @@ The live site, at the top of this page. One 600 px reading column, one 300 px ma
 
 `/about` redirects to `/#work`, and `/lab` and `/library` redirect to `/#off-the-clock`, so old links keep working.
 
-**Off the clock** is the only section driven by outside data. It shows my training week (authored), what I'm reading (Goodreads), what I last watched (Letterboxd), a curiosity from this week in history (Wikipedia's "On this day" feeds), what I'm making now, and a year of my GitHub contributions.
+**Off the clock** is the only section driven by outside data. It opens with a year of my GitHub contributions, then shows my training week (authored), what I'm reading (Goodreads), what I last watched (Letterboxd), a curiosity from this week in history (Wikipedia's "On this day" feeds), and what I'm making now.
 
 ## Stack
 

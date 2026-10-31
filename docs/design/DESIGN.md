@@ -166,7 +166,7 @@ One header on every page, in the same place, so following a row never moves it. 
 3. **Work**: BNP Paribas, Joveen, Optegra. Then **Where I'm headed**: its line, and three strand rows (Judgement, Depth, Range).
 4. **Things I make**: the three featured projects, the other projects newest first (at most ten), and the link to the Work archive with the true count.
 5. **How I work**: four habit rows with the pen (real problem, write it down, safe to undo, measure), then Threshold's PRD.
-6. **Off the clock**: today's training, the GitHub year, the book, the film, the history row and Now making.
+6. **Off the clock**: the GitHub year, then today's training, the book, the film, the history row and Now making. The GitHub year is first and is not a row; every item after it is.
 7. **Say hello**: the line, the email with Copy, then Résumé, GitHub and LinkedIn. The page ends here: **no page has a footer** ("Made by Elias" is retired). Each page ends on its own last content, with 80 to 128 px of room below it.
 
 Anchors stay `#work`, `#things-i-make`, `#how-i-work`, `#off-the-clock` and `#say-hello`, so the redirects, the 404's rows and each Role story's "← Work" keep working.
