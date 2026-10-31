@@ -58,11 +58,11 @@ export const opening = {
     ["digitisation competition", "digitisation"],
     ["Take Ownership award", "ownership"],
   ]),
-  /** What each reveal word's closer look says beyond the sentence. The paths' note is the caption the copy pass added (#282). */
+  /** What each reveal word's closer look says beyond the sentence. The paths' `alt` says they are illustrative; it is read in the word's accessible description and shown nowhere (#349). */
   looks: {
     engines: {
       caption: "The engines run large simulation-based calculations across several asset classes.",
-      note: "Illustrative paths, not real prices.",
+      alt: "Illustrative simulated paths fanning out from one level, with one highlighted in green.",
     },
     cores: { caption: "The same tests had to run on both CPU and GPU." },
     digitisation: {
@@ -80,7 +80,7 @@ export const opening = {
 
 /** What each reveal word's closer look says beyond the sentence, as the text its accessible description reads. */
 export const revealDescription: Record<RevealId, string> = {
-  engines: `${opening.looks.engines.caption} ${opening.looks.engines.note}`,
+  engines: `${opening.looks.engines.caption} ${opening.looks.engines.alt}`,
   cores: opening.looks.cores.caption,
   digitisation: `${opening.looks.digitisation.pin.label}. ${opening.looks.digitisation.pin.detail}. ${opening.looks.digitisation.line}`,
   ownership: opening.looks.ownership.certificate.caption,

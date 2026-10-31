@@ -230,10 +230,12 @@ The markers cover the deck’s retired list and the old wording of rows it marks
 
 | Word | Closer look caption | Status |
 | --- | --- | --- |
-| pricing and risk engines | The engines run large simulation-based calculations across several asset classes. · *Illustrative paths, not real prices.* | kept, plus a new line, as agreed in [#282](https://github.com/3ixas/eliasb.dev/issues/282) |
+| pricing and risk engines | The engines run large simulation-based calculations across several asset classes. | kept. The line "Illustrative paths, not real prices." was removed on 31 October 2026 ([#349](https://github.com/3ixas/eliasb.dev/issues/349)) |
 | CPU and GPU | The same tests had to run on both CPU and GPU. | kept (from the Role story) |
 | digitisation competition | Winner · Digitisation · 2025, then: Led a team of four to win the bank’s digitisation competition, co-building a dashboard that cut a 30–40 minute data load to under 5. Bars: **30–40 min** · **Under 5** | changed: the Résumé line without “Early Careers”; the bar labels are new |
 | Take Ownership award | Take Ownership · _nology · Q1 2026 · awarded May 2026 | kept (the certificate’s caption) |
+
+The engines' look is also described as: “Illustrative simulated paths fanning out from one level, with one highlighted in green.” Screen readers read it with the caption; nothing shows it on screen.
 
 ### Quiet index · Off the clock
 

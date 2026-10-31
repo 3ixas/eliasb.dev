@@ -15,7 +15,7 @@ const words = [...opening.headlineRuns, ...opening.supportRuns].flatMap((run) =>
 const { engines, cores, digitisation, ownership } = opening.looks;
 /** What each word's accessible description must contain: the caption its closer look shows, which is also the row-free way to read it. */
 const described: Record<RevealId, string> = {
-  engines: `${engines.caption} ${engines.note}`,
+  engines: `${engines.caption} ${engines.alt}`,
   cores: cores.caption,
   digitisation: digitisation.line,
   ownership: ownership.certificate.caption,
@@ -112,8 +112,7 @@ test.describe("On wide screens: the margin", () => {
       expect(await look.locator(".qi-sim__path").count(), "a fan of paths").toBeGreaterThanOrEqual(10);
       await expect(look.locator(".qi-sim__path[data-highlight]")).toHaveCount(1);
       await expect(look.locator(".qi-sim__path[data-highlight]")).toHaveCSS("stroke", BNP_GREEN);
-      await expect(look.locator("figcaption")).toHaveText(`${engines.caption} ${engines.note}`);
-      await expect(look.locator("figcaption")).toContainText("Illustrative paths, not real prices.");
+      await expect(look.locator("figcaption")).toHaveText(engines.caption);
     },
     cores: async (look) => {
       await expect(look.locator(".qi-chip--cpu .qi-core")).toHaveCount(4);

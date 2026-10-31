@@ -302,7 +302,7 @@ Elias agreed these on 26 October 2026, when the draft was reviewed:
 
 1. **The amber stays**, as `--sun`, only in the greeting's illustration (the lamp and the clock, since the sun left).
 2. **Navigation**: quiet section links in the desktop header, and no phone menu. The release check's five navigation targets and labels stay.
-3. **The simulation gets a caption** saying the paths are illustrative, worded in the copy pass ([#281](https://github.com/3ixas/eliasb.dev/issues/281)).
+3. **The simulation says it is illustrative in its accessible description**, not in a visible line ([#349](https://github.com/3ixas/eliasb.dev/issues/349); the caption added in [#281](https://github.com/3ixas/eliasb.dev/issues/281) was removed).
 4. **This file was the contract** for the homepage and shell only, as `QUIET-INDEX.md`. On 26 October 2026 the inner pages joined it ([#301](https://github.com/3ixas/eliasb.dev/issues/301)), and it became `DESIGN.md`, the one contract for the site.
 
 ## Exploration record
