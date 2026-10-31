@@ -21,9 +21,9 @@ test.describe("Work: the rows", () => {
     await page.goto("/");
   });
 
-  test("three employers, newest first, each a row linking to its Role story, then History at uni", async ({ page }) => {
+  test("three employers, newest first, each a row linking to its Role story", async ({ page }) => {
     const items = section(page).locator(".qi-list").first().locator(".qi-row");
-    await expect(items).toHaveCount(work.employers.length + 1);
+    await expect(items).toHaveCount(work.employers.length);
     for (const [index, { slug }] of work.employers.entries()) {
       const row = items.nth(index);
       await expect(row).toHaveJSProperty("tagName", "A");
@@ -31,14 +31,11 @@ test.describe("Work: the rows", () => {
       await expect(row.locator(".qi-row__title")).toHaveText(passRecords[slug].short);
       await expect(row.locator(".qi-row__line")).toHaveText(`${roleStories[slug].role} · ${roleStories[slug].dates}`.replaceAll(" · ", " · "));
     }
-    const history = items.last();
-    await expect(history.locator(".qi-row__title")).toHaveText(work.history.title);
-    await expect(history.locator(".qi-row__line")).toHaveText(work.history.line.replaceAll(" · ", " · "));
   });
 
   test("a row is 68 px or more, with a 44 px object, and the text starts at one edge down the list", async ({ page }) => {
     const rows = section(page).locator(".qi-row");
-    await expect(rows).toHaveCount(work.employers.length + 1 + work.headed.bars.length);
+    await expect(rows).toHaveCount(work.employers.length + work.headed.bars.length);
     const edges = new Set<number>();
     for (const row of await rows.all()) {
       expect((await boxOf(row)).height).toBeGreaterThanOrEqual(68);
@@ -50,9 +47,9 @@ test.describe("Work: the rows", () => {
     expect(edges.size, "every row's text starts at the same edge").toBe(1);
   });
 
-  test("only the employer rows are links; History and the strands take focus because they have closer looks", async ({ page }) => {
+  test("only the employer rows are links; the strands take focus because they have closer looks", async ({ page }) => {
     await expect(section(page).getByRole("link")).toHaveCount(work.employers.length);
-    for (const id of ["history-at-uni", ...strandIds]) {
+    for (const id of strandIds) {
       await expect(rowFor(page, id)).toHaveAttribute("tabindex", "0");
       await expect(rowFor(page, id).getByRole("link")).toHaveCount(0);
     }
@@ -240,17 +237,17 @@ test.describe("Work: the margin", () => {
   });
 
   test("focus shows it the same way; Escape hides it and focus stays on the row", async ({ page }) => {
-    const row = rowFor(page, "history-at-uni");
+    const row = rowFor(page, strandIds[0]);
     await row.scrollIntoViewIfNeeded();
     await row.focus();
     await expect(margin(page)).toBeVisible();
-    await expect(margin(page).locator(".qi-note")).toContainText(work.history.note.school);
+    await expect(margin(page).locator(".qi-strand")).toContainText(work.headed.bars[0].soFar.text);
     await page.keyboard.press("Escape");
     await expect(margin(page)).toHaveCount(0);
     await expect(row).toBeFocused();
     await page.keyboard.press("Tab");
-    await expect(rowFor(page, strandIds[0])).toBeFocused();
-    await expect(margin(page).locator(".qi-strand")).toContainText(work.headed.bars[0].soFar.text);
+    await expect(rowFor(page, strandIds[1])).toBeFocused();
+    await expect(margin(page).locator(".qi-strand")).toContainText(work.headed.bars[1].soFar.text);
     await page.evaluate(() => (document.activeElement as HTMLElement).blur());
     await expect(margin(page)).toHaveCount(0);
   });
@@ -279,7 +276,7 @@ test.describe("Work: the margin", () => {
   });
 
   test("a focused row keeps its closer look when the pointer crosses the column", async ({ page }) => {
-    const row = rowFor(page, "history-at-uni");
+    const row = rowFor(page, strandIds[0]);
     await row.scrollIntoViewIfNeeded();
     await row.focus();
     await expect(margin(page)).toBeVisible();
@@ -289,7 +286,7 @@ test.describe("Work: the margin", () => {
   });
 
   test("a focused row keeps its closer look when the pointer visits that row and leaves the column", async ({ page }) => {
-    const row = rowFor(page, "history-at-uni");
+    const row = rowFor(page, strandIds[0]);
     await row.scrollIntoViewIfNeeded();
     await row.focus();
     await expect(margin(page)).toBeVisible();
@@ -297,7 +294,7 @@ test.describe("Work: the margin", () => {
     await page.mouse.move(5, 5);
     await page.waitForTimeout(300);
     await expect(margin(page)).toBeVisible();
-    await expect(margin(page).locator(".qi-note")).toBeVisible();
+    await expect(margin(page).locator(".qi-strand")).toBeVisible();
   });
 
   test("every employer's closer look is its pass and three enamel Pass pins with glyphs, in one form", async ({ page }) => {
@@ -345,9 +342,9 @@ test.describe("Work: the margin", () => {
     await expect(margin(page).locator(".qi-look")).toHaveCSS("animation-duration", "0.2s");
     await expect(margin(page).locator(".qi-pass")).toHaveCSS("animation-name", "none");
     await expect(margin(page).locator(".qi-pins__item").first()).toHaveCSS("animation-name", "none");
-    for (const [id, kind] of [["history-at-uni", ".qi-note"], [strandIds[0], ".qi-strand__thread"]] as const) {
+    for (const id of strandIds) {
       await rowFor(page, id).hover();
-      await expect(margin(page).locator(kind)).toHaveCSS("animation-name", "none");
+      await expect(margin(page).locator(".qi-strand__thread")).toHaveCSS("animation-name", "none");
     }
   });
 
@@ -365,7 +362,7 @@ test.describe("Work: narrower than the margin", () => {
 
   test("no margin appears when a row is focused or hovered", async ({ page }) => {
     await page.goto("/");
-    await rowFor(page, "history-at-uni").focus();
+    await rowFor(page, strandIds[0]).focus();
     await rowFor(page, "bnp-paribas").hover();
     await expect(margin(page)).toHaveCount(0);
   });

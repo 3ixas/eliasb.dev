@@ -640,54 +640,6 @@
   list-style: none;
 }
 
-/* ---------- the note: paper that unfolds ---------- */
-
-.qi-note {
-  position: relative;
-  display: grid;
-  gap: 4px;
-  padding: 18px 18px 20px;
-  border-radius: 6px;
-  background: light-dark(#fffdf6, #26262f);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.4),
-    0 1px 1px rgb(0 0 0 / 0.2),
-    0 8px 18px -8px rgb(0 0 0 / 0.35);
-  font-size: var(--text-small);
-  line-height: 1.4;
-  transform-origin: 50% 0;
-  animation: qi-unfold 0.6s var(--out) both;
-}
-
-/* The fold crease, and the folded corner. */
-.qi-note::before {
-  content: "";
-  position: absolute;
-  inset: 50% 0 auto;
-  height: 1px;
-  background: rgb(0 0 0 / 0.1);
-}
-
-.qi-note::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 16px;
-  height: 16px;
-  border-radius: 6px 0;
-  background: linear-gradient(315deg, var(--stretch-page) 50%, rgb(0 0 0 / 0.12) 50%);
-}
-
-.qi-note__school {
-  font-weight: 650;
-}
-
-.qi-note__date {
-  color: var(--stretch-muted);
-  font-size: var(--text-label);
-}
-
 @keyframes qi-unfold {
   from {
     opacity: 0;
@@ -1375,7 +1327,6 @@
   .qi-pass,
   .qi-project,
   .qi-pins__item,
-  .qi-note,
   .qi-strand__thread,
   .qi-inline:has(> .qi-inline__in) {
     animation: none;

@@ -181,9 +181,9 @@ const copyFor = (name) => {
   return raw.slice(start, end === -1 ? undefined : start + 1 + end);
 };
 
-// Work: the employers' closer looks, Where I'm headed and History at uni, word for word.
+// Work: the employers' closer looks and Where I'm headed, word for word.
 const bullet = (text, label) => text.match(new RegExp(`^- ${label}: (.+)$`, "m"))?.[1];
-const { headed, history } = work;
+const { headed } = work;
 
 const workCopy = copyFor("Quiet index · Work");
 const workRows = Object.fromEntries(rows(workCopy, "### ").map(([where, copy]) => [where, copy]));
@@ -194,8 +194,6 @@ for (const { slug, pins } of work.employers) {
   assert.equal(`${story.role} · ${story.dates}`, workRows[`${passRecords[slug].short} row`], `${slug}: the row's line is its Role story's role and dates`);
   assert.equal(pins.length, 3, `${slug}: three Pass pins`);
 }
-assert.equal(`${history.line}`, workRows["History at uni row"], "History at uni: row");
-assert.equal(`${history.note.school} · ${history.note.course} · ${history.note.date}`, workRows["History at uni closer look"], "History at uni: closer look");
 assert.ok(workRows["Where I’m headed: heading and line"].includes(`${headed.heading} · ${headed.line}`), "Where I’m headed: heading and line");
 
 const headedCopy = copyFor("Where I’m headed");
@@ -209,7 +207,6 @@ assert.deepEqual(
 
 const gotHereCopy = copyFor("How I got here");
 assert.equal(work.note, bullet(gotHereCopy, "Note"), "Work: note");
-assert.equal(history.line, rows(gotHereCopy, "### ").map(([dates, , note]) => `${dates} · ${note}`)[0], "History");
 assert.equal(work.heading, bullet(raw.slice(raw.indexOf("## Work\n")), "Heading"), "Work: heading");
 
 // Every link goes to a Role story or Case study that exists, and every "So far" restates a fact its source tells.
