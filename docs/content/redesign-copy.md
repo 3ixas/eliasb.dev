@@ -58,16 +58,16 @@ The homepage section straight after the hero, led by employment ([#157](https://
 
 ### Where I’m headed
 
-Three strands (#211, settled on the map on 16 October 2026), shown as rows. Each says what “good” means; its “So far” is its closer look, and restates a fact already in a Role story or Case study, checked by `verify:copy`. The Optegra line says “guided”, as the Optegra Role story does (the prototype said “decided”).
+Three strands (#211, settled on the map on 16 October 2026), shown as rows. Each says what it takes to be the product engineer the line names (#352); its “So far” is its closer look, and restates a fact already in a Role story or Case study, checked by `verify:copy`. The Optegra line says “guided”, as the Optegra Role story does (the prototype said “decided”).
 
 - Heading: Where I’m headed
 - Tag: So far
 
 | Bar | Title | So far | Link |
 | --- | --- | --- | --- |
-| Judgement | Knowing what’s worth building. | At Optegra, split tests and dashboards guided what the engineers built next. | The Optegra story → |
-| Depth | Knowing why it works, not just that it does. | Six months from zero C# to production code, in a pricing engine of around 70 projects. | The BNP Paribas story → |
-| Range | The whole way, from idea to running in production. | Threshold, from 57 user stories to a live site. | The Threshold case study → |
+| Judgement | Close enough to users to know what’s worth building. | At Optegra, split tests and dashboards guided what the engineers built next. | The Optegra story → |
+| Depth | Knowing it well enough that people can rely on it. | Six months from zero C# to production code, in a pricing engine of around 70 projects. | The BNP Paribas story → |
+| Range | All the way, from first idea to how it gets used. | Threshold, from 57 user stories to a live site. | The Threshold case study → |
 
 ### How I got here
 
@@ -192,8 +192,8 @@ The markers cover the deck’s retired list and the old wording of rows it marks
 | Joveen closer look | The pass, then three points, each a bold result and its cause: **Page load, cut by 40%** · Cut page load by 40% by refactoring React components and lazy-loading assets. **Key API p95, 520 ms → 230 ms** · Added indexes and rewrote slow queries, starting with the API that mattered most. **Mobile retention, up 30%** · Fixed mobile layout and browser bugs found by a cross-browser testing pipeline. | changed: the bare “−40% page load” becomes three explained results, in the form of BNP’s pins (#283) |
 | Optegra row | Marketing executive · Sep 2021 – Aug 2024 | kept |
 | Optegra closer look | The pass, then: **Core Web Vitals pass rate, 62% → 88%** · Scoped performance fixes with the engineers and ticketed them. **p95 page load, cut by 30%** · The same scoped, ticketed fixes. **Where the switch started** · The best part of the job was working with the engineers who built our website. | changed: three points (#283). Its 15% conversion is How I work’s Measure proof, so it isn’t repeated here |
-| Where I’m headed: heading and line | Where I’m headed · Building a whole product well: what to make, why it works, and getting it to production. How far I’ve got on each. | changed: the aim as a job, not a feeling (#283) |
-| Strand rows (title · line) | Knowing what’s worth building. · Judgement · Knowing why it works, not just that it does. · Depth · The whole way, from idea to running in production. · Range | kept (the bars’ titles and labels) |
+| Where I’m headed: heading and line | Where I’m headed · I’m working towards being a product engineer, turning new ideas into software people use every day. Three things that takes, and how far I’ve got on each. | changed: the product engineer it’s aiming for (#352) |
+| Strand rows (title · line) | Close enough to users to know what’s worth building. · Judgement · Knowing it well enough that people can rely on it. · Depth · All the way, from first idea to how it gets used. · Range | changed: the titles, for a product engineer (#352); the labels kept |
 | Strand closer looks | So far · {Optegra / BNP Paribas / Threshold}, then its “So far” line from today’s Where I’m headed | kept |
 
 ### Quiet index · Things I make
