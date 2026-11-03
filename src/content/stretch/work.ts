@@ -22,7 +22,7 @@ import { storyText } from "./story.ts";
 export type HeadedSource = { story: RoleStorySlug } | { project: CaseStudySlug };
 
 /**
- * A bar of the self-issued pass: a label, what "good" means as a title, and one
+ * A bar of the self-issued pass: a label, what it takes as a title, and one
  * fact already in a Role story or Case study as its "So far". `restates` lists
  * the phrases of that fact which the source must contain word for word; the
  * content check fails when one is missing, so a "So far" cannot drift from its
@@ -141,12 +141,12 @@ export const work = {
   ] satisfies readonly Employer[],
   headed: {
     heading: "Where I’m headed",
-    line: "Building a whole product well: what to make, why it works, and getting it to production. How far I’ve got on each.",
+    line: "I’m working towards being a product engineer, turning new ideas into software people use every day. Three things that takes, and how far I’ve got on each.",
     soFar: "So far",
     bars: [
       {
         label: "Judgement",
-        title: "Knowing what’s worth building.",
+        title: "Close enough to users to know what’s worth building.",
         soFar: {
           text: "At Optegra, split tests and dashboards guided what the engineers built next.",
           restates: ["split tests and analytics dashboards", "guided what the engineers worked on next"],
@@ -155,7 +155,7 @@ export const work = {
       },
       {
         label: "Depth",
-        title: "Knowing why it works, not just that it does.",
+        title: "Knowing it well enough that people can rely on it.",
         soFar: {
           text: "Six months from zero C# to production code, in a pricing engine of around 70 projects.",
           restates: ["from zero C# to production code", "around 70 projects"],
@@ -164,7 +164,7 @@ export const work = {
       },
       {
         label: "Range",
-        title: "The whole way, from idea to running in production.",
+        title: "All the way, from first idea to how it gets used.",
         soFar: { text: "Threshold, from 57 user stories to a live site.", restates: ["57 user stories"] },
         source: { project: "threshold" },
       },

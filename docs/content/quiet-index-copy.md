@@ -38,8 +38,8 @@ Facts come only from the Role stories, `src/content/resume.ts` and the project c
 | Joveen closer look | The pass, then three points, each a bold result and its cause: **Page load, cut by 40%** · Cut page load by 40% by refactoring React components and lazy-loading assets. **Key API p95, 520 ms → 230 ms** · Added indexes and rewrote slow queries, starting with the API that mattered most. **Mobile retention, up 30%** · Fixed mobile layout and browser bugs found by a cross-browser testing pipeline. | changed: the bare "−40% page load" becomes three explained results, in the form of BNP's pins (#283) |
 | Optegra row | Marketing executive · Sep 2021 – Aug 2024 | kept |
 | Optegra closer look | The pass, then: **Core Web Vitals pass rate, 62% → 88%** · Scoped performance fixes with the engineers and ticketed them. **p95 page load, cut by 30%** · The same scoped, ticketed fixes. **Where the switch started** · The best part of the job was working with the engineers who built our website. | changed: three points (#283). Its 15% conversion is How I work's Measure proof, so it isn't repeated here |
-| Where I’m headed: heading and line | Where I’m headed · Building a whole product well: what to make, why it works, and getting it to production. How far I’ve got on each. | changed: the aim as a job, not a feeling (#283) |
-| Strand rows (title · line) | Knowing what’s worth building. · Judgement · Knowing why it works, not just that it does. · Depth · The whole way, from idea to running in production. · Range | kept (the bars' titles and labels) |
+| Where I’m headed: heading and line | Where I’m headed · I’m working towards being a product engineer, turning new ideas into software people use every day. Three things that takes, and how far I’ve got on each. | changed: the product engineer it’s aiming for (#352) |
+| Strand rows (title · line) | Close enough to users to know what’s worth building. · Judgement · Knowing it well enough that people can rely on it. · Depth · All the way, from first idea to how it gets used. · Range | changed: the titles, for a product engineer (#352); the labels kept |
 | Strand closer looks | So far · {Optegra / BNP Paribas / Threshold}, then the approved "So far" line | kept |
 
 ## Things I make
@@ -130,7 +130,7 @@ The decisions:
 - **The competition** is "the bank’s digitisation competition" everywhere, with no "Early Careers". Elias: it made him sound like a fresh graduate, which he isn't.
 - **Things I make:** the note is the archive's description, and Argus Risk's line now says what it is.
 - **Work:** Joveen and Optegra get three best points each.
-- **Where I'm headed** names the whole product.
+- **Where I'm headed** names the whole product. (Replaced on 3 November 2026 by the product engineer it's aiming for: #352.)
 - **How I work** has four habits.
 - **Off the clock:** the history row is framed as "some stranger than others".
 - **Say hello** has no question.
