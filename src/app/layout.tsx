@@ -1,6 +1,8 @@
 import { homeTitle, siteDescription, siteName } from "@/content/site";
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, JetBrains_Mono } from "next/font/google";
+import { Bricolage_Grotesque, DM_Mono, Geist_Mono, JetBrains_Mono } from "next/font/google";
+import { PrototypeTypeBar } from "@/components/prototype-type-bar";
+import "./prototype-type/proto-type.css";
 import "./base.css";
 import "./stretch-tokens.css";
 import "./stretch-type.css";
@@ -30,6 +32,11 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-jetbrains-mono",
 });
+
+const protoGeist = Geist_Mono({ subsets: ["latin"], variable: "--font-proto-geist", preload: false });
+const protoDm = DM_Mono({ subsets: ["latin"], weight: "400", variable: "--font-proto-dm", preload: false });
+// PROTOTYPE: picks apply before paint, from the URL, then from the last choice.
+const protoBootScript = `(function(){try{var q=new URLSearchParams(location.search),s=JSON.parse(localStorage.getItem("proto-type")||"{}");if(/^\\/(resume|prototype-type)/.test(location.pathname))return;["meta","bric","smooth","dots"].forEach(function(k){var v=q.get(k)||s[k];if(v)document.documentElement.setAttribute("data-proto-"+k,v)})}catch(e){}})()`;
 
 const isIndexable = process.env.SITE_INDEXABLE === "true";
 
@@ -90,12 +97,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       lang="en-GB"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${bricolage.variable} ${jetbrainsMono.variable}`}
+      className={`${bricolage.variable} ${jetbrainsMono.variable} ${protoGeist.variable} ${protoDm.variable}`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: siteBootScript }} />
+        <script dangerouslySetInnerHTML={{ __html: protoBootScript }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <PrototypeTypeBar />
+      </body>
     </html>
   );
 }

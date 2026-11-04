@@ -1,0 +1,56 @@
+/* PROTOTYPE, ticket "Which metadata typeface and Bricolage settings?". Never merge. Selectors work on <html> or a wrapper. */
+
+/* ---------- metadata face ---------- */
+[data-proto-meta="tuned"] .stretch-mono { letter-spacing: 0.01em; }
+[data-proto-meta="geist"] { --font-jetbrains-mono: var(--font-proto-geist); --font-mono: var(--font-proto-geist); }
+[data-proto-meta="dm"] { --font-jetbrains-mono: var(--font-proto-dm); --font-mono: var(--font-proto-dm); }
+[data-proto-meta="bricolage"] { --font-jetbrains-mono: var(--font-bricolage); --font-mono: var(--font-bricolage); }
+[data-proto-meta="bricolage"] .stretch-mono { font-variant-numeric: lining-nums tabular-nums; letter-spacing: 0.003em; }
+
+/* ---------- Bricolage settings: display, section titles, row titles, reading lines ---------- */
+[data-proto-bric="fine"] .qi-opening__line { font-variation-settings: "opsz" 96; font-weight: 600; letter-spacing: -0.02em; }
+[data-proto-bric="fine"] .qi-title { font-weight: 620; letter-spacing: -0.008em; }
+[data-proto-bric="fine"] .qi-row__title { font-weight: 570; letter-spacing: -0.008em; }
+[data-proto-bric="fine"] .qi-row__line,
+[data-proto-bric="fine"] .qi-opening__support { letter-spacing: -0.005em; }
+
+[data-proto-bric="quiet"] .qi-opening__line { font-weight: 540; letter-spacing: -0.025em; }
+[data-proto-bric="quiet"] .qi-title { font-weight: 580; letter-spacing: -0.008em; }
+[data-proto-bric="quiet"] .qi-row__title { font-weight: 500; letter-spacing: -0.006em; }
+[data-proto-bric="quiet"] .qi-row__line,
+[data-proto-bric="quiet"] .qi-opening__support { letter-spacing: -0.005em; }
+
+[data-proto-bric="narrow"] .qi-opening__line { font-stretch: 88%; font-weight: 620; letter-spacing: -0.02em; }
+[data-proto-bric="narrow"] .qi-title { font-stretch: 94%; font-weight: 620; letter-spacing: -0.005em; }
+[data-proto-bric="narrow"] .qi-row__title { font-stretch: 96%; font-weight: 570; letter-spacing: -0.005em; }
+[data-proto-bric="narrow"] .qi-row__line,
+[data-proto-bric="narrow"] .qi-opening__support { letter-spacing: -0.005em; }
+
+/* ---------- the review's two small type questions ---------- */
+html[data-proto-smooth="on"][data-lights="on"] { -webkit-font-smoothing: antialiased; }
+[data-proto-dots="on"] .qi-opening__line .qi-word { text-decoration-skip-ink: none; text-decoration-thickness: 2.5px; text-underline-offset: 6px; }
+
+/* ---------- the prototype's own furniture, in system type so it stays out of the test ---------- */
+.proto-bar {
+  position: fixed; z-index: 2147483000; left: 50%; bottom: calc(10px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+  display: grid; gap: 2px; width: min(340px, calc(100vw - 20px)); padding: 8px 10px; border-radius: 14px;
+  background: #111; color: #fff; font: 500 13px/1.3 -apple-system, system-ui, sans-serif; letter-spacing: 0;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.35);
+}
+.proto-bar[data-closed] { width: auto; padding: 4px; }
+.proto-bar__row { display: grid; grid-template-columns: 62px 40px 1fr 40px; align-items: center; min-height: 40px; }
+.proto-bar__row small { color: #aaa; font-size: 12px; }
+.proto-bar__row span { text-align: center; }
+.proto-bar button { min-height: 40px; min-width: 40px; border: 0; border-radius: 8px; background: transparent; color: inherit; font: inherit; cursor: pointer; touch-action: manipulation; }
+.proto-bar button:hover { background: #333; }
+.proto-bar__foot { display: flex; gap: 4px; justify-content: space-between; }
+.proto-bar__foot button[aria-pressed="true"] { background: #2b4bd6; }
+.proto-bar__foot button { padding-inline: 8px; font-size: 12px; }
+
+.proto-sheet { max-width: 1320px; margin: 0 auto; padding: 24px 16px 260px; }
+.proto-sheet h2 { margin: 40px 0 12px; font: 600 15px -apple-system, system-ui, sans-serif; }
+.proto-sheet__grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr)); }
+.proto-sheet__panel { padding: 16px; border: 1px solid var(--stretch-rule); border-radius: 12px; }
+.proto-sheet__label { display: block; margin-bottom: 12px; color: var(--stretch-muted); font: 500 12px -apple-system, system-ui, sans-serif; }
+.proto-sheet__row { display: flex; gap: 16px; justify-content: space-between; align-items: baseline; padding-block: 10px; }
+.proto-sheet__panel .qi-opening__line { font-size: 40px; }
