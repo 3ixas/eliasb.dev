@@ -54,3 +54,6 @@ html[data-proto-smooth="on"][data-lights="on"] { -webkit-font-smoothing: antiali
 .proto-sheet__label { display: block; margin-bottom: 12px; color: var(--stretch-muted); font: 500 12px -apple-system, system-ui, sans-serif; }
 .proto-sheet__row { display: flex; gap: 16px; justify-content: space-between; align-items: baseline; padding-block: 10px; }
 .proto-sheet__panel .qi-opening__line { font-size: 40px; }
+/* The site hides row metadata on phones; the sheet's whole point on a phone is to show it. */
+.proto-sheet .qi-row__meta { display: block; white-space: nowrap; }
+.proto-sheet p.qi-row__meta { white-space: normal; }
