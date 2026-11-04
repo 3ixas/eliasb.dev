@@ -1,6 +1,8 @@
 import { homeTitle, siteDescription, siteName } from "@/content/site";
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, JetBrains_Mono } from "next/font/google";
+import { ProtoBar } from "@/components/prototype-libraries";
+import "./prototype-libraries/proto.css";
 import "./base.css";
 import "./stretch-tokens.css";
 import "./stretch-type.css";
@@ -95,7 +97,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <script dangerouslySetInnerHTML={{ __html: siteBootScript }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <ProtoBar />
+      </body>
     </html>
   );
 }

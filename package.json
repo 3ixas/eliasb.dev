@@ -27,9 +27,12 @@
     "resume:pdf": "node --no-warnings --experimental-strip-types scripts/render-resume-pdf.mjs"
   },
   "dependencies": {
+    "img-fx": "^0.5.1",
+    "metal-fx": "^2.0.11",
     "next": "16.4.3",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "three": "^0.187.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",

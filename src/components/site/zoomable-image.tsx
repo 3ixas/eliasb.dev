@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { ProtoShot } from "@/components/prototype-libraries";
 import { useRef, useState, type CSSProperties } from "react";
 import { flushSync } from "react-dom";
 
@@ -37,7 +38,7 @@ export function ZoomableImage({ src, alt, width, height, sizes, preload }: { src
   return (
     <>
       <button ref={trigger} type="button" className="qi-zoom" aria-haspopup="dialog" onPointerEnter={want} onPointerDown={want} onFocus={want} onClick={open}>
-        <Image src={src} alt={alt} width={width} height={height} sizes={sizes} preload={preload} />
+        <ProtoShot src={src} alt={alt} width={width} height={height} sizes={sizes} preload={preload} />
         <span className="sr-only"> (view larger)</span>
       </button>
       <dialog ref={dialog} className="qi-zoom__dialog" aria-label={alt} onClick={(event) => event.currentTarget.close()} onClose={() => trigger.current?.focus()}>

@@ -1,0 +1,18 @@
+/* PROTOTYPE, ticket "Does either Libraries.dev candidate earn its place?". Never merge. */
+.proto-pin { background: transparent !important; box-shadow: none !important; }
+.proto-clip { display: block; }
+.proto-bar {
+  position: fixed; z-index: 2147483000; left: 50%; bottom: calc(10px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+  display: grid; gap: 2px; width: min(340px, calc(100vw - 20px)); padding: 8px 10px; border-radius: 14px;
+  background: #111; color: #fff; font: 500 13px/1.3 -apple-system, system-ui, sans-serif; letter-spacing: 0;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.35);
+}
+.proto-bar[data-closed] { width: auto; padding: 4px; }
+.proto-bar__row { display: grid; grid-template-columns: 62px 40px 1fr 40px; align-items: center; min-height: 40px; }
+.proto-bar__row small { color: #aaa; font-size: 12px; }
+.proto-bar__row span { text-align: center; }
+.proto-bar button { min-height: 40px; min-width: 40px; border: 0; border-radius: 8px; background: transparent; color: inherit; font: inherit; cursor: pointer; touch-action: manipulation; }
+.proto-bar button:hover { background: #333; }
+.proto-bar__foot { display: flex; gap: 4px; justify-content: space-between; }
+.proto-bar__foot button { padding-inline: 8px; font-size: 12px; }
+.proto-bar__foot button[aria-pressed="true"] { background: #2b4bd6; }

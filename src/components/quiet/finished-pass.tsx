@@ -4,6 +4,7 @@ import { passPhoto } from "@/content/stretch/media";
 import { roleStories } from "@/content/stretch/role-stories";
 import { roleStoryColours, type RoleStorySlug } from "@/content/stretch/role-story";
 import { passHang, passRecords, passStatus } from "@/content/stretch/staff-pass";
+import { ProtoClip, ProtoPin } from "@/components/prototype-libraries";
 import type { PinGlyph, WorkPin } from "@/content/stretch/work";
 
 /*
@@ -95,7 +96,7 @@ export function FullPass({ slug, countFrom }: { slug: RoleStorySlug; countFrom?:
   return (
     <figure className="qi-pass" style={passVars(slug)} data-pass-slug={slug}>
       <span className="qi-pass__strap" />
-      <Clip className="qi-pass__clip" />
+      <ProtoClip><Clip className="qi-pass__clip" /></ProtoClip>
       <div className="qi-pass__card">
         <span className="qi-pass__slot" />
         <header className="qi-pass__head">
@@ -193,11 +194,11 @@ export function PassPins({ pins }: { pins: readonly WorkPin[] }) {
     <ul className="qi-pins">
       {pins.map(({ glyph, label, detail }) => (
         <li key={label} className="qi-pins__item">
-          <span className="qi-pin" style={{ "--enamel": glyphs[glyph].colour } as CSSProperties}>
+          <ProtoPin enamel={glyphs[glyph].colour}>
             <svg viewBox="0 0 16 16" aria-hidden="true">
               {glyphs[glyph].paths}
             </svg>
-          </span>
+          </ProtoPin>
           <span className="qi-pins__text">
             <strong>{label}</strong> {detail}
           </span>
