@@ -39,13 +39,13 @@ export function projectLooks(projects: readonly Project[]) {
 
 /**
  * A project's Row, the same on the homepage and in the Work archive: its object, name, line and year, and its closer
- * look. A featured project also has its phone card (the homepage's three; the archive has none).
+ * look. A featured project also has its phone card (the homepage's three; the archive has none). `eager` is for a row on the first screen.
  */
-export function ProjectRow({ project, featured = false }: { project: Project; featured?: boolean }) {
+export function ProjectRow({ project, featured = false, eager = false }: { project: Project; featured?: boolean; eager?: boolean }) {
   return (
     <Row
       href={destination(project)}
-      object={<ProjectObject project={project} />}
+      object={<ProjectObject project={project} eager={eager} />}
       title={project.name}
       line={thingsIMake.rowOutcomes[project.slug] ?? project.outcome}
       meta={String(project.year)}

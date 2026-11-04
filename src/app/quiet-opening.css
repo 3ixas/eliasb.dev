@@ -5,11 +5,6 @@
  * visitor who prefers reduced motion gets the underline drawn and the cores still.
  */
 
-[data-stretch-shell] {
-  /* BNP Paribas's green as text and ink on the page: the Role story's field in light, lifted to keep 3:1 on the dark page. */
-  --bnp: light-dark(#00965e, #2fd08f);
-}
-
 .qi-opening {
   padding-block: 20px 8px;
 }
@@ -210,7 +205,7 @@
   margin: 0;
   padding: 12px;
   border-radius: 8px;
-  background-color: light-dark(#fffdf6, #1b1b24);
+  background-color: var(--stretch-graph);
   background-image:
     linear-gradient(to right, color-mix(in srgb, var(--stretch-ink) 9%, transparent) 1px, transparent 1px),
     linear-gradient(to bottom, color-mix(in srgb, var(--stretch-ink) 9%, transparent) 1px, transparent 1px);

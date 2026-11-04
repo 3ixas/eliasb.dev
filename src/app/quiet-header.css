@@ -22,7 +22,7 @@
     "look look";
   align-items: center;
   column-gap: 12px;
-  width: min(100% - 40px, 600px);
+  width: min(100% - 2 * var(--stretch-gutter), 600px);
   margin-inline: auto;
   padding-block: 8px;
 }
@@ -38,14 +38,14 @@
   text-decoration: none;
 }
 
-/* The portrait is its own 44 px button, a sibling of the name; its margin keeps the name where the 40 px circle put it. */
+/* The portrait is its own 44 px button, a sibling of the name; its margins put the 40 px circle on the text edge and keep the name where the circle put it. */
 .qi-header__facebtn {
   display: grid;
   place-items: center;
   flex: none;
   width: 44px;
   height: 44px;
-  margin: 0 -4px 0 0;
+  margin: 0 -4px 0 -2px;
   padding: 0;
   border: 0;
   border-radius: 50%;
@@ -65,6 +65,7 @@ span.qi-header__facebtn {
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  background: var(--stretch-card);
   box-shadow: 0 0 0 1px var(--stretch-rule);
   object-fit: cover;
   object-position: 52% 20%;
@@ -162,7 +163,7 @@ a.qi-header__name {
   gap: 8px;
   justify-self: start;
   min-height: 28px;
-  margin: -8px 0 0 52px;
+  margin: -8px 0 0 50px;
   color: var(--stretch-muted);
   font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
   font-size: var(--text-label);
@@ -201,6 +202,13 @@ a.qi-header__name {
     cursor: pointer;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  /* A 44 px target: to the header's edge below, and only as far up as the gap under the name. */
+  .qi-greeting::after {
+    content: "";
+    position: absolute;
+    inset: -6px 0 -10px;
   }
 }
 

@@ -29,7 +29,7 @@ if (!threshold) throw new Error("The 404 shows Threshold's object, so Threshold 
 /** Each homepage section's own object, by its anchor (docs/design/DESIGN.md, Objects). */
 const objects = {
   work: <MiniPass slug="bnp-paribas" />,
-  "things-i-make": <ProjectObject project={threshold} />,
+  "things-i-make": <ProjectObject project={threshold} eager />,
   "how-i-work": <HabitNumber position={0} />,
   "off-the-clock": <TodayTile />,
   "say-hello": <Sheet />,

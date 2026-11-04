@@ -30,6 +30,39 @@
   line-height: 1.35;
 }
 
+/*
+ * A line of parts (dot-line.tsx). Every part has a gutter on its left, holding its dot; the first has an empty one.
+ * The inner line starts one gutter left of the outer and the outer clips it, so whichever part starts a line has
+ * its gutter, and any dot in it, cut off.
+ */
+.qi-dots {
+  --dot: 0.8em;
+  display: block;
+  overflow-x: clip;
+}
+
+.stretch-mono .qi-dots {
+  --dot: 1.8em;
+}
+
+.qi-dots__in {
+  display: block;
+  margin-left: calc(-1 * var(--dot));
+}
+
+.qi-dots__part {
+  display: inline-block;
+  padding-left: var(--dot);
+  vertical-align: baseline;
+}
+
+.qi-dots__dot {
+  display: inline-block;
+  width: var(--dot);
+  margin-left: calc(-1 * var(--dot));
+  white-space: nowrap;
+}
+
 .qi-note-line {
   margin: 0;
   color: var(--stretch-muted);
@@ -106,8 +139,13 @@
   font-size: var(--text-label);
 }
 
+/* A fixed box: → and ↗ differ in width, and the metadata beside them must keep one edge down the list. */
 .qi-row__arrow {
+  flex: none;
+  width: 16px;
   color: var(--stretch-muted);
+  font-size: var(--text-small);
+  text-align: center;
   opacity: 0;
   transform: translateX(-4px);
   transition:
@@ -255,7 +293,7 @@
   height: 38px;
   overflow: hidden;
   border-radius: 5px;
-  background: light-dark(#fffdf6, #26262f);
+  background: var(--stretch-paper);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.4),
     0 1px 1px rgb(0 0 0 / 0.25),
@@ -565,7 +603,7 @@
   display: grid;
   gap: 12px;
   margin: 20px 0 0;
-  padding: 0 0 0 5px;
+  padding: 0;
   list-style: none;
 }
 
@@ -723,35 +761,20 @@
  */
 .qi-inline {
   display: grid;
-  grid-template-rows: 1fr;
+  grid-template-rows: 0fr;
   margin-left: 64px;
   container-type: inline-size;
+  transition: grid-template-rows 0.3s var(--out);
 }
 
-.qi-inline:has(> .qi-inline__in) {
-  animation: qi-open 0.3s var(--out) both;
-}
-
-/* A closed look folds back the way it opened, at the same pace (CLOSE_MS in closer-look-root.tsx), fading as it goes. */
-.qi-inline:has(> .qi-inline__in[data-leaving]) {
-  animation: qi-close 0.3s var(--out) both;
+/* A transition, so a look reversed part way carries on from the height it has reached. It folds back at the same pace (CLOSE_MS in closer-look-root.tsx), fading as it goes. */
+.qi-inline:has(> .qi-inline__in:not([data-leaving])) {
+  grid-template-rows: 1fr;
 }
 
 .qi-inline__in[data-leaving] .qi-look {
   opacity: 0;
   transition: opacity 0.2s linear;
-}
-
-@keyframes qi-open {
-  from {
-    grid-template-rows: 0fr;
-  }
-}
-
-@keyframes qi-close {
-  to {
-    grid-template-rows: 0fr;
-  }
 }
 
 /* A look that is a link, for a row that leaves the site. */
@@ -772,6 +795,17 @@
   width: 316px;
   padding: 10px 8px 20px;
   zoom: min(1, tan(atan2(100cqw, 316px)));
+}
+
+/* These two flow to any width, so they fill their slot rather than scaling below the 13 px floor. */
+.qi-inline .qi-look:has(> .qi-face-look, > .qi-project) {
+  width: auto;
+  max-width: 316px;
+  zoom: 1;
+}
+
+.qi-inline .qi-project {
+  width: 100%;
 }
 
 @media not all and (min-width: 1180px) and (hover: hover) {
@@ -1248,7 +1282,7 @@
   width: 30px;
   height: 38px;
   border-radius: 3px;
-  background: light-dark(#fffdf6, #26262f);
+  background: var(--stretch-paper);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.4),
     0 1px 1px rgb(0 0 0 / 0.25),
@@ -1278,7 +1312,7 @@
   margin: 0;
   padding: 18px 18px 14px;
   border-radius: 6px;
-  background: light-dark(#fffdf6, #26262f);
+  background: var(--stretch-paper);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.4),
     0 1px 1px rgb(0 0 0 / 0.2),
@@ -1327,8 +1361,7 @@
   .qi-pass,
   .qi-project,
   .qi-pins__item,
-  .qi-strand__thread,
-  .qi-inline:has(> .qi-inline__in) {
+  .qi-strand__thread {
     animation: none;
   }
 
@@ -1722,7 +1755,7 @@
   border-radius: 3px;
   background:
     repeating-linear-gradient(0deg, rgb(0 0 0 / 0.035) 0 1px, transparent 1px 3px),
-    light-dark(#ebe5d3, #2b2a27);
+    var(--stretch-newsprint);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.3),
     0 1px 1px rgb(0 0 0 / 0.2),
@@ -1743,7 +1776,7 @@
   padding: 3px 8px;
   border: 2px solid currentColor;
   border-radius: 3px;
-  color: light-dark(#3a3a44, #d9d6cb);
+  color: var(--stretch-stamp);
   font-size: var(--text-label);
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -1804,7 +1837,7 @@
 .qi-clipping__count {
   margin: 0;
   padding-top: 6px;
-  border-top: 1px solid light-dark(rgb(0 0 0 / 0.18), rgb(255 255 255 / 0.2));
+  border-top: 1px solid var(--stretch-paper-rule);
   font-size: var(--text-label);
   font-weight: 600;
   text-align: right;
@@ -2029,7 +2062,7 @@ button.stretch-gh__day[data-selected] {
   height: 28px;
   margin-block: 8px;
   border-radius: 3px;
-  background: light-dark(#fffdf6, #26262f);
+  background: var(--stretch-paper);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.4),
     0 1px 1px rgb(0 0 0 / 0.25),

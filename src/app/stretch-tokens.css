@@ -26,6 +26,13 @@
   --stretch-cobalt: #2340ff;
   --stretch-on-cobalt: #ffffff;
   --stretch-tile-edge: transparent;
+  --stretch-paper: #fffdf6;
+  --stretch-newsprint: #ebe5d3;
+  --stretch-graph: #fffdf6;
+  --stretch-stamp: #3a3a44;
+  --stretch-paper-rule: rgb(0 0 0 / 0.18);
+  /* BNP Paribas's green as text and ink on the page: the Role story's field in light, lifted to keep 3:1 on the dark page. */
+  --bnp: #00965e;
   /* The greeting's sun: an illustration colour, never an interface colour (docs/design/DESIGN.md "Colour"). */
   --sun: #e39a2d;
   --stretch-dark: 0;
@@ -59,6 +66,12 @@
     --stretch-cobalt: #8b9cff;
     --stretch-on-cobalt: #0d0d12;
     --stretch-tile-edge: #2a2a33;
+    --stretch-paper: #26262f;
+    --stretch-newsprint: #2b2a27;
+    --stretch-graph: #1b1b24;
+    --stretch-stamp: #d9d6cb;
+    --stretch-paper-rule: rgb(255 255 255 / 0.2);
+    --bnp: #2fd08f;
     --sun: #f5b84f;
     --stretch-dark: 1;
     --gh-0: #1f242c;
@@ -79,6 +92,12 @@
   --stretch-cobalt: #8b9cff;
   --stretch-on-cobalt: #0d0d12;
   --stretch-tile-edge: #2a2a33;
+  --stretch-paper: #26262f;
+  --stretch-newsprint: #2b2a27;
+  --stretch-graph: #1b1b24;
+  --stretch-stamp: #d9d6cb;
+  --stretch-paper-rule: rgb(255 255 255 / 0.2);
+  --bnp: #2fd08f;
   --sun: #f5b84f;
   --stretch-dark: 1;
   --gh-0: #1f242c;
@@ -98,6 +117,12 @@
   --stretch-cobalt: #8b9cff;
   --stretch-on-cobalt: #0d0d12;
   --stretch-tile-edge: #2a2a33;
+  --stretch-paper: #26262f;
+  --stretch-newsprint: #2b2a27;
+  --stretch-graph: #1b1b24;
+  --stretch-stamp: #d9d6cb;
+  --stretch-paper-rule: rgb(255 255 255 / 0.2);
+  --bnp: #2fd08f;
   --sun: #f5b84f;
   --stretch-dark: 1;
   --gh-0: #1f242c;

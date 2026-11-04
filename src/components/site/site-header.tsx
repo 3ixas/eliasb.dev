@@ -41,7 +41,7 @@ function FaceLook() {
  * page's 600 px column wide, with the links on a row of their own under the name.
  */
 export function SiteHeader(props: HeaderProps) {
-  const portraitImage = <Image className="qi-header__face" src={heroPortrait.src} alt="" width={80} height={80} sizes="40px" />;
+  const portraitImage = <Image className="qi-header__face" src={heroPortrait.src} alt="" width={80} height={80} sizes="40px" preload />;
   const row = (
     <>
       <div className="qi-header__who">

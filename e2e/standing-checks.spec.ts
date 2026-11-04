@@ -36,10 +36,11 @@ test("every page fits its width with no sideways scroll and no visible text unde
     await test.step(route, async () => {
       await open(page, route);
       await soft
+        // Below zero is fine: a reserved scrollbar gutter (scrollbar-gutter: stable) leaves the document narrower than the viewport.
         .poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), {
           message: `${route} scrolls sideways (px past the viewport)`,
         })
-        .toBe(0);
+        .toBeLessThanOrEqual(0);
       // Nothing a visitor reads is smaller than 13 px (docs/design/DESIGN.md, "Type").
       await soft
         .poll(

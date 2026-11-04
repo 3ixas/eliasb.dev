@@ -105,9 +105,6 @@
   margin: 0;
 }
 
-.qi-long__nowrap {
-  white-space: nowrap;
-}
 
 /* ---------- sections ---------- */
 
@@ -257,7 +254,8 @@
   width: max(calc(var(--share) * 100%), 8px);
   height: 10px;
   border-radius: 999px;
-  background: var(--stretch-rule);
+  /* The long bar is the comparison's whole argument, so it holds 3:1 on the card. */
+  background: color-mix(in srgb, var(--stretch-muted) 70%, var(--stretch-card));
   transform-origin: left;
 }
 

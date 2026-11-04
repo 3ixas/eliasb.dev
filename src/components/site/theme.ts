@@ -71,8 +71,9 @@ let paletteRegistered = false;
  * and the pre-paint preference script both run while the document is parsing. */
 function registerPalette() {
   if (paletteRegistered || typeof CSS.registerProperty !== "function") return;
-  for (const name of ["page", "ink", "muted", "rule", "card", "cobalt", "on-cobalt", "tile-edge", "tape"]) {
-    CSS.registerProperty({ name: `--stretch-${name}`, syntax: "<color>", inherits: true, initialValue: "transparent" });
+  const stretch = ["page", "ink", "muted", "rule", "card", "cobalt", "on-cobalt", "tile-edge", "paper", "newsprint", "graph", "stamp", "paper-rule"].map((name) => `--stretch-${name}`);
+  for (const name of [...stretch, "--bnp", "--sun", "--gh-0", "--gh-1", "--gh-2", "--gh-3", "--gh-4"]) {
+    CSS.registerProperty({ name, syntax: "<color>", inherits: true, initialValue: "transparent" });
   }
   paletteRegistered = true;
   // Resolve the current palette before a click or device change supplies its target.

@@ -78,3 +78,15 @@
 .stretch-mono {
   font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
+
+/* No single word alone on a last line, where the browser can manage it. Headings keep their own balance, and the Résumé sheet keeps the PDF's line breaks. */
+[data-stretch-shell] :is(p, li, figcaption, blockquote):not(.stretch-resume__sheet *),
+.qi-row__title,
+.qi-row__line {
+  text-wrap: pretty;
+}
+
+/* A How I work proof keeps ordinary wrapping: reflowed at 320 px, the pen's underline runs into the line below. */
+[data-habits] .qi-row__line {
+  text-wrap: wrap;
+}
