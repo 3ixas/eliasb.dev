@@ -78,3 +78,10 @@
 .stretch-mono {
   font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
+
+/* No single word alone on a last line, where the browser can manage it. Headings keep their own balance, and the Résumé sheet keeps the PDF's line breaks. */
+[data-stretch-shell] :is(p, li, figcaption, blockquote):not(.stretch-resume__sheet *),
+.qi-row__title,
+.qi-row__line {
+  text-wrap: pretty;
+}

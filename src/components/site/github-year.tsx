@@ -8,6 +8,7 @@ import {
   createContributionCalendar,
   moveContributionCalendarIndex,
 } from "@/components/site/contribution-calendar-model";
+import { DotLine } from "@/components/site/dot-line";
 import { offTheClock } from "@/content/stretch/off-the-clock";
 import type { ActivityDay } from "@/integrations/types";
 
@@ -57,11 +58,17 @@ export function GitHubYear({ activity, total, mark }: { activity: ActivityDay[];
   return (
     <>
       <p className="stretch-gh__total">
-        <span className="stretch-gh__count">
-          <CountUp from={0} to={total} format={grouped} whenSeen />
-        </span>{" "}
-        {copy.contributions(totalText).slice(totalText.length + 1)}
-        {mark && <>{"\u00a0· "}{mark}</>}
+        <DotLine
+          parts={[
+            <>
+              <span className="stretch-gh__count">
+                <CountUp from={0} to={total} format={grouped} whenSeen />
+              </span>{" "}
+              {copy.contributions(totalText).slice(totalText.length + 1)}
+            </>,
+            mark,
+          ]}
+        />
       </p>
       <p className="stretch-mono stretch-gh__readout" aria-hidden="true" data-readout>
         {selected === null ? " " : contributionTag(days[selected])}

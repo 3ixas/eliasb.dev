@@ -4,6 +4,9 @@ import { WorkArchiveList } from "@/components/site/work-archive";
 import { projectIndex, type Project } from "@/content/projects";
 import { workArchive } from "@/content/stretch/site-copy";
 
+/** How many rows can show before any scrolling, whose objects must not arrive late. */
+const FIRST_SCREEN_ROWS = 8;
+
 /**
  * The Work archive (docs/design/DESIGN.md, "The Work archive"): the homepage's Things I make, unabridged. The
  * shared header with no links, "Things I make" as the `h1` in the opening line's treatment with its note beneath,
@@ -17,7 +20,7 @@ export function WorkArchivePage({ catalogue }: { catalogue: readonly Project[] }
       <section className="stretch-wrap qi-long" aria-labelledby="work-archive-title">
         <div className="qi-column">
           <LongFormOpening titleId="work-archive-title" title={workArchive.heading} line={workArchive.note} />
-          <WorkArchiveList looks={projectLooks(ordered)} items={ordered.map((project) => ({ slug: project.slug, category: project.category, row: <ProjectRow project={project} /> }))} />
+          <WorkArchiveList looks={projectLooks(ordered)} items={ordered.map((project, index) => ({ slug: project.slug, category: project.category, row: <ProjectRow project={project} eager={index < FIRST_SCREEN_ROWS} /> }))} />
         </div>
       </section>
     </LongForm>

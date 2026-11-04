@@ -15,7 +15,7 @@
 
 /* The header lines up with the sheet it sits above: the name at the paper's left edge, the Eclipse at its right. */
 [data-resume] .qi-header__inner {
-  width: min(100% - 40px, 210mm);
+  width: min(100% - 2 * var(--stretch-gutter), 210mm);
   margin-inline: auto;
 }
 

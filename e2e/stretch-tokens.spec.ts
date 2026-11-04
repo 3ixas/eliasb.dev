@@ -81,8 +81,15 @@ for (const scheme of ["light", "dark"] as const) {
     });
 
     test("--sun is the greeting's amber, in the contract's two values", async ({ page }) => {
-      const sun = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--sun").trim().toLowerCase());
-      expect(sun).toBe(scheme === "dark" ? "#f5b84f" : "#e39a2d");
+      // Read as a colour, because the theme controller registers it once script runs so that it can crossfade.
+      const sun = await page.evaluate(() => {
+        const probe = document.body.appendChild(document.createElement("i"));
+        probe.style.color = "var(--sun)";
+        const colour = getComputedStyle(probe).color;
+        probe.remove();
+        return colour;
+      });
+      expect(sun).toBe(scheme === "dark" ? "rgb(245, 184, 79)" : "rgb(227, 154, 45)");
     });
 
     test("tiles keep the edge the spec gives them", async ({ page }) => {

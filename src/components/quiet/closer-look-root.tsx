@@ -10,7 +10,7 @@ import { correctHold, reportFolding, startHold, stopHold } from "@/components/qu
 const HIDE_MS = 140;
 /** Fired on `window` when a controller shows a look, so the others hide theirs: only one look is showing on the page. */
 const SHOWING = "qi-closer-look-showing";
-/** An inline look folds away over this long (quiet-index.css, `qi-close`); it is unmounted once it has. */
+/** An inline look folds away over this long (quiet-index.css, `.qi-inline`); it is unmounted once it has. */
 const CLOSE_MS = 300;
 
 /**
@@ -251,13 +251,18 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     else delete element.dataset.glide;
     place();
     placedFor.current = active.id;
+    // A glide is between two looks: once the page scrolls, the margin tracks its row exactly again.
+    const onScroll = () => {
+      delete element.dataset.glide;
+      place();
+    };
     const observer = new ResizeObserver(place);
     observer.observe(element);
-    window.addEventListener("scroll", place, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", place);
     return () => {
       observer.disconnect();
-      window.removeEventListener("scroll", place);
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", place);
     };
   }, [active, under]);

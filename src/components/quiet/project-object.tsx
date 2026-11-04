@@ -8,9 +8,10 @@ const SLOT = 44;
 /**
  * A project's object: the one legible detail of its own screenshot, set by the project's `crop`. The
  * screenshot is scaled to cover the 44 px slot, then zoomed by `crop.zoom`, and shifted so the crop's
- * focal point sits in the middle (never so far that the slot shows beyond the image).
+ * focal point sits in the middle (never so far that the slot shows beyond the image). One on the first screen is
+ * `eager`, so a row never arrives without its object.
  */
-export function ProjectObject({ project }: { project: Project }) {
+export function ProjectObject({ project, eager = false }: { project: Project; eager?: boolean }) {
   const { screenshot, crop } = project;
   if (!screenshot || !crop) throw new Error(`"${project.slug}" is shown on the homepage, so it needs a screenshot and a crop.`);
   const aspect = screenshot.width / screenshot.height;
@@ -25,6 +26,7 @@ export function ProjectObject({ project }: { project: Project }) {
         width={Math.round(width)}
         height={Math.round(height)}
         sizes={`${Math.round(width)}px`}
+        loading={eager ? "eager" : undefined}
         style={{ left: place(crop.x, width), top: place(crop.y, height) }}
       />
     </span>

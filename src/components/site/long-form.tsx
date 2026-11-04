@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Fragment, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Row } from "@/components/quiet/row";
-import { bindDots } from "@/components/site/bind-dots";
+import { DotLine } from "@/components/site/dot-line";
 import { FocusHashTarget } from "@/components/site/focus-hash-target";
 import { SiteHeader } from "@/components/site/site-header";
 
@@ -65,12 +65,7 @@ export function LongFormOpening({ titleId, title, line, meta, long, aside, below
         <p className="qi-long__line">{line}</p>
         {meta && (
           <p className="qi-long__meta stretch-mono">
-            {meta.map((part, index) => (
-              <Fragment key={part}>
-                {index > 0 && "\u00a0· "}
-                <span className="qi-long__nowrap">{bindDots(part)}</span>
-              </Fragment>
-            ))}
+            <DotLine parts={meta.flatMap((part) => part.split(" · "))} />
           </p>
         )}
       </div>

@@ -7,6 +7,7 @@ import { CycleScope } from "@/components/quiet/cycle";
 import { Row } from "@/components/quiet/row";
 import { TrainingLine, TrainingLook, TrainingTile, TrainingTitle } from "@/components/quiet/training";
 import { TypedQuote } from "@/components/quiet/typed-quote";
+import { DotLine } from "@/components/site/dot-line";
 import { GitHubYear } from "@/components/site/github-year";
 import { SourceMark } from "@/components/site/now-mark";
 import { projects } from "@/content/projects";
@@ -17,18 +18,6 @@ import type { FilmSignal, GitHubSignal, HistorySignal, LatestRepositorySignal, R
 
 /** A row with its closer look: the id they share, the `Row` for the list and what the margin and the inline slot show. */
 export type Entry = { id: string; row: ReactNode; look: ReactNode };
-
-/** The parts of a row's line, joined by dots that stay with the part before them (bind-dots.ts). */
-function joined(parts: (ReactNode | false | null | undefined)[]) {
-  return parts
-    .filter(Boolean)
-    .map((part, index) => (
-      <Fragment key={index}>
-        {index > 0 && "\u00a0· "}
-        {part}
-      </Fragment>
-    ));
-}
 
 /** The data attributes a source row carries: which item it is, and whether its saved data has gone stale. */
 const sourceAttrs = (item: string, status: PinStatus) => ({ "data-otc": item, "data-state": status.kind === "stale" ? "stale" : "current" });
@@ -138,7 +127,7 @@ export function bookEntry(reading: ReadingSignal, now: Date): Entry {
         href={reading.href}
         object={<Cover src={book.coverUrl} />}
         title={book.title}
-        line={joined([copy.reading.label, book.author, mark?.shown])}
+        line={<DotLine parts={[copy.reading.label, book.author, mark?.shown]} />}
         look={{ id, description: copy.reading.coverAlt(book.title, book.author) }}
       />
     ),
@@ -192,7 +181,9 @@ export function filmEntry(signal: FilmSignal, now: Date): Entry {
         href={film.href}
         object={<Cover src={film.posterUrl} />}
         title={film.title}
-        line={joined([
+        line={
+          <DotLine
+            parts={[
           row ? (
             <Fragment key="line">
               <span aria-hidden="true">{row.shown}</span>
@@ -202,7 +193,9 @@ export function filmEntry(signal: FilmSignal, now: Date): Entry {
             copy.watched.label
           ),
           mark?.shown,
-        ])}
+            ]}
+          />
+        }
         look={{ id, description: `${copy.watched.kicker}. ${copy.watched.posterAlt(film.title, film.year)}` }}
       />
     ),
@@ -252,7 +245,7 @@ export function makingEntry(latest: LatestRepositorySignal): Entry | null {
         href={entry.href}
         object={<Brackets />}
         title={entry.name}
-        line={joined([copy.nowMaking.label, mark?.shown])}
+        line={<DotLine parts={[copy.nowMaking.label, mark?.shown]} />}
         look={entry.description ? { id, description: entry.description } : undefined}
       />
     ),
@@ -289,7 +282,7 @@ export function historyEntry(history: HistorySignal): Entry | null {
         attrs={attrs}
         object={<CalendarTile number={history.weekOf ? String(Number(history.weekOf.slice(8))) : ""} />}
         title={copy.curiosity.label}
-        line={joined([line, mark?.shown])}
+        line={<DotLine parts={[line, mark?.shown]} />}
         look={{ id, description: steps.join(" "), cycle: events.length > 1 ? steps : undefined }}
       />
     ),

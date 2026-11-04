@@ -35,7 +35,7 @@ The Stretch homepage grew by addition: every pass added a well-made object, and 
 
 ## Layout
 
-- **The column**: `min(100% − 40px, 600px)`, centred, with 96 px above the header on desktop and 32 px on phones.
+- **The column**: `min(100% − 32px, 600px)`, centred, with 16 px gutters shared by the header and the text, with 96 px above the header on desktop and 32 px on phones.
 - **Sections**: 80 px apart (64 px on phones). Each has a title at 17 px, weight 650, and a note at 15 px muted directly beneath. There are no giant headings and no mono counts in headings.
 - **Lists**: rows 2 px apart. A list sits 18 px below its note and extends 12 px into the gutter on each side, so a row's hover fill lines up with the text column.
 
@@ -230,6 +230,12 @@ Defined in `src/app/stretch-tokens.css` as `--stretch-*` variables. Dark follows
 | `--stretch-cobalt` | `#2340ff` | `#8b9cff` | The Cobalt accent |
 | `--stretch-on-cobalt` | `#ffffff` | `#0d0d12` | Text on a cobalt surface |
 | `--stretch-tile-edge` | none | `#2a2a33` | Hairline that keeps objects visible in dark |
+| `--stretch-paper` | `#fffdf6` | `#26262f` | Calendar tiles, the note and other paper objects |
+| `--stretch-newsprint` | `#ebe5d3` | `#2b2a27` | The clipping |
+| `--stretch-graph` | `#fffdf6` | `#1b1b24` | Graph paper under the simulation |
+| `--stretch-stamp` | `#3a3a44` | `#d9d6cb` | The clipping's stamp |
+| `--stretch-paper-rule` | black at 18% | white at 20% | The rule printed on the clipping |
+| `--bnp` | `#00965e` | `#2fd08f` | BNP Paribas's green as text on the page |
 | `--gh-0` | `#e1e4e8` | `#1f242c` | GitHub year, no contributions. Light is a step darker than GitHub's own, so it shows on the card |
 | `--gh-1` … `--gh-4` | `#9be9a8` `#40c463` `#30a14e` `#216e39` | `#0e4429` `#006d32` `#26a641` `#39d353` | GitHub's contribution greens |
 | `--sun` | `#e39a2d` | `#f5b84f` | The greeting's amber, and nothing else: the lamp's bulb and pool of light and the clock's pivot. An illustration colour, never an interface colour |
@@ -256,6 +262,7 @@ Every text pair passes WCAG 2.2 AA; `e2e/stretch-tokens.spec.ts` measures them o
 - **Bricolage Grotesque** (variable `opsz`, `wdth`, `wght`), self-hosted through `next/font`, for everything people read. **JetBrains Mono** for metadata, dates, counts, captions and Print.
 - **One floor.** Nothing a visitor is meant to read is smaller than 13 px, on the page or as **Print** on an object (a Staff pass, a Pass pin's label, a credit), closer looks included. Reading text is 15 px or more, and body copy is 17 px. Calendar-tile bands are 13 px.
 - **One text scale.** Text under 24 px uses five steps, each a token in `stretch-tokens.css`: `--text-label` 13 px, `--text-small` 15 px, `--text-body` 17 px, `--text-lead` 19 px and `--text-quote` 22 px. A size may move up one step at a wider breakpoint, but never off the scale. `scripts/verify-type-scale.mjs` checks it.
+- **Lines of parts** (a role and its dates, a source and its mark) wrap between parts, each part whole where it fits. A dot only ever sits between two parts on one line: none ends or starts a line.
 - **Display type** is only the homepage's opening line, each page's `h1` in the same treatment, and the bold figures inside a Staff pass. Section headings are text, not display. Condensed uppercase display retires everywhere except the pass.
 
 ## Accessibility

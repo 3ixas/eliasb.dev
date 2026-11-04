@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import { CycleTrigger } from "@/components/quiet/cycle";
-import { bindDots } from "@/components/site/bind-dots";
+import { DotLine } from "@/components/site/dot-line";
 import { hostLabel } from "@/components/site/host-label";
 
 /**
@@ -46,7 +46,7 @@ export function Row({ object, title, line, meta, href, look, card, after, style,
       </span>
       <span className="qi-row__text">
         <span id={titleId} className="qi-row__title">{title}</span>
-        <span className="qi-row__line">{typeof line === "string" ? bindDots(line) : line}</span>
+        <span className="qi-row__line">{typeof line === "string" ? <DotLine parts={line.split(" · ")} /> : line}</span>
       </span>
       <span className="qi-row__end">
         {meta && <span className="qi-row__meta stretch-mono">{meta}</span>}

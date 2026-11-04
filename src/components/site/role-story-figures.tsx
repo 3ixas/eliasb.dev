@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { SiteLink } from "@/components/site/site-link";
 import { ZoomableImage } from "@/components/site/zoomable-image";
 import { ShrinkOnView } from "@/components/site/shrink-on-view";
 import type { RoleStoryFigure } from "@/content/stretch/role-story";
@@ -74,19 +75,21 @@ function ScaleBar({ kind, label, share }: { kind: "before" | "after"; label: str
 
 /** Screenshots of a public page, never edited: the link beneath says what and when they are, and goes to where they were taken. */
 function ScreensFigure({ figure }: { figure: Extract<RoleStoryFigure, { kind: "screens" }> }) {
+  // Without a phone screenshot beside it, a desktop screenshot takes the whole column.
+  const desktopSizes = figure.images.some(({ device }) => device === "phone") ? "(min-width: 761px) 430px, 72vw" : "(min-width: 761px) 600px, 100vw";
   return (
     <figure className="qi-figure qi-screens">
       <div className="qi-screens__row">
         {figure.images.map(({ src, alt, width, height, device }) => (
           <div key={src} className="qi-screens__shot" data-device={device}>
-            <ZoomableImage src={src} alt={alt} width={width} height={height} sizes={device === "phone" ? "(min-width: 761px) 130px, 24vw" : "(min-width: 761px) 430px, 72vw"} />
+            <ZoomableImage src={src} alt={alt} width={width} height={height} sizes={device === "phone" ? "(min-width: 761px) 130px, 24vw" : desktopSizes} />
           </div>
         ))}
       </div>
       <figcaption className="qi-figure__caption stretch-mono">
-        <a className="qi-screens__source" href={figure.source.href}>
+        <SiteLink className="qi-screens__source" href={figure.source.href}>
           {figure.source.label} <span aria-hidden="true">↗</span>
-        </a>
+        </SiteLink>
       </figcaption>
     </figure>
   );
