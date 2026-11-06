@@ -31,6 +31,11 @@
   --stretch-graph: #fffdf6;
   --stretch-stamp: #3a3a44;
   --stretch-paper-rule: rgb(0 0 0 / 0.18);
+  /* Object depth (docs/design/DESIGN.md "Finish"). Light: a 1 px ring and a faint shadow. --shadow-object is a small object, --shadow-look a pass or a project's closer look. --lit-pass and --lit-paper are the top edge's highlight on a coloured card and on paper. */
+  --shadow-object: 0 0 0 1px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.1);
+  --shadow-look: 0 0 0 1px rgb(0 0 0 / 0.08), 0 12px 24px -12px rgb(0 0 0 / 0.12);
+  --lit-pass: inset 0 1px 0 rgb(255 255 255 / 0.22);
+  --lit-paper: inset 0 1px 0 rgb(255 255 255 / 0.4);
   /* BNP Paribas's green as text and ink on the page: the Role story's field in light, lifted to keep 3:1 on the dark page. */
   --bnp: #00965e;
   /* The greeting's sun: an illustration colour, never an interface colour (docs/design/DESIGN.md "Colour"). */
@@ -73,6 +78,10 @@
     --stretch-graph: #1b1b24;
     --stretch-stamp: #d9d6cb;
     --stretch-paper-rule: rgb(255 255 255 / 0.2);
+    --shadow-object: 0 0 0 1px rgb(255 255 255 / 0.1), 0 1px 1px rgb(0 0 0 / 0.5);
+    --shadow-look: 0 0 0 1px rgb(255 255 255 / 0.1), 0 22px 36px -18px rgb(0 0 0 / 0.7);
+    --lit-pass: inset 0 1px 0 rgb(255 255 255 / 0.3);
+    --lit-paper: inset 0 1px 0 rgb(255 255 255 / 0.28);
     --bnp: #2fd08f;
     --sun: #f5b84f;
     --stretch-dark: 1;
@@ -99,6 +108,10 @@
   --stretch-graph: #1b1b24;
   --stretch-stamp: #d9d6cb;
   --stretch-paper-rule: rgb(255 255 255 / 0.2);
+  --shadow-object: 0 0 0 1px rgb(255 255 255 / 0.1), 0 1px 1px rgb(0 0 0 / 0.5);
+  --shadow-look: 0 0 0 1px rgb(255 255 255 / 0.1), 0 22px 36px -18px rgb(0 0 0 / 0.7);
+  --lit-pass: inset 0 1px 0 rgb(255 255 255 / 0.3);
+  --lit-paper: inset 0 1px 0 rgb(255 255 255 / 0.28);
   --bnp: #2fd08f;
   --sun: #f5b84f;
   --stretch-dark: 1;
@@ -124,6 +137,10 @@
   --stretch-graph: #1b1b24;
   --stretch-stamp: #d9d6cb;
   --stretch-paper-rule: rgb(255 255 255 / 0.2);
+  --shadow-object: 0 0 0 1px rgb(255 255 255 / 0.1), 0 1px 1px rgb(0 0 0 / 0.5);
+  --shadow-look: 0 0 0 1px rgb(255 255 255 / 0.1), 0 22px 36px -18px rgb(0 0 0 / 0.7);
+  --lit-pass: inset 0 1px 0 rgb(255 255 255 / 0.3);
+  --lit-paper: inset 0 1px 0 rgb(255 255 255 / 0.28);
   --bnp: #2fd08f;
   --sun: #f5b84f;
   --stretch-dark: 1;

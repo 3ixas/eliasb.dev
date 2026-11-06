@@ -11,7 +11,7 @@ const lookId = ({ slug }: Project) => `project-${slug}`;
 const metadata = ({ type, year }: Project) => `${type} · ${year}`;
 
 /** A project's closer look: its screenshot sliding in on its Project colour, then its type and year. */
-function ProjectLook({ project }: { project: Project }) {
+export function ProjectLook({ project }: { project: Project }) {
   const { screenshot } = project;
   return (
     <figure className="qi-project" style={projectColours(project)}>
