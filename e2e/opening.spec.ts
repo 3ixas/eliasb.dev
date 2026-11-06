@@ -48,9 +48,9 @@ test.describe("The opening line", () => {
     await expect(page.locator(".qi-opening__support")).toHaveText(opening.support);
   });
 
-  test("it is Bricolage at clamp(34px, 5.4vw, 50px), weight 650, and the largest type on the page", async ({ page }) => {
+  test("it is Bricolage at clamp(34px, 5.4vw, 50px), weight 600, and the largest type on the page", async ({ page }) => {
     const expected = Math.min(50, Math.max(34, page.viewportSize()!.width * 0.054));
-    await expect(heading(page)).toHaveCSS("font-weight", "650");
+    await expect(heading(page)).toHaveCSS("font-weight", "600");
     await expect(heading(page)).toHaveCSS("font-family", /Bricolage/);
     const size = await heading(page).evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
     expect(size).toBeCloseTo(expected, 1);

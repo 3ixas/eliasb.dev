@@ -1,6 +1,6 @@
 import { homeTitle, siteDescription, siteName } from "@/content/site";
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, JetBrains_Mono } from "next/font/google";
+import { Bricolage_Grotesque, DM_Mono } from "next/font/google";
 import "./base.css";
 import "./stretch-tokens.css";
 import "./stretch-type.css";
@@ -26,9 +26,11 @@ const bricolage = Bricolage_Grotesque({
   fallback: ["Bricolage Fallback", "system-ui", "sans-serif"],
 });
 
-const jetbrainsMono = JetBrains_Mono({
+// Metadata, dates, counts and captions. The Résumé sheet keeps JetBrains Mono, loaded by its own layout.
+const dmMono = DM_Mono({
   subsets: ["latin"],
-  variable: "--font-jetbrains-mono",
+  weight: "400",
+  variable: "--font-dm-mono",
 });
 
 const isIndexable = process.env.SITE_INDEXABLE === "true";
@@ -90,7 +92,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       lang="en-GB"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${bricolage.variable} ${jetbrainsMono.variable}`}
+      className={`${bricolage.variable} ${dmMono.variable}`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: siteBootScript }} />

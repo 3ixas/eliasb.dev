@@ -89,10 +89,10 @@ for (const slug of caseStudySlugs) {
 
     test("the title has the opening line's treatment, sections are 17 px, and the metadata is 13 px mono", async ({ page }) => {
       await expect(page.getByRole("heading", { level: 1 })).toHaveClass(/qi-opening__line/);
-      await expect(page.getByRole("heading", { level: 1 })).toHaveCSS("font-weight", "650");
+      await expect(page.getByRole("heading", { level: 1 })).toHaveCSS("font-weight", "600");
       for (const heading of await page.locator("article h2").all()) {
         await expect(heading).toHaveCSS("font-size", "17px");
-        await expect(heading).toHaveCSS("font-weight", "650");
+        await expect(heading).toHaveCSS("font-weight", "620");
       }
       await expect(page.locator(".qi-long__meta")).toHaveCSS("font-size", "13px");
     });

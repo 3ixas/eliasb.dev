@@ -68,8 +68,11 @@ test.describe("The reveal words", () => {
       await expect(target).toHaveAccessibleDescription(escaped(described[id]));
       await expect(target).toHaveCSS("text-decoration-line", "underline");
       await expect(target).toHaveCSS("text-decoration-style", "dotted");
-      await expect(target).toHaveCSS("text-decoration-thickness", "1.5px");
-      await expect(target).toHaveCSS("text-underline-offset", "5px");
+      // The opening line's words carry a heavier dot (2.5 px) than those in body text.
+      const inOpening = (await target.locator("xpath=ancestor::*[contains(@class,'qi-opening__line')]").count()) > 0;
+      await expect(target).toHaveCSS("text-decoration-thickness", inOpening ? "2.5px" : "1.5px");
+      await expect(target).toHaveCSS("text-underline-offset", inOpening ? "6px" : "5px");
+      await expect(target).toHaveCSS("text-decoration-skip-ink", "none");
       await expect(target).not.toHaveAttribute("href", /.*/);
     }
   });

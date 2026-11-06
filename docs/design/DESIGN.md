@@ -29,14 +29,14 @@ The Stretch homepage grew by addition: every pass added a well-made object, and 
 2. **A new object earns a place in two ways only**: as a row's object, drawn for the 44 px slot, or as a row's closer look. No new section-level set pieces, cards, Fasteners, tilts, posters or rails.
 3. **Motion must mean something.** It is allowed for a closer look, for a reaction of something real, for feedback on a control, and for the three arrival reactions. Nothing loops on screen, apart from a reveal that is itself showing work happening (the cores).
 4. **There are two widths.** The 600 px reading column and the 300 px margin. Nothing spans them.
-5. **The homepage has a length budget.** It stays within 4 screens at 1440 × 900 and 5 screens at 390 × 844 with nothing open (measured: 3.8 and 4.8). Something new pushes something else into a closer look or off the homepage. A long-form page has no budget: its length is the story.
+5. **The homepage has a length budget.** It stays within 4 screens at 1440 × 900 and 5 screens at 390 × 844 with nothing open (measured: 3.7 and 4.4). Something new pushes something else into a closer look or off the homepage. A long-form page has no budget: its length is the story.
 6. **Detail goes behind, not beside.** A fact that doesn't need to be read on arrival moves into a closer look or onto its own page. It doesn't get its own block on the homepage.
 7. **Proof is inline; names are behind.** On a long-form page, a figure the paragraph argues from (a screenshot of the work, a to-scale comparison, the PRD) sits inline at column width. A real thing the sentence only names (a certificate, the cores behind "CPU and GPU", a site as it is today) is a closer look on that word. Neither sits beside the column.
 
 ## Layout
 
 - **The column**: `min(100% − 32px, 600px)`, centred, with 16 px gutters shared by the header and the text, with 96 px above the header on desktop and 32 px on phones.
-- **Sections**: 80 px apart (64 px on phones). Each has a title at 17 px, weight 650, and a note at 15 px muted directly beneath. There are no giant headings and no mono counts in headings.
+- **Sections**: 80 px apart from 820 px wide, 64 px on phones. Each has a title at 17 px, weight 620, and a note at 15 px muted directly beneath. There are no giant headings and no mono counts in headings.
 - **Lists**: rows 2 px apart. A list sits 18 px below its note and extends 12 px into the gutter on each side, so a row's hover fill lines up with the text column.
 
 ## The row
@@ -106,7 +106,7 @@ A **closer look** is a row's detail: on desktop it appears in the margin, and on
 
 On a long-form page, the closer looks are the real things its prose names in passing (rule 7). The Role stories' and case studies' own figures are inline, not closer looks.
 
-**Words that can show something** have a dotted underline (muted at 70%, 1.5 px, 5 px offset), which turns cobalt on hover or focus. They are focusable.
+**Words that can show something** have a dotted underline (muted at 70%, 1.5 px, 5 px offset, drawn through descenders rather than skipping around them; 2.5 px with a 6 px offset in the opening line), which turns cobalt on hover or focus. They are focusable.
 
 **BNP Paribas** in the opening line is the exception: it reacts where it is. It turns BNP green, and a small pass drops below it on its strap. On phones, tapping it plays that reaction only; the BNP Paribas row in Work holds its closer look.
 
@@ -162,7 +162,7 @@ One header on every page, in the same place, so following a row never moves it. 
 ## The homepage, in order
 
 1. **Header**, as above.
-2. **The opening line**, as an `h1`: "I build pricing and risk engines at BNP Paribas, and products of my own." It is set in Bricolage at `clamp(34px, 5.4vw, 50px)`, weight 650, line height 1.1, −0.03 em tracking, and it is the loudest thing on the page. The supporting line follows at 17 px, muted.
+2. **The opening line**, as an `h1`: "I build pricing and risk engines at BNP Paribas, and products of my own." It is set in Bricolage at `clamp(34px, 5.4vw, 50px)`, weight 600 at optical size 96, line height 1.1, −0.02 em tracking, and it is the loudest thing on the page. The supporting line follows at 17 px, muted.
 3. **Work**: BNP Paribas, Joveen, Optegra. Then **Where I'm headed**: its line, and three strand rows (Judgement, Depth, Range).
 4. **Things I make**: the three featured projects, the other projects newest first (at most ten), and the link to the Work archive with the true count.
 5. **How I work**: four habit rows with the pen (real problem, write it down, safe to undo, measure), then Threshold's PRD.
@@ -176,8 +176,8 @@ Anchors stay `#work`, `#things-i-make`, `#how-i-work`, `#off-the-clock` and `#sa
 The two share one template. Each is the header, a back link, an opening, then its sections in the column, then one row to the next page. The removal rule holds, with rule 7 for figures; there is no length budget.
 
 - **Back link**: "← Work" on a Role story (to `/#work`), "← Things I make" on a case study (to the Work archive). 15 px, muted.
-- **Title**: the page's `h1`, in the opening line's treatment (`clamp(34px, 5.4vw, 50px)`, weight 650). It is the loudest text on the page, except that a name too long for the display size (Optegra Eye Healthcare & Kensington Medical) is set at 30 to 34 px so its longest word fits beside the pass. A supporting line follows at 17 px, muted, then quiet metadata in 13 px mono.
-- **Sections**: a 17 px title (weight 650) and the prose at 17 px, as on the homepage. No numbers, no giant headings, no condensed display type. A case study's header links use short labels (Where it started, On paper, Decisions, How it’s built, Where it stands, What’s next) so the six fit one row of the column; each section's own title is its bold line.
+- **Title**: the page's `h1`, in the opening line's treatment (`clamp(34px, 5.4vw, 50px)`, weight 600). It is the loudest text on the page, except that a name too long for the display size (Optegra Eye Healthcare & Kensington Medical) is set at 30 to 34 px so its longest word fits beside the pass. A supporting line follows at 17 px, muted, then quiet metadata in 13 px mono.
+- **Sections**: a 17 px title (weight 620) and the prose, sections 56 px apart (the long-form step) at 17 px, as on the homepage. No numbers, no giant headings, no condensed display type. A case study's header links use short labels (Where it started, On paper, Decisions, How it’s built, Where it stands, What’s next) so the six fit one row of the column; each section's own title is its bold line.
 - **Figures** (rule 7): inline at column width with a 13 px mono caption beneath. Screenshots sit on their Project colour with a 14 px radius. The to-scale bars and the flag figure are drawn on the card surface (`--stretch-card`). Every figure keeps its alt text. A screenshot is also a button: a click or tap opens the same image large in a modal dialog in the same window (centred, up to 1400 px wide, the page dimmed behind it), and a click anywhere on it, its Close button or Esc closes it and returns focus to the screenshot. The to-scale bars and the flag figure are not screenshots and do not expand.
 - **Ending**: one row, under "Next role" or "Next project", with the next page's 44 px object, its name and its one line. The order is unchanged (Role stories newest to oldest; case studies in the Things I make order).
 
@@ -256,6 +256,8 @@ What holds the finish in place. Each rule below is checked by a gate, or by the 
 
 - **Layout shift**: at most 0.01 over a first visit, scrolled to the bottom and back, on the homepage, BNP Paribas and Threshold, at 390 and 1440 px (`e2e/layout-shift.spec.ts`).
 - **JavaScript size**: a route fails `check:built` when its gzipped scripts grow more than 10% over the baseline in `scripts/js-budget.json`.
+- **Spacing**: homepage sections 80 px apart from 820 px wide and 64 px on phones; long-form sections 56 px (`--space-long-step`). The homepage stays within its length budget; if it goes over, the gap comes down.
+- **Type**: the Fine cut and DM Mono (see Type), dark-mode smoothing, dotted words without skip-ink. `e2e/stretch-type.spec.ts` holds the values.
 - **Motion specs pause and seek.** They never wait out a transition's length.
 - **The interruption walk** (`docs/runbooks/interruption-walk.md`): eleven steps on a real iPhone and a laptop at each sign-off. Nothing jumps, restarts from zero or is left stuck.
 
@@ -268,7 +270,10 @@ What holds the finish in place. Each rule below is checked by a gate, or by the 
 
 ## Type
 
-- **Bricolage Grotesque** (variable `opsz`, `wdth`, `wght`), self-hosted through `next/font`, for everything people read. **JetBrains Mono** for metadata, dates, counts, captions and Print.
+- **Bricolage Grotesque** (variable `opsz`, `wdth`, `wght`), self-hosted through `next/font`, for everything people read, set in the **Fine cut**: the opening line and page titles at weight 600, optical size 96 and −0.02 em; section titles at 620 and −0.008 em; row titles at 570 and −0.008 em; row lines and the supporting line at −0.005 em. **DM Mono** (400) for metadata, dates, counts, captions and Print. Only the Résumé sheet keeps **JetBrains Mono**, matching its PDF, and only that page loads it.
+- **Fallback faces** (`stretch-type.css`) are scaled to the width each weight has in Bricolage, measured at 390 and 1440 px, so the swap moves no line.
+- **Dark text** is smoothed to greyscale (`antialiased`) in dark mode only; light mode and the Résumé sheet keep the default.
+- **Inline words** (the dotted words) are exempt from the 44 px touch-target rule, as WCAG's inline exception allows.
 - **One floor.** Nothing a visitor is meant to read is smaller than 13 px, on the page or as **Print** on an object (a Staff pass, a Pass pin's label, a credit), closer looks included. Reading text is 15 px or more, and body copy is 17 px. Calendar-tile bands are 13 px.
 - **One text scale.** Text under 24 px uses five steps, each a token in `stretch-tokens.css`: `--text-label` 13 px, `--text-small` 15 px, `--text-body` 17 px, `--text-lead` 19 px and `--text-quote` 22 px. A size may move up one step at a wider breakpoint, but never off the scale. `scripts/verify-type-scale.mjs` checks it.
 - **Lines of parts** (a role and its dates, a source and its mark) wrap between parts, each part whole where it fits. A dot only ever sits between two parts on one line: none ends or starts a line.
@@ -282,7 +287,7 @@ What holds the finish in place. Each rule below is checked by a gate, or by the 
 - **The standing checks** in the "keep" rows of [#277](https://github.com/3ixas/eliasb.dev/issues/277) all hold. That means one `h1` (the opening line), the skip link, content in the server HTML and complete without script, axe, AA contrast, 3:1 focus rings, external links marked `↗` that open in a new tab, the theme rules, and the home title, description and social image.
 - **Every page has one `h1`**: the opening line on the homepage, the title elsewhere. Section titles are `h2`.
 - **Figures** keep their alt text and captions; a closer look's words are also its word's accessible description.
-- **Touch targets** are at least 44 px.
+- **Touch targets** are at least 44 px, except inline words in running text (WCAG 2.5.8's inline exception).
 - **Overflow**: nothing scrolls sideways at 320–1440 px, and no state widens the page. The greeting's extra words are desktop-only for that reason.
 - **On phones, a row's object is its own button**, a sibling of the row's link, never inside it (a button nested in a link is invalid and confuses screen readers). Its accessible name says what it shows, such as "A closer look at Joveen".
 

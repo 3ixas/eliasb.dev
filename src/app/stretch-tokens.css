@@ -49,6 +49,8 @@
   --out: cubic-bezier(.2, .8, .2, 1);
 
   /* Text under 24 px: nothing is smaller than 13 px, docs/design/DESIGN.md "Type". */
+  /* The long-form step: sections of a Role story or case study sit this far apart (the homepage uses 80 px, 64 px on phones). */
+  --space-long-step: 56px;
   --text-label: 13px;
   --text-small: 15px;
   --text-body: 17px;
