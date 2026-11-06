@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { ArrivalImage } from "@/components/site/arrival-image";
 import { Row } from "@/components/quiet/row";
 import { ProjectObject, projectColours } from "@/components/quiet/project-object";
 import type { Project } from "@/content/projects";
@@ -15,7 +15,7 @@ export function ProjectLook({ project }: { project: Project }) {
   const { screenshot } = project;
   return (
     <figure className="qi-project" style={projectColours(project)}>
-      {screenshot && <Image src={screenshot.src} alt="" width={screenshot.width} height={screenshot.height} sizes="300px" />}
+      {screenshot && <ArrivalImage src={screenshot.src} alt="" width={screenshot.width} height={screenshot.height} sizes="300px" />}
       <figcaption className="stretch-mono">{metadata(project)}</figcaption>
     </figure>
   );
@@ -27,7 +27,7 @@ function CardShot({ project }: { project: Project }) {
   if (!screenshot) return null;
   return (
     <span className="qi-card__shot">
-      <Image src={screenshot.src} alt={screenshot.alt} width={screenshot.width} height={screenshot.height} sizes="(max-width: 760px) 82vw, 1px" />
+      <ArrivalImage src={screenshot.src} alt={screenshot.alt} width={screenshot.width} height={screenshot.height} sizes="(max-width: 760px) 82vw, 1px" />
     </span>
   );
 }

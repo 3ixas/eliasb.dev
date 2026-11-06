@@ -30,8 +30,6 @@
 
 .qi-long__back:focus-visible {
   border-radius: 6px;
-  outline: 2px solid var(--stretch-cobalt);
-  outline-offset: 2px;
 }
 
 .qi-long__end {
@@ -350,8 +348,6 @@
 
 .qi-case__links a:focus-visible {
   border-radius: 4px;
-  outline: 2px solid var(--stretch-cobalt);
-  outline-offset: 2px;
 }
 
 @media (hover: hover) {
@@ -456,11 +452,6 @@
   cursor: zoom-in;
 }
 
-.qi-zoom:focus-visible {
-  outline: 2px solid var(--stretch-cobalt);
-  outline-offset: 2px;
-}
-
 .qi-zoom__dialog {
   /* The site's reset zeroes margins; a modal dialog is centred by its auto margins. */
   margin: auto;
@@ -507,8 +498,7 @@
 }
 
 .qi-zoom__close:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 2px;
+  outline-color: #fff;
 }
 
 /* The page behind a modal does not scroll. */

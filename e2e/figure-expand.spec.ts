@@ -45,7 +45,7 @@ for (const { route, trigger } of pages) {
 
     test("its keyboard focus ring is not clipped by any frame around it", async ({ page }) => {
       const button = page.locator(trigger).first();
-      // The ring is a 2 px outline offset by 2 px (.qi-zoom:focus-visible); no frame around the button may clip that.
+      // The ring is a 2 px outline offset by 2 px (the page-wide focus ring); no frame around the button may clip that.
       const ringExtent = 4;
       const clipped = await button.evaluate((element, extent) => {
         const ring = element.getBoundingClientRect();
