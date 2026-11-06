@@ -250,6 +250,15 @@ Every text pair passes WCAG 2.2 AA; `e2e/stretch-tokens.spec.ts` measures them o
 - **Theme changes** crossfade over 0.3 s with `cubic-bezier(0, 0, 0.38, 0.9)`, or switch instantly with reduced motion.
 - **Reduced motion** removes all movement and keeps 0.2 s fades, except theme changes, which are instant. Content never waits for motion.
 
+## Craft bar
+
+What holds the finish in place. Each rule below is checked by a gate, or by the interruption walk where feel is the point; later slices add their own rules here.
+
+- **Layout shift**: at most 0.01 over a first visit, scrolled to the bottom and back, on the homepage, BNP Paribas and Threshold, at 390 and 1440 px (`e2e/layout-shift.spec.ts`).
+- **JavaScript size**: a route fails `check:built` when its gzipped scripts grow more than 10% over the baseline in `scripts/js-budget.json`.
+- **Motion specs pause and seek.** They never wait out a transition's length.
+- **The interruption walk** (`docs/runbooks/interruption-walk.md`): eleven steps on a real iPhone and a laptop at each sign-off. Nothing jumps, restarts from zero or is left stuck.
+
 ## Colour rules
 
 - **Cobalt** marks "products of my own", today, now (the live dots, and the slash in Now making's brackets), the way to say hello, focus and a hovered row's arrow. **Pass pins** take their own enamel colours, inside the pass. On the GitHub year it is a ring around today, never a fill, so the greens stay true. Elias's name is no longer cobalt: the opening line leads.
