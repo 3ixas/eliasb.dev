@@ -59,7 +59,13 @@ test.describe("Interrupting", () => {
     const trigger = page.locator('#work button[data-look-tap="joveen"]');
     await trigger.scrollIntoViewIfNeeded();
     await trigger.click();
-    await expect.poll(() => page.locator('[data-look-slot="joveen"]').evaluate((slot) => slot.getAnimations().length)).toBe(0);
+    // Opening is finished by seeking to its end, not by waiting out its length.
+    await page.locator('[data-look-slot="joveen"]').evaluate(async (slot) => {
+      const fold = () => slot.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "grid-template-rows");
+      while (!fold()) await new Promise(requestAnimationFrame);
+      fold()!.finish();
+      await new Promise(requestAnimationFrame);
+    });
     const folded = await tapAndPause(page, 100);
     await trigger.evaluate((button) => (button as HTMLElement).click());
     for (const height of await nextHeights(page)) expect(height).toBeGreaterThanOrEqual(folded - 1);

@@ -2,6 +2,8 @@ import { spawn } from "node:child_process";
 import net from "node:net";
 import process from "node:process";
 import { setTimeout as delay } from "node:timers/promises";
+import { readFileSync } from "node:fs";
+import { gzipSync } from "node:zlib";
 
 const compatibilityRedirects = new Map([
   ["/about", "/#work"],
@@ -67,6 +69,9 @@ const expectedIndexableRobots = [
 ];
 
 const requiredHomepageSections = ["work", "things-i-make", "how-i-work", "off-the-clock", "say-hello"];
+// A route's JavaScript may grow by this much over its measured baseline in scripts/js-budget.json (gzipped bytes of the scripts its HTML loads).
+const jsBudgetGrowth = 0.1;
+const jsBudget = JSON.parse(readFileSync(new URL("./js-budget.json", import.meta.url), "utf8"));
 const failures = [];
 let checkCount = 0;
 
@@ -294,6 +299,28 @@ function verifyHomepage(markup) {
   }
 }
 
+/** The gzipped size of every script a page's HTML loads, which is what a first visit downloads before it can act. */
+async function pageScriptBytes(baseUrl, document) {
+  const sources = new Set(tags(document, "script").map((tag) => attribute(tag, "src")).filter((src) => src?.includes("/_next/static/")));
+  let bytes = 0;
+  for (const src of sources) {
+    const response = await fetch(new URL(src, baseUrl));
+    bytes += gzipSync(Buffer.from(await response.arrayBuffer())).length;
+  }
+  return bytes;
+}
+
+async function verifyJavaScriptBudget(baseUrl, pages) {
+  for (const route of Object.keys(jsBudget)) {
+    const page = pages.get(route) ?? await fetchPage(baseUrl, route);
+    pages.set(route, page);
+    const bytes = await pageScriptBytes(baseUrl, page.document);
+    const limit = Math.round(jsBudget[route] * (1 + jsBudgetGrowth));
+    console.log(`JavaScript on ${route}: ${bytes} bytes gzipped (baseline ${jsBudget[route]}, limit ${limit})`);
+    check(bytes <= limit, `${route} loads ${bytes} bytes of JavaScript, over its ${limit} limit (10% over the ${jsBudget[route]} baseline in scripts/js-budget.json)`);
+  }
+}
+
 async function verifyRoutes(baseUrl, pages) {
   for (const route of canonicalPages) {
     const page = pages.get(route) ?? await fetchPage(baseUrl, route);
@@ -456,6 +483,7 @@ try {
   verifyHomepage(homepage.markup);
 
   await verifyRoutes(baseUrl, pages);
+  await verifyJavaScriptBudget(baseUrl, pages);
 
   const robots = await fetchAsset(baseUrl, "/robots.txt");
   equal(

@@ -159,6 +159,14 @@ _Avoid_: Making an entire page client-rendered for one interaction
 Project stories, the training week, status, and other material Elias maintains directly in version-controlled typed data.
 _Avoid_: CMS content
 
+**Craft bar**:
+The written rules and gates that keep the finish: spacing, type, feedback timing, layout shift and JavaScript size. Lives in the Craft bar section of `docs/design/DESIGN.md`. Numbers and geometry are checked automatically; feel is checked by the **Interruption walk**.
+_Avoid_: Treating a passing test run as proof the site feels finished.
+
+**Interruption walk**:
+The eleven-step check, in `docs/runbooks/interruption-walk.md`, run by hand on a real iPhone and a laptop at each sign-off. It interrupts things (a double tap, a reopened fold, a pointer leaving mid-reaction) and passes when nothing jumps, restarts from zero or is left stuck.
+_Avoid_: Calling it a stress test or an automated check.
+
 ## History
 
 Terms the **Quiet index** retired, from the homepage and the Stretch-era pages ([#300](https://github.com/3ixas/eliasb.dev/issues/300)). They stay here so older issues and `docs/design/history/` still read.
