@@ -58,9 +58,9 @@ test.describe("Interrupting", () => {
     await hydrated(page);
     const trigger = page.locator('#work button[data-look-tap="joveen"]');
     await trigger.scrollIntoViewIfNeeded();
-    await trigger.click();
-    // Opening is finished by seeking to its end, not by waiting out its length.
+    // Opening is finished by seeking to its end, in the task that starts it, not by waiting out its length.
     await page.locator('[data-look-slot="joveen"]').evaluate(async (slot) => {
+      document.querySelector<HTMLElement>('#work button[data-look-tap="joveen"]')!.click();
       const fold = () => slot.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "grid-template-rows");
       while (!fold()) await new Promise(requestAnimationFrame);
       fold()!.finish();
