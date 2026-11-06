@@ -24,6 +24,7 @@
     "check": "pnpm lint && tsc --noEmit --incremental false && pnpm verify:signals && pnpm verify:catalogue && pnpm verify:copy && pnpm verify:springs && pnpm verify:type-scale && pnpm verify:retired && pnpm verify:resume && pnpm verify:link-check && pnpm verify:playwright-image && pnpm verify:ci-coverage",
     "check:built": "pnpm verify:routes && pnpm verify:release",
     "test:e2e": "playwright test",
+    "test:visual:update": "sh scripts/update-visual-baselines.sh",
     "resume:pdf": "node --no-warnings --experimental-strip-types scripts/render-resume-pdf.mjs"
   },
   "dependencies": {

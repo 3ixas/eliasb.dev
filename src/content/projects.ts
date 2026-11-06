@@ -72,7 +72,7 @@ const entries = [
       width: 2294,
       height: 1750,
     },
-    crop: { x: 0.18, y: 0.245, zoom: 5.5 },
+    crop: { x: 0.155, y: 0.245, zoom: 7 },
     colours: { field: "#1a1714", ink: "#f2efe9", swatch: "#c08a5a" },
   },
   {
@@ -113,7 +113,7 @@ const entries = [
       width: 1280,
       height: 640,
     },
-    crop: { x: 0.38, y: 0.49, zoom: 4.5 },
+    crop: { x: 0.372, y: 0.49, zoom: 4.1 },
     colours: { field: "#1e1915", ink: "#ece4d8", swatch: "#c0876a" },
   },
   {
@@ -130,7 +130,7 @@ const entries = [
       width: 1280,
       height: 800,
     },
-    crop: { x: 0.5, y: 0.455, zoom: 3 },
+    crop: { x: 0.44, y: 0.46, zoom: 7 },
   },
   {
     slug: "risk-event-tracker",
@@ -146,7 +146,7 @@ const entries = [
       width: 1600,
       height: 1000,
     },
-    crop: { x: 0.05, y: 0.38, zoom: 6 },
+    crop: { x: 0.03, y: 0.38, zoom: 7 },
   },
   {
     // Version 1 has no live link: askprofessorpast.com no longer serves it, and

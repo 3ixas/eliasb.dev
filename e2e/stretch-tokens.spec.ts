@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
+import { roleStories } from "../src/content/stretch/role-stories";
 import { contrastOnPaper } from "./support/contrast";
 
 // The tokens are the same in every engine and at every width, so this runs once
@@ -78,6 +79,23 @@ for (const scheme of ["light", "dark"] as const) {
         const [reading] = await contrastOnPaper(page, `[data-pair='${pair}']`);
         expect(reading.ratio, pair).toBeGreaterThanOrEqual(4.5);
       }
+    });
+
+    test("every Employer's pass ink meets 4.5:1 on its field, and Optegra's hold the values chosen for them", () => {
+      const channel = (hex: string, at: number) => {
+        const c = parseInt(hex.slice(at, at + 2), 16) / 255;
+        return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+      };
+      const luminance = (hex: string) => 0.2126 * channel(hex, 1) + 0.7152 * channel(hex, 3) + 0.0722 * channel(hex, 5);
+      const ratio = (a: string, b: string) => (Math.max(luminance(a), luminance(b)) + 0.05) / (Math.min(luminance(a), luminance(b)) + 0.05);
+      for (const [slug, story] of Object.entries(roleStories)) {
+        const { field, ink } = story.colours[scheme];
+        expect(ratio(ink, field), `${slug} ink on its field`).toBeGreaterThanOrEqual(4.5);
+      }
+      // docs/design/DESIGN.md "Finish": Optegra takes its logo's two teals, swapped by theme, so it stays apart from BNP Paribas's green at 44 px.
+      const { field, ink } = roleStories.optegra.colours[scheme];
+      expect(ratio(ink, field)).toBeCloseTo(scheme === "dark" ? 6.59 : 6.35, 2);
+      expect(field).toBe(scheme === "dark" ? "#00aa90" : "#006765");
     });
 
     test("--sun is the greeting's amber, in the contract's two values", async ({ page }) => {

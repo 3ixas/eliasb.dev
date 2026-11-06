@@ -317,11 +317,12 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
       { value: "−30%", label: "p95 page load" },
       { value: "+15%", label: "consultation conversion" },
     ],
-    // The teal of Optegra's logo (#00aa90, with its deeper #006765): the light band takes it as it is,
-    // the dark band a deepened teal.
+    // Both teals are Optegra's logo's own, and each theme swaps them: the light field is the deeper #006765
+    // (ink 6.35:1) so it stays apart from BNP Paribas's green at 44 px, the dark field is the logo's #00aa90
+    // (ink 6.59:1). The swatch takes the other teal.
     colours: {
-      light: { field: "#00aa90", ink: "#04100f", swatch: "#003d3b" },
-      dark: { field: "#004a48", ink: "#e6f6f4", swatch: "#3ddbc2" },
+      light: { field: "#006765", ink: "#f0fbf9", swatch: "#00aa90" },
+      dark: { field: "#00aa90", ink: "#04100f", swatch: "#006765" },
     },
     next: null,
   },
