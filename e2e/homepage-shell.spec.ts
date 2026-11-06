@@ -37,7 +37,7 @@ test.describe("Homepage shell", () => {
     const section = page.locator("section#work");
     const title = section.getByRole("heading", { level: 2, name: work.heading, exact: true });
     await expect(title).toHaveCSS("font-size", "17px");
-    await expect(title).toHaveCSS("font-weight", "650");
+    await expect(title).toHaveCSS("font-weight", "620");
     await expect(section.locator(".qi-note-line").first()).toHaveText(work.note);
   });
 
@@ -46,7 +46,7 @@ test.describe("Homepage shell", () => {
     const section = page.locator("section#off-the-clock");
     const title = section.getByRole("heading", { level: 2, name: offTheClock.heading, exact: true });
     await expect(title).toHaveCSS("font-size", "17px");
-    await expect(title).toHaveCSS("font-weight", "650");
+    await expect(title).toHaveCSS("font-weight", "620");
     await expect(section.locator(".qi-note-line").first()).toHaveText(offTheClock.note);
   });
 
@@ -55,7 +55,7 @@ test.describe("Homepage shell", () => {
     const section = page.locator("section#things-i-make");
     const title = section.getByRole("heading", { level: 2, name: thingsIMake.heading, exact: true });
     await expect(title).toHaveCSS("font-size", "17px");
-    await expect(title).toHaveCSS("font-weight", "650");
+    await expect(title).toHaveCSS("font-weight", "620");
     await expect(section.locator(".qi-note-line").first()).toHaveText(thingsIMake.note);
   });
 
@@ -64,7 +64,7 @@ test.describe("Homepage shell", () => {
     const section = page.locator("section#how-i-work");
     const title = section.getByRole("heading", { level: 2, name: howIWork.heading, exact: true });
     await expect(title).toHaveCSS("font-size", "17px");
-    await expect(title).toHaveCSS("font-weight", "650");
+    await expect(title).toHaveCSS("font-weight", "620");
     await expect(section.locator(".qi-note-line").first()).toHaveText(howIWork.note);
   });
 

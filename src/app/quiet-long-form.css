@@ -35,7 +35,7 @@
 }
 
 .qi-long__end {
-  margin-top: 56px;
+  margin-top: var(--space-long-step);
 }
 
 /* ---------- the opening ---------- */
@@ -109,7 +109,7 @@
 /* ---------- sections ---------- */
 
 .qi-long__section {
-  margin-top: 56px;
+  margin-top: var(--space-long-step);
   scroll-margin-top: 136px;
 }
 

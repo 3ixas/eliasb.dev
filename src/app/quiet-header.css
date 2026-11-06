@@ -165,7 +165,7 @@ a.qi-header__name {
   min-height: 28px;
   margin: -8px 0 0 50px;
   color: var(--stretch-muted);
-  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-size: var(--text-label);
   font-weight: 500;
   line-height: 1.2;

@@ -9,7 +9,7 @@
 @theme inline {
   --font-display: var(--font-bricolage), system-ui, sans-serif;
   --font-sans: var(--font-bricolage), system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-mono: var(--font-dm-mono), ui-monospace, monospace;
 }
 
 @layer base {
