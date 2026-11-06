@@ -223,7 +223,8 @@ for (const slug of caseStudySlugs) {
       expect(response?.status()).toBe(200);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       const width = page.viewportSize()?.width ?? 0;
-      for (const box of await Promise.all((await page.locator("[data-case-study] main *").all()).map((item) => item.boundingBox()))) {
+      // A project's crop is a screenshot clipped by its 44 px frame: the frame stays in the column, the picture behind it does not have to.
+      for (const box of await Promise.all((await page.locator("[data-case-study] main *:not(.qi-crop img)").all()).map((item) => item.boundingBox()))) {
         if (box) expect(box.x + box.width).toBeLessThanOrEqual(width + 1);
       }
       for (const target of await page.locator("[data-case-study] main a:visible, [data-case-study] main button:visible").all()) {
