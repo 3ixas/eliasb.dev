@@ -1,0 +1,58 @@
+/* PROTOTYPE, ticket "How far should objects and closer looks go?". Never merge. */
+
+/* Depth in light: lighter shadows, a 1 px ring doing the edge work. Dark keeps its own (below). */
+html[data-p-depth="lighter"]:not([data-lights="on"]) :is(.qi-crop, .qi-mini__card, .qi-tile) { box-shadow: 0 1px 1px rgb(0 0 0 / .14), 0 3px 5px -1px rgb(0 0 0 / .16); }
+html[data-p-depth="lighter"]:not([data-lights="on"]) .qi-mini__card { box-shadow: inset 0 1px 0 rgb(255 255 255 / .25), inset 0 0 0 1px rgb(255 255 255 / .06), 0 1px 1px rgb(0 0 0 / .14), 0 3px 5px -1px rgb(0 0 0 / .16); }
+html[data-p-depth="lighter"]:not([data-lights="on"]) .qi-tile { box-shadow: inset 0 1px 0 rgb(255 255 255 / .4), 0 1px 1px rgb(0 0 0 / .12), 0 3px 5px -1px rgb(0 0 0 / .14); }
+html[data-p-depth="lighter"]:not([data-lights="on"]) .qi-pass__card { box-shadow: inset 0 1px 0 rgb(255 255 255 / .22), inset 0 -1px 0 rgb(0 0 0 / .3), inset 0 0 0 1px rgb(255 255 255 / .06), 0 1px 1px rgb(0 0 0 / .12), 0 6px 12px -4px rgb(0 0 0 / .14), 0 22px 36px -18px rgb(0 0 0 / .18); }
+html[data-p-depth="lighter"]:not([data-lights="on"]) .qi-project { box-shadow: 0 1px 1px rgb(0 0 0 / .12), 0 8px 18px -8px rgb(0 0 0 / .18); }
+html[data-p-depth="ring"]:not([data-lights="on"]) :is(.qi-crop, .qi-mini__card, .qi-tile) { box-shadow: 0 0 0 1px rgb(0 0 0 / .08), 0 1px 2px rgb(0 0 0 / .1); }
+html[data-p-depth="ring"]:not([data-lights="on"]) .qi-mini__card { box-shadow: inset 0 1px 0 rgb(255 255 255 / .25), 0 0 0 1px rgb(0 0 0 / .08), 0 1px 2px rgb(0 0 0 / .1); }
+html[data-p-depth="ring"]:not([data-lights="on"]) .qi-tile { box-shadow: inset 0 1px 0 rgb(255 255 255 / .4), 0 0 0 1px rgb(0 0 0 / .08), 0 1px 2px rgb(0 0 0 / .1); }
+html[data-p-depth="ring"]:not([data-lights="on"]) .qi-pass__card { box-shadow: inset 0 1px 0 rgb(255 255 255 / .22), inset 0 -1px 0 rgb(0 0 0 / .3), 0 0 0 1px rgb(0 0 0 / .08), 0 2px 4px rgb(0 0 0 / .08), 0 12px 24px -12px rgb(0 0 0 / .12); }
+html[data-p-depth="ring"]:not([data-lights="on"]) .qi-project { box-shadow: 0 0 0 1px rgb(0 0 0 / .08), 0 12px 24px -12px rgb(0 0 0 / .12); }
+
+/* Depth in dark: a shadow can't show on a near-black page, so light does the work. */
+html[data-p-dark="edge"][data-lights="on"] .qi-mini__card { box-shadow: inset 0 1px 0 rgb(255 255 255 / .32), inset 0 0 0 1px rgb(255 255 255 / .1), 0 1px 1px rgb(0 0 0 / .5); }
+html[data-p-dark="edge"][data-lights="on"] .qi-tile { box-shadow: inset 0 1px 0 rgb(255 255 255 / .28), 0 0 0 1px rgb(255 255 255 / .08), 0 1px 1px rgb(0 0 0 / .5); }
+html[data-p-dark="edge"][data-lights="on"] .qi-crop { box-shadow: 0 0 0 1px rgb(255 255 255 / .1), 0 1px 1px rgb(0 0 0 / .5); }
+html[data-p-dark="edge"][data-lights="on"] .qi-pass__card { box-shadow: inset 0 1px 0 rgb(255 255 255 / .3), inset 0 -1px 0 rgb(0 0 0 / .3), inset 0 0 0 1px rgb(255 255 255 / .1), 0 1px 1px rgb(0 0 0 / .5), 0 22px 36px -18px rgb(0 0 0 / .7); }
+html[data-p-dark="edge"][data-lights="on"] .qi-project { box-shadow: 0 0 0 1px rgb(255 255 255 / .1), 0 22px 36px -18px rgb(0 0 0 / .7); }
+
+/* Hologram */
+html[data-p-holo="smaller"] .qi-pass__holo { top: 111px; left: 67px; width: 14px; height: 14px; opacity: .55; }
+html[data-p-holo="foil"] .qi-pass__holo {
+  top: auto; bottom: 46px; left: auto; right: 16px; width: 16px; height: 16px; border-radius: 3px; opacity: .9; mix-blend-mode: normal;
+  background: repeating-linear-gradient(115deg, rgb(255 255 255 / .28) 0 1px, transparent 1px 3px), conic-gradient(from 210deg, #f6b6da, #b2dcff, #c6f7c0, #fff2b0, #ffc9b6, #f6b6da);
+  box-shadow: inset 0 0 0 .5px rgb(255 255 255 / .6), 0 0 0 .5px rgb(0 0 0 / .2);
+}
+html[data-p-holo="none"] .qi-pass__holo { display: none; }
+
+/* Mini pass: telling BNP Paribas from Optegra at 44 px. Both are teals of Optegra's own logo (#00aa90 and #006765), swapped by theme. */
+html[data-p-mini="hue"] :is([data-pass-slug="optegra"], [data-p-pass="optegra"]) { --pass-f: light-dark(#006765, #00aa90) !important; --pass-i: light-dark(#f0fbf9, #04100f) !important; --pass-s: light-dark(#00aa90, #006765) !important; }
+html[data-p-mini="initial"] .qi-mini__lines { display: none; }
+html[data-p-mini="initial"] .qi-mini__card::after {
+  content: attr(data-p-initial); position: absolute; top: 8px; right: 3.5px; width: 11px; text-align: center;
+  color: var(--pass-i); font: 800 13px/1 var(--font-bricolage, system-ui), system-ui; font-stretch: 75%;
+}
+html[data-p-mini="returned"] [data-p-returned] .qi-mini__card::after {
+  content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 44%, rgb(255 255 255 / .55) 44% 56%, transparent 56%); mix-blend-mode: overlay;
+}
+
+/* Crops: tighter on the one defining detail */
+html[data-p-crops="recut"] .qi-crop[data-p-recut] img { left: var(--p-left) !important; top: var(--p-top) !important; width: var(--p-w) !important; height: var(--p-h) !important; }
+
+/* The switcher */
+.proto-bar {
+  position: fixed; z-index: 2147483000; left: 10px; bottom: calc(10px + env(safe-area-inset-bottom));
+  display: grid; width: min(300px, calc(100vw - 20px)); padding: 6px 8px; border-radius: 14px;
+  background: #111; color: #fff; font: 500 13px/1.25 -apple-system, system-ui, sans-serif; letter-spacing: 0; box-shadow: 0 6px 24px rgb(0 0 0 / .35);
+}
+.proto-bar[data-closed] { width: auto; padding: 2px; }
+.proto-bar__row { display: grid; grid-template-columns: 62px 36px 1fr 36px; align-items: center; min-height: 36px; }
+.proto-bar__row small { color: #aaa; font-size: 12px; }
+.proto-bar__row span { text-align: center; }
+.proto-bar button { min-height: 36px; min-width: 36px; border: 0; border-radius: 8px; background: transparent; color: inherit; font: inherit; cursor: pointer; touch-action: manipulation; }
+.proto-bar button:hover { background: #333; }
+.proto-bar__foot { display: flex; gap: 4px; justify-content: space-between; }
+.proto-bar__foot button { padding-inline: 8px; font-size: 12px; }

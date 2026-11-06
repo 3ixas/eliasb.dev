@@ -1,5 +1,6 @@
 import { homeTitle, siteDescription, siteName } from "@/content/site";
 import type { Metadata } from "next";
+import { ProtoBar } from "@/components/prototype-materials";
 import { Bricolage_Grotesque, JetBrains_Mono } from "next/font/google";
 import "./base.css";
 import "./stretch-tokens.css";
@@ -10,6 +11,7 @@ import "./quiet-opening.css";
 import "./quiet-header.css";
 import "./quiet-long-form.css";
 import "./stretch-resume.css";
+import "./prototype-materials/proto.css";
 
 // Self-hosted at build time by next/font, so no request goes to Google when a
 // visitor loads a page. Bricolage Grotesque is variable in weight, optical size
@@ -95,7 +97,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <script dangerouslySetInnerHTML={{ __html: siteBootScript }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <ProtoBar />
+      </body>
     </html>
   );
 }

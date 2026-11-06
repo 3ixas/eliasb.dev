@@ -70,10 +70,10 @@ function Barcode() {
 /** The 44 px object of an employer's row: a 28 × 38 portrait pass on a short strap and clip, in the Employer colour. It has no marks of its own. */
 export function MiniPass({ slug }: { slug: RoleStorySlug }) {
   return (
-    <span className="qi-mini" style={passVars(slug)} data-pass-slug={slug}>
+    <span className="qi-mini" style={passVars(slug)} data-pass-slug={slug} data-p-returned={slug === "bnp-paribas" ? undefined : ""}>
       <span className="qi-mini__strap" />
       <span className="qi-mini__clip" />
-      <span className="qi-mini__card">
+      <span className="qi-mini__card" data-p-initial={slug[0].toUpperCase()}>
         <span className="qi-mini__photo" style={{ backgroundImage: `url(${passPhoto.src})` }} />
         <span className="qi-mini__lines" />
         <span className="qi-mini__bars" />
@@ -93,7 +93,7 @@ export function FullPass({ slug, countFrom }: { slug: RoleStorySlug; countFrom?:
   const { value, label } = record.headline;
   const counted = /^(−?)(\d+)(%?)$/.exec(value);
   return (
-    <figure className="qi-pass" style={passVars(slug)} data-pass-slug={slug}>
+    <figure className="qi-pass" data-p-pass={slug} style={passVars(slug)} data-pass-slug={slug}>
       <span className="qi-pass__strap" />
       <Clip className="qi-pass__clip" />
       <div className="qi-pass__card">
