@@ -47,7 +47,8 @@ The Stretch homepage grew by addition: every pass added a well-made object, and 
 | Title | 17 px, weight 600, line height 1.35 |
 | Line | 15 px, muted, line height 1.45 |
 | Metadata | 13 px mono, muted (a year, a source). Hidden on phones |
-| Hover / focus | Card fill (`--stretch-card`), and an arrow that appears beside the metadata (opacity and 4 px travel) and turns cobalt. A 2 px cobalt focus ring inside the row |
+| Hover / focus | Card fill (`--stretch-card`), instant in and fading out over 120 ms, and an arrow that appears beside the metadata (opacity and 4 px travel) and turns cobalt. A 2 px cobalt focus ring inside the row (−2 px offset) |
+| Press | The fill darkens (`--stretch-card` mixed with 7% ink) and the object scales to .97 for as long as the row is held, on a tap as well as a click. With reduced motion the scale goes and the fill stays |
 | States | A link row goes to its page. A plain row (a habit, a strand) is focusable only if it has a closer look. On phones a link row with a closer look has two targets: its object opens the closer look, the rest of the row opens the page |
 
 Every row's text starts at the same edge down the whole page; that alignment is what makes the page read as one list.
@@ -261,6 +262,10 @@ What holds the finish in place. Each rule below is checked by a gate, or by the 
 - **JavaScript size**: a route fails `check:built` when its gzipped scripts grow more than 10% over the baseline in `scripts/js-budget.json`.
 - **Spacing**: homepage sections 80 px apart from 820 px wide and 64 px on phones; long-form sections 56 px (`--space-long-step`). The homepage stays within its length budget; if it goes over, the gap comes down.
 - **Type**: the Fine cut and DM Mono (see Type), dark-mode smoothing, dotted words without skip-ink. `e2e/stretch-type.spec.ts` holds the values.
+- **Feedback**: every control answers in 100 to 250 ms on `--out`, reversing from wherever it has reached. A row's fill is instant in and 120 ms out. Motion that is not feedback (a fold, a glide, an arrival, the theme) is named in `scripts/verify-craft.mjs`.
+- **Press**: a row darkens its fill, and a small control (the Eclipse, Copy, a filter, the large view's Close, the "all" links) or a row's object scales to .97 over 120 ms. Reduced motion drops the scale and keeps the fill. A press is CSS `:active`, so the browser ends it when a tap turns into a scroll.
+- **Focus**: one ring everywhere, 2 px cobalt at 2 px offset. The exceptions: inside a row (−2 px), a phone card (−2 px, in the Project's ink), the large view's Close (white on its scrim) and the Résumé sheet (its own ink). `verify:craft` reads the CSS for all of it.
+- **Image arrival**: a screenshot waits clear on its Project colour, then fades in over 150 ms once it has decoded (`ArrivalImage`). An image the browser already has when the page hydrates doesn't fade, and without script it shows as it loads. No library.
 - **Motion specs pause and seek.** They never wait out a transition's length.
 - **The interruption walk** (`docs/runbooks/interruption-walk.md`): eleven steps on a real iPhone and a laptop at each sign-off. Nothing jumps, restarts from zero or is left stuck.
 

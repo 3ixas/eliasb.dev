@@ -174,8 +174,6 @@ a.qi-header__name {
 
 .qi-greeting:focus-visible {
   border-radius: 8px;
-  outline: 2px solid var(--stretch-cobalt);
-  outline-offset: 2px;
 }
 
 /* The longest greeting is laid out unseen in the same cell as the shown one, so the words are the same width whichever shows. */

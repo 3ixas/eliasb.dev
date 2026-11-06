@@ -49,9 +49,35 @@ html:has([data-stretch-shell]) body {
   color: var(--stretch-on-cobalt);
 }
 
+/* The one focus ring (docs/design/DESIGN.md, "Craft bar"): 2 px cobalt at 2 px offset. A row's, inside it, is the only exception. */
 [data-stretch-shell] :focus-visible {
-  outline: 3px solid var(--stretch-cobalt);
-  outline-offset: 3px;
+  outline: 2px solid var(--stretch-cobalt);
+  outline-offset: 2px;
+}
+
+/*
+ * Press (docs/design/DESIGN.md, "Craft bar"): a small control scales to .97 while it is held, on a tap as well as a click,
+ * and returns over 120 ms. With reduced motion the scale goes; a row's fill, which is in quiet-index.css, stays.
+ * The browser ends :active when a tap becomes a scroll, so a press never outlasts the finger.
+ */
+:is(.stretch-eclipse, .qi-filters__button, .qi-zoom__close, .qi-all a) {
+  transition: transform 120ms var(--out);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :is(.stretch-eclipse, .qi-copy, .qi-filters__button, .qi-zoom__close, .qi-all a):active {
+    transform: scale(0.97);
+  }
+}
+
+/* Image arrival: a screenshot waits clear on its Project colour until it has decoded, then fades in over 150 ms (arrival-image.tsx). */
+img[data-arrival] {
+  transition: opacity 150ms var(--out);
+}
+
+img[data-arrival][data-arriving] {
+  opacity: 0;
+  transition: none;
 }
 
 /* A section that focus was sent to (by a link to it) is not a control, so it wears no ring. */
