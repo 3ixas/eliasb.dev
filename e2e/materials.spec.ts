@@ -29,8 +29,9 @@ for (const scheme of ["light", "dark"] as const) {
         await page.evaluate(() => document.fonts.ready);
         const group = page.locator(`[data-shot="${shot}"]`);
         await expect(group).toBeVisible();
-        // Every image is decoded before the picture, or a crop would be compared half-loaded.
-        await expect.poll(() => group.locator("img").evaluateAll((images) => images.every((image) => (image as HTMLImageElement).complete && (image as HTMLImageElement).naturalWidth > 0))).toBe(true);
+        // Every image is decoded and painted before the picture: `complete` alone let a baseline be taken with the portrait still blank.
+        await group.locator("img").evaluateAll((images) => Promise.all(images.map((image) => (image as HTMLImageElement).decode())));
+        await page.evaluate(() => new Promise<void>((done) => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
         await expect(group).toHaveScreenshot(`${shot}-${scheme}.png`, { maxDiffPixelRatio: 0.005, animations: "disabled" });
       });
     }
