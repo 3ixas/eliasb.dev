@@ -32,7 +32,7 @@ for (const scheme of ["light", "dark"] as const) {
         // Every image is decoded and painted before the picture: `complete` alone let a baseline be taken with the portrait still blank.
         await group.locator("img").evaluateAll((images) => Promise.all(images.map((image) => (image as HTMLImageElement).decode())));
         await page.evaluate(() => new Promise<void>((done) => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
-        await expect(group).toHaveScreenshot(`${shot}-${scheme}.png`, { maxDiffPixelRatio: 0.005, animations: "disabled" });
+        await expect(group).toHaveScreenshot(`${shot}-${scheme}.png`, { maxDiffPixelRatio: 0.005, animations: "disabled", scale: "device" });
       });
     }
   });
