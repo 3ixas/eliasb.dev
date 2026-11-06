@@ -13,7 +13,7 @@ export function CountUp({ from, to, prefix = "", suffix = "", format = String, w
   const text = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     const element = text.current;
-    if (!element || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!element || element.closest("[data-p-settled]") || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let frame = 0;
     const count = () => {
       const started = performance.now();

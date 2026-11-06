@@ -1,0 +1,47 @@
+/* PROTOTYPE, ticket "How should motion feel?". Never merge. */
+
+/* Spring */
+html[data-p-spring="tamed"] { --spring: cubic-bezier(.34, 1.2, .64, 1); }
+html[data-p-spring="none"] { --spring: var(--out); }
+
+/* Sweep: the glide */
+html[data-p-sweep="calm"] .qi-margin[data-glide] { transition: top .3s var(--out), left .3s var(--out); }
+html:is([data-p-sweep="first"], [data-p-sweep="rest"]) .qi-margin[data-glide] { transition: top .24s var(--out), left .24s var(--out); }
+/* Sweep: the exit */
+.qi-margin[data-p-exit] { opacity: 0; transition: opacity .12s ease-out; }
+/* Sweep: a look that gives way, and one that arrives already settled */
+.qi-look[data-p-prev] { position: absolute; inset: 0 auto auto 0; width: 100%; animation: p-out .12s linear both; }
+@keyframes p-out { to { opacity: 0; } }
+.qi-look[data-p-settled] { animation: qi-fade .12s ease-out both; }
+.qi-look[data-p-settled] *:not(.qi-core) { animation-duration: .001s !important; animation-delay: 0s !important; }
+
+/* Reactions: started by the pointer's arrival, not held by its stay */
+html:is([data-p-react="finish"], [data-p-react="return"]) .qi-row:hover :is(.qi-mini, .qi-tile):not(.p-play) { animation: none; }
+html:is([data-p-react="finish"], [data-p-react="return"]) .qi-bnp:hover .qi-bnp__pass:not(.p-play) { animation: none; }
+html:is([data-p-react="finish"], [data-p-react="return"]) .qi-opening__tail:hover .qi-letter:not(.p-play) { animation: none; }
+html:is([data-p-react="finish"], [data-p-react="return"]) .qi-opening__tail:hover path:not(.p-play) { animation: none; }
+html:is([data-p-react="finish"], [data-p-react="return"]) .qi-mini.p-play { animation: qi-swing .9s var(--out); }
+html:is([data-p-react="finish"], [data-p-react="return"]) .qi-tile.p-play { animation: qi-turn .6s var(--spring); }
+html:is([data-p-react="finish"], [data-p-react="return"]) .qi-bnp__pass.p-play { animation: qi-hang .8s var(--out) both; }
+html:is([data-p-react="finish"], [data-p-react="return"]) .qi-letter.p-play { animation: qi-lift .55s var(--spring) both; animation-delay: calc(var(--i) * 28ms); }
+html:is([data-p-react="finish"], [data-p-react="return"]) .qi-opening__tail path.p-play { animation: qi-scribble .8s var(--out); }
+
+/* Fold */
+html[data-p-fold="soft"] .qi-inline { transition: grid-template-rows .34s cubic-bezier(.25, .46, .3, 1); }
+html[data-p-fold="scaled"] .qi-inline { transition: grid-template-rows var(--p-fold, .34s) cubic-bezier(.25, .46, .3, 1); }
+
+/* The switcher */
+.proto-bar {
+  position: fixed; z-index: 2147483000; left: 10px; bottom: calc(10px + env(safe-area-inset-bottom));
+  display: grid; gap: 0; width: min(300px, calc(100vw - 20px)); padding: 6px 8px; border-radius: 14px;
+  background: #111; color: #fff; font: 500 13px/1.25 -apple-system, system-ui, sans-serif; letter-spacing: 0;
+  box-shadow: 0 6px 24px rgb(0 0 0 / .35);
+}
+.proto-bar[data-closed] { width: auto; padding: 2px; }
+.proto-bar__row { display: grid; grid-template-columns: 62px 36px 1fr 36px; align-items: center; min-height: 36px; }
+.proto-bar__row small { color: #aaa; font-size: 12px; }
+.proto-bar__row span { text-align: center; }
+.proto-bar button { min-height: 36px; min-width: 36px; border: 0; border-radius: 8px; background: transparent; color: inherit; font: inherit; cursor: pointer; touch-action: manipulation; }
+.proto-bar button:hover { background: #333; }
+.proto-bar__foot { display: flex; gap: 4px; justify-content: space-between; }
+.proto-bar__foot button { padding-inline: 8px; font-size: 12px; }

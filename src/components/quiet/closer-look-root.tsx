@@ -5,13 +5,12 @@ import { createPortal } from "react-dom";
 import { useCycleAdvance } from "@/components/quiet/cycle";
 import { margin as marginSpacing, placeMargin, WIDE } from "@/components/quiet/margin-placement";
 import { correctHold, reportFolding, startHold, stopHold } from "@/components/quiet/scroll-hold";
+import { protoCloseMs, protoFoldMs, protoPick, protoScrollBy, protoSlow } from "@/components/prototype-motion";
 
 /** The margin hides this long after the pointer leaves a row or focus leaves it, so crossing the gap between two rows does not flash. */
 const HIDE_MS = 140;
 /** Fired on `window` when a controller shows a look, so the others hide theirs: only one look is showing on the page. */
 const SHOWING = "qi-closer-look-showing";
-/** An inline look folds away over this long (quiet-index.css, `.qi-inline`); it is unmounted once it has. */
-const CLOSE_MS = 300;
 
 /**
  * The one value that says which closer look is showing: nothing, or one look and what asked for it. The margin
@@ -73,6 +72,14 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
   const removals = useRef(new Map<HTMLElement, number>());
   /** Names this controller to the page's scroll hold, which counts looks folding across every controller. */
   const owner = useRef({});
+  // PROTOTYPE: the margin's exit, the look giving way, and which looks arrive already settled.
+  const [lingering, setLingering] = useState<string | null>(null);
+  const lingerNow = useRef<string | null>(null);
+  const lingerTimer = useRef(0);
+  const [prevLook, setPrevLook] = useState<string | null>(null);
+  const prevTimer = useRef(0);
+  const settled = useRef(new Set<string>());
+  const restTimer = useRef(0);
 
   const cancelHide = () => window.clearTimeout(hideTimer.current);
   /** `slot` is where a tapped look is about to open, so another controller can tell whether the look it closes sits above it. */
@@ -83,6 +90,32 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     if (before === next) return;
     now.current = next;
     setActive(next);
+    const sweep = protoPick("sweep");
+    if (sweep !== "shipped") {
+      const wasMargin = !!before && before.source !== "tap";
+      if (wasMargin && !next) {
+        lingerNow.current = before.id;
+        setLingering(before.id);
+        window.clearTimeout(lingerTimer.current);
+        lingerTimer.current = window.setTimeout(() => {
+          lingerNow.current = null;
+          setLingering(null);
+          settled.current.clear();
+        }, 120 * protoSlow());
+      }
+      if (next && next.source !== "tap") {
+        window.clearTimeout(lingerTimer.current);
+        const from = wasMargin ? before.id : lingerNow.current;
+        lingerNow.current = null;
+        setLingering(null);
+        if (from && from !== next.id && sweep !== "calm") {
+          settled.current.add(next.id);
+          setPrevLook(from);
+          window.clearTimeout(prevTimer.current);
+          prevTimer.current = window.setTimeout(() => setPrevLook(null), 120 * protoSlow());
+        }
+      }
+    }
     if (next?.source === "tap") {
       cancelRemoval(removals.current, next.slot);
       setLeaving((all) => all.filter(({ id }) => id !== next.id));
@@ -99,16 +132,25 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
       window.setTimeout(() => {
         removals.current.delete(gone.slot);
         setLeaving((all) => all.filter((one) => one.slot !== gone.slot));
-      }, CLOSE_MS + 40),
+      }, protoCloseMs() + 40),
     );
     reportFolding(owner.current, removals.current.size + 1);
   };
   const hideSoon = () => {
     cancelHide();
+    window.clearTimeout(restTimer.current);
     hideTimer.current = window.setTimeout(() => change(null), HIDE_MS);
   };
   const show = (id: string, source: "pointer" | "focus") => {
     cancelHide();
+    window.clearTimeout(restTimer.current);
+    if (protoPick("sweep") === "rest" && source === "pointer" && now.current && now.current.source !== "tap" && now.current.id !== id) {
+      restTimer.current = window.setTimeout(() => {
+        announce();
+        change({ id, source });
+      }, 70);
+      return;
+    }
     announce();
     // A row that already holds focus keeps owning its look when the pointer arrives at it, so leaving the column cannot hide it.
     const before = now.current;
@@ -274,6 +316,24 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     reportFolding(owner.current, new Set([...removals.current.keys(), ...leaving.map(({ slot }) => slot)]).size);
   }, [active, leaving]);
 
+  // PROTOTYPE: a fold's length by its distance, and a gentle scroll to a look that would open mostly off screen.
+  useLayoutEffect(() => {
+    if (active?.source !== "tap") return;
+    const inner = active.slot.querySelector<HTMLElement>(".qi-inline__in");
+    if (!inner) return;
+    const height = inner.scrollHeight;
+    active.slot.style.setProperty("--p-fold", `${protoFoldMs(height) * protoSlow()}ms`);
+    if (protoPick("low") !== "reveal") return;
+    const top = active.slot.getBoundingClientRect().top;
+    const over = top + height - window.innerHeight;
+    if (over / height <= 0.5) return;
+    const header = document.querySelector("header")?.getBoundingClientRect().bottom ?? 0;
+    const delta = Math.min(over + 16, top - 76 - Math.max(header, 0) - 8);
+    if (delta <= 0) return;
+    stopHold();
+    protoScrollBy(delta);
+  }, [active]);
+
   // The object button (or reveal word) says what is open to assistive technology (CSS styles an open row from its filled slot).
   useEffect(() => {
     if (active?.source !== "tap") return;
@@ -310,10 +370,15 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
           id,
         ),
       )}
-      {active && active.source !== "tap" && (
-        <div ref={margin} className="qi-margin" aria-hidden="true" data-margin="">
-          <div key={active.id} className="qi-look">
-            {looks[active.id]}
+      {((active && active.source !== "tap") || lingering) && (
+        <div ref={margin} className="qi-margin" aria-hidden="true" data-margin="" data-p-exit={active && active.source !== "tap" ? undefined : ""}>
+          {prevLook && prevLook !== (active?.id ?? lingering) && (
+            <div key={prevLook} className="qi-look" data-p-prev="" data-p-settled={settled.current.has(prevLook) ? "" : undefined}>
+              {looks[prevLook]}
+            </div>
+          )}
+          <div key={active && active.source !== "tap" ? active.id : lingering!} className="qi-look" data-p-settled={settled.current.has(active && active.source !== "tap" ? active.id : lingering!) ? "" : undefined}>
+            {looks[active && active.source !== "tap" ? active.id : lingering!]}
           </div>
         </div>
       )}
