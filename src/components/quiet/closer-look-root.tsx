@@ -100,6 +100,14 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
       // The same look asked for by another source (the pointer, then focus) is not a new arrival: it keeps the mode it has.
       setSweeping((current) => (before?.id === next.id ? current : marginUp));
     } else if (before && before.source !== "tap" && fade && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      // The fade is where the margin stands: a glide in progress is stopped at the place it has reached.
+      const element = margin.current;
+      if (element) {
+        delete element.dataset.glide;
+        // The margin sits at the window's top left before its transform, so its rendered corner is the translation, at full precision.
+        const { left, top } = element.getBoundingClientRect();
+        element.style.transform = `translate(${left}px, ${top}px)`;
+      }
       setFading(before.id);
       fadeTimer.current = window.setTimeout(() => {
         fadeTimer.current = 0;

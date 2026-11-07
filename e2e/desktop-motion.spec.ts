@@ -25,6 +25,20 @@ const arrivals = (look: Locator) =>
       .map((animation) => (animation as CSSAnimation).animationName),
   );
 
+/** Resolves once the margin has held one place for ten frames: a look's images settling its height re-place it, and that is not what a test of the fade or the glide is judging. */
+const placed = (page: Page) =>
+  page.evaluate(async () => {
+    const node = document.querySelector(".qi-margin")!;
+    let still = 0;
+    let last = NaN;
+    while (still < 10) {
+      await new Promise(requestAnimationFrame);
+      const y = node.getBoundingClientRect().y;
+      still = y === last ? still + 1 : 0;
+      last = y;
+    }
+  });
+
 /**
  * Armed before the pointer arrives: waits in the page for the reaction on `host` to start and pauses it in the task that
  * finds it, at `at` ms, so a slow runner cannot let a 900 ms swing finish between a hover and a read. Returns the names paused.
@@ -61,10 +75,20 @@ test.describe("Desktop motion: the margin", () => {
   });
 
   test("the first look arrives in full; the next crossfades over 120 ms with its arrival already played", async ({ page }) => {
+    // Armed before the pointer arrives: the first arrival is paused in the task that finds it, so a slow runner cannot let its second finish first.
+    const dropping = page.evaluate(async () => {
+      for (;;) {
+        await new Promise(requestAnimationFrame);
+        const look = document.querySelector(".qi-margin .qi-look");
+        const running = look?.getAnimations({ subtree: true }).filter((animation) => animation.playState === "running" && Number.isFinite(animation.effect?.getComputedTiming().iterations));
+        if (running?.length) {
+          running.forEach((animation) => animation.pause());
+          return running.map((animation) => (animation as CSSAnimation).animationName);
+        }
+      }
+    });
     await rowFor(page, "bnp-paribas").hover();
-    const first = margin(page).locator(".qi-look");
-    await expect(first.locator(".qi-pass")).toBeVisible();
-    expect(await arrivals(first)).toContain("qi-drop");
+    expect(await dropping).toContain("qi-drop");
     await expect(margin(page)).not.toHaveAttribute("data-settled", "");
 
     await rowFor(page, "joveen").hover();
@@ -82,6 +106,7 @@ test.describe("Desktop motion: the margin", () => {
   test("the glide is 240 ms on transform, and seeked through it the margin never leaves the span between the two places", async ({ page }) => {
     await rowFor(page, "bnp-paribas").hover();
     await expect(margin(page).locator(".qi-pass")).toBeVisible();
+    await placed(page);
     // The glide is what `data-glide` plus a new transform does; making both in one task judges the CSS itself, whatever a runner's pointer or scroll timing.
     const glide = await margin(page).evaluate((element) => {
       const from = element.getBoundingClientRect().y;
@@ -112,6 +137,33 @@ test.describe("Desktop motion: the margin", () => {
     expect(glide!.ys[0]).toBeCloseTo(glide!.from, 0);
   });
 
+  test("dismissing the margin in the middle of a glide stops it where it has reached", async ({ page }) => {
+    await rowFor(page, "bnp-paribas").hover();
+    await expect(margin(page).locator(".qi-pass")).toBeVisible();
+    await placed(page);
+    const result = await margin(page).evaluate(async (element) => {
+      const frame = () => new Promise(requestAnimationFrame);
+      const [, x, y] = element.style.transform.match(/translate\((-?[\d.]+)px, (-?[\d.]+)px\)/)!.map(Number);
+      element.dataset.glide = "";
+      element.style.transform = `translate(${x}px, ${y + 80}px)`;
+      // Dismiss as soon as the glide has visibly started, whatever the runner's speed; a glide already over only makes the check easier.
+      while (element.getBoundingClientRect().y < y + 10) await frame();
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+      await frame();
+      const places: number[] = [];
+      let gliding = false;
+      for (let count = 0; count < 4 && element.isConnected; count++) {
+        gliding ||= element.getAnimations().some((animation) => (animation as CSSTransition).transitionProperty === "transform");
+        places.push(element.getBoundingClientRect().y);
+        await frame();
+      }
+      return { places, gliding };
+    });
+    expect(result.gliding).toBe(false);
+    // Frame after frame, the fading margin stays where the dismissal found it.
+    for (const place of result.places) expect(place).toBeCloseTo(result.places[0], 1);
+  });
+
   test("moving to another row sets the glide", async ({ page }) => {
     await rowFor(page, "bnp-paribas").hover();
     await expect(margin(page).locator(".qi-pass")).toBeVisible();
@@ -125,6 +177,7 @@ test.describe("Desktop motion: the margin", () => {
   test("the margin fades over 120 ms without moving, and returning inside the fade is the same sweep", async ({ page }) => {
     await rowFor(page, "bnp-paribas").hover();
     await expect(margin(page).locator(".qi-pass")).toBeVisible();
+    await placed(page);
     // Armed before the pointer leaves: at the commit that starts the fade, the pointer comes back to the same row, in the same task.
     const returned = page.evaluate(
       () =>
@@ -133,17 +186,18 @@ test.describe("Desktop motion: the margin", () => {
           const observer = new MutationObserver(() => {
             if (!node.hasAttribute("data-leaving")) return;
             observer.disconnect();
-            const before = node.getBoundingClientRect().y;
             const fade = node.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "opacity");
             const fadeMs = Number(fade?.effect?.getComputedTiming().duration);
             document.querySelector('section#work [data-look="bnp-paribas"]')!.dispatchEvent(new PointerEvent("pointerover", { bubbles: true, pointerType: "mouse" }));
             requestAnimationFrame(() =>
+              requestAnimationFrame(() =>
               resolve({
-                sameNode: document.querySelector(".qi-margin") === node && node.getBoundingClientRect().y === before,
+                sameNode: document.querySelector(".qi-margin") === node,
                 leaving: node.hasAttribute("data-leaving"),
                 settled: node.hasAttribute("data-settled"),
                 fadeMs,
               }),
+              ),
             );
           });
           observer.observe(node, { attributes: true, attributeFilter: ["data-leaving"] });
@@ -160,6 +214,7 @@ test.describe("Desktop motion: the margin", () => {
   test("a margin that is left goes after its fade, and does not move while it fades", async ({ page }) => {
     await rowFor(page, "joveen").hover();
     await expect(margin(page).locator(".qi-pass")).toBeVisible();
+    await placed(page);
     const watching = page.evaluate(
       () =>
         new Promise<number>((resolve) => {
@@ -169,7 +224,8 @@ test.describe("Desktop motion: the margin", () => {
             observer.disconnect();
             // From the commit that starts the fade, not from the look's first placement: its images may still be settling its height.
             const start = node.getBoundingClientRect().y;
-            requestAnimationFrame(() => requestAnimationFrame(() => resolve(node.getBoundingClientRect().y - start)));
+            // One frame on, if the fade is still there: a slow runner may have taken the margin away already, which is not movement.
+            requestAnimationFrame(() => resolve(node.isConnected ? node.getBoundingClientRect().y - start : 0));
           });
           observer.observe(node, { attributes: true, attributeFilter: ["data-leaving"] });
         }),
