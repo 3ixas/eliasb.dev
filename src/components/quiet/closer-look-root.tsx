@@ -103,9 +103,10 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
       // The fade is where the margin stands: a glide in progress is stopped at the place it has reached.
       const element = margin.current;
       if (element) {
-        delete element.dataset.glide;
+        // Read first: with the glide gone, a layout read resolves the destination, not the place it has reached.
         // The margin sits at the window's top left before its transform, so its rendered corner is the translation, at full precision.
         const { left, top } = element.getBoundingClientRect();
+        delete element.dataset.glide;
         element.style.transform = `translate(${left}px, ${top}px)`;
       }
       setFading(before.id);

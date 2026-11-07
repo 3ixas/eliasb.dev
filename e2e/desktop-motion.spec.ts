@@ -148,9 +148,10 @@ test.describe("Desktop motion: the margin", () => {
       element.style.transform = `translate(${x}px, ${y + 80}px)`;
       // Dismiss as soon as the glide has visibly started, whatever the runner's speed; a glide already over only makes the check easier.
       while (element.getBoundingClientRect().y < y + 10) await frame();
+      const reached = element.getBoundingClientRect().y;
       document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
       await frame();
-      const places: number[] = [];
+      const places: number[] = [reached];
       let gliding = false;
       for (let count = 0; count < 4 && element.isConnected; count++) {
         gliding ||= element.getAnimations().some((animation) => (animation as CSSTransition).transitionProperty === "transform");
@@ -161,7 +162,12 @@ test.describe("Desktop motion: the margin", () => {
     });
     expect(result.gliding).toBe(false);
     // Frame after frame, the fading margin stays where the dismissal found it.
-    for (const place of result.places) expect(place).toBeCloseTo(result.places[0], 1);
+    // The first place is the one read just before the dismissal: the fade must not jump from it to the glide's destination (up to 70 px on), nor keep moving.
+    const [reached, ...after] = result.places;
+    for (const place of after) {
+      expect(Math.abs(place - reached)).toBeLessThan(8);
+      expect(place).toBeCloseTo(after[0], 1);
+    }
   });
 
   test("moving to another row sets the glide", async ({ page }) => {
@@ -220,6 +226,8 @@ test.describe("Desktop motion: the margin", () => {
         new Promise<number>((resolve) => {
           const node = document.querySelector<HTMLElement>(".qi-margin")!;
           const observer = new MutationObserver(() => {
+            // A slow runner may have removed the margin before this ran; then there was no frame in which it could have moved.
+            if (!node.isConnected) return resolve(0);
             if (!node.hasAttribute("data-leaving")) return;
             observer.disconnect();
             // From the commit that starts the fade, not from the look's first placement: its images may still be settling its height.
@@ -227,7 +235,7 @@ test.describe("Desktop motion: the margin", () => {
             // One frame on, if the fade is still there: a slow runner may have taken the margin away already, which is not movement.
             requestAnimationFrame(() => resolve(node.isConnected ? node.getBoundingClientRect().y - start : 0));
           });
-          observer.observe(node, { attributes: true, attributeFilter: ["data-leaving"] });
+          observer.observe(document.body, { attributes: true, attributeFilter: ["data-leaving"], childList: true, subtree: true });
         }),
     );
     await page.mouse.move(5, 5);
