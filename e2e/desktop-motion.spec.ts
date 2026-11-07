@@ -25,6 +25,26 @@ const arrivals = (look: Locator) =>
       .map((animation) => (animation as CSSAnimation).animationName),
   );
 
+/**
+ * Armed before the pointer arrives: waits in the page for the reaction on `host` to start and pauses it in the task that
+ * finds it, at `at` ms, so a slow runner cannot let a 900 ms swing finish between a hover and a read. Returns the names paused.
+ */
+const pauseReaction = (host: Locator, at: number) =>
+  host.evaluate(async (element, time) => {
+    let playing: Animation[] = [];
+    // Only once the element is reacting: its own arrival animations are not the reaction.
+    while (!playing.length) {
+      await new Promise(requestAnimationFrame);
+      if (!element.hasAttribute("data-reacting")) continue;
+      playing = element.getAnimations({ subtree: true }).filter((animation) => animation.playState === "running" && Number.isFinite(animation.effect?.getComputedTiming().iterations));
+    }
+    for (const animation of playing) {
+      animation.pause();
+      animation.currentTime = time;
+    }
+    return playing.map((animation) => (animation as CSSAnimation).animationName);
+  }, at);
+
 test.describe("Desktop motion: the margin", () => {
   test.skip(({ page }) => !wide(page), "The margin is for wide screens with a hovering pointer");
   test.use({ reducedMotion: "no-preference" });
@@ -59,36 +79,47 @@ test.describe("Desktop motion: the margin", () => {
     expect(fade).toEqual({ name: "qi-fade", duration: 120 });
   });
 
-  test("the glide is 240 ms on transform, and a sweep seeked through it never leaves the span between the two rows", async ({ page }) => {
+  test("the glide is 240 ms on transform, and seeked through it the margin never leaves the span between the two places", async ({ page }) => {
     await rowFor(page, "bnp-paribas").hover();
     await expect(margin(page).locator(".qi-pass")).toBeVisible();
-    const from = (await margin(page).boundingBox())!.y;
-    // The pointer moves without scrolling the page: a scroll ends the glide, as it should.
-    const target = (await rowFor(page, "joveen").boundingBox())!;
-    // Armed before the pointer moves: the transition is paused in the task that finds it, so a slow runner cannot outlast it.
-    const seeking = margin(page).evaluate(async (element) => {
-      let transition: Animation | undefined;
-      while (!transition) {
-        await new Promise(requestAnimationFrame);
-        transition = element.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "transform");
-      }
-      transition.pause();
-      const duration = transition.effect!.getComputedTiming().duration;
+    // The glide is what `data-glide` plus a new transform does; making both in one task judges the CSS itself, whatever a runner's pointer or scroll timing.
+    const glide = await margin(page).evaluate((element) => {
+      const from = element.getBoundingClientRect().y;
+      const [, x, y] = element.style.transform.match(/translate\((-?[\d.]+)px, (-?[\d.]+)px\)/)!.map(Number);
+      element.dataset.glide = "";
+      element.style.transform = `translate(${x}px, ${y + 80}px)`;
+      const transitions = element.getAnimations().filter((animation) => animation instanceof CSSTransition);
+      const transform = transitions.find((animation) => (animation as CSSTransition).transitionProperty === "transform");
+      if (!transform) return null;
+      transform.pause();
+      const timing = transform.effect!.getComputedTiming();
       const ys: number[] = [];
       for (const time of [0, 60, 120, 180, 239]) {
-        transition.currentTime = time;
+        transform.currentTime = time;
         ys.push(element.getBoundingClientRect().y);
       }
-      return { duration, ys };
+      return { duration: timing.duration, ys, from, properties: transitions.map((animation) => (animation as CSSTransition).transitionProperty) };
     });
-    await page.mouse.move(target.x + target.width / 2, target.y + target.height / 2);
-    const glide = await seeking;
-    expect(glide.duration).toBe(240);
-    const to = Math.max(...glide.ys);
-    for (const y of glide.ys) {
-      expect(y).toBeGreaterThanOrEqual(Math.min(from, to) - 1);
-      expect(y).toBeLessThanOrEqual(Math.max(from, to) + 1);
+    expect(glide).not.toBeNull();
+    expect(glide!.duration).toBe(240);
+    expect(glide!.properties).not.toContain("top");
+    expect(glide!.properties).not.toContain("left");
+    // No overshoot: every sampled place lies between where it started and where it was going.
+    for (const y of glide!.ys) {
+      expect(y).toBeGreaterThanOrEqual(glide!.from - 1);
+      expect(y).toBeLessThanOrEqual(glide!.from + 80 + 1);
     }
+    expect(glide!.ys[0]).toBeCloseTo(glide!.from, 0);
+  });
+
+  test("moving to another row sets the glide", async ({ page }) => {
+    await rowFor(page, "bnp-paribas").hover();
+    await expect(margin(page).locator(".qi-pass")).toBeVisible();
+    const target = (await rowFor(page, "joveen").boundingBox())!;
+    await page.mouse.move(target.x + target.width / 2, target.y + target.height / 2);
+    await expect(margin(page).locator('.qi-pass[data-pass-slug="joveen"]')).toBeVisible();
+    // A scroll ends the glide on purpose, so the attribute is read the moment the look changes, not afterwards.
+    await expect(margin(page)).toHaveAttribute("data-settled", "");
   });
 
   test("the margin fades over 120 ms without moving, and returning inside the fade is the same sweep", async ({ page }) => {
@@ -158,14 +189,10 @@ test.describe("Desktop motion: reactions finish", () => {
     await hydrated(page);
     const row = rowFor(page, "bnp-paribas");
     await row.scrollIntoViewIfNeeded();
-    await row.hover();
     const mini = row.locator(".qi-mini");
-    await expect(mini).toHaveCSS("animation-name", "qi-swing");
-    await mini.evaluate((element) => {
-      const swing = element.getAnimations().find((animation) => (animation as CSSAnimation).animationName === "qi-swing")!;
-      swing.pause();
-      swing.currentTime = 300;
-    });
+    const paused = pauseReaction(row, 300);
+    await row.hover();
+    expect(await paused).toContain("qi-swing");
     await page.mouse.move(5, 5);
     // Gone from the row, the reaction is still there, where it was.
     await expect(row).toHaveAttribute("data-reacting", "");
@@ -178,14 +205,14 @@ test.describe("Desktop motion: reactions finish", () => {
   test("the employer's pass and the opening line's letters finish too", async ({ page }) => {
     await page.goto("/");
     await hydrated(page);
-    for (const [host, animated, name] of [
-      [".qi-bnp", ".qi-bnp__pass", "qi-hang"],
-      [".qi-opening__tail", ".qi-letter", "qi-lift"],
+    for (const [host, name] of [
+      [".qi-bnp", "qi-hang"],
+      [".qi-opening__tail", "qi-lift"],
     ] as const) {
       const element = page.locator(host).first();
+      const paused = pauseReaction(element, 100);
       await element.hover({ position: { x: 3, y: 3 } });
-      await expect(element.locator(animated).first()).toHaveCSS("animation-name", name);
-      await element.evaluate((node) => node.getAnimations({ subtree: true }).forEach((animation) => animation.pause()));
+      expect(await paused).toContain(name);
       await page.mouse.move(5, 5);
       await expect(element).toHaveAttribute("data-reacting", "");
       await element.evaluate((node) => node.getAnimations({ subtree: true }).forEach((animation) => animation.finish()));
