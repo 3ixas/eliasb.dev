@@ -5,7 +5,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 // only what a value can prove: the one focus ring, the two timing curves, the object shadow tokens and the length of
 // every feedback transition. Under a second, and nothing in it can flake.
 
-const SPRING = 'cubic-bezier(.34,1.56,.64,1)';
+const SPRING = 'cubic-bezier(.34,1.2,.64,1)';
 const OUT = 'cubic-bezier(.2,.8,.2,1)';
 const FEEDBACK_MS = [100, 250];
 
@@ -158,7 +158,7 @@ const broken = (path, from, to) => {
 const mustFail = (name, changed, pattern) => assert.ok(craftProblems(changed).some((problem) => pattern.test(problem)), `The ${name} check did not fail on its deliberate break`);
 mustFail('focus ring width', broken('src/app/stretch-shell.css', 'outline: 2px solid var(--stretch-cobalt);', 'outline: 3px solid var(--stretch-cobalt);'), /focus ring/);
 mustFail('focus ring offset', broken('src/app/quiet-long-form.css', '.qi-long__back:focus-visible {\n  border-radius: 6px;', '.qi-long__back:focus-visible {\n  border-radius: 6px;\n  outline-offset: 4px;'), /offset/);
-mustFail('spring', broken('src/app/stretch-tokens.css', '--spring: cubic-bezier(.34, 1.56, .64, 1);', '--spring: cubic-bezier(.3, 1.4, .64, 1);'), /--spring/);
+mustFail('spring', broken('src/app/stretch-tokens.css', '--spring: cubic-bezier(.34, 1.2, .64, 1);', '--spring: cubic-bezier(.3, 1.4, .64, 1);'), /--spring/);
 mustFail('feedback timing', broken('src/app/quiet-index.css', 'transition: background-color 120ms var(--out);', 'transition: background-color 400ms var(--out);'), /400 ms/);
 mustFail('row fill', broken('src/app/quiet-index.css', '  background: var(--stretch-card);\n    transition: none;', '  background: var(--stretch-card);'), /instant in/);
 mustFail('shadow tokens', broken('src/app/stretch-tokens.css', '--shadow-look: 0 0 0 1px rgb(0 0 0 / 0.08)', '--shadow-looks: 0 0 0 1px rgb(0 0 0 / 0.08)'), /shadow/);

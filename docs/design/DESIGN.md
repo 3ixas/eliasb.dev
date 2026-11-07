@@ -121,7 +121,9 @@ On a long-form page, the closer looks are the real things its prose names in pas
 - **When it's used**: on wide screens (from 1180 px) with a hovering pointer. A row or word shows its closer look on pointer enter or focus, and hides it 140 ms after leave or blur.
 - **Placement**: 40 px right of the column, 300 px wide. It lines up with the row's top (minus 6 px), but always fits the window: it rises until it sits 16 px above the bottom edge, and never above 16 px from the top. It keeps fitting as images load (`ResizeObserver`) and while the page scrolls.
 - **The header's portrait** is the one look that does not sit level with its trigger: the header's links and Eclipse fill the margin's height there, so its look hangs 16 px below the header, on the same edge. On phones it opens under the header's row.
-- **Moving between rows**: it glides on the `spring` timing. It takes no pointer events and never covers the column. A closer look has no links; the row is the link.
+- **Moving between rows**: the first look arrives in full. While the margin stays up, the next look crossfades in over 120 ms with its arrival already played (its drop, its count and its fills are finished; typing still types), and the margin glides 240 ms on `--out`, on `transform`, with no overshoot. It takes no pointer events and never covers the column. A closer look has no links; the row is the link.
+- **Leaving**: 140 ms after the pointer leaves, the margin fades over 120 ms without moving. Returning to a row inside that window is the same sweep: the margin comes back where it stood, and the next look crossfades. With reduced motion every look fades in over 0.2 s, with no glide and no fade-out.
+- **Words**: a look's words are readable by 300 ms unless the words are the arrival. The book's title and author arrive with the cover; Now making's description typing stays.
 
 ### Inline (phones and touch)
 
@@ -143,7 +145,7 @@ Decided in [Closer looks on phones: the dock, or inline under the row](https://g
 | "products of my own." | It draws its cobalt underline once on arrival. On hover, the letters lift in a short wave and the underline scribbles out and back |
 | Greeting | A line and a small object for the visitor's own time of day, all drawn for 30 × 22 px: "Hello" (before the clock is read, and without script) a terminal prompt with a blinking cobalt cursor; morning, "Kettle’s on.", a kettle whose steam curls; afternoon, a clock a few minutes short of five whose minute hand ticks up, saying "Nearly five?" on a weekday and "Nowhere to be?" on Saturday and Sunday (the visitor's own day; only the afternoon changes with it); evening, "Home yet?", a desk lamp whose pool of light fades in; late, "Still up?", the moon rocking as the stars come out. Hover or focus plays it and adds "it's HH:MM here in London". On a phone it plays once on arrival, and tapping the greeting plays it again and says London's time beneath, on its own line; tapping it again hides it. The width is reserved for the longest line, so no line moves the header |
 | The Eclipse (theme) | The icon turns over when pressed. The page crossfades (see Motion) |
-| Rows' objects | Projects lift and tilt 3°, Flowtime's icon counts seconds, passes swing, covers open on their spine, calendar tiles turn over |
+| Rows' objects | Projects lift and tilt 3°, Flowtime's icon counts seconds, passes swing, covers open on their spine, calendar tiles turn over. The pass, the tile, the employer's pass and "products of my own." start when the pointer arrives and finish after it leaves; the lift and tilt reverse from where they have reached |
 | How I work's pen | Rings around the numbers, arrows between habits, and underlines under each proof's strongest phrase draw as they scroll up the screen and un-draw on the way back (CSS scroll-driven animations; drawn when unsupported) |
 | GitHub year | The cells fill in and the total counts up when it first comes into view. A day shows its count on hover |
 | Live signals | "Live from Goodreads / Letterboxd / GitHub" with a cobalt dot that pulses three times, then rests |
@@ -250,7 +252,7 @@ Every text pair passes WCAG 2.2 AA; `e2e/stretch-tokens.spec.ts` measures them o
 
 ## Motion
 
-- **Timing**: `--spring: cubic-bezier(.34, 1.56, .64, 1)` for things that arrive or swing, and `--out: cubic-bezier(.2, .8, .2, 1)` for things that settle.
+- **Timing**: `--spring: cubic-bezier(.34, 1.2, .64, 1)` for things that arrive or swing, and `--out: cubic-bezier(.2, .8, .2, 1)` for things that settle.
 - **Theme changes** crossfade over 0.3 s with `cubic-bezier(0, 0, 0.38, 0.9)`, or switch instantly with reduced motion.
 - **Reduced motion** removes all movement and keeps 0.2 s fades, except theme changes, which are instant. Content never waits for motion.
 
@@ -266,6 +268,7 @@ What holds the finish in place. Each rule below is checked by a gate, or by the 
 - **Press**: a row darkens its fill, and a small control (the Eclipse, Copy, a filter, the large view's Close, the "all" links) or a row's object scales to .97 over 120 ms. Reduced motion drops the scale and keeps the fill. A press is CSS `:active`, so the browser ends it when a tap turns into a scroll.
 - **Focus**: one ring everywhere, 2 px cobalt at 2 px offset. The exceptions: inside a row (−2 px), a phone card (−2 px, in the Project's ink), the large view's Close (white on its scrim) and the Résumé sheet (its own ink). `verify:craft` reads the CSS for all of it.
 - **Image arrival**: a screenshot waits clear on its Project colour, then fades in over 150 ms once it has decoded (`ArrivalImage`). An image the browser already has when the page hydrates doesn't fade, and without script it shows as it loads. No library.
+- **Reactions finish**: a reaction that has started is not held by the pointer staying or cut short by it leaving (`data-reacting`, set by `reactions.ts` on arrival and cleared when its animations end). It needs a hovering pointer and motion allowed.
 - **Motion specs pause and seek.** They never wait out a transition's length.
 - **The interruption walk** (`docs/runbooks/interruption-walk.md`): eleven steps on a real iPhone and a laptop at each sign-off. Nothing jumps, restarts from zero or is left stuck.
 

@@ -1,19 +1,22 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
+import { LookArrival } from "@/components/quiet/look-arrival";
 
 const COUNT_MS = 900;
 
 /**
  * A figure that counts from `from` to `to` once: when its closer look arrives, or with `whenSeen`, the first time it
  * is on screen. The server (and a visitor who prefers reduced motion) get the finished text: the counting only
- * rewrites the text node, never the layout. `format` writes each step, and should be one stable function.
+ * rewrites the text node, never the layout. A look that replaces another in the margin arrives finished, so it does not count. `format` writes each step, and should be one stable function.
  */
 export function CountUp({ from, to, prefix = "", suffix = "", format = String, whenSeen = false }: { from: number; to: number; prefix?: string; suffix?: string; format?: (value: number) => string; whenSeen?: boolean }) {
   const text = useRef<HTMLSpanElement>(null);
+  /** Read once: a look that is already counting is not stopped because the pointer came back to it. */
+  const [arrivesFinished] = useState(useContext(LookArrival));
   useEffect(() => {
     const element = text.current;
-    if (!element || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!element || arrivesFinished || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let frame = 0;
     const count = () => {
       const started = performance.now();
@@ -40,6 +43,6 @@ export function CountUp({ from, to, prefix = "", suffix = "", format = String, w
       observer.disconnect();
       cancelAnimationFrame(frame);
     };
-  }, [from, to, prefix, suffix, format, whenSeen]);
+  }, [from, to, prefix, suffix, format, whenSeen, arrivesFinished]);
   return <span ref={text}>{`${prefix}${format(to)}${suffix}`}</span>;
 }

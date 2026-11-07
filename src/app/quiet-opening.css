@@ -97,7 +97,8 @@
   opacity: 1;
 }
 
-@media (hover: hover) {
+/* With no motion there is no reaction to finish, so the pass is simply there while the pointer is. */
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
   .qi-bnp:hover .qi-bnp__pass {
     opacity: 1;
   }
@@ -109,8 +110,10 @@
   }
 }
 
+/* Played from the pointer arriving (reactions.ts): the pass finishes its swing after the pointer leaves. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .qi-bnp:hover .qi-bnp__pass {
+  .qi-bnp[data-reacting] .qi-bnp__pass {
+    opacity: 1;
     animation: qi-hang 0.8s var(--out) both;
   }
 }
@@ -179,12 +182,12 @@
 }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .qi-opening__tail:hover .qi-letter {
+  .qi-opening__tail[data-reacting] .qi-letter {
     animation: qi-lift 0.55s var(--spring) both;
     animation-delay: calc(var(--i) * 28ms);
   }
 
-  .qi-opening__tail:hover path {
+  .qi-opening__tail[data-reacting] path {
     animation: qi-scribble 0.8s var(--out);
   }
 }
