@@ -68,7 +68,11 @@ export function startHold(trigger: HTMLElement) {
   };
   window.addEventListener("touchstart", take, { once: true, passive: true });
   window.addEventListener("wheel", take, { once: true, passive: true });
-  window.addEventListener("keydown", take, { once: true });
+  // A key pressed after the hold began, not the one that began it (Enter on a row is still bubbling to the window), nor its repeats.
+  const key = (event: KeyboardEvent) => {
+    if (event.timeStamp > started && !event.repeat) take();
+  };
+  window.addEventListener("keydown", key);
   const hold: Hold = {
     trigger,
     top: trigger.getBoundingClientRect().top,
@@ -77,7 +81,7 @@ export function startHold(trigger: HTMLElement) {
       window.cancelAnimationFrame(hold.frame);
       window.removeEventListener("touchstart", take);
       window.removeEventListener("wheel", take);
-      window.removeEventListener("keydown", take);
+      window.removeEventListener("keydown", key);
       if (current === hold) current = null;
     },
   };

@@ -315,6 +315,8 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     const just = opened.current;
     if (!just || active?.source !== "tap" || active.slot !== just.slot) return;
     opened.current = null;
+    // Where the page has moved the tapped row (a look above it was removed in this commit), put it back before measuring from it.
+    correctHold();
     const { height } = setFold(just.slot, just.shut);
     // A look reopened part way is already in view, and its row is still held where the visitor left it.
     if (!just.shut) return;
