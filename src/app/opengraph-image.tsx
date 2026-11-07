@@ -1,11 +1,10 @@
-import { bricolage } from "@/app/og-font";
+import { shareCard, shareSize } from "@/app/share-card";
 import { siteCopy } from "@/content/stretch/site-copy";
-import { ImageResponse } from "next/og";
 
 const { name, lead, emphasis } = siteCopy.socialImage;
 
 export const alt = `${name}. ${lead} ${emphasis}`;
-export const size = { width: 1200, height: 630 };
+export const size = shareSize;
 export const contentType = "image/png";
 
 // The light page, ink and cobalt from stretch-tokens.css, as plain values
@@ -15,29 +14,18 @@ const ink = "#111114";
 const cobalt = "#2340ff";
 
 // Satori lays out flex boxes, not inline text, so the headline wraps word by
-// word; "feel simple." stays together as the cobalt phrase.
+// word; "products of my own." stays together as the cobalt phrase.
 const words = [
   ...lead.split(" ").map((word) => ({ word, accent: false })),
   { word: emphasis, accent: true },
 ];
 
-export default async function OpenGraphImage() {
-  return new ImageResponse(
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        padding: "64px 80px 68px",
-        color: ink,
-        fontFamily: "Bricolage",
-        fontWeight: 800,
-        backgroundColor: page,
-      }}
-    >
-      <div style={{ display: "flex", fontSize: 40, letterSpacing: 4 }}>{name}</div>
+/** The homepage's card, and the card of every page without its own: the opening line. */
+export default function OpenGraphImage() {
+  return shareCard({
+    field: page,
+    ink,
+    children: (
       <div
         style={{
           display: "flex",
@@ -55,7 +43,6 @@ export default async function OpenGraphImage() {
           </span>
         ))}
       </div>
-    </div>,
-    { ...size, fonts: [await bricolage()] },
-  );
+    ),
+  });
 }

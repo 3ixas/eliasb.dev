@@ -18,7 +18,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const study = caseStudyFor(slug);
   if (!study) return {};
-  const { name, screenshot: image } = caseStudyOpening(study, projects);
+  const { name } = caseStudyOpening(study, projects);
   const { description } = study;
   return {
     title: name,
@@ -30,18 +30,11 @@ export async function generateMetadata({
       url: `/things-i-make/${slug}`,
       title: pageTitle(name),
       description,
-      images: [{
-        url: image.src,
-        width: image.width,
-        height: image.height,
-        alt: image.alt,
-      }],
     },
     twitter: {
       card: "summary_large_image",
       title: pageTitle(name),
       description,
-      images: [{ url: image.src, alt: image.alt }],
     },
   };
 }
