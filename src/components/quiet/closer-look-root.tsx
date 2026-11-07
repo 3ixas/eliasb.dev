@@ -5,9 +5,13 @@ import { createPortal } from "react-dom";
 import { useCycleAdvance } from "@/components/quiet/cycle";
 import { margin as marginSpacing, placeMargin, WIDE } from "@/components/quiet/margin-placement";
 import { correctHold, reportFolding, startHold, stopHold } from "@/components/quiet/scroll-hold";
+import { startReaction } from "@/components/quiet/reactions";
+import { arriveFinished, LookArrival } from "@/components/quiet/look-arrival";
 
 /** The margin hides this long after the pointer leaves a row or focus leaves it, so crossing the gap between two rows does not flash. */
 const HIDE_MS = 140;
+/** The margin fades over this long when its look goes (quiet-index.css, `.qi-margin`); a look shown inside it is the same sweep. */
+const FADE_MS = 120;
 /** Fired on `window` when a controller shows a look, so the others hide theirs: only one look is showing on the page. */
 const SHOWING = "qi-closer-look-showing";
 /** An inline look folds away over this long (quiet-index.css, `.qi-inline`); it is unmounted once it has. */
@@ -62,9 +66,14 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
   const root = useRef<HTMLDivElement>(null);
   const margin = useRef<HTMLDivElement>(null);
   const hideTimer = useRef(0);
+  const fadeTimer = useRef(0);
   /** The look the margin last placed itself for: a new one while it is showing glides there. */
   const placedFor = useRef<string | null>(null);
   const [active, setActive] = useState<Active>(null);
+  /** The look the margin is fading away, once nothing is active: it stays where it was, and returning to a row inside the fade is the same sweep. */
+  const [fading, setFading] = useState<string | null>(null);
+  /** Whether the margin was already up when the look it shows was asked for: such a look crossfades in with its arrival finished. */
+  const [sweeping, setSweeping] = useState(false);
   /** The same value, readable between renders: handlers decide from it before React has committed their change. */
   const now = useRef<Active>(null);
   const [leaving, setLeaving] = useState<Leaving[]>([]);
@@ -78,11 +87,30 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
   /** `slot` is where a tapped look is about to open, so another controller can tell whether the look it closes sits above it. */
   const announce = (slot?: HTMLElement) => window.dispatchEvent(new CustomEvent<Shown>(SHOWING, { detail: { root: root.current, slot } }));
   /** The one way the showing look changes. A tapped look that goes (or gives way to another) folds away first. */
-  const change = (next: Active, instant = false) => {
+  const change = (next: Active, instant = false, fade = false) => {
     const before = now.current;
     if (before === next) return;
     now.current = next;
     setActive(next);
+    const marginUp = (before !== null && before.source !== "tap") || fadeTimer.current !== 0;
+    window.clearTimeout(fadeTimer.current);
+    fadeTimer.current = 0;
+    if (next && next.source !== "tap") {
+      setFading(null);
+      setSweeping(marginUp);
+    } else if (before && before.source !== "tap" && fade && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setFading(before.id);
+      fadeTimer.current = window.setTimeout(() => {
+        fadeTimer.current = 0;
+        placedFor.current = null;
+        setFading(null);
+        setSweeping(false);
+      }, FADE_MS);
+    } else {
+      placedFor.current = null;
+      setFading(null);
+      setSweeping(false);
+    }
     if (next?.source === "tap") {
       cancelRemoval(removals.current, next.slot);
       setLeaving((all) => all.filter(({ id }) => id !== next.id));
@@ -105,7 +133,7 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
   };
   const hideSoon = () => {
     cancelHide();
-    hideTimer.current = window.setTimeout(() => change(null), HIDE_MS);
+    hideTimer.current = window.setTimeout(() => change(null, false, true), HIDE_MS);
   };
   const show = (id: string, source: "pointer" | "focus") => {
     cancelHide();
@@ -170,6 +198,7 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
   };
 
   const onPointerOver = (event: PointerEvent) => {
+    startReaction(event);
     if (event.pointerType === "touch" || !window.matchMedia(WIDE).matches) return;
     const id = lookOf(event.target);
     if (id) show(id, "pointer");
@@ -192,7 +221,7 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key !== "Escape") return;
       cancelHide();
-      change(null);
+      change(null, false, true);
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
@@ -219,6 +248,7 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     return () => {
       wide.removeEventListener("change", onChange);
       cancelHide();
+      window.clearTimeout(fadeTimer.current);
       stopHold();
       timers.forEach((timer) => window.clearTimeout(timer));
       timers.clear();
@@ -230,10 +260,7 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
   useLayoutEffect(() => {
     const element = margin.current;
     const row = active ? root.current?.querySelector<HTMLElement>(`[data-look="${CSS.escape(active.id)}"]`) : null;
-    if (!active || active.source === "tap" || !element || !row || !root.current) {
-      placedFor.current = null;
-      return;
-    }
+    if (!active || active.source === "tap" || !element || !row || !root.current) return;
     const place = () => {
       const box = root.current!.getBoundingClientRect();
       const hang = under && root.current!.closest(under.selector)?.getBoundingClientRect();
@@ -243,10 +270,9 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
         marginHeight: element.offsetHeight,
         viewportHeight: window.innerHeight,
       });
-      element.style.top = `${top}px`;
-      element.style.left = `${left}px`;
+      element.style.transform = `translate(${left}px, ${top}px)`;
     };
-    // Glide only between looks: the first placement of a showing margin must not slide in from the corner.
+    // Glide only between looks: the first placement of a showing margin must not slide in from the corner. The glide is on `transform`, so it never lays out.
     if (placedFor.current && placedFor.current !== active.id) element.dataset.glide = "";
     else delete element.dataset.glide;
     place();
@@ -285,6 +311,13 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
   }, [active]);
 
   /** The open tapped look and any folding away, keyed by id so a look keeps its place, and its animation, as it changes from one to the other. */
+  const shown = active ? (active.source === "tap" ? null : active.id) : fading;
+  const arrival = useRef<HTMLDivElement>(null);
+  /** A look that replaces another arrives finished: its animations have run before it is first painted. */
+  useLayoutEffect(() => {
+    if (sweeping && arrival.current) arriveFinished(arrival.current);
+  }, [shown, sweeping]);
+
   const tapped = active?.source === "tap" ? { id: active.id, slot: active.slot, folding: false } : null;
   const looksInline = [...(tapped ? [tapped] : []), ...leaving.filter(({ id }) => id !== tapped?.id).map((one) => ({ ...one, folding: true }))];
 
@@ -310,11 +343,13 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
           id,
         ),
       )}
-      {active && active.source !== "tap" && (
-        <div ref={margin} className="qi-margin" aria-hidden="true" data-margin="">
-          <div key={active.id} className="qi-look">
-            {looks[active.id]}
-          </div>
+      {shown && (
+        <div ref={margin} className="qi-margin" aria-hidden="true" data-margin="" data-leaving={active ? undefined : ""} data-settled={sweeping ? "" : undefined}>
+          <LookArrival.Provider value={sweeping}>
+            <div key={shown} ref={arrival} className="qi-look">
+              {looks[shown]}
+            </div>
+          </LookArrival.Provider>
         </div>
       )}
     </div>

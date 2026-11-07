@@ -368,13 +368,19 @@
   left: 0;
   width: 300px;
   pointer-events: none;
+  transition: opacity 120ms var(--out);
 }
 
-/* A look arriving while another shows glides there. The first placement is set with no transition. */
+/* The margin fades where it stands when its look goes; a look shown inside the fade is the same sweep, and the margin returns. */
+.qi-margin[data-leaving] {
+  opacity: 0;
+}
+
+/* A look arriving while another shows glides there on `transform`, with no overshoot. The first placement is set with no transition. */
 .qi-margin[data-glide] {
   transition:
-    top 0.5s var(--spring),
-    left 0.5s var(--spring);
+    transform 240ms var(--out),
+    opacity 120ms var(--out);
 }
 
 /* Under 1180 px the margin is not used (the same 1180 as WIDE in closer-look-root.tsx): closer looks open inline (#292). */
@@ -386,6 +392,13 @@
 
 .qi-look {
   animation: qi-fade 0.2s ease-out both;
+}
+
+/* The next look of a sweep crossfades in over 120 ms; its own arrival has already been played (arriveFinished). */
+@media (prefers-reduced-motion: no-preference) {
+  .qi-margin[data-settled] .qi-look {
+    animation-duration: 120ms;
+  }
 }
 
 @keyframes qi-fade {
@@ -1094,11 +1107,12 @@
 /* ---------- motion that only plays when asked for ---------- */
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .qi-row:hover .qi-mini {
+  /* Played from the pointer arriving (reactions.ts), so leaving does not cut a swing short. */
+  .qi-row[data-reacting] .qi-mini {
     animation: qi-swing 0.9s var(--out);
   }
 
-  .qi-row:hover .qi-tile {
+  .qi-row[data-reacting] .qi-tile {
     animation: qi-turn 0.6s var(--spring);
   }
 
@@ -1614,12 +1628,10 @@
   }
 }
 
-.qi-book .qi-look__name {
-  animation: qi-fill 0.45s 0.9s var(--out) both;
-}
-
+/* The title and author arrive with the cover, readable inside 300 ms. */
+.qi-book .qi-look__name,
 .qi-book .qi-look__by {
-  animation: qi-fill 0.45s 1.02s var(--out) both;
+  animation: qi-fill 0.2s var(--out) both;
 }
 
 /*

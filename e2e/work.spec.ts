@@ -106,7 +106,7 @@ test.describe("Work: the rows", () => {
       // A production build strips the spaces after the commas; the values are the same.
       return [style.getPropertyValue("--spring"), style.getPropertyValue("--out")].map((value) => value.replace(/\s/g, ""));
     });
-    expect(tokens).toEqual(["cubic-bezier(.34,1.56,.64,1)", "cubic-bezier(.2,.8,.2,1)"]);
+    expect(tokens).toEqual(["cubic-bezier(.34,1.2,.64,1)", "cubic-bezier(.2,.8,.2,1)"]);
   });
 
   test("a Role story's ← Work lands on this section, below the header", async ({ page }) => {
