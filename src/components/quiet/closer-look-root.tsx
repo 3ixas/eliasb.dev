@@ -97,7 +97,8 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     fadeTimer.current = 0;
     if (next && next.source !== "tap") {
       setFading(null);
-      setSweeping(marginUp);
+      // The same look asked for by another source (the pointer, then focus) is not a new arrival: it keeps the mode it has.
+      setSweeping((current) => (before?.id === next.id ? current : marginUp));
     } else if (before && before.source !== "tap" && fade && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setFading(before.id);
       fadeTimer.current = window.setTimeout(() => {

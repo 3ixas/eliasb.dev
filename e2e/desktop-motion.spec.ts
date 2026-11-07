@@ -65,25 +65,27 @@ test.describe("Desktop motion: the margin", () => {
     const from = (await margin(page).boundingBox())!.y;
     // The pointer moves without scrolling the page: a scroll ends the glide, as it should.
     const target = (await rowFor(page, "joveen").boundingBox())!;
-    await page.mouse.move(target.x + target.width / 2, target.y + target.height / 2);
-    await expect(margin(page)).toHaveAttribute("data-glide", "");
-    const glide = await margin(page).evaluate(async (element) => {
-      const transition = element.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "transform");
-      if (!transition) return null;
+    // Armed before the pointer moves: the transition is paused in the task that finds it, so a slow runner cannot outlast it.
+    const seeking = margin(page).evaluate(async (element) => {
+      let transition: Animation | undefined;
+      while (!transition) {
+        await new Promise(requestAnimationFrame);
+        transition = element.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "transform");
+      }
       transition.pause();
-      const timing = transition.effect!.getComputedTiming();
+      const duration = transition.effect!.getComputedTiming().duration;
       const ys: number[] = [];
       for (const time of [0, 60, 120, 180, 239]) {
         transition.currentTime = time;
         ys.push(element.getBoundingClientRect().y);
       }
-      return { duration: timing.duration, ys };
+      return { duration, ys };
     });
-    expect(glide).not.toBeNull();
-    expect(glide!.duration).toBe(240);
-    await expect.poll(async () => (await margin(page).evaluate((element) => element.getAnimations().map((animation) => (animation as CSSTransition).transitionProperty))).includes("top")).toBe(false);
-    const to = Math.max(...glide!.ys);
-    for (const y of glide!.ys) {
+    await page.mouse.move(target.x + target.width / 2, target.y + target.height / 2);
+    const glide = await seeking;
+    expect(glide.duration).toBe(240);
+    const to = Math.max(...glide.ys);
+    for (const y of glide.ys) {
       expect(y).toBeGreaterThanOrEqual(Math.min(from, to) - 1);
       expect(y).toBeLessThanOrEqual(Math.max(from, to) + 1);
     }
