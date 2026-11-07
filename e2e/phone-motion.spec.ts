@@ -83,7 +83,7 @@ test.describe("The fold", () => {
 test.describe("A look that opens low", () => {
   test.use({ reducedMotion: "no-preference" });
 
-  /** Scrolls so the trigger sits `gap` px above the screen's bottom edge, and returns the scroll position. */
+  /** Scrolls so the trigger sits `gap` px above the screen's bottom edge, and returns the scroll position. The screen is short, so a look opened there is mostly below it at any width. */
   const placeLow = (page: Page, gap: number) =>
     page.evaluate(
       ([trigger, space]) => {
@@ -96,6 +96,7 @@ test.describe("A look that opens low", () => {
 
   test("comes into view over 320 ms, ending 16 px above the bottom edge", async ({ page }) => {
     test.skip(inlineOnly(page), "Inline looks are for phones and touch");
+    await page.setViewportSize({ width: page.viewportSize()!.width, height: 700 });
     await page.goto("/");
     await hydrated(page);
     const before = await placeLow(page, 8);
@@ -122,6 +123,7 @@ test.describe("A look that opens low", () => {
 
   test("stops where it is when the visitor touches the screen", async ({ page }) => {
     test.skip(inlineOnly(page), "Inline looks are for phones and touch");
+    await page.setViewportSize({ width: page.viewportSize()!.width, height: 700 });
     await page.goto("/");
     await hydrated(page);
     await placeLow(page, 8);
