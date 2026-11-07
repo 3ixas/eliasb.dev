@@ -151,7 +151,7 @@ Decided in [Closer looks on phones: the dock, or inline under the row](https://g
 | How I work's pen | Rings around the numbers, arrows between habits, and underlines under each proof's strongest phrase draw as they scroll up the screen and un-draw on the way back (CSS scroll-driven animations; drawn when unsupported) |
 | GitHub year | The cells fill in and the total counts up when it first comes into view. A day shows its count on hover |
 | Live signals | "Live from Goodreads / Letterboxd / GitHub" with a cobalt dot that pulses three times, then rests |
-| Say hello | The email copies in place: the button turns cobalt and says "Copied" |
+| Say hello | The email copies in place: the button turns cobalt and says "Copied". If the browser refuses the clipboard, the button selects the address instead, ready to copy by hand, and says nothing new |
 
 ## The arrival
 
@@ -159,13 +159,17 @@ No hold. The page is complete and usable in its first frame, and nothing waits f
 
 ## The header (every page)
 
-One header on every page, in the same place, so following a row never moves it. It has the white-tux portrait as a 40 px circle, "Elias Bennett", the greeting and the Eclipse. On the homepage the portrait opens the full portrait, and that closer look belongs to the homepage alone. On every other page the portrait is a picture, with no hover, focus or tap behaviour, and the name is the link that leads to the homepage.
+One header on every page, in the same place, so following a row never moves it. The portrait and name never move between pages, and the Eclipse follows the page's width (the column's right edge, or the sheet's on the Résumé), with no change to the layout. A page with no links has the same header with the links left out. It has the white-tux portrait as a 40 px circle, "Elias Bennett", the greeting and the Eclipse. On the homepage the portrait opens the full portrait, and that closer look belongs to the homepage alone. On every other page the portrait is a picture, with no hover, focus or tap behaviour, and the name is the link that leads to the homepage.
 
 - **Its links are the sections of the page you're on, or none.** On the homepage they are its five sections (Work, Things I make, How I work, Off the clock, Say hello). On a Role story or case study they are that page's own sections, which replaces the numbered section bar. The Work archive, the Résumé and the 404 have no sections, so they have no links.
 - **Style**: 15 px, muted, turning ink on hover, and underlined while their section is in view (`aria-current`). They sit in a navigation landmark named "On this page".
 - **Width**: on wide screens the homepage's header spans the column and the margin (940 px), and its left edge is the column's. A long-form page's header is the column wide, because its six links go on a row of their own (below).
 - **Phones** (under 900 px): no links and no menu, and the greeting moves under the name. The header scrolls away with the page and does not return, so the Eclipse is only at the top; from 900 px it stays at the top of the screen. A long-form page is read top to bottom, with its back link at the top.
 - **A long-form page's header is the column wide.** The six links do not fit beside the name, the greeting and the Eclipse, so on a Role story or case study the header is the page's 600 px column (not 940), sharing its left edge, with the name, greeting and Eclipse on the top row and the links on a row of their own beneath, spread from the column's left edge to its right. The greeting keeps its words, and London's time shows without the links stepping aside. The links are 15 px, with no padding between them. The homepage's five links fit beside the greeting on one row, as before.
+
+## Share cards
+
+Every page shares with one template (`src/app/share-card.tsx`): a field, the page's own words at the top in Bricolage 800, and "ELIAS BENNETT" at the foot, on 1200 × 630 with the same margins everywhere. A page chooses only its field, its ink and its words. The homepage, and every page without its own card, says the opening line on the page colour, with "products of my own." in cobalt. A Role story says its employer large, with the role beneath, in the employer's colour, and a case study says its project's name large, with its one line beneath, in the project's colour. The archive and the Résumé take the homepage's card. The Résumé sheet is untouched: no card is drawn from it. The favicon (the cobalt mark on the page colour) sits with these cards without clashing, so it stays.
 
 ## The homepage, in order
 
