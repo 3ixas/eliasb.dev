@@ -153,10 +153,12 @@ test.describe("Homepage shell", () => {
     }
   });
 
-  test("the header stays in view while the page scrolls", async ({ page }) => {
+  test("the header stays in view while the page scrolls from 900 px, and scrolls away on a phone", async ({ page }) => {
     await page.goto("/");
     await page.mouse.wheel(0, 1200);
-    await expect(page.locator("[data-stretch-header]")).toBeInViewport();
+    const header = page.locator("[data-stretch-header]");
+    if ((page.viewportSize()?.width ?? 0) < 900) await expect(header).not.toBeInViewport();
+    else await expect(header).toBeInViewport();
   });
 
   test("the Board is no longer served at /", async ({ page }) => {
