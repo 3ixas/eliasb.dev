@@ -12,6 +12,13 @@
   border-bottom: 1px solid var(--stretch-rule);
 }
 
+/* On phones the header scrolls away with the page and does not return; the Eclipse is only at the top (docs/design/DESIGN.md, "The header"). */
+@media (max-width: 899px) {
+  .qi-header {
+    position: static;
+  }
+}
+
 /* Phones: no links and no menu. The portrait and name lead; the greeting sits under the name, in line with it. */
 .qi-header__inner {
   display: grid;
@@ -132,7 +139,7 @@ a.qi-header__name {
   line-height: 1.4;
 }
 
-/* Inline, the portrait never takes more than 40% of the screen's height, so the sticky header it opens in leaves room to read. */
+/* Inline, the portrait never takes more than 40% of the screen's height, so the header it opens in leaves room to read. */
 .qi-header__slot .qi-face-look img {
   width: auto;
   max-width: 100%;

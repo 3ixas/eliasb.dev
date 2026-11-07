@@ -2,7 +2,9 @@
 const HOLD_MS = 450;
 const HOLD_CAP_MS = 1500;
 
-type Hold = { trigger: HTMLElement; top: number; frame: number; stop: () => void };
+/** A scroll the hold is carrying out: its held row's place on screen moves from `from` to `to` over `ms`, from `start`. */
+type Glide = { from: number; to: number; start: number; ms: number };
+type Hold = { trigger: HTMLElement; top: number; frame: number; glide?: Glide; stop: () => void };
 
 /*
  * One hold for the whole page. The look that folds away above a tapped row can belong to another closer-look controller (a look
@@ -33,6 +35,20 @@ export function correctHold() {
   if (Math.abs(shift) >= 0.5) window.scrollBy({ top: shift, behavior: "instant" });
 }
 
+/**
+ * Moves the held row up the screen by `by` px over `ms` (0 for at once), so a look opened low on the page comes into view. The
+ * hold carries the scroll out, so the two never pull the page in different directions, and the visitor's own scroll ends both.
+ */
+export function glideHold(by: number, ms: number) {
+  if (!current || by <= 0) return;
+  if (ms <= 0) {
+    current.top -= by;
+    correctHold();
+    return;
+  }
+  current.glide = { from: current.top, to: current.top - by, start: performance.now(), ms };
+}
+
 /** Ends the hold in progress: its frame, its listeners and the held row. A new hold and an unmounting controller call it. */
 export function stopHold() {
   current?.stop();
@@ -52,6 +68,11 @@ export function startHold(trigger: HTMLElement) {
   };
   window.addEventListener("touchstart", take, { once: true, passive: true });
   window.addEventListener("wheel", take, { once: true, passive: true });
+  // A key pressed after the hold began, not the one that began it (Enter on a row is still bubbling to the window), nor its repeats.
+  const key = (event: KeyboardEvent) => {
+    if (event.timeStamp > started && !event.repeat) take();
+  };
+  window.addEventListener("keydown", key);
   const hold: Hold = {
     trigger,
     top: trigger.getBoundingClientRect().top,
@@ -60,6 +81,7 @@ export function startHold(trigger: HTMLElement) {
       window.cancelAnimationFrame(hold.frame);
       window.removeEventListener("touchstart", take);
       window.removeEventListener("wheel", take);
+      window.removeEventListener("keydown", key);
       if (current === hold) current = null;
     },
   };
@@ -67,9 +89,15 @@ export function startHold(trigger: HTMLElement) {
   const step = () => {
     // The user's own scroll moves the trigger too, so once they have taken over nothing is measured or corrected.
     if (taken || !trigger.isConnected) return hold.stop();
-    correctHold();
     const now = performance.now();
-    if (now >= started + HOLD_CAP_MS || (now >= started + HOLD_MS && !stillFolding())) return hold.stop();
+    const { glide } = hold;
+    if (glide) {
+      const done = Math.min(1, (now - glide.start) / glide.ms);
+      hold.top = glide.from + (glide.to - glide.from) * (1 - (1 - done) ** 3);
+      if (done === 1) hold.glide = undefined;
+    }
+    correctHold();
+    if (now >= started + HOLD_CAP_MS || (now >= started + HOLD_MS && !stillFolding() && !hold.glide)) return hold.stop();
     hold.frame = window.requestAnimationFrame(step);
   };
   hold.frame = window.requestAnimationFrame(step);

@@ -4,7 +4,8 @@ import { useEffect, useLayoutEffect, useRef, useState, type FocusEvent, type Key
 import { createPortal } from "react-dom";
 import { useCycleAdvance } from "@/components/quiet/cycle";
 import { margin as marginSpacing, placeMargin, WIDE } from "@/components/quiet/margin-placement";
-import { correctHold, reportFolding, startHold, stopHold } from "@/components/quiet/scroll-hold";
+import { correctHold, glideHold, reportFolding, startHold, stopHold } from "@/components/quiet/scroll-hold";
+import { REVEAL_MS, revealDistance, setFold } from "@/components/quiet/fold";
 import { startReaction } from "@/components/quiet/reactions";
 import { arriveFinished, LookArrival } from "@/components/quiet/look-arrival";
 
@@ -14,8 +15,8 @@ const HIDE_MS = 140;
 const FADE_MS = 120;
 /** Fired on `window` when a controller shows a look, so the others hide theirs: only one look is showing on the page. */
 const SHOWING = "qi-closer-look-showing";
-/** An inline look folds away over this long (quiet-index.css, `.qi-inline`); it is unmounted once it has. */
-const CLOSE_MS = 300;
+/** An unmounted look waits this long past its fold, so the last frame of the fold is painted first. */
+const UNMOUNT_LAG_MS = 40;
 
 /**
  * The one value that says which closer look is showing: nothing, or one look and what asked for it. The margin
@@ -80,6 +81,8 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
   const advance = useCycleAdvance();
   /** The pending removal of each folding look, by slot: a look that is reopened or closed again takes its earlier removal with it. */
   const removals = useRef(new Map<HTMLElement, number>());
+  /** A look just opened, and the row that opened it: once it has mounted, it is measured and brought into view if it opens low. */
+  const opened = useRef<{ trigger: HTMLElement; slot: HTMLElement; shut: boolean } | null>(null);
   /** Names this controller to the page's scroll hold, which counts looks folding across every controller. */
   const owner = useRef({});
 
@@ -130,6 +133,8 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     // moving the row, and holding a row still frame by frame through a fold is only as steady as the page is fast.
     if (instant || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const gone = { id: before.id, slot: before.slot };
+    // It folds back over the length it opened with, from the height it is now.
+    const { ms } = setFold(gone.slot, false);
     setLeaving((all) => [...all.filter(({ id }) => id !== gone.id), gone]);
     cancelRemoval(removals.current, gone.slot);
     removals.current.set(
@@ -137,7 +142,7 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
       window.setTimeout(() => {
         removals.current.delete(gone.slot);
         setLeaving((all) => all.filter((one) => one.slot !== gone.slot));
-      }, CLOSE_MS + 40),
+      }, ms + UNMOUNT_LAG_MS),
     );
     reportFolding(owner.current, removals.current.size + 1);
   };
@@ -164,6 +169,8 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     if (!id || !slot) return;
     startHold(trigger);
     const open = now.current?.source === "tap" && now.current.id === id;
+    // A slot with no height has no fold to carry on from: its look is measured shut once mounted. One part way open keeps its length.
+    opened.current = open ? null : { trigger, slot, shut: slot.offsetHeight === 0 };
     // Opening a look closes one in another controller in the same batch, so the correction sees both moves.
     if (!open) announce(slot);
     change(open ? null : { id, source: "tap", slot }, !open && sitsAbove(now.current, slot));
@@ -187,7 +194,7 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
     const open = target.closest<HTMLElement>(".qi-inline__in");
     if (open && !wide) return pressLook(open);
     const trigger = target.closest<HTMLElement>("[data-look-tap]");
-    // Following a link closes an inline look: it can sit in a sticky header, and an anchor would land behind it.
+    // Following a link closes an inline look: it can sit in the header, and an anchor would land behind it.
     const link = target.closest<HTMLAnchorElement>("a[href]");
     if (now.current?.source === "tap" && link && link !== trigger && link.target !== "_blank") change(null);
     if (!trigger || !root.current?.contains(trigger) || wide) return;
@@ -302,6 +309,20 @@ export function CloserLookRoot({ looks, className, under, children }: { looks: R
       window.removeEventListener("resize", place);
     };
   }, [active, under]);
+
+  // A look just opened learns how long its fold is, and comes into view if most of it would open below the screen.
+  useLayoutEffect(() => {
+    const just = opened.current;
+    if (!just || active?.source !== "tap" || active.slot !== just.slot) return;
+    opened.current = null;
+    // Where the page has moved the tapped row (a look above it was removed in this commit), put it back before measuring from it.
+    correctHold();
+    const { height } = setFold(just.slot, just.shut);
+    // A look reopened part way is already in view, and its row is still held where the visitor left it.
+    if (!just.shut) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    glideHold(revealDistance(just.trigger, just.slot, height), reduced ? 0 : REVEAL_MS);
+  }, [active]);
 
   // After a tap changes the page, put the tapped trigger back where it was on screen straight away; `hold` keeps it there while the looks move.
   useLayoutEffect(() => {

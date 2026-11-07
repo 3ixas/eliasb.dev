@@ -793,10 +793,11 @@
   grid-template-rows: 0fr;
   margin-left: 64px;
   container-type: inline-size;
-  transition: grid-template-rows 0.3s var(--out);
+  /* The fold is soft and lasts as long as the look is tall: closer-look-root.tsx writes --fold-ms (180 ms + height × 0.35, 220 to 420 ms) and unmounts the look once it has passed. */
+  transition: grid-template-rows var(--fold-ms, 300ms) cubic-bezier(.25, .46, .3, 1);
 }
 
-/* A transition, so a look reversed part way carries on from the height it has reached. It folds back at the same pace (CLOSE_MS in closer-look-root.tsx), fading as it goes. */
+/* A transition, so a look reversed part way carries on from the height it has reached. It folds back over the same length, fading as it goes. */
 .qi-inline:has(> .qi-inline__in:not([data-leaving])) {
   grid-template-rows: 1fr;
 }
