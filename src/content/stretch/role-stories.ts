@@ -63,7 +63,6 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
       "what-changed": {
         paragraphs: [
           "I used that workflow to integrate a pricer into the calculation engine in a couple of days. For an experienced integration engineer it takes about two weeks, and I was new to it.",
-          "I went from no C# to shipping production code independently in six months.",
           "The bank’s digitisation competition is the other half of this. I led a team of four and co-built a dashboard from our users’ requirements, which cut a 30–40 minute data load to under 5. We won, out of five groups, and presented it to the Head of Risk Systems.",
         ],
       },
@@ -117,7 +116,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
     ],
     evidence: [
       { value: "Nov 2025", label: "won the bank’s digitisation competition" },
-      { value: "6", label: "months from zero C# to production code" },
+      { value: "Six", label: "months from zero C# to production code" },
     ],
     // BNP's green, as a hue only (no logo). The light field takes near-black ink (5.0:1);
     // the dark field is the same hue deepened and takes light ink (11.4:1).
@@ -174,7 +173,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
       },
       "what-changed": {
         paragraphs: [
-          "Page load fell by 40%. Deploys went from 10 minutes to under 2. Mobile retention rose by 30%. The key API’s p95 dropped from 520 ms to 230 ms, and cloud costs fell by 18%.",
+          "Cloud costs fell by 18%.",
         ],
       },
       "what-i-took-with-me": {
