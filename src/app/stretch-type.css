@@ -7,7 +7,7 @@
 /*
  * What shows until Bricolage Grotesque arrives (layout.tsx lists it as the
  * font's fallback). One Arial face per style, scaled to the width that style
- * has in Bricolage (measured against the real font at 390 and 1440 px, after the Fine cut), so nothing wraps or moves when the real font
+ * has in Bricolage (measured against the real font at 390 and 1440 px, after the Fine cut), so almost nothing wraps or moves when the real font
  * swaps in: the condensed display type is far narrower than Arial, and the
  * name would otherwise break onto extra lines on a slow connection.
  *
