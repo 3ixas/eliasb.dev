@@ -164,7 +164,7 @@ for (const slug of roleStorySlugs) {
 
     if (slug === "bnp-paribas") {
       test("the evidence is what the pins do not say: the six months, not the competition they already show", async ({ page }) => {
-        await expect(page.locator("section#summary").getByRole("listitem")).toHaveText(["6months from zero C# to production code"]);
+        await expect(page.locator("section#summary").getByRole("listitem")).toHaveText(["Sixmonths from zero C# to production code"]);
       });
 
       test("its flag and its to-scale bars sit inline under their sections with their captions, and the certificate is not drawn inline", async ({ page }) => {
