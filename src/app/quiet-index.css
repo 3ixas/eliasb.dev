@@ -697,6 +697,7 @@
 }
 
 .qi-pins__text strong {
+  display: block;
   color: var(--stretch-ink);
   font-weight: 650;
 }
