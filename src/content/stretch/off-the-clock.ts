@@ -3,7 +3,7 @@
  * signals, from docs/content/redesign-copy.md. Live values ({title}, {fact},
  * counts) are passed in. The training week is authored here, from the plan
  * Elias approved on 3 October 2026 (docs/content/copy/09-training-log.md) and
- * confirmed for the Stretch poster on 8 October 2026.
+ * confirmed for the Stretch poster on 8 October 2026, and replaced on 8 November 2026.
  */
 
 export const offTheClock = {
@@ -26,12 +26,12 @@ export const offTheClock = {
     },
     /** Monday to Sunday: his usual week, a plan and never a log. */
     days: [
-      { short: "Mon", long: "Monday", session: "Full-body gym" },
-      { short: "Tue", long: "Tuesday", session: "Zone 2 run" },
-      { short: "Wed", long: "Wednesday", session: "Full-body gym" },
-      { short: "Thu", long: "Thursday", session: "Interval run" },
-      { short: "Fri", long: "Friday", session: "Full-body gym" },
-      { short: "Sat", long: "Saturday", session: "Zone 2, rower or bike" },
+      { short: "Mon", long: "Monday", session: "Upper body gym" },
+      { short: "Tue", long: "Tuesday", session: "Lower body gym" },
+      { short: "Wed", long: "Wednesday", session: "Zone 2, assault bike" },
+      { short: "Thu", long: "Thursday", session: "Upper body gym" },
+      { short: "Fri", long: "Friday", session: "Lower body gym" },
+      { short: "Sat", long: "Saturday", session: "Skipping rope intervals" },
       { short: "Sun", long: "Sunday", session: "Assault bike intervals" },
     ],
   },
