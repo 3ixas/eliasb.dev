@@ -280,7 +280,7 @@ What holds the finish in place. Each rule below is checked by a gate, or by the 
 
 ## Colour rules
 
-- **Cobalt** marks "products of my own", today, now (the live dots, and the slash in Now making's brackets), the way to say hello, focus and a hovered row's arrow. **Pass pins** take their own enamel colours, inside the pass. On the GitHub year it is a ring around today, never a fill, so the greens stay true. Elias's name is no longer cobalt: the opening line leads.
+- **Cobalt** marks "products of my own", today, now (the live dots, and the slash in Now making's brackets), the way to say hello, focus and a hovered row's arrow, and, as the same "look here", the after side of a to-scale comparison, a day's count on hover, the skip link and text selection. **Pass pins** take their own enamel colours, inside the pass. On the GitHub year it is a ring around today, never a fill, so the greens stay true. Elias's name is no longer cobalt: the opening line leads.
 - **Employer and Project colours** appear only inside objects, figures and closer looks (and on BNP Paribas when hovered), on every page. A Role story's pass and a case study's screenshots carry them; the page around them stays neutral, with no coloured opening band. A page's share card keeps its colour.
 - **GitHub's greens** appear only on the GitHub year.
 - **Colour never carries meaning alone.** A level of the GitHub year has a count on hover and a text alternative; today is marked by a ring as well as colour.
@@ -300,6 +300,7 @@ What holds the finish in place. Each rule below is checked by a gate, or by the 
 
 - **A closer look is supplementary.** Anything a closer look says that isn't on the row or on the row's destination page is also the row's accessible description, through visually hidden text referenced by `aria-describedby`. The margin and the inline closer look are themselves `aria-hidden`.
 - **Keyboard**: every row and dotted word with a closer look is focusable, and focus shows it as hover does. Escape hides the margin, and focus stays put. The GitHub year keeps today's single tab stop and arrow keys.
+- **Forced colours** (Windows High Contrast) keep the data and the drawings: the to-scale bars take the text colour (before) and the highlight (after), the GitHub year keeps its five levels with a hairline on each cell, the strands' threads take the text colour, and the objects and passes keep the colours they were drawn in (`quiet-forced-colors.css`).
 - **Reduced motion** shows each closer look with a 0.2 s fade and no arrival motion. The pen is drawn, the underline is drawn, nothing counts or types, and the greeting's scene rests, finished (the steam drawn, the lamp's pool lit, the cursor still).
 - **The standing checks** in the "keep" rows of [#277](https://github.com/3ixas/eliasb.dev/issues/277) all hold. That means one `h1` (the opening line), the skip link, content in the server HTML and complete without script, axe, AA contrast, 3:1 focus rings, external links marked `↗` that open in a new tab, the theme rules, and the home title, description and social image.
 - **Every page has one `h1`**: the opening line on the homepage, the title elsewhere. Section titles are `h2`.
