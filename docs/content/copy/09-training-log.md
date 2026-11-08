@@ -2,6 +2,8 @@
 
 Status: second version, approved by Elias, 3 October 2026, with the recommended note. The first version (approved earlier the same day) counted this week's sessions from Strava. Strava's API now needs a paid subscription, and Bevel and Apple Health have no web API, so there's no source the site can read. This version shows my training week as a plan instead, from the schedule Elias gave. Live counts are an optional post-launch ticket (#94).
 
+Revised 8 November 2026 (Elias): the week is now upper body gym Mon and Thu, lower body gym Tue and Fri, zone 2 on the assault bike Wed, skipping rope intervals Sat and assault bike intervals Sun. The running photo and its caption stay: they show Elias, not the plan.
+
 Covers the training pin on the Board: the running photo and its caption, and a page from a training diary pinned over its bottom edge with my usual week on it. Rules: plain, concrete, British spelling, no em dashes. Light, dry humour is welcome, but the card only says what I plan to do, never what I did: it's a plan, so it can't go out of date or claim a session happened.
 
 ## The photo
@@ -26,12 +28,12 @@ One row per day, the day in mono capitals and the session in the display face:
 
 | Day | Session |
 |---|---|
-| Mon | Full-body gym |
-| Tue | Zone 2 run |
-| Wed | Full-body gym |
-| Thu | Interval run |
-| Fri | Full-body gym |
-| Sat | Zone 2, rower or bike |
+| Mon | Upper body gym |
+| Tue | Lower body gym |
+| Wed | Zone 2, assault bike |
+| Thu | Upper body gym |
+| Fri | Lower body gym |
+| Sat | Skipping rope intervals |
 | Sun | Assault bike intervals |
 
 ### Today
@@ -50,7 +52,7 @@ Alternatives: "Three gym days, four cardio, no days off." (a plain count of the 
 
 ### For screen readers
 
-The page reads as one passage, with today first: "My training week, the plan. Today, Saturday: zone 2, rower or bike. Monday: full-body gym. Tuesday: zone 2 run. Wednesday: full-body gym. Thursday: interval run. Friday: full-body gym. Sunday: assault bike intervals. Zone 2 means slow on purpose." The pencil loop and arrow are decoration.
+The page reads as one passage, with today first: "My training week, the plan. Today, Saturday: skipping rope intervals. Monday: upper body gym. Tuesday: lower body gym. Wednesday: zone 2, assault bike. Thursday: upper body gym. Friday: lower body gym. Sunday: assault bike intervals. Zone 2 means slow on purpose." The pencil loop and arrow are decoration.
 
 ## States
 
