@@ -143,6 +143,18 @@ test.describe("A look that opens low", () => {
   });
 });
 
+test.describe("The header on a short screen", () => {
+  test("stays at the top when the screen is 700 px tall, and scrolls away when it is shorter", async ({ page }) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 900, "Phones have no sticky header");
+    const header = page.locator(".qi-header").first();
+    for (const [height, position] of [[700, "sticky"], [699, "static"]] as const) {
+      await page.setViewportSize({ width: page.viewportSize()!.width, height });
+      await page.goto("/work/bnp-paribas");
+      await expect(header).toHaveCSS("position", position);
+    }
+  });
+});
+
 test.describe("The header on a phone", () => {
   test("scrolls away with the page and does not return; from 900 px it stays", async ({ page }) => {
     await page.goto("/");

@@ -12,8 +12,8 @@
   border-bottom: 1px solid var(--stretch-rule);
 }
 
-/* On phones the header scrolls away with the page and does not return; the Eclipse is only at the top (docs/design/DESIGN.md, "The header"). */
-@media (max-width: 899px) {
+/* On phones, and on any screen under 700 px tall, the header scrolls away with the page and does not return; the Eclipse is only at the top (docs/design/DESIGN.md, "The header"). */
+@media (max-width: 899px), (max-height: 699px) {
   .qi-header {
     position: static;
   }

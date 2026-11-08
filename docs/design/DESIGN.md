@@ -84,7 +84,7 @@ Decided in [Object illustrations that look finished](https://github.com/3ixas/el
 - **Corners are concentric**: a nested shape's radius is its parent's minus the gap between them.
 - **Detail thins as the object shrinks.** At 44 px only the edge light, shadow and one defining detail survive (a spine crease, binding holes, a folded corner, the slot and clip).
 - **The Staff pass** has a real ID card's proportions (CR80, 85.6 × 54) and hangs from a punched slot. It carries the employer's name in condensed caps as its wordmark, the photo, the role, the dates, its status ("Valid · present" or "Returned"), its headline figure and a barcode with a real bar rhythm. Every text on it is at least 13 px.
-- **Pass pins**: three on every employer's pass. Each is an enamel pin with a glyph, with its label beside it: BNP Paribas's trophy (Winner), key (Take Ownership) and spark (AI Champion); Joveen's gauge (page load), database (key API p95) and phone (mobile retention); Optegra's tick (Core Web Vitals), gauge (p95 page load) and branch (where the switch started). Each enamel colour is as in the prototype.
+- **Pass pins**: three on every employer's pass. Each is an enamel pin with a glyph, with its label beside it and its detail on the line beneath: BNP Paribas's trophy (Winner), key (Take Ownership) and spark (AI Champion); Joveen's gauge (page load), database (key API p95) and phone (mobile retention); Optegra's tick (Core Web Vitals), gauge (p95 page load) and branch (where the switch started). Each enamel colour is as in the prototype.
 
 ## Closer looks
 
@@ -164,7 +164,7 @@ One header on every page, in the same place, so following a row never moves it. 
 - **Its links are the sections of the page you're on, or none.** On the homepage they are its five sections (Work, Things I make, How I work, Off the clock, Say hello). On a Role story or case study they are that page's own sections, which replaces the numbered section bar. The Work archive, the Résumé and the 404 have no sections, so they have no links.
 - **Style**: 15 px, muted, turning ink on hover, and underlined while their section is in view (`aria-current`). They sit in a navigation landmark named "On this page".
 - **Width**: on wide screens the homepage's header spans the column and the margin (940 px), and its left edge is the column's. A long-form page's header is the column wide, because its six links go on a row of their own (below).
-- **Phones** (under 900 px): no links and no menu, and the greeting moves under the name. The header scrolls away with the page and does not return, so the Eclipse is only at the top; from 900 px it stays at the top of the screen. A long-form page is read top to bottom, with its back link at the top.
+- **Phones** (under 900 px): no links and no menu, and the greeting moves under the name. The header scrolls away with the page and does not return, so the Eclipse is only at the top; from 900 px it stays at the top of the screen, unless the screen is under 700 px tall (a landscape phone, a short laptop window), where it scrolls away too: a long-form page's two-row header is 109 px, a quarter of a 430 px screen. A long-form page is read top to bottom, with its back link at the top.
 - **A long-form page's header is the column wide.** The six links do not fit beside the name, the greeting and the Eclipse, so on a Role story or case study the header is the page's 600 px column (not 940), sharing its left edge, with the name, greeting and Eclipse on the top row and the links on a row of their own beneath, spread from the column's left edge to its right. The greeting keeps its words, and London's time shows without the links stepping aside. The links are 15 px, with no padding between them. The homepage's five links fit beside the greeting on one row, as before.
 
 ## Share cards
@@ -203,7 +203,7 @@ The title (the project), its outcome as the line, its type, year and stack as me
 
 ### The PRD and evidence
 
-A case study's PRD is one inline **Sheet**: the quote at 19 px, "From the PRD" and its date, then the evidence figures as a quiet line (each value at 17 px, weight 600, its label in 13 px mono). A Role story's evidence figures follow the same pattern beneath its Summary, leaving out what the pass's pins already show.
+A case study's PRD is one inline **Sheet**: the quote at 19 px, "From the PRD" and its date, then the evidence figures as a quiet two-by-two block (each value at 17 px, weight 600, its label in 13 px mono). A Role story's evidence figures sit beneath its Summary, each value over its label (a label keeps one line where it fits, up to 40 characters), leaving out what the pass's pins already show.
 
 ### Motion on long-form pages
 
