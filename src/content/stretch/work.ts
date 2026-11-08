@@ -121,7 +121,7 @@ export const work = {
     {
       slug: "joveen",
       pins: [
-        { glyph: "gauge", label: "Page load, cut by 40%", detail: "Refactored React components and lazy-loaded assets." },
+        { glyph: "gauge", label: "Page load, cut by 40%", detail: "Cut page load by 40% by refactoring React components and lazy-loading assets." },
         { glyph: "database", label: "Key API p95, 520 ms → 230 ms", detail: "Added indexes and rewrote slow queries, starting with the API that mattered most." },
         { glyph: "phone", label: "Mobile retention, up 30%", detail: "Fixed mobile layout and browser bugs found by a cross-browser testing pipeline." },
       ],
