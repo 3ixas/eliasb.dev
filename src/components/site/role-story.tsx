@@ -93,7 +93,7 @@ export function RoleStoryPage({ story }: { story: RoleStory }) {
             />
           </div>
         ) : (
-          <nav className="qi-column qi-long__end" aria-label="More">
+          <nav className="qi-column qi-long__end" aria-label="Back to Work">
             <BackLink href={roleStoryBack.href} label={roleStoryBack.label} />
           </nav>
         )}

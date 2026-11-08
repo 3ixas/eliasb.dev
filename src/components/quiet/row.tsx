@@ -10,9 +10,9 @@ import { hostLabel } from "@/components/site/host-label";
  * its look's pages when clicked instead of opening it; on phones the row opens and closes its look like any other,
  * and a tap on the look steps it on.
  */
-export type RowLook = { id: string; description: string; cycle?: string[] };
+export type RowLook = { id: string; description: string; cycle?: string[]; name?: string };
 
-/** The object button of a link row, or a cycling row, is named for its title, so that title is text. */
+/** The object button of a link row, or a cycling row, is named for its title (so that title is text), unless the look gives a shorter name. */
 function nameOf(title: ReactNode) {
   if (typeof title !== "string") throw new Error("A row with a link or a cycle, and a closer look, needs a text title to name its object button");
   return title;
@@ -80,7 +80,7 @@ export function Row({ object, title, line, meta, href, look, card, after, style,
             {content}
           </div>
         )}
-        {(href || look?.cycle) && look && <button type="button" className="qi-row__tap" data-look-tap={look.id} aria-expanded="false" aria-label={`A closer look at ${nameOf(title)}`} />}
+        {(href || look?.cycle) && look && <button type="button" className="qi-row__tap" data-look-tap={look.id} aria-expanded="false" aria-label={`A closer look at ${look.name ?? nameOf(title)}`} />}
       </div>
       {after}
       {look && (

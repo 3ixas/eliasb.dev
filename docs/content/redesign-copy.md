@@ -189,7 +189,7 @@ The markers cover the deck’s retired list and the old wording of rows it marks
 | BNP Paribas row | Software engineer · Jul 2025 – now | kept (from the Role story) |
 | BNP Paribas closer look | The pass, then: I was nominated as an AI Champion, and the workflow I built is now used by several teams across the department. · With that workflow I integrated a pricer in a couple of days, a job that takes an experienced engineer about two weeks. | moved, from Now’s proofs |
 | Joveen row | Full stack software engineer · Aug 2024 – Jun 2025 | kept |
-| Joveen closer look | The pass, then three points, each a bold result and its cause: **Page load, cut by 40%** · Cut page load by 40% by refactoring React components and lazy-loading assets. **Key API p95, 520 ms → 230 ms** · Added indexes and rewrote slow queries, starting with the API that mattered most. **Mobile retention, up 30%** · Fixed mobile layout and browser bugs found by a cross-browser testing pipeline. | changed: the bare “−40% page load” becomes three explained results, in the form of BNP’s pins (#283) |
+| Joveen closer look | The pass, then three points, each a bold result and its cause: **Page load, cut by 40%** · Refactored React components and lazy-loaded assets. **Key API p95, 520 ms → 230 ms** · Added indexes and rewrote slow queries, starting with the API that mattered most. **Mobile retention, up 30%** · Fixed mobile layout and browser bugs found by a cross-browser testing pipeline. | changed: the bare “−40% page load” becomes three explained results, in the form of BNP’s pins (#283) |
 | Optegra row | Marketing executive · Sep 2021 – Aug 2024 | kept |
 | Optegra closer look | The pass, then: **Core Web Vitals pass rate, 62% → 88%** · Scoped performance fixes with the engineers and ticketed them. **p95 page load, cut by 30%** · The same scoped, ticketed fixes. **Where the switch started** · The best part of the job was working with the engineers who built our website. | changed: three points (#283). Its 15% conversion is How I work’s Measure proof, so it isn’t repeated here |
 | Where I’m headed: heading and line | Where I’m headed · I’m working towards being a product engineer, turning new ideas into software people use every day. Three things that takes, and how far I’ve got on each. | changed: the product engineer it’s aiming for (#352) |
@@ -289,7 +289,7 @@ Shared labels: ← Things I make · Live site ↗ · Code ↗ · Next project ·
 | 04 How it’s built | **The link is the save file.** Everything you choose lives in the URL: no account, no backend. The calculations are plain functions with no state of their own. The maps use real boundaries: 33 London boroughs, Zurich’s 12 Kreise, and Basel in seven areas. |
 | 05 Where it stands | **Used for real.** I used it during my own flat hunt, and friends have used it too. |
 | 06 What’s next | *Keep the data fresh.* Move the April 2026 snapshot to a scheduled refresh where the sources allow it. *Show the sources in the app.* Link every default to its source. *Finer areas in Basel.* Use its 19 Wohnviertel rather than seven areas. |
-| Meta description | A rental calculator for London, Basel, and Zurich that shows what a move really costs: upfront, monthly, and how long until you can afford it. |
+| Meta description | A rental calculator for London, Basel and Zurich that shows what a move costs: upfront, monthly and how long until you can afford it. |
 
 ### Argus Risk
 
@@ -315,7 +315,7 @@ Shared labels: ← Things I make · Live site ↗ · Code ↗ · Next project ·
 | 04 How it’s built | **Everything stays in your browser.** Sessions, tags, notes, and settings live on your device, with a CSV export. A service worker keeps it working offline. It works from the keyboard and announces changes to screen readers. |
 | 05 Where it stands | **Used for my own focus.** I use it for my own focused work, and friends have used it too. |
 | 06 What’s next | *Move between devices,* keeping local storage as the default. *Show when you focus best,* like the time of day you tend to focus longest. |
-| Meta description | A focus timer that counts up, sets breaks in proportion to your focus, and keeps your history on your device. |
+| Meta description | A focus timer that counts up, sets breaks in proportion to your focus and keeps your history on your device. |
 
 ## Role stories
 

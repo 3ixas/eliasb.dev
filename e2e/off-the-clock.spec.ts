@@ -632,7 +632,7 @@ test.describe("Off the clock: the GitHub year", () => {
   test("every day names its count for assistive technology", async ({ page }) => {
     const labels = await fixture(page, "github").locator("[data-github-days] button").evaluateAll((days) => days.map((day) => day.getAttribute("aria-label")));
     expect(labels).toHaveLength(365);
-    for (const label of labels) expect(label).toMatch(/^(Nothing on|\d+ contributions? on) \w{3} \d{1,2} \w+$/);
+    for (const label of labels) expect(label).toMatch(/^\d+ contributions? on \w{3} \d{1,2} \w+$/);
   });
 
   test("only one day is a tab stop, so the grid costs a keyboard user one Tab", async ({ page }) => {

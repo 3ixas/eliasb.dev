@@ -344,7 +344,7 @@ for (const slug of roleStorySlugs) {
         return;
       }
       await expect(page.getByRole("region", { name: roleStoryCopy.nextRole })).toHaveCount(0);
-      const end = page.getByRole("navigation", { name: "More" }).getByRole("link", { name: "Work", exact: true });
+      const end = page.getByRole("navigation", { name: "Back to Work" }).getByRole("link", { name: "Work", exact: true });
       await expect(end).toHaveAttribute("href", roleStoryBack.href);
       expect((await end.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     });

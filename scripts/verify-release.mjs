@@ -338,7 +338,7 @@ async function verifyRoutes(baseUrl, pages) {
 // The Résumé: the title and description, a Download PDF that serves the committed file, and no Drive link.
 async function verifyResume(baseUrl, { document, markup }) {
   equal(document.match(/<title>([^<]*)<\/title>/i)?.[1], "Résumé · Elias Bennett", "Résumé title");
-  check((metaContent(document, "description", "name") ?? "").startsWith("Elias Bennett’s résumé"), "Résumé description");
+  check((metaContent(document, "description", "name") ?? "").startsWith("My résumé"), "Résumé description");
   const download = hrefs(markup).find(({ tag }) => attribute(tag, "download") !== null);
   equal(download?.href, "/Elias-Bennett-Resume.pdf", "Download PDF should serve the committed file");
   const pdf = await fetch(new URL("/Elias-Bennett-Resume.pdf", baseUrl));
