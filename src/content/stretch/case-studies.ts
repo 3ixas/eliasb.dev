@@ -50,7 +50,7 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
       "how-its-built": {
         heading: "The link is the save file.",
         paragraphs: [
-          "Everything you choose lives in the URL: no account, no backend. The calculations are plain functions with no state of their own, covered by 182 tests. The maps use real boundaries: 33 London boroughs, Zurich’s 12 Kreise, and Basel in seven areas.",
+          "Everything you choose lives in the URL: no account, no backend. The calculations are plain functions with no state of their own. The maps use real boundaries: 33 London boroughs, Zurich’s 12 Kreise, and Basel in seven areas.",
         ],
         figure: {
           src: "/work/threshold/calculator.webp",
@@ -95,7 +95,6 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
   "argus-risk": {
     slug: "argus-risk",
     stack: [".NET 8", "Kafka", "PostgreSQL", "SignalR"],
-    note: "Runs locally with one Docker command.",
     sections: {
       "where-it-started": {
         heading: "A total doesn’t say how old it is.",

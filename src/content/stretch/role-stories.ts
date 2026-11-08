@@ -174,7 +174,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
       },
       "what-changed": {
         paragraphs: [
-          "Page load fell by 40%. Deploys went from 10 minutes to under 2. Mobile retention rose by 30%. The key API’s p95 dropped from 520 ms to 230 ms, and cloud costs fell by 18%.",
+          "Cloud costs fell by 18%.",
         ],
       },
       "what-i-took-with-me": {
