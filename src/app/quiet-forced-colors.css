@@ -1,0 +1,52 @@
+/*
+ * Forced colours (Windows High Contrast and the like) drop every authored background and shadow, and the site draws its
+ * objects, bars and the GitHub year with backgrounds. Without this, the to-scale bars, the year and the passes vanish and
+ * the page loses data and shape (docs/design/DESIGN.md, "Accessibility"). A system colour keyword written here is kept by
+ * the browser, so the marks that carry data take system colours; the objects are drawings with their own ground, so they
+ * keep the colours they were drawn in.
+ */
+@media (forced-colors: active) {
+  /* Drawings keep their own ground and colours: the row objects (a pass, a tile, a crop), a Role story's pass, and the enamel pins. */
+  .qi-row__object,
+  .qi-row__object *,
+  .qi-pass,
+  .qi-pass *,
+  .qi-pin,
+  .qi-pin * {
+    forced-color-adjust: none;
+  }
+
+  /* A strand's thread: the line is the only mark, so it takes the text colour. Its source is named in the words beside it. */
+  .qi-thread,
+  .qi-strand__thread {
+    background: CanvasText;
+  }
+
+  /* The to-scale bars: before is the text colour and after is the highlight, as the labels say. */
+  .qi-scale__fill {
+    background: CanvasText;
+  }
+
+  .qi-scale__bar[data-kind="after"] .qi-scale__fill {
+    background: Highlight;
+  }
+
+  /* The switch in the off position. */
+  .qi-flag__toggle {
+    border: 1px solid CanvasText;
+    background: Canvas;
+  }
+
+  .qi-flag__toggle::after {
+    background: CanvasText;
+    box-shadow: none;
+  }
+
+  /* The GitHub year keeps GitHub's five levels (they are the data), each cell with a hairline so an empty day still shows. */
+  .stretch-gh__day,
+  .qi-contrib > span {
+    forced-color-adjust: none;
+    outline: 1px solid GrayText;
+    outline-offset: -1px;
+  }
+}
