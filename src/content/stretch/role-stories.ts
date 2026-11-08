@@ -48,11 +48,11 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
         points: [
           {
             lead: "Ship the risky change behind a flag, switched off.",
-            text: "Removing the dependency touched live pricing, so I put the new path behind a feature flag that defaults to off, added caching, and wrote an end-to-end test nobody had asked for. The architect’s view was that the thing to protect was the blast radius, not only correctness. I’d have called that a nice-to-have before; now it’s how I start.",
+            text: "Removing the dependency touched live pricing, so I put the new path behind a feature flag that defaults to off, added caching and wrote an end-to-end test nobody had asked for. The architect’s view was that the thing to protect was the blast radius, not only correctness. I’d have called that a nice-to-have before; now it’s how I start.",
           },
           {
             lead: "Validate the data before trusting it.",
-            text: "The commodity loader was the harder one: ten file types, correlation groups, unit conversions, and records linked to each other. I checked the links, so an orphaned record gets caught on load rather than showing up as a strange number in a simulation.",
+            text: "The commodity loader was the harder one: ten file types, correlation groups, unit conversions and records linked to each other. I checked the links, so an orphaned record gets caught on load rather than showing up as a strange number in a simulation.",
           },
           {
             lead: "Give AI work phases.",
@@ -69,7 +69,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
       "what-i-took-with-me": {
         paragraphs: [
           "I was nominated as an AI Champion in the risk division, and the workflow is now used by several teams across the department. I also won a Take Ownership award.",
-          "The habit underneath all of it is simple: write down what you’re doing before you build it, and ship it so it’s safe to undo.",
+          "The habit underneath all of it: write down what you’re doing before you build it, and ship it so it’s safe to undo.",
         ],
       },
     },
@@ -144,11 +144,8 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
         ],
       },
       "the-problems": {
-        points: [
-          { lead: "A slow site.", text: "Pages took too long to load." },
-          { lead: "A codebase on its way out.", text: "Some modules were still in PHP and had to move to Spring Boot." },
-          { lead: "Mobile and browser bugs.", text: "Layouts and features broke on some phones and browsers." },
-          { lead: "Slow queries.", text: "A key API was slower than it needed to be." },
+        paragraphs: [
+          "Pages took too long to load. Some modules were still in PHP and had to move to Spring Boot. Layouts and features broke on some phones and browsers, and a key API was slower than it needed to be.",
         ],
       },
       decisions: {

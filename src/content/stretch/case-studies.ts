@@ -15,7 +15,7 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
       "where-it-started": {
         heading: "The rent is the easy part.",
         paragraphs: [
-          "My friends had no clear idea what renting would cost by area, and one of them was about to move to Switzerland. Most rent calculators stop at the monthly figure. Before you get the keys you might need five weeks’ deposit in London, or three months’ in Switzerland, plus the first month’s rent, moving costs, and furniture. Can I afford to move, and if not, how long until I can?",
+          "My friends had no clear idea what renting would cost by area, and one of them was about to move to Switzerland. Most rent calculators stop at the monthly figure. Before you get the keys you might need five weeks’ deposit in London, or three months’ in Switzerland, plus the first month’s rent, moving costs and furniture. Can I afford to move, and if not, how long until I can?",
         ],
       },
       "written-down-first": { heading: "The problem, on paper." },
@@ -32,7 +32,7 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
           },
           {
             lead: "Each city keeps its own rules.",
-            text: "Different deposits, local charges, and transport passes, and every default can be changed.",
+            text: "Different deposits, local charges and transport passes, and every default can be changed.",
           },
           {
             lead: "Suggestions show what would help.",
@@ -50,7 +50,7 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
       "how-its-built": {
         heading: "The link is the save file.",
         paragraphs: [
-          "Everything you choose lives in the URL: no account, no backend. The calculations are plain functions with no state of their own. The maps use real boundaries: 33 London boroughs, Zurich’s 12 Kreise, and Basel in seven areas.",
+          "Everything you choose lives in the URL: no account, no backend. The calculations are plain functions with no state of their own. The maps use real boundaries: 33 London boroughs, Zurich’s 12 Kreise and Basel in seven areas.",
         ],
         figure: {
           src: "/work/threshold/calculator.webp",
@@ -99,7 +99,7 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
       "where-it-started": {
         heading: "A total doesn’t say how old it is.",
         paragraphs: [
-          "I built this one on purpose. I work on pricing and risk systems, and I wanted to build a small version of that world end to end, with a front end that makes it easy to see. Most risk dashboards show a portfolio’s value, but not how old it is, which feed it came from, or whether the system is keeping up. Argus is a simulator: no real market data, and it runs on your machine.",
+          "I built this one on purpose. I work on pricing and risk systems, and I wanted to build a small version of that world end to end, with a front end that makes it easy to see. Most risk dashboards show a portfolio’s value, but not how old it is, which feed it came from, or whether the system is keeping up. Argus is a simulator: its prices, FX rates and trades are generated, and it runs on your machine.",
         ],
       },
       "written-down-first": { heading: "Two users, on paper." },
@@ -116,7 +116,7 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
           },
           {
             lead: "The maths is plain functions.",
-            text: "FIFO cost basis, P&L, and Value at Risk: same inputs, same answer.",
+            text: "FIFO cost basis, P&L and Value at Risk: same inputs, same answer.",
           },
           {
             lead: "Check the answer.",
@@ -134,7 +134,7 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
       "how-its-built": {
         heading: "Four services and a stream.",
         paragraphs: [
-          "Two simulators publish prices, FX rates, and trades to Kafka (Redpanda locally). The risk engine publishes a snapshot every second, and SignalR pushes it to a Next.js dashboard. Marten keeps position events in PostgreSQL, so history replays at up to 60 times speed.",
+          "Two simulators publish prices, FX rates and trades to Kafka (Redpanda locally). The risk engine publishes a snapshot every second, and SignalR pushes it to a Next.js dashboard. Marten keeps position events in PostgreSQL, so history replays at up to 60 times speed.",
         ],
       },
       "where-it-stands": {
@@ -146,10 +146,10 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
       "whats-next": {
         points: [
           { lead: "Measure the latency.", text: "Add a benchmark and publish the result." },
-          { lead: "Make it easier to see.", text: "A recorded replay or a hosted read-only demo." },
+          { lead: "Make it easier to see.", text: "Add a recorded replay or a hosted read-only demo." },
           {
             lead: "Stress testing.",
-            text: "Let you shock a currency or a sector and watch the portfolio react.",
+            text: "Shock a currency or a sector and watch the portfolio react.",
           },
         ],
       },
@@ -182,37 +182,37 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
       decisions: {
         heading: "Count from a fixed point, and ask instead of guessing.",
         points: [
-          { lead: "Time comes from a timestamp,", text: "so a sleeping tab never loses minutes." },
+          { lead: "Time comes from a timestamp.", text: "A sleeping tab never loses minutes." },
           {
-            lead: "The break follows the focus:",
-            text: "a fifth by default, adjustable from a third to an eighth.",
+            lead: "The break follows the focus.",
+            text: "It is a fifth by default, adjustable from a third to an eighth.",
           },
           {
-            lead: "Every state has a name:",
-            text: "six of them, so the interface always knows what to show.",
+            lead: "Every state has a name.",
+            text: "There are six, so the interface always knows what to show.",
           },
           {
-            lead: "Ask, don’t assume:",
-            text: "come back to an unfinished session and Flowtime asks what to do.",
+            lead: "Ask, don’t assume.",
+            text: "Come back to an unfinished session and Flowtime asks what to do.",
           },
         ],
       },
       "how-its-built": {
         heading: "Everything stays in your browser.",
         paragraphs: [
-          "Sessions, tags, notes, and settings live on your device, with a CSV export. A service worker keeps it working offline. It works from the keyboard and announces changes to screen readers.",
+          "Sessions, tags, notes and settings live on your device, with a CSV export. A service worker keeps it working offline. It works from the keyboard and announces changes to screen readers.",
         ],
       },
       "where-it-stands": {
         heading: "Used for my own focus.",
         paragraphs: [
-          "I use it for my own focused work, and friends have used it too.",
+          "I use it for my own focused work.",
         ],
       },
       "whats-next": {
         points: [
-          { lead: "Move between devices,", text: "keeping local storage as the default." },
-          { lead: "Show when you focus best,", text: "like the time of day you tend to focus longest." },
+          { lead: "Move between devices.", text: "Keep local storage as the default." },
+          { lead: "See when you focus best.", text: "Show the time of day you tend to focus longest." },
         ],
       },
     },
