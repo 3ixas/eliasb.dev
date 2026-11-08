@@ -289,7 +289,7 @@ Shared labels: ← Things I make · Live site ↗ · Code ↗ · Next project ·
 | 04 How it’s built | **The link is the save file.** Everything you choose lives in the URL: no account, no backend. The calculations are plain functions with no state of their own. The maps use real boundaries: 33 London boroughs, Zurich’s 12 Kreise, and Basel in seven areas. |
 | 05 Where it stands | **Used for real.** I used it during my own flat hunt, and friends have used it too. |
 | 06 What’s next | *Keep the data fresh.* Move the April 2026 snapshot to a scheduled refresh where the sources allow it. *Show the sources in the app.* Link every default to its source. *Finer areas in Basel.* Use its 19 Wohnviertel rather than seven areas. |
-| Meta description | A rental calculator for London, Basel, and Zurich that shows what a move really costs: upfront, monthly, and how long until you can afford it. |
+| Meta description | A rental calculator for London, Basel and Zurich that shows what a move costs: upfront, monthly and how long until you can afford it. |
 
 ### Argus Risk
 
@@ -315,7 +315,7 @@ Shared labels: ← Things I make · Live site ↗ · Code ↗ · Next project ·
 | 04 How it’s built | **Everything stays in your browser.** Sessions, tags, notes, and settings live on your device, with a CSV export. A service worker keeps it working offline. It works from the keyboard and announces changes to screen readers. |
 | 05 Where it stands | **Used for my own focus.** I use it for my own focused work, and friends have used it too. |
 | 06 What’s next | *Move between devices,* keeping local storage as the default. *Show when you focus best,* like the time of day you tend to focus longest. |
-| Meta description | A focus timer that counts up, sets breaks in proportion to your focus, and keeps your history on your device. |
+| Meta description | A focus timer that counts up, sets breaks in proportion to your focus and keeps your history on your device. |
 
 ## Role stories
 

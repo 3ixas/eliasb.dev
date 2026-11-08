@@ -438,7 +438,7 @@ const quietYear = datesForWindow(GITHUB_ACTIVITY_DAYS, new Date("2026-10-02T12:0
 // Day tags and month labels are written by the site, the same in every locale.
 assert.equal(contributionTag({ date: "2026-01-15", count: 12 }), "12 contributions on Thu 15 Jan");
 assert.equal(contributionTag({ date: "2026-01-15", count: 1 }), "1 contribution on Thu 15 Jan");
-assert.equal(contributionTag({ date: "2026-01-15", count: 0 }), "Nothing on Thu 15 Jan");
+assert.equal(contributionTag({ date: "2026-01-15", count: 0 }), "0 contributions on Thu 15 Jan");
 assert.deepEqual([0, 1, 2, 3, 4, 40].map(contributionLevel), [0, 1, 2, 3, 4, 4]);
 assert.deepEqual(createContributionCalendar(quietYear).monthLabels.map(({ label }) => label).filter((label) => /June|July/.test(label)), ["June", "July"]);
 

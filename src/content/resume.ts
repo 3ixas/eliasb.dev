@@ -22,7 +22,7 @@ export const resumePdf = { href: "/Elias-Bennett-Resume.pdf", file: "public/Elia
 
 export const resumeCopy = {
   title: "Résumé",
-  description: "Elias Bennett’s résumé on one page: his roles at BNP Paribas, Joveen and Optegra, three projects, awards, skills and education.",
+  description: "My résumé on one page: my roles at BNP Paribas, Joveen and Optegra, three projects, awards, skills and education.",
   download: "Download PDF",
   sections: { experience: "Experience", projects: "Selected projects", awards: "Awards", skills: "Skills", education: "Education" },
 } as const;

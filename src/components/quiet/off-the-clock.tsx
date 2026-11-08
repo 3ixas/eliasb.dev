@@ -283,7 +283,7 @@ export function historyEntry(history: HistorySignal): Entry | null {
         object={<CalendarTile number={history.weekOf ? String(Number(history.weekOf.slice(8))) : ""} />}
         title={copy.curiosity.label}
         line={<DotLine parts={[line, mark?.shown]} />}
-        look={{ id, description: steps.join(" "), cycle: events.length > 1 ? steps : undefined }}
+        look={{ id, description: steps.join(" "), cycle: events.length > 1 ? steps : undefined, name: "this week in history" }}
       />
     ),
   };

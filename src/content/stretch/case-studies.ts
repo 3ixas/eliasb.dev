@@ -90,7 +90,7 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
     ],
     next: "argus-risk",
     description:
-      "A rental calculator for London, Basel, and Zurich that shows what a move really costs: upfront, monthly, and how long until you can afford it.",
+      "A rental calculator for London, Basel and Zurich that shows what a move costs: upfront, monthly and how long until you can afford it.",
   },
   "argus-risk": {
     slug: "argus-risk",
@@ -229,7 +229,7 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
     ],
     next: "threshold",
     description:
-      "A focus timer that counts up, sets breaks in proportion to your focus, and keeps your history on your device.",
+      "A focus timer that counts up, sets breaks in proportion to your focus and keeps your history on your device.",
   },
 };
 

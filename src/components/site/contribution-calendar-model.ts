@@ -104,11 +104,11 @@ export function formatContributionDate(value: string, options: ContributionDateO
   return `${options.weekday === "short" ? weekday.slice(0, 3) : weekday}, ${day}`;
 }
 
-/** A day's pencilled tag: "12 contributions on Thu 15 Jan", or "Nothing on Thu 15 Jan". */
+/** A day's pencilled tag: "12 contributions on Thu 15 Jan", or "0 contributions on Thu 15 Jan". */
 export function contributionTag({ date, count }: ActivityDay) {
   const day = dateFromIsoDay(date);
   const when = `${CONTRIBUTION_WEEKDAYS[day.getUTCDay()].slice(0, 3)} ${day.getUTCDate()} ${SHORT_MONTH_NAMES[day.getUTCMonth()]}`;
-  if (count === 0) return `Nothing on ${when}`;
+  if (count === 0) return `0 contributions on ${when}`;
   return `${count} ${count === 1 ? "contribution" : "contributions"} on ${when}`;
 }
 

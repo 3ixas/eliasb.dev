@@ -88,7 +88,7 @@ const entries = [
     },
     screenshot: {
       src: "/work/argus/overview.webp",
-      alt: "Argus Risk dashboard showing portfolio value, profit and loss, exposure, and system status",
+      alt: "Argus Risk dashboard showing portfolio value, profit and loss, exposure and system status",
       width: 2854,
       height: 1716,
     },
