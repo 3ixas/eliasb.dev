@@ -125,6 +125,7 @@ img[data-arrival][data-arriving] {
   border-radius: 12px;
   background-color: var(--stretch-cobalt);
   color: var(--stretch-on-cobalt);
+  font-size: var(--text-small);
   font-weight: 600;
   text-decoration: none;
   transform: translateY(-200%);

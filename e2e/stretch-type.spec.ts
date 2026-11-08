@@ -81,6 +81,15 @@ test("the Fine cut: the opening line, section titles and row titles take the agr
   expect(row.tracking).toBeCloseTo(-0.008, 3);
 });
 
+test("the bold lead-ins in prose and the header name take the section title's weight, and the skip link is on the text scale", async ({ page }) => {
+  await page.goto("/work/bnp-paribas");
+  await page.evaluate(() => document.fonts.ready);
+  const weight = (selector: string) => page.locator(selector).first().evaluate((element) => getComputedStyle(element).fontWeight);
+  expect(await weight(".qi-long__p strong")).toBe("620");
+  expect(await weight(".qi-header__name")).toBe("620");
+  expect(await page.locator(".stretch-skip").evaluate((element) => getComputedStyle(element).fontSize)).toBe("15px");
+});
+
 test("dotted words skip no ink, and the opening line's dots are heavier", async ({ page }) => {
   await page.goto("/");
   const read = (selector: string) =>

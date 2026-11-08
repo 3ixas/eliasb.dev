@@ -80,7 +80,7 @@ span.qi-header__facebtn {
 
 .qi-header__name {
   font-size: var(--text-body);
-  font-weight: 650;
+  font-weight: 620;
   line-height: 1.35;
   white-space: nowrap;
 }
@@ -174,7 +174,6 @@ a.qi-header__name {
   color: var(--stretch-muted);
   font-family: var(--font-mono);
   font-size: var(--text-label);
-  font-weight: 500;
   line-height: 1.2;
   white-space: nowrap;
 }
