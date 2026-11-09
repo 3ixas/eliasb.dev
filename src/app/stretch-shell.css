@@ -65,7 +65,7 @@ html:has([data-stretch-shell]) body {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  :is(.stretch-eclipse, .qi-copy, .qi-filters__button, .qi-zoom__close, .qi-all a):active {
+  :is(.stretch-eclipse, .qi-copy, .stretch-pill, .qi-filters__button, .qi-zoom__close, .qi-all a):active {
     transform: scale(0.97);
   }
 }
@@ -146,11 +146,24 @@ img[data-arrival][data-arriving] {
   border-radius: 999px;
   background-color: transparent;
   color: var(--stretch-ink);
-  font-size: var(--text-label);
+  font-size: var(--text-small);
+  font-weight: 600;
+  transition:
+    border-color 0.2s,
+    color 0.2s,
+    transform 120ms var(--out);
 }
 
 button.stretch-pill {
   cursor: pointer;
+}
+
+/* The same answer as Copy: cobalt on hover. The ink border stays, so the pill still shows on the Résumé desk. */
+@media (hover: hover) {
+  .stretch-pill:hover {
+    border-color: var(--stretch-cobalt);
+    color: var(--stretch-cobalt);
+  }
 }
 
 /*

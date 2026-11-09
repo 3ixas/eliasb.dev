@@ -121,6 +121,21 @@ test.describe("The Résumé", () => {
     await expect(page.getByRole("heading", { level: 1, name: resumeSheet().name })).toBeVisible();
   });
 
+  test("Download PDF answers like Copy: cobalt on hover, and it scales to .97 while pressed", async ({ page }) => {
+    test.skip(!(await page.evaluate(() => matchMedia("(hover: hover)").matches)), "Hover needs a hovering pointer");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    const download = page.getByRole("link", { name: resumeCopy.download });
+    const read = () => download.evaluate((element) => ({ color: getComputedStyle(element).color, border: getComputedStyle(element).borderTopColor, transform: getComputedStyle(element).transform }));
+    const rest = await read();
+    await download.hover();
+    await expect.poll(async () => (await read()).color).not.toBe(rest.color);
+    expect((await read()).border).toMatch(/^rgb\((35, 64, 255|139, 156, 255)\)$/);
+    await page.mouse.down();
+    await expect.poll(async () => (await read()).transform).toBe("matrix(0.97, 0, 0, 0.97, 0, 0)");
+    await page.mouse.move(2, 2);
+    await page.mouse.up();
+  });
+
   test("keeps Download PDF on the desk, off the sheet and out of print", async ({ page }) => {
     const download = page.getByRole("link", { name: resumeCopy.download });
     await expect(download).toHaveAttribute("href", resumePdf.href);

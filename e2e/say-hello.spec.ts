@@ -49,8 +49,10 @@ test.describe("Say hello", () => {
     const copy = copyButton(page);
     await expect(copy).toBeVisible();
     const quiet = await copy.evaluate((element) => getComputedStyle(element).backgroundColor);
+    const quietWidth = (await copy.boundingBox())!.width;
     await copy.click();
     await expect(copy).toHaveText(sayHello.copied);
+    expect((await copy.boundingBox())!.width).toBe(quietWidth);
     await expect(section(page).getByRole("status")).toHaveText(sayHello.copied);
     await expect.poll(() => copy.evaluate((element) => getComputedStyle(element).backgroundColor)).toMatch(/^rgb\((35, 64, 255|139, 156, 255)\)$/);
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(address);
