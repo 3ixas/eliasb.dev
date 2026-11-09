@@ -129,7 +129,7 @@ test.describe("The Résumé", () => {
     const rest = await read();
     await download.hover();
     await expect.poll(async () => (await read()).color).not.toBe(rest.color);
-    expect((await read()).border).toMatch(/^rgb\((35, 64, 255|139, 156, 255)\)$/);
+    await expect.poll(async () => (await read()).border).toMatch(/^rgb\((35, 64, 255|139, 156, 255)\)$/);
     await page.mouse.down();
     await expect.poll(async () => (await read()).transform).toBe("matrix(0.97, 0, 0, 0.97, 0, 0)");
     await page.mouse.move(2, 2);
