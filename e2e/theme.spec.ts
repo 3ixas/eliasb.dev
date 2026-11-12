@@ -301,7 +301,9 @@ test.describe("Lights and theme", () => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     await page.emulateMedia({ reducedMotion: "no-preference" });
-    for (const target of [{ page: "rgb(13, 13, 15)", ink: "rgb(240, 239, 235)" }, { page: "rgb(238, 237, 233)", ink: "rgb(20, 20, 22)" }]) {
+    for (const [pressed, target] of [["false", { page: "rgb(13, 13, 15)", ink: "rgb(240, 239, 235)" }], ["true", { page: "rgb(238, 237, 233)", ink: "rgb(20, 20, 22)" }]] as const) {
+      // aria-pressed appears only once the Eclipse has hydrated, so the click below reaches its handler.
+      await expect(eclipse(page)).toHaveAttribute("aria-pressed", pressed);
       const frames = await page.evaluate(async () => {
         document.querySelector<HTMLButtonElement>("[data-eclipse]")!.click();
         const animations = document.documentElement.getAnimations();
