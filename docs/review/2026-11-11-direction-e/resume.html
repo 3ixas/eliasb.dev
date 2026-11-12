@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Résumé · Elias Bennett (prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300..600&family=Instrument+Sans:wght@400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="metal" x1="0" x2="1"><stop offset="0" stop-color="#8d8e94"/><stop offset=".28" stop-color="#f6f6f7"/><stop offset=".55" stop-color="#b4b5ba"/><stop offset=".8" stop-color="#e9e9eb"/><stop offset="1" stop-color="#7f8086"/></linearGradient>
+  <symbol id="clip" viewBox="0 0 40 70"><rect x="9" y=".5" width="22" height="15" rx="2.5" fill="url(#metal)" stroke="#4e4f55" stroke-width=".8"/><circle cx="20" cy="8" r="2.1" fill="#5d5e64"/><circle cx="19.5" cy="7.5" r=".8" fill="#e9e9eb"/><rect x="17.3" y="15" width="5.4" height="8" rx="2" fill="url(#metal)" stroke="#4e4f55" stroke-width=".6"/><rect x="9.5" y="22.5" width="21" height="43" rx="10.5" fill="none" stroke="#4e4f55" stroke-width="4.6"/><rect x="9.5" y="22.5" width="21" height="43" rx="10.5" fill="none" stroke="url(#metal)" stroke-width="3.2"/></symbol>
+</defs></svg>
+<header class="top wrap">
+  <a class="top__name" href="index.html">Elias Bennett</a><p class="greet" id="greet" tabindex="0"><span>Hello</span><span id="london"></span></p>
+  <nav id="nav" aria-label="On this page"><a href="index.html#work">Work</a><a href="index.html#things-i-make">Things I make</a><a href="index.html#how-i-work">How I work</a><a href="index.html#off-the-clock">Off the clock</a><a href="index.html#say-hello">Say hello</a></nav>
+  <div class="top__tools"><button class="theme" id="theme" type="button" aria-label="Dark theme" aria-pressed="false"><i></i></button><button class="menu" id="menu" type="button" aria-expanded="false" aria-controls="nav">Menu</button></div>
+</header>
+<main class="wrap">
+<div class="desk">
+  <a class="btn" href="../../../public/Elias-Bennett-Resume.pdf" download>Download PDF</a>
+  <article class="sheet" aria-label="The Résumé sheet, shown as a stand-in: the real sheet and its PDF are unchanged">
+    <h1>Elias Bennett</h1><p class="sheet__role">Software engineer · London</p>
+    <p>I’m Elias, a software engineer in London. I build pricing and risk engines at BNP Paribas in C# and Java, and products of my own.</p>
+    <h2>Experience</h2>
+    <h3>BNP Paribas · Software engineer <span>Jul 2025 – now</span></h3>
+    <ul><li>Went from no C# to shipping production code independently in six months, and now own implementation and delivery as the team’s only C# engineer.</li><li>Ported Java market-data loaders to C#, and took a stale data dependency out of live pricing behind a feature flag that defaults to off, with caching and an end-to-end test.</li><li>Built an AI workflow that gives each stage its own scoped agent. It took a pricer integration from about two weeks to a couple of days, and several teams across the department now use it.</li><li>Led a team of four to win the bank’s digitisation competition, co-building a dashboard that cut a 30–40 minute data load to under 5.</li></ul>
+    <h3>Joveen · Full stack software engineer <span>Aug 2024 – Jun 2025</span></h3>
+    <ul><li>Cut page load by 40% by refactoring React components and lazy-loading assets.</li><li>Moved PHP modules to Spring Boot module by module, with endpoints, validation and tests.</li><li>Added indexes and rewrote slow queries, taking the key API’s p95 from 520 ms to 230 ms.</li></ul>
+    <h2>Selected projects</h2><h2>Awards</h2><h2>Skills</h2><h2>Education</h2>
+  </article>
+</div>
+<section class="hello" id="say-hello">
+  <h2>Say hello</h2>
+  <div class="hello__row"><a class="hello__mail" href="mailto:eliasthebennett@gmail.com">eliasthebennett@gmail.com</a><button class="btn" id="copy" type="button">Copy</button></div>
+  <ul><li><a href="#">Résumé <span aria-hidden="true">→</span></a></li><li><a href="https://github.com/3ixas">GitHub <span aria-hidden="true">↗</span></a></li><li><a href="https://linkedin.com/in/elias-t-bennett/">LinkedIn <span aria-hidden="true">↗</span></a></li></ul>
+</section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
