@@ -295,4 +295,38 @@ test.describe("Lights and theme", () => {
       await expect(page.locator("html")).not.toHaveAttribute("data-theme-changing", "");
     }
   });
+
+  // tokens.css: the passes and panels palette fades with the room, through the same controller.
+  test("the passes and panels palette crossfades with the rest, in both directions", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.goto("/");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    for (const target of [{ page: "rgb(13, 13, 15)", ink: "rgb(240, 239, 235)" }, { page: "rgb(238, 237, 233)", ink: "rgb(20, 20, 22)" }]) {
+      const frames = await page.evaluate(async () => {
+        document.querySelector<HTMLButtonElement>("[data-eclipse]")!.click();
+        const animations = document.documentElement.getAnimations();
+        for (const animation of animations) animation.pause();
+        const frames = [];
+        for (const time of [0, 150, 300]) {
+          for (const animation of animations) animation.currentTime = time;
+          const style = getComputedStyle(document.documentElement);
+          frames.push({ page: style.getPropertyValue("--page").trim(), ink: style.getPropertyValue("--ink").trim() });
+        }
+        for (const animation of animations) animation.play();
+        return frames;
+      });
+      expect(new Set(frames.map((frame) => frame.page)).size, "--page passes through a middle value").toBe(3);
+      expect(new Set(frames.map((frame) => frame.ink)).size, "--ink passes through a middle value").toBe(3);
+      await expect(page.locator("html")).not.toHaveAttribute("data-theme-changing", "");
+      // The fade can still be finishing its last frames, so wait for it to land.
+      await expect
+        .poll(() =>
+          page.evaluate(() => {
+            const style = getComputedStyle(document.documentElement);
+            return { page: style.getPropertyValue("--page").trim(), ink: style.getPropertyValue("--ink").trim() };
+          }),
+        )
+        .toEqual(target);
+    }
+  });
 });
