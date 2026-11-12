@@ -25,7 +25,7 @@ readFileSync(new URL("tokens.css", dir), "utf8").split("\n").forEach((line, inde
   const least = Number(value.trim().match(/^(?:clamp\(\s*)?(\d*\.?\d+)px/)?.[1]);
   if (!(least >= floor)) problems.push(`tokens.css:${index + 1} ${name}: ${value.trim()} is not a px size or clamp() of at least ${floor} px`);
 });
-if (typeTokens.size < 10) problems.push(`tokens.css defines ${typeTokens.size} --type-* tokens; the scale has ten`);
+if (typeTokens.size < 12) problems.push(`tokens.css defines ${typeTokens.size} --type-* tokens; the scale has twelve`);
 
 /** Display sizes the patterns above can't read, each with why it never gets small. */
 const display = new Map([

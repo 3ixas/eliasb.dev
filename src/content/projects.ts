@@ -8,9 +8,10 @@
  * and the Project index is everything else. A featured project needs a case study, a
  * screenshot and its colours; `assertCatalogue` fails the build when it doesn't.
  *
- * This module has no runtime imports, so Node can load it directly (the
+ * Its one runtime import carries a .ts extension, so Node can load it directly (the
  * contract script) as well as Next.
  */
+import { panelColourProblems, type PanelColours } from "./stretch/story.ts";
 
 /** What the /things-i-make filters group by: Products, Systems or Experiments. */
 export const PROJECT_CATEGORIES = ["products", "systems", "experiments"] as const;
@@ -47,6 +48,8 @@ export type Project = {
   crop?: ProjectCrop;
   /** The project's own colours, carried by its tile. Needed to be featured. */
   colours?: { field: string; ink: string; swatch: string };
+  /** Its panel's field and ink, the same in both themes (DESIGN.md "Tokens"). Needed to be featured. */
+  panel?: PanelColours;
 };
 
 /*
@@ -74,6 +77,7 @@ const entries = [
     },
     crop: { x: 0.155, y: 0.245, zoom: 7 },
     colours: { field: "#1a1714", ink: "#f2efe9", swatch: "#c08a5a" },
+    panel: { field: "#c58f5e", ink: "#1a1714" },
   },
   {
     slug: "argus-risk",
@@ -94,6 +98,7 @@ const entries = [
     },
     crop: { x: 0.5, y: 0.472, zoom: 4.5 },
     colours: { field: "#0a0a0a", ink: "#f2f2f2", swatch: "#4f86f7" },
+    panel: { field: "#4f86f7", ink: "#060a14" },
   },
   {
     slug: "flowtime",
@@ -115,6 +120,7 @@ const entries = [
     },
     crop: { x: 0.372, y: 0.49, zoom: 4.1 },
     colours: { field: "#1e1915", ink: "#ece4d8", swatch: "#c0876a" },
+    panel: { field: "#2a211b", ink: "#ece4d8" },
   },
   {
     slug: "home-secretary",
@@ -248,6 +254,7 @@ export function catalogueProblems(
     if (!colours || !hexColour.test(colours.field) || !hexColour.test(colours.ink) || !hexColour.test(colours.swatch)) {
       problems.push(`Featured project "${slug}" needs its colours (field, ink and swatch, as #rrggbb).`);
     }
+    problems.push(...panelColourProblems(`Featured project "${slug}"`, project.panel));
   }
   return problems;
 }

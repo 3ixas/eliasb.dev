@@ -8,9 +8,11 @@ import type { RevealId } from "./opening.ts";
 import { siteCopy } from "./site-copy.ts";
 import {
   MAX_EVIDENCE,
+  panelColourProblems,
   storySectionHasContent,
   storyText,
   type EvidenceItem,
+  type PanelColours,
   type StoryColours,
   type StorySectionBody,
 } from "./story.ts";
@@ -135,6 +137,8 @@ export type RoleStory = {
   evidence: readonly EvidenceItem[];
   /** The employer's colour in each theme. */
   colours: { light: StoryColours; dark: StoryColours };
+  /** The employer's panel and pass band, the same in both themes (DESIGN.md "Tokens"). */
+  panel: PanelColours;
   /** The Role story that follows this one (newest to oldest), or null on the last. */
   next: RoleStorySlug | null;
 };
@@ -192,6 +196,7 @@ export function roleStoryProblems(stories: readonly RoleStory[]): string[] {
       problems.push(`Role story "${story.slug}" has ${story.resume.length} Résumé lines, not ${RESUME_LINES.min} to ${RESUME_LINES.max}.`);
     }
     problems.push(...resumeLineProblems(story));
+    problems.push(...panelColourProblems(`Role story "${story.slug}"`, story.panel));
     for (const { section, phrase } of roleStoryReveals[story.slug] ?? []) {
       const { paragraphs = [] } = story.sections[section];
       if (!paragraphs.some((paragraph) => paragraph.includes(phrase))) {

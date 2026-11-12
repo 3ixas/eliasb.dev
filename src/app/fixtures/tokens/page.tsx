@@ -27,6 +27,8 @@ const scale: { token: string; style: CSSProperties; text: string; measure?: true
   { token: "panel", style: serif, text: "Joveen" },
   { token: "figure", style: { ...serif, ...figures, fontWeight: 500, lineHeight: 1 }, text: "−40%" },
   { token: "prose", style: { ...serif, lineHeight: 1.5 }, text: opening.support, measure: true },
+  { token: "row", style: { ...serif, fontWeight: 500, letterSpacing: "-0.015em" }, text: "Home Secretary" },
+  { token: "link", style: serif, text: "Everything I’ve built" },
   { token: "body", style: { ...sans, lineHeight: 1.5 }, text: opening.support, measure: true },
   { token: "ui", style: { ...sans, fontWeight: 500 }, text: "The BNP Paribas story" },
   { token: "small", style: sans, text: "Software engineer · Jul 2025 – now" },

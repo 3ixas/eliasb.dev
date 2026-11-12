@@ -5,9 +5,16 @@ import { readdirSync, readFileSync } from 'node:fs';
 // only what a value can prove: the one focus ring, the two timing curves, the object shadow tokens and the length of
 // every feedback transition. Under a second, and nothing in it can flake.
 
-const SPRING = 'cubic-bezier(.34,1.2,.64,1)';
-const OUT = 'cubic-bezier(.2,.8,.2,1)';
+const SPRING = 'cubic-bezier(.3,1.5,.4,1)';
+const OUT = 'cubic-bezier(.22,1,.36,1)';
 const FEEDBACK_MS = [100, 250];
+
+/**
+ * The passes and panels ring (DESIGN.md "Controls"), in parts.css and every stylesheet that replaces a quiet-index
+ * one: 2 px cobalt at 3 px offset, taking the panel's ink on a panel. The quiet index keeps its own until #420.
+ */
+const NEW_RING = { files: ['src/app/parts.css'], rule: ':where(.pill, .button, .text-link, .row):focus-visible', colour: 'var(--cobalt)', offset: '3px' };
+const newRingExceptions = [{ selector: '.panel :focus-visible', colour: 'var(--panel-ink)', why: 'cobalt would not hold 3:1 on every panel field' }];
 
 /** Selectors whose focus ring differs from 2 px cobalt at 2 px offset, and exactly how. */
 const ringExceptions = [
@@ -32,6 +39,8 @@ const motionTransitions = [
   ['.qi-caret[data-done]', 'the typed quote ends'],
   ['.qi-scale__fill', 'a to-scale bar draws'],
   ['.stretch-eclipse__', 'the Eclipse flips the theme'],
+  ['[data-rise]', 'a panel or card rises into view (DESIGN.md "Motion")'],
+  ['[data-grow] .bar', 'bars to scale grow from the left'],
   [':root[data-theme-changing]', 'the theme changes'],
 ];
 
@@ -83,20 +92,25 @@ export function craftProblems(files) {
   if (global?.declarations.outline !== '2px solid var(--stretch-cobalt)' || global?.declarations['outline-offset'] !== '2px') {
     problems.push('The page-wide focus ring (`[data-stretch-shell] :focus-visible`) must be `outline: 2px solid var(--stretch-cobalt)` at `outline-offset: 2px`.');
   }
+  const ring = allRules.find(({ path, selector }) => NEW_RING.files.includes(path) && selector === NEW_RING.rule);
+  if (ring?.declarations.outline !== `2px solid ${NEW_RING.colour}` || ring?.declarations['outline-offset'] !== NEW_RING.offset) {
+    problems.push(`The passes and panels focus ring (\`${NEW_RING.rule}\`) must be \`outline: 2px solid ${NEW_RING.colour}\` at \`outline-offset: ${NEW_RING.offset}\`.`);
+  }
   for (const { path, selector, declarations } of allRules) {
     if (!selector.includes(':focus-visible') && !selector.includes('[data-card] .qi-row:is(')) continue;
+    const isNew = NEW_RING.files.includes(path);
     const outline = Object.keys(declarations).filter((name) => name.startsWith('outline'));
     if (outline.length === 0) continue;
     if (selector.includes('section[tabindex="-1"]')) {
       if (declarations.outline !== 'none') problems.push(`${path}: \`${selector}\` is the one place the ring may be none.`);
       continue;
     }
-    const exception = ringExceptions.find((entry) => selector.endsWith(entry.selector) || selector === entry.selector);
+    const exception = (isNew ? newRingExceptions : ringExceptions).find((entry) => selector.endsWith(entry.selector) || selector === entry.selector);
     const width = declarations.outline?.match(/^(\S+) solid (.+)$/);
     const colour = declarations['outline-color'] ?? width?.[2];
     const offset = declarations['outline-offset'];
-    const expectedOffset = exception?.offset ?? '2px';
-    const expectedColour = exception?.colour ?? 'var(--stretch-cobalt)';
+    const expectedOffset = exception?.offset ?? (isNew ? NEW_RING.offset : '2px');
+    const expectedColour = exception?.colour ?? (isNew ? NEW_RING.colour : 'var(--stretch-cobalt)');
     if (width && width[1] !== '2px') problems.push(`${path}: \`${selector}\` has a ${width[1]} focus ring; the one ring is 2px.`);
     if (declarations['outline-width'] && declarations['outline-width'] !== '2px') problems.push(`${path}: \`${selector}\` has a ${declarations['outline-width']} focus ring; the one ring is 2px.`);
     if (offset !== undefined && offset !== expectedOffset) problems.push(`${path}: \`${selector}\` has a focus ring offset of ${offset}; it must be ${expectedOffset}${exception ? '' : ' (only a row’s is −2px)'}.`);
@@ -158,9 +172,11 @@ const broken = (path, from, to) => {
 const mustFail = (name, changed, pattern) => assert.ok(craftProblems(changed).some((problem) => pattern.test(problem)), `The ${name} check did not fail on its deliberate break`);
 mustFail('focus ring width', broken('src/app/stretch-shell.css', 'outline: 2px solid var(--stretch-cobalt);', 'outline: 3px solid var(--stretch-cobalt);'), /focus ring/);
 mustFail('focus ring offset', broken('src/app/quiet-long-form.css', '.qi-long__back:focus-visible {\n  border-radius: 6px;', '.qi-long__back:focus-visible {\n  border-radius: 6px;\n  outline-offset: 4px;'), /offset/);
-mustFail('spring', broken('src/app/stretch-tokens.css', '--spring: cubic-bezier(.34, 1.2, .64, 1);', '--spring: cubic-bezier(.3, 1.4, .64, 1);'), /--spring/);
+mustFail('new focus ring offset', broken('src/app/parts.css', '  outline: 2px solid var(--cobalt);\n  outline-offset: 3px;', '  outline: 2px solid var(--cobalt);\n  outline-offset: 2px;'), /passes and panels focus ring/);
+mustFail('panel ring colour', broken('src/app/parts.css', 'outline-color: var(--panel-ink);', 'outline-color: var(--cobalt);'), /var\(--panel-ink\)/);
+mustFail('spring', broken('src/app/tokens.css', '--spring: cubic-bezier(.3, 1.5, .4, 1);', '--spring: cubic-bezier(.3, 1.4, .64, 1);'), /--spring/);
 mustFail('feedback timing', broken('src/app/quiet-index.css', 'transition: background-color 120ms var(--out);', 'transition: background-color 400ms var(--out);'), /400 ms/);
 mustFail('row fill', broken('src/app/quiet-index.css', '  background: var(--stretch-card);\n    transition: none;', '  background: var(--stretch-card);'), /instant in/);
 mustFail('shadow tokens', broken('src/app/stretch-tokens.css', '--shadow-look: 0 0 0 1px rgb(0 0 0 / 0.08)', '--shadow-looks: 0 0 0 1px rgb(0 0 0 / 0.08)'), /shadow/);
 
-console.log('Craft checks passed: one focus ring, the site curves, object shadows from tokens, feedback within 100 to 250 ms, rows instant in and 120 ms out.');
+console.log('Craft checks passed: one focus ring per design, the site curves, object shadows from tokens, feedback within 100 to 250 ms, rows instant in and 120 ms out.');

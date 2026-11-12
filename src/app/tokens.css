@@ -28,6 +28,10 @@
   --year-3: #1fae70;
   --year-4: #00804f;
 
+  /* Motion (DESIGN.md "Motion"): --out for things that settle, --spring for things that swing. The quiet index's parts read them too until they are replaced. */
+  --out: cubic-bezier(.22, 1, .36, 1);
+  --spring: cubic-bezier(.3, 1.5, .4, 1);
+
   /* Faces: next/font sets the variables in layout.tsx, with fallback faces measured from each font. */
   --serif: var(--font-newsreader), Georgia, serif;
   --sans: var(--font-instrument-sans), system-ui, sans-serif;
@@ -39,6 +43,9 @@
   --type-panel: clamp(30px, 3vw, 42px);
   --type-figure: clamp(88px, 9.6vw, 140px);
   --type-prose: 20px;
+  /* A row's name, and a text link. */
+  --type-row: 22px;
+  --type-link: 19px;
   --type-body: 16px;
   --type-ui: 15px;
   --type-small: 14.5px;

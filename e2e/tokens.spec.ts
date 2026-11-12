@@ -64,6 +64,8 @@ const scale = (width: number): Record<string, number> => ({
   panel: clamp(30, 3, 42, width),
   figure: clamp(88, 9.6, 140, width),
   prose: width < 720 ? 19 : 20,
+  row: 22,
+  link: 19,
   body: 16,
   ui: 15,
   small: 14.5,
@@ -108,7 +110,7 @@ test.describe("Text", () => {
     test.skip(browserName !== "chromium", "Measured in Chromium");
     await page.goto("/fixtures/tokens");
     const readings = await renderedContrast(page);
-    // Six pairs, ten type samples and their labels, and the swatches' names.
+    // Six pairs, twelve type samples and their labels, and the swatches' names.
     expect(readings.length).toBeGreaterThanOrEqual(30);
     expect(readings.filter((reading) => reading.blended)).toEqual([]);
     expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);
