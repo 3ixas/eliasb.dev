@@ -12,6 +12,16 @@ const fixture = "/fixtures/parts";
 const scaled = "matrix(0.97, 0, 0, 0.97, 0, 0)";
 const phone = (page: Page) => page.viewportSize()!.width < 720;
 
+/** Opens the fixture and waits for both faces, so a layout read measures the real fonts, not their fallbacks. */
+async function openWithFonts(page: Page) {
+  await page.goto(fixture);
+  for (const family of ["Newsreader", "Instrument Sans"]) {
+    await expect
+      .poll(() => page.evaluate((name) => [...document.fonts].some((face) => face.family.replaceAll('"', "") === name && face.status === "loaded"), family), { message: `${family} loaded` })
+      .toBe(true);
+  }
+}
+
 /** Every panel field on the fixture, as the browser computes its ink, keyed by the panel's slug. */
 const fields = [
   ...roleStorySlugs.map((slug) => [slug, roleStories[slug].panel] as const),
@@ -67,7 +77,7 @@ test.describe("The panel", () => {
 
 test.describe("Controls", () => {
   test("every pill and button is a 44 px round control in Instrument Sans 15 px / 500, on the page and on every field", async ({ page }) => {
-    await page.goto(fixture);
+    await openWithFonts(page);
     const controls = page.locator(".pill, .button");
     expect(await controls.count()).toBeGreaterThanOrEqual(16);
     const readings = await controls.evaluateAll((elements) =>
@@ -95,18 +105,21 @@ test.describe("Controls", () => {
   });
 
   test("a long name wraps inside its pill and never leaves its panel", async ({ page }) => {
-    await page.goto(fixture);
-    const overflow = await page.locator("[data-panel]").evaluateAll((panels) =>
-      panels.flatMap((panel) => {
-        const box = panel.getBoundingClientRect();
-        return [...panel.querySelectorAll(".pill")].filter((pill) => pill.getBoundingClientRect().right > box.right + 0.5).map((pill) => pill.textContent);
-      }),
-    );
-    expect(overflow).toEqual([]);
+    await openWithFonts(page);
+    await expect
+      .poll(() =>
+        page.locator("[data-panel]").evaluateAll((panels) =>
+          panels.flatMap((panel) => {
+            const box = panel.getBoundingClientRect();
+            return [...panel.querySelectorAll(".pill")].filter((pill) => pill.getBoundingClientRect().right > box.right + 0.5).map((pill) => pill.textContent);
+          }),
+        ),
+      )
+      .toEqual([]);
   });
 
   test("the text link is Newsreader 19 px, a 44 px target, with its words underlined and its arrow not", async ({ page }) => {
-    await page.goto(fixture);
+    await openWithFonts(page);
     const link = page.locator(".text-link").first();
     const read = await style(link, "font-family", "font-size", "text-decoration-line");
     expect(read["font-family"]).toMatch(/^Newsreader/);
@@ -117,7 +130,7 @@ test.describe("Controls", () => {
   });
 
   test("a row is a 44 px target and a chip is 13 px", async ({ page }) => {
-    await page.goto(fixture);
+    await openWithFonts(page);
     for (const box of await page.locator(".row").evaluateAll((rows) => rows.map((row) => row.getBoundingClientRect().height))) expect(box).toBeGreaterThanOrEqual(44);
     expect((await style(page.locator(".chip").first(), "font-size"))["font-size"]).toBe("13px");
   });
@@ -318,7 +331,7 @@ test.describe("Text", () => {
   });
 
   test("the fixture does not scroll sideways", async ({ page }) => {
-    await page.goto(fixture);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+    await openWithFonts(page);
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
   });
 });
