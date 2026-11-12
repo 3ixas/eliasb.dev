@@ -65,7 +65,7 @@ Carry these over; restyle only where a ticket says so.
 - **Replaces:** `quiet/opening.tsx`, `quiet-opening.css`, `quiet/reveal-word.tsx`, `quiet/opening-looks.tsx`, `quiet/finished-pass.tsx`, `site/staff-pass-hang.tsx`.
 - **Content:** `content/stretch/staff-pass.ts` gains each pass's three points (keep `pins` for the Résumé); `passProblems` checks all three. `content/stretch/opening.ts` keeps the line and support.
 - **Specs:** `opening` (17), `reveal-words` (21, retires).
-- **Asset:** `public/profile/elias.webp` cropped by CSS in the prototype; ship a real crop through `next/image`.
+- **Asset:** `public/profile/elias-evening.webp` (the white-tux portrait), cropped by CSS in the prototype; ship a real crop through `next/image`.
 
 ### #413 Work
 
@@ -77,7 +77,7 @@ Carry these over; restyle only where a ticket says so.
 ### #414 Where I'm headed and How I work
 
 - **Replaces:** the strands in `quiet/work.tsx`, `quiet/how-i-work.tsx`, `quiet/typed-quote.tsx`, `quiet/sheet.tsx`.
-- **Content:** `content/stretch/work.ts` (line 144 holds the lead: open decision 2), `content/stretch/how-i-work.ts`.
+- **Content:** `content/stretch/work.ts` (line 144 holds the lead: the one open decision, in the spec's Further Notes), `content/stretch/how-i-work.ts`.
 - **Specs:** `how-i-work` (12), `motion` (11, the pen's strokes retire).
 
 ### #415 Things I make and the archive

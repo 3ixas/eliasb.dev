@@ -51,7 +51,7 @@ A printed card hanging from a lanyard. It is an object, so it keeps its printed 
 - **Card**: CR80 proportion (14.5 : 23), 0.8 em radius, white stock, a hairline edge, a 1.5 px lower edge for thickness, and two soft shadows. Sizes inside it are in em of the card's width ÷ 14.5.
 - **Lanyard**: two plies of woven ribbon in the employer's colour, 1 em wide, opening upward at 4.5° each way and running out of view at the top.
 - **Clip**: a metal crimp, a swivel and a loop. The loop's two legs cross the strip above the slot, enter the slot and end at its lower edge, so it passes behind the card.
-- **Print, top to bottom**: a header band in the employer's colour with the employer's name in Newsreader 500; the portrait (colour on the current pass, greyscale on a returned one); "Elias Bennett", the role, the dates; three points, each a Newsreader lead over an Instrument Sans detail, ruled apart; the status and a barcode. The current pass has a hologram beside "Valid · present"; a returned pass says "Returned".
+- **Print, top to bottom**: a header band in the employer's colour with the employer's name in Newsreader 500; the white-tux portrait (`public/profile/elias-evening.webp`; colour on the current pass, greyscale on a returned one); "Elias Bennett", the role, the dates; three points, each a Newsreader lead over an Instrument Sans detail, ruled apart; the status and a barcode. The current pass has a hologram beside "Valid · present"; a returned pass says "Returned".
 - **Points**: BNP Paribas: Winner (Digitisation competition, 2025), Take Ownership (Award, Q1 2026), AI workflow (Used by several teams). Joveen: −40% (Page load), 520 → 230 ms (Key API p95), +30% (Mobile retention). Optegra: 62 → 88% (Core Web Vitals pass rate), −30% (p95 page load), +15% (Consultation conversion). Every point is a fact its Role story tells.
 - **Size and order**: BNP Paribas first, 264 px wide, hanging lowest; Joveen and Optegra 248 px. Every text on a pass is at least 13 px.
 - **Where**: three in the homepage's opening, each linking to its panel in Work; one at the top of each Role story, not a link.
@@ -256,4 +256,8 @@ Elias agreed these between 10 and 12 November 2026, across three rounds of proto
 7. **Off the clock follows the theme.**
 8. **The header keeps the time-of-day greeting.**
 
-Still open, and listed in the spec: the portrait on the passes, the "Where I'm headed" lead, the simulation's second caption sentence, the BNP Paribas pass's last two points, how this week in history and Now making appear in Off the clock, the section notes, and what happens to the lens 8 pull request.
+9. **The portrait on the passes is the white-tux photo** (`public/profile/elias-evening.webp`).
+10. **History steps on a tap**, at every width; there is no swipe.
+11. **Section notes go**, except Work's, which is its subheading.
+
+Still open, and in the spec: the wording of "Where I'm headed"'s lead.
