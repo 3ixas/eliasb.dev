@@ -1,6 +1,6 @@
 # Passes and panels: the redesign of eliasb.dev
 
-Status: **direction approved by Elias on 11 November 2026**; one decision is still his, the "Where I'm headed" lead (see Further Notes). This is the build spec. The contract it produces is `docs/design/DESIGN.md`; the visual reference is the prototype in `docs/review/2026-11-11-direction-e/` (the homepage, two Role stories, a case study, the archive, the 404, the Résumé page, and `parts.html` for states and parts the pages do not show). What each ticket replaces in the code is in `PASSES-AND-PANELS-CODE-MAP.md`. How the direction was reached, and the three rounds of concepts it came from, are in `CRAFT-ELEVATION-SPEC.md`, which is now a record and no longer a list of work.
+Status: **direction approved by Elias on 11 November 2026**; his decisions are recorded under Further Notes. This is the build spec. The contract it produces is `docs/design/DESIGN.md`; the visual reference is the prototype in `docs/review/2026-11-11-direction-e/` (the homepage, two Role stories, a case study, the archive, the 404, the Résumé page, and `parts.html` for states and parts the pages do not show). What each ticket replaces in the code is in `PASSES-AND-PANELS-CODE-MAP.md`. How the direction was reached, and the three rounds of concepts it came from, are in `CRAFT-ELEVATION-SPEC.md`, which is now a record and no longer a list of work.
 
 "Passes and panels" is a working name for the direction, after its two parts. It can change without changing anything below.
 
@@ -378,22 +378,12 @@ R-27 (content) and R-31 (the craft audit's findings) apply to every ticket that 
 Elias answered these on 12 November 2026.
 
 1. **The portrait on the passes** is the white-tux photo, `public/profile/elias-evening.webp`, in colour on the current pass and greyscale on returned ones (R-12).
-2. **"Where I'm headed"'s lead** (R-16) is **still open**; see below.
+2. **"Where I'm headed"'s lead** (R-16) is: "I’m working towards the judgement, depth and range to be trusted with what to build, building it well and getting it used. Here’s how far I’ve got on each." It replaces the approved line that names "a product engineer". Elias's aim is a level and a character, a strong senior or staff engineer who would thrive on a small product team, and the line evokes that without naming a role or a kind of company. His own wording was "I'm working towards building the judgement, depth, and range needed to be trusted with what to build, building it well, and getting it used."; this is that line tightened, without the serial commas the site does not use. The three parts beneath it are judgement, depth and range in that order. The string goes into `docs/content/redesign-copy.md` and `src/content/stretch/work.ts` in #414.
 3. **The simulation's caption** is accurate and approved as written (R-14).
 4. **The BNP Paribas pass's points** are the prototype's: "Winner · Digitisation competition, 2025", "Take Ownership · Award, Q1 2026", "AI workflow · Used by several teams" (R-12). The Résumé's Awards are unchanged.
 5. **This week in history and Now making** are as drawn (R-19). History steps on a tap of its "1 of 3" button at every width. There is no swipe: a sideways swipe competes with the page's own gestures, cannot be discovered, and would still need the button for keyboard and screen-reader use.
 6. **[#407](https://github.com/3ixas/eliasb.dev/pull/407)** merges to `main` now.
 7. **Section notes** under Things I make, How I work and Off the clock are removed. Work keeps its line as the subheading.
-
-### Open decision: the "Where I'm headed" lead
-
-The approved line names "a product engineer". Elias's aim is a level and a character, not a title: a strong senior or staff engineer who would thrive in a product-focused tech or fintech company of small to medium size. The line should evoke that engineer without naming the role or the kind of company. Three candidates, each followed by the existing "Three things that takes, and how far I’ve got on each.":
-
-- **A (in the prototype, recommended):** "I’m working towards being the engineer a small product team can hand a whole problem to."
-- **B:** "I’m working towards being trusted with the whole thing: what to build, building it well, and getting it used."
-- **C:** "I’m working towards the judgement, depth and range a small team needs from its senior engineers."
-
-Until Elias picks one or writes his own, #414 builds with A and says so in its pull request. The picked string goes into `docs/content/redesign-copy.md` and `src/content/stretch/work.ts` in the same change.
 
 ### Evidence and its limits
 

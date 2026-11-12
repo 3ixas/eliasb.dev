@@ -259,5 +259,4 @@ Elias agreed these between 10 and 12 November 2026, across three rounds of proto
 9. **The portrait on the passes is the white-tux photo** (`public/profile/elias-evening.webp`).
 10. **History steps on a tap**, at every width; there is no swipe.
 11. **Section notes go**, except Work's, which is its subheading.
-
-Still open, and in the spec: the wording of "Where I'm headed"'s lead.
+12. **"Where I'm headed" leads with** "I’m working towards the judgement, depth and range to be trusted with what to build, building it well and getting it used. Here’s how far I’ve got on each."
