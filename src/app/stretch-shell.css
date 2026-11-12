@@ -108,7 +108,7 @@ img[data-arrival][data-arriving] {
 /* Animate the palette once. Descendant colour transitions would repeatedly
  * chase their parent's inherited colour and make text lag behind the surface. */
 :root[data-theme-changing] {
-  transition-property: --stretch-page, --stretch-ink, --stretch-muted, --stretch-rule, --stretch-card, --stretch-cobalt, --stretch-on-cobalt, --stretch-tile-edge, --stretch-paper, --stretch-newsprint, --stretch-graph, --stretch-stamp, --stretch-paper-rule, --bnp, --sun, --gh-0, --gh-1, --gh-2, --gh-3, --gh-4;
+  transition-property: --stretch-page, --stretch-ink, --stretch-muted, --stretch-rule, --stretch-card, --stretch-cobalt, --stretch-on-cobalt, --stretch-tile-edge, --stretch-paper, --stretch-newsprint, --stretch-graph, --stretch-stamp, --stretch-paper-rule, --bnp, --sun, --gh-0, --gh-1, --gh-2, --gh-3, --gh-4, --page, --paper, --ink, --muted, --hair, --tint, --cobalt, --green, --year-0, --year-1, --year-2, --year-3, --year-4;
   transition-duration: var(--stretch-room-duration);
   transition-timing-function: var(--stretch-room-ease);
   transition-delay: 0s;

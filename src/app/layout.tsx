@@ -1,8 +1,9 @@
 import { homeTitle, siteDescription, siteName } from "@/content/site";
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, DM_Mono } from "next/font/google";
+import { Bricolage_Grotesque, DM_Mono, Instrument_Sans, Newsreader } from "next/font/google";
 import "./base.css";
 import "./stretch-tokens.css";
+import "./tokens.css";
 import "./stretch-type.css";
 import "./stretch-shell.css";
 import "./quiet-index.css";
@@ -32,6 +33,23 @@ const dmMono = DM_Mono({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-dm-mono",
+});
+
+// Passes and panels (docs/design/DESIGN.md "Type"): Newsreader for headings, figures and prose, with its
+// optical-size axis; Instrument Sans for interface text. Both variable in weight, Latin only, and given
+// next/font's fallback faces, which it sizes from each font's own metrics so a late font moves nothing.
+// tokens.css reads them as --serif and --sans. Bricolage and DM Mono stay until #420.
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  axes: ["opsz"],
+  style: "normal",
+  variable: "--font-newsreader",
+});
+
+const instrumentSans = Instrument_Sans({
+  subsets: ["latin"],
+  style: "normal",
+  variable: "--font-instrument-sans",
 });
 
 const isIndexable = process.env.SITE_INDEXABLE === "true";
@@ -93,7 +111,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       lang="en-GB"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${bricolage.variable} ${dmMono.variable}`}
+      className={`${bricolage.variable} ${dmMono.variable} ${newsreader.variable} ${instrumentSans.variable}`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: siteBootScript }} />

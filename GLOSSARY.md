@@ -17,6 +17,10 @@ _Avoid_: Board, a playful theme of props (its play comes from scale, colour and 
 The site's direction since 26 October 2026, first on the homepage ([#278](https://github.com/3ixas/eliasb.dev/issues/278)) and then on every inner page ([#301](https://github.com/3ixas/eliasb.dev/issues/301)); its contract is `docs/design/DESIGN.md`. One quiet column of **Rows**, the opening line as the loudest thing, and character found by looking closer. Anything that names something real can show it, as a **Closer look**. It replaces the Stretch homepage, which grew by addition, and carries a removal rule so it can't grow that way again.
 _Avoid_: Minimal (it isn't empty), adding a section-level set piece
 
+**Panel**:
+The block that holds one subject in the passes and panels direction, Elias's approved redesign ([#409](https://github.com/3ixas/eliasb.dev/issues/409); `docs/design/DESIGN.md`). It is sized by how much the subject matters, takes the subject's own field and ink (an **Employer colour** or **Project colour**) or paper that follows the theme, and carries its proof on its face: a display figure, a chart, bars to scale or a screenshot. BNP Paribas's is the largest. A panel never carries a **Staff pass**'s furniture ("Valid · present", a barcode).
+_Avoid_: Card (a card sits inside a panel), tile, section
+
 **Row**:
 The one shape on the **Quiet index**: a 44 px object, a title, one line and quiet metadata, all starting on the same text edge. Projects, employers, strands, habits and personal things are all rows. The object is drawn to read at 44 px (a legible detail of a screenshot, a mini **Staff pass**, a real cover, a calendar tile), never a whole page shrunk down.
 _Avoid_: Card, tile, thumbnail of a whole page
