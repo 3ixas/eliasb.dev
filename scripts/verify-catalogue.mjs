@@ -20,6 +20,7 @@ const featurable = (slug) =>
   base(slug, 2026, {
     links: { caseStudy: `/things-i-make/${slug}` },
     colours: { field: "#000000", ink: "#ffffff", swatch: "#808080" },
+    panel: { field: "#000000", ink: "#ffffff" },
   });
 
 // The real catalogue and featured list are valid, and what the site depends on.
@@ -67,7 +68,9 @@ assert.match(failing({ ...featurable("a"), links: {} })[0], /needs a case study/
 assert.match(failing({ ...featurable("a"), screenshot: undefined }).join(" "), /Featured project "a" needs a screenshot/);
 assert.match(failing({ ...featurable("a"), colours: undefined })[0], /Featured project "a" needs its colours/);
 assert.match(failing({ ...featurable("a"), colours: { field: "red", ink: "#ffffff", swatch: "#808080" } })[0], /needs its colours/);
-assert.equal(failing({ ...featurable("a"), screenshot: undefined, colours: undefined }).length, 3, "Every problem is reported");
+assert.match(failing({ ...featurable("a"), panel: undefined })[0], /Featured project "a" needs its panel colours/);
+assert.match(failing({ ...featurable("a"), panel: { field: "#777777", ink: "#ffffff" } })[0], /panel ink is 4\.48:1 on its field; it needs 4\.5:1/);
+assert.equal(failing({ ...featurable("a"), screenshot: undefined, colours: undefined, panel: undefined }).length, 4, "Every problem is reported");
 assert.match(catalogueProblems([], ["ghost"], [])[0], /"ghost" is not in the catalogue/);
 
 // At most three, none twice, no duplicate slugs.

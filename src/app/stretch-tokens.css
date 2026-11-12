@@ -49,9 +49,6 @@
   --gh-4: #216e39;
   color-scheme: light;
 
-  /* Motion timing (docs/design/DESIGN.md "Motion"): --spring for things that arrive or swing, --out for things that settle. */
-  --spring: cubic-bezier(.34, 1.2, .64, 1);
-  --out: cubic-bezier(.2, .8, .2, 1);
 
   /* Text under 24 px: nothing is smaller than 13 px, docs/design/DESIGN.md "Type". */
   /* The long-form step: sections of a Role story or case study sit this far apart (the homepage uses 80 px, 64 px on phones). */

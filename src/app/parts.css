@@ -1,0 +1,388 @@
+/*
+ * The passes and panels parts every page shares (docs/design/DESIGN.md "Layout", "The panel", "Controls" and
+ * "Motion"; R-03, R-04, R-05 and R-07): the page frame and section rhythm, the panel, one set of controls, and the
+ * three arrival motions. Values are DESIGN.md's; tokens.css holds the colours, type and curves.
+ *
+ * A panel sets --field and --panel-ink for everything inside it, and --line, the ink at 30%, for its outlines and
+ * rules. On the page they fall back to the page's own ink and hairline, so a control means the same thing anywhere.
+ */
+
+/* ---- Layout (R-03) ---- */
+
+.frame {
+  max-width: 1344px;
+  margin-inline: auto;
+  padding-inline: 32px;
+}
+
+.section {
+  padding-top: 144px;
+}
+
+.section__title {
+  margin-bottom: 40px;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: var(--type-section);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+/* Panels in one section: 16 px apart, two side by side stacking on a phone. */
+.panels {
+  display: grid;
+  gap: 16px;
+}
+
+.panels--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.panels--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* ---- The panel (R-04) ---- */
+
+.panel {
+  --field: var(--paper);
+  --panel-ink: var(--ink);
+  --line: color-mix(in srgb, var(--panel-ink) 30%, transparent);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 44px;
+  border-radius: 28px;
+  background: var(--field);
+  color: var(--panel-ink);
+}
+
+/* The 1 px lighter top edge, inside the curve. */
+.panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18);
+  pointer-events: none;
+}
+
+/* A panel that follows the theme: paper, with a hairline so it holds its edge on the page in both themes. */
+.panel--paper {
+  --line: var(--hair);
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+
+/* In the dark theme a project's panel glows in its own colour; in light it has no depth at all. */
+.panel--glow {
+  box-shadow: 0 50px 90px -56px light-dark(transparent, color-mix(in srgb, var(--field) 70%, transparent));
+}
+
+.panel__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px 24px;
+  flex-wrap: wrap;
+}
+
+.panel__name {
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: var(--type-panel);
+  line-height: 1;
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+}
+
+/* Role and dates: two lines at the right, wrapping between parts and never inside one. */
+.panel__meta {
+  margin-left: auto;
+  text-align: right;
+  font-size: var(--type-small);
+  line-height: 1.4;
+}
+
+.panel__meta span {
+  display: block;
+}
+
+/* ---- Controls (R-05) ---- */
+
+.pill,
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: var(--type-ui);
+  font-weight: 500;
+  /* One line in every real case; a long name (Optegra's in full) wraps inside the pill rather than out of its panel. */
+  line-height: 1.2;
+  text-align: center;
+  text-wrap: balance;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 150ms var(--out), background-color 200ms var(--out), color 200ms var(--out);
+}
+
+/* On a panel: its ink as the fill and its field as the text. */
+.pill {
+  background: var(--panel-ink, var(--ink));
+  color: var(--field, var(--page));
+}
+
+.pill--outline {
+  background: transparent;
+  color: var(--panel-ink, var(--ink));
+  box-shadow: inset 0 0 0 1px var(--line, var(--hair));
+}
+
+/* On the page: an ink outline that fills with ink. */
+.button {
+  min-width: 84px;
+  background: transparent;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+.button[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--page);
+}
+
+/* The words underlined in hair; the arrow sits outside the underline. 10 px above and below make it a 44 px target. */
+.text-link {
+  display: inline-block;
+  padding-block: 10px;
+  color: inherit;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-link);
+  line-height: 1.3;
+  text-decoration: underline;
+  text-decoration-color: var(--line, var(--hair));
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+  transition: text-decoration-color 150ms var(--out);
+}
+
+/* An arrow beside a control's words. Inline-block, so no underline reaches it and it can move. */
+.arrow {
+  display: inline-block;
+  margin-left: 8px;
+  font-style: normal;
+  transition: transform 200ms var(--out);
+}
+
+.pill .arrow,
+.button .arrow {
+  margin-left: 0;
+}
+
+/* A row: the other projects and the 404's suggestions. The whole row takes the tint. */
+.rows {
+  border-top: 1px solid var(--line, var(--hair));
+}
+
+.rows > li {
+  border-bottom: 1px solid var(--line, var(--hair));
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 4fr 7fr minmax(max-content, 1fr);
+  gap: 4px 24px;
+  align-items: baseline;
+  min-height: 44px;
+  margin-inline: -12px;
+  padding: 18px 12px;
+  border-radius: 12px;
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 150ms var(--out);
+}
+
+.row__name {
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-row);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.row__line,
+.row__meta {
+  color: var(--muted);
+}
+
+.row__meta {
+  text-align: right;
+  font-size: var(--type-small);
+  white-space: nowrap;
+}
+
+/* A chip: a stack item in a round outline, or a source in its own colour. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: var(--type-label);
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: inset 0 0 0 1px var(--line, var(--hair));
+}
+
+.chip--source {
+  font-weight: 600;
+  background: color-mix(in srgb, var(--source) 14%, transparent);
+  box-shadow: inset 0 0 0 1.5px var(--source);
+}
+
+/* One ring: 2 px cobalt at 3 px offset; on a panel, the panel's ink. */
+:where(.pill, .button, .text-link, .row):focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 3px;
+}
+
+.panel :focus-visible {
+  outline-color: var(--panel-ink);
+}
+
+/* Hover is feedback for a hovering fine pointer only: it never sticks after a tap. Arrows move 4 px. */
+@media (hover: hover) and (pointer: fine) {
+  :is(.pill, .button, .text-link, .row):hover .arrow {
+    transform: translateX(4px);
+  }
+
+  :is(.pill, .button, .text-link, .row):hover .arrow--out {
+    transform: translate(3px, -3px);
+  }
+
+  .pill--outline:hover {
+    background: color-mix(in srgb, var(--panel-ink, var(--ink)) 10%, transparent);
+  }
+
+  .button:hover {
+    background: var(--ink);
+    color: var(--page);
+  }
+
+  .text-link:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .row:hover {
+    background: var(--tint);
+  }
+}
+
+/* Press: 0.97 over 150 ms, released from wherever it has reached. */
+.pill:active,
+.button:active {
+  transform: scale(0.97);
+}
+
+/* ---- Arrival motion (R-07) ---- */
+
+/*
+ * Each motion arms only what starts below the fold (components/parts/on-view.tsx sets data-armed), and lets it go
+ * once, when it is 15% into the viewport. The server, a browser without script, a visitor who prefers reduced
+ * motion and anything already in view get the finished state, so nothing is ever held back.
+ */
+[data-rise] {
+  transition: opacity 600ms var(--out), transform 900ms var(--out);
+}
+
+[data-rise][data-armed] {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+/* Bars to scale grow from their left edge, the after bar 300 ms behind the before. */
+[data-grow] .bar {
+  transform-origin: left center;
+  transition: transform 1s var(--out) 150ms;
+}
+
+[data-grow] .bar--after {
+  transition-delay: 450ms;
+}
+
+[data-grow][data-armed] .bar {
+  transform: scaleX(0);
+}
+
+/* ---- Phone ---- */
+
+@media (max-width: 1259.98px) {
+  .panels--three {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 719.98px) {
+  .frame {
+    padding-inline: 16px;
+  }
+
+  .section {
+    padding-top: 96px;
+  }
+
+  .section__title {
+    margin-bottom: 28px;
+  }
+
+  .panels--two,
+  .panels--three {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .panel {
+    padding: 26px 22px;
+    border-radius: 22px;
+  }
+
+  .row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .row__line {
+    grid-column: 1;
+    grid-row: 2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill:active,
+  .button:active {
+    transform: none;
+  }
+}
+
+/* A printed page has no viewport to arrive in. */
+@media print {
+  [data-armed],
+  [data-armed] .bar {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
