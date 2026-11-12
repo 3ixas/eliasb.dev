@@ -2002,7 +2002,7 @@ button.stretch-gh__day[data-selected] {
 
 /* The Copy button is quiet until pressed, then fills with cobalt and says "Copied". It needs script, so it is hidden without it. */
 .qi-copy {
-  min-width: 86px;
+  min-width: 88px;
   min-height: 44px;
   padding: 0 16px;
   border: 1px solid var(--stretch-rule);
