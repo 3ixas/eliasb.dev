@@ -6,7 +6,7 @@ The design contract for all of eliasb.dev: the homepage, the shell (header and t
 
 **Keeping it current.** A tweak edits this file in place, in the same pull request as the change. A new direction first copies this file into `history/` with a superseded note at the top, then rewrites it. The directions it replaced are in `history/`: the quiet index (`QUIET-INDEX.md`), the Stretch direction (`STRETCH.md`), the Board (`BOARD.md`) and the Cabinet of Curiosities (`SELECTED-DIRECTION.md`).
 
-The build spec, with acceptance criteria and the order of work, is `docs/specs/PASSES-AND-PANELS-SPEC.md` (requirements `R-01` to `R-40`). How the direction was reached is in `docs/specs/CRAFT-ELEVATION-SPEC.md`. The visual reference is the prototype in `docs/review/2026-11-11-direction-e/` (`index.html`, `bnp.html`, `threshold.html`, `things.html`, with `style.css` holding every value below). Where the prototype and this file disagree, this file wins. Terms follow `GLOSSARY.md`; approved copy is in `docs/content/redesign-copy.md`.
+The build spec, with acceptance criteria and the order of work, is `docs/specs/PASSES-AND-PANELS-SPEC.md` (requirements `R-01` to `R-40`). How the direction was reached is in `docs/specs/CRAFT-ELEVATION-SPEC.md`. The visual reference is the prototype in `docs/review/2026-11-11-direction-e/` (`index.html`, `bnp.html`, `joveen.html`, `threshold.html`, `things.html`, `404.html`, `resume.html`, and `parts.html` for the states and parts those pages do not show, with `style.css` holding every value below). What each part replaces in the code is in `docs/specs/PASSES-AND-PANELS-CODE-MAP.md`. Where the prototype and this file disagree, this file wins. Terms follow `GLOSSARY.md`; approved copy is in `docs/content/redesign-copy.md`.
 
 ## Principle
 
@@ -27,7 +27,7 @@ A change that breaks one needs Elias's decision, not a judgement in review.
 - **Sections**: 144 px apart (96 px under 720 px). Each opens with its title; Work alone has a subheading.
 - **Panels in a section**: 16 px apart. Two panels side by side stack under 720 px.
 - **Breakpoints**: 1260 px (the opening and wide panels stack), 900 px (the passes scroll sideways), 720 px (phone).
-- **Length**: the homepage stays within 7.5 screens at 1440 × 900 and 10.5 at 390 × 844. Something new takes the place of something else. A long-form page has no budget.
+- **Length**: the homepage stays within 8 screens at 1440 × 900 and 11 at 390 × 844. Something new takes the place of something else. A long-form page has no budget.
 
 ## The panel
 
@@ -42,6 +42,8 @@ A change that breaks one needs Elias's decision, not a judgement in review.
 
 Pass furniture ("Valid · present", "Returned", a barcode) never appears on a panel.
 
+**Text on a coloured panel is the panel's ink at full strength.** Dimmed text is allowed only where it still measures AA: on the dark fields (Joveen, Optegra, Flowtime) and on paper. BNP Paribas's panel lifts from `#2cbd86` at its top left to its field `#00965e` and is never darker than the field.
+
 ## The staff pass
 
 A printed card hanging from a lanyard. It is an object, so it keeps its printed colours in both themes; its card stock is a step darker in dark.
@@ -49,7 +51,7 @@ A printed card hanging from a lanyard. It is an object, so it keeps its printed 
 - **Card**: CR80 proportion (14.5 : 23), 0.8 em radius, white stock, a hairline edge, a 1.5 px lower edge for thickness, and two soft shadows. Sizes inside it are in em of the card's width ÷ 14.5.
 - **Lanyard**: two plies of woven ribbon in the employer's colour, 1 em wide, opening upward at 4.5° each way and running out of view at the top.
 - **Clip**: a metal crimp, a swivel and a loop. The loop's two legs cross the strip above the slot, enter the slot and end at its lower edge, so it passes behind the card.
-- **Print, top to bottom**: a header band in the employer's colour with the employer's name in Newsreader 500; the portrait (colour on the current pass, greyscale on a returned one); "Elias Bennett", the role, the dates; three points, each a Newsreader lead over an Instrument Sans detail, ruled apart; the status and a barcode. The current pass has a hologram beside "Valid · present"; a returned pass says "Returned".
+- **Print, top to bottom**: a header band in the employer's colour with the employer's name in Newsreader 500; the white-tux portrait (`public/profile/elias-evening.webp`; colour on the current pass, greyscale on a returned one); "Elias Bennett", the role, the dates; three points, each a Newsreader lead over an Instrument Sans detail, ruled apart; the status and a barcode. The current pass has a hologram beside "Valid · present"; a returned pass says "Returned".
 - **Points**: BNP Paribas: Winner (Digitisation competition, 2025), Take Ownership (Award, Q1 2026), AI workflow (Used by several teams). Joveen: −40% (Page load), 520 → 230 ms (Key API p95), +30% (Mobile retention). Optegra: 62 → 88% (Core Web Vitals pass rate), −30% (p95 page load), +15% (Consultation conversion). Every point is a fact its Role story tells.
 - **Size and order**: BNP Paribas first, 264 px wide, hanging lowest; Joveen and Optegra 248 px. Every text on a pass is at least 13 px.
 - **Where**: three in the homepage's opening, each linking to its panel in Work; one at the top of each Role story, not a link.
@@ -92,7 +94,7 @@ The name in Newsreader 500 at 20 px, a link to the homepage; the greeting; the f
 4. **Where I'm headed**: one paper panel. The title and lead at the left; three parts at the right, each from a chip naming its source (Optegra, BNP Paribas, Threshold).
 5. **Things I make**: Threshold wide; Argus Risk and Flowtime side by side; the other projects as rows, newest first, at most ten; the link to the Work archive with the true count.
 6. **How I work**: four cards, then the link to Threshold's PRD.
-7. **Off the clock**: one paper panel: the training week and today's session, the book, the film, this week in history, then the GitHub year and its total.
+7. **Off the clock**: one paper panel in three bands. Three cells: the training week and today's session, the book, the film. Then this week in history, full width: the image, its title, the year and the fact, and an outline pill ("1 of 3") that steps to the next oddity in place. Then the GitHub year: the total, with "Now making" and the latest repository beneath it, beside the grid. A stale feed says "From Goodreads, as of 2 Nov"; a feed that is down shows its authored fallback, and the panel keeps its shape.
 8. **Say hello**, which ends every page.
 
 Anchors stay `#work`, `#things-i-make`, `#how-i-work`, `#off-the-clock` and `#say-hello`.
@@ -254,4 +256,7 @@ Elias agreed these between 10 and 12 November 2026, across three rounds of proto
 7. **Off the clock follows the theme.**
 8. **The header keeps the time-of-day greeting.**
 
-Still open, and listed in the spec: the portrait on the passes, the "Where I'm headed" lead, the simulation's second caption sentence, the BNP Paribas pass's last two points, how this week in history and Now making appear in Off the clock, and what happens to the lens 8 pull request.
+9. **The portrait on the passes is the white-tux photo** (`public/profile/elias-evening.webp`).
+10. **History steps on a tap**, at every width; there is no swipe.
+11. **Section notes go**, except Work's, which is its subheading.
+12. **"Where I'm headed" leads with** "I’m working towards the judgement, depth and range to be trusted with what to build, building it well and getting it used. Here’s how far I’ve got on each."

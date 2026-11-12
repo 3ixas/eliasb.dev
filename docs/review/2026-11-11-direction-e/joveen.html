@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Full stack software engineer at Joveen · Elias Bennett (prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300..600&family=Instrument+Sans:wght@400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="metal" x1="0" x2="1"><stop offset="0" stop-color="#8d8e94"/><stop offset=".28" stop-color="#f6f6f7"/><stop offset=".55" stop-color="#b4b5ba"/><stop offset=".8" stop-color="#e9e9eb"/><stop offset="1" stop-color="#7f8086"/></linearGradient>
+  <symbol id="clip" viewBox="0 0 40 70"><rect x="9" y=".5" width="22" height="15" rx="2.5" fill="url(#metal)" stroke="#4e4f55" stroke-width=".8"/><circle cx="20" cy="8" r="2.1" fill="#5d5e64"/><circle cx="19.5" cy="7.5" r=".8" fill="#e9e9eb"/><rect x="17.3" y="15" width="5.4" height="8" rx="2" fill="url(#metal)" stroke="#4e4f55" stroke-width=".6"/><rect x="9.5" y="22.5" width="21" height="43" rx="10.5" fill="none" stroke="#4e4f55" stroke-width="4.6"/><rect x="9.5" y="22.5" width="21" height="43" rx="10.5" fill="none" stroke="url(#metal)" stroke-width="3.2"/></symbol>
+</defs></svg>
+<header class="top wrap">
+  <a class="top__name" href="index.html">Elias Bennett</a><p class="greet" id="greet" tabindex="0"><span>Hello</span><span id="london"></span></p>
+  <nav id="nav" aria-label="On this page"><a href="index.html#work">Work</a><a href="index.html#things-i-make">Things I make</a><a href="index.html#how-i-work">How I work</a><a href="index.html#off-the-clock">Off the clock</a><a href="index.html#say-hello">Say hello</a></nav>
+  <div class="top__tools"><button class="theme" id="theme" type="button" aria-label="Dark theme" aria-pressed="false"><i></i></button><button class="menu" id="menu" type="button" aria-expanded="false" aria-controls="nav">Menu</button></div>
+</header>
+<main class="wrap">
+<section class="story-open">
+  <div class="story-open__txt">
+    <a class="back" href="index.html#work">← Work</a>
+    <h1>Joveen</h1>
+    <p class="meta">Full stack software engineer · Aug 2024 – Jun 2025</p>
+    <p class="lede">I was a full stack software engineer at Joveen, working on its e-commerce site in React, Java with Spring Boot and MySQL.</p>
+    <ul class="nums nums--top"><li><b>−40%</b>page load</li><li><b>Under 2</b>minutes to deploy, down from 10</li><li><b>+30%</b>mobile retention</li><li><b>230 ms</b>key API p95, down from 520 ms</li></ul>
+  </div>
+  <div class="rail"><div class="pass pass--lead" style="--f:#0a0a0a;--i:#f2f2f2;--s:#2b2b2d;--tilt:1.4deg;--d:1;--ph:grayscale(1) contrast(1.05)" role="img" aria-label="Joveen staff pass. Full stack software engineer, August 2024 to June 2025. Page load down 40%. Key API p95 from 520 to 230 milliseconds. Mobile retention up 30%.">
+      <span class="lan" aria-hidden="true"><i></i><i></i></span><svg class="clip" aria-hidden="true"><use href="#clip"/></svg>
+      <div class="card" aria-hidden="true">
+        <div class="card__band"><span>Joveen</span></div><i class="card__slot"></i><i class="card__photo"></i>
+        <div class="card__who"><b>Elias Bennett</b><span>Full stack software engineer</span><span>Aug 2024 – Jun 2025</span></div>
+        <ul class="card__pts"><li><b>−40%</b><span>Page load</span></li><li><b>520 → 230 ms</b><span>Key API p95</span></li><li><b>+30%</b><span>Mobile retention</span></li></ul>
+        <div class="card__foot"><span class="card__st">Returned</span><i class="card__code"></i></div>
+        <i class="sheen"></i>
+      </div>
+    </div></div>
+</section>
+<article class="story">
+  <section><h2>The role</h2><div class="story__body"><div class="prose"><p>I worked across the React front end, the Java API behind it and the MySQL database underneath. I was also on a coding bootcamp alongside the job.</p></div>
+    <figure class="fig fig--screens rise"><div class="screens"><button class="zoom" type="button" aria-label="Open the joveen.com homepage on a desktop, larger"><img src="../../../public/work/joveen/home-desktop.webp" alt="The joveen.com homepage on a desktop: the Joveen wordmark and menu above a hero for CliniCare skincare, with a Shop the Range button and a row of the range’s products." loading="lazy" width="1600" height="800"></button><button class="zoom" type="button" aria-label="Open the joveen.com homepage on a phone, larger"><img src="../../../public/work/joveen/home-phone.webp" alt="The same joveen.com hero on a phone, stacked: the CliniCare line, the Shop the Range button and the products." loading="lazy" width="585" height="796"></button></div>
+      <figcaption><a href="https://www.joveen.com/">joveen.com <span aria-hidden="true">↗</span></a></figcaption></figure></div></section>
+  <section><h2>The problems</h2><div class="story__body prose"><p>Pages took too long to load. Some modules were still in PHP and had to move to Spring Boot. Layouts and features broke on some phones and browsers, and a key API was slower than it needed to be.</p></div></section>
+  <section><h2>Decisions</h2><div class="story__body"><ul class="points">
+    <li><b>Make the front end do less up front.</b><span>We refactored React components and lazy-loaded assets, so a page loads what it needs first.</span></li>
+    <li><b>Move PHP to Spring Boot in pieces.</b><span>Migrating module by module let us release in smaller steps. I wrote endpoints, validation and tests, and fixed defects along the way.</span></li>
+    <li><b>Test across browsers, then fix.</b><span>A cross-browser testing pipeline caught the mobile layout and functionality bugs, and I fixed them.</span></li>
+    <li><b>Measure the database.</b><span>We added indexes and rewrote slow queries, starting with the API that mattered most.</span></li></ul></div></section>
+  <section><h2>What changed</h2><div class="story__body prose"><p>Cloud costs fell by 18%.</p></div></section>
+  <section><h2>What I took with me</h2><div class="story__body prose"><p>Alongside the job I did freelance AI training, reviewing 1,000 code items across TypeScript, Python, Java, C# and SQL at 97% QA precision. It was my first sustained work with AI on code, and the start of the thread that leads to the workflow I built at BNP Paribas.</p></div></section>
+</article>
+<a class="stage next rise" href="#" style="--f:#006765;--i:#f0fbf9"><p>Next role<br>Marketing executive · Sep 2021 – Aug 2024</p><b>Optegra <span aria-hidden="true">→</span></b></a>
+<dialog class="large" id="large"><button class="btn large__close" type="button" id="large-close">Close</button><img id="large-img" alt=""></dialog>
+<section class="hello" id="say-hello">
+  <h2>Say hello</h2>
+  <div class="hello__row"><a class="hello__mail" href="mailto:eliasthebennett@gmail.com">eliasthebennett@gmail.com</a><button class="btn" id="copy" type="button">Copy</button></div>
+  <ul><li><a href="#">Résumé <span aria-hidden="true">→</span></a></li><li><a href="https://github.com/3ixas">GitHub <span aria-hidden="true">↗</span></a></li><li><a href="https://linkedin.com/in/elias-t-bennett/">LinkedIn <span aria-hidden="true">↗</span></a></li></ul>
+</section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
