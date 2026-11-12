@@ -269,7 +269,7 @@ Each retirement removes its code, tokens, specs and visual baselines in the tick
 
 ### Carried over from the lens passes
 
-The lens map ([#385](https://github.com/3ixas/eliasb.dev/issues/385)) and its open tickets were written to finish the quiet index. Lenses 1 to 7 are merged. What lenses 8 to 14 asked for still matters and moves here as requirements on the new build, checked once on the finished design instead of as separate passes on the old one.
+The lens map ([#385](https://github.com/3ixas/eliasb.dev/issues/385)) and its open tickets, closed on 12 November 2026, were written to finish the quiet index. Lenses 1 to 7 are merged. What lenses 8 to 14 asked for still matters and moves here as requirements on the new build, checked once on the finished design instead of as separate passes on the old one.
 
 | Lens | Ticket | Becomes |
 |---|---|---|
@@ -321,19 +321,25 @@ Verified on a real iPhone, or in the iOS Simulator recorded as a limit: hover do
 
 ### Sequence
 
-Each step is a vertical slice that leaves `main` shippable. The first decision the tickets must settle is whether the redesign ships route by route behind the current design or lands on a long-lived branch; this spec assumes route by route, newest shell first.
+The work is thirteen tickets under [#409](https://github.com/3ixas/eliasb.dev/issues/409). Every ticket merges into the integration branch `redesign/passes-and-panels`, which has its own preview; `main` keeps the quiet index until the last ticket, so production never shows a half-redesigned site.
 
-1. **Foundations:** tokens, fonts, the panel, the controls, the header with greeting, theme and Menu, Say hello (R-01 to R-10), on every route, with the old sections restyled only as far as needed to stay legible.
-2. **The opening and the passes** (R-11, R-12).
-3. **Work** (R-13 to R-15), then **Where I'm headed** (R-16).
-4. **Things I make** (R-17) and **the archive** (R-23).
-5. **How I work** (R-18) and **Off the clock** (R-19).
-6. **Role stories** (R-21), then **case studies** (R-22).
-7. **The Résumé page, the 404 and share cards** (R-24 to R-26).
-8. **Retirements and gates** left over (R-32, R-40), the glossary (R-39).
-9. **The finishing checks** (R-33 to R-38) on the whole site, then sign-off.
+| # | Ticket | Covers | Blocked by |
+|---|---|---|---|
+| [#410](https://github.com/3ixas/eliasb.dev/issues/410) | Foundations: tokens, type, the panel and one set of controls | R-01 to R-07 | none |
+| [#411](https://github.com/3ixas/eliasb.dev/issues/411) | The shell: header, greeting, theme control, Menu and Say hello | R-08 to R-10 | #410 |
+| [#412](https://github.com/3ixas/eliasb.dev/issues/412) | The opening: the line and three staff passes | R-11, R-12 | #411 |
+| [#413](https://github.com/3ixas/eliasb.dev/issues/413) | Work: the BNP Paribas panel, and Joveen and Optegra | R-13 to R-15 | #411 |
+| [#414](https://github.com/3ixas/eliasb.dev/issues/414) | Where I'm headed and How I work | R-16, R-18 | #411 |
+| [#415](https://github.com/3ixas/eliasb.dev/issues/415) | Things I make and the Work archive | R-17, R-23 | #411 |
+| [#416](https://github.com/3ixas/eliasb.dev/issues/416) | Off the clock | R-19, R-30, R-34 | #411 |
+| [#417](https://github.com/3ixas/eliasb.dev/issues/417) | Role stories | R-21 | #412, #413 |
+| [#418](https://github.com/3ixas/eliasb.dev/issues/418) | Case studies | R-22 | #411 |
+| [#419](https://github.com/3ixas/eliasb.dev/issues/419) | The Résumé page, the 404 and share cards | R-24 to R-26 | #411 |
+| [#420](https://github.com/3ixas/eliasb.dev/issues/420) | Retirements, gates and the glossary | R-20, R-28, R-29, R-32, R-39, R-40 | #412 to #419 |
+| [#421](https://github.com/3ixas/eliasb.dev/issues/421) | Finishing checks on the whole design | R-33 to R-36, R-38 | #420 |
+| [#422](https://github.com/3ixas/eliasb.dev/issues/422) | Sign-off on a real iPhone, then merge to `main` | R-37 | #421 |
 
-Steps 3 to 5 can run in any order after 2; 6 and 7 need only 1.
+R-27 (content) and R-31 (the craft audit's findings) apply to every ticket that touches the part they describe.
 
 ## Testing Decisions
 
