@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parts and states · Elias Bennett (prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300..600&family=Instrument+Sans:wght@400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="metal" x1="0" x2="1"><stop offset="0" stop-color="#8d8e94"/><stop offset=".28" stop-color="#f6f6f7"/><stop offset=".55" stop-color="#b4b5ba"/><stop offset=".8" stop-color="#e9e9eb"/><stop offset="1" stop-color="#7f8086"/></linearGradient>
+  <symbol id="clip" viewBox="0 0 40 70"><rect x="9" y=".5" width="22" height="15" rx="2.5" fill="url(#metal)" stroke="#4e4f55" stroke-width=".8"/><circle cx="20" cy="8" r="2.1" fill="#5d5e64"/><circle cx="19.5" cy="7.5" r=".8" fill="#e9e9eb"/><rect x="17.3" y="15" width="5.4" height="8" rx="2" fill="url(#metal)" stroke="#4e4f55" stroke-width=".6"/><rect x="9.5" y="22.5" width="21" height="43" rx="10.5" fill="none" stroke="#4e4f55" stroke-width="4.6"/><rect x="9.5" y="22.5" width="21" height="43" rx="10.5" fill="none" stroke="url(#metal)" stroke-width="3.2"/></symbol>
+</defs></svg>
+<header class="top wrap">
+  <a class="top__name" href="index.html">Elias Bennett</a><p class="greet" id="greet" tabindex="0"><span>Hello</span><span id="london"></span></p>
+  <nav id="nav" aria-label="On this page"><a href="index.html#work">Work</a><a href="index.html#things-i-make">Things I make</a><a href="index.html#how-i-work">How I work</a><a href="index.html#off-the-clock">Off the clock</a><a href="index.html#say-hello">Say hello</a></nav>
+  <div class="top__tools"><button class="theme" id="theme" type="button" aria-label="Dark theme" aria-pressed="false"><i></i></button><button class="menu" id="menu" type="button" aria-expanded="false" aria-controls="nav">Menu</button></div>
+</header>
+<main class="wrap">
+<header class="page-head"><h1>Parts and states</h1><p>Everything the four pages do not show. A reference for the build, not a page of the site.</p></header>
+
+<section class="sec sec--near"><div class="sec__head"><h2>Controls</h2></div>
+  <div class="parts-row"><a class="btn" href="#">Copy</a><a class="btn" href="#">Download PDF</a><a class="more" href="#" style="margin:0">Everything I’ve built (06) <span aria-hidden="true">→</span></a><ul class="chips" style="margin:0;--line:var(--hair)"><li>React 19</li><li>TypeScript</li></ul><span class="node" style="--c:#00965e">BNP Paribas</span></div>
+  <div class="grid3" style="margin-top:16px">
+    <div class="stage swatch" style="--f:#00965e;--i:#04140d;--line:rgb(4 20 13 / .3)"><h3>BNP Paribas</h3><p>#00965e · ink #04140d</p><div class="parts-row"><a class="pill" href="#">The BNP Paribas story <span aria-hidden="true">→</span></a><a class="pill pill--q" href="#">Code <span aria-hidden="true">↗</span></a></div></div>
+    <div class="stage swatch" style="--f:#0b0b0c;--i:#f4f4f2;--line:rgb(255 255 255 / .16)"><h3>Joveen</h3><p>#0b0b0c · ink #f4f4f2</p><div class="parts-row"><a class="pill" href="#">The Joveen story <span aria-hidden="true">→</span></a><a class="pill pill--q" href="#">Code <span aria-hidden="true">↗</span></a></div></div>
+    <div class="stage swatch" style="--f:#006765;--i:#f0fbf9;--line:rgb(255 255 255 / .2)"><h3>Optegra</h3><p>#006765 · ink #f0fbf9</p><div class="parts-row"><a class="pill" href="#">The Optegra story <span aria-hidden="true">→</span></a><a class="pill pill--q" href="#">Code <span aria-hidden="true">↗</span></a></div></div>
+    <div class="stage swatch" style="--f:#c58f5e;--i:#1a1714;--line:rgb(26 23 20 / .3)"><h3>Threshold</h3><p>#c58f5e · ink #1a1714</p><div class="parts-row"><a class="pill" href="#">Live site <span aria-hidden="true">↗</span></a><a class="pill pill--q" href="#">Code <span aria-hidden="true">↗</span></a></div></div>
+    <div class="stage swatch" style="--f:#4f86f7;--i:#060a14;--line:rgb(6 10 20 / .3)"><h3>Argus Risk</h3><p>#4f86f7 · ink #060a14</p><div class="parts-row"><a class="pill" href="#">Live site <span aria-hidden="true">↗</span></a><a class="pill pill--q" href="#">Code <span aria-hidden="true">↗</span></a></div></div>
+    <div class="stage swatch" style="--f:#2a211b;--i:#ece4d8;--line:rgb(255 255 255 / .18)"><h3>Flowtime</h3><p>#2a211b · ink #ece4d8</p><div class="parts-row"><a class="pill" href="#">Live site <span aria-hidden="true">↗</span></a><a class="pill pill--q" href="#">Code <span aria-hidden="true">↗</span></a></div></div>
+  </div>
+</section>
+
+<section class="sec"><div class="sec__head"><h2>The archive’s filters</h2><p>Shown only once there are more than ten projects.</p></div>
+  <div class="filters" role="group" aria-label="Filter projects"><button class="btn" type="button" aria-pressed="true">All</button><button class="btn" type="button" aria-pressed="false">Products</button><button class="btn" type="button" aria-pressed="false">Systems</button><button class="btn" type="button" aria-pressed="false">Experiments</button></div>
+</section>
+
+<section class="sec"><div class="sec__head"><h2>Off the clock when a feed is stale</h2><p>The source line says where it is from and as of when.</p></div>
+  <div class="stage otc">
+    <div><ol class="week" aria-label="My training week"><li>M</li><li class="on">T</li><li>W</li><li>T</li><li>F</li><li>S</li><li>S</li></ol><h3>Lower body gym</h3><p>Today’s session, from my training week</p></div>
+    <a class="m" href="#"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1525464420l/29226553._SX300_.jpg" alt="Cover of Dark Age by Pierce Brown" loading="lazy"><span><h3>Dark Age</h3><p>From Goodreads, as of 2 Nov <i aria-hidden="true">↗</i></p></span></a>
+    <a class="m" href="#"><img src="https://a.ltrbxd.com/resized/sm/upload/ek/qa/d5/cb/18GHWx66uADdY7GM9NL8WRY5GSw-0-600-0-900-crop.jpg?v=cc723e4c2b" alt="Poster for Kiss Kiss Bang Bang" loading="lazy"><span><h3>Kiss Kiss Bang Bang</h3><p>From Letterboxd, as of 9 Oct <i aria-hidden="true">↗</i></p></span></a>
+    <div class="hist"><img src="../../../public/signals/history/galileo.webp" alt="NASA illustration of the Galileo spacecraft passing Io, with Jupiter behind it" loading="lazy"><div><h3>Odd but true, from this week in history</h3><p><b>2003</b> NASA sent Galileo into Jupiter’s atmosphere, ending its 14-year mission and protecting Europa from a future impact.</p></div><button class="pill pill--q" type="button">3 of 3 <span aria-hidden="true">→</span></button></div>
+    <div class="ghw"><div><p><b>1,939</b>contributions in the past year</p></div><div class="gh__scroll"><div class="gh gh--demo" role="img" aria-label="GitHub contributions over the past year: 1,939."></div></div></div>
+  </div>
+</section>
+
+<section class="sec"><div class="sec__head"><h2>Off the clock when the feeds are down</h2><p>Authored fallbacks. The panel keeps its four cells and its shape; a cell with no cover has none, and no placeholder box.</p></div>
+  <div class="stage otc">
+    <div><ol class="week" aria-label="My training week"><li>M</li><li class="on">T</li><li>W</li><li>T</li><li>F</li><li>S</li><li>S</li></ol><h3>Lower body gym</h3><p>Today’s session, from my training week</p></div>
+    <div><h3>Between books.</h3><p>Now reading</p></div>
+    <div><h3>Nothing logged yet.</h3><p>Last watched</p></div>
+    <div class="hist"><img src="../../../public/signals/history/montgolfier-balloon.webp" alt="An eighteenth-century illustration of a Montgolfier balloon, with its proportions and decoration" loading="lazy"><div><h3>Odd but true, from this week in history</h3><p><b>1783</b> The first living creatures to ride in a balloon were a sheep, a duck and a rooster. All three survived the flight at Versailles.</p><p>From the archive</p></div><button class="pill pill--q" type="button">1 of 3 <span aria-hidden="true">→</span></button></div>
+    <div class="ghw"><div><p><b>1,939</b>contributions in the past year</p></div><div class="gh__scroll"><div class="gh gh--demo" role="img" aria-label="GitHub contributions over the past year: 1,939."></div></div></div>
+  </div>
+</section>
+
+<section class="sec"><div class="sec__head"><h2>A screenshot’s large view</h2><p>A dialog in the same window. Close, Escape or a click on the image closes it and returns focus to the screenshot. On a phone the image fills the width.</p></div>
+  <div class="large-demo"><span class="btn large__close">Close</span><img src="../../../public/work/threshold/costs.webp" alt="Threshold results showing upfront and monthly cost breakdowns" loading="lazy"></div>
+</section>
+
+<section class="sec"><div class="sec__head"><h2>Share cards</h2><p>1200 × 630, shown at half size. Newsreader 500; the name in Instrument Sans 600, letter-spaced.</p></div>
+  <div class="shares"><div class="share " style="background:#eeede9;color:#141416"><div class="share__top"><p>I build pricing and risk engines at BNP Paribas, and <span style="color:#2443d6">products of my own.</span></p></div><div class="share__name">ELIAS BENNETT</div></div><div class="share " style="background:#00965e;color:#04140d"><div class="share__top"><p class="share__big">BNP Paribas</p><p class="share__sub">Software engineer</p></div><div class="share__name">ELIAS BENNETT</div></div><div class="share " style="background:#c58f5e;color:#1a1714"><div class="share__top"><p class="share__big">Threshold</p><p class="share__sub">A clearer view of what moving could cost.</p></div><div class="share__name">ELIAS BENNETT</div></div></div>
+</section>
+
+<section class="sec"><div class="sec__head"><h2>The greeting</h2><p>Words by the visitor’s own clock. The small scene beside each line is the current site’s component and carries over as built.</p></div>
+  <ul class="rest rest--top rest--plain">
+    <li><a><b>Hello</b><span>Before the clock is read, and without script</span><span></span></a></li>
+    <li><a><b>Kettle’s on.</b><span>05:00 to 11:59</span><span></span></a></li>
+    <li><a><b>Nearly five?</b><span>12:00 to 16:59, Monday to Friday</span><span></span></a></li>
+    <li><a><b>Nowhere to be?</b><span>12:00 to 16:59, Saturday and Sunday</span><span></span></a></li>
+    <li><a><b>Home yet?</b><span>17:00 to 21:59</span><span></span></a></li>
+    <li><a><b>Still up?</b><span>22:00 to 04:59</span><span></span></a></li>
+    <li><a><b>it’s 14:32 here in London</b><span>On hover or focus, in place of the line</span><span></span></a></li>
+  </ul>
+</section>
+<section class="hello" id="say-hello">
+  <h2>Say hello</h2>
+  <div class="hello__row"><a class="hello__mail" href="mailto:eliasthebennett@gmail.com">eliasthebennett@gmail.com</a><button class="btn" id="copy" type="button">Copy</button></div>
+  <ul><li><a href="#">Résumé <span aria-hidden="true">→</span></a></li><li><a href="https://github.com/3ixas">GitHub <span aria-hidden="true">↗</span></a></li><li><a href="https://linkedin.com/in/elias-t-bennett/">LinkedIn <span aria-hidden="true">↗</span></a></li></ul>
+</section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

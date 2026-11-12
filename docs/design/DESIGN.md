@@ -6,7 +6,7 @@ The design contract for all of eliasb.dev: the homepage, the shell (header and t
 
 **Keeping it current.** A tweak edits this file in place, in the same pull request as the change. A new direction first copies this file into `history/` with a superseded note at the top, then rewrites it. The directions it replaced are in `history/`: the quiet index (`QUIET-INDEX.md`), the Stretch direction (`STRETCH.md`), the Board (`BOARD.md`) and the Cabinet of Curiosities (`SELECTED-DIRECTION.md`).
 
-The build spec, with acceptance criteria and the order of work, is `docs/specs/PASSES-AND-PANELS-SPEC.md` (requirements `R-01` to `R-40`). How the direction was reached is in `docs/specs/CRAFT-ELEVATION-SPEC.md`. The visual reference is the prototype in `docs/review/2026-11-11-direction-e/` (`index.html`, `bnp.html`, `threshold.html`, `things.html`, with `style.css` holding every value below). Where the prototype and this file disagree, this file wins. Terms follow `GLOSSARY.md`; approved copy is in `docs/content/redesign-copy.md`.
+The build spec, with acceptance criteria and the order of work, is `docs/specs/PASSES-AND-PANELS-SPEC.md` (requirements `R-01` to `R-40`). How the direction was reached is in `docs/specs/CRAFT-ELEVATION-SPEC.md`. The visual reference is the prototype in `docs/review/2026-11-11-direction-e/` (`index.html`, `bnp.html`, `joveen.html`, `threshold.html`, `things.html`, `404.html`, `resume.html`, and `parts.html` for the states and parts those pages do not show, with `style.css` holding every value below). What each part replaces in the code is in `docs/specs/PASSES-AND-PANELS-CODE-MAP.md`. Where the prototype and this file disagree, this file wins. Terms follow `GLOSSARY.md`; approved copy is in `docs/content/redesign-copy.md`.
 
 ## Principle
 
@@ -27,7 +27,7 @@ A change that breaks one needs Elias's decision, not a judgement in review.
 - **Sections**: 144 px apart (96 px under 720 px). Each opens with its title; Work alone has a subheading.
 - **Panels in a section**: 16 px apart. Two panels side by side stack under 720 px.
 - **Breakpoints**: 1260 px (the opening and wide panels stack), 900 px (the passes scroll sideways), 720 px (phone).
-- **Length**: the homepage stays within 7.5 screens at 1440 × 900 and 10.5 at 390 × 844. Something new takes the place of something else. A long-form page has no budget.
+- **Length**: the homepage stays within 8 screens at 1440 × 900 and 11 at 390 × 844. Something new takes the place of something else. A long-form page has no budget.
 
 ## The panel
 
@@ -41,6 +41,8 @@ A change that breaks one needs Elias's decision, not a judgement in review.
 | Depth | None in light. In dark a project panel glows in its own colour (`0 50px 90px -56px`, the field at 70%) |
 
 Pass furniture ("Valid · present", "Returned", a barcode) never appears on a panel.
+
+**Text on a coloured panel is the panel's ink at full strength.** Dimmed text is allowed only where it still measures AA: on the dark fields (Joveen, Optegra, Flowtime) and on paper. BNP Paribas's panel lifts from `#2cbd86` at its top left to its field `#00965e` and is never darker than the field.
 
 ## The staff pass
 
@@ -92,7 +94,7 @@ The name in Newsreader 500 at 20 px, a link to the homepage; the greeting; the f
 4. **Where I'm headed**: one paper panel. The title and lead at the left; three parts at the right, each from a chip naming its source (Optegra, BNP Paribas, Threshold).
 5. **Things I make**: Threshold wide; Argus Risk and Flowtime side by side; the other projects as rows, newest first, at most ten; the link to the Work archive with the true count.
 6. **How I work**: four cards, then the link to Threshold's PRD.
-7. **Off the clock**: one paper panel: the training week and today's session, the book, the film, this week in history, then the GitHub year and its total.
+7. **Off the clock**: one paper panel in three bands. Three cells: the training week and today's session, the book, the film. Then this week in history, full width: the image, its title, the year and the fact, and an outline pill ("1 of 3") that steps to the next oddity in place. Then the GitHub year: the total, with "Now making" and the latest repository beneath it, beside the grid. A stale feed says "From Goodreads, as of 2 Nov"; a feed that is down shows its authored fallback, and the panel keeps its shape.
 8. **Say hello**, which ends every page.
 
 Anchors stay `#work`, `#things-i-make`, `#how-i-work`, `#off-the-clock` and `#say-hello`.
@@ -254,4 +256,4 @@ Elias agreed these between 10 and 12 November 2026, across three rounds of proto
 7. **Off the clock follows the theme.**
 8. **The header keeps the time-of-day greeting.**
 
-Still open, and listed in the spec: the portrait on the passes, the "Where I'm headed" lead, the simulation's second caption sentence, the BNP Paribas pass's last two points, how this week in history and Now making appear in Off the clock, and what happens to the lens 8 pull request.
+Still open, and listed in the spec: the portrait on the passes, the "Where I'm headed" lead, the simulation's second caption sentence, the BNP Paribas pass's last two points, how this week in history and Now making appear in Off the clock, the section notes, and what happens to the lens 8 pull request.

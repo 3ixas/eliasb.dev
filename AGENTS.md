@@ -12,6 +12,8 @@ Before pushing to, re-running checks on, or merging a pull request, read `docs/r
 
 Before running Playwright, a verify script or a build locally, read `docs/runbooks/local-testing.md`.
 
+Before working on a redesign ticket (any issue under #409), read `docs/specs/PASSES-AND-PANELS-SPEC.md`, `docs/design/DESIGN.md` and `docs/specs/PASSES-AND-PANELS-CODE-MAP.md`. Its pull request targets `integration/passes-and-panels`, not `main`.
+
 ## Code Review Rules
 
 ### Thermo-Nuclear Maintainability Review

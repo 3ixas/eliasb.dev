@@ -58,3 +58,25 @@ const gh = $("gh");
 if (gh) gh.innerHTML = [..."00000000000000000000000000030113000240400000000021110303444420000004444434443302040400400044244024404000144400143401244042023404000000000000000100000000004042404210000000000000000004130000000400000000000000000000000000000100000000000100000000100000000000000044444003444404000400003404444424120044300000000004400020344444444444404444444442444444444444444444042044420012340102013201024321034201234"].map((l) => `<i data-l="${l}"></i>`).join("");
 const copy = $("copy");
 if (copy) copy.addEventListener("click", async () => { try { await navigator.clipboard.writeText("eliasthebennett@gmail.com"); } catch {} copy.textContent = "Copied"; setTimeout(() => (copy.textContent = "Copy"), 2000); });
+
+// This week in history: three oddities, stepping in place.
+const histNext = $("hist-next");
+if (histNext) {
+  const odd = [
+    ["1783", "The first living creatures to ride in a balloon were a sheep, a duck and a rooster. All three survived the flight at Versailles.", "montgolfier-balloon", "An eighteenth-century illustration of a Montgolfier balloon, with its proportions and decoration"],
+    ["1933", "Mexico’s Empresa Mexicana de Lucha Libre, now CMLL, was founded by Salvador Lutteroth.", "cmll-wrestling", "Atlantis in his blue and white mask at a CMLL event in Mexico City"],
+    ["2003", "NASA sent Galileo into Jupiter’s atmosphere, ending its 14-year mission and protecting Europa from a future impact.", "galileo", "NASA illustration of the Galileo spacecraft passing Io, with Jupiter behind it"],
+  ];
+  let at = 0;
+  histNext.addEventListener("click", () => { at = (at + 1) % odd.length; const [y, t, img, alt] = odd[at]; $("hist-year").textContent = y; $("hist-text").textContent = t; $("hist-img").src = `../../../public/signals/history/${img}.webp`; $("hist-img").alt = alt; $("hist-n").textContent = `${at + 1} of ${odd.length}`; });
+}
+document.querySelectorAll(".gh--demo").forEach((g) => (g.innerHTML = $("gh") ? $("gh").innerHTML : "<i data-l=\"0\"></i>".repeat(368)));
+
+// A screenshot opens large in a dialog and gives focus back when it closes.
+const large = $("large");
+if (large) {
+  let from = null;
+  document.querySelectorAll(".zoom").forEach((b) => b.addEventListener("click", () => { const i = b.querySelector("img"); $("large-img").src = i.src; $("large-img").alt = i.alt; from = b; large.showModal(); }));
+  const close = () => { large.close(); from?.focus(); };
+  $("large-close").addEventListener("click", close); $("large-img").addEventListener("click", close);
+}

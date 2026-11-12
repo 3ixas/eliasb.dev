@@ -1,6 +1,6 @@
 # Passes and panels: the redesign of eliasb.dev
 
-Status: **direction approved by Elias on 11 November 2026**; six decisions are still his (see Open decisions). This is the build spec. The contract it produces is `docs/design/DESIGN.md`; the visual reference is the prototype in `docs/review/2026-11-11-direction-e/` (`index.html`, `bnp.html`, `threshold.html`, `things.html`). How the direction was reached, and the three rounds of concepts it came from, are in `CRAFT-ELEVATION-SPEC.md`, which is now a record and no longer a list of work.
+Status: **direction approved by Elias on 11 November 2026**; seven decisions are still his (see Open decisions). This is the build spec. The contract it produces is `docs/design/DESIGN.md`; the visual reference is the prototype in `docs/review/2026-11-11-direction-e/` (the homepage, two Role stories, a case study, the archive, the 404, the Résumé page, and `parts.html` for states and parts the pages do not show). What each ticket replaces in the code is in `PASSES-AND-PANELS-CODE-MAP.md`. How the direction was reached, and the three rounds of concepts it came from, are in `CRAFT-ELEVATION-SPEC.md`, which is now a record and no longer a list of work.
 
 "Passes and panels" is a working name for the direction, after its two parts. It can change without changing anything below.
 
@@ -86,6 +86,8 @@ The page is `max-width: 1344px` with 32 px gutters (16 px under 720 px). Section
 A panel is a block with a 28 px radius (22 px under 720 px), a field and an ink, and a 1 px lighter top edge. Things inside a panel, and cards, take 16 px; images 12 px; pills are fully round. A panel has no shadow in the light theme. In the dark theme a project panel has a soft glow in its own colour (`0 50px 90px -56px`, the field at 70%).
 
 A panel's header is always the name at the left and, where there is one, role and dates at the right. Pass furniture ("Valid · present", "Returned", barcodes) appears only on a pass.
+
+Text on a coloured panel is the panel's ink at full strength. A dimmed pair is allowed only where it still measures AA, which today is on the dark fields (Joveen, Optegra, Flowtime) and on paper. BNP Paribas's panel lifts from `#2cbd86` at the top left to its field `#00965e` and is never darker than the field, so its ink holds 4.5:1 everywhere.
 
 #### R-05 Controls
 
@@ -198,11 +200,19 @@ Four upright cards on paper, each in three steps: the habit in Newsreader above 
 
 #### R-19 Off the clock
 
-One paper panel: the training week with today marked and today's session; the book; the film; this week in history; then the GitHub year with its total. The live data, its caching and its fallbacks are the existing integrations, unchanged (R-30). The book and the film link out and are marked as external.
+One paper panel in three bands:
+
+1. **Three cells:** the training week with today marked and today's session; the book with its cover; the film with its poster. The book and the film link out and are marked external.
+2. **This week in history,** full width: the image, the title "Odd but true, from this week in history", the year and the fact, and an outline pill reading "1 of 3" that steps to the next oddity in place. The change is announced politely.
+3. **The GitHub year:** the total and, under it, "Now making" with the latest repository as a link, beside the year's grid.
+
+The live data, its caching and its fallbacks are the existing integrations, unchanged (R-30). `parts.html` shows the stale state (the source line reads "From Goodreads, as of 2 Nov") and the fallback state ("Between books.", "Nothing logged yet.", "From the archive"). A cell with no cover has none, and no placeholder box.
+
+**Acceptance:** the panel keeps its three bands in every state; stepping history moves nothing else on the page; with script off the first oddity shows.
 
 #### R-20 Length
 
-The homepage stays within 7.5 screens at 1440 × 900 and 10.5 at 390 × 844 (measured: 7.3 and 10.2). Something new takes the place of something else.
+The homepage stays within 8 screens at 1440 × 900 and 11 at 390 × 844 (measured on the prototype: 7.5 and 10.4). Something new takes the place of something else.
 
 ### The other pages
 
@@ -321,25 +331,30 @@ Verified on a real iPhone, or in the iOS Simulator recorded as a limit: hover do
 
 ### Sequence
 
-The work is thirteen tickets under [#409](https://github.com/3ixas/eliasb.dev/issues/409). Every ticket merges into the integration branch `redesign/passes-and-panels`, which has its own preview; `main` keeps the quiet index until the last ticket, so production never shows a half-redesigned site.
+The work is eighteen tickets under [#409](https://github.com/3ixas/eliasb.dev/issues/409). Every ticket merges into the integration branch `integration/passes-and-panels`, which has its own preview and the same required checks as `main` (`docs/runbooks/merging.md`); `main` keeps the quiet index until the last ticket, so production never shows a half-redesigned site.
 
 | # | Ticket | Covers | Blocked by |
 |---|---|---|---|
-| [#410](https://github.com/3ixas/eliasb.dev/issues/410) | Foundations: tokens, type, the panel and one set of controls | R-01 to R-07 | none |
-| [#411](https://github.com/3ixas/eliasb.dev/issues/411) | The shell: header, greeting, theme control, Menu and Say hello | R-08 to R-10 | #410 |
+| [#410](https://github.com/3ixas/eliasb.dev/issues/410) | Integration branch, tokens and type | R-01, R-02, R-06 | none |
+| [#423](https://github.com/3ixas/eliasb.dev/issues/423) | The panel and one set of controls | R-03 to R-05, R-07 | #410 |
+| [#411](https://github.com/3ixas/eliasb.dev/issues/411) | The shell: header, greeting, theme control, Menu and Say hello | R-08 to R-10 | #410, #423 |
 | [#412](https://github.com/3ixas/eliasb.dev/issues/412) | The opening: the line and three staff passes | R-11, R-12 | #411 |
 | [#413](https://github.com/3ixas/eliasb.dev/issues/413) | Work: the BNP Paribas panel, and Joveen and Optegra | R-13 to R-15 | #411 |
 | [#414](https://github.com/3ixas/eliasb.dev/issues/414) | Where I'm headed and How I work | R-16, R-18 | #411 |
 | [#415](https://github.com/3ixas/eliasb.dev/issues/415) | Things I make and the Work archive | R-17, R-23 | #411 |
-| [#416](https://github.com/3ixas/eliasb.dev/issues/416) | Off the clock | R-19, R-30, R-34 | #411 |
+| [#416](https://github.com/3ixas/eliasb.dev/issues/416) | Off the clock | R-19, R-30 | #411 |
 | [#417](https://github.com/3ixas/eliasb.dev/issues/417) | Role stories | R-21 | #412, #413 |
 | [#418](https://github.com/3ixas/eliasb.dev/issues/418) | Case studies | R-22 | #411 |
 | [#419](https://github.com/3ixas/eliasb.dev/issues/419) | The Résumé page, the 404 and share cards | R-24 to R-26 | #411 |
-| [#420](https://github.com/3ixas/eliasb.dev/issues/420) | Retirements, gates and the glossary | R-20, R-28, R-29, R-32, R-39, R-40 | #412 to #419 |
-| [#421](https://github.com/3ixas/eliasb.dev/issues/421) | Finishing checks on the whole design | R-33 to R-36, R-38 | #420 |
-| [#422](https://github.com/3ixas/eliasb.dev/issues/422) | Sign-off on a real iPhone, then merge to `main` | R-37 | #421 |
+| [#420](https://github.com/3ixas/eliasb.dev/issues/420) | Remove what is left of the quiet index | R-32 | #412 to #419 |
+| [#424](https://github.com/3ixas/eliasb.dev/issues/424) | Gates and standing checks hold the new design | R-20, R-28, R-29, R-40 | #420 |
+| [#425](https://github.com/3ixas/eliasb.dev/issues/425) | The contract, the glossary and the runbooks | R-39 | #420 |
+| [#421](https://github.com/3ixas/eliasb.dev/issues/421) | The component checkpoint | R-33 | #420, #424 |
+| [#426](https://github.com/3ixas/eliasb.dev/issues/426) | States and worst-case data | R-34, R-35 | #424 |
+| [#427](https://github.com/3ixas/eliasb.dev/issues/427) | Smoothness and the copy gate | R-36, R-38 | #424 |
+| [#422](https://github.com/3ixas/eliasb.dev/issues/422) | Sign-off on a real iPhone, then merge to `main` | R-37 | #421, #425, #426, #427 |
 
-R-27 (content) and R-31 (the craft audit's findings) apply to every ticket that touches the part they describe.
+R-27 (content) and R-31 (the craft audit's findings) apply to every ticket that touches the part they describe. Safari and the keyboard are checked from #411 onward on every ticket, so sign-off confirms and does not discover.
 
 ## Testing Decisions
 
@@ -364,9 +379,18 @@ R-27 (content) and R-31 (the craft audit's findings) apply to every ticket that 
 2. **"Where I'm headed"'s lead** (R-16). The prototype reads "I’m working towards turning new ideas into software people use every day. Three things that takes, and how far I’ve got on each." The approved copy names "a product engineer"; you said that is not the aim. Confirm this line or give your own.
 3. **The simulation's second caption sentence** (R-14): "Thousands of possible market paths go in; a price and its risk come out." Confirm it is accurate for the engines.
 4. **The BNP Paribas pass's points** (R-12): "Take Ownership · Award, Q1 2026" and "AI workflow · Used by several teams", in place of "AI Champion".
-5. **This week in history and Now making** (R-19). The prototype shows history as one cell and has no Now making. Recommended: history keeps its three oddities, stepping in place on a click with "1 of 3"; Now making becomes one line beside the GitHub total ("Now making" and the repository, linking to it).
+5. **This week in history and Now making** (R-19). Drawn in the prototype as recommended: history is a full-width band that steps through its three oddities in place, and Now making is one line under the GitHub total. Confirm, or say what you would rather see.
 6. **The lens 8 pull request**, [#407](https://github.com/3ixas/eliasb.dev/pull/407): merge it now or close it.
+7. **Section notes.** The quiet index has a note under each section title ("Products of my own, from a rental calculator to a risk simulator.", "Four habits, and where I picked them up.", "What my own time looks like this week."). This design keeps only Work's, as its subheading, under the rule that text earns its place. Confirm the other three go.
 
 ### Evidence and its limits
 
-The prototype is static HTML, CSS and script on real content, checked in headless Chromium: no sideways overflow and no script errors on its four pages at 1024, 768, 390 and 320 px, and on the homepage at 1440 and 1280 px; no text under 13 px; light and dark captured for the opening and Off the clock. Not checked: a real iPhone or Safari, motion at real speed, keyboard and screen reader, forced colours, dark below the first screen on inner pages. Not built: the Joveen and Optegra stories, the Argus Risk and Flowtime case studies, the Résumé page, the 404, share cards, and the greeting's scene (the prototype shows its words only). Those follow the templates above.
+The prototype is static HTML, CSS and script on real content: the homepage, the BNP Paribas and Joveen stories, the Threshold case study, the archive, the 404, the Résumé page (with a stand-in for the sheet, which does not change) and `parts.html` (controls on every field, the archive's filters, Off the clock stale and in fallback, the large view, share cards, the greeting's lines).
+
+Checked in headless Chromium:
+
+- **Overflow and errors:** none on any of the eight pages at 1440, 390 and 320 px; the first four also at 1024 and 768 px.
+- **Contrast:** every text element on every page measured against its effective background in both themes, with opacity and gradients taken at their worst case. All pass AA after three fixes (BNP Paribas's panel no longer goes darker than its field and carries no dimmed text; the back link and a project's type and year are at full strength).
+- **Type floor:** nothing under 13 px.
+
+Not checked: a real iPhone or Safari, motion at real speed, keyboard and screen reader, forced colours. CI runs WebKit at four widths, so Safari's engine is covered from the first ticket; a real device is #422. Not drawn: the Optegra story, the Argus Risk and Flowtime case studies (same templates), and the greeting's small scene, which is the current component and carries over as built.
