@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Software engineer at BNP Paribas · Elias Bennett (prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300..600&family=Instrument+Sans:wght@400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="metal" x1="0" x2="1"><stop offset="0" stop-color="#8d8e94"/><stop offset=".28" stop-color="#f6f6f7"/><stop offset=".55" stop-color="#b4b5ba"/><stop offset=".8" stop-color="#e9e9eb"/><stop offset="1" stop-color="#7f8086"/></linearGradient>
+  <symbol id="clip" viewBox="0 0 40 70"><rect x="9" y=".5" width="22" height="15" rx="2.5" fill="url(#metal)" stroke="#4e4f55" stroke-width=".8"/><circle cx="20" cy="8" r="2.1" fill="#5d5e64"/><circle cx="19.5" cy="7.5" r=".8" fill="#e9e9eb"/><rect x="17.3" y="15" width="5.4" height="8" rx="2" fill="url(#metal)" stroke="#4e4f55" stroke-width=".6"/><rect x="9.5" y="22.5" width="21" height="43" rx="10.5" fill="none" stroke="#4e4f55" stroke-width="4.6"/><rect x="9.5" y="22.5" width="21" height="43" rx="10.5" fill="none" stroke="url(#metal)" stroke-width="3.2"/></symbol>
+</defs></svg>
+<header class="top wrap">
+  <a class="top__name" href="index.html">Elias Bennett</a><p class="greet" id="greet" tabindex="0"><span>Hello</span><span id="london"></span></p>
+  <nav id="nav" aria-label="On this page"><a href="index.html#work">Work</a><a href="index.html#things-i-make">Things I make</a><a href="index.html#how-i-work">How I work</a><a href="index.html#off-the-clock">Off the clock</a><a href="index.html#say-hello">Say hello</a></nav>
+  <div class="top__tools"><button class="theme" id="theme" type="button" aria-label="Dark theme" aria-pressed="false"><i></i></button><button class="menu" id="menu" type="button" aria-expanded="false" aria-controls="nav">Menu</button></div>
+</header>
+<main class="wrap">
+<section class="story-open">
+  <div class="story-open__txt">
+    <a class="back" href="index.html#work">← Work</a>
+    <h1>BNP Paribas</h1>
+    <p class="meta">Software engineer · Jul 2025 – now · Risk division, London</p>
+    <p class="lede">I’m a software engineer in BNP Paribas’s risk division in London. I work in C# on the engines that price and risk-manage trades on CPU and GPU, and I’m the team’s only C# engineer.</p>
+    <ul class="nums nums--top"><li><b>Nov 2025</b>won the bank’s digitisation competition</li><li><b>Six</b>months from zero C# to production code</li></ul>
+  </div>
+  <div class="rail"><div class="pass pass--lead" style="--f:#00965e;--i:#fff;--s:#0b6b47;--tilt:-1deg;--d:1" role="img" aria-label="BNP Paribas staff pass. Software engineer, July 2025 to now. Winner, digitisation competition, 2025. Take Ownership award, Q1 2026. AI workflow used by several teams.">
+      <span class="lan" aria-hidden="true"><i></i><i></i></span><svg class="clip" aria-hidden="true"><use href="#clip"/></svg>
+      <div class="card" aria-hidden="true">
+        <div class="card__band"><span>BNP Paribas</span></div><i class="card__slot"></i><i class="card__photo"></i>
+        <div class="card__who"><b>Elias Bennett</b><span>Software engineer</span><span>Jul 2025 – now</span></div>
+        <ul class="card__pts"><li><b>Winner</b><span>Digitisation competition, 2025</span></li><li><b>Take Ownership</b><span>Award, Q1 2026</span></li><li><b>AI workflow</b><span>Used by several teams</span></li></ul>
+        <div class="card__foot"><span class="card__st"><i class="holo"></i>Valid · present</span><i class="card__code"></i></div>
+        <i class="sheen"></i>
+      </div>
+    </div></div>
+</section>
+<article class="story">
+  <section><h2>The role</h2><div class="story__body prose">
+    <p>The engines run large simulation-based calculations across several asset classes. It’s a big codebase, around 70 projects, and some of the C# is translated to run on the GPU.</p>
+    <p>I joined in July 2025 having never written C#. Today I own implementation and delivery on the C# side, from planning through review.</p></div></section>
+  <section><h2>The problems</h2><div class="story__body"><ul class="points">
+    <li><b>Market data.</b><span>Loaders written in Java had to be ported to C#, pulling data from several sources into one place and checking it on the way.</span></li>
+    <li><b>A stale dependency.</b><span>The live pricing pipeline relied on a data file that was no longer reliably available in production.</span></li>
+    <li><b>Quant code.</b><span>Pricing code written by quantitative developers had to be integrated into the engine.</span></li>
+    <li><b>Two execution paths.</b><span>The same tests had to run on both CPU and GPU.</span></li></ul></div></section>
+  <section><h2>Decisions</h2><div class="story__body"><ul class="points">
+    <li><b>Ship the risky change behind a flag, switched off.</b><span>Removing the dependency touched live pricing, so I put the new path behind a feature flag that defaults to off, added caching and wrote an end-to-end test nobody had asked for. The architect’s view was that the thing to protect was the blast radius, not only correctness. I’d have called that a nice-to-have before; now it’s how I start.</span></li>
+    <li><b>Validate the data before trusting it.</b><span>The commodity loader was the harder one: ten file types, correlation groups, unit conversions and records linked to each other. I checked the links, so an orphaned record gets caught on load rather than showing up as a strange number in a simulation.</span></li>
+    <li><b>Give AI work phases.</b><span>I built a workflow where each stage has its own scoped agent: grill the problem, plan, build test-first, self-review, then a health review. Each agent only sees what that stage needs, which keeps it from skipping ahead.</span></li></ul>
+    <figure class="fig rise"><div class="stage" style="--f:#00965e;--i:#04140d"><div class="lanes">
+      <p class="lane"><span>Live pricing · today’s path</span><i></i></p>
+      <p class="lane lane--new"><span>New path · no stale file · cached</span><span class="sw" aria-hidden="true"></span><i></i><b>off by default</b></p></div></div>
+      <figcaption>Protect the blast radius</figcaption></figure></div></section>
+  <section><h2>What changed</h2><div class="story__body"><div class="prose">
+    <p>I used that workflow to integrate a pricer into the calculation engine in a couple of days. For an experienced integration engineer it takes about two weeks, and I was new to it.</p>
+    <p>The bank’s digitisation competition is the other half of this. I led a team of four and co-built a dashboard from our users’ requirements, which cut a 30–40 minute data load to under 5. We won, out of five groups, and presented it to the Head of Risk Systems.</p></div>
+    <figure class="fig rise"><div class="stage" style="--f:#00965e;--i:#04140d"><ul class="cmps reveal">
+      <li style="--b:100;--a:20"><h4>Integrating a pricer</h4><p class="cmp"><span>An experienced engineer</span><b>about two weeks</b><i class="b"></i></p><p class="cmp cmp--me"><span>Me, new to it</span><b>a couple of days</b><i class="a"></i></p></li>
+      <li style="--b:100;--a:12.5"><h4>The competition dashboard’s data load</h4><p class="cmp"><span>Before</span><b>30–40 min</b><i class="b"></i></p><p class="cmp cmp--me"><span>After</span><b>under 5 min</b><i class="a"></i></p></li></ul></div>
+      <figcaption>Bars to scale. Two weeks is taken as ten working days.</figcaption></figure></div></section>
+  <section><h2>What I took with me</h2><div class="story__body"><div class="prose">
+    <p>I was nominated as an AI Champion in the risk division, and the workflow is now used by several teams across the department. I also won a Take Ownership award.</p>
+    <p>The habit underneath all of it: write down what you’re doing before you build it, and ship it so it’s safe to undo.</p></div>
+    <figure class="fig rise"><img src="../../../public/work/bnp-paribas/take-ownership.png" alt="_nology’s Q1 2026 Take Ownership award certificate for Elias Bennett, citing his move into a C# role with no prior experience, production C# in pricing and risk systems, onboarding documentation and a winning digitisation project." loading="lazy" width="1600" height="900">
+      <figcaption>Take Ownership · _nology · Q1 2026 · awarded May 2026</figcaption></figure></div></section>
+</article>
+<a class="stage next rise" href="#" style="--f:#0b0b0c;--i:#f4f4f2"><p>Next role<br>Full stack software engineer · Aug 2024 – Jun 2025</p><b>Joveen <span aria-hidden="true">→</span></b></a>
+<section class="hello" id="say-hello">
+  <h2>Say hello</h2>
+  <div class="hello__row"><a class="hello__mail" href="mailto:eliasthebennett@gmail.com">eliasthebennett@gmail.com</a><button class="btn" id="copy" type="button">Copy</button></div>
+  <ul><li><a href="#">Résumé <span aria-hidden="true">→</span></a></li><li><a href="https://github.com/3ixas">GitHub <span aria-hidden="true">↗</span></a></li><li><a href="https://linkedin.com/in/elias-t-bennett/">LinkedIn <span aria-hidden="true">↗</span></a></li></ul>
+</section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Threshold · Elias Bennett (prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300..600&family=Instrument+Sans:wght@400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="metal" x1="0" x2="1"><stop offset="0" stop-color="#8d8e94"/><stop offset=".28" stop-color="#f6f6f7"/><stop offset=".55" stop-color="#b4b5ba"/><stop offset=".8" stop-color="#e9e9eb"/><stop offset="1" stop-color="#7f8086"/></linearGradient>
+  <symbol id="clip" viewBox="0 0 40 70"><rect x="9" y=".5" width="22" height="15" rx="2.5" fill="url(#metal)" stroke="#4e4f55" stroke-width=".8"/><circle cx="20" cy="8" r="2.1" fill="#5d5e64"/><circle cx="19.5" cy="7.5" r=".8" fill="#e9e9eb"/><rect x="17.3" y="15" width="5.4" height="8" rx="2" fill="url(#metal)" stroke="#4e4f55" stroke-width=".6"/><rect x="9.5" y="22.5" width="21" height="43" rx="10.5" fill="none" stroke="#4e4f55" stroke-width="4.6"/><rect x="9.5" y="22.5" width="21" height="43" rx="10.5" fill="none" stroke="url(#metal)" stroke-width="3.2"/></symbol>
+</defs></svg>
+<header class="top wrap">
+  <a class="top__name" href="index.html">Elias Bennett</a><p class="greet" id="greet" tabindex="0"><span>Hello</span><span id="london"></span></p>
+  <nav id="nav" aria-label="On this page"><a href="index.html#work">Work</a><a href="index.html#things-i-make">Things I make</a><a href="index.html#how-i-work">How I work</a><a href="index.html#off-the-clock">Off the clock</a><a href="index.html#say-hello">Say hello</a></nav>
+  <div class="top__tools"><button class="theme" id="theme" type="button" aria-label="Dark theme" aria-pressed="false"><i></i></button><button class="menu" id="menu" type="button" aria-expanded="false" aria-controls="nav">Menu</button></div>
+</header>
+<main class="wrap">
+<section class="stage case" style="--f:#c58f5e;--i:#1a1714;--line:rgb(26 23 20 / 0.3)">
+  <a class="back" href="index.html#things-i-make">← Things I make</a>
+  <div class="case__txt">
+    <h1>Threshold</h1>
+    <p class="lede">A rental calculator for London, Basel and Zurich that shows what a move costs: upfront, monthly and how long until you can afford it.</p>
+    <ul class="chips"><li>React 19</li><li>TypeScript</li><li>MapLibre</li></ul>
+    <div class="case__links"><a class="pill" href="https://threshold-beta.vercel.app">Live site <span aria-hidden="true">↗</span></a><a class="pill pill--q" href="https://github.com/3ixas/threshold">Code <span aria-hidden="true">↗</span></a></div>
+    <ul class="nums"><li><b>57</b>user stories</li><li><b>13</b>slices, built in a day</li><li><b>182</b>tests</li><li><b>3</b>cities</li></ul>
+  </div>
+  <img src="../../../public/work/threshold/landing.webp" alt="Threshold landing page introducing the real cost of moving out">
+</section>
+<article class="story">
+  <section><h2>The rent is the easy part.</h2><div class="story__body prose">
+    <p>My friends had no clear idea what renting would cost by area, and one of them was about to move to Switzerland. Most rent calculators stop at the monthly figure. Before you get the keys you might need five weeks’ deposit in London, or three months’ in Switzerland, plus the first month’s rent, moving costs and furniture. Can I afford to move, and if not, how long until I can?</p></div></section>
+  <section><h2>The problem, on paper.</h2><div class="story__body">
+    <blockquote class="prd rise"><p>“People in their 20s and 30s make the decision to move out … without a clear, honest view of what it will actually cost.”</p><footer>Threshold’s PRD, 16 April 2026</footer></blockquote></div></section>
+  <section><h2>Two totals and a straight answer.</h2><div class="story__body"><ul class="points">
+    <li><b>Upfront and monthly stay separate.</b><span>You can often afford the monthly costs long before you’ve saved the upfront ones.</span></li>
+    <li><b>The answer is one of three.</b><span>Move now; not yet, and how many months of saving; or your income doesn’t cover the monthly costs.</span></li>
+    <li><b>Each city keeps its own rules.</b><span>Different deposits, local charges and transport passes, and every default can be changed.</span></li>
+    <li><b>Suggestions show what would help.</b><span>A cheaper district, a smaller place, or a flatmate, and how much each would save.</span></li></ul>
+    <figure class="fig rise"><img src="../../../public/work/threshold/costs.webp" alt="Threshold results showing upfront and monthly cost breakdowns" loading="lazy" width="2298" height="1750"><figcaption>Upfront and monthly totals, kept apart.</figcaption></figure></div></section>
+  <section><h2>The link is the save file.</h2><div class="story__body"><div class="prose">
+    <p>Everything you choose lives in the URL: no account, no backend. The calculations are plain functions with no state of their own. The maps use real boundaries: 33 London boroughs, Zurich’s 12 Kreise and Basel in seven areas.</p></div>
+    <figure class="fig rise"><img src="../../../public/work/threshold/calculator.webp" alt="Threshold calculator with a district map and scenario controls" loading="lazy" width="2296" height="1748"><figcaption>The district map and the choices that drive the estimate.</figcaption></figure></div></section>
+  <section><h2>Used for real.</h2><div class="story__body prose"><p>I used it during my own flat hunt, and friends have used it too.</p></div></section>
+  <section><h2>What’s next</h2><div class="story__body"><ul class="points">
+    <li><b>Keep the data fresh.</b><span>Move the April 2026 snapshot to a scheduled refresh where the sources allow it.</span></li>
+    <li><b>Show the sources in the app.</b><span>Link every default to its source.</span></li>
+    <li><b>Finer areas in Basel.</b><span>Use its 19 Wohnviertel rather than seven areas.</span></li></ul></div></section>
+</article>
+<a class="stage next rise" href="#" style="--f:#4f86f7;--i:#060a14"><p>Next project<br>A risk simulator where every number shows its source and age.</p><b>Argus Risk <span aria-hidden="true">→</span></b></a>
+<section class="hello" id="say-hello">
+  <h2>Say hello</h2>
+  <div class="hello__row"><a class="hello__mail" href="mailto:eliasthebennett@gmail.com">eliasthebennett@gmail.com</a><button class="btn" id="copy" type="button">Copy</button></div>
+  <ul><li><a href="#">Résumé <span aria-hidden="true">→</span></a></li><li><a href="https://github.com/3ixas">GitHub <span aria-hidden="true">↗</span></a></li><li><a href="https://linkedin.com/in/elias-t-bennett/">LinkedIn <span aria-hidden="true">↗</span></a></li></ul>
+</section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

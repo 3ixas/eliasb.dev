@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Things I make · Elias Bennett (prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300..600&family=Instrument+Sans:wght@400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="metal" x1="0" x2="1"><stop offset="0" stop-color="#8d8e94"/><stop offset=".28" stop-color="#f6f6f7"/><stop offset=".55" stop-color="#b4b5ba"/><stop offset=".8" stop-color="#e9e9eb"/><stop offset="1" stop-color="#7f8086"/></linearGradient>
+  <symbol id="clip" viewBox="0 0 40 70"><rect x="9" y=".5" width="22" height="15" rx="2.5" fill="url(#metal)" stroke="#4e4f55" stroke-width=".8"/><circle cx="20" cy="8" r="2.1" fill="#5d5e64"/><circle cx="19.5" cy="7.5" r=".8" fill="#e9e9eb"/><rect x="17.3" y="15" width="5.4" height="8" rx="2" fill="url(#metal)" stroke="#4e4f55" stroke-width=".6"/><rect x="9.5" y="22.5" width="21" height="43" rx="10.5" fill="none" stroke="#4e4f55" stroke-width="4.6"/><rect x="9.5" y="22.5" width="21" height="43" rx="10.5" fill="none" stroke="url(#metal)" stroke-width="3.2"/></symbol>
+</defs></svg>
+<header class="top wrap">
+  <a class="top__name" href="index.html">Elias Bennett</a><p class="greet" id="greet" tabindex="0"><span>Hello</span><span id="london"></span></p>
+  <nav id="nav" aria-label="On this page"><a href="index.html#work">Work</a><a href="index.html#things-i-make">Things I make</a><a href="index.html#how-i-work">How I work</a><a href="index.html#off-the-clock">Off the clock</a><a href="index.html#say-hello">Say hello</a></nav>
+  <div class="top__tools"><button class="theme" id="theme" type="button" aria-label="Dark theme" aria-pressed="false"><i></i></button><button class="menu" id="menu" type="button" aria-expanded="false" aria-controls="nav">Menu</button></div>
+</header>
+<main class="wrap">
+<header class="page-head"><h1>Things I make</h1><p>Everything I’ve built that I’d happily talk through.</p></header>
+<div class="grid3">
+<a class="stage proj rise " href="threshold.html" style="--f:#c58f5e;--i:#1a1714"><div class="proj__txt"><h2>Threshold</h2><p>A clearer view of what moving could cost.</p><span class="proj__meta">Product · 2026</span></div><img src="../../../public/work/threshold/landing.webp" alt="Threshold landing page introducing the real cost of moving out" loading="lazy"></a>
+<a class="stage proj rise " href="#" style="--f:#4f86f7;--i:#060a14"><div class="proj__txt"><h2>Argus Risk</h2><p>Every number shows where it came from and how old it is.</p><span class="proj__meta">System · 2026</span></div><img src="../../../public/work/argus/overview.webp" alt="Argus Risk dashboard showing portfolio value, profit and loss, exposure and system status" loading="lazy"></a>
+<a class="stage proj rise " href="#" style="--f:#2a211b;--i:#ece4d8"><div class="proj__txt"><h2>Flowtime</h2><p>Breaks that match how long you actually focused.</p><span class="proj__meta">Product · 2026</span></div><img src="../../../public/work/flowtime/timer.jpg" alt="Flowtime focus timer showing 00:00:00 and a Start Focus Session button" loading="lazy"></a>
+<a class="stage proj rise proj--paper" href="https://github.com/3ixas/home-secretary-prototype" style=""><div class="proj__txt"><h2>Home Secretary</h2><p>A household coordination prototype, built for my software engineering coursework.</p><span class="proj__meta">Experiment · 2026 ↗</span></div><img src="../../../public/work/home-secretary/noticeboard.webp" alt="Home Secretary noticeboard" loading="lazy"></a>
+<a class="stage proj rise proj--paper" href="https://github.com/3ixas/risk-event-tracker" style=""><div class="proj__txt"><h2>Risk Event Tracker</h2><p>A tested C# Web API for managing risk events.</p><span class="proj__meta">System · 2025 ↗</span></div><img src="../../../public/work/risk-event-tracker/swagger.webp" alt="Risk Event Tracker API in Swagger" loading="lazy"></a>
+<a class="stage proj rise proj--paper" href="https://github.com/3ixas/ask-professor-past" style=""><div class="proj__txt"><h2>Ask Professor Past</h2><p>History you can talk to. Version 1; I’m rebuilding it.</p><span class="proj__meta">Product · 2025 ↗</span></div><img src="../../../public/work/ask-professor-past/chat.webp" alt="Ask Professor Past chat" loading="lazy"></a>
+</div>
+<section class="hello" id="say-hello">
+  <h2>Say hello</h2>
+  <div class="hello__row"><a class="hello__mail" href="mailto:eliasthebennett@gmail.com">eliasthebennett@gmail.com</a><button class="btn" id="copy" type="button">Copy</button></div>
+  <ul><li><a href="#">Résumé <span aria-hidden="true">→</span></a></li><li><a href="https://github.com/3ixas">GitHub <span aria-hidden="true">↗</span></a></li><li><a href="https://linkedin.com/in/elias-t-bennett/">LinkedIn <span aria-hidden="true">↗</span></a></li></ul>
+</section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
