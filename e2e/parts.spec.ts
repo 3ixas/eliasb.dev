@@ -261,6 +261,20 @@ test.describe("Arrival", () => {
     await expect(count).toHaveText("−40%");
   });
 
+  test("it is let go when its top passes 85% of the viewport's height, the line that armed it", async ({ page }) => {
+    await page.goto(fixture);
+    const rise = page.locator("[data-rise]");
+    await expect(rise).toHaveAttribute("data-armed", "");
+    const placeTop = (share: number) =>
+      rise.evaluate((element, at) => scrollBy({ top: element.getBoundingClientRect().top - innerHeight * at, behavior: "instant" }), share);
+    await placeTop(0.9);
+    // Two frames for the observer to report; it must not have let go above the line.
+    await page.evaluate(() => new Promise<void>((done) => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
+    await expect(rise).toHaveAttribute("data-armed", "");
+    await placeTop(0.8);
+    await expect(rise).not.toHaveAttribute("data-armed");
+  });
+
   test("the bars' after bar starts 300 ms behind the before", async ({ page }) => {
     await page.goto(fixture);
     const delays = await page.locator("[data-grow] .bar").evaluateAll((bars) => bars.map((bar) => getComputedStyle(bar).transitionDelay));

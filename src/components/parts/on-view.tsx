@@ -28,18 +28,30 @@ function useFirstSight(ref: RefObject<HTMLElement | null>, arrival: Arrival) {
     const { arm, release, finish } = actions.current;
     arm(element);
     let waiting = true;
-    const watcher = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        watcher.disconnect();
-        waiting = false;
-        release(element);
-      },
-      { rootMargin: "0px 0px -15% 0px" },
-    );
-    watcher.observe(element);
+    let watcher: IntersectionObserver | undefined;
+    // The line is 15% of the viewport's height up from its bottom, in pixels: a percentage rootMargin resolves
+    // against the root's width, which would put release on a different line from the arming check above.
+    const watch = () => {
+      watcher?.disconnect();
+      watcher = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return;
+          stop();
+          waiting = false;
+          release(element);
+        },
+        { rootMargin: `0px 0px -${Math.round(window.innerHeight * 0.15)}px 0px` },
+      );
+      watcher.observe(element);
+    };
+    const stop = () => {
+      watcher?.disconnect();
+      window.removeEventListener("resize", watch);
+    };
+    watch();
+    window.addEventListener("resize", watch);
     return () => {
-      watcher.disconnect();
+      stop();
       if (waiting) finish(element);
     };
   }, [ref]);
