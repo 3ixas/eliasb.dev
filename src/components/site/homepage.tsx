@@ -14,7 +14,7 @@ import { Work } from "@/components/site/work";
  */
 export function Homepage() {
   return (
-    <div data-stretch-shell>
+    <div data-site>
       <SiteHeader home />
       <main id="main-content" tabIndex={-1}>
         <Opening />

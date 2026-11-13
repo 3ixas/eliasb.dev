@@ -287,7 +287,7 @@ test.describe("Lights and theme", () => {
           for (const animation of animations) animation.currentTime = time;
           frames.push({
             ink: getComputedStyle(document.documentElement).getPropertyValue("--ink").trim(),
-            colours: ["[data-stretch-shell]", "#things-i-make h2", "#how-i-work .card h3"].map(
+            colours: ["[data-site]", "#things-i-make h2", "#how-i-work .card h3"].map(
               (selector) => getComputedStyle(document.querySelector(selector)!).color,
             ),
           });

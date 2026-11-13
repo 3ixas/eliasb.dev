@@ -1,14 +1,9 @@
 import { homeTitle, siteDescription, siteName } from "@/content/site";
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, DM_Mono, Instrument_Sans, Newsreader } from "next/font/google";
+import { Instrument_Sans, Newsreader } from "next/font/google";
 import "./base.css";
-import "./stretch-tokens.css";
 import "./tokens.css";
-import "./stretch-type.css";
-import "./stretch-shell.css";
-import "./quiet-index.css";
-import "./quiet-long-form.css";
-import "./quiet-forced-colors.css";
+import "./zoom.css";
 import "./shell.css";
 import "./parts.css";
 import "./pass.css";
@@ -20,32 +15,11 @@ import "./off-the-clock.css";
 import "./story.css";
 import "./stretch-resume.css";
 
-// Self-hosted at build time by next/font, so no request goes to Google when a
-// visitor loads a page. Bricolage Grotesque is variable in weight, optical size
-// and width: the width axis gives the condensed display style (stretch-type.css).
-// Latin only, which covers the accented letters the site has used so far; adding
-// latin-ext would preload another 53 KB file on every page.
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  axes: ["opsz", "wdth"],
-  variable: "--font-bricolage",
-  // The fallback faces are in stretch-type.css, sized per style; next/font's
-  // own would be one width for every style, wrong for the condensed display type.
-  adjustFontFallback: false,
-  fallback: ["Bricolage Fallback", "system-ui", "sans-serif"],
-});
-
-// Metadata, dates, counts and captions. The Résumé sheet keeps JetBrains Mono, loaded by its own layout.
-const dmMono = DM_Mono({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-dm-mono",
-});
-
+// Self-hosted at build time by next/font, so no request goes to Google when a visitor loads a page.
 // Passes and panels (docs/design/DESIGN.md "Type"): Newsreader for headings, figures and prose, with its
 // optical-size axis; Instrument Sans for interface text. Both variable in weight, Latin only, and given
 // next/font's fallback faces, which it sizes from each font's own metrics so a late font moves nothing.
-// tokens.css reads them as --serif and --sans. Bricolage and DM Mono stay until #420.
+// tokens.css reads them as --serif and --sans. The Résumé sheet's own faces are loaded by its layout.
 const newsreader = Newsreader({
   subsets: ["latin"],
   axes: ["opsz"],
@@ -120,7 +94,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       lang="en-GB"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${bricolage.variable} ${dmMono.variable} ${newsreader.variable} ${instrumentSans.variable}`}
+      className={`${newsreader.variable} ${instrumentSans.variable}`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: siteBootScript }} />

@@ -24,7 +24,7 @@ export function Arrowed({ label }: { label: string }) {
 /** The page: the shared header, the page's own content, Say hello to end it, and the skip link's target. */
 export function LongForm({ attrs, children }: { attrs: Record<`data-${string}`, string>; children: ReactNode }) {
   return (
-    <div data-stretch-shell {...attrs}>
+    <div data-site {...attrs}>
       <SiteHeader />
       <FocusHashTarget />
       <main id="main-content" tabIndex={-1}>

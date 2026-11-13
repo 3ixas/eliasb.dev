@@ -193,7 +193,7 @@ export default async function OffTheClockFixtures() {
   if (process.env.BOARD_FIXTURES !== "1") notFound();
 
   return (
-    <div data-stretch-shell>
+    <div data-site>
       <main id="main-content" tabIndex={-1} className="frame">
         <h1 className="sr-only">Off the clock fixtures</h1>
         <h2 className="sr-only">Off the clock</h2>

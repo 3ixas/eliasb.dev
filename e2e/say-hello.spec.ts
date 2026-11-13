@@ -194,7 +194,7 @@ test.describe("No footer", () => {
       await expect(page.locator(".stretch-footer")).toHaveCount(0);
       await expect(section(page)).toHaveCount(1);
       const last = await page.evaluate(() => {
-        const content = [...document.querySelectorAll("[data-stretch-shell] *")].filter((element) => element.getClientRects().length > 0);
+        const content = [...document.querySelectorAll("[data-site] *")].filter((element) => element.getClientRects().length > 0);
         const bottom = Math.max(...content.map((element) => element.getBoundingClientRect().bottom));
         return document.querySelector("section#say-hello")!.getBoundingClientRect().bottom >= bottom - 0.5;
       });

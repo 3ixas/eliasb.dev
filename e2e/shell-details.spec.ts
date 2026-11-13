@@ -103,7 +103,7 @@ test.describe("Shell details: hover and height", () => {
     const declared = await page.evaluate(() => {
       for (const sheet of document.styleSheets) {
         for (const rule of sheet.cssRules) {
-          if (rule instanceof CSSStyleRule && rule.selectorText === "[data-stretch-shell]" && rule.style.minHeight) return rule.style.minHeight;
+          if (rule instanceof CSSStyleRule && rule.selectorText === "[data-site]" && rule.style.minHeight) return rule.style.minHeight;
         }
       }
       return null;

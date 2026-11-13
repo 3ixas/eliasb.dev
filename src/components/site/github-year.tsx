@@ -70,12 +70,12 @@ export function GitHubYear({ activity, total, mark }: { activity: ActivityDay[];
           ]}
         />
       </p>
-      <p className="stretch-mono stretch-gh__readout" aria-hidden="true" data-readout>
+      <p className="stretch-gh__readout" aria-hidden="true" data-readout>
         {selected === null ? " " : contributionTag(days[selected])}
       </p>
       <div ref={scroller} className="stretch-gh__scroll" data-github-scroll>
         <div className="stretch-gh__sheet" style={{ "--weeks": weekCount } as CSSProperties}>
-          <div className="stretch-gh__months stretch-mono" aria-hidden="true">
+          <div className="stretch-gh__months" aria-hidden="true">
             {calendar.monthLabels.map(({ column, label, row, span }) => (
               <span key={`${column}-${label}`} style={{ gridColumn: `${column + 1} / span ${span}`, gridRow: row + 1 }}>
                 {label}
@@ -119,7 +119,7 @@ export function GitHubYear({ activity, total, mark }: { activity: ActivityDay[];
       <p id={hintId} className="sr-only">
         {copy.keys}
       </p>
-      <div className="stretch-gh__foot stretch-mono" aria-hidden="true">
+      <div className="stretch-gh__foot" aria-hidden="true">
         <span className="stretch-gh__legend">
           {copy.legend.less}
           {[0, 1, 2, 3, 4].map((level) => (

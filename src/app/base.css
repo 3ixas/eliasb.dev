@@ -1,15 +1,14 @@
 @import "tailwindcss";
 
 /*
- * What the whole site shares beneath the Stretch stylesheets: Tailwind's reset
- * and its sr-only utility, the font families Tailwind reads, and the page-wide
- * motion rules. Colours, type and layout live in stretch-tokens.css,
- * stretch-type.css and stretch-shell.css.
+ * What the whole site shares beneath its stylesheets: Tailwind's reset and its
+ * sr-only utility, the font families Tailwind reads, and the page-wide motion
+ * rules. Colours, type and curves live in tokens.css.
  */
 @theme inline {
-  --font-display: var(--font-bricolage), system-ui, sans-serif;
-  --font-sans: var(--font-bricolage), system-ui, sans-serif;
-  --font-mono: var(--font-dm-mono), ui-monospace, monospace;
+  --font-display: var(--font-newsreader), Georgia, serif;
+  --font-sans: var(--font-instrument-sans), system-ui, sans-serif;
+  --font-mono: ui-monospace, monospace;
 }
 
 @layer base {
@@ -20,10 +19,9 @@
   }
 
   /* Reduced motion removes transitions, including theme changes. The tiny
-   * animation duration preserves completion events used by other effects.
-   * A closer look is the exception: it still fades in over 0.2 s (docs/design/DESIGN.md). */
+   * animation duration preserves completion events used by other effects. */
   @media (prefers-reduced-motion: reduce) {
-    *:not(.qi-look),
+    *,
     *::before,
     *::after {
       scroll-behavior: auto !important;

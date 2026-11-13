@@ -290,3 +290,158 @@
     background: CanvasText;
   }
 }
+
+/* ---- The GitHub year's grid (site/github-year.tsx), under Off the clock's own rules above ---- */
+
+.stretch-gh__total {
+  margin: 0;
+  font-size: var(--text-body);
+  line-height: 1.4;
+}
+
+.stretch-gh__count {
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.stretch-gh__readout {
+  margin: 0;
+  min-height: 1.4em;
+  color: var(--cobalt);
+  font-size: var(--text-label);
+}
+
+/* The grid scrolls inside its own column on phones, so the page never does. The padding leaves room for today's ring. */
+.stretch-gh__scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 4px;
+}
+
+.stretch-gh__sheet {
+  position: relative;
+}
+
+@media (max-width: 760px) {
+  .stretch-gh__sheet {
+    min-width: 700px;
+  }
+
+  /* The edge the grid scrolls off fades, so a cut month label reads as the year continuing. */
+  .stretch-gh__scroll {
+    mask-image: linear-gradient(to right, transparent, #000 28px);
+  }
+}
+
+.stretch-gh__months,
+.stretch-gh__days {
+  display: grid;
+  grid-template-columns: repeat(var(--weeks), minmax(0, 1fr));
+  column-gap: 3px;
+}
+
+.stretch-gh__months {
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: var(--text-label);
+  white-space: nowrap;
+}
+
+.stretch-gh__days {
+  grid-template-rows: repeat(7, auto);
+  grid-auto-flow: column;
+  row-gap: 3px;
+}
+
+/* GitHub's own five levels (--gh-0 to --gh-4), the only place their greens appear. */
+.stretch-gh__day {
+  display: block;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background-color: var(--year-0);
+}
+
+.stretch-gh__day[data-level="1"] { background-color: var(--year-1); }
+.stretch-gh__day[data-level="2"] { background-color: var(--year-2); }
+.stretch-gh__day[data-level="3"] { background-color: var(--year-3); }
+.stretch-gh__day[data-level="4"] { background-color: var(--year-4); }
+
+/* Today is a cobalt ring around its own level, never a fill, so the greens stay true. */
+.stretch-gh__day[data-today] {
+  position: relative;
+  z-index: 1;
+  box-shadow:
+    0 0 0 1.5px var(--page),
+    0 0 0 3.5px var(--cobalt);
+}
+
+button.stretch-gh__day {
+  cursor: pointer;
+}
+
+button.stretch-gh__day[data-selected] {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 1px;
+}
+
+.stretch-gh__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  color: var(--muted);
+  font-size: var(--text-label);
+}
+
+.stretch-gh__legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stretch-gh__legend .stretch-gh__day {
+  width: 12px;
+  height: 12px;
+}
+
+.stretch-gh__legend .stretch-gh__day[data-today] {
+  margin-left: 16px;
+}
+
+/* A line of parts with a dot between them (dot-line.tsx): each dot leads its part in a gutter the line clips, so a part
+ * that starts a new line loses its dot. */
+.dot-line {
+  --dot: 0.8em;
+  display: block;
+  overflow-x: clip;
+}
+
+.dot-line__in {
+  display: block;
+  margin-left: calc(-1 * var(--dot));
+}
+
+.dot-line__part {
+  display: inline-block;
+  padding-left: var(--dot);
+  vertical-align: baseline;
+}
+
+.dot-line__dot {
+  display: inline-block;
+  width: var(--dot);
+  margin-left: calc(-1 * var(--dot));
+  white-space: nowrap;
+}
+
+/* Forced colours keep the year's data: GitHub's five levels, each cell with a hairline so an empty day still shows (R-29). */
+@media (forced-colors: active) {
+  /* The GitHub year keeps GitHub's five levels (they are the data), each cell with a hairline so an empty day still shows. */
+  .stretch-gh__day {
+    forced-color-adjust: none;
+    outline: 1px solid GrayText;
+    outline-offset: -1px;
+  }
+}

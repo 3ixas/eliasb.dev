@@ -3,11 +3,11 @@ import { expect, test } from "@playwright/test";
 
 // A screenshot on a long-form page opens large in the same window: a case study's, and a Role story's (and its certificate).
 const pages = [
-  { route: "/things-i-make/threshold", trigger: ".case-open .qi-zoom" },
-  { route: "/things-i-make/argus-risk", trigger: "section .story-fig .qi-zoom" },
-  { route: "/work/joveen", trigger: ".story-fig .qi-zoom" },
-  { route: "/work/optegra", trigger: ".story-fig .qi-zoom" },
-  { route: "/work/bnp-paribas", trigger: "#take-ownership-certificate .qi-zoom" },
+  { route: "/things-i-make/threshold", trigger: ".case-open .zoom" },
+  { route: "/things-i-make/argus-risk", trigger: "section .story-fig .zoom" },
+  { route: "/work/joveen", trigger: ".story-fig .zoom" },
+  { route: "/work/optegra", trigger: ".story-fig .zoom" },
+  { route: "/work/bnp-paribas", trigger: "#take-ownership-certificate .zoom" },
 ];
 
 for (const { route, trigger } of pages) {
@@ -89,7 +89,7 @@ for (const { route, trigger } of pages) {
       await page.reload();
       await page.locator(trigger).first().click();
       const names = () => page.getByRole("dialog").evaluate((dialog) => dialog.getAnimations().map((animation) => (animation as CSSAnimation).animationName));
-      await expect.poll(names).toContain("qi-zoom-in");
+      await expect.poll(names).toContain("zoom-in");
       await page.keyboard.press("Escape");
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.locator(trigger).first().click();

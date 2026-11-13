@@ -32,9 +32,9 @@ test.describe("Nothing is blank", () => {
 
   test("an expanded screenshot has started loading before it opens, and opens on the picture", async ({ page }) => {
     await page.goto("/things-i-make/threshold");
-    const button = page.locator(".case-open .qi-zoom").first();
+    const button = page.locator(".case-open .zoom").first();
     await expect.poll(() => button.evaluate((element) => Object.keys(element).some((key) => key.startsWith("__reactProps$")))).toBe(true);
-    const dialog = page.locator(".qi-zoom__dialog").first();
+    const dialog = page.locator(".zoom__dialog").first();
     await expect(dialog.locator("img")).toHaveCount(0);
     await button.focus();
     await expect(dialog.locator("img")).toHaveCount(1);
@@ -49,7 +49,7 @@ test.describe("Nothing is blank", () => {
 
   test("opening waits for the image to decode, even for a click with nothing before it", async ({ page }) => {
     await page.goto("/things-i-make/threshold");
-    const button = page.locator(".case-open .qi-zoom").first();
+    const button = page.locator(".case-open .zoom").first();
     await expect.poll(() => button.evaluate((element) => Object.keys(element).some((key) => key.startsWith("__reactProps$")))).toBe(true);
     // A click from assistive technology: no pointer or focus first, so nothing has asked for the large image yet.
     await button.evaluate((element) => {
@@ -75,7 +75,7 @@ test.describe("Nothing is blank", () => {
 
   test("a full-column screenshot asks for a full-column file", async ({ page }) => {
     await page.goto("/work/optegra");
-    await expect(page.locator(".story-fig .qi-zoom img").first()).toHaveAttribute("sizes", "(min-width: 1260px) 760px, (min-width: 720px) 60vw, 100vw");
+    await expect(page.locator(".story-fig .zoom img").first()).toHaveAttribute("sizes", "(min-width: 1260px) 760px, (min-width: 720px) 60vw, 100vw");
   });
 
   test("the site declares a touch icon", async ({ page }) => {
