@@ -104,6 +104,8 @@ test.describe("Work: the panels", () => {
         await expect(rows.nth(index).locator(".pair__what")).toHaveText(pair.what);
         await expect(rows.nth(index).locator(".pair__value")).toHaveText(pair.value);
         const [before, after] = widths[index];
+        // A bar too narrow to read is a collapsed track: side by side at 720 to 1000 px the panels are at their narrowest.
+        expect(Math.max(before, after), `${slug}: ${pair.what} has room for its bars`).toBeGreaterThan(120);
         expect(after / before, `${slug}: ${pair.what}`).toBeCloseTo(pair.after / pair.before, 2);
       }
     }

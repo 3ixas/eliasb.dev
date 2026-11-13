@@ -303,7 +303,9 @@
   margin-top: 52px;
 }
 
+/* The pairs lay out by their own width, not the window's: side by side at 720 to 1000 px a panel is too narrow for the label, bars and value in one row. */
 .pairs {
+  container-type: inline-size;
   display: grid;
   align-content: start;
   gap: 14px;
@@ -403,6 +405,10 @@
     margin-top: 36px;
   }
 
+}
+
+/* Under 440 px of its own the label and value share a line above the bars, which take the full width. */
+@container (max-width: 439.98px) {
   .pair {
     grid-template-columns: minmax(0, 1fr) auto;
   }
