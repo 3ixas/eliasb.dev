@@ -13,7 +13,7 @@ const FEEDBACK_MS = [100, 250];
  * The one ring (DESIGN.md "Controls", R-05): 2 px cobalt at 3 px offset, taking the panel's ink on a panel. The page-wide
  * rule in shell.css gives it to anything without its own; parts.css gives it to the controls.
  */
-const RING = { colour: 'var(--cobalt)', offset: '3px', page: '[data-site] :focus-visible', controls: ':where(.pill, .button, .text-link, .row):focus-visible' };
+const RING = { colour: 'var(--cobalt)', offset: '3px', page: ':where([data-site] :focus-visible)', controls: ':where(.pill, .button, .text-link, .row):focus-visible' };
 
 /** Selectors whose focus ring differs, and exactly how. */
 const ringExceptions = [
@@ -149,8 +149,8 @@ const broken = (path, from, to) => {
   return { ...files, [path]: files[path].replace(from, to) };
 };
 const mustFail = (name, changed, pattern) => assert.ok(craftProblems(changed).some((problem) => pattern.test(problem)), `The ${name} check did not fail on its deliberate break`);
-mustFail('focus ring width', broken('src/app/shell.css', '[data-site] :focus-visible {\n  outline: 2px solid var(--cobalt);', '[data-site] :focus-visible {\n  outline: 3px solid var(--cobalt);'), /focus ring/);
-mustFail('focus ring offset', broken('src/app/zoom.css', '.zoom__close:focus-visible {\n  outline-color: #fff;', '.zoom__close:focus-visible {\n  outline-color: #fff;\n  outline-offset: 4px;'), /offset/);
+mustFail('focus ring width', broken('src/app/shell.css', ':where([data-site] :focus-visible) {\n  outline: 2px solid var(--cobalt);', ':where([data-site] :focus-visible) {\n  outline: 3px solid var(--cobalt);'), /focus ring/);
+mustFail('focus ring offset', broken('src/app/zoom.css', '.zoom__dialog .zoom__close:focus-visible {\n  outline-color: #fff;', '.zoom__dialog .zoom__close:focus-visible {\n  outline-color: #fff;\n  outline-offset: 4px;'), /offset/);
 mustFail('controls ring offset', broken('src/app/parts.css', '  outline: 2px solid var(--cobalt);\n  outline-offset: 3px;', '  outline: 2px solid var(--cobalt);\n  outline-offset: 2px;'), /focus ring/);
 mustFail('panel ring colour', broken('src/app/parts.css', 'outline-color: var(--panel-ink);', 'outline-color: var(--cobalt);'), /var\(--panel-ink\)/);
 mustFail('spring', broken('src/app/tokens.css', '--spring: cubic-bezier(.3, 1.5, .4, 1);', '--spring: cubic-bezier(.3, 1.4, .64, 1);'), /--spring/);

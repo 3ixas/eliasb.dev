@@ -61,7 +61,7 @@
   cursor: pointer;
 }
 
-.zoom__close:focus-visible {
+.zoom__dialog .zoom__close:focus-visible {
   outline-color: #fff;
 }
 

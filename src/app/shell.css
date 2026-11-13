@@ -23,8 +23,9 @@ html:has([data-site]) body,
   color: var(--page);
 }
 
-/* The one ring for anything that has no ring of its own (DESIGN.md "Controls"): 2 px cobalt at 3 px offset. */
-[data-site] :focus-visible {
+/* The one ring for anything that has no ring of its own (DESIGN.md "Controls"): 2 px cobalt at 3 px offset. No
+ * specificity, so a part's own ring (the zoom dialog's white Close, a panel's ink, the Résumé sheet's) always wins. */
+:where([data-site] :focus-visible) {
   outline: 2px solid var(--cobalt);
   outline-offset: 3px;
 }

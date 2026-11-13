@@ -60,6 +60,16 @@ for (const { route, trigger } of pages) {
       expect(clipped).toBeNull();
     });
 
+    test("the Close button's focus ring is white, so it shows on any screenshot", async ({ page }) => {
+      const button = page.locator(trigger).first();
+      await button.focus();
+      await page.keyboard.press("Enter");
+      const close = page.getByRole("dialog").getByRole("button", { name: "Close" });
+      await expect(close).toBeVisible();
+      await close.focus();
+      await expect(close).toHaveCSS("outline-color", "rgb(255, 255, 255)");
+    });
+
     test("Enter opens it from the keyboard; a click on it and its Close button close it", async ({ page }) => {
       const button = page.locator(trigger).first();
       const dialog = page.getByRole("dialog");
