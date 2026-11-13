@@ -1,93 +1,113 @@
 import type { CSSProperties } from "react";
+import { OnView } from "@/components/parts/on-view";
+import { Panel } from "@/components/parts/panel";
 import { SiteLink } from "@/components/site/site-link";
 import { ZoomableImage } from "@/components/site/zoomable-image";
-import { ShrinkOnView } from "@/components/site/shrink-on-view";
 import type { RoleStoryFigure } from "@/content/stretch/role-story";
+import type { PanelColours } from "@/content/stretch/story";
 
 /**
- * The figure a Role story argues from, inline at column width on the card surface with its caption beneath
- * (DESIGN.md rule 7): a flag, a to-scale before-and-after, or screenshots of a public page. A certificate is a
- * real thing the sentence only names, so it is a closer look on that word and is not drawn here.
+ * The figure a Role story argues from, in the text column with a muted caption beneath (DESIGN.md "Figures", R-21): the
+ * flag and the comparisons on a panel in the employer's colour; screenshots and the certificate as they are, with a
+ * hairline edge, each opening large in a dialog.
  */
-export function RoleStoryFigureBlock({ figure }: { figure: RoleStoryFigure }) {
+export function RoleStoryFigureBlock({ figure, panel }: { figure: RoleStoryFigure; panel: PanelColours }) {
   switch (figure.kind) {
     case "flag":
-      return <FlagFigure figure={figure} />;
+      return <FlagFigure figure={figure} panel={panel} />;
     case "scale":
-      return <ScaleFigure figure={figure} />;
+      return <ScaleFigure figure={figure} panel={panel} />;
     case "screens":
       return <ScreensFigure figure={figure} />;
     case "certificate":
-      return null;
+      return <CertificateFigure figure={figure} />;
   }
 }
 
-/** One path is live ("on"); the new one sits behind a toggle that is off. */
-function FlagFigure({ figure }: { figure: Extract<RoleStoryFigure, { kind: "flag" }> }) {
+/** Two lanes: today's path, live, and the new one behind a switch that is off. */
+function FlagFigure({ figure, panel }: { figure: Extract<RoleStoryFigure, { kind: "flag" }>; panel: PanelColours }) {
   return (
-    <figure className="qi-figure qi-flag">
-      <div className="qi-figure__card">
-        <div className="qi-flag__row">
-          <span className="qi-flag__path">{figure.live}</span>
-          <span className="qi-flag__on stretch-mono">on</span>
+    <figure className="story-fig">
+      <Panel colours={panel} className="story-fig__panel">
+        <div className="lanes">
+          <p className="lane">
+            <span>{figure.live}</span>
+            <i aria-hidden="true" />
+          </p>
+          <p className="lane lane--new">
+            <span>{figure.toggled}</span>
+            <span className="lane__switch" aria-hidden="true" />
+            <i aria-hidden="true" />
+            <b>{figure.state}</b>
+          </p>
         </div>
-        <div className="qi-flag__row">
-          <span className="qi-flag__path">{figure.toggled}</span>
-          <span className="qi-flag__toggle" aria-hidden="true" />
-          <span className="qi-flag__state stretch-mono">{figure.state}</span>
-        </div>
+      </Panel>
+      <figcaption>{figure.caption}</figcaption>
+    </figure>
+  );
+}
+
+/** Each comparison's two bars share a unit, so their lengths compare; they grow to their share once, arriving below the fold. */
+function ScaleFigure({ figure, panel }: { figure: Extract<RoleStoryFigure, { kind: "scale" }>; panel: PanelColours }) {
+  return (
+    <figure className="story-fig">
+      <Panel colours={panel} className="story-fig__panel">
+        <OnView motion="grow">
+          <ul className="cmps">
+            {figure.rows.map(({ what, before, after }) => {
+              const longest = Math.max(before.amount, after.amount);
+              return (
+                <li key={what}>
+                  <h3>{what}</h3>
+                  <p className="cmp">
+                    <span>Before</span>
+                    <b>{before.label}</b>
+                    <i className="bar" style={{ "--share": before.amount / longest } as CSSProperties} aria-hidden="true" />
+                  </p>
+                  <p className="cmp cmp--after">
+                    <span>After</span>
+                    <b>{after.label}</b>
+                    <i className="bar bar--after" style={{ "--share": after.amount / longest } as CSSProperties} aria-hidden="true" />
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+        </OnView>
+      </Panel>
+      <figcaption>{figure.caption}</figcaption>
+    </figure>
+  );
+}
+
+/** The award's certificate, at column width; the Take Ownership point on the pass names it, and its id is the anchor. */
+function CertificateFigure({ figure }: { figure: Extract<RoleStoryFigure, { kind: "certificate" }> }) {
+  return (
+    <figure id={figure.id} className="story-fig story-fig--shots">
+      <div className="story-fig__shot">
+        <ZoomableImage src={figure.src} alt={figure.alt} width={figure.width} height={figure.height} sizes="(min-width: 1260px) 760px, (min-width: 720px) 60vw, 100vw" />
       </div>
-      <figcaption className="qi-figure__caption stretch-mono">{figure.caption}</figcaption>
+      <figcaption>{figure.caption}</figcaption>
     </figure>
-  );
-}
-
-/** Each row's bars share a unit: the before bar is the full width, the after bar is its share of it, and it shrinks to that once as it scrolls into view (ShrinkOnView). */
-function ScaleFigure({ figure }: { figure: Extract<RoleStoryFigure, { kind: "scale" }> }) {
-  return (
-    <figure className="qi-figure qi-scale">
-      <ShrinkOnView className="qi-figure__card">
-        {figure.rows.map(({ what, before, after }) => (
-          <div key={what} className="qi-scale__row">
-            <p className="qi-scale__what">{what}</p>
-            <ScaleBar kind="before" label={before.label} share={1} />
-            <ScaleBar kind="after" label={after.label} share={after.amount / before.amount} />
-          </div>
-        ))}
-      </ShrinkOnView>
-      <figcaption className="qi-figure__caption stretch-mono">{figure.caption}</figcaption>
-    </figure>
-  );
-}
-
-function ScaleBar({ kind, label, share }: { kind: "before" | "after"; label: string; share: number }) {
-  return (
-    <div className="qi-scale__bar" data-kind={kind}>
-      <span className="qi-scale__label stretch-mono">
-        {kind === "before" ? "Before" : "After"} · {label}
-      </span>
-      <span className="qi-scale__track">
-        <span className="qi-scale__fill" style={{ "--share": share } as CSSProperties} />
-      </span>
-    </div>
   );
 }
 
 /** Screenshots of a public page, never edited: the link beneath says what and when they are, and goes to where they were taken. */
 function ScreensFigure({ figure }: { figure: Extract<RoleStoryFigure, { kind: "screens" }> }) {
   // Without a phone screenshot beside it, a desktop screenshot takes the whole column.
-  const desktopSizes = figure.images.some(({ device }) => device === "phone") ? "(min-width: 761px) 430px, 72vw" : "(min-width: 761px) 600px, 100vw";
+  const withPhone = figure.images.some(({ device }) => device === "phone");
+  const desktopSizes = withPhone ? "(min-width: 1260px) 560px, (min-width: 720px) 45vw, 72vw" : "(min-width: 1260px) 760px, (min-width: 720px) 60vw, 100vw";
   return (
-    <figure className="qi-figure qi-screens">
-      <div className="qi-screens__row">
+    <figure className="story-fig story-fig--shots">
+      <div className="story-fig__shots">
         {figure.images.map(({ src, alt, width, height, device }) => (
-          <div key={src} className="qi-screens__shot" data-device={device}>
-            <ZoomableImage src={src} alt={alt} width={width} height={height} sizes={device === "phone" ? "(min-width: 761px) 130px, 24vw" : desktopSizes} />
+          <div key={src} className="story-fig__shot" data-device={device} style={{ "--ar": width / height } as CSSProperties}>
+            <ZoomableImage src={src} alt={alt} width={width} height={height} sizes={device === "phone" ? "(min-width: 720px) 180px, 24vw" : desktopSizes} />
           </div>
         ))}
       </div>
-      <figcaption className="qi-figure__caption stretch-mono">
-        <SiteLink className="qi-screens__source" href={figure.source.href}>
+      <figcaption>
+        <SiteLink className="story-fig__source" href={figure.source.href}>
           {figure.source.label} <span aria-hidden="true">↗</span>
         </SiteLink>
       </figcaption>

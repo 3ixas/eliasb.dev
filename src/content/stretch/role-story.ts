@@ -1,10 +1,9 @@
 /*
  * The Role story shape (see Role story in GLOSSARY.md): an employer's page at
  * /work/<employer>, the sibling of a Case study. It shares the story pieces
- * (opening band, numbered sections, evidence strip) and differs in what it
- * tells: an employer, a role and the years there, in the employer's colour.
+ * (the opening, sections, evidence figures) and differs in what it tells: an
+ * employer, a role and the years there, in the employer's colour.
  */
-import type { RevealId } from "./opening.ts";
 import { siteCopy } from "./site-copy.ts";
 import {
   MAX_EVIDENCE,
@@ -32,7 +31,7 @@ export const roleStorySectionKeys = [
 
 export type RoleStorySectionKey = (typeof roleStorySectionKeys)[number];
 
-/** The section links and headings: "01 Summary" and so on. */
+/** The sections' headings. Summary is the opening's lede, so its label heads nothing on the page. */
 export const roleStorySectionLabels: Record<RoleStorySectionKey, string> = {
   summary: "Summary",
   "the-role": "The role",
@@ -69,7 +68,7 @@ export type RoleStoryFigure =
     }
   | {
       kind: "certificate";
-      /** The anchor the Take Ownership pin leads to. */
+      /** The figure's id, so an address can name the certificate. */
       id: string;
       src: string;
       alt: string;
@@ -84,33 +83,6 @@ export type RoleStoryFigure =
       /** Where it came from, as a link in plain words that also say what it is and when it was captured. */
       source: { href: string; label: string };
     };
-
-/**
- * The words in a Role story's sections that name something real, and the closer look each shows (rule 7 in
- * docs/design/DESIGN.md: proof is inline, names are behind). Only these are marked; the looks are the homepage's
- * reveal words', so they say nothing the story does not. `roleStoryProblems` checks each phrase is in its section.
- */
-export type RoleStoryReveal = { section: RoleStorySectionKey; phrase: string; id: Extract<RevealId, "cores" | "ownership"> };
-
-export const roleStoryReveals: Partial<Record<RoleStorySlug, readonly RoleStoryReveal[]>> = {
-  "bnp-paribas": [
-    { section: "summary", phrase: "CPU and GPU", id: "cores" },
-    { section: "what-i-took-with-me", phrase: "Take Ownership award", id: "ownership" },
-  ],
-};
-
-/**
- * The evidence a Role story's pass does not already show: an item whose figures are all on the pass (in its
- * headline or a Pass pin) is left out, so the proof under Summary does not say the pass's numbers twice.
- */
-export function evidenceBeyondPass(evidence: readonly EvidenceItem[], onPass: readonly string[]): readonly EvidenceItem[] {
-  const figuresOf = (text: string) => text.match(/\d+/g) ?? [];
-  const shown = new Set(onPass.flatMap(figuresOf));
-  return evidence.filter((item) => {
-    const figures = figuresOf(`${item.value} ${item.label}`);
-    return figures.length === 0 || !figures.every((figure) => shown.has(figure));
-  });
-}
 
 /** How many achievement lines a role gives the Résumé. */
 export const RESUME_LINES = { min: 2, max: 4 } as const;
@@ -133,7 +105,7 @@ export type RoleStory = {
   figures?: Partial<Record<RoleStorySectionKey, RoleStoryFigure>>;
   /** The achievement lines the Résumé shows for this role (see Résumé in GLOSSARY.md): written to stand alone, not the evidence fragments. */
   resume: readonly string[];
-  /** At most four, shown under What changed. */
+  /** At most four, shown in the opening under the lede. */
   evidence: readonly EvidenceItem[];
   /** The employer's colour in each theme. */
   colours: { light: StoryColours; dark: StoryColours };
@@ -197,12 +169,6 @@ export function roleStoryProblems(stories: readonly RoleStory[]): string[] {
     }
     problems.push(...resumeLineProblems(story));
     problems.push(...panelColourProblems(`Role story "${story.slug}"`, story.panel));
-    for (const { section, phrase } of roleStoryReveals[story.slug] ?? []) {
-      const { paragraphs = [] } = story.sections[section];
-      if (!paragraphs.some((paragraph) => paragraph.includes(phrase))) {
-        problems.push(`Role story "${story.slug}" marks "${phrase}", which no paragraph of its "${section}" section says.`);
-      }
-    }
     for (const key of roleStorySectionKeys) {
       if (!storySectionHasContent(story.sections[key])) {
         problems.push(`Role story "${story.slug}" has an empty "${key}" section.`);

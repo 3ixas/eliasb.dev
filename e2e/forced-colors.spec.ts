@@ -14,7 +14,7 @@ test.describe("Forced colours", () => {
 
   test("a to-scale comparison's before and after bars are different colours, and neither is the page's", async ({ page }) => {
     await page.goto("/work/bnp-paribas");
-    const fills = await page.locator(".qi-scale__fill").evaluateAll((elements) => elements.map((element) => getComputedStyle(element).backgroundColor));
+    const fills = await page.locator("section#what-changed .bar").evaluateAll((elements) => elements.map((element) => getComputedStyle(element).backgroundColor));
     const page_ = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
     expect(fills.length).toBeGreaterThanOrEqual(2);
     expect(new Set(fills).size).toBeGreaterThan(1);
