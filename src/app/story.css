@@ -583,7 +583,7 @@
   overflow-wrap: anywhere;
 }
 
-.missing span {
+.missing > span {
   color: var(--muted);
   font-size: var(--type-ui);
 }
