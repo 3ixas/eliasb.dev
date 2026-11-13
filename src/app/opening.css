@@ -1,0 +1,120 @@
+/*
+ * The homepage's opening (docs/design/DESIGN.md "The homepage, in order" 2, R-11; components/site/opening.tsx): the
+ * opening line and its supporting line at the left, the three staff passes hanging from the header's rule at the
+ * right. One screen tall, so nothing of Work shows before a scroll. Under 1260 px the text is above the passes, which
+ * hang from a hairline; under 900 px the passes scroll sideways, BNP Paribas first.
+ */
+
+.opening {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  /* The header is 64 px, its rule included. */
+  min-height: min(calc(100svh - 64px), 900px);
+}
+
+.opening__text {
+  align-self: center;
+  padding-bottom: 7vh;
+}
+
+.opening__line {
+  margin: 0;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-opening);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.028em;
+  text-wrap: balance;
+}
+
+/* BNP Paribas's green as a mark: an underline under the name only. */
+.opening__employer {
+  background: linear-gradient(var(--green), var(--green)) 0 96% / 100% 0.06em no-repeat;
+}
+
+.opening__own {
+  color: var(--cobalt);
+}
+
+.opening__support {
+  max-width: 24em;
+  margin: 26px 0 0;
+  color: var(--muted);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-prose);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+/* The passes hang from the top of the section, which is the header's rule; their lanyards run up out of view. */
+.opening__rail {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 20px;
+  padding-bottom: 48px;
+  clip-path: inset(0 -200px -200px -200px);
+}
+
+@media (max-width: 1259.98px) {
+  .opening {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .opening__text {
+    padding: 64px 0 56px;
+  }
+
+  .opening__support {
+    max-width: 30em;
+  }
+
+  /* Under the text the passes hang from a hairline. */
+  .opening__rail {
+    justify-content: center;
+    padding-bottom: 24px;
+    border-top: 1px solid var(--hair);
+  }
+
+  .opening__rail .pass {
+    --drop: calc(132px * var(--drop-by, 1));
+  }
+}
+
+/* The rail scrolls sideways inside itself, edge to edge, BNP Paribas first. */
+@media (max-width: 899.98px) {
+  .opening__rail {
+    justify-content: flex-start;
+    margin-inline: -32px;
+    padding-inline: 32px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    clip-path: none;
+  }
+
+  .opening__rail::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (max-width: 719.98px) {
+  .opening__text {
+    padding: 40px 0;
+  }
+
+  .opening__rail {
+    gap: 18px;
+    margin-inline: -16px;
+    padding-inline: 16px;
+    padding-bottom: 56px;
+  }
+
+  .opening__rail .pass {
+    --drop: calc(88px * var(--drop-by, 1));
+  }
+}

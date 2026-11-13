@@ -68,6 +68,7 @@ export function Work() {
           return (
             <Row
               key={employer.slug}
+              id={employer.slug}
               href={`/work/${employer.slug}`}
               object={<MiniPass slug={employer.slug} />}
               title={passRecords[employer.slug].short}

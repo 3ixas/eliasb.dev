@@ -62,7 +62,7 @@ test("only the Résumé loads JetBrains Mono, and its sheet sets metadata in it"
   expect(sheetMono.replaceAll('"', "")).toMatch(/^JetBrains Mono/);
 });
 
-test("the Fine cut: the opening line, section titles and row titles take the agreed values", async ({ page }) => {
+test("the Fine cut: section titles and row titles take the agreed values", async ({ page }) => {
   await page.goto("/");
   await page.evaluate(() => document.fonts.ready);
   const read = (selector: string) =>
@@ -70,10 +70,6 @@ test("the Fine cut: the opening line, section titles and row titles take the agr
       const style = getComputedStyle(element);
       return { weight: style.fontWeight, tracking: Number.parseFloat(style.letterSpacing) / Number.parseFloat(style.fontSize), axes: style.fontVariationSettings };
     });
-  const opening = await read(".qi-opening__line");
-  expect(opening.weight).toBe("600");
-  expect(opening.tracking).toBeCloseTo(-0.02, 3);
-  expect(opening.axes).toContain('"opsz" 96');
   const title = await read(".qi-title");
   expect(title.weight).toBe("620");
   expect(title.tracking).toBeCloseTo(-0.008, 3);
@@ -90,18 +86,10 @@ test("the bold lead-ins in prose take the section title's weight, and the skip l
   expect(await page.locator(".skip-link").evaluate((element) => getComputedStyle(element).fontSize)).toBe("15px");
 });
 
-test("dotted words skip no ink, and the opening line's dots are heavier", async ({ page }) => {
-  await page.goto("/");
-  const read = (selector: string) =>
-    page.locator(selector).first().evaluate((element) => {
-      const style = getComputedStyle(element);
-      return { skip: style.textDecorationSkipInk, thickness: Number.parseFloat(style.textDecorationThickness) };
-    });
-  const inLine = await read(".qi-opening__line .qi-word");
-  const elsewhere = await read(".qi-word:not(.qi-opening__line .qi-word)");
-  expect(inLine.skip).toBe("none");
-  expect(elsewhere.skip).toBe("none");
-  expect(inLine.thickness).toBeGreaterThan(elsewhere.thickness);
+test("dotted words skip no ink", async ({ page }) => {
+  // The homepage's opening lost its dotted words in #412; a Role story keeps them until #417.
+  await page.goto("/work/bnp-paribas");
+  await expect(page.locator(".qi-word").first()).toHaveCSS("text-decoration-skip-ink", "none");
 });
 
 test("dark mode smooths text to greyscale and light mode keeps the default", async ({ page }, testInfo) => {

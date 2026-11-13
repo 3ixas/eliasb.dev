@@ -272,29 +272,6 @@ test.describe("Desktop motion: reactions finish", () => {
     await expect(mini).toHaveCSS("animation-name", "none");
   });
 
-  test("the employer's pass and the opening line's letters finish too", async ({ page }) => {
-    await page.goto("/");
-    await hydrated(page);
-    for (const [host, name] of [
-      [".qi-bnp", "qi-hang"],
-      [".qi-opening__tail", "qi-lift"],
-    ] as const) {
-      const element = page.locator(host).first();
-      const paused = pauseReaction(element, 100);
-      await element.hover({ position: { x: 3, y: 3 } });
-      expect(await paused).toContain(name);
-      await page.mouse.move(5, 5);
-      await expect(element).toHaveAttribute("data-reacting", "");
-      await element.evaluate((node) => node.getAnimations({ subtree: true }).forEach((animation) => animation.finish()));
-      await expect(element).not.toHaveAttribute("data-reacting", "");
-    }
-  });
-});
-
-test.describe("Desktop motion: closer look words", () => {
-  test.skip(({ page }) => !wide(page), "The margin is for wide screens with a hovering pointer");
-  test.use({ reducedMotion: "no-preference" });
-
   test("the book's title and author arrive with the cover, readable by 300 ms", async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
     await hydrated(page);

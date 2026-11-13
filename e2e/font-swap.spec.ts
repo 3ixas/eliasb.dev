@@ -1,7 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 
-// The display font arrives after the first paint on a slow connection, and the
-// opening line must not move when it does (#252). This blocks the font files,
+// The display font arrives after the first paint on a slow connection, and a
+// title in it must not move when it does (#252). The homepage's opening line is
+// Newsreader since #412 (type.spec.ts); the quiet index's display face is left on
+// the long-form titles, measured here on Optegra's, which wraps. This blocks the font files,
 // measures the opening line in the Arial fallback, loads the page again with the
 // real font and compares the two. Nothing is throttled and nothing waits on
 // timing: the fallback run has no font to wait for.
@@ -20,7 +22,7 @@ const displayFontLoaded = (page: Page) =>
 
 async function measureOpening(page: Page, { blockFonts }: { blockFonts: boolean }): Promise<Measure> {
   if (blockFonts) await page.route(/\.woff2(\?|$)/, (route) => route.abort());
-  await page.goto("/");
+  await page.goto("/work/optegra");
   await page.evaluate(() => document.fonts.ready);
   // The real font is requested lazily (WebKit resolves fonts.ready before it
   // starts), so wait for it to be in; the blocked run never gets it.
@@ -28,18 +30,18 @@ async function measureOpening(page: Page, { blockFonts }: { blockFonts: boolean 
   // Guards against comparing a font with itself.
   expect(await displayFontLoaded(page), blockFonts ? "the fallback run had the font" : "the real run lacks the font").toBe(!blockFonts);
   return page.evaluate(() => {
-    const line = document.querySelector<HTMLElement>(".qi-opening__line")!;
+    const line = document.querySelector<HTMLElement>(".qi-long__title")!;
     const box = line.getBoundingClientRect();
     const lineHeight = parseFloat(getComputedStyle(line).lineHeight);
     return {
       lines: Math.round(box.height / lineHeight),
       box: { top: box.top, height: box.height },
-      supportTop: document.querySelector(".qi-opening__support")!.getBoundingClientRect().top,
+      supportTop: document.querySelector(".qi-long__line")!.getBoundingClientRect().top,
     };
   });
 }
 
-test("the opening line does not move, rewrap or resize when the display font replaces its fallback", async ({ page, context }) => {
+test("a long-form title does not move, rewrap or resize when the display font replaces its fallback", async ({ page, context }) => {
   const fallback = await measureOpening(page, { blockFonts: true });
   // A new page: WebKit keeps a font that failed to load for the life of the page.
   const real = await measureOpening(await context.newPage(), { blockFonts: false });

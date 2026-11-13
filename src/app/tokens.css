@@ -27,6 +27,10 @@
   --year-2: #5fcf98;
   --year-3: #1fae70;
   --year-4: #00804f;
+  /* A staff pass is printed: its card stock and its shadow on the page (DESIGN.md "The staff pass"). */
+  --stock: #ffffff;
+  --stock-end: #f5f4f0;
+  --shadow: rgb(30 28 22 / 0.3);
 
   /* Motion (DESIGN.md "Motion"): --out for things that settle, --spring for things that swing. The quiet index's parts read them too until they are replaced. */
   --out: cubic-bezier(.22, 1, .36, 1);
@@ -76,6 +80,9 @@
     --year-2: #23845a;
     --year-3: #2fb078;
     --year-4: #46d996;
+    --stock: #eeede8;
+    --stock-end: #dfded8;
+    --shadow: rgb(0 0 0 / 0.7);
   }
 }
 
@@ -93,6 +100,9 @@
   --year-2: #23845a;
   --year-3: #2fb078;
   --year-4: #46d996;
+  --stock: #eeede8;
+  --stock-end: #dfded8;
+  --shadow: rgb(0 0 0 / 0.7);
 }
 
 :root[data-theme="dark"] {
@@ -109,4 +119,7 @@
   --year-2: #23845a;
   --year-3: #2fb078;
   --year-4: #46d996;
+  --stock: #eeede8;
+  --stock-end: #dfded8;
+  --shadow: rgb(0 0 0 / 0.7);
 }

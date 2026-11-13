@@ -1,0 +1,305 @@
+/*
+ * The staff pass (docs/design/DESIGN.md "The staff pass", R-12; components/parts/staff-pass.tsx): a printed card on a
+ * lanyard. It is an object, so it keeps its printed colours in both themes; only its card stock is a step darker in
+ * dark (--stock). Every size inside is in em of the card's width ÷ 14.5, so the card is drawn once at any width;
+ * small print is floored at 13 px. The pass sets --field and --band-ink (its Role story's panel) and --lanyard from its content, --tilt for how it
+ * rests, and --drop-by for how far below the rail it hangs.
+ */
+
+.pass {
+  --card: 248px;
+  --drop: calc(clamp(140px, 25svh, 232px) * var(--drop-by, 1));
+  position: relative;
+  display: block;
+  flex: none;
+  width: var(--card);
+  padding-top: var(--drop);
+  border-radius: 0.8em;
+  color: inherit;
+  font-size: calc(var(--card) / 14.5);
+  text-decoration: none;
+  transform: rotate(var(--tilt, 0deg));
+  transform-origin: 50% 0;
+  transition: transform 0.8s var(--spring);
+}
+
+.pass--lead {
+  --card: 264px;
+}
+
+/* It swings to rest once on arrival, each 80 ms after the last; reduced motion shows it at rest. */
+@media (prefers-reduced-motion: no-preference) {
+  .pass {
+    animation: pass-swing 1.8s cubic-bezier(0.3, 1.35, 0.4, 1) backwards;
+  }
+
+  .pass:nth-child(2) {
+    animation-delay: 80ms;
+  }
+
+  .pass:nth-child(3) {
+    animation-delay: 160ms;
+  }
+
+  /* On hover it leans the other way. */
+  @media (hover: hover) and (pointer: fine) {
+    .pass:hover {
+      transform: rotate(calc(var(--tilt, 0deg) * -0.7));
+    }
+  }
+}
+
+@keyframes pass-swing {
+  from {
+    transform: rotate(calc(var(--tilt, 0deg) * -5));
+  }
+}
+
+.pass:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 3px;
+}
+
+/* Two plies of woven ribbon, opening upward at 4.5° each way and running out of view at the top. */
+.pass__lanyard {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  height: calc(var(--drop) - 1.25em);
+}
+
+.pass__lanyard i {
+  position: absolute;
+  bottom: 0;
+  left: -0.5em;
+  width: 1em;
+  height: calc(100% + 60px);
+  transform-origin: 50% 100%;
+  background:
+    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.09) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(-45deg, rgb(0 0 0 / 0.12) 0 1px, transparent 1px 3px),
+    linear-gradient(90deg, rgb(0 0 0 / 0.28), transparent 18% 82%, rgb(0 0 0 / 0.28)),
+    var(--lanyard);
+}
+
+.pass__lanyard i:first-child {
+  transform: rotate(-4.5deg);
+  filter: brightness(0.8);
+}
+
+.pass__lanyard i:last-child {
+  transform: rotate(4.5deg);
+  box-shadow: -1px 0 2px rgb(0 0 0 / 0.25);
+}
+
+/* The clip: a crimp, a swivel and a loop. The loop's lower 0.94em is clipped away where its legs go through the slot and behind the card. */
+.pass__clip {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--drop) - 1.75em);
+  z-index: 2;
+  width: 2.5em;
+  height: 4.375em;
+  margin-left: -1.25em;
+  clip-path: inset(0 0 0.94em 0);
+  filter: drop-shadow(0 0.08em 0.06em rgb(0 0 0 / 0.45));
+}
+
+/* CR80: 14.5 by 23. White stock, a hairline edge, a 1.5 px lower edge for thickness and two soft shadows. */
+.pass__card {
+  position: relative;
+  display: block;
+  height: 23em;
+  overflow: hidden;
+  border-radius: 0.8em;
+  color: #141416;
+  font-family: var(--sans);
+  line-height: 1.2;
+  background: linear-gradient(180deg, var(--stock), var(--stock-end));
+  box-shadow:
+    0 0 0 0.5px rgb(0 0 0 / 0.28),
+    0 1.5px 0 #c9c8c1,
+    0 3px 4px -1px rgb(0 0 0 / 0.22),
+    0 22px 30px -18px var(--shadow),
+    0 44px 60px -36px var(--shadow);
+}
+
+.pass__band {
+  display: flex;
+  align-items: flex-end;
+  height: 4.9em;
+  padding: 0 1.15em 0.7em;
+  color: var(--band-ink);
+  background:
+    repeating-linear-gradient(118deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 6px),
+    linear-gradient(180deg, rgb(255 255 255 / 0.1), transparent 60%),
+    var(--field);
+}
+
+/* 1.41em keeps the name large text (24 px) on the smallest card, so its ink needs 3:1 on the band under the sheen. */
+.pass__band span {
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: 1.41em;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.012em;
+}
+
+/* The punched slot shows the page through the card. */
+.pass__slot {
+  position: absolute;
+  top: 0.9em;
+  left: 50%;
+  width: 2.9em;
+  height: 0.8em;
+  margin-left: -1.45em;
+  border-radius: 0.4em;
+  background: var(--page);
+  box-shadow: inset 0 0.1em 0.14em rgb(0 0 0 / 0.5), 0 0.5px 0 rgb(255 255 255 / 0.35);
+}
+
+.pass__photo {
+  position: absolute;
+  left: 1.15em;
+  top: 5.6em;
+  width: 4.3em;
+  height: 5.2em;
+  border-radius: 0.3em;
+  background: #e9e2d6;
+  object-fit: cover;
+  box-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.25);
+}
+
+.pass[data-state="returned"] .pass__photo {
+  filter: grayscale(1) contrast(1.05);
+}
+
+.pass__who {
+  position: absolute;
+  left: 6.15em;
+  right: 0.8em;
+  top: 5.5em;
+  display: grid;
+  gap: 0.1em;
+}
+
+.pass__who b {
+  margin-bottom: 0.14em;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: 1.24em;
+  font-weight: 500;
+  line-height: 1.06;
+  letter-spacing: -0.012em;
+}
+
+.pass__who span,
+.pass__points span span,
+.pass__status {
+  font-size: max(13px, 0.76em);
+}
+
+.pass__who span {
+  line-height: 1.22;
+}
+
+.pass__who span:last-child,
+.pass__points span span {
+  color: #5c5b56;
+}
+
+/* Three points, each a serif lead over a sans detail, ruled apart. */
+.pass__points {
+  position: absolute;
+  left: 1.15em;
+  right: 1.15em;
+  top: 11.6em;
+  display: grid;
+  border-top: 1px solid #dddcd6;
+}
+
+.pass__points > span {
+  display: grid;
+  padding: 0.42em 0 0.44em;
+  border-bottom: 1px solid #e7e6e0;
+}
+
+.pass__points b {
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: 1em;
+  font-weight: 500;
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.pass__points span span {
+  line-height: 1.25;
+}
+
+.pass__foot {
+  position: absolute;
+  left: 1.15em;
+  right: 1.15em;
+  bottom: 0.78em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pass__status {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-weight: 600;
+  color: #4b4a46;
+}
+
+.pass__holo {
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 50%;
+  background: conic-gradient(from var(--holo-turn, 20deg), #9fe8ff, #dcb8ff, #ffe39a, #a9f5c4, #9fe8ff);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.75), 0 0 0 0.5px rgb(0 0 0 / 0.3);
+}
+
+.pass__code {
+  width: 4.4em;
+  height: 1.05em;
+  opacity: 0.82;
+  background: repeating-linear-gradient(90deg, #141416 0 1px, transparent 1px 3px, #141416 3px 5px, transparent 5px 6px, #141416 6px 7px, transparent 7px 10px, #141416 10px 12px, transparent 12px 13px);
+}
+
+/* The light on the laminate: it follows a fine pointer (pass-light.tsx) and brightens on hover. */
+.pass__sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background:
+    radial-gradient(16em circle at var(--light-x, 28%) var(--light-y, 6%), rgb(255 255 255 / 0.5), transparent 55%),
+    linear-gradient(160deg, transparent 55%, rgb(0 0 0 / 0.05));
+  transition: opacity 0.4s var(--out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pass:hover .pass__sheen {
+    opacity: 1;
+  }
+}
+
+/* Forced colours keep the pass as drawn: it is a picture of a printed object. */
+@media (forced-colors: active) {
+  .pass__card {
+    forced-color-adjust: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pass,
+  .pass__sheen {
+    transition: none;
+  }
+}

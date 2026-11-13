@@ -77,10 +77,11 @@ test.describe("Inline closer looks close as smoothly as they open", () => {
     });
 
     test("a look above the tapped row goes at once and the row does not move, however slow the page", async ({ page, browserName }) => {
-      const cores = page.locator('.qi-word[data-look="cores"]');
-      await cores.scrollIntoViewIfNeeded();
-      await tap(page, cores);
-      const above = page.locator('[data-look-slot="cores"] .qi-inline__in');
+      // BNP Paribas's row is above Joveen's in Work.
+      const first = page.locator('#work button[data-look-tap="bnp-paribas"]');
+      await first.scrollIntoViewIfNeeded();
+      await tap(page, first);
+      const above = page.locator('#work [data-look-slot="bnp-paribas"] .qi-inline__in');
       await expect(above).toBeVisible();
       const object = page.locator('#work button[data-look-tap="joveen"]');
       // The look has finished growing once the row below it stops moving down the page.

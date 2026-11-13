@@ -1,8 +1,7 @@
 /*
- * The opening (docs/design/DESIGN.md, "The opening line"): the h1, the supporting line, the words in them that can
- * show something, and those words' closer looks. It sits in the same 600 px column as Work and uses the Margin and
- * the inline slots quiet-index.css owns. Rules that move are gated on hover or on motion preference, and a
- * visitor who prefers reduced motion gets the underline drawn and the cores still.
+ * What is left of the quiet index's opening: the display line a long-form page's title still wears, the reveal
+ * words and their closer looks, which the Role stories still use. The homepage's opening is opening.css (#412); these
+ * go with the Role stories' redesign (#417).
  */
 
 .qi-opening {
@@ -21,14 +20,6 @@
   line-height: 1.1;
   letter-spacing: -0.02em;
   text-wrap: balance;
-}
-
-.qi-opening__support {
-  margin: 16px 0 0;
-  color: var(--stretch-muted);
-  font-size: var(--text-body);
-  line-height: 1.5;
-  letter-spacing: -0.005em;
 }
 
 /* A word that can show something: a dotted underline that turns cobalt, and a tap target on phones. */
@@ -55,155 +46,6 @@
 @media (hover: hover) {
   .qi-word:hover {
     text-decoration-color: var(--stretch-cobalt);
-  }
-}
-
-/* ---------- the employer: it reacts where it stands ---------- */
-
-/* The name stays whole on one line, so the pass hangs from the middle of it. */
-.qi-bnp {
-  position: relative;
-  white-space: nowrap;
-  transition: color 0.2s var(--out);
-}
-
-/* A tap focuses the name, so focus is what plays the reaction on touch; hover is for a pointer. */
-.qi-bnp:focus {
-  color: var(--bnp);
-}
-
-@media (hover: hover) {
-  .qi-bnp:hover {
-    color: var(--bnp);
-  }
-}
-
-/* The small pass hangs under the word on its strap. It is decoration, so it never takes the pointer. */
-.qi-bnp__pass {
-  position: absolute;
-  z-index: 2;
-  top: calc(100% - 2px);
-  left: 50%;
-  width: 44px;
-  height: 44px;
-  margin-left: -22px;
-  opacity: 0;
-  pointer-events: none;
-  transform-origin: 50% 0;
-  transition: opacity 0.15s ease-out;
-}
-
-.qi-bnp:focus .qi-bnp__pass {
-  opacity: 1;
-}
-
-/* With no motion there is no reaction to finish, so the pass is simply there while the pointer is. */
-@media (hover: hover) and (prefers-reduced-motion: reduce) {
-  .qi-bnp:hover .qi-bnp__pass {
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .qi-bnp:focus .qi-bnp__pass {
-    animation: qi-hang 0.8s var(--out) both;
-  }
-}
-
-/* Played from the pointer arriving (reactions.ts): the pass finishes its swing after the pointer leaves. */
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .qi-bnp[data-reacting] .qi-bnp__pass {
-    opacity: 1;
-    animation: qi-hang 0.8s var(--out) both;
-  }
-}
-
-@keyframes qi-hang {
-  from {
-    transform: translateY(-26px) rotate(-6deg);
-  }
-  45% {
-    transform: translateY(2px) rotate(5deg);
-  }
-  70% {
-    transform: rotate(-2.5deg);
-  }
-}
-
-/* ---------- "products of my own." ---------- */
-
-.qi-opening__tail {
-  position: relative;
-  display: inline-block;
-  color: var(--stretch-cobalt);
-  font-style: normal;
-}
-
-.qi-opening__tail svg {
-  position: absolute;
-  right: 0;
-  bottom: -0.12em;
-  left: 0;
-  width: 100%;
-  height: 0.3em;
-  clip-path: inset(0 0 0 0);
-  overflow: visible;
-}
-
-.qi-opening__tail path {
-  fill: none;
-  stroke: var(--stretch-cobalt);
-  stroke-width: 6;
-  stroke-linecap: round;
-  transform-box: fill-box;
-  transform-origin: 0 50%;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  /* The underline draws once on arrival, from left to right. */
-  .qi-opening__tail svg {
-    animation: qi-underline 0.9s var(--out) 0.2s both;
-  }
-}
-
-@keyframes qi-underline {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-}
-
-/*
- * On hover the letters lift in a short wave, and the underline scribbles out and back. A letter lifts by its offset
- * (relative position), so it stays an inline box: the line keeps its kerning and its accessible name, which an
- * inline-block or a transform would break.
- */
-.qi-letter {
-  position: relative;
-}
-
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .qi-opening__tail[data-reacting] .qi-letter {
-    animation: qi-lift 0.55s var(--spring) both;
-    animation-delay: calc(var(--i) * 28ms);
-  }
-
-  .qi-opening__tail[data-reacting] path {
-    animation: qi-scribble 0.8s var(--out);
-  }
-}
-
-@keyframes qi-lift {
-  40% {
-    top: -0.14em;
-  }
-}
-
-@keyframes qi-scribble {
-  40% {
-    transform: scaleX(0.04);
-  }
-  70% {
-    transform: scaleX(0.6) translateY(1px);
   }
 }
 
@@ -483,8 +325,7 @@
 @media (prefers-reduced-motion: reduce) {
   .qi-sim__path,
   .qi-bar__fill,
-  .qi-certificate,
-  .qi-bnp__pass {
+  .qi-certificate {
     animation: none;
   }
 }
