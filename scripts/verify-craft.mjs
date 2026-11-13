@@ -43,6 +43,9 @@ const motionTransitions = [
   ['.pass__sheen', 'a staff pass catches the light'],
   ['[data-rise]', 'a panel or card rises into view (DESIGN.md "Motion")'],
   ['[data-grow] .bar', 'bars to scale grow from the left'],
+  ['.sim__plot[data-released] .sim__paths', "the simulation's paths draw from the left"],
+  ['.sim__plot[data-released] .sim__bin', "the simulation's histogram grows"],
+  ['.sim__plot[data-released] .sim__price', "the simulation's price line appears last"],
   [':root[data-theme-changing]', 'the theme changes'],
 ];
 

@@ -65,46 +65,6 @@ test.describe("Inline closer looks close as smoothly as they open", () => {
       await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 3000 }).toBeGreaterThan(before + 120);
     });
 
-    test("following the employer's link right after opening its look leaves the next page where it loads", async ({ page }) => {
-      const object = page.locator('#work button[data-look-tap="joveen"]');
-      await object.scrollIntoViewIfNeeded();
-      await object.click();
-      await page.locator('#work a.qi-row[href="/work/joveen"]').click();
-      await expect(page).toHaveURL(/\/work\/joveen$/);
-      // The hold's frame loop is gone with the controller: nothing scrolls the new page afterwards.
-      await page.waitForTimeout(700);
-      expect(await page.evaluate(() => window.scrollY)).toBeLessThan(40);
-    });
-
-    test("a look above the tapped row goes at once and the row does not move, however slow the page", async ({ page, browserName }) => {
-      // BNP Paribas's row is above Joveen's in Work.
-      const first = page.locator('#work button[data-look-tap="bnp-paribas"]');
-      await first.scrollIntoViewIfNeeded();
-      await tap(page, first);
-      const above = page.locator('#work [data-look-slot="bnp-paribas"] .qi-inline__in');
-      await expect(above).toBeVisible();
-      const object = page.locator('#work button[data-look-tap="joveen"]');
-      // The look has finished growing once the row below it stops moving down the page.
-      await expect
-        .poll(async () => {
-          const first = (await object.boundingBox())!.y;
-          await page.waitForTimeout(150);
-          return Math.abs((await object.boundingBox())!.y - first);
-        })
-        .toBe(0);
-      await object.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
-      const before = (await object.boundingBox())!.y;
-      // Where the engine allows it (Chromium) the page is as slow as it can be made: a fold above the row would be left behind by it,
-      // but a look that goes at once cannot be.
-      const cdp = browserName === "chromium" ? await page.context().newCDPSession(page) : null;
-      await cdp?.send("Emulation.setCPUThrottlingRate", { rate: 6 });
-      await object.click();
-      // Gone in the commit that opens the next look, not after a fold (which takes 340 ms before it is unmounted, and longer on a slow page).
-      await expect(above).toHaveCount(0, { timeout: 250 });
-      await expect.poll(async () => Math.abs((await object.boundingBox())!.y - before)).toBeLessThanOrEqual(1);
-      await cdp?.send("Emulation.setCPUThrottlingRate", { rate: 1 });
-    });
-
     test("closing again while it folds starts a new fold that the first one's timer cannot cut short", async ({ page }) => {
       await page.clock.install();
       await tap(page, row(page));

@@ -1,0 +1,441 @@
+/*
+ * Work (docs/design/DESIGN.md "The homepage, in order" 3 and "Figures"; R-13 to R-15): the subheading, BNP Paribas's
+ * panel with its figure, the simulation and two comparisons, and Joveen's and Optegra's panels with a display figure
+ * and three pairs. The panel, the pill and the arrivals are parts.css's; this file lays out what is on the panels.
+ *
+ * Bars to scale: every bar is `.bar` with --share, its length as a share of the longer of its pair. The before bar is
+ * thin and soft, the after bar thicker and solid: white on BNP Paribas's green, the panel's ink elsewhere.
+ */
+
+.work__subheading {
+  max-width: 28em;
+  margin: -26px 0 40px;
+  color: var(--muted);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-prose);
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+.work .panel {
+  --soft: color-mix(in srgb, var(--panel-ink) 26%, transparent);
+  --solid: var(--panel-ink);
+  scroll-margin-top: 24px;
+  /* In dark a hairline of the panel's ink holds its edge: Joveen's near-black field is otherwise one step off the page. */
+  box-shadow: inset 0 0 0 1px light-dark(transparent, color-mix(in srgb, var(--panel-ink) 14%, transparent));
+}
+
+/* ---- Figures ---- */
+
+.figure__words,
+.figure__value {
+  display: block;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.figure__value {
+  font-size: var(--type-figure);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+
+/* BNP Paribas's figure is words, so it is a step smaller than a number. */
+.figure__words {
+  font-size: clamp(64px, 7vw, 104px);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.figure__label {
+  display: block;
+  margin-top: 12px;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-prose);
+  line-height: 1.3;
+}
+
+/* ---- Bars to scale ---- */
+
+.work .bar {
+  display: block;
+  width: calc(var(--share) * 100%);
+  height: 6px;
+  border-radius: 3px;
+  background: var(--soft);
+}
+
+.work .bar--after {
+  height: 12px;
+  border-radius: 6px;
+  background: var(--solid);
+}
+
+/* ---- BNP Paribas ---- */
+
+/* Green, lifting from #2cbd86 at the top left to its field, and never darker than the field (R-04). */
+.work .work-bnp {
+  --solid: #fff;
+  display: grid;
+  grid-template:
+    "head head" auto
+    "figure sim" 1fr
+    "comparisons comparisons" auto
+    "story story" auto
+    / 5fr 7fr;
+  column-gap: 56px;
+  background: radial-gradient(120% 110% at 10% -10%, #2cbd86 0%, #0fa56d 46%, var(--field) 100%);
+}
+
+.work-bnp > .panel__head {
+  grid-area: head;
+}
+
+.work-bnp__figure {
+  grid-area: figure;
+  align-self: center;
+  padding-block: 56px;
+}
+
+.work-bnp__comparisons {
+  grid-area: comparisons;
+}
+
+.work-bnp__comparisons ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px 56px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.work-bnp__comparisons h4 {
+  margin-bottom: 4px;
+  font-family: var(--sans);
+  font-size: var(--type-ui);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.cmp {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 12px;
+  margin-top: 14px;
+  font-size: var(--type-small);
+}
+
+.cmp b {
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.cmp .bar {
+  grid-column: 1 / -1;
+}
+
+.cmp--after span {
+  font-weight: 600;
+}
+
+.work-bnp > .work__story {
+  grid-area: story;
+  justify-self: start;
+  margin-top: 36px;
+}
+
+/* ---- The simulation ---- */
+
+.sim {
+  grid-area: sim;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 34px;
+  min-width: 0;
+  padding-block: 44px 40px;
+}
+
+/* The plot leaves room at its right for the histogram (72 px) and the price label. */
+.sim__plot {
+  --hist: 72px;
+  position: relative;
+  min-height: 280px;
+  margin-right: calc(var(--hist) + 12px);
+  border-left: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.sim__paths {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.sim__paths path {
+  fill: none;
+  stroke: var(--panel-ink);
+  stroke-width: 1;
+  opacity: 0.17;
+  vector-effect: non-scaling-stroke;
+}
+
+.sim__hist {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: var(--hist);
+  padding-left: 6px;
+}
+
+.sim__bin {
+  flex: 1;
+  width: calc(var(--share) * 100%);
+  border-radius: 0 2px 2px 0;
+  background: var(--soft);
+  transform-origin: left center;
+}
+
+.sim__bin[data-mean] {
+  background: #fff;
+}
+
+/* The mean of the endpoints: a dashed white line across the plot and the histogram, labelled at its right. */
+.sim__price {
+  position: absolute;
+  top: calc(var(--at) * 100%);
+  left: 0;
+  right: calc(-1 * var(--hist) - 12px);
+  border-top: 1.5px dashed rgb(255 255 255 / 0.9);
+}
+
+.sim__price b {
+  position: absolute;
+  top: 0;
+  right: -6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: #fff;
+  color: #00643f;
+  font-family: var(--sans);
+  font-size: var(--type-label);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  transform: translateY(-50%);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.18);
+}
+
+.sim__x {
+  position: absolute;
+  top: calc(100% + 8px);
+  font-size: var(--type-label);
+}
+
+.sim__x--start {
+  left: 0;
+}
+
+.sim__x--end {
+  right: 0;
+}
+
+.sim figcaption {
+  max-width: 36em;
+  font-size: var(--type-ui);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/*
+ * Arrival, for a plot that starts below the fold (simulation-plot.tsx): the paths draw from the left over 1.1 s, the
+ * histogram grows from 1.1 s, and the price line appears last, at 1.8 s. The transitions live on the released state
+ * only, so arming never animates anything away.
+ */
+.sim__plot[data-armed] .sim__paths {
+  clip-path: inset(0 100% 0 0);
+}
+
+.sim__plot[data-armed] .sim__bin {
+  transform: scaleX(0);
+}
+
+.sim__plot[data-armed] .sim__price {
+  opacity: 0;
+}
+
+.sim__plot[data-released] .sim__paths {
+  transition: clip-path 1.1s var(--out);
+}
+
+.sim__plot[data-released] .sim__bin {
+  transition: transform 0.9s var(--out) 1.1s;
+}
+
+.sim__plot[data-released] .sim__price {
+  transition: opacity 0.6s var(--out) 1.8s;
+}
+
+/* ---- Joveen and Optegra ---- */
+
+.work-role__arrival,
+.work-role {
+  height: 100%;
+}
+
+.work-role {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  padding: 36px 40px 40px;
+}
+
+.work-role__figure {
+  margin-top: 52px;
+}
+
+.pairs {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  margin-block: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: 10em minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 3px 16px;
+  font-size: var(--type-small);
+}
+
+.pair__what {
+  grid-row: 1 / span 2;
+}
+
+.pair .bar {
+  grid-column: 2;
+  height: 5px;
+}
+
+.pair .bar--after {
+  height: 9px;
+  border-radius: 5px;
+}
+
+.pair__value {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  min-width: 8.5em;
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  text-align: right;
+}
+
+.work-role > .work__story {
+  justify-self: start;
+}
+
+/* Where I'm headed's rows, until #414 makes them a panel. */
+.work__headed {
+  margin-top: 96px;
+}
+
+/* ---- Narrower ---- */
+
+@media (max-width: 1259.98px) {
+  .work .work-bnp {
+    grid-template:
+      "head" auto
+      "figure" auto
+      "sim" auto
+      "comparisons" auto
+      "story" auto
+      / minmax(0, 1fr);
+  }
+
+  .work-bnp__figure {
+    padding-block: 44px 0;
+  }
+}
+
+@media (max-width: 719.98px) {
+  .work__subheading {
+    margin: -16px 0 28px;
+  }
+
+  .work-bnp__figure {
+    padding-top: 36px;
+  }
+
+  .work-bnp__comparisons ul {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .sim {
+    gap: 30px;
+    padding-block: 32px 28px;
+  }
+
+  .sim__plot {
+    --hist: 50px;
+    min-height: 210px;
+    margin-right: calc(var(--hist) + 10px);
+  }
+
+  .work-role {
+    padding: 26px 22px 28px;
+  }
+
+  .work-role__figure {
+    margin-top: 36px;
+  }
+
+  .pair {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .pair__what {
+    grid-row: 1;
+  }
+
+  .pair__value {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .pair .bar {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Forced colours keep the data: before bars in the text colour, after bars in the highlight (R-29). */
+@media (forced-colors: active) {
+  .work .bar,
+  .sim__bin {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  .work .bar--after,
+  .sim__bin[data-mean] {
+    background: Highlight;
+  }
+
+  .sim__paths path {
+    stroke: CanvasText;
+  }
+}

@@ -390,3 +390,28 @@ What each employer's pass prints, as approved in the passes and panels spec (R-1
 | Optegra | 62 → 88% | Core Web Vitals pass rate |
 | Optegra | −30% | p95 page load |
 | Optegra | +15% | Consultation conversion |
+
+## Passes and panels · Work
+
+What Work's panels say, as approved in the passes and panels spec (R-13 to R-15, 11 November 2026). The heading and subheading are Work's own (above). Every figure and bar amount is its Role story's fact: `verify:copy` checks these strings and `workPanelProblems` checks the numbers.
+
+- BNP Paribas figure: Six months · from zero C# to production code
+- Simulation: Today · Horizon · One price
+- Simulation caption: The engines run large simulation-based calculations across several asset classes. Thousands of possible market paths go in; a price and its risk come out.
+- Simulation description: Illustrative simulated paths from today to the horizon, a histogram of where they end on the right edge, and a dashed line at their average, labelled one price.
+
+Screen readers read the description with the figure; nothing shows it on screen. Its words are R-14's own description of the drawing.
+
+| Comparison | Before | After |
+|---|---|---|
+| Integrating a pricer | An experienced engineer · about two weeks | Me, new to it · a couple of days |
+| The competition dashboard’s data load | Before · 30–40 min | After · under 5 min |
+
+| Panel | Pair | Value |
+|---|---|---|
+| Joveen | Key API p95 | 520 ms → 230 ms |
+| Joveen | Time to deploy | 10 min → under 2 |
+| Joveen | Mobile retention | +30% |
+| Optegra | Pass rate | 62% → 88% |
+| Optegra | p95 page load | −30% |
+| Optegra | Consultation conversion | +15% |

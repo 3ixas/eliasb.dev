@@ -7,8 +7,9 @@ import { expect, test, type Page } from "@playwright/test";
  */
 
 const inlineOnly = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1180;
-const SLOT = '[data-look-slot="joveen"]';
-const TRIGGER = '#work button[data-look-tap="joveen"]';
+/* Where I'm headed's first strand: the homepage's first row with an inline look now that Work's employers are panels (#413). */
+const SLOT = '[data-look-slot="strand-judgement"]';
+const TRIGGER = '#work .qi-row[data-look-tap="strand-judgement"]';
 
 /**
  * Hydrated, with the opening's passes at rest: their arrival swing is finished at once, as a motion spec seeks rather
@@ -42,7 +43,7 @@ test.describe("The fold", () => {
         await new Promise(requestAnimationFrame);
         return { duration: Number(duration), easing: String(easing) };
       };
-      const trigger = document.querySelector<HTMLElement>('#work button[data-look-tap="joveen"]')!;
+      const trigger = document.querySelector<HTMLElement>('#work .qi-row[data-look-tap="strand-judgement"]')!;
       trigger.click();
       const opening = await timing();
       const height = slot.querySelector<HTMLElement>(".qi-inline__in")!.scrollHeight;
@@ -63,7 +64,7 @@ test.describe("The fold", () => {
     await page.locator(TRIGGER).scrollIntoViewIfNeeded();
     const stayed = await page.locator(SLOT).evaluate(async (slot) => {
       const fold = () => slot.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "grid-template-rows");
-      const trigger = document.querySelector<HTMLElement>('#work button[data-look-tap="joveen"]')!;
+      const trigger = document.querySelector<HTMLElement>('#work .qi-row[data-look-tap="strand-judgement"]')!;
       trigger.click();
       while (!fold()) await new Promise(requestAnimationFrame);
       fold()!.finish();

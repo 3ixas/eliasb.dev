@@ -27,6 +27,7 @@ import { offTheClock } from "../src/content/stretch/off-the-clock.ts";
 import { opening } from "../src/content/stretch/opening.ts";
 import { notFound, sayHello, siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy.ts";
 import { headedProblems, shownSource, work } from "../src/content/stretch/work.ts";
+import { comparisonRow, workPanelProblems, workPanels } from "../src/content/stretch/work-panels.ts";
 
 const raw = readFileSync(new URL("../docs/content/redesign-copy.md", import.meta.url), "utf8");
 // Emphasis stars and the {braces} around live values are markup, not words.
@@ -353,6 +354,40 @@ assert.equal(passLinkLabel(passRecords.optegra), "The Optegra story →", "The l
 assert.deepEqual(workArchive.filters.map(({ category }) => category), [null, ...PROJECT_CATEGORIES], "the filters are All, then every category once, in the catalogue's order");
 for (const [what, ids] of [["menu", siteCopy.menu.map(({ id }) => id)], ["Say hello links", sayHello.links.map(({ id }) => id)]]) {
   assert.equal(new Set(ids).size, ids.length, `the ${what} lists each id once`);
+}
+
+// Work's panels (R-13 to R-15): every string as the deck gives it, and every figure and bar its Role story's fact.
+{
+  const deck = raw.slice(raw.indexOf("## Passes and panels · Work"));
+  const tables = deck.split("\n").filter((line) => line.startsWith("|") && !line.startsWith("|---")).map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()));
+  const { bnp, roles } = workPanels;
+  assert.equal(workPanels.heading, work.heading, "Work's panels keep Work's heading");
+  assert.equal(workPanels.subheading, work.note, "Work's subheading is its approved note");
+  assert.equal(`${bnp.figure.value} · ${bnp.figure.label}`, bullet(deck, "BNP Paribas figure"), "Work: BNP Paribas's figure");
+  assert.equal(`${bnp.simulation.start} · ${bnp.simulation.end} · ${bnp.simulation.price}`, bullet(deck, "Simulation"), "Work: the simulation's labels");
+  assert.equal(bnp.simulation.caption, bullet(deck, "Simulation caption"), "Work: the simulation's caption");
+  assert.equal(bnp.simulation.description, bullet(deck, "Simulation description"), "Work: the simulation's accessible description");
+  assert.match(bnp.simulation.description, /^Illustrative/, "The simulation says it is illustrative");
+  const story = roleStories[bnp.slug];
+  assert.deepEqual(
+    bnp.comparisons.map((comparison) => [comparisonRow(story, comparison)?.what, `${comparison.before.name} · ${comparison.before.value}`, `${comparison.after.name} · ${comparison.after.value}`]),
+    tables.filter((row) => row.length === 3 && row[0] !== "Comparison" && row[0] !== "Panel" && !["Joveen", "Optegra"].includes(row[0])),
+    "Work: BNP Paribas's comparisons",
+  );
+  assert.deepEqual(
+    roles.flatMap((panel) => panel.pairs.map((pair) => [passRecords[panel.slug].short, pair.what, pair.value])),
+    tables.filter((row) => ["Joveen", "Optegra"].includes(row[0])),
+    "Work: Joveen's and Optegra's pairs",
+  );
+  assert.deepEqual(workPanelProblems(workPanels), []);
+  const pair = (index, replacement) => workPanelProblems({ ...workPanels, roles: [{ ...roles[0], pairs: roles[0].pairs.map((entry, at) => (at === index ? { ...entry, ...replacement } : entry)) }, roles[1]] });
+  assert.match(pair(0, { value: "520 ms → 210 ms", after: 210 })[0], /joveen's "Key API p95" says "210"/, "A pair's number must be its story's");
+  assert.match(pair(0, { after: 200 })[0], /draws 520 against 200, but its value states 520 against 230/, "A bar is drawn at the amount its value states");
+  assert.match(pair(2, { after: 140 })[0], /draws 100 against 140, but its value states 100 against 130/, "A change in per cent is drawn from 100");
+  const comparison = (replacement) => workPanelProblems({ ...workPanels, bnp: { ...bnp, comparisons: [{ ...bnp.comparisons[0], ...replacement }, bnp.comparisons[1]] } });
+  assert.match(comparison({ after: { name: "Me, new to it", value: "an afternoon" } })[0], /writes "an afternoon"/, "A comparison's value is its scale row's");
+  assert.match(comparison({ row: 4 })[0], /scale row 4/);
+  assert.match(workPanelProblems({ ...workPanels, bnp: { ...bnp, figure: { value: "Six months", label: "from zero Rust to production code" } } })[0], /figure .* is not one of its Role story's evidence items/);
 }
 
 console.log("Redesign copy checks passed.");

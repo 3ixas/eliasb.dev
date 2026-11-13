@@ -9,6 +9,11 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 const wide = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1180;
 const margin = (page: Page) => page.locator(".qi-margin");
 const rowFor = (page: Page, id: string) => page.locator(`section#work [data-look="${id}"]`);
+/* Where I'm headed's strand rows are the homepage's first rows with closer looks now that Work's employers are panels (#413). */
+const FIRST = "strand-judgement";
+const NEXT = "strand-depth";
+/** The next strand's look: its "So far" names BNP Paribas. */
+const nextLook = '.qi-strand:has-text("BNP Paribas")';
 
 const hydrated = (page: Page) =>
   page.waitForFunction(() => {
@@ -39,26 +44,6 @@ const placed = (page: Page) =>
     }
   });
 
-/**
- * Armed before the pointer arrives: waits in the page for the reaction on `host` to start and pauses it in the task that
- * finds it, at `at` ms, so a slow runner cannot let a 900 ms swing finish between a hover and a read. Returns the names paused.
- */
-const pauseReaction = (host: Locator, at: number) =>
-  host.evaluate(async (element, time) => {
-    let playing: Animation[] = [];
-    // Only once the element is reacting: its own arrival animations are not the reaction.
-    while (!playing.length) {
-      await new Promise(requestAnimationFrame);
-      if (!element.hasAttribute("data-reacting")) continue;
-      playing = element.getAnimations({ subtree: true }).filter((animation) => animation.playState === "running" && Number.isFinite(animation.effect?.getComputedTiming().iterations));
-    }
-    for (const animation of playing) {
-      animation.pause();
-      animation.currentTime = time;
-    }
-    return playing.map((animation) => (animation as CSSAnimation).animationName);
-  }, at);
-
 /** The fade lasts 120 ms and these specs act inside it: Linux WebKit on a CI runner lets it pass between frames, which is the runner's timing, not the margin's. The logic is shared script, and Chromium holds it. */
 const WEBKIT_TIMING = "Linux WebKit on a CI runner cannot be held inside a 120 ms fade";
 
@@ -69,10 +54,10 @@ test.describe("Desktop motion: the margin", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
     await hydrated(page);
-    const bnp = rowFor(page, "bnp-paribas");
-    await bnp.scrollIntoViewIfNeeded();
+    const first = rowFor(page, FIRST);
+    await first.scrollIntoViewIfNeeded();
     // Near the top of the window, so neither row's margin is lifted by the bottom edge.
-    await bnp.evaluate((element) => window.scrollBy(0, element.getBoundingClientRect().top - 140));
+    await first.evaluate((element) => window.scrollBy(0, element.getBoundingClientRect().top - 140));
     // The scroll event arrives a frame later, and a scroll during a glide ends it; let it land before any pointer moves.
     await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
   });
@@ -90,13 +75,13 @@ test.describe("Desktop motion: the margin", () => {
         }
       }
     });
-    await rowFor(page, "bnp-paribas").hover();
-    expect(await dropping).toContain("qi-drop");
+    await rowFor(page, FIRST).hover();
+    expect(await dropping).toContain("qi-draw");
     await expect(margin(page)).not.toHaveAttribute("data-settled", "");
 
-    await rowFor(page, "joveen").hover();
+    await rowFor(page, NEXT).hover();
     const next = margin(page).locator(".qi-look");
-    await expect(margin(page).locator('.qi-pass[data-pass-slug="joveen"]')).toBeVisible();
+    await expect(margin(page).locator(nextLook)).toBeVisible();
     await expect(margin(page)).toHaveAttribute("data-settled", "");
     expect(await arrivals(next)).toEqual([]);
     const fade = await next.evaluate((element) => {
@@ -107,8 +92,8 @@ test.describe("Desktop motion: the margin", () => {
   });
 
   test("the glide is 240 ms on transform, and seeked through it the margin never leaves the span between the two places", async ({ page }) => {
-    await rowFor(page, "bnp-paribas").hover();
-    await expect(margin(page).locator(".qi-pass")).toBeVisible();
+    await rowFor(page, FIRST).hover();
+    await expect(margin(page).locator(".qi-strand")).toBeVisible();
     await placed(page);
     // The glide is what `data-glide` plus a new transform does; making both in one task judges the CSS itself, whatever a runner's pointer or scroll timing.
     const glide = await margin(page).evaluate((element) => {
@@ -142,8 +127,8 @@ test.describe("Desktop motion: the margin", () => {
 
   test("dismissing the margin in the middle of a glide stops it where it has reached", async ({ page, browserName }) => {
     test.skip(browserName === "webkit", WEBKIT_TIMING);
-    await rowFor(page, "bnp-paribas").hover();
-    await expect(margin(page).locator(".qi-pass")).toBeVisible();
+    await rowFor(page, FIRST).hover();
+    await expect(margin(page).locator(".qi-strand")).toBeVisible();
     await placed(page);
     const result = await margin(page).evaluate(async (element) => {
       const frame = () => new Promise(requestAnimationFrame);
@@ -175,19 +160,19 @@ test.describe("Desktop motion: the margin", () => {
   });
 
   test("moving to another row sets the glide", async ({ page }) => {
-    await rowFor(page, "bnp-paribas").hover();
-    await expect(margin(page).locator(".qi-pass")).toBeVisible();
-    const target = (await rowFor(page, "joveen").boundingBox())!;
+    await rowFor(page, FIRST).hover();
+    await expect(margin(page).locator(".qi-strand")).toBeVisible();
+    const target = (await rowFor(page, NEXT).boundingBox())!;
     await page.mouse.move(target.x + target.width / 2, target.y + target.height / 2);
-    await expect(margin(page).locator('.qi-pass[data-pass-slug="joveen"]')).toBeVisible();
+    await expect(margin(page).locator(nextLook)).toBeVisible();
     // A scroll ends the glide on purpose, so the attribute is read the moment the look changes, not afterwards.
     await expect(margin(page)).toHaveAttribute("data-settled", "");
   });
 
   test("the margin fades over 120 ms without moving, and returning inside the fade is the same sweep", async ({ page, browserName }) => {
     test.skip(browserName === "webkit", WEBKIT_TIMING);
-    await rowFor(page, "bnp-paribas").hover();
-    await expect(margin(page).locator(".qi-pass")).toBeVisible();
+    await rowFor(page, FIRST).hover();
+    await expect(margin(page).locator(".qi-strand")).toBeVisible();
     await placed(page);
     // Armed before the pointer leaves: at the commit that starts the fade, the pointer comes back to the same row, in the same task.
     const returned = page.evaluate(
@@ -199,7 +184,7 @@ test.describe("Desktop motion: the margin", () => {
             observer.disconnect();
             const fade = node.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "opacity");
             const fadeMs = Number(fade?.effect?.getComputedTiming().duration);
-            document.querySelector('section#work [data-look="bnp-paribas"]')!.dispatchEvent(new PointerEvent("pointerover", { bubbles: true, pointerType: "mouse" }));
+            document.querySelector('section#work [data-look="strand-judgement"]')!.dispatchEvent(new PointerEvent("pointerover", { bubbles: true, pointerType: "mouse" }));
             requestAnimationFrame(() =>
               requestAnimationFrame(() =>
               resolve({
@@ -224,8 +209,8 @@ test.describe("Desktop motion: the margin", () => {
 
   test("a margin that is left goes after its fade, and does not move while it fades", async ({ page, browserName }) => {
     test.skip(browserName === "webkit", WEBKIT_TIMING);
-    await rowFor(page, "joveen").hover();
-    await expect(margin(page).locator(".qi-pass")).toBeVisible();
+    await rowFor(page, NEXT).hover();
+    await expect(margin(page).locator(".qi-strand")).toBeVisible();
     await placed(page);
     const watching = page.evaluate(
       () =>
@@ -254,24 +239,6 @@ test.describe("Desktop motion: reactions finish", () => {
   test.skip(({ page }) => !wide(page), "Reactions start from a hovering pointer");
   test.use({ reducedMotion: "no-preference" });
 
-  test("a row's pass keeps swinging after the pointer has left, then rests", async ({ page }) => {
-    await page.goto("/");
-    await hydrated(page);
-    const row = rowFor(page, "bnp-paribas");
-    await row.scrollIntoViewIfNeeded();
-    const mini = row.locator(".qi-mini");
-    const paused = pauseReaction(row, 300);
-    await row.hover();
-    expect(await paused).toContain("qi-swing");
-    await page.mouse.move(5, 5);
-    // Gone from the row, the reaction is still there, where it was.
-    await expect(row).toHaveAttribute("data-reacting", "");
-    expect(await mini.evaluate((element) => element.getAnimations().find((animation) => (animation as CSSAnimation).animationName === "qi-swing")?.currentTime)).toBe(300);
-    await mini.evaluate((element) => element.getAnimations().find((animation) => (animation as CSSAnimation).animationName === "qi-swing")!.finish());
-    await expect(row).not.toHaveAttribute("data-reacting", "");
-    await expect(mini).toHaveCSS("animation-name", "none");
-  });
-
   test("the book's title and author arrive with the cover, readable by 300 ms", async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
     await hydrated(page);
@@ -296,13 +263,13 @@ test.describe("Desktop motion: reduced motion", () => {
   test("each look still shows with a 0.2 s fade and no arrival, and a sweep has no glide or fade-out", async ({ page }) => {
     await page.goto("/");
     await hydrated(page);
-    await rowFor(page, "bnp-paribas").hover();
+    await rowFor(page, FIRST).hover();
     const look = margin(page).locator(".qi-look");
-    await expect(look.locator(".qi-pass")).toBeVisible();
+    await expect(look.locator(".qi-strand")).toBeVisible();
     expect(await arrivals(look)).toEqual([]);
     expect(await look.evaluate((element) => element.getAnimations().map((animation) => animation.effect!.getComputedTiming().duration))).toEqual([200]);
-    await rowFor(page, "joveen").hover();
-    await expect(margin(page).locator('.qi-pass[data-pass-slug="joveen"]')).toBeVisible();
+    await rowFor(page, NEXT).hover();
+    await expect(margin(page).locator(nextLook)).toBeVisible();
     expect(await margin(page).evaluate((element) => element.getAnimations().map((animation) => (animation as CSSTransition).transitionProperty))).toEqual([]);
     await page.mouse.move(5, 5);
     await expect(margin(page)).toHaveCount(0);
