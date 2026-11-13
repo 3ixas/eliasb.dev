@@ -100,11 +100,11 @@ test.describe("Interrupting", () => {
 });
 
 test.describe("Nothing is blank", () => {
-  test("the first screen of the Work archive has its objects", async ({ page }) => {
+  test("the first screen of the Work archive has its screenshots", async ({ page }) => {
     await page.goto("/things-i-make");
-    const objects = page.locator(".qi-crop img");
-    expect(await objects.count()).toBeGreaterThan(0);
-    for (const object of await objects.all()) await expect(object).toHaveAttribute("loading", "eager");
+    const shots = page.locator(".archive__grid .project__shot img");
+    expect(await shots.count()).toBeGreaterThan(2);
+    for (const shot of (await shots.all()).slice(0, 3)) await expect(shot).toHaveAttribute("loading", "eager");
   });
 
   test("an expanded screenshot has started loading before it opens, and opens on the picture", async ({ page }) => {
@@ -209,21 +209,6 @@ test.describe("Reading on a phone", () => {
     await expect(page.locator(".qi-row__line").first()).toHaveCSS("text-wrap-style", "pretty");
   });
 
-  test("project looks hold the 13 px floor", async ({ page }) => {
-    test.skip(wide(page), "Inline looks are for phones and touch");
-    await page.goto("/");
-    await hydrated(page);
-    const effective = (locator: ReturnType<typeof page.locator>) => locator.evaluate((element) => parseFloat(getComputedStyle(element).fontSize) * (element.closest<HTMLElement>(".qi-look") ? parseFloat(getComputedStyle(element.closest<HTMLElement>(".qi-look")!).zoom || "1") : 1));
-    const project = page.locator('#things-i-make .qi-list__item:not([data-card]) button[data-look-tap^="project-"]').first();
-    await project.scrollIntoViewIfNeeded();
-    await project.click();
-    const figcaption = page.locator("#things-i-make .qi-project figcaption");
-    await expect(figcaption).toBeVisible();
-    expect(await effective(figcaption)).toBeGreaterThanOrEqual(13);
-    // Filling its slot stops at the contract's 300 px, even on a tablet.
-    expect((await page.locator("#things-i-make .qi-project").boundingBox())!.width).toBeLessThanOrEqual(300.5);
-  });
-
   test("the greeting is a 44 px target on a phone", async ({ page }) => {
     test.skip(wide(page) || width(page) >= 900, "On a wide screen it is not a button");
     test.skip(width(page) < 400, "Under 400 px the greeting is not shown");
@@ -243,9 +228,9 @@ test.describe("Reading on a phone", () => {
 test.describe("Alignment and consistency", () => {
   test("a list's metadata keeps one edge, whichever arrow is beside it", async ({ page }) => {
     test.skip(width(page) < 761, "Phones hide the metadata");
-    for (const route of ["/", "/things-i-make"]) {
+    for (const route of ["/"]) {
       await page.goto(route);
-      const lefts = await page.locator(":is(#things-i-make, .qi-archive) .qi-row__meta").evaluateAll((all) => all.map((element) => element.getBoundingClientRect().left));
+      const lefts = await page.locator("#things-i-make .row__meta").evaluateAll((all) => all.map((element) => element.getBoundingClientRect().left));
       expect(lefts.length).toBeGreaterThan(1);
       expect(Math.max(...lefts) - Math.min(...lefts)).toBeLessThan(0.5);
     }

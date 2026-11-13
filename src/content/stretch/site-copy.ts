@@ -77,8 +77,10 @@ export const thingsIMake = {
     "argus-risk": "A risk simulator where every number shows its source and age.",
     "home-secretary": "A household coordination prototype, built for coursework.",
   } as Readonly<Record<string, string>>,
-  /** The link to the archive, with the true count. */
-  allThings: (built: number) => `Everything I’ve built (${pad(built)}) →`,
+  /** The link to the archive, with the true count; its arrow is drawn beside it. */
+  allThings: (built: number) => `Everything I’ve built (${pad(built)})`,
+  /** The wide panel's figures: the indexes of its case study's evidence it shows (57 user stories, 182 tests, 3 cities). */
+  wideFigures: [0, 2, 3],
 } as const;
 
 export const sayHello = {

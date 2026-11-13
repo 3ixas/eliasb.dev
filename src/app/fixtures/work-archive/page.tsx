@@ -21,7 +21,8 @@ const catalogue: Project[] = Array.from({ length: MAX }, (_, position) => ({
   year: 2022 + (position % 5),
   category: PROJECT_CATEGORIES[position % PROJECT_CATEGORIES.length],
   links: { code: `https://github.com/3ixas/fixture-${position + 1}` },
-  screenshot: projects[0].screenshot,
+  // The last has no screenshot, so the archive shows a project panel that is text alone.
+  screenshot: position === MAX - 1 ? undefined : projects[0].screenshot,
   crop: projects[0].crop,
   colours: projects[0].colours,
 }));

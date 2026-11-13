@@ -49,7 +49,7 @@ assert.match(catalogueProblems([base("a", 2025, { crop: { x: 0.5, y: 0.5, zoom: 
 
 // The homepage shows the three featured, then the others newest first, at most ten, and the archive link counts them all.
 assert.equal(HOMEPAGE_INDEX_ROWS, 10);
-assert.equal(thingsIMake.allThings(projects.length), "Everything I’ve built (06) →");
+assert.equal(`${thingsIMake.allThings(projects.length)} →`, "Everything I’ve built (06) →");
 assert.deepEqual([...featuredProjects(projects, featuredSlugs), ...projectIndex(projects, featuredSlugs).slice(0, HOMEPAGE_INDEX_ROWS)].map((project) => project.slug), ["threshold", "argus-risk", "flowtime", "home-secretary", "risk-event-tracker", "ask-professor-past"]);
 const many = Array.from({ length: 14 }, (_, index) => base(`p${index}`, 2000 + index));
 assert.equal(projectIndex(many, []).slice(0, HOMEPAGE_INDEX_ROWS).length, 10);

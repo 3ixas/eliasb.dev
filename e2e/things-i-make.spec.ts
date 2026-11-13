@@ -1,95 +1,126 @@
-import { expect, test, type Page } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { featuredProjects, featuredSlugs, HOMEPAGE_INDEX_ROWS, projectIndex, projects } from "../src/content/projects";
+import { caseStudies } from "../src/content/stretch/case-studies";
 import { thingsIMake } from "../src/content/stretch/site-copy";
-import { contrastOnPaper } from "./support/contrast";
+import { renderedContrast } from "./support/rendered-contrast";
 
 /*
- * Things I make (docs/design/DESIGN.md, "The homepage, in order"): one list of rows, the featured projects first,
- * each with an object cropped from its own screenshot; on phones the featured three are swipeable cards.
+ * Things I make (docs/design/DESIGN.md "The homepage, in order" 5, R-17): Threshold as a wide panel with three of its
+ * figures and its screenshot bleeding off the right, Argus Risk and Flowtime side by side, the others as rows newest
+ * first (at most ten), then the archive link with the true count.
  */
 
 const featured = featuredProjects(projects, featuredSlugs);
-const shown = [...featured, ...projectIndex(projects, featuredSlugs).slice(0, HOMEPAGE_INDEX_ROWS)];
+const others = projectIndex(projects, featuredSlugs).slice(0, HOMEPAGE_INDEX_ROWS);
 const section = (page: Page) => page.locator("section#things-i-make");
-const items = (page: Page) => section(page).locator(".qi-list__item");
-const phone = (page: Page) => (page.viewportSize()?.width ?? 0) < 761;
+const panels = (page: Page) => section(page).locator(".project");
+const rows = (page: Page) => section(page).locator(".rows .row");
+const width = (page: Page) => page.viewportSize()?.width ?? 0;
+const boxOf = async (locator: Locator) => (await locator.boundingBox())!;
 const rgb = (hex: string) => `rgb(${[1, 3, 5].map((start) => parseInt(hex.slice(start, start + 2), 16)).join(", ")})`;
+const line = (slug: string, outcome: string) => thingsIMake.rowOutcomes[slug] ?? outcome;
 
-test.describe("Things I make: the rows", () => {
+test.describe("Things I make", () => {
   test.beforeEach(async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
   });
 
-  test("one list: the featured three in order, the others newest first, then the archive link with the true count", async ({ page }) => {
-    await expect(section(page).locator("ul")).toHaveCount(1);
-    await expect(items(page)).toHaveCount(shown.length);
-    expect(shown.slice(0, 3).map((project) => project.slug)).toEqual(["threshold", "argus-risk", "flowtime"]);
-    for (const [index, project] of shown.entries()) {
-      const item = items(page).nth(index);
-      await expect(item.locator(".qi-row__title")).toHaveText(project.name);
-      await expect(item.locator(".qi-row__line")).toHaveText(thingsIMake.rowOutcomes[project.slug] ?? project.outcome);
-      await expect(item.locator(".qi-row__meta")).toHaveText(String(project.year));
+  test("the featured three are panels in order, each in its field and ink, named one level below the section, linking to its case study", async ({ page }) => {
+    await expect(section(page).getByRole("heading", { level: 2 })).toHaveText(thingsIMake.heading);
+    await expect(panels(page)).toHaveCount(featured.length);
+    for (const [index, project] of featured.entries()) {
+      const panel = panels(page).nth(index);
+      await expect(panel.getByRole("heading", { level: 3 })).toHaveText(project.name);
+      await expect(panel.locator(".project__line")).toHaveText(line(project.slug, project.outcome));
+      await expect(panel).toHaveAttribute("href", project.links.caseStudy!);
+      await expect(panel).toHaveCSS("background-color", rgb(project.panel!.field));
+      await expect(panel).toHaveCSS("color", rgb(project.panel!.ink));
     }
-    const years = await section(page).locator(".qi-row__meta").allTextContents();
-    const others = years.slice(featured.length).map(Number);
-    expect(others).toEqual([...others].sort((a, b) => b - a));
-    await expect(section(page).locator(".qi-row-box > a, .qi-row-box > div")).toHaveCount(shown.length);
+  });
+
+  test("Threshold is wide with three figures from its case study and its screenshot at the right; the other two sit side by side from 720 px", async ({ page }) => {
+    const wide = panels(page).first();
+    await expect(wide).toHaveClass(/project--wide/);
+    const evidence = caseStudies.threshold.evidence;
+    await expect(wide.locator(".project__figures > span")).toHaveText(thingsIMake.wideFigures.map((index) => `${evidence[index].value} ${evidence[index].label}`));
+    const [text, shot] = await Promise.all([boxOf(wide.locator(".project__text")), boxOf(wide.locator(".project__shot"))]);
+    if (width(page) >= 1260) expect(shot.x).toBeGreaterThan(text.x + text.width - 1);
+    else expect(shot.y).toBeGreaterThan(text.y + text.height - 1);
+    const [a, b] = await Promise.all([boxOf(panels(page).nth(1)), boxOf(panels(page).nth(2))]);
+    if (width(page) >= 720) expect(Math.abs(a.y - b.y)).toBeLessThan(1);
+    else expect(b.y).toBeGreaterThan(a.y + a.height);
+  });
+
+  test("the others are rows newest first, at most ten, each its name, line and year, marked ↗ and opening in a new tab when it leaves the site", async ({ page }) => {
+    await expect(rows(page)).toHaveCount(others.length);
+    expect(others.length).toBeLessThanOrEqual(HOMEPAGE_INDEX_ROWS);
+    for (const [index, project] of others.entries()) {
+      const row = rows(page).nth(index);
+      await expect(row.locator(".row__name")).toHaveText(project.name);
+      await expect(row.locator(".row__line")).toHaveText(line(project.slug, project.outcome));
+      await expect(row.locator(".row__meta")).toContainText(String(project.year));
+      const href = (project.links.caseStudy ?? project.links.live ?? project.links.code)!;
+      await expect(row).toHaveAttribute("href", href);
+      if (href.startsWith("http")) {
+        await expect(row).toHaveAttribute("target", "_blank");
+        await expect(row.locator(".arrow--out")).toHaveText("↗");
+        await expect(row).toHaveAccessibleName(/opens .+ in a new tab/);
+      }
+      expect((await boxOf(row)).height).toBeGreaterThanOrEqual(44);
+    }
+  });
+
+  test("the archive link has the true count", async ({ page }) => {
     const all = section(page).getByRole("link", { name: thingsIMake.allThings(projects.length) });
     await expect(all).toHaveAttribute("href", "/things-i-make");
-    expect((await all.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    await expect(all).toContainText("(06)");
   });
 
-  test("the rows are in the server-rendered page", async ({ page }) => {
+  test("the phone carousel, the 44 px objects and the closer looks are gone", async ({ page }) => {
+    await expect(section(page).locator(".qi-crop, .qi-row, [data-card], [data-quiet-column], .qi-project")).toHaveCount(0);
+  });
+
+  test("in light no panel has a shadow; in dark each glows in its own colour", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+    await page.reload();
+    // The glow's colour is transparent in light, so it draws nothing.
+    const noShadow = (shadow: string) => shadow === "none" || /^rgba\([^)]*, 0\) /.test(shadow);
+    for (const shadow of await panels(page).evaluateAll((all) => all.map((panel) => getComputedStyle(panel).boxShadow))) expect(noShadow(shadow), shadow).toBe(true);
+    await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" });
+    await page.reload();
+    for (const panel of await panels(page).all()) await expect(panel).toHaveCSS("box-shadow", /-56px/);
+  });
+
+  test("it is complete without script", async ({ page }) => {
     await page.route("**/*.js", (route) => route.abort());
     await page.reload();
-    await expect(items(page)).toHaveCount(shown.length);
+    await expect(panels(page)).toHaveCount(featured.length);
+    await expect(rows(page)).toHaveCount(others.length);
   });
 
-  test("the Featured tiles and their tilt are gone from the homepage", async ({ page }) => {
-    await expect(section(page).locator(".stretch-tile, .stretch-tiles, .stretch-index, .stretch-intro")).toHaveCount(0);
+  test("a panel is one keyboard stop with the panel's ink as its ring, and Enter opens its case study", async ({ page, browserName }) => {
+    test.skip(browserName === "webkit", "Safari does not Tab to links by default");
+    const panel = panels(page).nth(1);
+    await panel.focus();
+    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press("Tab");
+    await expect(panel).toBeFocused();
+    const [outline, ink] = await panel.evaluate((element) => [getComputedStyle(element).outline, getComputedStyle(element).color]);
+    expect(outline).toContain(ink);
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(new RegExp(`${featured[1].links.caseStudy}$`));
   });
 
-  test("a project row goes to its case study, else its live site, else its code; external ones are marked ↗ and open in a new tab", async ({ page }) => {
-    for (const [index, project] of shown.entries()) {
-      const link = items(page).nth(index).locator(".qi-row-box > a");
-      const href = project.links.caseStudy ?? project.links.live ?? project.links.code!;
-      await expect(link).toHaveAttribute("href", href);
-      if (href.startsWith("http")) {
-        const where = new URL(href).hostname === "github.com" ? "GitHub" : new URL(href).hostname.replace(/^www\./, "");
-        await expect(link).toHaveAttribute("target", "_blank");
-        await expect(link).toHaveAttribute("rel", /noreferrer/);
-        await expect(link.locator(".qi-row__arrow")).toHaveText("↗");
-        await expect(link).toHaveAccessibleName(new RegExp(`^${project.name}.* opens ${where} in a new tab$`));
-      } else {
-        await expect(link).not.toHaveAttribute("target", "_blank");
-        await expect(link.locator(".qi-row__arrow")).toHaveText("→");
-        await expect(link).not.toHaveAccessibleName(/new tab/);
-      }
-    }
+  test("nothing scrolls sideways and nothing is under 13 px", async ({ page }) => {
+    await page.evaluate(() => document.fonts.ready);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    const sizes = await section(page).evaluate((element) => [...element.querySelectorAll("*")].filter((node) => node.childElementCount === 0 && node.textContent?.trim()).map((node) => parseFloat(getComputedStyle(node).fontSize)));
+    expect(Math.min(...sizes)).toBeGreaterThanOrEqual(13);
   });
 
-  test("an object is a 44 px crop of the project's own screenshot that fills its slot, on its Project colour", async ({ page }) => {
-    for (const [index, project] of shown.entries()) {
-      // A phone's featured projects are cards, which have no object.
-      if (phone(page) && index < featured.length) continue;
-      const object = items(page).nth(index).locator(".qi-crop");
-      const image = object.locator("img");
-      await expect(image).toHaveAttribute("src", /\/_next\/image/);
-      const [slot, shot] = await Promise.all([object.boundingBox(), image.boundingBox()]);
-      expect(slot!.width).toBeCloseTo(44, 0);
-      expect(slot!.height).toBeCloseTo(44, 0);
-      // The screenshot is zoomed in beyond the slot, and covers all of it.
-      expect(shot!.width, project.slug).toBeGreaterThan(slot!.width * (project.crop!.zoom - 0.1));
-      expect(shot!.x).toBeLessThanOrEqual(slot!.x + 0.5);
-      expect(shot!.y).toBeLessThanOrEqual(slot!.y + 0.5);
-      expect(shot!.x + shot!.width).toBeGreaterThanOrEqual(slot!.x + slot!.width - 0.5);
-      expect(shot!.y + shot!.height).toBeGreaterThanOrEqual(slot!.y + slot!.height - 0.5);
-      await expect(object).toHaveCSS("border-top-left-radius", "11px");
-      if (project.colours) await expect(object).toHaveCSS("background-color", rgb(project.colours.field));
-    }
-  });
-
-  test("project colours pass contrast: their ink on their field reads at 4.5:1 and their swatch at 3:1", async () => {
+  test("project colours pass contrast: each panel's ink on its field reads at 4.5:1", async () => {
     const luminance = (hex: string) => {
       const [r, g, b] = [1, 3, 5].map((start) => {
         const c = parseInt(hex.slice(start, start + 2), 16) / 255;
@@ -98,105 +129,41 @@ test.describe("Things I make: the rows", () => {
       return 0.2126 * r + 0.7152 * g + 0.0722 * b;
     };
     const ratio = (a: string, b: string) => (Math.max(luminance(a), luminance(b)) + 0.05) / (Math.min(luminance(a), luminance(b)) + 0.05);
-    for (const { slug, colours } of featured) {
-      expect(ratio(colours!.ink, colours!.field), slug).toBeGreaterThanOrEqual(4.5);
-      expect(ratio(colours!.swatch, colours!.field), slug).toBeGreaterThanOrEqual(3);
-    }
+    for (const { slug, panel } of featured) expect(ratio(panel!.ink, panel!.field), slug).toBeGreaterThanOrEqual(4.5);
   });
+
+  for (const scheme of ["light", "dark"] as const) {
+    test(`every text in the section passes AA, measured on the rendered page (${scheme})`, async ({ page, browserName }) => {
+      test.skip(browserName !== "chromium", "Measured in Chromium");
+      await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
+      await page.reload();
+      await page.evaluate(() => document.fonts.ready);
+      const texts = await section(page).innerText();
+      const readings = (await renderedContrast(page)).filter((reading) => texts.includes(reading.text));
+      for (const expected of ["Threshold", "user stories", "Argus Risk", "Flowtime", "Home Secretary", "Everything I’ve built"]) {
+        expect(readings.some((reading) => reading.text.includes(expected)), expected).toBe(true);
+      }
+      expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);
+    });
+
+    test(`has no axe violations (${scheme})`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
+      await page.reload();
+      const results = await new AxeBuilder({ page }).include("#things-i-make").analyze();
+      expect(results.violations).toEqual([]);
+    });
+  }
 });
 
-test.describe("Things I make: the closer look in the margin", () => {
-  test("hovering a project slides in its screenshot on its Project colour, with its type and year", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "reduce" });
+test.describe("Things I make: hover", () => {
+  test("a screenshot lifts 10 px under a hovering fine pointer, and not with reduced motion", async ({ page, browserName }) => {
+    test.skip(width(page) < 1180, "A hovering fine pointer");
+    test.skip(browserName === "webkit", "Hover emulation, Chromium");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
-    test.skip(!(await page.evaluate(() => matchMedia("(min-width: 1180px) and (hover: hover)").matches)), "The margin is for wide screens with a hover");
-    const column = section(page).locator("[data-quiet-column]");
-    await page.waitForFunction(() => Object.keys(document.querySelector("#things-i-make [data-quiet-column]")!).some((key) => key.startsWith("__reactProps$")));
-    for (const project of featured) {
-      await section(page).locator(`.qi-list__item:has([data-look="project-${project.slug}"]) .qi-row`).hover();
-      const look = page.locator(".qi-margin .qi-project");
-      await expect(look).toBeVisible();
-      await expect(look.locator("figcaption")).toHaveText(`${project.type} · ${project.year}`);
-      await expect(look.locator("img")).toBeVisible();
-      await expect(look).toHaveCSS("background-color", rgb(project.colours!.field));
-      const readings = await contrastOnPaper(page, ".qi-margin .qi-project figcaption");
-      expect(readings.every((reading) => reading.ratio >= 4.5)).toBe(true);
-    }
-    await page.mouse.move(0, 0);
-    await expect(page.locator(".qi-margin")).toHaveCount(0);
-    await expect(column).toBeVisible();
-  });
-});
-
-test.describe("Things I make: phone cards", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
-
-  test("at phone width the featured three are scroll-snapping cards at 82% and the rest stay rows, in the one list", async ({ page }) => {
-    test.skip(!phone(page), "Phones only");
-    const list = section(page).locator("ul");
-    await expect(list).toHaveCount(1);
-    await expect(list).toHaveCSS("scroll-snap-type", "x mandatory");
-    const listBox = (await list.boundingBox())!;
-    const content = listBox.width - 32;
-    for (const [index, project] of featured.entries()) {
-      const card = items(page).nth(index);
-      const box = (await card.boundingBox())!;
-      expect(box.width, project.slug).toBeCloseTo(content * 0.82, 0);
-      await expect(card).toHaveCSS("scroll-snap-align", "start");
-      await expect(card.getByRole("img", { name: project.screenshot!.alt })).toBeVisible();
-      await expect(card.locator(".qi-row__object")).toBeHidden();
-      await expect(card.locator(".qi-row__tap")).toBeHidden();
-      await expect(card.locator(".qi-row__title")).toHaveText(project.name);
-      await expect(card.locator(".qi-row__line")).toHaveText(thingsIMake.rowOutcomes[project.slug] ?? project.outcome);
-    }
-    expect((await items(page).first().boundingBox())!.x).toBeCloseTo(16, 0);
-    for (let index = featured.length; index < shown.length; index++) {
-      const row = items(page).nth(index);
-      const box = (await row.boundingBox())!;
-      expect(box.width).toBeCloseTo(content, 0);
-      expect((await row.locator(".qi-row").boundingBox())!.width).toBeCloseTo(content + 24, 0);
-      await expect(row.locator(".qi-card__shot")).toHaveCount(0);
-      await expect(row.locator(".qi-row__object")).toBeVisible();
-    }
-    // Swiping moves the cards and leaves the rows where they are.
-    const rowBefore = (await items(page).nth(featured.length).boundingBox())!;
-    const cardBefore = (await items(page).first().boundingBox())!;
-    await list.evaluate((element) => element.scrollTo({ left: element.scrollWidth, behavior: "instant" }));
-    await expect.poll(async () => (await items(page).first().boundingBox())!.x).toBeLessThan(cardBefore.x - 40);
-    expect((await items(page).nth(featured.length).boundingBox())!.x).toBeCloseTo(rowBefore.x, 0);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  });
-
-  test("a card's text passes contrast on its Project colour and it opens the case study in one tap", async ({ page }) => {
-    test.skip(!phone(page), "Phones only");
-    for (const selector of [".qi-row__title", ".qi-row__line"]) {
-      const readings = await contrastOnPaper(page, `#things-i-make [data-card] ${selector}`);
-      expect(readings).toHaveLength(featured.length);
-      for (const reading of readings) expect(reading.ratio, reading.text ?? "").toBeGreaterThanOrEqual(4.5);
-    }
-    await items(page).first().locator(".qi-row").click();
-    await expect(page).toHaveURL(/\/things-i-make\/threshold$/);
-  });
-
-  test("a focused card keeps its Project colour", async ({ page, browserName }) => {
-    test.skip(!phone(page) || browserName !== "chromium", "Phones, Chromium (Safari does not Tab to links)");
-    const link = items(page).first().locator(".qi-row");
-    await link.focus();
-    await page.keyboard.press("Shift+Tab");
-    await page.keyboard.press("Tab");
-    await expect(link).toBeFocused();
-    await expect(link).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-    await expect(items(page).first()).toHaveCSS("background-color", rgb(featured[0].colours!.field));
-    expect(parseFloat(await link.evaluate((element) => getComputedStyle(element).outlineWidth))).toBeGreaterThanOrEqual(2);
-  });
-
-  test("from 761 px the list is not a carousel and shows no card screenshot", async ({ page }) => {
-    test.skip(phone(page), "Wider than a phone only");
-    const list = section(page).locator("ul");
-    expect(await list.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
-    await expect(section(page).locator(".qi-card__shot").first()).toBeHidden();
-    await expect(items(page).first().locator(".qi-row__object")).toBeVisible();
+    const panel = panels(page).nth(1);
+    await panel.scrollIntoViewIfNeeded();
+    await panel.hover();
+    await expect.poll(() => panel.locator(".project__shot").evaluate((element) => new DOMMatrix(getComputedStyle(element).transform).m42)).toBe(-10);
   });
 });
