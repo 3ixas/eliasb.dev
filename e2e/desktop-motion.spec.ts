@@ -57,7 +57,8 @@ test.describe("Desktop motion: the margin", () => {
     const first = rowFor(page, FIRST);
     await first.scrollIntoViewIfNeeded();
     // Near the top of the window, so neither row's margin is lifted by the bottom edge.
-    await first.evaluate((element) => window.scrollBy(0, element.getBoundingClientRect().top - 140));
+    // Instant: with motion allowed the page scrolls smoothly (base.css), and a scroll still gliding when the pointer arrives moves the row out from under it.
+    await first.evaluate((element) => window.scrollBy({ top: element.getBoundingClientRect().top - 140, behavior: "instant" }));
     // The scroll event arrives a frame later, and a scroll during a glide ends it; let it land before any pointer moves.
     await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
   });
