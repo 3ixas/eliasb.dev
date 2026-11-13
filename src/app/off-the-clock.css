@@ -247,6 +247,17 @@
   .otc__training {
     grid-column: 1 / -1;
   }
+
+  /* The year needs the width to itself: the total and Now making above it, the grid full width. */
+  .otc__year {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .otc__year > :is(.stretch-gh__total, .stretch-gh__readout, .stretch-gh__scroll, .stretch-gh__foot),
+  .otc__year-side {
+    grid-column: 1;
+    grid-row: auto;
+  }
 }
 
 @media (max-width: 719.98px) {
@@ -265,15 +276,6 @@
     justify-self: start;
   }
 
-  .otc__year {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .otc__year > :is(.stretch-gh__total, .stretch-gh__readout, .stretch-gh__scroll, .stretch-gh__foot),
-  .otc__year-side {
-    grid-column: 1;
-    grid-row: auto;
-  }
 }
 
 @media (forced-colors: active) {
