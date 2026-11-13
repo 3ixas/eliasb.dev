@@ -8,9 +8,9 @@ import "./stretch-type.css";
 import "./stretch-shell.css";
 import "./quiet-index.css";
 import "./quiet-opening.css";
-import "./quiet-header.css";
 import "./quiet-long-form.css";
 import "./quiet-forced-colors.css";
+import "./shell.css";
 import "./parts.css";
 import "./stretch-resume.css";
 
@@ -85,6 +85,8 @@ export const metadata: Metadata = {
 const siteBootScript = `
   try {
     const root = document.documentElement;
+    // Script runs: the header's links may wait behind Menu on a phone (shell.css). Without it they show.
+    root.dataset.script = '';
     let saved = null;
     try { saved = localStorage.getItem('elias-theme'); } catch (_) {}
     if (saved === 'light' || saved === 'dark') root.dataset.theme = saved;
@@ -98,7 +100,7 @@ const siteBootScript = `
     // choice that differs from the device. This meta is made here, not in JSX:
     // React would recreate a hoisted meta whose attributes script had changed.
     // The page colours, as in TOOLBAR_COLOUR (components/site/theme.ts); theme.spec.ts keeps them level.
-    const toolbar = { light: '#fbfbf8', dark: '#0d0d12' };
+    const toolbar = { light: '#eeede9', dark: '#0d0d0f' };
     const meta = document.createElement('meta');
     meta.name = 'theme-color';
     meta.content = dark ? toolbar.dark : toolbar.light;

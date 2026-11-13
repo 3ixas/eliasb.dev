@@ -12,11 +12,10 @@ import {
 } from "@/content/stretch/case-study";
 
 /**
- * A case study (docs/design/DESIGN.md, "Long-form pages") on the shared template: the header with the six
- * sections as links, a back link to the Work archive, the project as the title with its outcome as the line, its
+ * A case study (docs/design/DESIGN.md, "Long-form pages") on the shared template: the shared header, a back link to the Work archive, the project as the title with its outcome as the line, its
  * type, year and stack, the links it has, and its landing screenshot on its Project colour. Then the six sections
- * in their fixed order (the PRD as one inline Sheet under "On paper") and one row to the next project. The server
- * renders all of it.
+ * in their fixed order (the PRD as one inline Sheet under "On paper") and one row to the next project, then Say hello. The
+ * server renders all of it.
  */
 export function CaseStudyPage({ study }: { study: CaseStudy }) {
   const opening = caseStudyOpening(study, projects);
@@ -24,10 +23,7 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
   if (!next) throw new Error(`Case study "${study.slug}" ends with "${study.next}", which is not a project.`);
 
   return (
-    <LongForm
-      attrs={{ "data-case-study": study.slug }}
-      sections={caseStudySectionKeys.map((key) => ({ id: key, label: caseStudySectionLabels[key] }))}
-    >
+    <LongForm attrs={{ "data-case-study": study.slug }}>
       <article className="stretch-wrap qi-long" aria-labelledby="case-study-title">
         <div className="qi-column">
           <BackLink href="/things-i-make" label={caseStudyCopy.back} />

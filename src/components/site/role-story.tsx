@@ -24,7 +24,7 @@ import { passRecords } from "@/content/stretch/staff-pass";
 import { work } from "@/content/stretch/work";
 
 /**
- * A Role story (GLOSSARY.md) on the long-form template: the shared header with its six sections as links, a back
+ * A Role story (GLOSSARY.md) on the long-form template: the shared header, a back
  * link, the employer as the title with its role and dates, the employer's Staff pass with its Pass pins beside
  * them, the six sections in their fixed order with the evidence beneath Summary, and one row to the next role (the
  * last story ends on "← Work"). A figure the paragraph argues from sits inline; a real thing a sentence only
@@ -40,10 +40,7 @@ export function RoleStoryPage({ story }: { story: RoleStory }) {
   const next = story.next ? roleStories[story.next] : null;
 
   return (
-    <LongForm
-      attrs={{ "data-role-story": story.slug }}
-      sections={roleStorySectionKeys.map((key) => ({ id: key, label: roleStorySectionLabels[key] }))}
-    >
+    <LongForm attrs={{ "data-role-story": story.slug }}>
       <article className="stretch-wrap qi-long" aria-labelledby="role-story-title">
         <CloserLookRoot className="qi-column" looks={Object.fromEntries(reveals.map(({ id }) => [id, looks[id]]))}>
           <BackLink href={roleStoryBack.href} label={roleStoryBack.label} />

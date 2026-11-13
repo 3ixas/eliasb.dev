@@ -18,8 +18,8 @@ export type ThemePreference = Theme | "system";
 
 export const THEME_STORAGE_KEY = "elias-theme";
 
-/** The page background in each theme: `--stretch-page` in stretch-tokens.css. */
-export const TOOLBAR_COLOUR: Record<Theme, string> = { light: "#fbfbf8", dark: "#0d0d12" };
+/** The page background in each theme: `--page` in tokens.css. */
+export const TOOLBAR_COLOUR: Record<Theme, string> = { light: "#eeede9", dark: "#0d0d0f" };
 
 /**
  * Sets the browser's toolbar colour to the page's. The boot script in the root

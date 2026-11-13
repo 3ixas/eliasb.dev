@@ -3,11 +3,12 @@ import type { ReactNode } from "react";
 import { Row } from "@/components/quiet/row";
 import { DotLine } from "@/components/site/dot-line";
 import { FocusHashTarget } from "@/components/site/focus-hash-target";
+import { SayHello } from "@/components/site/say-hello";
 import { SiteHeader } from "@/components/site/site-header";
 
 /*
  * The long-form template (docs/design/DESIGN.md, "Long-form pages"): what a Role story and a case study share.
- * The shared header with the page's own sections as its links, then one 600 px column: a back link, an opening,
+ * The shared header, then one 600 px column: a back link, an opening,
  * sections at 17 px, and one row to the next page. The pieces here know nothing about either page; what belongs
  * to one (the pass, the screenshot, the figures) is passed in. Server-rendered in full, so it reads the same
  * with no script.
@@ -25,17 +26,15 @@ export function Arrowed({ label }: { label: string }) {
   );
 }
 
-/** The header's links on a long-form page: the page's own sections, in reading order. */
-export type LongFormSection = { readonly id: string; readonly label: string };
-
-/** The page: the shared header, the column's room, and the skip link's target. A page with no `sections` has no links but the way home. */
-export function LongForm({ sections, attrs, children }: { sections?: readonly LongFormSection[]; attrs: Record<`data-${string}`, string>; children: ReactNode }) {
+/** The page: the shared header, the page's own content, Say hello to end it, and the skip link's target. */
+export function LongForm({ attrs, children }: { attrs: Record<`data-${string}`, string>; children: ReactNode }) {
   return (
     <div data-stretch-shell {...attrs}>
-      <SiteHeader inner sections={sections} />
+      <SiteHeader />
       <FocusHashTarget />
       <main id="main-content" tabIndex={-1}>
         {children}
+        <SayHello />
       </main>
     </div>
   );

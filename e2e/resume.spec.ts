@@ -89,33 +89,21 @@ test.describe("The Résumé", () => {
       .toEqual({ pageOverflow: false, clipped: [], sheetFits: true });
   });
 
-  test("takes the shared header with the way home and no section links, and Download PDF sits above the sheet", async ({ page }) => {
-    await expect(page.locator("header.qi-header")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Elias Bennett, home" })).toHaveAttribute("href", "/");
-    await expect(page.getByRole("navigation", { name: siteCopy.header.linksLabel })).toHaveCount(0);
+  test("takes the shared header and ends with Say hello, and Download PDF sits above the sheet", async ({ page }) => {
+    await expect(page.locator("[data-site-header]")).toBeVisible();
+    await expect(page.locator("[data-site-header]").getByRole("link", { name: "Elias Bennett", exact: true })).toHaveAttribute("href", "/");
+    await expect(page.getByRole("navigation", { name: siteCopy.header.linksLabel, includeHidden: true })).toHaveCount(1);
+    await expect(page.locator("section#say-hello")).toHaveCount(1);
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     await expect(sheet(page)).toBeVisible();
     const [download, paper] = await Promise.all([page.getByRole("link", { name: resumeCopy.download }).boundingBox(), sheet(page).boundingBox()]);
     expect(download!.y + download!.height).toBeLessThanOrEqual(paper!.y);
   });
 
-  test("the header lines up with the sheet: its row has the paper's left and right edges", async ({ page }) => {
-    test.skip((page.viewportSize()?.width ?? 0) < 900, "Below 900 px the header is the narrow column, not the sheet's width");
-    await expect(sheet(page)).toBeVisible();
-    const edges = () =>
-      page.evaluate(() => {
-        const paper = document.querySelector(".stretch-resume__sheet")!.getBoundingClientRect();
-        const row = document.querySelector(".qi-header__inner")!.getBoundingClientRect();
-        return { left: Math.abs(row.left - paper.left), right: Math.abs(row.right - paper.right) };
-      });
-    await expect.poll(async () => (await edges()).left).toBeLessThanOrEqual(1);
-    await expect.poll(async () => (await edges()).right).toBeLessThanOrEqual(1);
-  });
-
   test("is complete without script: the header, its skip link, Download PDF and the sheet are in the server HTML", async ({ page }) => {
     await page.route("**/*.js", (route) => route.abort());
     await page.reload();
-    await expect(page.locator("header.qi-header")).toBeVisible();
+    await expect(page.locator("[data-site-header]")).toBeVisible();
     await expect(page.getByRole("link", { name: "Skip to content" })).toHaveCount(1);
     await expect(page.getByRole("link", { name: resumeCopy.download })).toBeVisible();
     await expect(page.getByRole("heading", { level: 1, name: resumeSheet().name })).toBeVisible();
@@ -147,7 +135,8 @@ test.describe("The Résumé", () => {
 
     await page.emulateMedia({ media: "print" });
     await expect(download).toBeHidden();
-    await expect(page.locator("header.qi-header")).toBeHidden();
+    await expect(page.locator("[data-site-header]")).toBeHidden();
+    await expect(page.locator("section#say-hello")).toBeHidden();
     await expect(page.locator("footer")).toBeHidden();
     // The room below the content is for the screen: paper has none to leave, so it must not push a blank page.
     await expect(page.locator("[data-resume] main")).toHaveCSS("padding-bottom", "0px");

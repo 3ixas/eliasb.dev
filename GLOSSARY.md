@@ -54,7 +54,7 @@ The site's one accent colour (`#2340ff` in light, `#8b9cff` in dark). It may be 
 _Avoid_: Using it for project tiles or as decoration
 
 **Eclipse**:
-The theme toggle in the header: an icon-only sun while the page is light and a crescent moon while it is dark. Pressing it eclipses one into the other as the page changes ([#156](https://github.com/3ixas/eliasb.dev/issues/156)). It shows the current theme, is announced as "Dark theme", pressed while dark, and has no outline at rest (it keeps its focus ring for keyboard users), because the theme isn't the focus and the control should be understood at a glance and then ignored. It replaces the "Lights on / Lights off" pill.
+The theme toggle in the header: an icon-only sun while the page is light and a crescent moon while it is dark. Pressing it eclipses one into the other as the page changes ([#156](https://github.com/3ixas/eliasb.dev/issues/156)). It shows the current theme, is announced as "Dark theme", pressed while dark, and has no outline at rest (it keeps its focus ring for keyboard users), because the theme isn't the focus and the control should be understood at a glance and then ignored. It replaces the "Lights on / Lights off" pill. Since [#411](https://github.com/3ixas/eliasb.dev/issues/411) it is the header's 36 px round theme control.
 _Avoid_: Lights pill, "Lights on / Lights off" (retired wording), a metaphor that needs a second look
 
 **Project colour**:

@@ -9,7 +9,7 @@ const FIRST_SCREEN_ROWS = 8;
 
 /**
  * The Work archive (docs/design/DESIGN.md, "The Work archive"): the homepage's Things I make, unabridged. The
- * shared header with no links, "Things I make" as the `h1` in the opening line's treatment with its note beneath,
+ * shared header, "Things I make" as the `h1` in the opening line's treatment with its note beneath,
  * then every project in the catalogue as the homepage's rows, newest first, with the same closer looks. The server
  * renders all of it.
  */

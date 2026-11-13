@@ -22,7 +22,7 @@ const findHeld = (): Sample => {
   const describe = (element: Element) => element.tagName.toLowerCase() + (element.className ? `.${String(element.className).split(" ")[0]}` : "");
   const held: string[] = [];
   for (const element of document.querySelectorAll("body *")) {
-    if (element.closest("[hidden], dialog, noscript, template, [aria-hidden='true'], .qi-greeting__more")) continue;
+    if (element.closest("[hidden], dialog, noscript, template, [aria-hidden='true'], .greeting__more")) continue;
     const style = getComputedStyle(element);
     if (style.display === "none") continue;
     if (Number(style.opacity) < 1 || style.visibility === "hidden") held.push(describe(element));

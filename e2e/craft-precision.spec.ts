@@ -1,5 +1,4 @@
 import { expect, test, type Page } from "@playwright/test";
-import { heroPortrait } from "../src/content/stretch/media";
 
 /*
  * What a design engineer does first: interrupt things, look for anything blank, and read a phone's line breaks.
@@ -94,14 +93,6 @@ test.describe("Interrupting", () => {
 });
 
 test.describe("Nothing is blank", () => {
-  test("the header's portrait loads with the document, on a resting fill", async ({ page }) => {
-    await page.goto("/work/bnp-paribas");
-    const portrait = page.locator(".qi-header__face");
-    await expect(portrait).not.toHaveAttribute("loading", "lazy");
-    expect(await page.locator(`link[rel="preload"][as="image"][imagesrcset*="${encodeURIComponent(heroPortrait.src)}"]`).count()).toBe(1);
-    await expect(portrait).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-  });
-
   test("the first screen of the Work archive has its objects", async ({ page }) => {
     await page.goto("/things-i-make");
     const objects = page.locator(".qi-crop img");
@@ -211,17 +202,11 @@ test.describe("Reading on a phone", () => {
     await expect(page.locator(".qi-row__line").first()).toHaveCSS("text-wrap-style", "pretty");
   });
 
-  test("the portrait and project looks hold the 13 px floor", async ({ page }) => {
+  test("project looks hold the 13 px floor", async ({ page }) => {
     test.skip(wide(page), "Inline looks are for phones and touch");
     await page.goto("/");
     await hydrated(page);
-    const portrait = page.locator('.qi-header button[data-look-tap="face"]');
-    await portrait.click();
-    const caption = page.locator(".qi-header .qi-face-look figcaption");
-    await expect(caption).toBeVisible();
-    const effective = (locator: typeof caption) => locator.evaluate((element) => parseFloat(getComputedStyle(element).fontSize) * (element.closest<HTMLElement>(".qi-look") ? parseFloat(getComputedStyle(element.closest<HTMLElement>(".qi-look")!).zoom || "1") : 1));
-    expect(await effective(caption)).toBeGreaterThanOrEqual(13);
-    await portrait.click();
+    const effective = (locator: ReturnType<typeof page.locator>) => locator.evaluate((element) => parseFloat(getComputedStyle(element).fontSize) * (element.closest<HTMLElement>(".qi-look") ? parseFloat(getComputedStyle(element.closest<HTMLElement>(".qi-look")!).zoom || "1") : 1));
     const project = page.locator('#things-i-make .qi-list__item:not([data-card]) button[data-look-tap^="project-"]').first();
     await project.scrollIntoViewIfNeeded();
     await project.click();
@@ -232,21 +217,11 @@ test.describe("Reading on a phone", () => {
     expect((await page.locator("#things-i-make .qi-project").boundingBox())!.width).toBeLessThanOrEqual(300.5);
   });
 
-  test("the header and the text share one left edge", async ({ page }) => {
-    // On a phone the Résumé's sheet runs edge to edge, so its text is the edge; elsewhere the paper is.
-    const resumeEdge = width(page) < 761 ? "#resume-name" : ".stretch-resume__sheet";
-    for (const [route, text] of [["/work/bnp-paribas", "h1"], ["/resume", resumeEdge]]) {
-      await page.goto(route);
-      const face = await page.locator(".qi-header__face").boundingBox();
-      const edge = await page.locator(text).boundingBox();
-      expect(Math.abs(face!.x - edge!.x), route).toBeLessThanOrEqual(0.6);
-    }
-  });
-
   test("the greeting is a 44 px target on a phone", async ({ page }) => {
     test.skip(wide(page) || width(page) >= 900, "On a wide screen it is not a button");
+    test.skip(width(page) < 400, "Under 400 px the greeting is not shown");
     await page.goto("/");
-    const greeting = page.locator(".qi-greeting");
+    const greeting = page.locator(".greeting");
     const hits = await greeting.evaluate((element) => {
       const box = element.getBoundingClientRect();
       const x = box.left + box.width / 2;
@@ -323,7 +298,7 @@ test.describe("Colour", () => {
     await hydrated(page);
     await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--gh-1").trim().startsWith("rgb"))).toBe(true);
     // The press and the read share a task, so a slow runner cannot miss the 300 ms crossfade.
-    const animated = await page.locator(".stretch-eclipse").first().evaluate(async (button) => {
+    const animated = await page.locator("[data-eclipse]").evaluate(async (button) => {
       (button as HTMLElement).click();
       await new Promise(requestAnimationFrame);
       return document.documentElement.getAnimations().map((animation) => (animation as CSSTransition).transitionProperty);

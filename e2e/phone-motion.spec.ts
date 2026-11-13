@@ -1,12 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
 
 /*
- * Phone motion (docs/design/DESIGN.md, "Inline" and "The header"; the craft bar's interruption walk, new step).
+ * Phone motion (docs/design/DESIGN.md, "Inline"; the craft bar's interruption walk, new step).
  * A fold is judged by seeking its transition in the task that starts it, so a slow runner cannot miss it and nothing
  * waits on a clock.
  */
 
-const phone = (page: Page) => (page.viewportSize()?.width ?? 0) < 900;
 const inlineOnly = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1180;
 const SLOT = '[data-look-slot="joveen"]';
 const TRIGGER = '#work button[data-look-tap="joveen"]';
@@ -140,35 +139,5 @@ test.describe("A look that opens low", () => {
     });
     expect(stopped.held).toBeGreaterThan(stopped.start);
     expect(stopped.after).toBe(stopped.held);
-  });
-});
-
-test.describe("The header on a short screen", () => {
-  test("stays at the top when the screen is 700 px tall, and scrolls away when it is shorter", async ({ page }) => {
-    test.skip((page.viewportSize()?.width ?? 0) < 900, "Phones have no sticky header");
-    const header = page.locator(".qi-header").first();
-    for (const [height, position] of [[700, "sticky"], [699, "static"]] as const) {
-      await page.setViewportSize({ width: page.viewportSize()!.width, height });
-      await page.goto("/work/bnp-paribas");
-      await expect(header).toHaveCSS("position", position);
-    }
-  });
-});
-
-test.describe("The header on a phone", () => {
-  test("scrolls away with the page and does not return; from 900 px it stays", async ({ page }) => {
-    await page.goto("/");
-    await hydrated(page);
-    const header = page.locator(".qi-header").first();
-    await page.evaluate(() => window.scrollTo({ top: 1200, behavior: "instant" }));
-    if (phone(page)) {
-      await expect(header).toHaveCSS("position", "static");
-      expect((await header.boundingBox())!.y + (await header.boundingBox())!.height).toBeLessThan(0);
-      await page.evaluate(() => window.scrollBy({ top: -200, behavior: "instant" }));
-      expect((await header.boundingBox())!.y + (await header.boundingBox())!.height).toBeLessThan(0);
-    } else {
-      await expect(header).toHaveCSS("position", "sticky");
-      expect((await header.boundingBox())!.y).toBe(0);
-    }
   });
 });

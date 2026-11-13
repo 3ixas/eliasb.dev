@@ -35,15 +35,13 @@ export function setFold(slot: HTMLElement, shut: boolean) {
 
 /**
  * How far to scroll so a look just opened under `trigger` is in view, or 0 when at least half of it already is. The look
- * is `height` tall once open and starts at the slot's top. The scroll never takes the trigger's row under a header that
- * stays on screen.
+ * is `height` tall once open and starts at the slot's top. The scroll never takes the trigger's row off the top of the
+ * screen.
  */
 export function revealDistance(trigger: HTMLElement, slot: HTMLElement, height: number) {
   const viewport = window.innerHeight;
   const below = slot.getBoundingClientRect().top + height - viewport;
   if (below <= height / 2) return 0;
-  const header = document.querySelector<HTMLElement>(".qi-header");
-  const stuck = header && getComputedStyle(header).position === "sticky" ? header.getBoundingClientRect().bottom : 0;
-  const room = trigger.getBoundingClientRect().top - stuck;
+  const room = trigger.getBoundingClientRect().top;
   return Math.max(0, Math.min(below + BOTTOM_GAP, room));
 }

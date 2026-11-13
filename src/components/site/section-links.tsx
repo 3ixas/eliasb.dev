@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 /** How far down the window a section's top may be and still count as the one in view: a third of the way. */
 const READING_LINE = 1 / 3;
+
+/** Where the links stop hiding behind Menu (shell.css). */
+const WIDE = "(min-width: 720px)";
 
 /**
  * The id of the last section whose top has passed the reading line, or none above the first. At the foot of the
@@ -21,15 +24,11 @@ function sectionInView(ids: readonly string[]): string | null {
   return current;
 }
 
-/**
- * The header's links to the sections of the page: quiet text, with the one whose section is in view underlined
- * and marked `aria-current`. The links are in the server HTML; the mark follows once script runs.
- */
-export function SectionLinks({ label, sections }: { label: string; sections: readonly { id: string; label: string }[] }) {
+/** On the homepage, the id of the section in view, followed as the page scrolls; elsewhere always none. */
+function useSectionInView(ids: readonly string[], track: boolean) {
   const [current, setCurrent] = useState<string | null>(null);
-
   useEffect(() => {
-    const ids = sections.map(({ id }) => id);
+    if (!track) return;
     let frame = 0;
     const update = () => {
       cancelAnimationFrame(frame);
@@ -43,19 +42,59 @@ export function SectionLinks({ label, sections }: { label: string; sections: rea
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
     };
-  }, [sections]);
+  }, [ids, track]);
+  return current;
+}
+
+type Props = { home: boolean; label: string; menuLabel: string; sections: readonly { id: string; label: string }[] };
+
+/**
+ * The header's links to the homepage's sections, and Menu, which holds them under 720 px (DESIGN.md "The header").
+ * The links are in the server HTML and show without script (shell.css hides them only once the boot script has
+ * marked the page `data-script`). Menu reports `aria-expanded`; Escape closes it and gives focus back to it, and
+ * choosing a link closes it. It comes before the links, so Tab goes from Menu into the list it opened.
+ */
+export function SectionLinks({ home, label, menuLabel, sections }: Props) {
+  const [ids] = useState(() => sections.map(({ id }) => id));
+  const current = useSectionInView(ids, home);
+  const [open, setOpen] = useState(false);
+  const button = useRef<HTMLButtonElement>(null);
+  const navId = useId();
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setOpen(false);
+      button.current?.focus();
+    };
+    // Widening past the phone layout shows the links anyway; the list should not be found open on the way back.
+    const wide = window.matchMedia(WIDE);
+    const onWide = () => wide.matches && setOpen(false);
+    document.addEventListener("keydown", onKey);
+    wide.addEventListener("change", onWide);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      wide.removeEventListener("change", onWide);
+    };
+  }, [open]);
 
   return (
-    <nav aria-label={label} className="qi-header__links">
-      <ul>
-        {sections.map(({ id, label: name }) => (
-          <li key={id}>
-            <a href={`#${id}`} aria-current={current === id ? "location" : undefined}>
-              {name}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
+    <div className="site-header__links">
+      <button ref={button} type="button" className="menu-button" aria-expanded={open} aria-controls={navId} onClick={() => setOpen(!open)}>
+        {menuLabel}
+      </button>
+      <nav id={navId} aria-label={label} className="site-nav" data-open={open || undefined}>
+        <ul>
+          {sections.map(({ id, label: name }) => (
+            <li key={id}>
+              <a href={home ? `#${id}` : `/#${id}`} aria-current={current === id ? "location" : undefined} onClick={() => setOpen(false)}>
+                {name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
   );
 }
