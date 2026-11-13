@@ -1,12 +1,13 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-// A screenshot on a long-form page opens large in the same window: a case study's, and a Role story's.
+// A screenshot on a long-form page opens large in the same window: a case study's, and a Role story's (and its certificate).
 const pages = [
   { route: "/things-i-make/threshold", trigger: ".qi-case__below .qi-zoom" },
   { route: "/things-i-make/argus-risk", trigger: "section#decisions .qi-zoom" },
-  { route: "/work/joveen", trigger: ".qi-screens .qi-zoom" },
-  { route: "/work/optegra", trigger: ".qi-screens .qi-zoom" },
+  { route: "/work/joveen", trigger: ".story-fig .qi-zoom" },
+  { route: "/work/optegra", trigger: ".story-fig .qi-zoom" },
+  { route: "/work/bnp-paribas", trigger: "#take-ownership-certificate .qi-zoom" },
 ];
 
 for (const { route, trigger } of pages) {

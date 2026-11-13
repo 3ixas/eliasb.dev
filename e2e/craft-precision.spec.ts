@@ -152,7 +152,7 @@ test.describe("Nothing is blank", () => {
 
   test("a full-column screenshot asks for a full-column file", async ({ page }) => {
     await page.goto("/work/optegra");
-    await expect(page.locator(".qi-screens .qi-zoom img").first()).toHaveAttribute("sizes", "(min-width: 761px) 600px, 100vw");
+    await expect(page.locator(".story-fig .qi-zoom img").first()).toHaveAttribute("sizes", "(min-width: 1260px) 760px, (min-width: 720px) 60vw, 100vw");
   });
 
   test("the site declares a touch icon", async ({ page }) => {
@@ -204,7 +204,7 @@ test.describe("Reading on a phone", () => {
 
   test("prose and row lines avoid a lone last word", async ({ page }) => {
     await page.goto("/work/bnp-paribas");
-    await expect(page.locator(".qi-long p").first()).toHaveCSS("text-wrap-style", "pretty");
+    await expect(page.locator(".story .prose p").first()).toHaveCSS("text-wrap-style", "pretty");
     // The 404's suggestions are the last rows on the site since the homepage became panels (#416).
     await page.goto("/nothing-here");
     await expect(page.locator(".qi-row__line").first()).toHaveCSS("text-wrap-style", "pretty");
@@ -237,13 +237,6 @@ test.describe("Alignment and consistency", () => {
     }
   });
 
-  test("Pass pins start on the text edge", async ({ page }) => {
-    await page.goto("/work/bnp-paribas");
-    const pins = await page.locator(".qi-pins").first().boundingBox();
-    const title = await page.locator("h1").boundingBox();
-    expect(Math.abs(pins!.x - title!.x)).toBeLessThanOrEqual(0.6);
-  });
-
   for (const route of ["/work/joveen", "/work/optegra"]) {
     test(`every link leaving the site from ${route} opens in a new tab`, async ({ page }) => {
       await page.goto(route);
@@ -268,18 +261,22 @@ test.describe("Colour", () => {
     return 0.2126 * x + 0.7152 * y + 0.0722 * z;
   };
 
-  test("a to-scale figure's long bar holds 3:1 on its card", async ({ page }) => {
+  test("a to-scale figure's long bar holds 3:1 on its panel", async ({ page }) => {
     await page.goto("/work/bnp-paribas");
-    const bar = page.locator('.qi-scale__bar[data-kind="before"] .qi-scale__fill').first();
-    await bar.scrollIntoViewIfNeeded();
+    const bar = page.locator("section#what-changed .bar:not(.bar--after)").first();
+    await bar.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
     const colours = await bar.evaluate((element) => {
       const canvas = document.createElement("canvas").getContext("2d", { willReadFrequently: true })!;
-      const pixel = (colour: string) => {
-        canvas.fillStyle = colour;
-        canvas.fillRect(0, 0, 1, 1);
+      const field = getComputedStyle(element.closest(".panel")!).backgroundColor;
+      // The bar is painted over the panel, so a translucent bar is read as the colour it composites to there.
+      const pixel = (...layers: string[]) => {
+        for (const colour of layers) {
+          canvas.fillStyle = colour;
+          canvas.fillRect(0, 0, 1, 1);
+        }
         return [...canvas.getImageData(0, 0, 1, 1).data].slice(0, 3);
       };
-      return { bar: pixel(getComputedStyle(element).backgroundColor), card: pixel(getComputedStyle(element.closest(".qi-figure__card")!).backgroundColor) };
+      return { bar: pixel(field, getComputedStyle(element).backgroundColor), card: pixel(field) };
     });
     const [lighter, darker] = [luminance(colours.bar), luminance(colours.card)].sort((a, b) => b - a);
     expect((lighter + 0.05) / (darker + 0.05)).toBeGreaterThanOrEqual(3);

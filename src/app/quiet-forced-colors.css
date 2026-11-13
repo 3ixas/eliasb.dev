@@ -22,26 +22,6 @@
     background: CanvasText;
   }
 
-  /* The to-scale bars: before is the text colour and after is the highlight, as the labels say. */
-  .qi-scale__fill {
-    background: CanvasText;
-  }
-
-  .qi-scale__bar[data-kind="after"] .qi-scale__fill {
-    background: Highlight;
-  }
-
-  /* The switch in the off position. */
-  .qi-flag__toggle {
-    border: 1px solid CanvasText;
-    background: Canvas;
-  }
-
-  .qi-flag__toggle::after {
-    background: CanvasText;
-    box-shadow: none;
-  }
-
   /* The GitHub year keeps GitHub's five levels (they are the data), each cell with a hairline so an empty day still shows. */
   .stretch-gh__day {
     forced-color-adjust: none;

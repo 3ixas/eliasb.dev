@@ -80,17 +80,12 @@ test("the Fine cut: section titles and row titles take the agreed values", async
 });
 
 test("the bold lead-ins in prose take the section title's weight, and the skip link is on the type scale", async ({ page }) => {
-  await page.goto("/work/bnp-paribas");
+  // A case study keeps the quiet index's prose until #418; a Role story's points are story.css's since #417.
+  await page.goto("/things-i-make/threshold");
   await page.evaluate(() => document.fonts.ready);
   const weight = (selector: string) => page.locator(selector).first().evaluate((element) => getComputedStyle(element).fontWeight);
   expect(await weight(".qi-long__p strong")).toBe("620");
   expect(await page.locator(".skip-link").evaluate((element) => getComputedStyle(element).fontSize)).toBe("15px");
-});
-
-test("dotted words skip no ink", async ({ page }) => {
-  // The homepage's opening lost its dotted words in #412; a Role story keeps them until #417.
-  await page.goto("/work/bnp-paribas");
-  await expect(page.locator(".qi-word").first()).toHaveCSS("text-decoration-skip-ink", "none");
 });
 
 test("dark mode smooths text to greyscale and light mode keeps the default", async ({ page }, testInfo) => {
@@ -108,7 +103,8 @@ test("homepage sections sit 144 px apart on a wide screen and 96 px on a phone (
 });
 
 test("a long-form page's sections sit 56 px apart", async ({ page }) => {
-  await page.goto("/work/bnp-paribas");
+  // A case study keeps the quiet index's long form until #418; a Role story's sections are role-story.spec's since #417.
+  await page.goto("/things-i-make/threshold");
   const margin = await page.locator(".qi-long__section").first().evaluate((element) => getComputedStyle(element).marginTop);
   expect(margin).toBe("56px");
 });

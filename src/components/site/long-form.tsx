@@ -7,7 +7,8 @@ import { SayHello } from "@/components/site/say-hello";
 import { SiteHeader } from "@/components/site/site-header";
 
 /*
- * The long-form template (docs/design/DESIGN.md, "Long-form pages"): what a Role story and a case study share.
+ * The long-form template (docs/design/DESIGN.md, "Long-form pages"): the page around a Role story, a case study and
+ * the 404. Until #418 and #419 move them onto story-parts.tsx, the pieces below it are the case study's and the 404's.
  * The shared header, then one 600 px column: a back link, an opening,
  * sections at 17 px, and one row to the next page. The pieces here know nothing about either page; what belongs
  * to one (the pass, the screenshot, the figures) is passed in. Server-rendered in full, so it reads the same
@@ -49,16 +50,12 @@ export function BackLink({ href, label }: { href: string; label: string }) {
   );
 }
 
-/**
- * The opening: the title as the page's one `h1` in the opening line's treatment, its line, quiet metadata, and
- * the page's object beside it (below the title on a phone), and what hangs from the object under the title, in
- * the room the object leaves (after it on a phone). `long` sets a name too long for the display size smaller.
- */
-export function LongFormOpening({ titleId, title, line, meta, long, aside, below }: { titleId: string; title: string; line: string; meta?: readonly string[]; long?: boolean; aside?: ReactNode; below?: ReactNode }) {
+/** The opening: the title as the page's one `h1` in the opening line's treatment, its line, quiet metadata, and what the page puts beneath. */
+export function LongFormOpening({ titleId, title, line, meta, below }: { titleId: string; title: string; line: string; meta?: readonly string[]; below?: ReactNode }) {
   return (
-    <header className="qi-long__open" data-aside={aside ? "" : undefined}>
+    <header className="qi-long__open">
       <div className="qi-long__heading">
-        <h1 id={titleId} className="qi-opening__line qi-long__title" data-long={long ? "" : undefined}>
+        <h1 id={titleId} className="qi-opening__line qi-long__title">
           {title}
         </h1>
         <p className="qi-long__line">{line}</p>
@@ -68,7 +65,6 @@ export function LongFormOpening({ titleId, title, line, meta, long, aside, below
           </p>
         )}
       </div>
-      {aside}
       {below}
     </header>
   );

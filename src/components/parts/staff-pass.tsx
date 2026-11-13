@@ -12,16 +12,18 @@ const portrait = { src: "/profile/elias-evening-pass.webp", width: 352, height: 
  * A staff pass (DESIGN.md "The staff pass", R-12): a printed CR80 card hanging from a two-ply lanyard by a metal clip
  * whose legs pass through the slot. Top to bottom it prints the employer's band, the portrait with the name, role and
  * dates, three points and the status with a barcode. The current pass is in colour with a hologram; a returned one is
- * greyscale. It keeps its printed colours in both themes. The drawing is hidden from assistive technology; the link's
- * name is its print. Sizes inside are in em of the card's width ÷ 14.5 (pass.css).
+ * greyscale. It keeps its printed colours in both themes. The drawing is hidden from assistive technology; the pass's
+ * name is its print. With `href` it is a link (the homepage's, to its employer in Work); without, it is an image (a Role
+ * story's own pass, which has nowhere further to go). Sizes inside are in em of the card's width ÷ 14.5 (pass.css).
  */
-export function StaffPass({ slug, href, lead = false, drop = 1, priority = false }: { slug: RoleStorySlug; href: string; lead?: boolean; drop?: number; priority?: boolean }) {
+export function StaffPass({ slug, href, lead = false, drop = 1, priority = false }: { slug: RoleStorySlug; href?: string; lead?: boolean; drop?: number; priority?: boolean }) {
   const { short, points, lanyard } = passRecords[slug];
   const { role, dates, panel } = roleStories[slug];
   const { state, tilt } = passHang[slug];
   const style = { "--field": panel.field, "--band-ink": panel.ink, "--lanyard": lanyard, "--tilt": `${tilt}deg`, "--drop-by": drop } as CSSProperties;
+  const Tag = href ? "a" : "div";
   return (
-    <a className={lead ? "pass pass--lead" : "pass"} href={href} style={style} data-state={state} aria-label={passName(slug)}>
+    <Tag className={lead ? "pass pass--lead" : "pass"} {...(href ? { href } : { role: "img" })} style={style} data-state={state} aria-label={passName(slug)}>
       <span className="pass__lanyard" aria-hidden="true">
         <i />
         <i />
@@ -71,6 +73,6 @@ export function StaffPass({ slug, href, lead = false, drop = 1, priority = false
         </span>
         <i className="pass__sheen" />
       </span>
-    </a>
+    </Tag>
   );
 }

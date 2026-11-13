@@ -1,0 +1,494 @@
+/*
+ * Long-form pages on the passes and panels design (docs/design/DESIGN.md "Long-form pages", R-21;
+ * components/site/role-story.tsx and story-parts.tsx): a Role story's opening with its pass, sections with the heading
+ * at the left (4 of 12 columns) and the text at the right (at most 760 px), figures in the text column, and the next
+ * page as a panel. The panel, the bars and the arrivals are parts.css's.
+ */
+
+/* ---- The back link ---- */
+
+.story-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: var(--ink);
+  font-size: var(--type-small);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  .story-back:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+
+/* The passes and panels ring on the page's own links (DESIGN.md "Controls"); the next panel's sits outside its colour, so it is cobalt too. */
+:where(.story-back, .story-fig__source, .next-panel):focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 3px;
+}
+
+/* ---- A Role story's opening ---- */
+
+/* The text at the left; the pass hangs from the header's rule at the right, its lanyard running up out of view. */
+.story-open {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: 24px;
+  min-height: 640px;
+}
+
+.story-open__text {
+  align-self: center;
+  min-width: 0;
+  padding: 40px 0 72px;
+}
+
+.story-open__title {
+  margin: 20px 0 0;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-title);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+/* An employer's name too long for the display size (Optegra Eye Healthcare & Kensington Medical) is set smaller, so its longest word fits at 320 px. */
+.story-open__title[data-long] {
+  font-size: clamp(36px, 4.6vw, 72px);
+  line-height: 1;
+}
+
+/*
+ * Role, dates and setting on one muted line, wrapping between parts and never inside one. Each dot sits in the gap before
+ * its part, so a part that starts a new line takes its dot past the line's left edge, where the line clips it.
+ */
+.story-open__meta {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1em;
+  margin: 18px 0 0;
+  overflow: clip;
+  color: var(--muted);
+  font-size: var(--type-ui);
+  line-height: 1.5;
+}
+
+.story-open__part {
+  position: relative;
+  white-space: nowrap;
+}
+
+.story-open__part + .story-open__part::before {
+  content: "·" / ", ";
+  position: absolute;
+  right: 100%;
+  width: 1em;
+  text-align: center;
+}
+
+.story-open__lede {
+  max-width: 25em;
+  margin: 28px 0 0;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-lede);
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+/* The evidence figures: each value large in Newsreader over its muted words. Four wrap two by two where they do not fit in a row. */
+.story-open__figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px 36px;
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: var(--type-small);
+  line-height: 1.4;
+}
+
+.story-open__figures li {
+  max-width: 12em;
+}
+
+.story-open__figures b {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: 46px;
+  font-weight: 500;
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+
+.story-open__rail {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-bottom: 48px;
+  clip-path: inset(0 -200px -200px -200px);
+}
+
+/* ---- Sections ---- */
+
+.story-section {
+  display: grid;
+  grid-template-columns: 4fr 8fr;
+  gap: 24px;
+  padding: 64px 0;
+  border-top: 1px solid var(--hair);
+  scroll-margin-top: 24px;
+}
+
+/* Focused by an address that names it; the heading is what shows it. */
+.story-section:focus {
+  outline: none;
+}
+
+.story-section__title {
+  margin: 0;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: clamp(28px, 2.7vw, 40px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.story-section__body {
+  min-width: 0;
+  max-width: 760px;
+}
+
+.prose p {
+  margin: 0;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-prose);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.prose p + p {
+  margin-top: 1em;
+}
+
+.prose + .points {
+  margin-top: 32px;
+}
+
+.points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.points li {
+  padding: 20px 0;
+  border-top: 1px solid var(--hair);
+}
+
+.points li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.points b {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-lead);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+.points span {
+  display: block;
+  color: var(--muted);
+  font-size: var(--type-body);
+  line-height: 1.55;
+}
+
+/* ---- Figures ---- */
+
+.story-fig {
+  margin: 36px 0 0;
+}
+
+.story-fig figcaption {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: var(--type-small);
+  line-height: 1.4;
+}
+
+/* The before bar is the ink at 70%, so it holds 3:1 on the field (BNP Paribas's green is the closest); the after bar is the ink, and thicker. */
+.story-fig__panel {
+  --soft: color-mix(in srgb, var(--panel-ink) 70%, var(--field));
+  --solid: var(--panel-ink);
+  padding: 32px 36px 36px;
+  border-radius: 16px;
+  /* In dark a hairline of the panel's ink holds its edge, as on Work's panels. */
+  box-shadow: inset 0 0 0 1px light-dark(transparent, color-mix(in srgb, var(--panel-ink) 14%, transparent));
+}
+
+/* The flag: today's path solid, the new one dashed behind a switch that is off. */
+.lanes {
+  display: grid;
+  gap: 26px;
+}
+
+.lane {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 14px;
+  margin: 0;
+  font-size: var(--type-small);
+  font-weight: 500;
+}
+
+.lane > span:first-child {
+  grid-column: 1 / -1;
+}
+
+.lane i {
+  grid-column: 1 / -1;
+  height: 0;
+  border-top: 3px solid var(--panel-ink);
+  border-radius: 2px;
+}
+
+.lane--new {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.lane--new i {
+  grid-column: 2;
+  border-top: 2px dashed var(--panel-ink);
+  opacity: 0.55;
+}
+
+.lane b {
+  font-weight: 600;
+}
+
+/* A switch in the off position: the knob sits at the left. */
+.lane__switch {
+  position: relative;
+  width: 34px;
+  height: 20px;
+  border: 1.5px solid var(--panel-ink);
+  border-radius: 10px;
+}
+
+.lane__switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--panel-ink);
+}
+
+/* The comparisons: two side by side, each a title and its two bars to scale. */
+.cmps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px 56px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cmps h3 {
+  margin: 0 0 4px;
+  font-family: var(--sans);
+  font-size: var(--type-ui);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+/* Screenshots and the certificate: as they are, 16 px corners and a hairline edge. The frame does not clip, so the focus ring shows. */
+.story-fig__shots {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.story-fig__shot {
+  flex: var(--ar, 1) 1 0;
+  min-width: 0;
+}
+
+.story-fig__shot .qi-zoom {
+  display: block;
+  width: 100%;
+}
+
+/* The inline image only: the dialog beside it holds the large copy, which keeps its own size. */
+.story-fig__shot .qi-zoom img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px var(--hair), 0 30px 50px -36px var(--shadow);
+}
+
+/* On its own line, so the link is a 44 px target. */
+.story-fig__source {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--hair);
+  text-underline-offset: 4px;
+}
+
+/* ---- The next page ---- */
+
+.story-next {
+  margin-top: 32px;
+}
+
+.next-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 24px;
+  padding: 40px 44px;
+  text-decoration: none;
+}
+
+.next-panel__line {
+  display: grid;
+  font-size: var(--type-ui);
+  line-height: 1.45;
+}
+
+.next-panel__name {
+  display: inline-flex;
+  gap: 0.25em;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: clamp(36px, 5vw, 72px);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.next-panel__name .arrow {
+  transition: transform 0.25s var(--out);
+}
+
+@media (hover: hover) {
+  .next-panel:hover .arrow {
+    transform: translateX(4px);
+  }
+}
+
+/* ---- Under 1260 px: the pass hangs below the text, from a hairline ---- */
+
+@media (max-width: 1259.98px) {
+  .story-open {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .story-open__text {
+    padding-bottom: 48px;
+  }
+
+  .story-open__rail {
+    padding-bottom: 24px;
+    border-top: 1px solid var(--hair);
+  }
+
+  .story-open__rail .pass {
+    --drop: 132px;
+  }
+}
+
+/* ---- Phone ---- */
+
+@media (max-width: 719.98px) {
+  .story-open__text {
+    padding-top: 24px;
+  }
+
+  .story-open__figures {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 20px;
+  }
+
+  .story-open__figures li {
+    max-width: none;
+  }
+
+  .story-open__figures b {
+    font-size: 34px;
+    white-space: normal;
+  }
+
+  .story-open__rail .pass {
+    --drop: 88px;
+  }
+
+  .story-section {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding: 44px 0;
+  }
+
+  .story-fig__panel {
+    padding: 24px 22px 26px;
+  }
+
+  .cmps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .next-panel {
+    flex-direction: column;
+    gap: 8px;
+    padding: 26px 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .next-panel__name .arrow {
+    transition: none;
+  }
+}
+
+/* Forced colours keep the flag: the lines and the switch in the text colour (R-29). */
+@media (forced-colors: active) {
+  .lane i,
+  .lane__switch {
+    border-color: CanvasText;
+  }
+
+  .lane__switch::after {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+}
