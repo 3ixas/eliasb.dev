@@ -21,6 +21,8 @@
   transform: rotate(var(--tilt, 0deg));
   transform-origin: 50% 0;
   transition: transform 0.8s var(--spring);
+  /* Its own layer: the swing and the lean turn the card as painted, rather than repainting its blurred shadows every frame. */
+  will-change: transform;
 }
 
 .pass--lead {

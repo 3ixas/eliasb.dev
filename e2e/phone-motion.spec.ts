@@ -10,11 +10,17 @@ const inlineOnly = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1180;
 const SLOT = '[data-look-slot="joveen"]';
 const TRIGGER = '#work button[data-look-tap="joveen"]';
 
-const hydrated = (page: Page) =>
-  page.waitForFunction(() => {
+/**
+ * Hydrated, with the opening's passes at rest: their arrival swing is finished at once, as a motion spec seeks rather
+ * than waits, so a slow engine is not painting it while the fold under test runs.
+ */
+const hydrated = async (page: Page) => {
+  await page.waitForFunction(() => {
     const columns = [...document.querySelectorAll("[data-quiet-column]")];
     return columns.length > 0 && columns.every((column) => Object.keys(column).some((key) => key.startsWith("__reactProps$")));
   });
+  await page.evaluate(() => document.querySelectorAll(".pass").forEach((pass) => pass.getAnimations().forEach((animation) => animation.finish())));
+};
 
 test.describe("The fold", () => {
   test.use({ reducedMotion: "no-preference" });
