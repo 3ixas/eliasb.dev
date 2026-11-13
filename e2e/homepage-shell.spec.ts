@@ -10,8 +10,8 @@ import { renderedContrast } from "./support/rendered-contrast";
 
 const menuLabels = siteCopy.menu.map(({ label }) => label);
 
-/** Under `width` px: by default the phone header, whose links are behind Menu. */
-const narrow = (page: Page, width = 720) => (page.viewportSize()?.width ?? 0) < width;
+/** Under `width` px: by default the narrow header, whose links are behind Menu. */
+const narrow = (page: Page, width = 900) => (page.viewportSize()?.width ?? 0) < width;
 
 const sections = [
   { id: "work", heading: work.heading, note: work.note },
@@ -72,7 +72,7 @@ test.describe("Homepage shell", () => {
   });
 
   test("the header links jump to each section and mark the one in view", async ({ page }) => {
-    test.skip(narrow(page), "Under 720 px the links are behind Menu (below)");
+    test.skip(narrow(page), "Under 900 px the links are behind Menu (below)");
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     const nav = page.getByRole("navigation", { name: siteCopy.header.linksLabel });
@@ -93,7 +93,7 @@ test.describe("Homepage shell", () => {
   });
 
   test("the links are muted 14.5 px text, taking ink and the tint on hover", async ({ page }) => {
-    test.skip(narrow(page), "Under 720 px the links are behind Menu");
+    test.skip(narrow(page), "Under 900 px the links are behind Menu");
     await page.goto("/");
     const link = page.getByRole("navigation", { name: siteCopy.header.linksLabel }).getByRole("link", { name: "How I work", exact: true });
     await expect(link).toHaveCSS("font-size", "14.5px");
@@ -104,8 +104,8 @@ test.describe("Homepage shell", () => {
     await expect.poll(() => link.evaluate((element) => getComputedStyle(element).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
   });
 
-  test("under 720 px the links are behind Menu, which reports its state, closes on Escape and on a link, and gives focus back", async ({ page, browserName }) => {
-    test.skip(!narrow(page), "Phone header");
+  test("under 900 px the links are behind Menu, which reports its state, closes on Escape and on a link, and gives focus back", async ({ page, browserName }) => {
+    test.skip(!narrow(page), "Narrow header");
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     const nav = page.locator(".site-nav");
@@ -199,6 +199,24 @@ test.describe("Homepage shell", () => {
       });
       expect(reach, (await control.textContent()) ?? "control").toBeGreaterThanOrEqual(44);
     }
+  });
+
+  test("the header fits on one row at every width around Menu's breakpoint, with the theme control inside the gutter", async ({ browser }, testInfo) => {
+    test.skip(!/-1440-light$/.test(testInfo.project.name), "Sweeps its own widths: once per engine");
+    const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+    const page = await context.newPage();
+    await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
+    for (const width of [720, 760, 820, 899, 900, 960, 1024, 1100]) {
+      await page.setViewportSize({ width, height: 900 });
+      const gutter = width < 720 ? 16 : 32;
+      await expect.poll(() => page.locator("[data-eclipse]").evaluate((element) => element.getBoundingClientRect().right), String(width)).toBeLessThanOrEqual(width - gutter + 0.5);
+      expect((await page.locator("[data-site-header]").boundingBox())!.height, String(width)).toBeCloseTo(64, 0);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), String(width)).toBeLessThanOrEqual(0);
+      const menuShown = await page.getByRole("button", { name: siteCopy.header.menuButton, exact: true }).isVisible();
+      expect(menuShown, String(width)).toBe(width < 900);
+    }
+    await context.close();
   });
 
   test("the header scrolls away with the page", async ({ page }) => {

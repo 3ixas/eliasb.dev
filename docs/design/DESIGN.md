@@ -70,7 +70,7 @@ One set on every page.
 | Row | The other projects and the 404's suggestions: name, line and metadata on a hairline; the whole row takes the tint on hover |
 | Chip | 13 px / 500 to 600 in a round outline: a stack item, or a source in its colour |
 | Theme control | A 36 px round button in the header |
-| Menu | Under 720 px: a 36 px outline button that opens the section links as a list beneath the header |
+| Menu | Under 900 px: a 36 px outline button that opens the section links as a list beneath the header |
 
 - **Hover** applies only to a hovering fine pointer. Arrows move 4 px.
 - **Press**: 0.97 scale over 150 ms. Reduced motion drops the scale.
@@ -80,7 +80,7 @@ One set on every page.
 
 ## The header (every page)
 
-The name in Newsreader 500 at 20 px, a link to the homepage; the greeting; the five section links (Work, Things I make, How I work, Off the clock, Say hello) in a navigation landmark named "On this page"; and the theme control. It sits over a 1 px ink rule and is 64 px tall. It is not sticky. On an inner page the links go to the homepage's sections. Under 720 px the links are behind Menu; Escape or choosing one closes it. Without script the links show.
+The name in Newsreader 500 at 20 px, a link to the homepage; the greeting; the five section links (Work, Things I make, How I work, Off the clock, Say hello) in a navigation landmark named "On this page"; and the theme control. It sits over a 1 px ink rule and is 64 px tall. It is not sticky. On an inner page the links go to the homepage's sections. Under 900 px, where the full row no longer fits, the links are behind Menu; Escape or choosing one closes it. Without script the links show.
 
 **The greeting** is the existing one, whole: "Hello" before the clock is read and without script, then by the visitor's own time "Kettle’s on." (from 05:00), "Nearly five?" on a weekday or "Nowhere to be?" at the weekend (from 12:00), "Home yet?" (from 17:00), "Still up?" (from 22:00), with its small scene. Hover or focus adds "it’s HH:MM here in London". Its width is reserved for the longest line. It hides under 400 px.
 

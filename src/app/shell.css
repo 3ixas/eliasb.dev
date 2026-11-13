@@ -131,7 +131,7 @@ html:has([data-stretch-shell]) {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  padding-inline: 12px;
+  padding-inline: 10px;
   border-radius: 999px;
   color: var(--muted);
   text-decoration: none;
@@ -623,7 +623,10 @@ html:has([data-stretch-shell]) {
   .say-hello__links {
     gap: 0 22px;
   }
+}
 
+/* The full row needs about 880 px (name, greeting, five links, theme control), so the links wait behind Menu below 900 px. */
+@media (max-width: 899.98px) {
   /* Once script runs, the links wait behind Menu and open as a list under the header's rule. */
   :root[data-script] .menu-button {
     display: inline-flex;
@@ -637,7 +640,7 @@ html:has([data-stretch-shell]) {
     right: 0;
     /* Under the header's rule, not over it. */
     top: calc(100% + 1px);
-    padding: 4px 16px 8px;
+    padding: 4px var(--menu-gutter, 32px) 8px;
     border-bottom: 1px solid var(--ink);
     background-color: var(--page);
   }
@@ -683,6 +686,13 @@ html:has([data-stretch-shell]) {
 
   :root:not([data-script]) .site-nav a {
     padding-inline: 0 12px;
+  }
+}
+
+/* The Menu list keeps the page's gutter. */
+@media (max-width: 719.98px) {
+  :root[data-script] .site-nav {
+    --menu-gutter: 16px;
   }
 }
 

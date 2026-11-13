@@ -6,7 +6,7 @@ import { useEffect, useId, useRef, useState } from "react";
 const READING_LINE = 1 / 3;
 
 /** Where the links stop hiding behind Menu (shell.css). */
-const WIDE = "(min-width: 720px)";
+const WIDE = "(min-width: 900px)";
 
 /**
  * The id of the last section whose top has passed the reading line, or none above the first. At the foot of the
@@ -49,7 +49,7 @@ function useSectionInView(ids: readonly string[], track: boolean) {
 type Props = { home: boolean; label: string; menuLabel: string; sections: readonly { id: string; label: string }[] };
 
 /**
- * The header's links to the homepage's sections, and Menu, which holds them under 720 px (DESIGN.md "The header").
+ * The header's links to the homepage's sections, and Menu, which holds them under 900 px (DESIGN.md "The header").
  * The links are in the server HTML and show without script (shell.css hides them only once the boot script has
  * marked the page `data-script`). Menu reports `aria-expanded`; Escape closes it and gives focus back to it, and
  * choosing a link closes it. It comes before the links, so Tab goes from Menu into the list it opened.
