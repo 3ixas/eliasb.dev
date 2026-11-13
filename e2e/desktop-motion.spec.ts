@@ -8,8 +8,8 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const wide = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1180;
 const margin = (page: Page) => page.locator(".qi-margin");
-const rowFor = (page: Page, id: string) => page.locator(`section#off-the-clock [data-look="${id}"]`);
-/* Off the clock's training and book rows: the homepage's first rows with closer looks now that Work and How I work are panels and cards (#413, #414). */
+const rowFor = (page: Page, id: string) => page.locator(`[data-fixture="pair"] [data-look="${id}"]`);
+/* Off the clock's training and book rows on fixed data (/fixtures/off-the-clock, "pair"): the homepage's book depends on Goodreads. */
 const FIRST = "book";
 const NEXT = "training";
 /** The training row's look: the week. */
@@ -52,7 +52,7 @@ test.describe("Desktop motion: the margin", () => {
   test.use({ reducedMotion: "no-preference" });
 
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/fixtures/off-the-clock");
     await hydrated(page);
     const first = rowFor(page, FIRST);
     await first.scrollIntoViewIfNeeded();
@@ -184,7 +184,7 @@ test.describe("Desktop motion: the margin", () => {
             observer.disconnect();
             const fade = node.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "opacity");
             const fadeMs = Number(fade?.effect?.getComputedTiming().duration);
-            document.querySelector('section#off-the-clock [data-look="training"]')!.dispatchEvent(new PointerEvent("pointerover", { bubbles: true, pointerType: "mouse" }));
+            document.querySelector('[data-fixture="pair"] [data-look="training"]')!.dispatchEvent(new PointerEvent("pointerover", { bubbles: true, pointerType: "mouse" }));
             requestAnimationFrame(() =>
               requestAnimationFrame(() =>
               resolve({
@@ -261,7 +261,7 @@ test.describe("Desktop motion: reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
 
   test("each look still shows with a 0.2 s fade and no arrival, and a sweep has no glide or fade-out", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/fixtures/off-the-clock");
     await hydrated(page);
     await rowFor(page, FIRST).hover();
     const look = margin(page).locator(".qi-look");

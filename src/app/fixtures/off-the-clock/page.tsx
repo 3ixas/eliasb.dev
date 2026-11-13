@@ -126,6 +126,8 @@ const row = (entry: Entry | null) => <OffTheClockList entries={[entry]} />;
 // The live source mark's dot rings, and only one ring plays at a time, so the states that are not about the mark are saved data: no dot.
 const items = [
   ...trainingAt.map(({ name, at }) => ({ name: `training-${name}`, item: row(trainingEntry(at)) })),
+  // Two rows under one controller, on fixed data: the closer looks' own specs move between them (inline-looks, desktop-motion).
+  { name: "pair", item: <OffTheClockList entries={[trainingEntry(trainingAt[1].at), bookEntry(reading({ state: "curated" }), now)]} /> },
   { name: "book", item: row(bookEntry(reading({}), now)) },
   { name: "book-empty", item: row(bookEntry(reading({ book: null }), now)) },
   { name: "book-unfetched", item: row(bookEntry(reading({ state: "pending", book: null, updatedAt: null }), now)) },

@@ -3,12 +3,12 @@ import { tap } from "./support/tap";
 
 /*
  * Inline closer looks on phones and touch (docs/design/DESIGN.md, "Inline"): below 1180 px a closer look opens
- * under its row, only when tapped. Work and How I work are panels and cards now (#413, #414), so these run on Off the
- * clock's rows: training, the homepage's last plain row with a look, and the book below it, a link whose look opens on a
- * tap. The spec retires with Off the clock's rows in #416.
+ * under its row, only when tapped. These run on Off the clock's training row, a plain row, and the book below it, a link
+ * whose look opens on a tap, on fixed data (/fixtures/off-the-clock, "pair"): the homepage's book depends on Goodreads.
+ * The spec retires with Off the clock's rows in #416.
  */
 
-const section = (page: Page) => page.locator("section#off-the-clock");
+const section = (page: Page) => page.locator('[data-fixture="pair"]');
 const row = (page: Page, id: string) => section(page).locator(`.qi-row[data-look-tap="${id}"]`);
 const openLooks = (page: Page) => page.locator(".qi-inline__in");
 const inlineLook = (page: Page, id: string) => section(page).locator(`[data-look-slot="${id}"] .qi-look`);
@@ -21,10 +21,10 @@ test.describe("Inline closer looks", () => {
 
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
-    await page.goto("/");
+    await page.goto("/fixtures/off-the-clock");
     // The controller listens through React's props on the column, which exist only once it has hydrated; a tap before that does nothing.
     await page.waitForFunction(() => {
-      const column = document.querySelector("#off-the-clock [data-quiet-column]");
+      const column = document.querySelector('[data-fixture="pair"] [data-quiet-column]');
       return !!column && Object.keys(column).some((key) => key.startsWith("__reactProps$"));
     });
   });
@@ -46,7 +46,7 @@ test.describe("Inline closer looks", () => {
     await expect(inlineLook(page, below)).toBeVisible();
     await expect(openLooks(page)).toHaveCount(1);
     await expect(inlineLook(page, plain)).toHaveCount(0);
-    await section(page).getByRole("heading", { level: 2 }).click();
+    await page.locator("body").click({ position: { x: 4, y: 4 } });
     await expect(openLooks(page)).toHaveCount(1);
     await expect(inlineLook(page, below)).toBeVisible();
   });
@@ -96,8 +96,8 @@ test.describe("Inline closer looks", () => {
     const describedBefore = await plainRow.evaluate((element) => document.getElementById(element.getAttribute("aria-describedby")!)!.textContent);
     await tap(page, plainRow);
     await expect(inlineLook(page, plain)).toBeVisible();
-    await expect(page.locator(`[data-look-slot="${plain}"]`)).toHaveAttribute("aria-hidden", "true");
-    await expect(page.locator(`[data-look-slot="${plain}"] a, [data-look-slot="${plain}"] button`)).toHaveCount(0);
+    await expect(section(page).locator(`[data-look-slot="${plain}"]`)).toHaveAttribute("aria-hidden", "true");
+    await expect(section(page).locator(`[data-look-slot="${plain}"] a, [data-look-slot="${plain}"] button`)).toHaveCount(0);
     await expect(plainRow).toHaveAccessibleDescription(describedBefore!);
   });
 
@@ -121,7 +121,7 @@ test.describe("Inline closer looks", () => {
     await expect(look).toBeVisible();
     await expect(look).toHaveCSS("animation-name", "qi-fade");
     await expect(look).toHaveCSS("animation-duration", "0.2s");
-    await expect(page.locator(`[data-look-slot="${plain}"]`)).toHaveCSS("animation-name", "none");
+    await expect(section(page).locator(`[data-look-slot="${plain}"]`)).toHaveCSS("animation-name", "none");
     // Nothing inside the look plays its arrival: the fade on the look itself is all that moves.
     expect(await look.evaluate((element) => element.getAnimations({ subtree: true }).filter((animation) => (animation.effect as KeyframeEffect | null)?.target !== element).length)).toBe(0);
   });

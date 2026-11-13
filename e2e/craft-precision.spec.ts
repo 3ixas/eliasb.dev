@@ -78,11 +78,11 @@ test.describe("Interrupting", () => {
 
   test("after one glide the margin tracks its row exactly as the page scrolls", async ({ page }) => {
     test.skip(!wide(page), "The margin is for wide screens");
-    await page.goto("/");
+    await page.goto("/fixtures/off-the-clock");
     await hydrated(page);
-    // Off the clock's rows: the homepage's first rows with closer looks now that Work and How I work are panels and cards (#413, #414).
-    const bnp = page.locator('#off-the-clock .qi-row[data-look="training"]');
-    const joveen = page.locator('#off-the-clock .qi-row[data-look="book"]');
+    // Off the clock's training and book rows on fixed data: the homepage's book depends on Goodreads.
+    const bnp = page.locator('[data-fixture="pair"] .qi-row[data-look="training"]');
+    const joveen = page.locator('[data-fixture="pair"] .qi-row[data-look="book"]');
     const margin = page.locator(".qi-margin");
     await bnp.scrollIntoViewIfNeeded();
     await bnp.hover();
