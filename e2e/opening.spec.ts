@@ -245,7 +245,9 @@ test.describe("The staff passes", () => {
       await page.evaluate(() => document.querySelectorAll(".opening [aria-hidden='true']").forEach((element) => element.removeAttribute("aria-hidden")));
       const texts = await page.locator(".opening").evaluate((element) => (element as HTMLElement).innerText);
       const readings = (await renderedContrast(page)).filter((reading) => texts.includes(reading.text));
-      for (const expected of [opening.support.slice(0, 20), "Valid · present", "Returned", "Key API p95"]) {
+      // Under 900 px only the first pass is on screen; the others are in the rail's scroll.
+      const shown = width(page) < 900 ? [opening.support.slice(0, 20), "Valid · present"] : [opening.support.slice(0, 20), "Valid · present", "Returned", "Key API p95"];
+      for (const expected of shown) {
         expect(readings.some((reading) => reading.text.includes(expected)), expected).toBe(true);
       }
       expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);

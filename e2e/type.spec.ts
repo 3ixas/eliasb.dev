@@ -53,7 +53,7 @@ test.describe("Fallback faces", () => {
     test.skip(!/^chromium-(390|1440)-light$/.test(testInfo.project.name), "Measured at a phone and a desktop width, in Chromium");
   });
 
-  type Measure = Record<"prose" | "body", { lines: number; height: number }>;
+  type Measure = Record<"opening" | "prose" | "body", { lines: number; height: number }>;
 
   async function measure(page: Page, { blockFonts }: { blockFonts: boolean }): Promise<Measure> {
     if (blockFonts) await page.route(/\.woff2(\?|$)/, (route) => route.abort());
@@ -70,16 +70,19 @@ test.describe("Fallback faces", () => {
         const height = element.getBoundingClientRect().height;
         return { lines: Math.round(height / Number.parseFloat(getComputedStyle(element).lineHeight)), height };
       };
-      return { prose: read("prose"), body: read("body") };
+      return { opening: read("opening"), prose: read("prose"), body: read("body") };
     });
   }
 
-  test("prose and body text keep their lines and height when the real faces replace their fallbacks", async ({ page, context }) => {
+  test("the opening line, prose and body text keep their lines and height when the real faces replace their fallbacks", async ({ page, context }) => {
     const fallback = await measure(page, { blockFonts: true });
     // A new page: a font that failed to load can stay failed for the life of the page.
     const real = await measure(await context.newPage(), { blockFonts: false });
     for (const step of ["prose", "body"] as const) {
       expect(fallback[step].lines, `${step} wraps over more than one line`).toBeGreaterThan(1);
+    }
+    // The opening line's size too: the homepage's h1 is Newsreader since #412 (font-swap.spec.ts measured its old face).
+    for (const step of ["opening", "prose", "body"] as const) {
       expect(fallback[step].lines, `${step}: the same number of lines in either face`).toBe(real[step].lines);
       expect(Math.abs(fallback[step].height - real[step].height), `${step} height`).toBeLessThanOrEqual(1);
     }

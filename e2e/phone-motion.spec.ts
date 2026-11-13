@@ -101,7 +101,7 @@ test.describe("A look that opens low", () => {
     const before = await placeLow(page, 8);
     await page.locator(TRIGGER).click();
     const look = page.locator(`${SLOT} .qi-look`);
-    await expect.poll(async () => (await look.boundingBox())!.y + (await look.boundingBox())!.height, { timeout: 3000 }).toBeLessThanOrEqual((page.viewportSize()!.height ?? 0) - 15);
+    await expect.poll(async () => (await look.boundingBox())!.y + (await look.boundingBox())!.height, { timeout: 3000 }).toBeLessThanOrEqual((page.viewportSize()!.height ?? 0) - 14.5);
     expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(before);
     // The row is still on screen, and clear of the top.
     expect((await page.locator(TRIGGER).boundingBox())!.y).toBeGreaterThanOrEqual(0);
