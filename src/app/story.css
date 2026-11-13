@@ -343,7 +343,8 @@
   width: 100%;
 }
 
-.story-fig__shot img {
+/* The inline image only: the dialog beside it holds the large copy, which keeps its own size. */
+.story-fig__shot .qi-zoom img {
   display: block;
   width: 100%;
   height: auto;
