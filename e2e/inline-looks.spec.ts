@@ -4,7 +4,7 @@ import { tap } from "./support/tap";
 /*
  * Inline closer looks on phones and touch (docs/design/DESIGN.md, "Inline"): below 1180 px a closer look opens
  * under its row, only when tapped. These run on Off the clock's training row, a plain row, and the book below it, a link
- * whose look opens on a tap, on fixed data (/fixtures/off-the-clock, "pair"): the homepage's book depends on Goodreads.
+ * whose look opens on a tap, on fixed data (/fixtures/closer-looks, "pair"): no page shows these rows since #416.
  * The spec retires with Off the clock's rows in #416.
  */
 
@@ -21,7 +21,7 @@ test.describe("Inline closer looks", () => {
 
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
-    await page.goto("/fixtures/off-the-clock");
+    await page.goto("/fixtures/closer-looks");
     // The controller listens through React's props on the column, which exist only once it has hydrated; a tap before that does nothing.
     await page.waitForFunction(() => {
       const column = document.querySelector('[data-fixture="pair"] [data-quiet-column]');

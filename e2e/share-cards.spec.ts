@@ -44,9 +44,10 @@ test.describe("Copy, when the clipboard refuses", () => {
       Object.defineProperty(navigator, "clipboard", { value: { writeText: () => Promise.reject(new Error("refused")) }, configurable: true });
     });
     await page.goto("/");
+    // The Copy button answers once it has hydrated (the homepage has no quiet column to wait on since #416).
     await page.waitForFunction(() => {
-      const columns = [...document.querySelectorAll("[data-quiet-column]")];
-      return columns.length > 0 && columns.every((column) => Object.keys(column).some((key) => key.startsWith("__reactProps$")));
+      const button = document.querySelector(".copy-button");
+      return !!button && Object.keys(button).some((key) => key.startsWith("__reactProps$"));
     });
     const copy = page.locator(".copy-button");
     const label = sayHello.copy;

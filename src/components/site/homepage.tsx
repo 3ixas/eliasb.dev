@@ -26,9 +26,7 @@ export function Homepage() {
 
         <HowIWork />
 
-        <section id="off-the-clock" className="stretch-wrap stretch-section" aria-labelledby="off-the-clock-heading">
-          <OffTheClock />
-        </section>
+        <OffTheClock />
 
         <SayHello />
       </main>

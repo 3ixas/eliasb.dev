@@ -19,8 +19,8 @@ test.describe("Homepage sign-off", () => {
 
   test("nothing but the margin is wider than the column and its row bleed", async ({ page }) => {
     await page.goto("/");
-    // One, Off the clock: the opening (#412), Say hello (#411), Work (#413), Where I'm headed and How I work (#414) and Things I make (#415) are no longer quiet-index columns.
-    await expect(page.locator(".qi-column")).toHaveCount(1);
+    // None: every section of the homepage is a panel or cards since #416.
+    await expect(page.locator(".qi-column")).toHaveCount(0);
     await page.evaluate(() => document.fonts.ready);
     // Measured in the page, and polled: a slow runner may still be laying out hydrated content or swapping the display font.
     const measure = () =>

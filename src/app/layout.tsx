@@ -17,6 +17,7 @@ import "./opening.css";
 import "./work.css";
 import "./headed-how.css";
 import "./projects.css";
+import "./off-the-clock.css";
 import "./stretch-resume.css";
 
 // Self-hosted at build time by next/font, so no request goes to Google when a

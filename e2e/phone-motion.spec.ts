@@ -7,9 +7,9 @@ import { expect, test, type Page } from "@playwright/test";
  */
 
 const inlineOnly = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1180;
-/* Off the clock's training row: the homepage's first plain row with an inline look now that Work and How I work are panels and cards (#413, #414). */
-const SLOT = '[data-look-slot="training"]';
-const TRIGGER = '#off-the-clock .qi-row[data-look-tap="training"]';
+/* The training row on /fixtures/closer-looks: no page shows a row with a closer look since #416. */
+const SLOT = '[data-fixture="training"] [data-look-slot="training"]';
+const TRIGGER = '[data-fixture="training"] .qi-row[data-look-tap="training"]';
 
 /**
  * Hydrated, with the opening's passes at rest: their arrival swing is finished at once, as a motion spec seeks rather
@@ -37,7 +37,7 @@ test.describe("The fold", () => {
 
   test("lasts 180 ms + height × 0.35, between 220 and 420 ms, on the soft curve, opening and closing", async ({ page }) => {
     test.skip(inlineOnly(page), "Inline looks are for phones and touch");
-    await page.goto("/");
+    await page.goto("/fixtures/closer-looks");
     await hydrated(page);
     await centre(page);
     const read = await page.locator(SLOT).evaluate(async (slot) => {
@@ -55,7 +55,7 @@ test.describe("The fold", () => {
         await new Promise(requestAnimationFrame);
         return { duration: Number(duration), easing: String(easing) };
       };
-      const trigger = document.querySelector<HTMLElement>('#off-the-clock .qi-row[data-look-tap="training"]')!;
+      const trigger = document.querySelector<HTMLElement>('[data-fixture="training"] .qi-row[data-look-tap="training"]')!;
       trigger.click();
       const opening = await timing();
       const height = slot.querySelector<HTMLElement>(".qi-inline__in")!.scrollHeight;
@@ -71,7 +71,7 @@ test.describe("The fold", () => {
 
   test("a look unmounts only once it has folded", async ({ page }) => {
     test.skip(inlineOnly(page), "Inline looks are for phones and touch");
-    await page.goto("/");
+    await page.goto("/fixtures/closer-looks");
     await hydrated(page);
     await centre(page);
     const stayed = await page.locator(SLOT).evaluate(async (slot) => {
@@ -82,7 +82,7 @@ test.describe("The fold", () => {
           await new Promise(requestAnimationFrame);
         }
       };
-      const trigger = document.querySelector<HTMLElement>('#off-the-clock .qi-row[data-look-tap="training"]')!;
+      const trigger = document.querySelector<HTMLElement>('[data-fixture="training"] .qi-row[data-look-tap="training"]')!;
       trigger.click();
       await started();
       fold()!.finish();
@@ -121,7 +121,7 @@ test.describe("A look that opens low", () => {
   test("comes into view over 320 ms, ending 16 px above the bottom edge", async ({ page }) => {
     test.skip(inlineOnly(page), "Inline looks are for phones and touch");
     await page.setViewportSize({ width: page.viewportSize()!.width, height: 700 });
-    await page.goto("/");
+    await page.goto("/fixtures/closer-looks");
     await hydrated(page);
     const before = await placeLow(page, 8);
     await page.locator(TRIGGER).click();
@@ -134,7 +134,7 @@ test.describe("A look that opens low", () => {
 
   test("leaves a look that is mostly on screen where it is", async ({ page }) => {
     test.skip(inlineOnly(page), "Inline looks are for phones and touch");
-    await page.goto("/");
+    await page.goto("/fixtures/closer-looks");
     await hydrated(page);
     await page.locator(TRIGGER).evaluate((button) => button.scrollIntoView({ block: "start", behavior: "instant" }));
     const before = await page.evaluate(() => window.scrollY);
@@ -148,7 +148,7 @@ test.describe("A look that opens low", () => {
   test("stops where it is when the visitor touches the screen", async ({ page }) => {
     test.skip(inlineOnly(page), "Inline looks are for phones and touch");
     await page.setViewportSize({ width: page.viewportSize()!.width, height: 700 });
-    await page.goto("/");
+    await page.goto("/fixtures/closer-looks");
     await hydrated(page);
     await placeLow(page, 8);
     const stopped = await page.locator(TRIGGER).evaluate(async (button) => {

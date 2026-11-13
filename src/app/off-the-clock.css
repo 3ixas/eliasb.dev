@@ -1,0 +1,292 @@
+/*
+ * Off the clock (docs/design/DESIGN.md "The homepage, in order" 7; R-19): one paper panel that follows the theme, in three
+ * bands: the training week, the book and the film; this week in history; the GitHub year with Now making. The panel and
+ * the pill are parts.css's; the GitHub year's structure is github-year.tsx's, restyled here onto the year ramps.
+ */
+
+.otc {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 40px 32px;
+}
+
+.otc h3 {
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.otc p {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: var(--type-small);
+}
+
+/* ---- The training week ---- */
+
+.otc__week {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  font-size: var(--type-label);
+  font-weight: 600;
+}
+
+.otc__week li {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--muted);
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+
+.otc__week li[data-today] {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: none;
+}
+
+/* ---- The book and the film ---- */
+
+.otc__media {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* A cell with no cover has none, and no placeholder box. */
+.otc__media:not(:has(.otc__cover)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.otc__cover {
+  width: 64px;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 5px;
+  box-shadow: 0 10px 20px -8px var(--shadow);
+}
+
+.otc__source {
+  font-size: var(--type-label);
+}
+
+/* ---- This week in history ---- */
+
+.otc__history {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px 20px;
+  padding-top: 32px;
+  border-top: 1px solid var(--hair);
+}
+
+.otc__history-image img {
+  display: block;
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.otc__history-text {
+  display: grid;
+  max-width: 46em;
+}
+
+/* Every oddity in one cell: the hidden ones hold the band at the tallest, so stepping moves nothing. */
+.otc__history-text > * {
+  grid-area: 1 / 1;
+}
+
+.otc__history-sizer {
+  visibility: hidden;
+}
+
+.otc__history b {
+  margin-right: 4px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-ui);
+  font-weight: 500;
+  font-variant-numeric: lining-nums;
+}
+
+.otc__credit {
+  font-size: var(--type-label);
+}
+
+/* The pill keeps one width whatever the count says, so stepping moves nothing. */
+.otc__step {
+  min-width: 96px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- The GitHub year and Now making ---- */
+
+.otc__year {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+  align-items: end;
+  gap: 8px 32px;
+  padding-top: 32px;
+  border-top: 1px solid var(--hair);
+}
+
+.otc__year > .stretch-gh__total {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--type-ui);
+}
+
+.otc__year .stretch-gh__count {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: 64px;
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.otc__year-side {
+  grid-column: 1;
+  grid-row: 2 / span 2;
+  align-self: end;
+}
+
+.otc__year > .stretch-gh__readout,
+.otc__year > .stretch-gh__scroll,
+.otc__year > .stretch-gh__foot {
+  grid-column: 2;
+}
+
+.otc__year > .stretch-gh__readout {
+  grid-row: 1;
+  align-self: end;
+  color: var(--cobalt);
+}
+
+.otc__year > .stretch-gh__scroll {
+  grid-row: 2;
+}
+
+.otc__year > .stretch-gh__foot {
+  grid-row: 3;
+  color: var(--muted);
+}
+
+/* The year ramps (tokens.css), light and dark; today is a cobalt ring around its own level. */
+.otc__year .stretch-gh__day {
+  background-color: var(--year-0);
+}
+
+.otc__year .stretch-gh__day[data-level="1"] { background-color: var(--year-1); }
+.otc__year .stretch-gh__day[data-level="2"] { background-color: var(--year-2); }
+.otc__year .stretch-gh__day[data-level="3"] { background-color: var(--year-3); }
+.otc__year .stretch-gh__day[data-level="4"] { background-color: var(--year-4); }
+
+.otc__year .stretch-gh__day[data-today] {
+  box-shadow:
+    0 0 0 1.5px var(--paper),
+    0 0 0 3.5px var(--cobalt);
+}
+
+.otc__year .stretch-gh__months,
+.otc__year .stretch-gh__foot,
+.otc__year .stretch-gh__readout {
+  color: var(--muted);
+  font-family: var(--sans);
+}
+
+.otc__making {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--ink);
+  font-size: var(--type-small);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.otc__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cobalt);
+}
+
+/* ---- Narrower ---- */
+
+@media (max-width: 1259.98px) {
+  .otc {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .otc__training {
+    grid-column: 1 / -1;
+  }
+
+  /* The year needs the width to itself: the total and Now making above it, the grid full width. */
+  .otc__year {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .otc__year > :is(.stretch-gh__total, .stretch-gh__readout, .stretch-gh__scroll, .stretch-gh__foot),
+  .otc__year-side {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+@media (max-width: 719.98px) {
+  .otc {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .otc__history {
+    grid-template-columns: 64px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .otc__step {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+}
+
+@media (forced-colors: active) {
+  .otc__week li[data-today] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .otc__dot {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+}
