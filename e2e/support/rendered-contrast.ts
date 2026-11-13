@@ -27,7 +27,7 @@ export type ContrastReading = {
  * filters are applied to its colour; a blend mode can't be, so a run under one
  * is marked `blended`.
  *
- * It samples the middle of each run's box, so a rotated stamp's own border
+ * It samples the middle of each line of a run, so a rotated stamp's own border
  * stays out of the background. Text hidden from assistive technology, or
  * visually hidden for it, is skipped.
  */
@@ -89,8 +89,10 @@ async function measureOnce(page: Page): Promise<ContrastReading[]> {
       if (!element.checkVisibility({ opacityProperty: true, visibilityProperty: true })) continue;
       const range = document.createRange();
       range.selectNodeContents(node);
-      const box = range.getBoundingClientRect();
-      if (box.width < 4 || box.height < 4 || box.bottom + scrollY <= 0) continue;
+      // One reading per line: a run that wraps is measured where its words are, not across the box spanning both lines,
+      // which takes in whatever sits beside it (a pen stroke under the phrase before it, say).
+      const lines = [...range.getClientRects()].filter((box) => box.width >= 4 && box.height >= 4 && box.bottom + scrollY > 0);
+      if (lines.length === 0) continue;
       const style = getComputedStyle(element);
       const size = parseFloat(style.fontSize);
       let opacity = 1;
@@ -102,18 +104,20 @@ async function measureOnce(page: Page): Promise<ContrastReading[]> {
         if (own.filter !== "none") filters.push(own.filter);
         if (own.mixBlendMode !== "normal") blended = true;
       }
-      found.push({
-        text: node.textContent.trim().slice(0, 60),
-        color: style.color,
-        rgba: rgba(style.color, filters),
-        opacity,
-        blended,
-        large: size >= 24 || (Number(style.fontWeight) >= 700 && size >= 18.66),
-        x: box.left + scrollX + box.width * 0.2,
-        y: box.top + scrollY + box.height * 0.25,
-        w: box.width * 0.6,
-        h: box.height * 0.5,
-      });
+      for (const box of lines) {
+        found.push({
+          text: node.textContent.trim().slice(0, 60),
+          color: style.color,
+          rgba: rgba(style.color, filters),
+          opacity,
+          blended,
+          large: size >= 24 || (Number(style.fontWeight) >= 700 && size >= 18.66),
+          x: box.left + scrollX + box.width * 0.2,
+          y: box.top + scrollY + box.height * 0.25,
+          w: box.width * 0.6,
+          h: box.height * 0.5,
+        });
+      }
     }
     return found;
   });

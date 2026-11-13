@@ -12,6 +12,8 @@ import "./quiet-long-form.css";
 import "./quiet-forced-colors.css";
 import "./shell.css";
 import "./parts.css";
+import "./pass.css";
+import "./opening.css";
 import "./stretch-resume.css";
 
 // Self-hosted at build time by next/font, so no request goes to Google when a

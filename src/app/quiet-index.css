@@ -1231,11 +1231,12 @@
   white-space: nowrap;
 }
 
+/* The stroke stays within its phrase, so it never runs under the words beside it. */
 .qi-ink--under {
   position: absolute;
-  left: -2px;
+  left: 0;
   bottom: -4px;
-  width: calc(100% + 4px);
+  width: 100%;
   height: 8px;
   stroke-width: 2;
 }

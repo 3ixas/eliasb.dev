@@ -33,11 +33,19 @@ const display = new Map([
   ["min(clamp(36px, 7.5vw, 76px), var(--cs-name-fit))", "a Role story's name, fitted to its column's width"],
 ]);
 
+/**
+ * A staff pass is drawn in em of its card's width ÷ 14.5 (pass.css), so it prints the same at any card width. Its em is
+ * the card's width ÷ 14.5 (at least 17 px, as the smallest card is 248 px), its sizes are 1 em or more, and its small
+ * print is floored at the 13 px floor. Only pass.css may size text this way.
+ */
+const passSize = /^(calc\(var\(--card\) \/ 14\.5\)|1(\.\d+)?em|max\(13px, 0\.\d+em\))$/;
+
 for (const file of readdirSync(dir).filter((name) => name.endsWith(".css"))) {
   readFileSync(new URL(file, dir), "utf8").split("\n").forEach((line, index) => {
     const size = line.match(/^\s*font-size:\s*([^;]+);/)?.[1].trim();
     if (!size) return;
     const at = `${file}:${index + 1} font-size: ${size}`;
+    if (file === "pass.css" && passSize.test(size)) return;
     const token = size.match(/^var\((--(?:text|type)-[\w-]+)\)$/)?.[1];
     if (token) {
       if (!tokens.has(token) && !typeTokens.has(token)) problems.push(`${at} uses ${token}, which is not a text or type token`);

@@ -70,7 +70,7 @@ html:has([data-stretch-shell]) {
 /* Animate the palette once, on the root. Descendant colour transitions would chase their parent's inherited colour
  * and make text lag behind the surface. The theme controller (theme.ts) registers each of these as a <color>. */
 :root[data-theme-changing] {
-  transition-property: --stretch-page, --stretch-ink, --stretch-muted, --stretch-rule, --stretch-card, --stretch-cobalt, --stretch-on-cobalt, --stretch-tile-edge, --stretch-paper, --stretch-newsprint, --stretch-graph, --stretch-stamp, --stretch-paper-rule, --bnp, --sun, --gh-0, --gh-1, --gh-2, --gh-3, --gh-4, --page, --paper, --ink, --muted, --hair, --tint, --cobalt, --green, --year-0, --year-1, --year-2, --year-3, --year-4;
+  transition-property: --stretch-page, --stretch-ink, --stretch-muted, --stretch-rule, --stretch-card, --stretch-cobalt, --stretch-on-cobalt, --stretch-tile-edge, --stretch-paper, --stretch-newsprint, --stretch-graph, --stretch-stamp, --stretch-paper-rule, --bnp, --sun, --gh-0, --gh-1, --gh-2, --gh-3, --gh-4, --page, --paper, --ink, --muted, --hair, --tint, --cobalt, --green, --year-0, --year-1, --year-2, --year-3, --year-4, --stock, --stock-end, --shadow;
   transition-duration: var(--room-duration);
   transition-timing-function: var(--room-ease);
   transition-delay: 0s;

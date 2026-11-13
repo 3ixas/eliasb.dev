@@ -4,7 +4,7 @@
  * not held by it staying, so leaving never cuts one short. CSS plays the reaction while `data-reacting` is on the
  * element; this sets it on arrival and removes it once the animations inside have finished.
  */
-const REACTS = ".qi-row, .qi-bnp, .qi-opening__tail";
+const REACTS = ".qi-row";
 const FINE = "(hover: hover) and (prefers-reduced-motion: no-preference)";
 
 export function startReaction(event: { target: EventTarget | null; relatedTarget: EventTarget | null; pointerType: string }) {

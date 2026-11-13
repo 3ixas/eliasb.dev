@@ -1,9 +1,10 @@
 import { expect, test } from "@playwright/test";
 
-// The removal rule (docs/design/DESIGN.md) as tests: the page with nothing open stays inside its length budget,
-// and nothing but the margin is wider than the column plus the 12 px a row's hover fill bleeds into the gutter.
+// The page with nothing open stays inside its length budget (DESIGN.md "Layout": 8 screens at 1440 × 900, 11 at
+// 390 × 844), and nothing in the quiet index's columns is wider than the column plus the 12 px a row's hover fill
+// bleeds into the gutter.
 
-const heightBudget = { 1440: 3600, 390: 4220 } as const;
+const heightBudget = { 1440: 8 * 900, 390: 11 * 844 } as const;
 const rowBleed = 12;
 
 test.describe("Homepage sign-off", () => {
@@ -18,8 +19,8 @@ test.describe("Homepage sign-off", () => {
 
   test("nothing but the margin is wider than the column and its row bleed", async ({ page }) => {
     await page.goto("/");
-    // Five: Say hello is the shell's (#411), not a quiet-index column.
-    await expect(page.locator(".qi-column")).toHaveCount(5);
+    // Four: the opening (#412) and Say hello (#411) are no longer quiet-index columns.
+    await expect(page.locator(".qi-column")).toHaveCount(4);
     await page.evaluate(() => document.fonts.ready);
     // Measured in the page, and polled: a slow runner may still be laying out hydrated content or swapping the display font.
     const measure = () =>

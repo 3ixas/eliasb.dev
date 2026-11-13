@@ -374,3 +374,19 @@ Shared labels: ← Work · Next role · Evidence · section numbers 01–06 ([#1
 - **Facts:** every claim traces to #103, the CV, `src/content/case-files.ts`, or the project specs (Argus `project-spec.md`; Flowtime `project-spec.md`, added 3 January 2026). Threshold’s figures come from the evidence note.
 - **Privacy:** BNP Paribas detail stays at CV level; no colleague names, internal system names, or review context. “The team’s only C# engineer” is CV wording.
 - **Voice:** British spelling, plain verbs, few em-dashes, at most one light touch of humour per section.
+
+## Passes and panels · Staff passes
+
+What each employer's pass prints, as approved in the passes and panels spec (R-12, 11 November 2026). Each point is a lead over a detail; `verify:copy` and `passProblems` check each against its Role story.
+
+| Pass | Lead | Detail |
+|---|---|---|
+| BNP Paribas | Winner | Digitisation competition, 2025 |
+| BNP Paribas | Take Ownership | Award, Q1 2026 |
+| BNP Paribas | AI workflow | Used by several teams |
+| Joveen | −40% | Page load |
+| Joveen | 520 → 230 ms | Key API p95 |
+| Joveen | +30% | Mobile retention |
+| Optegra | 62 → 88% | Core Web Vitals pass rate |
+| Optegra | −30% | p95 page load |
+| Optegra | +15% | Consultation conversion |

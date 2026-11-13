@@ -73,7 +73,7 @@ function registerPalette() {
   if (paletteRegistered || typeof CSS.registerProperty !== "function") return;
   const stretch = ["page", "ink", "muted", "rule", "card", "cobalt", "on-cobalt", "tile-edge", "paper", "newsprint", "graph", "stamp", "paper-rule"].map((name) => `--stretch-${name}`);
   // tokens.css: the passes and panels palette, beside the Stretch one until #420.
-  const palette = ["page", "paper", "ink", "muted", "hair", "tint", "cobalt", "green", "year-0", "year-1", "year-2", "year-3", "year-4"].map((name) => `--${name}`);
+  const palette = ["page", "paper", "ink", "muted", "hair", "tint", "cobalt", "green", "year-0", "year-1", "year-2", "year-3", "year-4", "stock", "stock-end", "shadow"].map((name) => `--${name}`);
   for (const name of [...stretch, "--bnp", "--sun", "--gh-0", "--gh-1", "--gh-2", "--gh-3", "--gh-4", ...palette]) {
     CSS.registerProperty({ name, syntax: "<color>", inherits: true, initialValue: "transparent" });
   }

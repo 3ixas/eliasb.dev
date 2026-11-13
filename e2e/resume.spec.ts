@@ -149,5 +149,5 @@ test.describe("The Résumé", () => {
 
 test("Say hello is the only way in: the header and the opening do not link /resume", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(`header a[href="/resume"], .qi-opening a[href="/resume"]`)).toHaveCount(0);
+  await expect(page.locator(`header a[href="/resume"], .opening a[href="/resume"]`)).toHaveCount(0);
 });

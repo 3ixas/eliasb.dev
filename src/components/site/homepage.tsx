@@ -1,8 +1,8 @@
 import { SiteHeader } from "@/components/site/site-header";
 import { OffTheClock } from "@/components/site/off-the-clock";
+import { Opening } from "@/components/site/opening";
 import { SayHello } from "@/components/site/say-hello";
 import { HowIWork } from "@/components/quiet/how-i-work";
-import { Opening } from "@/components/quiet/opening";
 import { ThingsIMake } from "@/components/quiet/things-i-make";
 import { Work } from "@/components/quiet/work";
 

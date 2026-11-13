@@ -33,7 +33,7 @@ function nameOf(title: ReactNode) {
  * inside a link is invalid), and the empty slot under the row is where the controller opens the inline closer look.
  * A row that leaves the site opens its look when tapped on a phone, and the look is the link (`data-look-href`).
  */
-export function Row({ object, title, line, meta, href, look, card, after, style, attrs }: { object: ReactNode; title: ReactNode; line: ReactNode; meta?: string; href?: string; look?: RowLook; card?: ReactNode; after?: ReactNode; style?: CSSProperties; attrs?: Record<`data-${string}`, string> }) {
+export function Row({ id, object, title, line, meta, href, look, card, after, style, attrs }: { id?: string; object: ReactNode; title: ReactNode; line: ReactNode; meta?: string; href?: string; look?: RowLook; card?: ReactNode; after?: ReactNode; style?: CSSProperties; attrs?: Record<`data-${string}`, string> }) {
   const external = href?.startsWith("http") ?? false;
   const descriptionId = look && `${look.id}-description`;
   const props = look ? { "data-look": look.id, "aria-describedby": descriptionId } : {};
@@ -60,7 +60,7 @@ export function Row({ object, title, line, meta, href, look, card, after, style,
     </>
   );
   return (
-    <li className="qi-list__item" data-card={card ? "" : undefined} style={style} {...attrs}>
+    <li id={id} className="qi-list__item" data-card={card ? "" : undefined} style={style} {...attrs}>
       <div className="qi-row-box">
         {external ? (
           <a className="qi-row" href={href} target="_blank" rel="noreferrer" data-look-tap={look?.id} {...props}>

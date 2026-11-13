@@ -54,6 +54,8 @@ const modules = {
     ownership: opening.looks.ownership.certificate.caption,
   },
   thingsIMake,
+  // What the passes print (R-12); the lanyard and band are colours, not words.
+  passPoints: Object.fromEntries(Object.entries(passRecords).map(([slug, { points }]) => [slug, points.map(({ lead, detail }) => ({ lead, detail }))])),
   sayHello,
   workArchive,
   howIWork,
@@ -330,6 +332,19 @@ assert.equal(passRecords.joveen.pins, undefined, "Only the current pass wears th
   assert.deepEqual(claim("optegra", { value: "88%", label: "Core Web Vitals pass rate, up from 62%" }), [], "The whole evidence label is the story's fact too");
   assert.match(claim("bnp-paribas", { value: "Only", label: "C# engineer on the team" })[0], /"bnp-paribas"/, "A stated fact needs the sentence that states it");
   assert.match(claim("bnp-paribas", { value: "Only", label: "C# engineer on the team", quote: "only Rust engineer" })[0], /"bnp-paribas"/, "...and the story must say it");
+}
+{
+  // Every point on a pass is its story's evidence or a fact it states, with no number the source lacks (R-12).
+  const point = (slug, index, replacement) => {
+    const points = [...passRecords[slug].points];
+    points[index] = replacement;
+    return passProblems({ ...passRecords, [slug]: { ...passRecords[slug], points } }, roles);
+  };
+  assert.deepEqual(roleStorySlugs.map((slug) => passRecords[slug].points.length), [3, 3, 3]);
+  assert.match(point("joveen", 1, { lead: "520 → 210 ms", detail: "Key API p95", evidence: 3 })[0], /Staff pass "joveen": the point "520 → 210 ms · Key API p95" says "210", which its source does not/);
+  assert.match(point("optegra", 0, { lead: "62 → 88%", detail: "Core Web Vitals pass rate", evidence: 9 })[0], /names evidence item 9/);
+  assert.match(point("bnp-paribas", 2, { lead: "AI workflow", detail: "Used by every team", quotes: ["used by every team"] })[0], /quotes "used by every team", which its Role story does not say/);
+  assert.match(point("bnp-paribas", 1, { lead: "Take Ownership", detail: "Award, Q2 2026", quotes: ["won a Take Ownership award"] })[0], /says "2", which its source does not/);
 }
 assert.equal(currentPassStatus, "Valid · present");
 assert.equal(passLinkLabel(passRecords.optegra), "The Optegra story →", "The link names the short employer, not Optegra Eye Healthcare & Kensington Medical");

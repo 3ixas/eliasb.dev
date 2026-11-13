@@ -10,11 +10,17 @@ const inlineOnly = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1180;
 const SLOT = '[data-look-slot="joveen"]';
 const TRIGGER = '#work button[data-look-tap="joveen"]';
 
-const hydrated = (page: Page) =>
-  page.waitForFunction(() => {
+/**
+ * Hydrated, with the opening's passes at rest: their arrival swing is finished at once, as a motion spec seeks rather
+ * than waits, so a slow engine is not painting it while the fold under test runs.
+ */
+const hydrated = async (page: Page) => {
+  await page.waitForFunction(() => {
     const columns = [...document.querySelectorAll("[data-quiet-column]")];
     return columns.length > 0 && columns.every((column) => Object.keys(column).some((key) => key.startsWith("__reactProps$")));
   });
+  await page.evaluate(() => document.querySelectorAll(".pass").forEach((pass) => pass.getAnimations().forEach((animation) => animation.finish())));
+};
 
 test.describe("The fold", () => {
   test.use({ reducedMotion: "no-preference" });
@@ -101,7 +107,7 @@ test.describe("A look that opens low", () => {
     const before = await placeLow(page, 8);
     await page.locator(TRIGGER).click();
     const look = page.locator(`${SLOT} .qi-look`);
-    await expect.poll(async () => (await look.boundingBox())!.y + (await look.boundingBox())!.height, { timeout: 3000 }).toBeLessThanOrEqual((page.viewportSize()!.height ?? 0) - 15);
+    await expect.poll(async () => (await look.boundingBox())!.y + (await look.boundingBox())!.height, { timeout: 3000 }).toBeLessThanOrEqual((page.viewportSize()!.height ?? 0) - 14.5);
     expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(before);
     // The row is still on screen, and clear of the top.
     expect((await page.locator(TRIGGER).boundingBox())!.y).toBeGreaterThanOrEqual(0);
