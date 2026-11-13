@@ -42,9 +42,9 @@ test.describe("Work archive: the catalogue", () => {
     await expect(page.getByRole("link", { name: thingsIMake.allThings(listed) })).toHaveAttribute("href", "/things-i-make");
   });
 
-  test("the header has the way home and no section links", async ({ page }) => {
-    await expect(page.getByRole("link", { name: "Elias Bennett, home" })).toHaveAttribute("href", "/");
-    await expect(page.getByRole("navigation", { name: siteCopy.header.linksLabel })).toHaveCount(0);
+  test("the header has the way home and the links to the homepage's sections", async ({ page }) => {
+    await expect(page.locator("[data-site-header]").getByRole("link", { name: "Elias Bennett", exact: true })).toHaveAttribute("href", "/");
+    await expect(page.getByRole("navigation", { name: siteCopy.header.linksLabel, includeHidden: true }).locator("a").first()).toHaveAttribute("href", "/#work");
   });
 
   test("has no filters at ten or fewer projects", async ({ page }) => {
@@ -134,7 +134,7 @@ test.describe("Work archive: a catalogue above ten (fixtures)", () => {
       await expect(filters(page).getByRole("button", { name: label, exact: true })).toHaveAttribute("aria-pressed", "true");
       expect([...(await names(page))].sort()).toEqual([...expected].sort());
       newestFirst(await years(page));
-      await expect(page.getByRole("status")).toHaveText(workArchive.count(4));
+      await expect(page.locator("main").getByRole("status").filter({ hasText: /\S/ })).toHaveText(workArchive.count(4));
     }
     await filters(page).getByRole("button", { name: "All", exact: true }).click();
     await expect(rows(page)).toHaveCount(12);

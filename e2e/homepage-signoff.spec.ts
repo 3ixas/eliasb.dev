@@ -18,7 +18,8 @@ test.describe("Homepage sign-off", () => {
 
   test("nothing but the margin is wider than the column and its row bleed", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator(".qi-column")).toHaveCount(6);
+    // Five: Say hello is the shell's (#411), not a quiet-index column.
+    await expect(page.locator(".qi-column")).toHaveCount(5);
     await page.evaluate(() => document.fonts.ready);
     // Measured in the page, and polled: a slow runner may still be laying out hydrated content or swapping the display font.
     const measure = () =>
