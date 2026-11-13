@@ -60,13 +60,11 @@ test.describe("Homepage shell", () => {
     await expect(section.locator(".qi-note-line").first()).toHaveText(offTheClock.note);
   });
 
-  test("Things I make has a quiet title and its note", async ({ page }) => {
+  test("Things I make has its section title and no note", async ({ page }) => {
     await page.goto("/");
     const section = page.locator("section#things-i-make");
-    const title = section.getByRole("heading", { level: 2, name: thingsIMake.heading, exact: true });
-    await expect(title).toHaveCSS("font-size", "17px");
-    await expect(title).toHaveCSS("font-weight", "620");
-    await expect(section.locator(".qi-note-line").first()).toHaveText(thingsIMake.note);
+    await expect(section.getByRole("heading", { level: 2, name: thingsIMake.heading, exact: true })).toHaveClass(/section__title/);
+    await expect(section.locator(".qi-note-line")).toHaveCount(0);
   });
 
   test("How I work has its section title and no note", async ({ page }) => {
@@ -579,7 +577,7 @@ test.describe("Accessibility and contrast", () => {
       const readings = await renderedContrast(page);
       const texts = readings.map((reading) => reading.text);
       // The greeting is hydrated by now, and the pill, nav, headings and notes were measured.
-      for (const expected of [siteCopy.menu[0].label, siteCopy.menu[4].label, thingsIMake.heading, thingsIMake.note.split(",")[0]]) {
+      for (const expected of [siteCopy.menu[0].label, siteCopy.menu[4].label, thingsIMake.heading, offTheClock.note.split(",")[0]]) {
         expect(texts.some((text) => text.includes(expected)), expected).toBe(true);
       }
       expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);

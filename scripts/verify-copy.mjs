@@ -86,7 +86,7 @@ const built = [
 ];
 for (const text of built) assert.ok(plain.includes(text), `Built string is not in the approved copy: "${text}"`);
 assert.equal(thingsIMake.note, "Products of my own, from a rental calculator to a risk simulator.");
-assert.equal(thingsIMake.allThings(projects.length), "Everything I’ve built (06) →");
+assert.equal(`${thingsIMake.allThings(projects.length)} →`, "Everything I’ve built (06) →");
 
 // The 404's missing row, section title and note are listed field by field, and each section's line is in the deck's table.
 for (const line of [

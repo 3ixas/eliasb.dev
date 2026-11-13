@@ -4,7 +4,7 @@ import { Opening } from "@/components/site/opening";
 import { SayHello } from "@/components/site/say-hello";
 import { HowIWork } from "@/components/site/how-i-work";
 import { WhereImHeaded } from "@/components/site/where-im-headed";
-import { ThingsIMake } from "@/components/quiet/things-i-make";
+import { ThingsIMake } from "@/components/site/things-i-make";
 import { Work } from "@/components/site/work";
 
 /**
@@ -22,9 +22,7 @@ export function Homepage() {
         <Work />
         <WhereImHeaded />
 
-        <section id="things-i-make" className="stretch-wrap stretch-section" aria-labelledby="things-i-make-heading">
-          <ThingsIMake />
-        </section>
+        <ThingsIMake />
 
         <HowIWork />
 

@@ -4,12 +4,12 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 test.describe("Hover that needs a hover", () => {
   test.use({ reducedMotion: "no-preference", hasTouch: true, isMobile: true, viewport: { width: 1200, height: 900 } });
 
-  test("a project's object does not take its hover pose on a device with no hover", async ({ page, browserName }) => {
+  test("a project's screenshot does not lift on a device with no hover", async ({ page, browserName }) => {
     test.skip(browserName !== "chromium", "Touch emulation, Chromium");
     await page.goto("/");
     expect(await page.evaluate(() => matchMedia("(hover: hover)").matches)).toBe(false);
-    const row = page.locator("#things-i-make .qi-row").first();
-    const shot = row.locator(".qi-crop");
+    const row = page.locator("#things-i-make .project").nth(1);
+    const shot = row.locator(".project__shot");
     await row.scrollIntoViewIfNeeded();
     const resting = await shot.evaluate((element) => getComputedStyle(element).transform);
     await row.hover();

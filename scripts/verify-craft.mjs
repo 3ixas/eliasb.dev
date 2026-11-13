@@ -13,8 +13,10 @@ const FEEDBACK_MS = [100, 250];
  * The passes and panels ring (DESIGN.md "Controls"), in parts.css and every stylesheet that replaces a quiet-index
  * one: 2 px cobalt at 3 px offset, taking the panel's ink on a panel. The quiet index keeps its own until #420.
  */
-const NEW_RING = { files: ['src/app/parts.css', 'src/app/shell.css', 'src/app/pass.css'], rule: ':where(.pill, .button, .text-link, .row):focus-visible', colour: 'var(--cobalt)', offset: '3px' };
-const newRingExceptions = [{ selector: '.panel :focus-visible', colour: 'var(--panel-ink)', why: 'cobalt would not hold 3:1 on every panel field' }];
+const NEW_RING = { files: ['src/app/parts.css', 'src/app/shell.css', 'src/app/pass.css', 'src/app/projects.css'], rule: ':where(.pill, .button, .text-link, .row):focus-visible', colour: 'var(--cobalt)', offset: '3px' };
+const newRingExceptions = [
+  { selector: '.panel :focus-visible', colour: 'var(--panel-ink)', why: 'cobalt would not hold 3:1 on every panel field' },
+];
 
 /** Selectors whose focus ring differs from 2 px cobalt at 2 px offset, and exactly how. */
 const ringExceptions = [
@@ -43,6 +45,7 @@ const motionTransitions = [
   ['.pass__sheen', 'a staff pass catches the light'],
   ['[data-rise]', 'a panel or card rises into view (DESIGN.md "Motion")'],
   ['[data-grow] .bar', 'bars to scale grow from the left'],
+  ['.project__shot', "a project's screenshot lifts on hover (DESIGN.md \"Motion\")"],
   ['.sim__plot[data-released] .sim__paths', "the simulation's paths draw from the left"],
   ['.sim__plot[data-released] .sim__bin', "the simulation's histogram grows"],
   ['.sim__plot[data-released] .sim__price', "the simulation's price line appears last"],
