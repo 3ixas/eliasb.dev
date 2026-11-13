@@ -123,13 +123,10 @@
   letter-spacing: -0.03em;
 }
 
+/* The panel is itself the control, so its ring is outside it on the page: the page's cobalt, not the panel's ink. */
 .project:focus-visible {
-  outline: 2px solid var(--panel-ink);
+  outline: 2px solid var(--cobalt);
   outline-offset: 3px;
-}
-
-.project.panel--paper:focus-visible {
-  outline-color: var(--cobalt);
 }
 
 @media (hover: hover) and (pointer: fine) {

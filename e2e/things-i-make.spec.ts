@@ -100,15 +100,24 @@ test.describe("Things I make", () => {
     await expect(rows(page)).toHaveCount(others.length);
   });
 
-  test("a panel is one keyboard stop with the panel's ink as its ring, and Enter opens its case study", async ({ page, browserName }) => {
+  test("a panel is one keyboard stop with the page's cobalt ring outside it, and Enter opens its case study", async ({ page, browserName }) => {
     test.skip(browserName === "webkit", "Safari does not Tab to links by default");
     const panel = panels(page).nth(1);
     await panel.focus();
     await page.keyboard.press("Shift+Tab");
     await page.keyboard.press("Tab");
     await expect(panel).toBeFocused();
-    const [outline, ink] = await panel.evaluate((element) => [getComputedStyle(element).outline, getComputedStyle(element).color]);
-    expect(outline).toContain(ink);
+    // The ring sits outside the panel, on the page, so it is the page's cobalt: a panel's own ink can be close to the page.
+    const [outline, cobalt] = await panel.evaluate((element) => {
+      const probe = document.createElement("i");
+      probe.style.color = "var(--cobalt)";
+      document.body.append(probe);
+      const colour = getComputedStyle(probe).color;
+      probe.remove();
+      return [getComputedStyle(element).outline, colour];
+    });
+    expect(outline).toContain(cobalt);
+    expect(outline).toContain("2px");
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(new RegExp(`${featured[1].links.caseStudy}$`));
   });

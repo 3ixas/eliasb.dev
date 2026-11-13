@@ -16,7 +16,6 @@ const FEEDBACK_MS = [100, 250];
 const NEW_RING = { files: ['src/app/parts.css', 'src/app/shell.css', 'src/app/pass.css', 'src/app/projects.css'], rule: ':where(.pill, .button, .text-link, .row):focus-visible', colour: 'var(--cobalt)', offset: '3px' };
 const newRingExceptions = [
   { selector: '.panel :focus-visible', colour: 'var(--panel-ink)', why: 'cobalt would not hold 3:1 on every panel field' },
-  { selector: '.project:focus-visible', colour: 'var(--panel-ink)', why: 'a project panel is itself the link, on its own field' },
 ];
 
 /** Selectors whose focus ring differs from 2 px cobalt at 2 px offset, and exactly how. */
