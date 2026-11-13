@@ -7,6 +7,8 @@ import { siteCopy } from "../src/content/stretch/site-copy";
 // and nothing wider than the column plus the margin.
 const COLUMN = 600;
 const MARGIN = 300 + 40;
+/** The passes and panels frame (DESIGN.md "Layout"). */
+const FRAME = 1344;
 
 const routes = ["/things-i-make", "/resume", "/nothing-here", ...roleStorySlugs.map((slug) => `/work/${slug}`), ...Object.keys(caseStudies).map((slug) => `/things-i-make/${slug}`)];
 
@@ -22,8 +24,9 @@ for (const route of routes) {
       await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
       // The page's own wrapper spans the window, and Say hello is the page's width; what sits inside the column is measured.
       const widest = await page.locator("main :not(.stretch-wrap, .say-hello, .say-hello *)").evaluateAll((elements) => Math.max(...elements.map((element) => element.getBoundingClientRect().width)));
-      // The Résumé's sheet is the page: A4 is wider than the column, and it is the one thing allowed to be.
-      expect(widest).toBeLessThanOrEqual(route === "/resume" ? 900 : COLUMN + MARGIN);
+      // The Résumé's sheet is the page: A4 is wider than the column. The Work archive is panels across the whole frame (#415).
+      const limit = route === "/resume" ? 900 : route === "/things-i-make" ? FRAME : COLUMN + MARGIN;
+      expect(widest).toBeLessThanOrEqual(limit);
     });
   });
 }
