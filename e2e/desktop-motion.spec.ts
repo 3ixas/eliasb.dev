@@ -8,12 +8,12 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const wide = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1180;
 const margin = (page: Page) => page.locator(".qi-margin");
-const rowFor = (page: Page, id: string) => page.locator(`section#work [data-look="${id}"]`);
-/* Where I'm headed's strand rows are the homepage's first rows with closer looks now that Work's employers are panels (#413). */
-const FIRST = "strand-judgement";
-const NEXT = "strand-depth";
-/** The next strand's look: its "So far" names BNP Paribas. */
-const nextLook = '.qi-strand:has-text("BNP Paribas")';
+const rowFor = (page: Page, id: string) => page.locator(`[data-fixture="pair"] [data-look="${id}"]`);
+/* Off the clock's training and book rows on fixed data (/fixtures/off-the-clock, "pair"): the homepage's book depends on Goodreads. */
+const FIRST = "book";
+const NEXT = "training";
+/** The training row's look: the week. */
+const nextLook = ".qi-week";
 
 const hydrated = (page: Page) =>
   page.waitForFunction(() => {
@@ -52,7 +52,7 @@ test.describe("Desktop motion: the margin", () => {
   test.use({ reducedMotion: "no-preference" });
 
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/fixtures/off-the-clock");
     await hydrated(page);
     const first = rowFor(page, FIRST);
     await first.scrollIntoViewIfNeeded();
@@ -76,7 +76,7 @@ test.describe("Desktop motion: the margin", () => {
       }
     });
     await rowFor(page, FIRST).hover();
-    expect(await dropping).toContain("qi-draw");
+    expect(await dropping).toContain("qi-pluck-room");
     await expect(margin(page)).not.toHaveAttribute("data-settled", "");
 
     await rowFor(page, NEXT).hover();
@@ -93,7 +93,7 @@ test.describe("Desktop motion: the margin", () => {
 
   test("the glide is 240 ms on transform, and seeked through it the margin never leaves the span between the two places", async ({ page }) => {
     await rowFor(page, FIRST).hover();
-    await expect(margin(page).locator(".qi-strand")).toBeVisible();
+    await expect(margin(page).locator(".qi-look")).toBeVisible();
     await placed(page);
     // The glide is what `data-glide` plus a new transform does; making both in one task judges the CSS itself, whatever a runner's pointer or scroll timing.
     const glide = await margin(page).evaluate((element) => {
@@ -128,7 +128,7 @@ test.describe("Desktop motion: the margin", () => {
   test("dismissing the margin in the middle of a glide stops it where it has reached", async ({ page, browserName }) => {
     test.skip(browserName === "webkit", WEBKIT_TIMING);
     await rowFor(page, FIRST).hover();
-    await expect(margin(page).locator(".qi-strand")).toBeVisible();
+    await expect(margin(page).locator(".qi-look")).toBeVisible();
     await placed(page);
     const result = await margin(page).evaluate(async (element) => {
       const frame = () => new Promise(requestAnimationFrame);
@@ -161,7 +161,7 @@ test.describe("Desktop motion: the margin", () => {
 
   test("moving to another row sets the glide", async ({ page }) => {
     await rowFor(page, FIRST).hover();
-    await expect(margin(page).locator(".qi-strand")).toBeVisible();
+    await expect(margin(page).locator(".qi-look")).toBeVisible();
     const target = (await rowFor(page, NEXT).boundingBox())!;
     await page.mouse.move(target.x + target.width / 2, target.y + target.height / 2);
     await expect(margin(page).locator(nextLook)).toBeVisible();
@@ -172,7 +172,7 @@ test.describe("Desktop motion: the margin", () => {
   test("the margin fades over 120 ms without moving, and returning inside the fade is the same sweep", async ({ page, browserName }) => {
     test.skip(browserName === "webkit", WEBKIT_TIMING);
     await rowFor(page, FIRST).hover();
-    await expect(margin(page).locator(".qi-strand")).toBeVisible();
+    await expect(margin(page).locator(".qi-look")).toBeVisible();
     await placed(page);
     // Armed before the pointer leaves: at the commit that starts the fade, the pointer comes back to the same row, in the same task.
     const returned = page.evaluate(
@@ -184,7 +184,7 @@ test.describe("Desktop motion: the margin", () => {
             observer.disconnect();
             const fade = node.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "opacity");
             const fadeMs = Number(fade?.effect?.getComputedTiming().duration);
-            document.querySelector('section#work [data-look="strand-judgement"]')!.dispatchEvent(new PointerEvent("pointerover", { bubbles: true, pointerType: "mouse" }));
+            document.querySelector('[data-fixture="pair"] [data-look="training"]')!.dispatchEvent(new PointerEvent("pointerover", { bubbles: true, pointerType: "mouse" }));
             requestAnimationFrame(() =>
               requestAnimationFrame(() =>
               resolve({
@@ -210,7 +210,7 @@ test.describe("Desktop motion: the margin", () => {
   test("a margin that is left goes after its fade, and does not move while it fades", async ({ page, browserName }) => {
     test.skip(browserName === "webkit", WEBKIT_TIMING);
     await rowFor(page, NEXT).hover();
-    await expect(margin(page).locator(".qi-strand")).toBeVisible();
+    await expect(margin(page).locator(".qi-look")).toBeVisible();
     await placed(page);
     const watching = page.evaluate(
       () =>
@@ -261,11 +261,11 @@ test.describe("Desktop motion: reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
 
   test("each look still shows with a 0.2 s fade and no arrival, and a sweep has no glide or fade-out", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/fixtures/off-the-clock");
     await hydrated(page);
     await rowFor(page, FIRST).hover();
     const look = margin(page).locator(".qi-look");
-    await expect(look.locator(".qi-strand")).toBeVisible();
+    await expect(look).toBeVisible();
     expect(await arrivals(look)).toEqual([]);
     expect(await look.evaluate((element) => element.getAnimations().map((animation) => animation.effect!.getComputedTiming().duration))).toEqual([200]);
     await rowFor(page, NEXT).hover();

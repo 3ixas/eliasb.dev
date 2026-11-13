@@ -141,7 +141,8 @@ export const work = {
   ] satisfies readonly Employer[],
   headed: {
     heading: "Where I’m headed",
-    line: "I’m working towards being a product engineer, turning new ideas into software people use every day. Three things that takes, and how far I’ve got on each.",
+    /** The lead (the passes and panels spec, Decisions 2): it names a level and a character, not a job title. */
+    line: "I’m working towards the judgement, depth and range to be trusted with what to build, building it well and getting it used. Here’s how far I’ve got on each.",
     soFar: "So far",
     bars: [
       {

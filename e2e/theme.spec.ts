@@ -287,7 +287,7 @@ test.describe("Lights and theme", () => {
           for (const animation of animations) animation.currentTime = time;
           frames.push({
             ink: getComputedStyle(document.documentElement).getPropertyValue("--ink").trim(),
-            colours: ["[data-stretch-shell]", "#things-i-make h2", "#how-i-work .qi-row__title"].map(
+            colours: ["[data-stretch-shell]", "#things-i-make h2", "#how-i-work .card h3"].map(
               (selector) => getComputedStyle(document.querySelector(selector)!).color,
             ),
           });
@@ -297,7 +297,7 @@ test.describe("Lights and theme", () => {
       });
       expect(new Set(samples.map((sample) => sample.ink)).size).toBeGreaterThan(1);
       for (const sample of samples) for (const colour of sample.colours) expect(colour).toBe(sample.ink);
-      await expect(page.locator("#how-i-work .qi-row__title").first()).toHaveCSS("color", target);
+      await expect(page.locator("#how-i-work .card h3").first()).toHaveCSS("color", target);
       await expect(page.locator("html")).not.toHaveAttribute("data-theme-changing", "");
     }
   });

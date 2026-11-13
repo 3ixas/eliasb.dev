@@ -1,57 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
-// Motion on the finished page: hover that only moves things where there is a hover.
-test.describe("Margin notes", () => {
-  const strokes = (page: Page) => page.locator("#how-i-work path[pathLength]");
-  // The first habit's circle, a stroke that is on screen at every width.
-  const circle = (page: Page) => page.locator("#how-i-work .qi-ink--circle").first();
-  const offset = (page: Page) => circle(page).locator("path").evaluate((path) => parseFloat(getComputedStyle(path).strokeDashoffset));
-  // Scrolls so the circle's middle sits this far down the visible area (0 is its top, 1 its bottom edge).
-  const scrollCircleTo = (page: Page, down: number) =>
-    circle(page).evaluate((element, at) => {
-      const padding = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
-      const { top, height } = element.getBoundingClientRect();
-      scrollBy(0, top + height / 2 - (padding + (innerHeight - padding) * at));
-    }, down);
-
-  test.describe("with motion", () => {
-    test.use({ reducedMotion: "no-preference" });
-
-    test("a stroke draws as it scrolls up the screen and un-draws on the way back", async ({ page, browserName }) => {
-      test.skip(browserName !== "chromium", "Scroll-driven animation, Chromium");
-      await page.goto("/");
-      expect(await page.evaluate(() => CSS.supports("animation-timeline", "view()"))).toBe(true);
-      await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
-      await circle(page).scrollIntoViewIfNeeded();
-
-      await scrollCircleTo(page, 0.97);
-      await expect.poll(() => offset(page)).toBeGreaterThan(0.5);
-      await scrollCircleTo(page, 0.3);
-      await expect.poll(() => offset(page)).toBe(0);
-      await scrollCircleTo(page, 0.97);
-      await expect.poll(() => offset(page), "scrolling back up takes the ink out again").toBeGreaterThan(0.5);
-    });
-  });
-
-  test.describe("with reduced motion", () => {
-    test.use({ reducedMotion: "reduce" });
-
-    test("every stroke is simply drawn, wherever the page is scrolled", async ({ page }) => {
-      await page.goto("/");
-      await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
-      await expect(strokes(page)).toHaveCount(11);
-      await circle(page).scrollIntoViewIfNeeded();
-      for (const at of [0.97, 0.3]) {
-        await scrollCircleTo(page, at);
-        const state = await strokes(page).evaluateAll((paths) =>
-          paths.map((path) => ({ offset: getComputedStyle(path).strokeDashoffset, animation: getComputedStyle(path.closest("svg")!).animationName })),
-        );
-        for (const stroke of state) expect(stroke).toEqual({ offset: "0px", animation: "none" });
-      }
-    });
-  });
-});
-
+// Motion on the finished page: hover that only moves things where there is a hover. (How I work's pen, which drew with the scroll, retired in #414.)
 test.describe("Hover that needs a hover", () => {
   test.use({ reducedMotion: "no-preference", hasTouch: true, isMobile: true, viewport: { width: 1200, height: 900 } });
 

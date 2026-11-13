@@ -415,3 +415,17 @@ Screen readers read the description with the figure; nothing shows it on screen.
 | Optegra | Pass rate | 62% → 88% |
 | Optegra | p95 page load | −30% |
 | Optegra | Consultation conversion | +15% |
+
+## Passes and panels · Where I’m headed and How I work
+
+As approved in the passes and panels spec (R-16 and R-18, 11 November 2026). Where I’m headed is its own section: its three parts keep their titles and “So far” lines from the table above, each under a chip naming its source; it shows no destination label and no job title. How I work’s cards show the habit and its story with the phrase highlighted (no longer underlined), then the proof drawn in the card’s foot. The section notes are gone (the spec’s Decisions 7). `verify:copy` checks every drawn number against its highlighted phrase.
+
+- Where I’m headed lead: I’m working towards the judgement, depth and range to be trusted with what to build, building it well and getting it used. Here’s how far I’ve got on each.
+- PRD link: Threshold’s PRD, 16 April 2026 →
+
+| Habit | Highlighted | Drawn |
+|---|---|---|
+| Start from a real problem. | no clear idea | Threshold · Flowtime |
+| Write it down first. | 57 user stories | 57, as 57 ticks |
+| Ship it so it’s safe to undo. | defaults to off | A switch, Off |
+| Measure whether it works. | rose by 15% | +15%, its bar 15% longer |

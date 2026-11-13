@@ -2,7 +2,8 @@ import { SiteHeader } from "@/components/site/site-header";
 import { OffTheClock } from "@/components/site/off-the-clock";
 import { Opening } from "@/components/site/opening";
 import { SayHello } from "@/components/site/say-hello";
-import { HowIWork } from "@/components/quiet/how-i-work";
+import { HowIWork } from "@/components/site/how-i-work";
+import { WhereImHeaded } from "@/components/site/where-im-headed";
 import { ThingsIMake } from "@/components/quiet/things-i-make";
 import { Work } from "@/components/site/work";
 
@@ -19,14 +20,13 @@ export function Homepage() {
         <Opening />
 
         <Work />
+        <WhereImHeaded />
 
         <section id="things-i-make" className="stretch-wrap stretch-section" aria-labelledby="things-i-make-heading">
           <ThingsIMake />
         </section>
 
-        <section id="how-i-work" className="stretch-wrap stretch-section" aria-labelledby="how-i-work-heading">
-          <HowIWork />
-        </section>
+        <HowIWork />
 
         <section id="off-the-clock" className="stretch-wrap stretch-section" aria-labelledby="off-the-clock-heading">
           <OffTheClock />

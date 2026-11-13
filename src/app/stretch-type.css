@@ -113,8 +113,3 @@ html[data-lights="on"] {
 .qi-row__line {
   text-wrap: pretty;
 }
-
-/* A How I work proof keeps ordinary wrapping: reflowed at 320 px, the pen's underline runs into the line below. */
-[data-habits] .qi-row__line {
-  text-wrap: wrap;
-}

@@ -22,16 +22,15 @@ const sections = [
 ];
 
 test.describe("Homepage shell", () => {
-  test("six sections in order, the five after the opening anchored", async ({ page }) => {
+  test("seven sections in order: the opening, then the five anchored ones with Where I'm headed after Work", async ({ page }) => {
     await page.goto("/");
     const main = page.locator("#main-content");
-    await expect(main.locator("> section")).toHaveCount(6);
-    expect(await main.locator("> section").evaluateAll((all) => all.map((section) => section.id))).toEqual([
-      "",
-      ...sections.map((section) => section.id),
-    ]);
+    await expect(main.locator("> section")).toHaveCount(7);
+    const ids = sections.map((section) => section.id);
+    expect(await main.locator("> section").evaluateAll((all) => all.map((section) => section.id))).toEqual(["", ids[0], "", ...ids.slice(1)]);
     await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName(opening.headline);
-    await expect(page.getByRole("heading", { level: 2 })).toHaveText(sections.map((section) => section.id === "say-hello" ? "Say hello" : section.heading));
+    const headings = sections.map((section) => (section.id === "say-hello" ? "Say hello" : section.heading));
+    await expect(page.getByRole("heading", { level: 2 })).toHaveText([headings[0], work.headed.heading, ...headings.slice(1)]);
   });
 
   // Work opens with a section title and, alone among the sections, a subheading (DESIGN.md "Layout"; #413).
@@ -70,13 +69,11 @@ test.describe("Homepage shell", () => {
     await expect(section.locator(".qi-note-line").first()).toHaveText(thingsIMake.note);
   });
 
-  test("How I work has a quiet title and its note", async ({ page }) => {
+  test("How I work has its section title and no note", async ({ page }) => {
     await page.goto("/");
     const section = page.locator("section#how-i-work");
-    const title = section.getByRole("heading", { level: 2, name: howIWork.heading, exact: true });
-    await expect(title).toHaveCSS("font-size", "17px");
-    await expect(title).toHaveCSS("font-weight", "620");
-    await expect(section.locator(".qi-note-line").first()).toHaveText(howIWork.note);
+    await expect(section.getByRole("heading", { level: 2, name: howIWork.heading, exact: true })).toHaveClass(/section__title/);
+    await expect(section.locator(".qi-note-line")).toHaveCount(0);
   });
 
   test("the header links jump to each section and mark the one in view", async ({ page }) => {

@@ -12,15 +12,15 @@ test.describe("Homepage sign-off", () => {
     const width = page.viewportSize()!.width;
     test.skip(!(width in heightBudget), "The budget is set at 1440 × 900 and 390 × 844");
     await page.goto("/");
-    await expect(page.locator("#main-content > section")).toHaveCount(6);
+    await expect(page.locator("#main-content > section")).toHaveCount(7);
     const budget = heightBudget[width as keyof typeof heightBudget];
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight)).toBeLessThanOrEqual(budget);
   });
 
   test("nothing but the margin is wider than the column and its row bleed", async ({ page }) => {
     await page.goto("/");
-    // Four: the opening (#412) and Say hello (#411) are no longer quiet-index columns.
-    await expect(page.locator(".qi-column")).toHaveCount(4);
+    // Two, Things I make and Off the clock: the opening (#412), Say hello (#411), Work (#413), Where I'm headed and How I work (#414) are no longer quiet-index columns.
+    await expect(page.locator(".qi-column")).toHaveCount(2);
     await page.evaluate(() => document.fonts.ready);
     // Measured in the page, and polled: a slow runner may still be laying out hydrated content or swapping the display font.
     const measure = () =>

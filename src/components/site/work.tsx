@@ -4,7 +4,6 @@ import { OnView, Count } from "@/components/parts/on-view";
 import { Arrow, Panel, PanelHead } from "@/components/parts/panel";
 import { simulation } from "@/components/site/simulation-model";
 import { SimulationPlot } from "@/components/site/simulation-plot";
-import { HeadedRows } from "@/components/quiet/headed-rows";
 import { roleStories } from "@/content/stretch/role-stories";
 import type { RoleStorySlug } from "@/content/stretch/role-story";
 import { passRecords } from "@/content/stretch/staff-pass";
@@ -151,7 +150,7 @@ function RolePanelView({ panel }: { panel: RolePanel }) {
 /**
  * Work (DESIGN.md "The homepage, in order" 3, R-13 to R-15): the title and its subheading, BNP Paribas full width,
  * then Joveen and Optegra side by side. Each panel carries its employer's slug as its id, which the opening's passes
- * link to. Where I'm headed's rows follow until it becomes its own panel (#414).
+ * link to.
  */
 export function Work() {
   return (
@@ -168,7 +167,6 @@ export function Work() {
           ))}
         </div>
       </div>
-      <HeadedRows />
     </section>
   );
 }

@@ -1,0 +1,272 @@
+/*
+ * Where I'm headed and How I work (docs/design/DESIGN.md "The homepage, in order" 4 and 6, "How I work's cards"; R-16 and
+ * R-18). The panel, the chip, the text link and the arrivals are parts.css's; this file lays out what is on them.
+ */
+
+/* ---- Where I'm headed: one paper panel, the title and lead at the left, three parts at the right ---- */
+
+.headed {
+  display: grid;
+  grid-template-columns: 4fr 7fr;
+  gap: 56px;
+}
+
+.headed__title {
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: var(--type-panel);
+  line-height: 1;
+  letter-spacing: -0.028em;
+}
+
+.headed__lead p {
+  max-width: 21em;
+  margin-top: 18px;
+  color: var(--muted);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-prose);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.headed__parts li {
+  display: grid;
+  grid-template-columns: 8em minmax(0, 1fr);
+  align-items: center;
+  gap: 20px;
+  padding-block: 22px;
+}
+
+.headed__parts li:first-child {
+  padding-top: 0;
+}
+
+.headed__parts li:last-child {
+  padding-bottom: 0;
+}
+
+.headed__parts li + li {
+  border-top: 1px solid var(--hair);
+}
+
+.headed__parts .chip {
+  justify-self: start;
+}
+
+.headed__parts h3 {
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.headed__parts p {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: var(--type-ui);
+}
+
+/* ---- How I work: four upright cards ---- */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+
+/* The habit above its 2 px cobalt rule. Room for two lines, set from the bottom (padding and the rule included), keeps every rule at one height. */
+.card h3 {
+  display: flex;
+  align-items: flex-end;
+  min-height: calc(2.2em + 42px);
+  margin-inline: 24px;
+  padding-block: 24px 16px;
+  border-bottom: 2px solid var(--cobalt);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.018em;
+  text-wrap: balance;
+}
+
+.card p {
+  padding: 16px 24px 24px;
+  color: var(--muted);
+  font-size: var(--type-body);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+/* The proof phrase: a cobalt tint behind the words, in full ink. Never an underline, which reads as a link. */
+.card mark {
+  margin-inline: -1px;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--cobalt) 13%, transparent);
+  color: var(--ink);
+  font-weight: 500;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* The proof, drawn in a 76 px foot tinted with cobalt at 8%. */
+.card__proof {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 76px;
+  padding-inline: 24px;
+  background: color-mix(in srgb, var(--cobalt) 8%, transparent);
+  font-size: var(--type-small);
+  font-weight: 500;
+}
+
+.card__proof b {
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: 30px;
+  font-weight: 500;
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.drawn__dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.drawn__dot::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--dot);
+}
+
+.drawn__ticks {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 3px 1.5px;
+}
+
+.drawn__ticks i {
+  width: 2px;
+  height: 11px;
+  border-radius: 1px;
+  background: var(--cobalt);
+}
+
+/* A switch that is off: an outline with its knob at the left. */
+.drawn__switch {
+  position: relative;
+  flex: none;
+  width: 40px;
+  height: 24px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1.5px var(--muted);
+}
+
+.drawn__switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.drawn__bars {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+}
+
+.drawn__bars .bar {
+  display: block;
+  width: calc(var(--share) * 100%);
+  height: 5px;
+  border-radius: 3px;
+  background: var(--hair);
+}
+
+.drawn__bars .bar--after {
+  height: 9px;
+  border-radius: 5px;
+  background: var(--cobalt);
+}
+
+.how__prd {
+  margin-top: 32px;
+}
+
+/* ---- Narrower ---- */
+
+@media (max-width: 1259.98px) {
+  .headed {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36px;
+  }
+
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 719.98px) {
+  .headed {
+    gap: 28px;
+  }
+
+  .headed__parts li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding-block: 20px;
+  }
+
+  .cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .card h3 {
+    min-height: 0;
+    padding-top: 22px;
+  }
+}
+
+/* Forced colours keep the drawings: ticks and the after bar in the highlight, the before bar and the switch in the text colour. */
+@media (forced-colors: active) {
+  .drawn__bars .bar,
+  .drawn__switch::after {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  .drawn__ticks i,
+  .drawn__bars .bar--after,
+  .drawn__dot::before {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+}

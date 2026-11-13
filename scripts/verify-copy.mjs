@@ -37,7 +37,7 @@ const plain = raw.replace(/\*/g, "").replace(/[{}]/g, "");
 
 const leaves = (value, path = "") => {
   // Links, image paths, a figure's kind and its screens' devices, dates, anchors, category keys and Role story slugs are addresses and data, not words, so the approved copy does not list them.
-  if (typeof value === "string") return /(href|src|writtenOn|\.id|\.glyph|\.slug|\.figures\.[\w-]+\.kind|\.figures\.[\w-]+\.images\[\d+\]\.device|\.category|\.story|\.project|\.restates\[\d+\])$/.test(path) ? [] : [[path, value]];
+  if (typeof value === "string") return /(href|src|writtenOn|\.id|\.glyph|\.slug|\.figures\.[\w-]+\.kind|\.figures\.[\w-]+\.images\[\d+\]\.device|\.category|\.story|\.project|\.restates\[\d+\]|\.drawn\.kind|\.drawn\.projects\[\d+\])$/.test(path) ? [] : [[path, value]];
   if (Array.isArray(value)) return value.flatMap((item, index) => leaves(item, `${path}[${index}]`));
   if (value && typeof value === "object") return Object.entries(value).flatMap(([key, item]) => leaves(item, `${path}.${key}`));
   return [];
@@ -165,17 +165,39 @@ const keptBeats = rows(raw, "## How I work");
 const quietHow = Object.fromEntries(rows(raw, "### Quiet index · How I work"));
 assert.equal(howIWork.beats.length, 4, "How I work has four habits");
 assert.equal(howIWork.note, quietHow.Note, "How I work: note");
-// The pen underlines a phrase of each proof, so the phrase must be in the proof word for word.
-for (const beat of howIWork.beats) assert.ok(beat.proof.includes(beat.underline), `How I work: "${beat.habit}" has no "${beat.underline}" in its proof to underline`);
+// Each card highlights a phrase of its story, so the phrase must be in the story word for word.
+for (const beat of howIWork.beats) assert.ok(beat.proof.includes(beat.highlight), `How I work: "${beat.habit}" has no "${beat.highlight}" in its story to highlight`);
 assert.deepEqual(
   howIWork.beats.slice(0, 2).map((beat) => [`**${beat.habit}**`, beat.proof]),
   keptBeats.slice(0, 2),
 );
-for (const beat of howIWork.beats.slice(2)) assert.equal(`${beat.proof} Underline: “${beat.underline}”`, quietHow[beat.habit], `How I work: "${beat.habit}"`);
+for (const beat of howIWork.beats.slice(2)) assert.equal(`${beat.proof} Underline: “${beat.highlight}”`, quietHow[beat.habit], `How I work: "${beat.habit}"`);
 // The PRD row and the closer look's caption are the case study's own date, so the two cannot drift apart.
 const prdDate = caseStudies.threshold.prd.date;
 assert.equal(`${howIWork.prd.title} · ${prdDate}`, quietHow["PRD row"], "How I work: the PRD row");
 assert.equal(`${howIWork.prd.title}, ${prdDate}`, raw.match(/^- PRD card caption: (.+)$/m)?.[1], "How I work: the PRD closer look's caption");
+{
+  // The cards' drawn proofs (R-18) and the link to the PRD, as the deck's "Passes and panels" section gives them.
+  const deck = raw.slice(raw.indexOf("## Passes and panels · Where I’m headed and How I work"));
+  const line = (label) => deck.match(new RegExp(`^- ${label}: (.+)$`, "m"))?.[1];
+  const table = deck.split("\n").filter((line) => line.startsWith("|") && !line.startsWith("|---")).map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()));
+  const drawnAs = ({ drawn }) =>
+    drawn.kind === "projects" ? drawn.projects.map((slug) => projects.find((project) => project.slug === slug)?.name).join(" · ")
+    : drawn.kind === "count" ? `${drawn.value}, as ${drawn.value} ticks`
+    : drawn.kind === "switch" ? `A switch, ${drawn.label}`
+    : `${drawn.value}, its bar ${drawn.percent}% longer`;
+  assert.deepEqual(howIWork.beats.map((beat) => [beat.habit, beat.highlight, drawnAs(beat)]), table.filter((row) => howIWork.beats.some((beat) => beat.habit === row[0])), "How I work: the highlights and drawn proofs");
+  assert.equal(`${howIWork.prd.title}, ${prdDate} →`, line("PRD link"), "How I work: the link to the PRD");
+  // A drawing never says more than its story: a count or a change is a number the story states.
+  for (const beat of howIWork.beats) {
+    const { drawn } = beat;
+    const number = drawn.kind === "count" ? String(drawn.value) : drawn.kind === "change" ? String(drawn.percent) : null;
+    if (number) assert.ok(beat.highlight.includes(number), `How I work: "${beat.habit}" draws ${number}, which its highlighted phrase does not state`);
+    if (drawn.kind === "change") assert.equal(drawn.value, `+${drawn.percent}%`, `How I work: "${beat.habit}" writes ${drawn.value} for a ${drawn.percent}% change`);
+    if (drawn.kind === "projects") for (const slug of drawn.projects) assert.ok(beat.proof.includes(projects.find((project) => project.slug === slug)?.name ?? slug), `How I work: "${beat.habit}" draws ${slug}, which its story does not name`);
+  }
+  assert.equal(line("Where I’m headed lead"), work.headed.line, "Where I’m headed: the lead (spec Decisions 2)");
+}
 
 // The approved copy under a `### name` heading, for the sections that follow.
 const copyFor = (name) => {
@@ -197,7 +219,6 @@ for (const { slug, pins } of work.employers) {
   assert.equal(`${story.role} · ${story.dates}`, workRows[`${passRecords[slug].short} row`], `${slug}: the row's line is its Role story's role and dates`);
   assert.equal(pins.length, 3, `${slug}: three Pass pins`);
 }
-assert.ok(workRows["Where I’m headed: heading and line"].includes(`${headed.heading} · ${headed.line}`), "Where I’m headed: heading and line");
 
 const headedCopy = copyFor("Where I’m headed");
 assert.equal(headed.heading, bullet(headedCopy, "Heading"), "Where I’m headed: heading");
@@ -358,7 +379,9 @@ for (const [what, ids] of [["menu", siteCopy.menu.map(({ id }) => id)], ["Say he
 
 // Work's panels (R-13 to R-15): every string as the deck gives it, and every figure and bar its Role story's fact.
 {
-  const deck = raw.slice(raw.indexOf("## Passes and panels · Work"));
+  const from = raw.indexOf("## Passes and panels · Work");
+  const next = raw.indexOf("\n## ", from + 1);
+  const deck = raw.slice(from, next === -1 ? undefined : next);
   const tables = deck.split("\n").filter((line) => line.startsWith("|") && !line.startsWith("|---")).map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()));
   const { bnp, roles } = workPanels;
   assert.equal(workPanels.heading, work.heading, "Work's panels keep Work's heading");

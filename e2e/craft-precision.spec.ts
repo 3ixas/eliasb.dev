@@ -25,8 +25,8 @@ test.describe("Interrupting", () => {
 
   /** Taps the look's trigger and, in the same task, pauses its fold at `at` ms: a slow runner cannot miss a 300 ms transition. Returns the height there. */
   const tapAndPause = (page: Page, at: number) =>
-    page.locator('[data-look-slot="strand-judgement"]').evaluate(async (slot, time) => {
-      document.querySelector<HTMLElement>('#work .qi-row[data-look-tap="strand-judgement"]')!.click();
+    page.locator('[data-look-slot="training"]').evaluate(async (slot, time) => {
+      document.querySelector<HTMLElement>('#off-the-clock .qi-row[data-look-tap="training"]')!.click();
       const fold = () => slot.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "grid-template-rows");
       while (!fold()) await new Promise(requestAnimationFrame);
       fold()!.pause();
@@ -36,7 +36,7 @@ test.describe("Interrupting", () => {
     }, at);
   /** The height over the next few frames of whatever fold is now running. */
   const nextHeights = (page: Page) =>
-    page.locator('[data-look-slot="strand-judgement"]').evaluate(async (slot) => {
+    page.locator('[data-look-slot="training"]').evaluate(async (slot) => {
       const heights: number[] = [];
       for (let frame = 0; frame < 4; frame++) {
         await new Promise(requestAnimationFrame);
@@ -49,11 +49,11 @@ test.describe("Interrupting", () => {
     test.skip(wide(page), "Inline looks are for phones and touch");
     await page.goto("/");
     await hydrated(page);
-    await page.locator('#work .qi-row[data-look-tap="strand-judgement"]').scrollIntoViewIfNeeded();
+    await page.locator('#off-the-clock .qi-row[data-look-tap="training"]').scrollIntoViewIfNeeded();
     // Closing never grows from where opening had got to.
     const opened = await tapAndPause(page, 100);
     expect(opened).toBeGreaterThan(0);
-    await page.locator('#work .qi-row[data-look-tap="strand-judgement"]').evaluate((button) => (button as HTMLElement).click());
+    await page.locator('#off-the-clock .qi-row[data-look-tap="training"]').evaluate((button) => (button as HTMLElement).click());
     for (const height of await nextHeights(page)) expect(height).toBeLessThanOrEqual(opened + 1);
   });
 
@@ -61,11 +61,11 @@ test.describe("Interrupting", () => {
     test.skip(wide(page), "Inline looks are for phones and touch");
     await page.goto("/");
     await hydrated(page);
-    const trigger = page.locator('#work .qi-row[data-look-tap="strand-judgement"]');
+    const trigger = page.locator('#off-the-clock .qi-row[data-look-tap="training"]');
     await trigger.scrollIntoViewIfNeeded();
     // Opening is finished by seeking to its end, in the task that starts it, not by waiting out its length.
-    await page.locator('[data-look-slot="strand-judgement"]').evaluate(async (slot) => {
-      document.querySelector<HTMLElement>('#work .qi-row[data-look-tap="strand-judgement"]')!.click();
+    await page.locator('[data-look-slot="training"]').evaluate(async (slot) => {
+      document.querySelector<HTMLElement>('#off-the-clock .qi-row[data-look-tap="training"]')!.click();
       const fold = () => slot.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "grid-template-rows");
       while (!fold()) await new Promise(requestAnimationFrame);
       fold()!.finish();
@@ -78,11 +78,11 @@ test.describe("Interrupting", () => {
 
   test("after one glide the margin tracks its row exactly as the page scrolls", async ({ page }) => {
     test.skip(!wide(page), "The margin is for wide screens");
-    await page.goto("/");
+    await page.goto("/fixtures/off-the-clock");
     await hydrated(page);
-    // Where I'm headed's strands: Work's first rows with closer looks now that its employers are panels (#413).
-    const bnp = page.locator('.qi-row[data-look="strand-judgement"]');
-    const joveen = page.locator('.qi-row[data-look="strand-depth"]');
+    // Off the clock's training and book rows on fixed data: the homepage's book depends on Goodreads.
+    const bnp = page.locator('[data-fixture="pair"] .qi-row[data-look="training"]');
+    const joveen = page.locator('[data-fixture="pair"] .qi-row[data-look="book"]');
     const margin = page.locator(".qi-margin");
     await bnp.scrollIntoViewIfNeeded();
     await bnp.hover();
