@@ -14,6 +14,7 @@ import "./shell.css";
 import "./parts.css";
 import "./pass.css";
 import "./opening.css";
+import "./work.css";
 import "./stretch-resume.css";
 
 // Self-hosted at build time by next/font, so no request goes to Google when a

@@ -25,8 +25,8 @@ test.describe("Interrupting", () => {
 
   /** Taps the look's trigger and, in the same task, pauses its fold at `at` ms: a slow runner cannot miss a 300 ms transition. Returns the height there. */
   const tapAndPause = (page: Page, at: number) =>
-    page.locator('[data-look-slot="joveen"]').evaluate(async (slot, time) => {
-      document.querySelector<HTMLElement>('#work button[data-look-tap="joveen"]')!.click();
+    page.locator('[data-look-slot="strand-judgement"]').evaluate(async (slot, time) => {
+      document.querySelector<HTMLElement>('#work .qi-row[data-look-tap="strand-judgement"]')!.click();
       const fold = () => slot.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "grid-template-rows");
       while (!fold()) await new Promise(requestAnimationFrame);
       fold()!.pause();
@@ -36,7 +36,7 @@ test.describe("Interrupting", () => {
     }, at);
   /** The height over the next few frames of whatever fold is now running. */
   const nextHeights = (page: Page) =>
-    page.locator('[data-look-slot="joveen"]').evaluate(async (slot) => {
+    page.locator('[data-look-slot="strand-judgement"]').evaluate(async (slot) => {
       const heights: number[] = [];
       for (let frame = 0; frame < 4; frame++) {
         await new Promise(requestAnimationFrame);
@@ -49,11 +49,11 @@ test.describe("Interrupting", () => {
     test.skip(wide(page), "Inline looks are for phones and touch");
     await page.goto("/");
     await hydrated(page);
-    await page.locator('#work button[data-look-tap="joveen"]').scrollIntoViewIfNeeded();
+    await page.locator('#work .qi-row[data-look-tap="strand-judgement"]').scrollIntoViewIfNeeded();
     // Closing never grows from where opening had got to.
     const opened = await tapAndPause(page, 100);
     expect(opened).toBeGreaterThan(0);
-    await page.locator('#work button[data-look-tap="joveen"]').evaluate((button) => (button as HTMLElement).click());
+    await page.locator('#work .qi-row[data-look-tap="strand-judgement"]').evaluate((button) => (button as HTMLElement).click());
     for (const height of await nextHeights(page)) expect(height).toBeLessThanOrEqual(opened + 1);
   });
 
@@ -61,11 +61,11 @@ test.describe("Interrupting", () => {
     test.skip(wide(page), "Inline looks are for phones and touch");
     await page.goto("/");
     await hydrated(page);
-    const trigger = page.locator('#work button[data-look-tap="joveen"]');
+    const trigger = page.locator('#work .qi-row[data-look-tap="strand-judgement"]');
     await trigger.scrollIntoViewIfNeeded();
     // Opening is finished by seeking to its end, in the task that starts it, not by waiting out its length.
-    await page.locator('[data-look-slot="joveen"]').evaluate(async (slot) => {
-      document.querySelector<HTMLElement>('#work button[data-look-tap="joveen"]')!.click();
+    await page.locator('[data-look-slot="strand-judgement"]').evaluate(async (slot) => {
+      document.querySelector<HTMLElement>('#work .qi-row[data-look-tap="strand-judgement"]')!.click();
       const fold = () => slot.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "grid-template-rows");
       while (!fold()) await new Promise(requestAnimationFrame);
       fold()!.finish();
@@ -80,8 +80,9 @@ test.describe("Interrupting", () => {
     test.skip(!wide(page), "The margin is for wide screens");
     await page.goto("/");
     await hydrated(page);
-    const bnp = page.locator('.qi-row[data-look="bnp-paribas"]');
-    const joveen = page.locator('.qi-row[data-look="joveen"]');
+    // Where I'm headed's strands: Work's first rows with closer looks now that its employers are panels (#413).
+    const bnp = page.locator('.qi-row[data-look="strand-judgement"]');
+    const joveen = page.locator('.qi-row[data-look="strand-depth"]');
     const margin = page.locator(".qi-margin");
     await bnp.scrollIntoViewIfNeeded();
     await bnp.hover();
@@ -190,10 +191,10 @@ test.describe("Reading on a phone", () => {
     });
   }
 
-  test("a date range in a Work row stays whole", async ({ page }) => {
+  test("a role and its dates on a Work panel each stay whole", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => document.fonts.ready);
-    const parts = page.locator("#work .qi-row__line .qi-dots__part");
+    const parts = page.locator("#work .panel__meta span");
     expect(await parts.count()).toBeGreaterThan(0);
     for (const part of await parts.all()) {
       const lines = await part.evaluate((element) => new Set([...element.getClientRects()].map((rect) => Math.round(rect.top))).size);

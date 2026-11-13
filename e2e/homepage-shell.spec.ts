@@ -34,14 +34,22 @@ test.describe("Homepage shell", () => {
     await expect(page.getByRole("heading", { level: 2 })).toHaveText(sections.map((section) => section.id === "say-hello" ? "Say hello" : section.heading));
   });
 
-  // Work is the first section in the quiet index's language: a 17 px title and a 15 px note, not a giant heading (#291).
-  test("Work has a quiet title and its note", async ({ page }) => {
+  // Work opens with a section title and, alone among the sections, a subheading (DESIGN.md "Layout"; #413).
+  test("Work has its section title and its subheading", async ({ page }) => {
     await page.goto("/");
     const section = page.locator("section#work");
     const title = section.getByRole("heading", { level: 2, name: work.heading, exact: true });
-    await expect(title).toHaveCSS("font-size", "17px");
-    await expect(title).toHaveCSS("font-weight", "620");
-    await expect(section.locator(".qi-note-line").first()).toHaveText(work.note);
+    const size = await page.evaluate(() => {
+      const probe = document.createElement("i");
+      probe.style.fontSize = "var(--type-section)";
+      document.body.append(probe);
+      const value = getComputedStyle(probe).fontSize;
+      probe.remove();
+      return value;
+    });
+    await expect(title).toHaveCSS("font-size", size);
+    await expect(title).toHaveCSS("font-family", /^Newsreader/);
+    await expect(section.locator(".work__subheading")).toHaveText(work.note);
   });
 
   test("Off the clock has a quiet title and its note", async ({ page }) => {

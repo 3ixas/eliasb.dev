@@ -7,8 +7,9 @@ import { expect, test, type Page } from "@playwright/test";
  */
 
 const inlineOnly = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1180;
-const SLOT = '[data-look-slot="joveen"]';
-const TRIGGER = '#work button[data-look-tap="joveen"]';
+/* Where I'm headed's first strand: the homepage's first row with an inline look now that Work's employers are panels (#413). */
+const SLOT = '[data-look-slot="strand-judgement"]';
+const TRIGGER = '#work .qi-row[data-look-tap="strand-judgement"]';
 
 /**
  * Hydrated, with the opening's passes at rest: their arrival swing is finished at once, as a motion spec seeks rather
@@ -22,6 +23,15 @@ const hydrated = async (page: Page) => {
   await page.evaluate(() => document.querySelectorAll(".pass").forEach((pass) => pass.getAnimations().forEach((animation) => animation.finish())));
 };
 
+/**
+ * Puts the trigger mid-screen and lets the scroll land. WebKit's scrollIntoViewIfNeeded leaves it at the bottom edge, where
+ * a look opens low and the page glides to show it: that is the next block's subject, not the fold's.
+ */
+const centre = async (page: Page) => {
+  await page.locator(TRIGGER).evaluate((row) => row.scrollIntoView({ block: "center", behavior: "instant" }));
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+};
+
 test.describe("The fold", () => {
   test.use({ reducedMotion: "no-preference" });
 
@@ -29,11 +39,14 @@ test.describe("The fold", () => {
     test.skip(inlineOnly(page), "Inline looks are for phones and touch");
     await page.goto("/");
     await hydrated(page);
-    await page.locator(TRIGGER).scrollIntoViewIfNeeded();
+    await centre(page);
     const read = await page.locator(SLOT).evaluate(async (slot) => {
       const fold = () => slot.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "grid-template-rows");
       const timing = async () => {
-        while (!fold()) await new Promise(requestAnimationFrame);
+        for (let frame = 0; !fold(); frame++) {
+          if (frame > 120) throw new Error("no fold started within 120 frames of the tap");
+          await new Promise(requestAnimationFrame);
+        }
         const animation = fold()!;
         animation.pause();
         const { duration } = animation.effect!.getComputedTiming();
@@ -42,7 +55,7 @@ test.describe("The fold", () => {
         await new Promise(requestAnimationFrame);
         return { duration: Number(duration), easing: String(easing) };
       };
-      const trigger = document.querySelector<HTMLElement>('#work button[data-look-tap="joveen"]')!;
+      const trigger = document.querySelector<HTMLElement>('#work .qi-row[data-look-tap="strand-judgement"]')!;
       trigger.click();
       const opening = await timing();
       const height = slot.querySelector<HTMLElement>(".qi-inline__in")!.scrollHeight;
@@ -60,16 +73,22 @@ test.describe("The fold", () => {
     test.skip(inlineOnly(page), "Inline looks are for phones and touch");
     await page.goto("/");
     await hydrated(page);
-    await page.locator(TRIGGER).scrollIntoViewIfNeeded();
+    await centre(page);
     const stayed = await page.locator(SLOT).evaluate(async (slot) => {
       const fold = () => slot.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "grid-template-rows");
-      const trigger = document.querySelector<HTMLElement>('#work button[data-look-tap="joveen"]')!;
+      const started = async () => {
+        for (let frame = 0; !fold(); frame++) {
+          if (frame > 120) throw new Error("no fold started within 120 frames of the tap");
+          await new Promise(requestAnimationFrame);
+        }
+      };
+      const trigger = document.querySelector<HTMLElement>('#work .qi-row[data-look-tap="strand-judgement"]')!;
       trigger.click();
-      while (!fold()) await new Promise(requestAnimationFrame);
+      await started();
       fold()!.finish();
       await new Promise(requestAnimationFrame);
       trigger.click();
-      while (!fold()) await new Promise(requestAnimationFrame);
+      await started();
       // Held part way through its fold, the look is still there.
       fold()!.pause();
       fold()!.currentTime = 100;
@@ -144,6 +163,9 @@ test.describe("A look that opens low", () => {
       return { held, after: window.scrollY, start };
     });
     expect(stopped.held).toBeGreaterThan(stopped.start);
-    expect(stopped.after).toBe(stopped.held);
+    // The glide does not carry on: it would move the page on by tens of px. Under load WebKit settles a scroll back by a few px
+    // once it is let go (seen at 320 and 390 in CI, never with the machine idle), which is the engine, not the hold.
+    expect(stopped.after - stopped.held).toBeLessThanOrEqual(1);
+    expect(stopped.after - stopped.held).toBeGreaterThanOrEqual(-4);
   });
 });

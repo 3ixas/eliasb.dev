@@ -4,7 +4,7 @@ import { Opening } from "@/components/site/opening";
 import { SayHello } from "@/components/site/say-hello";
 import { HowIWork } from "@/components/quiet/how-i-work";
 import { ThingsIMake } from "@/components/quiet/things-i-make";
-import { Work } from "@/components/quiet/work";
+import { Work } from "@/components/site/work";
 
 /**
  * The Stretch homepage shell: the header, the opening line and five anchored sections
@@ -18,9 +18,7 @@ export function Homepage() {
       <main id="main-content" tabIndex={-1}>
         <Opening />
 
-        <section id="work" className="stretch-wrap stretch-section" aria-labelledby="work-heading">
-          <Work />
-        </section>
+        <Work />
 
         <section id="things-i-make" className="stretch-wrap stretch-section" aria-labelledby="things-i-make-heading">
           <ThingsIMake />
