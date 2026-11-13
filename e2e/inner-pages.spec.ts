@@ -4,9 +4,7 @@ import { roleStorySlugs } from "../src/content/stretch/role-stories";
 import { siteCopy } from "../src/content/stretch/site-copy";
 
 // Every inner page has one `h1`, the shared header whose links lead to the homepage's sections (DESIGN.md "The header"),
-// and nothing wider than the column plus the margin.
-const COLUMN = 600;
-const MARGIN = 300 + 40;
+// and nothing wider than the frame (the Résumé's sheet aside).
 /** The passes and panels frame (DESIGN.md "Layout"). */
 const FRAME = 1344;
 
@@ -19,13 +17,13 @@ for (const route of routes) {
       await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     });
 
-    test("has nothing wider than the column plus the margin, and no sideways scroll", async ({ page }) => {
+    test("has nothing wider than the frame, and no sideways scroll", async ({ page }) => {
       await page.goto(route);
       await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
       // The page's own wrapper spans the window, and Say hello is the page's width; what sits inside the column is measured.
       const widest = await page.locator("main :not(.stretch-wrap, .say-hello, .say-hello *)").evaluateAll((elements) => Math.max(...elements.map((element) => element.getBoundingClientRect().width)));
-      // The Résumé's sheet is the page: A4 is wider than the column. The Work archive (#415), the Role stories (#417) and the case studies (#418) are on the whole frame.
-      const limit = route === "/resume" ? 900 : route === "/nothing-here" ? COLUMN + MARGIN : FRAME;
+      // Every inner page is on the frame since #419; the Résumé is its A4 sheet.
+      const limit = route === "/resume" ? 900 : FRAME;
       expect(widest).toBeLessThanOrEqual(limit);
     });
   });

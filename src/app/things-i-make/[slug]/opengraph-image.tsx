@@ -12,19 +12,21 @@ export function generateStaticParams() {
   return caseStudySlugs.map((slug) => ({ slug }));
 }
 
-/** A case study's card: the project's colours, its name large and the one line it does for someone beneath. */
+/** A case study's card: its project's panel field and ink, the name large and the one line it does for someone beneath. */
 export default async function CaseStudyImage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const study = caseStudyFor(slug);
   if (!study) notFound();
-  const { name, outcome, colours } = caseStudyOpening(study, projects);
+  const { name, outcome } = caseStudyOpening(study, projects);
+  const panel = projects.find((project) => project.slug === slug)?.panel;
+  if (!panel) notFound();
 
   return shareCard({
-    field: colours.field,
-    ink: colours.ink,
+    field: panel.field,
+    ink: panel.ink,
     children: (
       <div style={{ display: "flex", flexDirection: "column", rowGap: 16 }}>
-        <div style={{ display: "flex", fontSize: name.length > 12 ? 120 : 168, lineHeight: 0.95, letterSpacing: -2, textTransform: "uppercase" }}>{name}</div>
+        <div style={{ display: "flex", fontSize: name.length > 12 ? 128 : 168, lineHeight: 0.95, letterSpacing: -4 }}>{name}</div>
         <div style={{ display: "flex", fontSize: 48, lineHeight: 1.1 }}>{outcome}</div>
       </div>
     ),

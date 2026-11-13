@@ -1,50 +1,7 @@
 /*
- * The 404's long form until #419 moves it onto story.css (Role stories and case studies are already there): an opening
- * and a section in the quiet index's column. The title's treatment (.qi-opening__line), the section titles (.qi-title)
- * and the rows belong to quiet-index.css and quiet-opening.css. The screenshot dialog (.qi-zoom) is every long-form
- * page's, and stays.
+ * The screenshot that opens large in the same window (components/site/zoomable-image.tsx), on every long-form page.
+ * The quiet index's long form it once sat in is gone: Role stories, case studies and the 404 are story.css's.
  */
-
-.qi-long {
-  padding-block: 20px 0;
-}
-
-/* ---------- the opening ---------- */
-
-.qi-long__open {
-  display: grid;
-  gap: 28px;
-  margin-top: 8px;
-}
-
-.qi-long__title {
-  overflow-wrap: break-word;
-}
-
-.qi-long__line {
-  margin: 16px 0 0;
-  color: var(--stretch-muted);
-  font-size: var(--text-body);
-  line-height: 1.5;
-}
-
-.qi-long__meta {
-  margin: 10px 0 0;
-  color: var(--stretch-muted);
-  font-size: var(--text-label);
-  line-height: 1.4;
-}
-
-/* ---------- sections ---------- */
-
-.qi-long__section {
-  margin-top: var(--space-long-step);
-  scroll-margin-top: 136px;
-}
-
-.qi-long__section:focus {
-  outline: none;
-}
 
 /* ---------- a screenshot that opens large in the same window ---------- */
 

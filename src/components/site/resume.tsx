@@ -6,7 +6,8 @@ import { resumeCopy, resumePdf, resumeSheet } from "@/content/resume";
 
 /**
  * The Résumé (GLOSSARY.md): an A4 sheet lying on the desk, which is also what
- * prints. The desk holds the Download PDF button, between the shared header and Say hello, which do not print; the
+ * prints. The desk holds the Download PDF Button on the sheet's top edge, at its right (DESIGN.md "The Résumé", R-24),
+ * between the shared header and Say hello, which do not print; the
  * sheet holds only what the PDF holds. It is light paper in either theme (stretch-resume.css), and the
  * server renders all of it.
  */
@@ -16,7 +17,7 @@ export function ResumePage() {
     <div data-stretch-shell data-resume>
       <SiteHeader />
       <main id="main-content" tabIndex={-1} className="stretch-resume__desk">
-        <a className="stretch-pill stretch-resume__download" href={resumePdf.href} download>
+        <a className="button stretch-resume__download" href={resumePdf.href} download>
           {resumeCopy.download}
         </a>
         <article className="stretch-resume__sheet" aria-labelledby="resume-name">

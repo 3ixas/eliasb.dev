@@ -96,8 +96,11 @@ test.describe("The Résumé", () => {
     await expect(page.locator("section#say-hello")).toHaveCount(1);
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     await expect(sheet(page)).toBeVisible();
+    // On the sheet's top edge, at its right (R-24): 16 px above it, its right edge on the sheet's (inside the gutter on a phone).
     const [download, paper] = await Promise.all([page.getByRole("link", { name: resumeCopy.download }).boundingBox(), sheet(page).boundingBox()]);
     expect(download!.y + download!.height).toBeLessThanOrEqual(paper!.y);
+    expect(paper!.y - (download!.y + download!.height)).toBeLessThanOrEqual(17);
+    expect(paper!.x + paper!.width - (download!.x + download!.width)).toBeLessThanOrEqual((page.viewportSize()?.width ?? 0) <= 760 ? 33 : 1);
   });
 
   test("is complete without script: the header, its skip link, Download PDF and the sheet are in the server HTML", async ({ page }) => {
@@ -109,15 +112,15 @@ test.describe("The Résumé", () => {
     await expect(page.getByRole("heading", { level: 1, name: resumeSheet().name })).toBeVisible();
   });
 
-  test("Download PDF answers like Copy: cobalt on hover, and it scales to .97 while pressed", async ({ page }) => {
+  test("Download PDF is the Button: an ink outline that fills with ink on hover, and scales to .97 while pressed", async ({ page }) => {
+    const download = page.getByRole("link", { name: resumeCopy.download });
+    await expect(download).toHaveClass(/\bbutton\b/);
     test.skip(!(await page.evaluate(() => matchMedia("(hover: hover)").matches)), "Hover needs a hovering pointer");
     await page.emulateMedia({ reducedMotion: "no-preference" });
-    const download = page.getByRole("link", { name: resumeCopy.download });
-    const read = () => download.evaluate((element) => ({ color: getComputedStyle(element).color, border: getComputedStyle(element).borderTopColor, transform: getComputedStyle(element).transform }));
+    const read = () => download.evaluate((element) => ({ color: getComputedStyle(element).color, background: getComputedStyle(element).backgroundColor, transform: getComputedStyle(element).transform }));
     const rest = await read();
     await download.hover();
-    await expect.poll(async () => (await read()).color).not.toBe(rest.color);
-    await expect.poll(async () => (await read()).border).toMatch(/^rgb\((35, 64, 255|139, 156, 255)\)$/);
+    await expect.poll(async () => (await read()).background).toBe(rest.color);
     await page.mouse.down();
     await expect.poll(async () => (await read()).transform).toBe("matrix(0.97, 0, 0, 0.97, 0, 0)");
     await page.mouse.move(2, 2);

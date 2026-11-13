@@ -224,6 +224,10 @@
   color: var(--muted);
 }
 
+.row__line {
+  text-wrap: pretty;
+}
+
 .row__meta {
   text-align: right;
   font-size: var(--type-small);

@@ -5,12 +5,16 @@
  * margin in print, so the lines break in the same places in both.
  */
 
+/* The desk: the sheet centred on the page, with Download PDF on its top edge at the right (R-24). */
 .stretch-resume__desk {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  padding: 24px var(--stretch-gutter) 64px;
+  display: grid;
+  /* One column the desk's width, so the sheet's 210 mm gives way to a phone (it has max-width: 100%). */
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: end;
+  gap: 16px;
+  width: min(210mm, 100%);
+  margin-inline: auto;
+  padding: 48px 0 64px;
 }
 
 .stretch-resume__sheet {
@@ -36,7 +40,11 @@
 /* A phone shows the sheet full width, with no paper edge. */
 @media (max-width: 760px) {
   .stretch-resume__desk {
-    padding-inline: 0;
+    padding-top: 24px;
+  }
+
+  .stretch-resume__download {
+    margin-right: var(--stretch-gutter);
   }
 
   .stretch-resume__sheet {

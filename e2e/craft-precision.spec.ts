@@ -205,9 +205,9 @@ test.describe("Reading on a phone", () => {
   test("prose and row lines avoid a lone last word", async ({ page }) => {
     await page.goto("/work/bnp-paribas");
     await expect(page.locator(".story .prose p").first()).toHaveCSS("text-wrap-style", "pretty");
-    // The 404's suggestions are the last rows on the site since the homepage became panels (#416).
+    // The 404's suggestions are rows of the shared part since #419.
     await page.goto("/nothing-here");
-    await expect(page.locator(".qi-row__line").first()).toHaveCSS("text-wrap-style", "pretty");
+    await expect(page.locator("main .row__line").first()).toHaveCSS("text-wrap-style", "pretty");
   });
 
   test("the greeting is a 44 px target on a phone", async ({ page }) => {
