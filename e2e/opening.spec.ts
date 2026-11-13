@@ -205,7 +205,9 @@ test.describe("The staff passes", () => {
 
   test("on hover a pass leans the other way and catches the light where the pointer is", async ({ page }) => {
     test.skip(!(await page.evaluate(() => matchMedia("(hover: hover) and (pointer: fine)").matches)), "Hover needs a fine pointer");
+    // The suite runs with reduced motion; the hover's lean and light are motion, so the page is loaded again without it.
     await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.reload();
     const pass = passes(page).first();
     await expect.poll(() => pass.evaluate((element) => element.getAnimations().length)).toBe(0);
     await expect.poll(() => page.locator(".opening__rail").evaluate((element) => Object.keys(element).some((key) => key.startsWith("__reactProps$")))).toBe(true);
