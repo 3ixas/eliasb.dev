@@ -176,6 +176,8 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  /* The finished shape is an inset too, so the reveal from inset(0 100% 0 0) interpolates; `none` would jump. */
+  clip-path: inset(0);
 }
 
 .sim__paths path {

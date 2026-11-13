@@ -23,7 +23,7 @@ function Head({ slug }: { slug: RoleStorySlug }) {
 function StoryLink({ slug, outline = false }: { slug: RoleStorySlug; outline?: boolean }) {
   return (
     <Link className={outline ? "pill pill--outline work__story" : "pill work__story"} href={`/work/${slug}`}>
-      The {passRecords[slug].short} story
+      {`The ${passRecords[slug].short} story`}
       <Arrow />
     </Link>
   );

@@ -219,10 +219,10 @@ test.describe("Work: the panels", () => {
       await expect(plot(page)).toHaveAttribute("data-drawn", "");
       // The axis labels are hidden from assistive technology, which the measure skips, so they are measured with it shown.
       await page.evaluate(() => document.querySelectorAll("#work .panel [aria-hidden='true']").forEach((element) => element.removeAttribute("aria-hidden")));
-      const texts = await section(page).evaluate((element) => [...element.querySelectorAll(".panel")].map((panelElement) => (panelElement as HTMLElement).innerText).join("\n"));
+      const texts = await section(page).evaluate((element) => [...element.querySelectorAll(".work__subheading, .panel")].map((part) => (part as HTMLElement).innerText).join("\n"));
       const readings = (await renderedContrast(page)).filter((reading) => texts.includes(reading.text));
       for (const expected of [workPanels.subheading.slice(0, 20), "Six months", "One price", "Horizon", "Key API p95", "Consultation", "The Optegra story"]) {
-        expect(readings.some((reading) => reading.text.includes(expected) || expected.includes(reading.text)), expected).toBe(true);
+        expect(readings.some((reading) => reading.text.includes(expected)), expected).toBe(true);
       }
       expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);
     });
@@ -253,9 +253,18 @@ test.describe("Work: arriving", () => {
     await page.locator(".sim").scrollIntoViewIfNeeded();
     await expect(plot(page)).toHaveAttribute("data-released", "");
     await expect(plot(page)).not.toHaveAttribute("data-armed", "");
-    // Seek the draw instead of waiting it out.
+    // Seek the draw instead of waiting it out: halfway through, part of the paths is drawn, and at the end all of them.
+    const halfway = await page.locator(".sim__paths").evaluate((element) => {
+      const draw = element.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "clip-path")!;
+      draw.pause();
+      draw.currentTime = 550;
+      return getComputedStyle(element).clipPath;
+    });
+    const hidden = Number(halfway.match(/inset\(0px ([\d.]+)%/)?.[1]);
+    expect(hidden, halfway).toBeGreaterThan(0);
+    expect(hidden, halfway).toBeLessThan(100);
     await plot(page).evaluate((element) => element.getAnimations({ subtree: true }).forEach((animation) => animation.finish()));
-    await expect(page.locator(".sim__paths")).toHaveCSS("clip-path", "none");
+    await expect(page.locator(".sim__paths")).toHaveCSS("clip-path", "inset(0px)");
     await joveen.scrollIntoViewIfNeeded();
     await expect(joveen.locator("[data-grow]")).not.toHaveAttribute("data-armed", "");
     await expect(joveen.locator(".figure__value")).toHaveText("−40%");
@@ -290,7 +299,7 @@ test.describe("Work: reduced motion", () => {
     await page.locator(".sim").scrollIntoViewIfNeeded();
     await expect(plot(page)).toHaveAttribute("data-drawn", "");
     await expect(plot(page)).not.toHaveAttribute("data-released", "");
-    await expect(page.locator(".sim__paths")).toHaveCSS("clip-path", "none");
+    await expect(page.locator(".sim__paths")).toHaveCSS("clip-path", "inset(0px)");
   });
 });
 
