@@ -294,7 +294,8 @@ test.describe("Colour", () => {
     // The press and the read share a task, so a slow runner cannot miss the 300 ms crossfade.
     const animated = await page.locator("[data-eclipse]").evaluate(async (button) => {
       (button as HTMLElement).click();
-      await new Promise(requestAnimationFrame);
+      // WebKit can start the crossfade a frame or two after the press: read as soon as it has, well inside its 300 ms.
+      for (let frame = 0; frame < 10 && document.documentElement.getAnimations().length === 0; frame++) await new Promise(requestAnimationFrame);
       return document.documentElement.getAnimations().map((animation) => (animation as CSSTransition).transitionProperty);
     });
     for (const property of ["--stretch-page", "--stretch-paper", "--stretch-stamp", "--bnp", "--gh-1", "--sun"]) expect(animated).toContain(property);
