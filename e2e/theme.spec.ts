@@ -142,14 +142,6 @@ test.describe("Lights and theme", () => {
     await follows("the device went dark", "dark");
   });
 
-  test("dark mode shows the tile-edge hairline", async ({ page }) => {
-    await page.emulateMedia({ colorScheme: "dark" });
-    await page.goto("/");
-    expect(await token(page, "--stretch-tile-edge")).toBe("#2a2a33");
-    await page.emulateMedia({ colorScheme: "light" });
-    await expect.poll(() => token(page, "--stretch-tile-edge")).toBe("transparent");
-  });
-
   test("a change of device setting crossfades the page too", async ({ page }) => {
     // Motion goes on after the page has loaded.
     await page.emulateMedia({ colorScheme: "light" });

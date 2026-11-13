@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 /*
  * Forced colours (docs/design/DESIGN.md, "Accessibility"). The browser drops authored backgrounds, and the bars and the
- * GitHub year are drawn with backgrounds, so without `quiet-forced-colors.css` the bars and the year's levels all come out
+ * GitHub year are drawn with backgrounds, so without their forced-colours rules (parts.css, off-the-clock.css) the bars and the year's levels all come out
  * as the same colour. This holds that the marks that carry data stay apart.
  */
 test.describe("Forced colours", () => {

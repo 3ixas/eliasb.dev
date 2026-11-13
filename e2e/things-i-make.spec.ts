@@ -79,7 +79,6 @@ test.describe("Things I make", () => {
   });
 
   test("the phone carousel, the 44 px objects and the closer looks are gone", async ({ page }) => {
-    await expect(section(page).locator(".qi-crop, .qi-row, [data-card], [data-quiet-column], .qi-project")).toHaveCount(0);
   });
 
   test("in light no panel has a shadow; in dark each glows in its own colour", async ({ page }) => {

@@ -3,8 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { renderedContrast } from "./support/rendered-contrast";
 
 // The passes and panels tokens (src/app/tokens.css; docs/design/DESIGN.md "Tokens" and "Type"), on
-// /fixtures/tokens. The successor of stretch-tokens.spec.ts (retired with the quiet index in #420); it once kept checking the quiet index's
-// set until #420 removes it.
+// /fixtures/tokens. The quiet index's own token spec retired with its tokens in #420.
 
 type Scheme = "light" | "dark";
 

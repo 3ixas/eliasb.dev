@@ -1,27 +1,23 @@
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 
-// The craft bar's numbers, read from the CSS (docs/design/DESIGN.md, "Craft bar"). It cannot judge feel, so it holds
-// only what a value can prove: the one focus ring, the two timing curves, the object shadow tokens and the length of
-// every feedback transition. Under a second, and nothing in it can flake.
+// The craft bar's numbers, read from the CSS (docs/design/DESIGN.md, "Controls" and "Motion"). It cannot judge feel, so it
+// holds only what a value can prove: the one focus ring, the two timing curves and the length of every feedback
+// transition. Under a second, and nothing in it can flake.
 
 const SPRING = 'cubic-bezier(.3,1.5,.4,1)';
 const OUT = 'cubic-bezier(.22,1,.36,1)';
 const FEEDBACK_MS = [100, 250];
 
 /**
- * The passes and panels ring (DESIGN.md "Controls"), in parts.css and every stylesheet that replaces a quiet-index
- * one: 2 px cobalt at 3 px offset, taking the panel's ink on a panel. The quiet index keeps its own until #420.
+ * The one ring (DESIGN.md "Controls", R-05): 2 px cobalt at 3 px offset, taking the panel's ink on a panel. The page-wide
+ * rule in shell.css gives it to anything without its own; parts.css gives it to the controls.
  */
-const NEW_RING = { files: ['src/app/parts.css', 'src/app/shell.css', 'src/app/pass.css', 'src/app/projects.css', 'src/app/story.css'], rule: ':where(.pill, .button, .text-link, .row):focus-visible', colour: 'var(--cobalt)', offset: '3px' };
-const newRingExceptions = [
-  { selector: '.panel :focus-visible', colour: 'var(--panel-ink)', why: 'cobalt would not hold 3:1 on every panel field' },
-];
+const RING = { colour: 'var(--cobalt)', offset: '3px', page: '[data-site] :focus-visible', controls: ':where(.pill, .button, .text-link, .row):focus-visible' };
 
-/** Selectors whose focus ring differs from 2 px cobalt at 2 px offset, and exactly how. */
+/** Selectors whose focus ring differs, and exactly how. */
 const ringExceptions = [
-  { selector: '.qi-row:focus-visible', offset: '-2px', why: 'a row: the ring sits inside it so the fill and the ring share one edge' },
-  { selector: '[data-card] .qi-row:is(:focus-visible, :active)', offset: '-2px', colour: 'var(--project-ink)', why: 'a phone card: cobalt would not hold 3:1 on the Project colour' },
+  { selector: '.panel :focus-visible', colour: 'var(--panel-ink)', why: 'cobalt would not hold 3:1 on every panel field' },
   { selector: '.zoom__close:focus-visible', colour: '#fff', why: 'the Close button sits on a dark scrim' },
   { selector: '.stretch-resume__sheet :focus-visible', colour: 'var(--sheet-focus)', why: 'the Résumé sheet is paper with its own ink' },
 ];
@@ -35,10 +31,6 @@ const motionTransitions = [
   ['.site-header__links', 'the links step aside for London\'s time'],
   ['.scene__moon', 'the late scene arrives'],
   ['.scene__star', 'the late scene arrives'],
-  ['.qi-margin[data-glide]', 'the margin glides between rows'],
-  ['.qi-inline', 'an inline closer look folds open'],
-  ['.qi-crop', 'an object reacts'],
-  ['.qi-caret[data-done]', 'the typed quote ends'],
   ['.eclipse__', 'the Eclipse flips the theme'],
   ['.pass', 'a staff pass leans on hover (DESIGN.md "Motion")'],
   ['.pass__sheen', 'a staff pass catches the light'],
@@ -95,32 +87,27 @@ export function craftProblems(files) {
   const allRules = Object.entries(files).flatMap(([path, css]) => [...rules(css)].map((rule) => ({ ...rule, path })));
 
   // One focus ring.
-  const global = allRules.find(({ selector }) => selector === '[data-site] :focus-visible');
-  if (global?.declarations.outline !== '2px solid var(--stretch-cobalt)' || global?.declarations['outline-offset'] !== '2px') {
-    problems.push('The page-wide focus ring (`[data-site] :focus-visible`) must be `outline: 2px solid var(--stretch-cobalt)` at `outline-offset: 2px`.');
-  }
-  const ring = allRules.find(({ path, selector }) => NEW_RING.files.includes(path) && selector === NEW_RING.rule);
-  if (ring?.declarations.outline !== `2px solid ${NEW_RING.colour}` || ring?.declarations['outline-offset'] !== NEW_RING.offset) {
-    problems.push(`The passes and panels focus ring (\`${NEW_RING.rule}\`) must be \`outline: 2px solid ${NEW_RING.colour}\` at \`outline-offset: ${NEW_RING.offset}\`.`);
+  for (const selector of [RING.page, RING.controls]) {
+    const rule = allRules.find((entry) => entry.selector === selector);
+    if (rule?.declarations.outline !== `2px solid ${RING.colour}` || rule?.declarations['outline-offset'] !== RING.offset) {
+      problems.push(`The focus ring (\`${selector}\`) must be \`outline: 2px solid ${RING.colour}\` at \`outline-offset: ${RING.offset}\`.`);
+    }
   }
   for (const { path, selector, declarations } of allRules) {
-    if (!selector.includes(':focus-visible') && !selector.includes('[data-card] .qi-row:is(')) continue;
-    const isNew = NEW_RING.files.includes(path);
-    const outline = Object.keys(declarations).filter((name) => name.startsWith('outline'));
-    if (outline.length === 0) continue;
+    if (!selector.includes(':focus-visible')) continue;
+    if (!Object.keys(declarations).some((name) => name.startsWith('outline'))) continue;
     if (selector.includes('section[tabindex="-1"]')) {
       if (declarations.outline !== 'none') problems.push(`${path}: \`${selector}\` is the one place the ring may be none.`);
       continue;
     }
-    const exception = (isNew ? newRingExceptions : ringExceptions).find((entry) => selector.endsWith(entry.selector) || selector === entry.selector);
+    const exception = ringExceptions.find((entry) => selector.endsWith(entry.selector) || selector === entry.selector);
     const width = declarations.outline?.match(/^(\S+) solid (.+)$/);
     const colour = declarations['outline-color'] ?? width?.[2];
     const offset = declarations['outline-offset'];
-    const expectedOffset = exception?.offset ?? (isNew ? NEW_RING.offset : '2px');
-    const expectedColour = exception?.colour ?? (isNew ? NEW_RING.colour : 'var(--stretch-cobalt)');
+    const expectedColour = exception?.colour ?? RING.colour;
     if (width && width[1] !== '2px') problems.push(`${path}: \`${selector}\` has a ${width[1]} focus ring; the one ring is 2px.`);
     if (declarations['outline-width'] && declarations['outline-width'] !== '2px') problems.push(`${path}: \`${selector}\` has a ${declarations['outline-width']} focus ring; the one ring is 2px.`);
-    if (offset !== undefined && offset !== expectedOffset) problems.push(`${path}: \`${selector}\` has a focus ring offset of ${offset}; it must be ${expectedOffset}${exception ? '' : ' (only a row’s is −2px)'}.`);
+    if (offset !== undefined && offset !== RING.offset) problems.push(`${path}: \`${selector}\` has a focus ring offset of ${offset}; it must be ${RING.offset}.`);
     if (colour !== undefined && colour !== expectedColour) problems.push(`${path}: \`${selector}\` has a ${colour} focus ring; it must be ${expectedColour}${exception ? '' : ' (named exceptions are in verify-craft.mjs)'}.`);
   }
 
@@ -131,15 +118,6 @@ export function craftProblems(files) {
   }
   const springs = allRules.filter(({ declarations }) => declarations['--spring'] !== undefined);
   if (springs.length === 0) problems.push('No rule sets --spring.');
-
-  // Object depth comes from tokens: every theme block that has one has both, and the dark blocks agree.
-  const shadowBlocks = allRules.filter(({ declarations }) => declarations['--shadow-object'] !== undefined || declarations['--shadow-look'] !== undefined);
-  if (shadowBlocks.length !== 4) problems.push(`Expected the shadow tokens in the 4 theme blocks of stretch-tokens.css, found ${shadowBlocks.length}.`);
-  for (const { path, selector, declarations } of shadowBlocks) {
-    if (declarations['--shadow-object'] === undefined || declarations['--shadow-look'] === undefined) problems.push(`${path}: \`${selector}\` sets only one of --shadow-object and --shadow-look.`);
-  }
-  const dark = shadowBlocks.slice(1).map(({ declarations }) => `${declarations['--shadow-object']} | ${declarations['--shadow-look']}`);
-  if (new Set(dark).size > 1) problems.push('The three dark theme blocks give different object shadows; they must agree.');
 
   // Feedback transitions are 100 to 250 ms.
   for (const { path, selector, declarations } of allRules) {
@@ -158,12 +136,6 @@ export function craftProblems(files) {
     if (!allRules.some(({ selector, declarations }) => selector.includes(part) && ('transition' in declarations || 'transition-duration' in declarations))) problems.push(`The motion exception \`${part}\` matches no transition; remove it from verify-craft.mjs.`);
   }
 
-  // The row fill: instant in, 120 ms out.
-  const row = allRules.find(({ selector }) => selector === '.qi-row');
-  if (normal(row?.declarations.transition ?? '') !== 'background-color120msvar(--out)') problems.push('`.qi-row` must fade its fill out over `background-color 120ms var(--out)`.');
-  for (const state of ['.qi-row:hover', '[data-site] .qi-row:focus-visible', '[data-site] .qi-row:active']) {
-    if (allRules.find(({ selector }) => selector === state)?.declarations.transition !== 'none') problems.push(`\`${state}\` must set \`transition: none\`, so the fill is instant in.`);
-  }
   return problems;
 }
 
@@ -177,13 +149,11 @@ const broken = (path, from, to) => {
   return { ...files, [path]: files[path].replace(from, to) };
 };
 const mustFail = (name, changed, pattern) => assert.ok(craftProblems(changed).some((problem) => pattern.test(problem)), `The ${name} check did not fail on its deliberate break`);
-mustFail('focus ring width', broken('src/app/stretch-shell.css', 'outline: 2px solid var(--stretch-cobalt);', 'outline: 3px solid var(--stretch-cobalt);'), /focus ring/);
-mustFail('focus ring offset', broken('src/app/quiet-long-form.css', '.zoom__close:focus-visible {\n  outline-color: #fff;', '.zoom__close:focus-visible {\n  outline-color: #fff;\n  outline-offset: 4px;'), /offset/);
-mustFail('new focus ring offset', broken('src/app/parts.css', '  outline: 2px solid var(--cobalt);\n  outline-offset: 3px;', '  outline: 2px solid var(--cobalt);\n  outline-offset: 2px;'), /passes and panels focus ring/);
+mustFail('focus ring width', broken('src/app/shell.css', '[data-site] :focus-visible {\n  outline: 2px solid var(--cobalt);', '[data-site] :focus-visible {\n  outline: 3px solid var(--cobalt);'), /focus ring/);
+mustFail('focus ring offset', broken('src/app/zoom.css', '.zoom__close:focus-visible {\n  outline-color: #fff;', '.zoom__close:focus-visible {\n  outline-color: #fff;\n  outline-offset: 4px;'), /offset/);
+mustFail('controls ring offset', broken('src/app/parts.css', '  outline: 2px solid var(--cobalt);\n  outline-offset: 3px;', '  outline: 2px solid var(--cobalt);\n  outline-offset: 2px;'), /focus ring/);
 mustFail('panel ring colour', broken('src/app/parts.css', 'outline-color: var(--panel-ink);', 'outline-color: var(--cobalt);'), /var\(--panel-ink\)/);
 mustFail('spring', broken('src/app/tokens.css', '--spring: cubic-bezier(.3, 1.5, .4, 1);', '--spring: cubic-bezier(.3, 1.4, .64, 1);'), /--spring/);
-mustFail('feedback timing', broken('src/app/quiet-index.css', 'transition: background-color 120ms var(--out);', 'transition: background-color 400ms var(--out);'), /400 ms/);
-mustFail('row fill', broken('src/app/quiet-index.css', '  background: var(--stretch-card);\n    transition: none;', '  background: var(--stretch-card);'), /instant in/);
-mustFail('shadow tokens', broken('src/app/stretch-tokens.css', '--shadow-look: 0 0 0 1px rgb(0 0 0 / 0.08)', '--shadow-looks: 0 0 0 1px rgb(0 0 0 / 0.08)'), /shadow/);
+mustFail('feedback timing', broken('src/app/parts.css', 'transition: background-color 150ms var(--out);', 'transition: background-color 400ms var(--out);'), /400 ms/);
 
-console.log('Craft checks passed: one focus ring per design, the site curves, object shadows from tokens, feedback within 100 to 250 ms, rows instant in and 120 ms out.');
+console.log('Craft checks passed: one focus ring, the site curves and feedback within 100 to 250 ms.');

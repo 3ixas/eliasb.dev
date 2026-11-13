@@ -22,7 +22,7 @@ const dotsStartingALine = (page: Page) =>
       glyphs.forEach((glyph, index) => {
         if (glyph.node.data[glyph.at] !== "·" || index === 0 || !line.getClientRects().length) return;
         // A dot that leads a wrapped line sits in the gutter its line clips (dot-line.tsx), so nobody sees it.
-        const clip = glyph.node.parentElement!.closest(".qi-dots");
+        const clip = glyph.node.parentElement!.closest(".dot-line");
         if (clip && glyph.node.parentElement!.getBoundingClientRect().left + 1 < clip.getBoundingClientRect().left) return;
         if (top(glyph) > top(glyphs[index - 1]) + 2) found.push(line.textContent!.trim());
       });

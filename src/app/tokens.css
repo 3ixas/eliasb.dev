@@ -1,7 +1,7 @@
 /*
  * Passes and panels tokens (docs/design/DESIGN.md "Tokens" and "Type"; R-01 and R-02 in
  * docs/specs/PASSES-AND-PANELS-SPEC.md). Role names, with no design's name in them, so they
- * outlive this direction. The quiet index's --stretch-* set retired in #420.
+ * outlive this direction. The quiet index's own set retired in #420.
  *
  * Which theme applies, in order: a remembered choice (data-theme),
  * then the appearance in force (data-lights), then the device setting when script has not
@@ -30,6 +30,7 @@
   --sun: #e39a2d;
   /* 1 in the dark theme and 0 in the light one, for what cannot take a colour (the Eclipse icon). Not registered, so it flips at once. */
   --dark: 0;
+  color-scheme: light;
   /* The Résumé sheet's own text steps, which its PDF was drawn at (the sheet alone reads them). */
   --text-label: 13px;
   --text-small: 15px;
@@ -94,6 +95,7 @@
     --year-4: #46d996;
     --sun: #f5b84f;
     --dark: 1;
+    color-scheme: dark;
     --stock: #eeede8;
     --stock-end: #dfded8;
     --shadow: rgb(0 0 0 / 0.7);
@@ -116,6 +118,7 @@
   --year-4: #46d996;
   --sun: #f5b84f;
   --dark: 1;
+  color-scheme: dark;
   --stock: #eeede8;
   --stock-end: #dfded8;
   --shadow: rgb(0 0 0 / 0.7);
@@ -137,6 +140,7 @@
   --year-4: #46d996;
   --sun: #f5b84f;
   --dark: 1;
+  color-scheme: dark;
   --stock: #eeede8;
   --stock-end: #dfded8;
   --shadow: rgb(0 0 0 / 0.7);

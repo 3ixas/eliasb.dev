@@ -111,7 +111,8 @@ test.describe("Faces on the pages", () => {
   test("only the Résumé loads its sheet's faces, and the sheet sets metadata in JetBrains Mono", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => document.fonts.ready);
-    expect(await page.evaluate(() => [...document.fonts].some((face) => /JetBrains Mono|Bricolage/.test(face.family)))).toBe(false);
+    // The sheet's local fallback face is declared everywhere, but nothing outside the Résumé loads a sheet face.
+    expect(await page.evaluate(() => [...document.fonts].some((face) => /JetBrains Mono|Bricolage/.test(face.family) && face.status !== "unloaded"))).toBe(false);
     await page.goto("/resume");
     await page.evaluate(() => document.fonts.ready);
     const sheetMono = await page.locator(".stretch-resume__sheet .stretch-mono").first().evaluate((element) => getComputedStyle(element).fontFamily);

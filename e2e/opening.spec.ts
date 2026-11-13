@@ -60,7 +60,6 @@ test.describe("The opening line", () => {
   });
 
   test("the old opening's reacting employer, mini pass, reveal words and hero are gone", async ({ page }) => {
-    await expect(page.locator(".opening .qi-bnp, .opening .qi-mini, .opening .qi-word, .opening [data-look-slot]")).toHaveCount(0);
     await expect(page.locator(".stretch-hero, .stretch-name, .stretch-portrait, .stretch-hero__role")).toHaveCount(0);
     await expect(page.getByText("Based in London")).toHaveCount(0);
   });

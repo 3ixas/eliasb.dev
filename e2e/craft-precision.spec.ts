@@ -90,12 +90,12 @@ test.describe("Nothing is blank", () => {
 test.describe("Reading on a phone", () => {
   /** Every visible dot, with whether anything is printed after it, and before it, on its own line. */
   const strandedDots = (page: Page) =>
-    page.locator(".qi-dots").evaluateAll((lines) =>
+    page.locator(".dot-line").evaluateAll((lines) =>
       lines.flatMap((line) => {
         const clipLeft = line.getBoundingClientRect().left;
-        const parts = [...line.querySelectorAll<HTMLElement>(".qi-dots__part")].filter((part) => part.getClientRects().length);
+        const parts = [...line.querySelectorAll<HTMLElement>(".dot-line__part")].filter((part) => part.getClientRects().length);
         return parts.flatMap((part, index) => {
-          const dot = part.querySelector(".qi-dots__dot");
+          const dot = part.querySelector(".dot-line__dot");
           if (!dot) return [];
           const { left, top } = dot.getBoundingClientRect();
           const before = parts[index - 1]?.getBoundingClientRect();
@@ -205,12 +205,12 @@ test.describe("Colour", () => {
     expect((lighter + 0.05) / (darker + 0.05)).toBeGreaterThanOrEqual(3);
   });
 
-  test("a theme change crossfades the tiles and GitHub cells with the page", async ({ page }) => {
+  test("a theme change crossfades the palette, the GitHub year and the sun with the page", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
     // The homepage has no quiet column to wait on since #416: wait for the theme control itself to hydrate.
     await page.waitForFunction(() => Object.keys(document.querySelector("[data-eclipse]")!).some((key) => key.startsWith("__reactProps$")));
-    await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--gh-1").trim().startsWith("rgb"))).toBe(true);
+    await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--year-1").trim().startsWith("rgb"))).toBe(true);
     // The press and the read share a task, so a slow runner cannot miss the 300 ms crossfade.
     const animated = await page.locator("[data-eclipse]").evaluate(async (button) => {
       (button as HTMLElement).click();
@@ -218,6 +218,6 @@ test.describe("Colour", () => {
       for (let frame = 0; frame < 10 && document.documentElement.getAnimations().length === 0; frame++) await new Promise(requestAnimationFrame);
       return document.documentElement.getAnimations().map((animation) => (animation as CSSTransition).transitionProperty);
     });
-    for (const property of ["--stretch-page", "--stretch-paper", "--stretch-stamp", "--bnp", "--gh-1", "--sun"]) expect(animated).toContain(property);
+    for (const property of ["--page", "--paper", "--ink", "--year-1", "--sun"]) expect(animated).toContain(property);
   });
 });

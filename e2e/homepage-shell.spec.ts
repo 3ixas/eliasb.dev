@@ -55,21 +55,18 @@ test.describe("Homepage shell", () => {
     await page.goto("/");
     const section = page.locator("section#off-the-clock");
     await expect(section.getByRole("heading", { level: 2, name: offTheClock.heading, exact: true })).toHaveClass(/section__title/);
-    await expect(section.locator(".qi-note-line")).toHaveCount(0);
   });
 
   test("Things I make has its section title and no note", async ({ page }) => {
     await page.goto("/");
     const section = page.locator("section#things-i-make");
     await expect(section.getByRole("heading", { level: 2, name: thingsIMake.heading, exact: true })).toHaveClass(/section__title/);
-    await expect(section.locator(".qi-note-line")).toHaveCount(0);
   });
 
   test("How I work has its section title and no note", async ({ page }) => {
     await page.goto("/");
     const section = page.locator("section#how-i-work");
     await expect(section.getByRole("heading", { level: 2, name: howIWork.heading, exact: true })).toHaveClass(/section__title/);
-    await expect(section.locator(".qi-note-line")).toHaveCount(0);
   });
 
   test("the header links jump to each section and mark the one in view", async ({ page }) => {
