@@ -43,8 +43,10 @@
   --type-panel: clamp(30px, 3vw, 42px);
   --type-figure: clamp(88px, 9.6vw, 140px);
   --type-prose: 20px;
-  /* A row's name, and a text link. */
+  /* A row's name, Say hello's links, the header's name, and a text link. */
   --type-row: 22px;
+  --type-hello: 21px;
+  --type-name: 20px;
   --type-link: 19px;
   --type-body: 16px;
   --type-ui: 15px;

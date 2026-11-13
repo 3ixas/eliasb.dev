@@ -136,5 +136,5 @@ test("--sun is read only by the lamp's bulb and pool and the clock's pivot", () 
       if (line.includes("var(--sun)")) readers.push(`${file} ${selector}`);
     }
   }
-  expect(readers.sort()).toEqual(["quiet-header.css .qi-scene__lit", "quiet-header.css .qi-scene__pool"]);
+  expect(readers.sort()).toEqual(["shell.css .scene__lit", "shell.css .scene__pool"]);
 });

@@ -43,8 +43,7 @@
   }
 
   /* The GitHub year keeps GitHub's five levels (they are the data), each cell with a hairline so an empty day still shows. */
-  .stretch-gh__day,
-  .qi-contrib > span {
+  .stretch-gh__day {
     forced-color-adjust: none;
     outline: 1px solid GrayText;
     outline-offset: -1px;

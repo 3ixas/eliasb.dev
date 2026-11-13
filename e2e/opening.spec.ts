@@ -58,8 +58,9 @@ test.describe("The opening line", () => {
     // The sections still in the Stretch style keep their display headings until their own tickets move them (#296 to #299); #300 asserts this for the whole page.
     const larger = await page.evaluate((limit) => {
       const found: string[] = [];
+      // Say hello's address is display type by design (DESIGN.md "Say hello").
       for (const element of document.querySelectorAll("body *")) {
-        if (element.closest("[hidden]") || !element.checkVisibility()) continue;
+        if (element.closest("[hidden], .say-hello") || !element.checkVisibility()) continue;
         const hasText = [...element.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim());
         if (hasText && parseFloat(getComputedStyle(element).fontSize) > limit + 0.01) found.push(`${element.tagName.toLowerCase()}.${element.className}`);
       }
@@ -71,8 +72,8 @@ test.describe("The opening line", () => {
   test("the hero's name, tilted portrait, label and actions are gone", async ({ page }) => {
     await expect(page.locator(".stretch-hero, .stretch-name, .stretch-portrait, .stretch-hero__role")).toHaveCount(0);
     await expect(page.getByText("See my work")).toHaveCount(0);
-    // It is the header portrait's caption now, shown only in that closer look (header-portrait.spec.ts).
-    await expect(page.getByText("Based in London")).toBeHidden();
+    // The header portrait's caption retired with it (#411).
+    await expect(page.getByText("Based in London")).toHaveCount(0);
   });
 
   test("a visitor's wider letter spacing does not push the page sideways", async ({ page }) => {

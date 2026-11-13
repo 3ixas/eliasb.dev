@@ -14,38 +14,38 @@ test.describe("The 404", () => {
     for (const content of robots) expect(content).toMatch(/noindex/);
   });
 
-  test("shows the new header: the portrait, the name leading home, the greeting and the Eclipse, and no section links", async ({ page }) => {
+  test("shows the shared header: the name leading home, the greeting, the links to the homepage's sections and the theme control", async ({ page }) => {
     await page.goto("/nothing-here");
-    const header = page.locator("[data-stretch-header]");
-    const home = header.getByRole("link", { name: "Elias Bennett, home" });
+    const header = page.locator("[data-site-header]");
+    const home = header.getByRole("link", { name: "Elias Bennett", exact: true });
     await expect(home).toHaveAttribute("href", "/");
-    await expect(header.locator(".qi-header__face")).toBeVisible();
-    await expect(home).toHaveText("Elias Bennett");
     expect((await home.boundingBox())!.height).toBeGreaterThanOrEqual(44);
-    await expect(header.locator("[data-greeting]")).toBeVisible();
+    await expect(header.locator("img")).toHaveCount(0);
     await expect(header.locator("[data-eclipse]")).toBeVisible();
-    // The 404 has no sections of its own, so the header has no links and no menu.
-    await expect(header.getByRole("navigation")).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Menu", exact: true })).toHaveCount(0);
+    expect(await header.getByRole("navigation", { includeHidden: true }).locator("a").evaluateAll((links) => links.map((link) => link.getAttribute("href")))).toEqual(
+      ["work", "things-i-make", "how-i-work", "off-the-clock", "say-hello"].map((id) => `/#${id}`),
+    );
     await home.click();
     await expect(page).toHaveURL(/\/$/);
   });
 
-  test("on a wide screen the Eclipse stays at the right edge, and London's time never paints over it", async ({ page }) => {
-    test.skip((page.viewportSize()?.width ?? 0) < 900, "The header's single row starts at 900 px");
+  test("on a wide screen London's time never paints over the links or the theme control", async ({ page }) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 900, "London's time hangs beside the greeting from 900 px");
     await page.goto("/nothing-here");
     const greeting = page.locator("[data-greeting]");
     // The greeting is a tab stop once it has hydrated for a wide screen, which is also when it can read London's time.
     await expect(greeting).toHaveAttribute("tabindex", "0");
     await greeting.hover();
-    const more = page.locator(".qi-greeting__more");
+    const more = page.locator(".greeting__more");
     await expect(more).toHaveCSS("opacity", "1");
-    const [time, eclipse, inner] = await Promise.all(
-      [more, page.locator("[data-eclipse]"), page.locator(".qi-header__inner")].map(async (locator) => (await locator.boundingBox())!),
+    const [time, nav, eclipse, header] = await Promise.all(
+      [more, page.locator(".site-nav"), page.locator("[data-eclipse]"), page.locator("[data-site-header]")].map(async (locator) => (await locator.boundingBox())!),
     );
     expect(time.x + time.width).toBeLessThanOrEqual(eclipse.x);
-    // The Eclipse's own margin pulls its icon in line with the column's edge; it is the header's last item.
-    expect(Math.abs(eclipse.x + eclipse.width - (inner.x + inner.width))).toBeLessThanOrEqual(12);
+    const linksShown = await page.locator(".site-header__links").evaluate((element) => getComputedStyle(element).opacity === "1");
+    if (linksShown) expect(time.x + time.width).toBeLessThanOrEqual(nav.x);
+    // The theme control is the header's last item, at the page's right gutter.
+    expect(Math.abs(eclipse.x + eclipse.width - (header.x + header.width - 32))).toBeLessThanOrEqual(1);
   });
 
   test("the missing row shows the address asked for, struck through, and is not a link", async ({ page }) => {

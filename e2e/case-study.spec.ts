@@ -6,8 +6,6 @@ import { caseStudyCopy, caseStudySectionKeys, caseStudySectionLabels } from "../
 import { contrastOnPaper } from "./support/contrast";
 
 const schemes = ["light", "dark"] as const;
-/** From this width the header carries the section links, on a row of their own. */
-const LINKS_FROM = 900;
 const rgb = (hex: string) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
 
 for (const slug of caseStudySlugs) {
@@ -34,7 +32,7 @@ for (const slug of caseStudySlugs) {
       const code = opening.getByRole("link", { name: "Code", exact: true });
       if (project.links.code) await expect(code).toHaveAttribute("href", project.links.code);
       else await expect(code).toHaveCount(0);
-      await expect(page.getByRole("link", { name: "Things I make", exact: true }).first()).toHaveAttribute("href", "/things-i-make");
+      await expect(page.locator("main").getByRole("link", { name: "Things I make", exact: true }).first()).toHaveAttribute("href", "/things-i-make");
       // The old opening band, its number and the numbered section bar are gone.
       await expect(page.locator(".stretch-cs-open, .stretch-cs-links-row, .stretch-cs-evidence, .stretch-cs-next")).toHaveCount(0);
     });
@@ -48,43 +46,11 @@ for (const slug of caseStudySlugs) {
       expect(Math.abs(box!.width - column!.width)).toBeLessThanOrEqual(1);
     });
 
-    test("the header is the shared one, and its links are this page's six sections", async ({ page }) => {
-      const width = page.viewportSize()?.width ?? 0;
-      await expect(page.locator("header.qi-header")).toHaveCount(1);
-      await expect(page.locator('nav[aria-label="On this page"]')).toHaveCount(1);
-      const links = page.locator(".qi-header__links a");
-      await expect(links).toHaveText(caseStudySectionKeys.map((key) => caseStudySectionLabels[key]));
-      for (const key of caseStudySectionKeys) await expect(links.filter({ hasText: caseStudySectionLabels[key] })).toHaveAttribute("href", `#${key}`);
+    test("the header is the shared one, and the page's six sections are in order, each with its heading", async ({ page }) => {
+      await expect(page.locator("[data-site-header]")).toHaveCount(1);
       const ids = await page.locator("article section[id]").evaluateAll((sections) => sections.map((section) => section.id));
       expect(ids).toEqual([...caseStudySectionKeys]);
       for (const key of caseStudySectionKeys) await expect(page.locator(`section#${key} h2`)).toHaveCount(1);
-      if (width < LINKS_FROM) {
-        await expect(links.first()).toBeHidden();
-        return;
-      }
-      await expect(links.first()).toBeVisible();
-      // The header is the column wide: the links share the title's left edge and run along one row beneath the name.
-      await expect
-        .poll(async () => {
-          const [title, first, last, greeting, column] = await Promise.all([
-            page.getByRole("heading", { level: 1 }).boundingBox(),
-            links.first().boundingBox(),
-            links.last().boundingBox(),
-            page.locator("[data-greeting]").boundingBox(),
-            page.locator(".qi-long .qi-column").first().boundingBox(),
-          ]);
-          return {
-            sharedLeftEdge: Math.abs(first!.x - title!.x) <= 1,
-            insideColumn: last!.x + last!.width <= column!.x + column!.width + 1,
-            oneLine: Math.abs(first!.y - last!.y) <= 1,
-            below: first!.y >= greeting!.y + greeting!.height - 1,
-          };
-        })
-        .toEqual({ sharedLeftEdge: true, insideColumn: true, oneLine: true, below: true });
-      await links.last().click();
-      await expect(page).toHaveURL(/#whats-next$/);
-      await expect(page.locator("section#whats-next")).toBeInViewport();
-      await expect(links.last()).toHaveAttribute("aria-current", "location");
     });
 
     test("the title has the opening line's treatment, sections are 17 px, and the metadata is 13 px mono", async ({ page }) => {
@@ -97,12 +63,12 @@ for (const slug of caseStudySlugs) {
       await expect(page.locator(".qi-long__meta")).toHaveCSS("font-size", "13px");
     });
 
-    test("a section's address opens on that section, below the header, and focuses it", async ({ page }) => {
+    test("a section's address opens on that section and focuses it", async ({ page }) => {
       await page.goto(`/things-i-make/${slug}#decisions`);
       await expect(page.locator("section#decisions")).toBeInViewport();
       await expect(page.locator("section#decisions")).toBeFocused();
-      const headerBottom = await page.locator("header.qi-header").evaluate((header) => header.getBoundingClientRect().bottom);
-      await expect.poll(() => page.locator("section#decisions h2").evaluate((element) => element.getBoundingClientRect().top)).toBeGreaterThanOrEqual(headerBottom - 1);
+      // The header scrolls away, so the heading is in view with its top on screen.
+      await expect.poll(() => page.locator("section#decisions h2").evaluate((element) => element.getBoundingClientRect().top)).toBeGreaterThanOrEqual(0);
     });
 
     test("section copy is the approved copy", async ({ page }) => {
@@ -179,7 +145,8 @@ for (const slug of caseStudySlugs) {
       await page.route("**/*.js", (route) => route.abort());
       await page.reload();
       await expect(page.locator("article section[id]")).toHaveCount(caseStudySectionKeys.length);
-      await expect(page.locator('nav[aria-label="On this page"] a')).toHaveCount(caseStudySectionKeys.length);
+      // The header's links to the homepage's sections are in it too.
+      await expect(page.locator('nav[aria-label="On this page"] a')).toHaveCount(5);
       await expect(page.getByRole("list", { name: "Evidence" }).getByRole("listitem")).toHaveCount(study.evidence.length);
       await expect(page.locator(".qi-case__shot img")).not.toHaveCount(0);
     });
@@ -255,9 +222,6 @@ for (const slug of caseStudySlugs) {
           return widest <= holder.clientWidth + 0.5;
         };
         await expect.poll(() => page.getByRole("heading", { level: 1 }).evaluate(widestWordFits)).toBe(true);
-        const links = page.locator(".qi-header__links a");
-        await expect(links).toHaveCount(caseStudySectionKeys.length);
-        if (width >= LINKS_FROM) for (const link of await links.all()) await expect.poll(() => link.evaluate(widestWordFits)).toBe(true);
       });
     }
   });

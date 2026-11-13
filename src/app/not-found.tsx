@@ -36,8 +36,8 @@ const objects = {
 } as const;
 
 /**
- * The 404 (docs/design/DESIGN.md, "The 404"): it says what didn't work, then what to try. The shared header with no
- * links, "This page doesn't exist." as the opening line, the missing row (the address asked for, struck through,
+ * The 404 (docs/design/DESIGN.md, "The 404"): it says what didn't work, then what to try. The shared header,
+ * "This page doesn't exist." as the opening line, the missing row (the address asked for, struck through,
  * with an empty slot as its object; not a link), then the homepage's five sections as rows with their own objects.
  */
 export default function NotFound() {

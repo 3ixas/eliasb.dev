@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { caseStudySlugs } from "../src/content/stretch/case-studies";
 import { roleStorySlugs } from "../src/content/stretch/role-stories";
+import { sayHello } from "../src/content/stretch/site-copy";
 
 /*
  * Share cards (docs/design/DESIGN.md, "Share cards"): one template, so every card is a 1200 × 630 PNG, and the
@@ -47,12 +48,12 @@ test.describe("Copy, when the clipboard refuses", () => {
       const columns = [...document.querySelectorAll("[data-quiet-column]")];
       return columns.length > 0 && columns.every((column) => Object.keys(column).some((key) => key.startsWith("__reactProps$")));
     });
-    const copy = page.locator(".qi-copy");
-    const label = await copy.textContent();
-    const address = (await page.locator(".qi-email__address").textContent())!.trim();
+    const copy = page.locator(".copy-button");
+    const label = sayHello.copy;
+    const address = (await page.locator("#say-hello-email").textContent())!.trim();
     await copy.click();
     await expect.poll(() => page.evaluate(() => window.getSelection()?.toString().trim())).toBe(address);
-    await expect(copy).toHaveText(label!);
+    await expect(copy).toHaveAccessibleName(label);
     await expect(copy).not.toHaveAttribute("data-copied", "");
   });
 });

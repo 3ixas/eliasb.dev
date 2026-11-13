@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { SiteLink } from "@/components/site/site-link";
+import { SayHello } from "@/components/site/say-hello";
 import { SiteHeader } from "@/components/site/site-header";
 import { resumeCopy, resumePdf, resumeSheet } from "@/content/resume";
 
 /**
  * The Résumé (GLOSSARY.md): an A4 sheet lying on the desk, which is also what
- * prints. The desk holds the shared header (no links) and the Download PDF button; the
+ * prints. The desk holds the Download PDF button, between the shared header and Say hello, which do not print; the
  * sheet holds only what the PDF holds. It is light paper in either theme (stretch-resume.css), and the
  * server renders all of it.
  */
@@ -13,7 +14,7 @@ export function ResumePage() {
   const sheet = resumeSheet();
   return (
     <div data-stretch-shell data-resume>
-      <SiteHeader inner />
+      <SiteHeader />
       <main id="main-content" tabIndex={-1} className="stretch-resume__desk">
         <a className="stretch-pill stretch-resume__download" href={resumePdf.href} download>
           {resumeCopy.download}
@@ -128,6 +129,7 @@ export function ResumePage() {
           </section>
         </article>
       </main>
+      <SayHello />
     </div>
   );
 }

@@ -109,13 +109,13 @@ test.describe("Work: the rows", () => {
     expect(tokens).toEqual(["cubic-bezier(.3,1.5,.4,1)", "cubic-bezier(.22,1,.36,1)"]);
   });
 
-  test("a Role story's ← Work lands on this section, below the header", async ({ page }) => {
+  test("a Role story's ← Work lands on this section, its heading on screen", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/work/bnp-paribas");
     await page.locator("article").getByRole("link", { name: "Work", exact: true }).first().click();
     await expect(page).toHaveURL(/\/#work$/);
-    const headerBottom = await page.locator("[data-stretch-header]").evaluate((header) => header.getBoundingClientRect().bottom);
-    await expect.poll(() => page.locator("#work h2").evaluate((element) => element.getBoundingClientRect().top)).toBeGreaterThanOrEqual(headerBottom - 1);
+    await expect.poll(() => page.locator("#work h2").evaluate((element) => element.getBoundingClientRect().top)).toBeGreaterThanOrEqual(0);
+    await expect(page.locator("#work h2")).toBeInViewport();
   });
 
   test("no link points at the retired anchor, and every in-page anchor exists", async ({ page }) => {

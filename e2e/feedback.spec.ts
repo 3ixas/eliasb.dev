@@ -51,8 +51,8 @@ test.describe("with motion", () => {
   });
 
   test("pressing the Eclipse scales it to .97", async ({ page }) => {
-    const eclipse = page.locator(".qi-header .stretch-eclipse");
-    await expect(eclipse).toHaveCSS("transition-duration", "0.12s");
+    const eclipse = page.locator("[data-site-header] [data-eclipse]");
+    await expect(eclipse).toHaveCSS("transition-duration", "0.15s, 0.15s");
     await hold(page, eclipse);
     await expect(eclipse).toHaveCSS("transform", scaled);
     await letGo(page);
@@ -71,7 +71,7 @@ test.describe("with reduced motion", () => {
     await expect(row).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
     await expect(row).not.toHaveCSS("background-color", card);
     await letGo(page);
-    const eclipse = page.locator(".qi-header .stretch-eclipse");
+    const eclipse = page.locator("[data-site-header] [data-eclipse]");
     await hold(page, eclipse);
     await expect(eclipse).toHaveCSS("transform", "none");
     await letGo(page);
@@ -79,17 +79,17 @@ test.describe("with reduced motion", () => {
 });
 
 test.describe("the focus ring", () => {
-  test("is 2 px cobalt at 2 px offset, and inside a row at −2 px", async ({ page }) => {
+  test("is 2 px cobalt at 3 px offset on the header's controls, and inside a quiet-index row at −2 px", async ({ page }) => {
     await page.goto("/");
     await page.keyboard.press("Tab");
-    const eclipse = page.locator(".qi-header .stretch-eclipse");
+    const eclipse = page.locator("[data-site-header] [data-eclipse]");
     await eclipse.focus();
     await expect(eclipse).toBeFocused();
     const ring = (element: Locator) => element.evaluate((node) => {
       const style = getComputedStyle(node);
       return { width: style.outlineWidth, offset: style.outlineOffset, style: style.outlineStyle };
     });
-    expect(await ring(eclipse)).toEqual({ width: "2px", offset: "2px", style: "solid" });
+    expect(await ring(eclipse)).toEqual({ width: "2px", offset: "3px", style: "solid" });
     const row = page.locator(".qi-list a.qi-row").first();
     await row.focus();
     await expect(row).toBeFocused();

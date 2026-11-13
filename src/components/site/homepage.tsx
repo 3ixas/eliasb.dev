@@ -1,13 +1,10 @@
-import { sectionLinks } from "@/components/site/sections";
 import { SiteHeader } from "@/components/site/site-header";
 import { OffTheClock } from "@/components/site/off-the-clock";
+import { SayHello } from "@/components/site/say-hello";
 import { HowIWork } from "@/components/quiet/how-i-work";
 import { Opening } from "@/components/quiet/opening";
-import { SayHello } from "@/components/quiet/say-hello";
 import { ThingsIMake } from "@/components/quiet/things-i-make";
 import { Work } from "@/components/quiet/work";
-
-const sayHelloHeadingId = "say-hello-heading";
 
 /**
  * The Stretch homepage shell: the header, the opening line and five anchored sections
@@ -17,7 +14,7 @@ const sayHelloHeadingId = "say-hello-heading";
 export function Homepage() {
   return (
     <div data-stretch-shell>
-      <SiteHeader sections={sectionLinks} />
+      <SiteHeader home />
       <main id="main-content" tabIndex={-1}>
         <Opening />
 
@@ -37,11 +34,8 @@ export function Homepage() {
           <OffTheClock />
         </section>
 
-        <section id="say-hello" className="stretch-wrap stretch-section" aria-labelledby={sayHelloHeadingId}>
-          <SayHello headingId={sayHelloHeadingId} />
-        </section>
+        <SayHello />
       </main>
-
     </div>
   );
 }

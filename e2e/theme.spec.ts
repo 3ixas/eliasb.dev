@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 const eclipse = (page: Page) => page.locator("[data-eclipse]");
 /** How far the icon has gone from sun (0) to moon (1), read from the rays it draws in. */
 const moon = (page: Page) =>
-  page.evaluate(() => 1 - Number(getComputedStyle(document.querySelector("[data-eclipse] .stretch-eclipse__rays")!).opacity));
+  page.evaluate(() => 1 - Number(getComputedStyle(document.querySelector("[data-eclipse] .eclipse__rays")!).opacity));
 const scheme = (page: Page) => page.evaluate(() => getComputedStyle(document.documentElement).colorScheme);
 const stored = (page: Page) => page.evaluate(() => localStorage.getItem("elias-theme"));
 const token = (page: Page, name: string) =>
@@ -65,7 +65,7 @@ test.describe("Lights and theme", () => {
           const root = document.documentElement;
           (window as unknown as { firstPaint: object }).firstPaint = {
             scheme: getComputedStyle(root).colorScheme,
-            page: getComputedStyle(root).getPropertyValue("--stretch-page").trim().toLowerCase(),
+            page: getComputedStyle(root).getPropertyValue("--page").trim().toLowerCase(),
             background: getComputedStyle(document.body).backgroundColor,
             toolbar: [...document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')].map((meta) => meta.content.toLowerCase()),
           };
@@ -74,15 +74,15 @@ test.describe("Lights and theme", () => {
       await page.goto("/");
       const paint = await page.evaluate(() => (window as unknown as { firstPaint: { scheme: string; page: string; background: string; toolbar: string[] } }).firstPaint);
       expect(paint.scheme).toBe(chosen);
-      expect(paint.background).toBe(chosen === "dark" ? "rgb(13, 13, 18)" : "rgb(251, 251, 248)");
+      expect(paint.background).toBe(chosen === "dark" ? "rgb(13, 13, 15)" : "rgb(238, 237, 233)");
       // The toolbar colour is the page's, before the first paint.
       expect(paint.toolbar.length).toBeGreaterThan(0);
-      expect([paint.background, chosen === "dark" ? "#0d0d12" : "#fbfbf8"]).toContain(paint.page);
-      for (const colour of paint.toolbar) expect(colour).toBe(chosen === "dark" ? "#0d0d12" : "#fbfbf8");
+      expect([paint.background, chosen === "dark" ? "#0d0d0f" : "#eeede9"]).toContain(paint.page);
+      for (const colour of paint.toolbar) expect(colour).toBe(chosen === "dark" ? "#0d0d0f" : "#eeede9");
     });
   }
 
-  for (const [device, expected, background] of [["dark", 1, "rgb(13, 13, 18)"], ["light", 0, "rgb(251, 251, 248)"]] as const) {
+  for (const [device, expected, background] of [["dark", 1, "rgb(13, 13, 15)"], ["light", 0, "rgb(238, 237, 233)"]] as const) {
     test(`with script off, a ${device} device still gets the ${device} page and its icon`, async ({ browser }) => {
       const context = await browser.newContext({ javaScriptEnabled: false, colorScheme: device });
       const page = await context.newPage();
@@ -121,11 +121,11 @@ test.describe("Lights and theme", () => {
     await page.goto("/");
     const follows = async (label: string, theme: "light" | "dark") => {
       await expect(page.locator("html")).not.toHaveAttribute("data-theme-changing", "");
-      const background = theme === "dark" ? "#0d0d12" : "#fbfbf8";
+      const background = theme === "dark" ? "#0d0d0f" : "#eeede9";
       // WebKit may resolve a registered colour on the next rendering frame
       // after the timer clears. Wait for the palette's actual target as well.
-      await expect.poll(() => token(page, "--stretch-page"), { message: label }).toBe(background);
-      await expect(page.locator("body")).toHaveCSS("background-color", theme === "dark" ? "rgb(13, 13, 18)" : "rgb(251, 251, 248)");
+      await expect.poll(() => token(page, "--page"), { message: label }).toBe(background);
+      await expect(page.locator("body")).toHaveCSS("background-color", theme === "dark" ? "rgb(13, 13, 15)" : "rgb(238, 237, 233)");
       const colours = await toolbar(page);
       expect(colours.length, label).toBeGreaterThan(0);
       for (const colour of colours) expect(colour, label).toBe(background);
@@ -171,11 +171,16 @@ test.describe("Lights and theme", () => {
     expect(await page.evaluate(() => (window as unknown as { fading: Promise<number> }).fading)).toBeGreaterThan(0);
   });
 
-  test("the Eclipse is a quiet 44 px target: no outline at rest, a hover tint, a solid focus ring", async ({ page }) => {
+  test("the Eclipse is a quiet 36 px round button reaching 44 px: no outline at rest, a hover tint, a solid focus ring", async ({ page }) => {
     await page.goto("/");
-    const box = await eclipse(page).boundingBox();
-    expect(box?.width).toBe(44);
-    expect(box?.height).toBe(44);
+    const box = (await eclipse(page).boundingBox())!;
+    expect([box.width, box.height]).toEqual([36, 36]);
+    await expect(eclipse(page)).toHaveCSS("border-top-left-radius", "999px");
+    // It answers 4 px beyond its edge all round.
+    expect(await eclipse(page).evaluate((element) => {
+      const r = element.getBoundingClientRect();
+      return [[r.left - 3.5, r.top + r.height / 2], [r.right + 3.5, r.top + r.height / 2], [r.left + r.width / 2, r.top - 3.5], [r.left + r.width / 2, r.bottom + 3.5]].every(([x, y]) => element.contains(document.elementFromPoint(x, y)));
+    })).toBe(true);
     await expect(eclipse(page)).toHaveCSS("border-top-width", "0px");
     await expect(eclipse(page)).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
     await eclipse(page).hover();
@@ -190,7 +195,7 @@ test.describe("Lights and theme", () => {
     await page.goto("/");
     const durations = () =>
       page.evaluate(() =>
-        [".stretch-eclipse__disc", ".stretch-eclipse__shadow", ".stretch-eclipse__rays"].map(
+        [".eclipse__disc", ".eclipse__shadow", ".eclipse__rays"].map(
           (selector) => getComputedStyle(document.querySelector(selector)!).transitionDuration.split(", ")[0],
         ),
       );
@@ -204,7 +209,7 @@ test.describe("Lights and theme", () => {
     await page.goto("/");
     const path = await page.evaluate(() => {
       const button = document.querySelector<HTMLButtonElement>("[data-eclipse]")!;
-      const disc = document.querySelector(".stretch-eclipse__disc")!;
+      const disc = document.querySelector(".eclipse__disc")!;
       const scale = () => new DOMMatrix(getComputedStyle(disc).transform).a;
       const discTransitions = () =>
         document.getAnimations().filter((animation) => (animation as CSSTransition).transitionProperty === "transform" && (animation.effect as KeyframeEffect).target === disc);
@@ -249,7 +254,7 @@ test.describe("Lights and theme", () => {
   test("with reduced motion both theme changes are instant", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
     await page.goto("/");
-    for (const target of ["rgb(13, 13, 18)", "rgb(251, 251, 248)"]) {
+    for (const target of ["rgb(13, 13, 15)", "rgb(238, 237, 233)"]) {
       const during = await page.evaluate(() => {
         document.querySelector<HTMLButtonElement>("[data-eclipse]")!.click();
         return {
@@ -269,7 +274,8 @@ test.describe("Lights and theme", () => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     await page.emulateMedia({ reducedMotion: "no-preference" });
-    for (const target of ["rgb(241, 241, 244)", "rgb(17, 17, 20)"]) {
+    // The page's text is the shell's ink (tokens.css), which everything that does not set its own colour inherits.
+    for (const target of ["rgb(240, 239, 235)", "rgb(20, 20, 22)"]) {
       const samples = await page.evaluate(async () => {
         document.querySelector<HTMLButtonElement>("[data-eclipse]")!.click();
         // Sample fixed animation times so a busy runner cannot miss the
@@ -280,7 +286,7 @@ test.describe("Lights and theme", () => {
         for (const time of [0, 75, 150, 225, 300]) {
           for (const animation of animations) animation.currentTime = time;
           frames.push({
-            ink: getComputedStyle(document.documentElement).getPropertyValue("--stretch-ink").trim(),
+            ink: getComputedStyle(document.documentElement).getPropertyValue("--ink").trim(),
             colours: ["[data-stretch-shell]", "#things-i-make h2", "#how-i-work .qi-row__title"].map(
               (selector) => getComputedStyle(document.querySelector(selector)!).color,
             ),

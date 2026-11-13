@@ -37,11 +37,11 @@ const longest = greetingLines.reduce((a, b) => (b.length > a.length ? b : a));
  * A greeting from the visitor's time of day, with a small scene for it. The page is cached, so the server cannot
  * know the hour or the day: the server and the first browser render say "Hello" with its prompt, then the browser's
  * own clock picks the words and the scene (and, in the afternoon, whether it is a weekend). The time never leaves the browser. The words are as wide as the longest greeting
- * (quiet-header.css sets it from data-longest), so the swap moves nothing, and it is not a live region, so a change
+ * (shell.css sets it from data-longest), so the swap moves nothing, and it is not a live region, so a change
  * is not announced.
  *
  * The scene plays once on every load (data-playing), and again on hover or focus. With reduced motion it rests:
- * quiet-header.css moves nothing. On a wide screen, hover or focus also adds London's time, read when the pointer
+ * shell.css moves nothing. On a wide screen, hover or focus also adds London's time, read when the pointer
  * arrives and placed absolutely, so it can never widen the header. Anywhere else the greeting is a button: a tap
  * plays the scene again and says London's time on a line of its own beneath, and a second tap puts it away.
  */
@@ -74,7 +74,7 @@ export function SiteGreeting() {
 
   return (
     <p
-      className="qi-greeting"
+      className="greeting"
       data-greeting={key}
       data-playing={playing || undefined}
       data-open={open || undefined}
@@ -95,10 +95,10 @@ export function SiteGreeting() {
       }
     >
       <GreetingScene period={key} />
-      <span className="qi-greeting__words" data-longest={longest}>
+      <span className="greeting__words" data-longest={longest}>
         <span>{greetingLine(key, weekend)}</span>
       </span>
-      <span className="qi-greeting__more">
+      <span className="greeting__more">
         <span>
           <span>{london && siteCopy.header.londonTime(london)}</span>
         </span>

@@ -13,7 +13,7 @@ const FEEDBACK_MS = [100, 250];
  * The passes and panels ring (DESIGN.md "Controls"), in parts.css and every stylesheet that replaces a quiet-index
  * one: 2 px cobalt at 3 px offset, taking the panel's ink on a panel. The quiet index keeps its own until #420.
  */
-const NEW_RING = { files: ['src/app/parts.css'], rule: ':where(.pill, .button, .text-link, .row):focus-visible', colour: 'var(--cobalt)', offset: '3px' };
+const NEW_RING = { files: ['src/app/parts.css', 'src/app/shell.css'], rule: ':where(.pill, .button, .text-link, .row):focus-visible', colour: 'var(--cobalt)', offset: '3px' };
 const newRingExceptions = [{ selector: '.panel :focus-visible', colour: 'var(--panel-ink)', why: 'cobalt would not hold 3:1 on every panel field' }];
 
 /** Selectors whose focus ring differs from 2 px cobalt at 2 px offset, and exactly how. */
@@ -29,16 +29,16 @@ const ringExceptions = [
  * specs and the interruption walk instead. A new transition outside 100 to 250 ms fails until it is brought in or named here.
  */
 const motionTransitions = [
-  ['.qi-greeting__more', 'the greeting folds open'],
-  ['.qi-header__links', 'the links fade with the greeting'],
-  ['.qi-scene__moon', 'the late scene arrives'],
-  ['.qi-scene__star', 'the late scene arrives'],
+  ['.greeting__more', 'the greeting folds open'],
+  ['.site-header__links', 'the links step aside for London\'s time'],
+  ['.scene__moon', 'the late scene arrives'],
+  ['.scene__star', 'the late scene arrives'],
   ['.qi-margin[data-glide]', 'the margin glides between rows'],
   ['.qi-inline', 'an inline closer look folds open'],
   ['.qi-crop', 'an object reacts'],
   ['.qi-caret[data-done]', 'the typed quote ends'],
   ['.qi-scale__fill', 'a to-scale bar draws'],
-  ['.stretch-eclipse__', 'the Eclipse flips the theme'],
+  ['.eclipse__', 'the Eclipse flips the theme'],
   ['[data-rise]', 'a panel or card rises into view (DESIGN.md "Motion")'],
   ['[data-grow] .bar', 'bars to scale grow from the left'],
   [':root[data-theme-changing]', 'the theme changes'],

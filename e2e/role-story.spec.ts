@@ -18,8 +18,7 @@ import { pageTitle } from "../src/content/site";
 import { contrastOnPaper } from "./support/contrast";
 
 const schemes = ["light", "dark"] as const;
-/** From this width the header carries the section links (on a row of their own), and from MARGIN_FROM a closer look arrives in the margin. */
-const LINKS_FROM = 900;
+/** From this width a closer look arrives in the margin. */
 const MARGIN_FROM = 1180;
 
 for (const slug of roleStorySlugs) {
@@ -40,49 +39,14 @@ for (const slug of roleStorySlugs) {
       await expect(opening).toContainText(story.role);
       if (story.setting) await expect(opening).toContainText(story.setting);
       await expect(opening).toContainText(story.dates);
-      await expect(page.getByRole("link", { name: "Work", exact: true }).first()).toHaveAttribute("href", roleStoryBack.href);
+      await expect(page.locator("main").getByRole("link", { name: "Work", exact: true }).first()).toHaveAttribute("href", roleStoryBack.href);
     });
 
-    test("the header is the shared one, and its links are this page's six sections", async ({ page }) => {
-      const width = page.viewportSize()?.width ?? 0;
-      await expect(page.locator("header.qi-header")).toHaveCount(1);
-      await expect(page.locator('nav[aria-label="On this page"]')).toHaveCount(1);
-      const links = page.locator(".qi-header__links a");
-      await expect(links).toHaveText(roleStorySectionKeys.map((key) => roleStorySectionLabels[key]));
-      for (const key of roleStorySectionKeys) await expect(links.filter({ hasText: roleStorySectionLabels[key] })).toHaveAttribute("href", `#${key}`);
+    test("the header is the shared one, and the page's six sections are in order, each with its heading", async ({ page }) => {
+      await expect(page.locator("[data-site-header]")).toHaveCount(1);
       const ids = await page.locator("article section[id]").evaluateAll((sections) => sections.map((section) => section.id));
       expect(ids).toEqual([...roleStorySectionKeys]);
-      if (width < LINKS_FROM) {
-        await expect(links.first()).toBeHidden();
-        return;
-      }
-      await expect(links.first()).toBeVisible();
-      // The header is the column wide: it shares the title's left edge, and the links run along a row of their own beneath the name,
-      // from that edge to the column's right edge, on one line.
-      await expect
-        .poll(async () => {
-          const [title, header, first, last, greeting, column] = await Promise.all([
-            page.getByRole("heading", { level: 1 }).boundingBox(),
-            page.locator(".qi-header__inner").boundingBox(),
-            links.first().boundingBox(),
-            links.last().boundingBox(),
-            page.locator("[data-greeting]").boundingBox(),
-            page.locator(".qi-long .qi-column").first().boundingBox(),
-          ]);
-          return {
-            sharedLeftEdge: Math.abs(header!.x - title!.x) <= 1 && Math.abs(first!.x - title!.x) <= 1,
-            insideColumn: last!.x + last!.width <= column!.x + column!.width + 1,
-            oneLine: Math.abs(first!.y - last!.y) <= 1,
-            below: first!.y >= greeting!.y + greeting!.height - 1,
-          };
-        })
-        .toEqual({ sharedLeftEdge: true, insideColumn: true, oneLine: true, below: true });
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      await links.last().click();
-      await expect(page).toHaveURL(/#what-i-took-with-me$/);
-      await expect(page.locator("section#what-i-took-with-me")).toBeInViewport();
-      // The link of the section in view is marked, and underlined.
-      await expect(links.last()).toHaveAttribute("aria-current", "location");
+      for (const key of roleStorySectionKeys) await expect(page.locator(`section#${key} h2`)).toHaveCount(1);
     });
 
     test("the employer's pass hangs in the column with its three Pass pins, and is not a link", async ({ page }) => {
@@ -114,12 +78,12 @@ for (const slug of roleStorySlugs) {
       }
     });
 
-    test("a section's address opens on that section, below the header, and focuses it", async ({ page }) => {
+    test("a section's address opens on that section and focuses it", async ({ page }) => {
       await page.goto(`/work/${slug}#decisions`);
       await expect(page.locator("section#decisions")).toBeInViewport();
       await expect(page.locator("section#decisions")).toBeFocused();
-      const headerBottom = await page.locator("header.qi-header").evaluate((header) => header.getBoundingClientRect().bottom);
-      await expect.poll(() => page.locator("section#decisions h2").evaluate((element) => element.getBoundingClientRect().top)).toBeGreaterThanOrEqual(headerBottom - 1);
+      // The header scrolls away, so the heading is in view with its top on screen.
+      await expect.poll(() => page.locator("section#decisions h2").evaluate((element) => element.getBoundingClientRect().top)).toBeGreaterThanOrEqual(0);
     });
 
     test("the pass drops on its strap once on arrival, and not at all with reduced motion", async ({ page }) => {
@@ -313,9 +277,6 @@ for (const slug of roleStorySlugs) {
           return widest <= holder.clientWidth + 0.5;
         };
         await expect.poll(() => page.getByRole("heading", { level: 1 }).evaluate(widestWordFits)).toBe(true);
-        const links = page.locator(".qi-header__links a");
-        await expect(links).toHaveCount(roleStorySectionKeys.length);
-        if (width >= LINKS_FROM) for (const link of await links.all()) await expect.poll(() => link.evaluate(widestWordFits)).toBe(true);
       });
     }
 
@@ -365,7 +326,8 @@ for (const slug of roleStorySlugs) {
       await page.route("**/*.js", (route) => route.abort());
       await page.reload();
       await expect(page.locator("article section[id]")).toHaveCount(roleStorySectionKeys.length);
-      await expect(page.locator('nav[aria-label="On this page"] a')).toHaveCount(roleStorySectionKeys.length);
+      // The header's links to the homepage's sections are in it too.
+      await expect(page.locator('nav[aria-label="On this page"] a')).toHaveCount(5);
       await expect(page.locator(".qi-long .qi-pass")).toHaveCount(1);
       for (const { phrase } of reveals) await expect(page.locator("article")).toContainText(phrase);
     });
