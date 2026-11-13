@@ -178,7 +178,7 @@ const broken = (path, from, to) => {
 };
 const mustFail = (name, changed, pattern) => assert.ok(craftProblems(changed).some((problem) => pattern.test(problem)), `The ${name} check did not fail on its deliberate break`);
 mustFail('focus ring width', broken('src/app/stretch-shell.css', 'outline: 2px solid var(--stretch-cobalt);', 'outline: 3px solid var(--stretch-cobalt);'), /focus ring/);
-mustFail('focus ring offset', broken('src/app/quiet-long-form.css', '.qi-long__back:focus-visible {\n  border-radius: 6px;', '.qi-long__back:focus-visible {\n  border-radius: 6px;\n  outline-offset: 4px;'), /offset/);
+mustFail('focus ring offset', broken('src/app/quiet-long-form.css', '.qi-zoom__close:focus-visible {\n  outline-color: #fff;', '.qi-zoom__close:focus-visible {\n  outline-color: #fff;\n  outline-offset: 4px;'), /offset/);
 mustFail('new focus ring offset', broken('src/app/parts.css', '  outline: 2px solid var(--cobalt);\n  outline-offset: 3px;', '  outline: 2px solid var(--cobalt);\n  outline-offset: 2px;'), /passes and panels focus ring/);
 mustFail('panel ring colour', broken('src/app/parts.css', 'outline-color: var(--panel-ink);', 'outline-color: var(--cobalt);'), /var\(--panel-ink\)/);
 mustFail('spring', broken('src/app/tokens.css', '--spring: cubic-bezier(.3, 1.5, .4, 1);', '--spring: cubic-bezier(.3, 1.4, .64, 1);'), /--spring/);

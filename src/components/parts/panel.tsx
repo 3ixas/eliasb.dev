@@ -7,7 +7,7 @@ type PanelProps = {
   /** In the dark theme, a soft glow in the panel's own colour: a project's panel. */
   glow?: boolean;
   /** Rises into view once, when it starts below the fold (R-07). The wrapper decides; this only marks it. */
-  as?: "section" | "article" | "div" | "li";
+  as?: "section" | "article" | "header" | "div" | "li";
   className?: string;
   children: ReactNode;
 } & Omit<React.HTMLAttributes<HTMLElement>, "className" | "children" | "style">;

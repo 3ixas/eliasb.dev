@@ -42,6 +42,7 @@ export const caseStudyCopy = {
   live: "Live site ↗",
   code: "Code ↗",
   nextProject: "Next project",
+  fromPrd: "From the PRD",
 } as const;
 
 /** A screenshot placed in a section. Alt text and caption carry over from the Board's case files. */

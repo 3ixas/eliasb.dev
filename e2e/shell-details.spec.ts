@@ -35,7 +35,9 @@ const arrowGap = (page: Page, selector: string) =>
   page.locator(selector).first().evaluate((link) => {
     const arrow = link.querySelector("[aria-hidden='true']")!;
     const words = document.createRange();
-    const after = arrow.nextSibling;
+    // The words a screen reader alone hears (where a link opens) take no room, so they are not the neighbour.
+    const shown = (node: ChildNode | null) => (node instanceof Element && node.classList.contains("sr-only") ? null : node);
+    const after = shown(arrow.nextSibling);
     if (after) words.selectNodeContents(after);
     else words.selectNodeContents(arrow.previousSibling!);
     const arrowBox = arrow.getBoundingClientRect();
@@ -44,11 +46,11 @@ const arrowGap = (page: Page, selector: string) =>
   });
 
 test.describe("Shell details: arrows", () => {
-  test("the case study's back link and buttons keep a gap between label and arrow, with no literal space", async ({ page }) => {
+  test("the case study's back link and its Live site and Code keep a gap between label and arrow, with no literal space", async ({ page }) => {
     await page.goto("/things-i-make/threshold");
-    for (const selector of [".qi-long__back", ".qi-case__links a:has([aria-hidden='true'])"]) {
+    for (const selector of [".case-open .story-back", ".case-open__links .pill"]) {
       await expect.poll(() => arrowGap(page, selector)).toBeGreaterThanOrEqual(3);
-      expect(await page.locator(selector).first().textContent()).not.toMatch(/[←↗]\s|\s[←↗]/);
+      expect(await page.locator(selector).first().evaluate((link) => [...link.childNodes].filter((node) => !(node instanceof Element && node.classList.contains("sr-only"))).map((node) => node.textContent).join(""))).not.toMatch(/[←↗]\s|\s[←↗]/);
     }
   });
 
@@ -69,7 +71,8 @@ test.describe("Shell details: separators", () => {
   }
 
   test("every dot in a metadata line is bound to the item before it", async ({ page }) => {
-    for (const route of ["/nothing-here", "/things-i-make/threshold"]) {
+    // The 404 is the last page with the quiet index's metadata lines (until #419); a case study has none since #418.
+    for (const route of ["/nothing-here"]) {
       await page.goto(route);
       const lines = await page.locator(".qi-long__meta, .stretch-tile__meta, .qi-row__line").allTextContents();
       expect(lines.length).toBeGreaterThan(0);

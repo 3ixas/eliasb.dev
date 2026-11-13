@@ -50,6 +50,8 @@
   /* A Role story's lede, and a point's serif lead in a long-form section. */
   --type-lede: clamp(20px, 1.8vw, 25px);
   --type-lead: 23px;
+  /* The PRD's quote on its card. */
+  --type-quote: clamp(22px, 2.2vw, 30px);
   /* A row's name, Say hello's links, the header's name, and a text link. */
   --type-row: 22px;
   --type-hello: 21px;

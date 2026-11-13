@@ -1,115 +1,106 @@
-import { ProjectObject, projectColours } from "@/components/quiet/project-object";
-import { Arrowed, BackLink, LongForm, LongFormOpening, LongFormSectionBlock, NextRow } from "@/components/site/long-form";
+import { Arrow, Panel } from "@/components/parts/panel";
+import { hostLabel } from "@/components/site/host-label";
+import { LongForm } from "@/components/site/long-form";
+import { SiteLink } from "@/components/site/site-link";
+import { EvidenceFigures, NextPanel, StoryBack, StoryImage, StorySection, StoryText } from "@/components/site/story-parts";
 import { ZoomableImage } from "@/components/site/zoomable-image";
-import { projects } from "@/content/projects";
-import {
-  caseStudyCopy,
-  caseStudyOpening,
-  caseStudySectionKeys,
-  caseStudySectionLabels,
-  type CaseStudy,
-  type CaseStudyOpening,
-} from "@/content/stretch/case-study";
+import { projects, type Project } from "@/content/projects";
+import { caseStudyCopy, caseStudySectionKeys, caseStudySectionLabels, type CaseStudy } from "@/content/stretch/case-study";
+
+/** "Live site" from "Live site ↗": the pill draws its own arrow. */
+const words = (label: string) => label.replace(/ ↗$/, "");
 
 /**
- * A case study (docs/design/DESIGN.md, "Long-form pages") on the shared template: the shared header, a back link to the Work archive, the project as the title with its outcome as the line, its
- * type, year and stack, the links it has, and its landing screenshot on its Project colour. Then the six sections
- * in their fixed order (the PRD as one inline Sheet under "On paper") and one row to the next project, then Say hello. The
- * server renders all of it.
+ * A case study (GLOSSARY.md; DESIGN.md "Long-form pages", R-22): a panel in the project's colour holding "← Things I
+ * make", the name as the `h1`, the description, the stack as chips, Live site and Code, the evidence figures and the
+ * landing screenshot; then its six sections in the Role story's layout, each under its own heading, with the PRD as a
+ * paper card under "On paper"; then the next project as a panel in its colour, and Say hello. The server renders all of it.
  */
 export function CaseStudyPage({ study }: { study: CaseStudy }) {
-  const opening = caseStudyOpening(study, projects);
-  const next = projects.find(({ slug }) => slug === study.next);
-  if (!next) throw new Error(`Case study "${study.slug}" ends with "${study.next}", which is not a project.`);
+  const project = projectFor(study.slug);
+  const next = projectFor(study.next);
 
   return (
     <LongForm attrs={{ "data-case-study": study.slug }}>
-      <article className="stretch-wrap qi-long" aria-labelledby="case-study-title">
-        <div className="qi-column">
-          <BackLink href="/things-i-make" label={caseStudyCopy.back} />
-          <LongFormOpening titleId="case-study-title" title={opening.name} line={opening.outcome} meta={opening.meta} below={<OpeningBelow opening={opening} />} />
-          {caseStudySectionKeys.map((key) => {
-            const { heading, paragraphs, points, figure } = study.sections[key];
-            return (
-              <LongFormSectionBlock key={key} id={key} title={heading ?? caseStudySectionLabels[key]}>
-                {paragraphs?.map((paragraph) => (
-                  <p key={paragraph} className="qi-long__p">
-                    {paragraph}
-                  </p>
-                ))}
-                {points?.map(({ lead, text }) => (
-                  <p key={lead} className="qi-long__p">
-                    <strong>{lead}</strong> {text}
-                  </p>
-                ))}
-                {key === "written-down-first" && <Sheet study={study} />}
-                {figure && (
-                  <figure className="qi-figure">
-                    <div className="qi-case__shot" style={projectColours(opening)}>
-                      <ZoomableImage src={figure.src} alt={figure.alt} width={figure.width} height={figure.height} sizes="(max-width: 760px) calc(100vw - 32px), 560px" />
-                    </div>
-                    <figcaption className="qi-figure__caption stretch-mono">{figure.caption}</figcaption>
-                  </figure>
-                )}
-              </LongFormSectionBlock>
-            );
-          })}
-          <NextRow label={caseStudyCopy.nextProject} href={`/things-i-make/${next.slug}`} object={<ProjectObject project={next} />} title={next.name} line={next.outcome} />
-        </div>
+      <article className="frame story" aria-labelledby="case-study-title">
+        <Opening study={study} project={project} />
+        {caseStudySectionKeys.map((key) => {
+          const { heading, figure, ...body } = study.sections[key];
+          return (
+            <StorySection key={key} id={key} title={heading ?? caseStudySectionLabels[key]}>
+              <StoryText body={body} />
+              {key === "written-down-first" && <PrdCard study={study} />}
+              {figure && <StoryImage src={figure.src} alt={figure.alt} width={figure.width} height={figure.height} caption={figure.caption} />}
+            </StorySection>
+          );
+        })}
       </article>
+      <NextPanel label={caseStudyCopy.nextProject} href={`/things-i-make/${next.slug}`} name={next.name} line={next.outcome} colours={next.panel!} />
     </LongForm>
   );
 }
 
-/** The links the project has (a project with no live site or no code shows only the other), the note beside them, and the landing screenshot on the project's colour. */
-function OpeningBelow({ opening }: { opening: CaseStudyOpening }) {
-  const { links, screenshot, note } = opening;
-  return (
-    <div className="qi-case__below">
-      {(links.live || links.code || note) && (
-        <div className="qi-case__links">
-          {links.live && (
-            <a href={links.live} target="_blank" rel="noreferrer">
-              <Arrowed label={caseStudyCopy.live} />
-            </a>
-          )}
-          {links.code && (
-            <a href={links.code} target="_blank" rel="noreferrer">
-              <Arrowed label={caseStudyCopy.code} />
-            </a>
-          )}
-          {note && <p className="qi-case__note">{note}</p>}
-        </div>
-      )}
-      <div className="qi-case__shot" style={projectColours(opening)}>
-        <ZoomableImage src={screenshot.src} alt={screenshot.alt} width={screenshot.width} height={screenshot.height} sizes="(max-width: 760px) calc(100vw - 32px), 560px" preload />
-      </div>
-    </div>
-  );
+/** A case study's project: the catalogue holds its name, links, screenshot and panel colours (`assertCatalogue` checks them). */
+function projectFor(slug: string): Project & Required<Pick<Project, "panel" | "screenshot">> {
+  const project = projects.find((entry) => entry.slug === slug);
+  if (!project?.panel || !project.screenshot) throw new Error(`Case study "${slug}" needs its project's panel and screenshot.`);
+  return project as Project & Required<Pick<Project, "panel" | "screenshot">>;
 }
 
-/** The line from the project's own spec on one inline Sheet, then its figures from its own records as a quiet line. */
-function Sheet({ study }: { study: CaseStudy }) {
-  const { prd, evidence } = study;
+/** The opening panel: the text at the left, the landing screenshot at the right (beneath under 1260 px). */
+function Opening({ study, project }: { study: CaseStudy; project: ReturnType<typeof projectFor> }) {
+  const { links, screenshot } = project;
   return (
-    <div className="qi-case__sheet">
-      <figure>
-        {prd.lead && <p className="qi-case__around">{prd.lead}</p>}
-        <blockquote className="qi-case__quote">“{prd.quote}”</blockquote>
-        {prd.after && <p className="qi-case__around">{prd.after}</p>}
-        <figcaption className="qi-figure__caption stretch-mono">
-          From the PRD{prd.date && ` · ${prd.date}`}
-        </figcaption>
-      </figure>
-      {evidence.length > 0 && (
-        <ul className="qi-case__evidence" aria-label="Evidence">
-          {evidence.map(({ value, label }) => (
-            <li key={label}>
-              <strong>{value}</strong> <span className="stretch-mono">{label}</span>
+    <Panel as="header" colours={project.panel} glow className="case-open">
+      <StoryBack href="/things-i-make" label={caseStudyCopy.back} />
+      <div className="case-open__text">
+        <h1 id="case-study-title" className="case-open__title">
+          {project.name}
+        </h1>
+        <p className="case-open__lede">{study.description}</p>
+        <ul className="chips case-open__stack" aria-label="Stack">
+          {study.stack.map((item) => (
+            <li key={item} className="chip">
+              {item}
             </li>
           ))}
         </ul>
-      )}
-    </div>
+        {(links.live || links.code || study.note) && (
+          <div className="case-open__links">
+            {links.live && <OutLink href={links.live} label={words(caseStudyCopy.live)} />}
+            {links.code && <OutLink href={links.code} label={words(caseStudyCopy.code)} outline />}
+            {study.note && <p className="case-open__note">{study.note}</p>}
+          </div>
+        )}
+        <EvidenceFigures evidence={study.evidence} />
+      </div>
+      <div className="case-open__shot story-fig__shot">
+        <ZoomableImage src={screenshot.src} alt={screenshot.alt} width={screenshot.width} height={screenshot.height} sizes="(min-width: 1260px) 720px, 92vw" preload />
+      </div>
+    </Panel>
+  );
+}
+
+/** Live site or Code: a pill marked ↗ that opens in a new tab, saying where for a screen reader. */
+function OutLink({ href, label, outline = false }: { href: string; label: string; outline?: boolean }) {
+  return (
+    <SiteLink href={href} className={outline ? "pill pill--outline" : "pill"}>
+      {label}
+      <Arrow out />
+      <span className="sr-only"> opens {hostLabel(href)} in a new tab</span>
+    </SiteLink>
+  );
+}
+
+/** The line from the project's own spec on a paper card with a cobalt rule: the quote in Newsreader, then its source and date. */
+function PrdCard({ study }: { study: CaseStudy }) {
+  const { lead, quote, after, date } = study.prd;
+  return (
+    <figure className="prd">
+      {lead && <p className="prd__around">{lead}</p>}
+      <blockquote className="prd__quote">“{quote}”</blockquote>
+      {after && <p className="prd__around">{after}</p>}
+      <figcaption>{date ? `${caseStudyCopy.fromPrd} · ${date}` : caseStudyCopy.fromPrd}</figcaption>
+    </figure>
   );
 }
