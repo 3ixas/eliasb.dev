@@ -76,10 +76,10 @@ test.describe("Shell details: separators", () => {
     }
   });
 
-  test("a Work row's line stays inside its row, even at the narrowest width", async ({ page }) => {
+  test("a row's line stays inside its row, even at the narrowest width", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => document.fonts.ready);
-    const rows = page.locator("#work .qi-row");
+    const rows = page.locator("main .qi-row");
     await expect(rows.first()).toBeVisible();
     await expect.poll(() => rows.evaluateAll((all) => all.filter((row) => row.scrollWidth > row.clientWidth).length)).toBe(0);
   });

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { MiniPass } from "@/components/quiet/finished-pass";
-import { HabitNumber } from "@/components/quiet/how-i-work";
+import { HabitNumber } from "@/components/quiet/habit-number";
 import { ProjectObject } from "@/components/quiet/project-object";
 import { Row } from "@/components/quiet/row";
 import { Sheet } from "@/components/quiet/sheet";

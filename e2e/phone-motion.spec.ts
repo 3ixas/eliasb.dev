@@ -7,9 +7,9 @@ import { expect, test, type Page } from "@playwright/test";
  */
 
 const inlineOnly = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1180;
-/* Where I'm headed's first strand: the homepage's first row with an inline look now that Work's employers are panels (#413). */
-const SLOT = '[data-look-slot="strand-judgement"]';
-const TRIGGER = '#work .qi-row[data-look-tap="strand-judgement"]';
+/* Off the clock's training row: the homepage's first plain row with an inline look now that Work and How I work are panels and cards (#413, #414). */
+const SLOT = '[data-look-slot="training"]';
+const TRIGGER = '#off-the-clock .qi-row[data-look-tap="training"]';
 
 /**
  * Hydrated, with the opening's passes at rest: their arrival swing is finished at once, as a motion spec seeks rather
@@ -55,7 +55,7 @@ test.describe("The fold", () => {
         await new Promise(requestAnimationFrame);
         return { duration: Number(duration), easing: String(easing) };
       };
-      const trigger = document.querySelector<HTMLElement>('#work .qi-row[data-look-tap="strand-judgement"]')!;
+      const trigger = document.querySelector<HTMLElement>('#off-the-clock .qi-row[data-look-tap="training"]')!;
       trigger.click();
       const opening = await timing();
       const height = slot.querySelector<HTMLElement>(".qi-inline__in")!.scrollHeight;
@@ -82,7 +82,7 @@ test.describe("The fold", () => {
           await new Promise(requestAnimationFrame);
         }
       };
-      const trigger = document.querySelector<HTMLElement>('#work .qi-row[data-look-tap="strand-judgement"]')!;
+      const trigger = document.querySelector<HTMLElement>('#off-the-clock .qi-row[data-look-tap="training"]')!;
       trigger.click();
       await started();
       fold()!.finish();

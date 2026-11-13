@@ -2,14 +2,13 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { roleStories } from "../src/content/stretch/role-stories";
 import { passRecords } from "../src/content/stretch/staff-pass";
-import { shownSource, work } from "../src/content/stretch/work";
 import { comparisonRow, workPanels } from "../src/content/stretch/work-panels";
 import { renderedContrast } from "./support/rendered-contrast";
 
 /*
  * Work (docs/design/DESIGN.md "The homepage, in order" 3 and "Figures", R-13 to R-15): the title and subheading,
  * BNP Paribas's panel with its figure, the simulation and two comparisons, then Joveen and Optegra side by side with a
- * display figure and three pairs each. Where I'm headed's rows follow until #414; their tests are at the end.
+ * display figure and three pairs each.
  */
 
 const section = (page: Page) => page.locator("section#work");
@@ -300,71 +299,5 @@ test.describe("Work: reduced motion", () => {
     await expect(plot(page)).toHaveAttribute("data-drawn", "");
     await expect(plot(page)).not.toHaveAttribute("data-released", "");
     await expect(page.locator(".sim__paths")).toHaveCSS("clip-path", "inset(0px)");
-  });
-});
-
-test.describe("Where I'm headed: the rows", () => {
-  const strandIds = work.headed.bars.map((bar) => `strand-${bar.label.toLowerCase()}`);
-  const rowFor = (page: Page, id: string) => section(page).locator(`[data-look="${id}"]`);
-  const margin = (page: Page) => page.locator(".qi-margin");
-
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
-
-  test("its line and three strand rows: the title, then the label, with a thread in the source's colour", async ({ page }) => {
-    const group = section(page).getByRole("group", { name: work.headed.heading });
-    await expect(group.getByRole("heading", { level: 3 })).toHaveText(work.headed.heading);
-    await expect(group.locator(".qi-note-line")).toHaveText(work.headed.line);
-    const rows = group.locator(".qi-row");
-    await expect(rows).toHaveCount(work.headed.bars.length);
-    for (const [index, bar] of work.headed.bars.entries()) {
-      await expect(rows.nth(index).locator(".qi-row__title")).toHaveText(bar.title);
-      await expect(rows.nth(index).locator(".qi-row__line")).toHaveText(bar.label);
-    }
-    expect(work.headed.bars.map((bar) => shownSource(bar.source).name)).toEqual(["Optegra", "BNP Paribas", "Threshold"]);
-    const strand = await rowFor(page, strandIds[0]).evaluate((row) => document.getElementById(row.getAttribute("aria-describedby")!)?.textContent ?? "");
-    expect(strand).toBe(`${work.headed.soFar}, ${shownSource(work.headed.bars[0].source).name}. ${work.headed.bars[0].soFar.text}`);
-  });
-
-  test("on a wide screen focus shows a strand's closer look in the margin; Escape hides it and focus stays on the row", async ({ page }) => {
-    test.skip(width(page) < 1180, "the margin is for wide screens");
-    const row = rowFor(page, strandIds[0]);
-    await row.scrollIntoViewIfNeeded();
-    await row.focus();
-    await expect(margin(page)).toBeVisible();
-    await expect(margin(page).locator(".qi-strand")).toContainText(work.headed.bars[0].soFar.text);
-    await page.keyboard.press("Escape");
-    await expect(margin(page)).toHaveCount(0);
-    await expect(row).toBeFocused();
-    await page.keyboard.press("Tab");
-    await expect(rowFor(page, strandIds[1])).toBeFocused();
-    await expect(margin(page).locator(".qi-strand")).toContainText(work.headed.bars[1].soFar.text);
-  });
-
-  test("on a wide screen the margin sits 40 px right of the column, level with the row's top less 6 px, and stays 16 px inside the window", async ({ page }) => {
-    test.skip(width(page) < 1180, "the margin is for wide screens");
-    const row = rowFor(page, strandIds[0]);
-    await row.scrollIntoViewIfNeeded();
-    await row.evaluate((element) => window.scrollBy(0, element.getBoundingClientRect().top - 140));
-    await row.hover();
-    await expect(margin(page)).toBeVisible();
-    await expect(margin(page)).toHaveAttribute("aria-hidden", "true");
-    await expect
-      .poll(async () => {
-        const [m, r, column, height] = await Promise.all([boxOf(margin(page)), boxOf(row), boxOf(page.locator("#work .qi-column")), page.evaluate(() => innerHeight)]);
-        const wanted = Math.max(16, Math.min(r.y - 6, height - 16 - m.height));
-        return [Math.abs(m.x - (column.x + column.width + 40)) < 1, Math.abs(m.y - wanted) < 1, m.x + m.width <= width(page) - 16 + 1];
-      })
-      .toEqual([true, true, true]);
-    await page.mouse.move(5, 5);
-    await expect(margin(page)).toHaveCount(0);
-  });
-
-  test("narrower than the margin, none appears when a row is focused or hovered", async ({ page }) => {
-    test.skip(width(page) >= 1180, "the wide layout has a margin");
-    await rowFor(page, strandIds[0]).focus();
-    await rowFor(page, strandIds[1]).hover();
-    await expect(margin(page)).toHaveCount(0);
   });
 });

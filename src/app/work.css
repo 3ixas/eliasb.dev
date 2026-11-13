@@ -351,11 +351,6 @@
   justify-self: start;
 }
 
-/* Where I'm headed's rows, until #414 makes them a panel. */
-.work__headed {
-  margin-top: 96px;
-}
-
 /* ---- Narrower ---- */
 
 @media (max-width: 1259.98px) {

@@ -1,198 +1,179 @@
-import { expect, test, type Page } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { caseStudies } from "../src/content/stretch/case-studies";
 import { howIWork } from "../src/content/stretch/how-i-work";
-import { contrastOnPaper } from "./support/contrast";
-import { tap } from "./support/tap";
+import { shownSource, work } from "../src/content/stretch/work";
+import { renderedContrast } from "./support/rendered-contrast";
 
-const section = (page: Page) => page.locator("section#how-i-work");
-const habits = (page: Page) => section(page).locator("[data-habits] .qi-list__item").filter({ has: page.locator(".qi-number") });
-const prdRow = (page: Page) => section(page).locator('[data-look="threshold-prd"]');
-const { quote } = caseStudies.threshold.prd;
+/*
+ * Where I'm headed and How I work (docs/design/DESIGN.md "The homepage, in order" 4 and 6, "How I work's cards"; R-16 and
+ * R-18): one paper panel with three parts, each from a chip naming its source; then four upright cards, each the habit
+ * above a cobalt rule, the story with its proof phrase highlighted, and the proof drawn in the foot; then the PRD link.
+ */
+
+const headed = (page: Page) => page.locator("section[aria-labelledby='headed-heading']");
+const how = (page: Page) => page.locator("section#how-i-work");
+const cards = (page: Page) => how(page).locator(".card");
+const width = (page: Page) => page.viewportSize()?.width ?? 0;
+const boxOf = async (locator: Locator) => (await locator.boundingBox())!;
+const settled = (page: Page) => page.evaluate(() => document.fonts.ready.then(() => true));
 const date = caseStudies.threshold.prd.date!;
-const caption = `${howIWork.prd.title}, ${date}`;
-const wide = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1180;
 
-/** The PRD's closer look: in the margin on wide screens (the pointer arrives), under the row on phones (a tap). */
-const openPrd = async (page: Page) => {
-  // The controller listens through React's props on the column, which exist only once it has hydrated.
-  await page.waitForFunction(() => {
-    const column = document.querySelector("#how-i-work [data-quiet-column]");
-    return !!column && Object.keys(column).some((key) => key.startsWith("__reactProps$"));
-  });
-  if (wide(page)) {
-    await prdRow(page).hover();
-    return page.locator(".qi-margin .qi-prd");
-  }
-  await tap(page, section(page).locator('.qi-row[data-look-tap="threshold-prd"]'));
-  return section(page).locator('[data-look-slot="threshold-prd"] .qi-prd');
-};
-
-test.describe("How I work: the habits", () => {
+test.describe("Where I'm headed", () => {
   test.beforeEach(async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
   });
 
-  test("four habit rows, each with its proof verbatim from the approved copy", async ({ page }) => {
-    await expect(habits(page)).toHaveCount(4);
+  test("is its own section after Work: one paper panel with the title, the lead and three parts", async ({ page }) => {
+    const order = await page.locator("#main-content > section").evaluateAll((all) => all.map((section) => section.id || section.getAttribute("aria-labelledby")));
+    expect(order.indexOf("headed-heading")).toBe(order.indexOf("work") + 1);
+    await expect(headed(page).getByRole("heading", { level: 2 })).toHaveText(work.headed.heading);
+    await expect(headed(page).locator(".panel--paper")).toHaveCount(1);
+    await expect(headed(page).locator(".headed__lead p")).toHaveText(work.headed.line);
+    const parts = headed(page).locator(".headed__parts > li");
+    await expect(parts).toHaveCount(3);
+    for (const [index, bar] of work.headed.bars.entries()) {
+      await expect(parts.nth(index).locator(".chip")).toHaveText(shownSource(bar.source).name);
+      await expect(parts.nth(index).getByRole("heading", { level: 3 })).toHaveText(bar.title);
+      await expect(parts.nth(index).locator("p")).toHaveText(bar.soFar.text);
+    }
+  });
+
+  test("names no destination and no job title", async ({ page }) => {
+    const text = await headed(page).innerText();
+    for (const retired of ["product engineer", "So far", "Judgement", "Depth", "Range"]) expect(text).not.toContain(retired);
+    await expect(headed(page).locator(".qi-row, .qi-strand, .qi-thread")).toHaveCount(0);
+  });
+
+  test("the lead sits beside the parts from 1260 px and above them under it", async ({ page }) => {
+    const [lead, parts] = await Promise.all([boxOf(headed(page).locator(".headed__lead")), boxOf(headed(page).locator(".headed__parts"))]);
+    if (width(page) >= 1260) expect(parts.x).toBeGreaterThan(lead.x + lead.width);
+    else expect(parts.y).toBeGreaterThanOrEqual(lead.y + lead.height);
+  });
+});
+
+test.describe("How I work", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+  });
+
+  test("four cards, each the habit, its story verbatim with the proof phrase highlighted, and a drawn proof", async ({ page }) => {
+    await expect(how(page).getByRole("heading", { level: 2 })).toHaveText(howIWork.heading);
+    await expect(cards(page)).toHaveCount(4);
     for (const [index, beat] of howIWork.beats.entries()) {
-      const row = habits(page).nth(index).locator(".qi-row");
-      await expect(row.locator(".qi-row__title")).toHaveText(beat.habit);
-      await expect(row.locator(".qi-row__line")).toHaveText(beat.proof);
+      const card = cards(page).nth(index);
+      await expect(card.getByRole("heading", { level: 3 })).toHaveText(beat.habit);
+      await expect(card.locator("p")).toHaveText(beat.proof);
+      await expect(card.locator("mark")).toHaveText(beat.highlight);
+      await expect(card.locator(".card__proof")).toBeVisible();
     }
   });
 
-  test("a habit is a plain row: not a link, and not a tab stop because it has no closer look", async ({ page }) => {
-    for (const row of await habits(page).locator(".qi-row").all()) {
-      await expect(row).toHaveJSProperty("tagName", "DIV");
-      await expect(row).not.toHaveAttribute("tabindex", /.*/);
-      await expect(row).not.toHaveAttribute("data-look", /.*/);
+  test("the highlight is a tint behind the words, never an underline", async ({ page }) => {
+    for (const mark of await how(page).locator("mark").all()) {
+      const style = await mark.evaluate((element) => ({ line: getComputedStyle(element).textDecorationLine, background: getComputedStyle(element).backgroundColor }));
+      expect(style.line).toBe("none");
+      expect(style.background).not.toBe("rgba(0, 0, 0, 0)");
     }
+    await expect(how(page).locator(".qi-ink, .qi-mark, .qi-number")).toHaveCount(0);
   });
 
-  test("it is in the server-rendered page, the PRD's whole quote included", async ({ page }) => {
+  test("the proofs are drawn from the content: the two projects, 57 ticks, a switch that is off, a bar 15% longer", async ({ page }) => {
+    const [start, write, ship, measure] = [0, 1, 2, 3].map((index) => cards(page).nth(index).locator(".card__proof"));
+    await expect(start.locator(".drawn__dot")).toHaveText(["Threshold", "Flowtime"]);
+    await expect(write.locator("b")).toHaveText("57");
+    await expect(write.locator(".drawn__ticks i")).toHaveCount(57);
+    await expect(ship).toHaveText("Off");
+    await expect(ship.locator(".drawn__switch")).toHaveCount(1);
+    await expect(measure.locator("b")).toHaveText("+15%");
+    const [before, after] = await measure.locator(".bar").evaluateAll((bars) => bars.map((bar) => bar.getBoundingClientRect().width));
+    expect(after / before).toBeCloseTo(1.15, 2);
+  });
+
+  test("every card's rule sits at one height, and the cards are four across, two under 1260 px and one under 720 px", async ({ page }) => {
+    await settled(page);
+    const rules = await cards(page).locator("h3").evaluateAll((headings) => headings.map((heading) => Math.round(heading.getBoundingClientRect().bottom)));
+    const tops = await cards(page).evaluateAll((all) => all.map((card) => Math.round(card.getBoundingClientRect().top)));
+    const across = width(page) >= 1260 ? 4 : width(page) >= 720 ? 2 : 1;
+    for (let row = 0; row < 4; row += across) {
+      const inRow = rules.slice(row, row + across);
+      if (across > 1) expect(new Set(inRow).size, `rules in row ${row / across + 1}`).toBe(1);
+      expect(new Set(tops.slice(row, row + across)).size).toBe(1);
+    }
+    await expect(cards(page).first().locator("h3")).toHaveCSS("border-bottom-width", "2px");
+  });
+
+  test("the PRD link names its date and lands on the PRD on Threshold's case study", async ({ page }) => {
+    const link = how(page).getByRole("link", { name: `${howIWork.prd.title}, ${date}` });
+    await expect(link).toHaveAttribute("href", "/things-i-make/threshold#written-down-first");
+    expect((await boxOf(link)).height).toBeGreaterThanOrEqual(44);
+    await link.click();
+    await expect(page).toHaveURL(/\/things-i-make\/threshold#written-down-first$/);
+    await expect(page.locator("#written-down-first")).toBeInViewport();
+  });
+
+  test("#how-i-work still lands on the section", async ({ page }) => {
+    await page.goto("/#how-i-work");
+    await expect(how(page).getByRole("heading", { level: 2 })).toBeInViewport();
+  });
+
+  test("both sections are complete without script", async ({ page }) => {
     await page.route("**/*.js", (route) => route.abort());
     await page.reload();
-    await expect(habits(page)).toHaveCount(4);
-    expect(await section(page).locator("#threshold-prd-description").evaluate((element) => element.textContent)).toBe(`${quote} ${caption}`);
+    await expect(headed(page).locator(".headed__parts > li")).toHaveCount(3);
+    await expect(cards(page)).toHaveCount(4);
+    for (const card of await cards(page).all()) await expect(card).toBeVisible();
   });
 
-  test("the numbers are decorative, and the title and note are the quiet ones", async ({ page }) => {
-    for (const number of await section(page).locator(".qi-row__object").all()) await expect(number).toHaveAttribute("aria-hidden", "true");
-    await expect(section(page).getByRole("heading", { level: 2, name: howIWork.heading, exact: true })).toBeVisible();
-    await expect(section(page).locator(".qi-note-line")).toHaveText(howIWork.note);
-  });
-
-  test("rows are 68 px or more, with a 44 px object, and their text starts at one edge", async ({ page }) => {
-    const edges = new Set<number>();
-    for (const row of await section(page).locator(".qi-row").all()) {
-      expect((await row.boundingBox())!.height).toBeGreaterThanOrEqual(68);
-      const object = (await row.locator(".qi-row__object").boundingBox())!;
-      expect([object.width, object.height]).toEqual([44, 44]);
-      edges.add(Math.round((await row.locator(".qi-row__text").boundingBox())!.x));
-    }
-    expect(edges.size).toBe(1);
-  });
-
-  test("text passes WCAG 2.2 AA contrast", async ({ page }) => {
-    for (const selector of [".qi-row__title", ".qi-row__line", ".qi-number"]) {
-      const readings = await contrastOnPaper(page, `#how-i-work ${selector}`);
-      expect(readings.length, selector).toBeGreaterThan(0);
-      for (const reading of readings) expect(reading.ratio, `${selector}: ${reading.text}`).toBeGreaterThanOrEqual(4.5);
-    }
-  });
-
-  test("nothing in the section overflows, and the page does not scroll sideways", async ({ page }) => {
-    const width = page.viewportSize()?.width ?? 0;
-    for (const box of await Promise.all((await section(page).locator(".qi-row").all()).map((row) => row.boundingBox()))) {
-      expect(box!.x).toBeGreaterThanOrEqual(0);
-      expect(box!.x + box!.width).toBeLessThanOrEqual(width);
-    }
+  test("nothing scrolls sideways, and nothing in either section is under 13 px", async ({ page }) => {
+    await settled(page);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  });
-});
-
-test.describe("How I work: the pen", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
-
-  test("a ring on each number, an arrow to the next habit, and a line under each proof's phrase", async ({ page }) => {
-    await expect(section(page).locator(".qi-ink--circle")).toHaveCount(4);
-    await expect(section(page).locator(".qi-ink--next")).toHaveCount(3);
-    await expect(section(page).locator(".qi-ink--under")).toHaveCount(4);
-    for (const [index, beat] of howIWork.beats.entries()) {
-      const row = habits(page).nth(index);
-      await expect(row.locator(".qi-number .qi-ink--circle")).toHaveCount(1);
-      await expect(row.locator(".qi-mark")).toHaveText(beat.underline);
-      await expect(row.locator(".qi-mark .qi-ink--under")).toHaveCount(1);
-      await expect(row.locator(".qi-ink--next")).toHaveCount(index < howIWork.beats.length - 1 ? 1 : 0);
-    }
-    for (const stroke of await section(page).locator(".qi-ink").all()) await expect(stroke).toHaveAttribute("aria-hidden", "true");
-    // Dashes measure in pathLength units; a non-scaling stroke would measure them in pixels.
-    for (const path of await section(page).locator(".qi-ink path").all()) {
-      await expect(path).toHaveAttribute("pathLength", "1");
-      expect(await path.evaluate((element) => getComputedStyle(element).vectorEffect)).toBe("none");
-    }
-  });
-
-  test("each ring holds its number, each arrow runs from a ring to the next, and each line sits under its phrase", async ({ page }) => {
-    await expect
-      .poll(async () => {
-        const boxes = async (selector: string) => Promise.all((await section(page).locator(selector).all()).map((element) => element.boundingBox()));
-        const [rings, numbers, arrows] = await Promise.all([boxes(".qi-ink--circle"), boxes(".qi-number"), boxes(".qi-ink--next")]);
-        const ringsHoldNumbers = rings.every((ring, index) => ring!.x <= numbers[index]!.x && ring!.y <= numbers[index]!.y && ring!.x + ring!.width >= numbers[index]!.x + numbers[index]!.width);
-        const arrowsBetween = arrows.every((arrow, index) => arrow!.y >= rings[index]!.y + rings[index]!.height - 1 && arrow!.y + arrow!.height <= rings[index + 1]!.y + 4);
-        return ringsHoldNumbers && arrowsBetween;
-      })
-      .toBe(true);
-    for (const row of await habits(page).all()) {
-      const mark = (await row.locator(".qi-mark").boundingBox())!;
-      const line = (await row.locator(".qi-ink--under").boundingBox())!;
-      expect(line.y + line.height / 2).toBeGreaterThanOrEqual(mark.y + mark.height - 8);
-      expect(line.x).toBeLessThanOrEqual(mark.x + 1);
-    }
-  });
-});
-
-test.describe("How I work: Threshold's PRD", () => {
-  test("a row after the habits with the Sheet as its object, and no card", async ({ page }) => {
-    await page.goto("/");
-    const row = prdRow(page);
-    await expect(row.locator(".qi-row__title")).toHaveText(howIWork.prd.title);
-    await expect(row.locator(".qi-row__line")).toHaveText(date);
-    await expect(row.locator(".qi-row__object .qi-sheet")).toHaveCount(1);
-    await expect(section(page).locator(".qi-list__item").last().locator('[data-look="threshold-prd"]')).toHaveCount(1);
-  });
-
-  test.describe("with motion", () => {
-    test.use({ reducedMotion: "no-preference" });
-
-    test("the quote types itself with a caret, at about 45 characters a second, and then the caret goes", async ({ page }) => {
-      await page.goto("/");
-      const look = await openPrd(page);
-      await expect(look).toBeVisible();
-      // Sampled on the page's own frames, so a busy runner cannot skip the typing between two polls.
-      const run = await look.evaluate(
-        (element, total) =>
-          new Promise<{ lengths: number[]; seconds: number; caretShown: boolean }>((resolve) => {
-            const typed = element.querySelector("blockquote span")!;
-            const caret = element.querySelector<HTMLElement>(".qi-caret")!;
-            const lengths: number[] = [];
-            let caretShown = true;
-            const started = performance.now();
-            const sample = () => {
-              const length = typed.textContent!.length;
-              lengths.push(length);
-              if (length < total) caretShown &&= getComputedStyle(caret).display !== "none";
-              if (length >= total) return resolve({ lengths, seconds: (performance.now() - started) / 1000, caretShown });
-              requestAnimationFrame(sample);
-            };
-            sample();
-          }),
-        quote.length,
+    for (const scope of [headed(page), how(page)]) {
+      const sizes = await scope.evaluate((element) =>
+        [...element.querySelectorAll("*")].filter((node) => node.childElementCount === 0 && node.textContent?.trim()).map((node) => parseFloat(getComputedStyle(node).fontSize)),
       );
-      expect(run.lengths.some((length) => length > 0 && length < quote.length), "it types, rather than appearing at once").toBe(true);
-      expect([...run.lengths].sort((a, b) => a - b)).toEqual(run.lengths);
-      expect(run.caretShown).toBe(true);
-      // Time-based, so the whole quote takes about its length over 45 a second, whatever the frame rate.
-      const expected = quote.length / 45;
-      expect(run.seconds).toBeGreaterThan(expected * 0.5);
-      expect(run.seconds).toBeLessThan(expected * 2);
-      await expect(look.locator("blockquote")).toHaveText(quote);
-      await expect(look.locator(".qi-caret")).toHaveAttribute("data-done", "");
-      await expect(look.locator("figcaption")).toHaveText(caption);
-    });
+      expect(Math.min(...sizes)).toBeGreaterThanOrEqual(13);
+    }
   });
 
-  test.describe("with reduced motion", () => {
-    test.use({ reducedMotion: "reduce" });
-
-    test("the quote is complete at once, with no caret", async ({ page }) => {
-      await page.goto("/");
-      const look = await openPrd(page);
-      await expect(look).toBeVisible();
-      await expect(look.locator("blockquote span").first()).toHaveText(quote);
-      await expect(look.locator(".qi-caret")).toBeHidden();
+  for (const scheme of ["light", "dark"] as const) {
+    test(`every text in both sections passes AA, measured on the rendered page (${scheme})`, async ({ page, browserName }) => {
+      test.skip(browserName !== "chromium", "Measured in Chromium");
+      await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
+      await page.reload();
+      await settled(page);
+      const texts = (await headed(page).innerText()) + "\n" + (await how(page).innerText());
+      const readings = (await renderedContrast(page)).filter((reading) => texts.includes(reading.text));
+      for (const expected of ["Optegra", work.headed.bars[0].soFar.text.slice(0, 20), "no clear idea", "Before I build", "Off", "+15%", "Threshold’s PRD"]) {
+        expect(readings.some((reading) => reading.text.includes(expected)), expected).toBe(true);
+      }
+      expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);
     });
+
+    test(`has no axe violations (${scheme})`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
+      await page.reload();
+      const results = await new AxeBuilder({ page }).include("section[aria-labelledby='headed-heading']").include("#how-i-work").analyze();
+      expect(results.violations).toEqual([]);
+    });
+  }
+});
+
+test.describe("How I work: arriving", () => {
+  test.use({ reducedMotion: "no-preference" });
+
+  test("below the fold the cards rise and the +15% bars grow once in view; reduced motion arms nothing", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForFunction(() => Object.keys(document.querySelector("#how-i-work .card")!).some((key) => key.startsWith("__reactProps$")));
+    await expect(cards(page).first()).toHaveAttribute("data-armed", "");
+    await expect(how(page).locator(".drawn__bars")).toHaveAttribute("data-armed", "");
+    await how(page).locator(".drawn__bars").evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+    await expect(cards(page).last()).not.toHaveAttribute("data-armed", "");
+    await expect(how(page).locator(".drawn__bars")).not.toHaveAttribute("data-armed", "");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    await expect(page.locator("#how-i-work [data-armed], section[aria-labelledby='headed-heading'] [data-armed]")).toHaveCount(0);
   });
 });
