@@ -3,8 +3,8 @@ import { expect, test } from "@playwright/test";
 
 // A screenshot on a long-form page opens large in the same window: a case study's, and a Role story's (and its certificate).
 const pages = [
-  { route: "/things-i-make/threshold", trigger: ".qi-case__below .qi-zoom" },
-  { route: "/things-i-make/argus-risk", trigger: "section#decisions .qi-zoom" },
+  { route: "/things-i-make/threshold", trigger: ".case-open .qi-zoom" },
+  { route: "/things-i-make/argus-risk", trigger: "section .story-fig .qi-zoom" },
   { route: "/work/joveen", trigger: ".story-fig .qi-zoom" },
   { route: "/work/optegra", trigger: ".story-fig .qi-zoom" },
   { route: "/work/bnp-paribas", trigger: "#take-ownership-certificate .qi-zoom" },

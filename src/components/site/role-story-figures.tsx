@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { OnView } from "@/components/parts/on-view";
 import { Panel } from "@/components/parts/panel";
 import { SiteLink } from "@/components/site/site-link";
+import { columnImageSizes, StoryImage } from "@/components/site/story-parts";
 import { ZoomableImage } from "@/components/site/zoomable-image";
 import type { RoleStoryFigure } from "@/content/stretch/role-story";
 import type { PanelColours } from "@/content/stretch/story";
@@ -80,25 +81,18 @@ function ScaleFigure({ figure, panel }: { figure: Extract<RoleStoryFigure, { kin
   );
 }
 
-/** The award's certificate, at column width; the Take Ownership point on the pass names it, and its id is the anchor. */
+/** The award's certificate, at column width; its id lets an address name it. */
 function CertificateFigure({ figure }: { figure: Extract<RoleStoryFigure, { kind: "certificate" }> }) {
-  return (
-    <figure id={figure.id} className="story-fig story-fig--shots">
-      <div className="story-fig__shot">
-        <ZoomableImage src={figure.src} alt={figure.alt} width={figure.width} height={figure.height} sizes="(min-width: 1260px) 760px, (min-width: 720px) 60vw, 100vw" />
-      </div>
-      <figcaption>{figure.caption}</figcaption>
-    </figure>
-  );
+  return <StoryImage id={figure.id} src={figure.src} alt={figure.alt} width={figure.width} height={figure.height} caption={figure.caption} />;
 }
 
 /** Screenshots of a public page, never edited: the link beneath says what and when they are, and goes to where they were taken. */
 function ScreensFigure({ figure }: { figure: Extract<RoleStoryFigure, { kind: "screens" }> }) {
   // Without a phone screenshot beside it, a desktop screenshot takes the whole column.
   const withPhone = figure.images.some(({ device }) => device === "phone");
-  const desktopSizes = withPhone ? "(min-width: 1260px) 560px, (min-width: 720px) 45vw, 72vw" : "(min-width: 1260px) 760px, (min-width: 720px) 60vw, 100vw";
+  const desktopSizes = withPhone ? "(min-width: 1260px) 560px, (min-width: 720px) 45vw, 72vw" : columnImageSizes;
   return (
-    <figure className="story-fig story-fig--shots">
+    <figure className="story-fig">
       <div className="story-fig__shots">
         {figure.images.map(({ src, alt, width, height, device }) => (
           <div key={src} className="story-fig__shot" data-device={device} style={{ "--ar": width / height } as CSSProperties}>

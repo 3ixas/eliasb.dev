@@ -2,7 +2,7 @@ import { PassLight } from "@/components/parts/pass-light";
 import { StaffPass } from "@/components/parts/staff-pass";
 import { LongForm } from "@/components/site/long-form";
 import { RoleStoryFigureBlock } from "@/components/site/role-story-figures";
-import { NextPanel, StoryBack, StorySection, StoryText } from "@/components/site/story-parts";
+import { EvidenceFigures, NextPanel, StoryBack, StorySection, StoryText } from "@/components/site/story-parts";
 import { roleStories } from "@/content/stretch/role-stories";
 import { hasLongEmployer, roleStoryBack, roleStoryCopy, roleStorySectionKeys, roleStorySectionLabels, type RoleStory } from "@/content/stretch/role-story";
 import { passRecords } from "@/content/stretch/staff-pass";
@@ -38,15 +38,7 @@ export function RoleStoryPage({ story }: { story: RoleStory }) {
               ))}
             </p>
             <p className="story-open__lede">{story.sections.summary.paragraphs[0]}</p>
-            {story.evidence.length > 0 && (
-              <ul className="story-open__figures" aria-label="Evidence">
-                {story.evidence.map(({ value, label }) => (
-                  <li key={label}>
-                    <b>{value}</b> {label}
-                  </li>
-                ))}
-              </ul>
-            )}
+            <EvidenceFigures evidence={story.evidence} />
           </div>
           <PassLight className="story-open__rail">
             <StaffPass slug={story.slug} lead priority />
