@@ -237,8 +237,9 @@
   line-height: 1.4;
 }
 
+/* The before bar is the ink at 70%, so it holds 3:1 on the field (BNP Paribas's green is the closest); the after bar is the ink, and thicker. */
 .story-fig__panel {
-  --soft: color-mix(in srgb, var(--panel-ink) 26%, transparent);
+  --soft: color-mix(in srgb, var(--panel-ink) 70%, var(--field));
   --solid: var(--panel-ink);
   padding: 32px 36px 36px;
   border-radius: 16px;

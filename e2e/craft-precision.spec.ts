@@ -267,12 +267,16 @@ test.describe("Colour", () => {
     await bar.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
     const colours = await bar.evaluate((element) => {
       const canvas = document.createElement("canvas").getContext("2d", { willReadFrequently: true })!;
-      const pixel = (colour: string) => {
-        canvas.fillStyle = colour;
-        canvas.fillRect(0, 0, 1, 1);
+      const field = getComputedStyle(element.closest(".panel")!).backgroundColor;
+      // The bar is painted over the panel, so a translucent bar is read as the colour it composites to there.
+      const pixel = (...layers: string[]) => {
+        for (const colour of layers) {
+          canvas.fillStyle = colour;
+          canvas.fillRect(0, 0, 1, 1);
+        }
         return [...canvas.getImageData(0, 0, 1, 1).data].slice(0, 3);
       };
-      return { bar: pixel(getComputedStyle(element).backgroundColor), card: pixel(getComputedStyle(element.closest(".panel")!).backgroundColor) };
+      return { bar: pixel(field, getComputedStyle(element).backgroundColor), card: pixel(field) };
     });
     const [lighter, darker] = [luminance(colours.bar), luminance(colours.card)].sort((a, b) => b - a);
     expect((lighter + 0.05) / (darker + 0.05)).toBeGreaterThanOrEqual(3);
