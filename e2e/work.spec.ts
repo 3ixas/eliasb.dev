@@ -264,7 +264,8 @@ test.describe("Work: the margin", () => {
   test("the margin refits when the window shrinks, staying 16 px inside it", async ({ page }) => {
     const row = rowFor(page, strandIds[2]);
     await row.scrollIntoViewIfNeeded();
-    await row.hover();
+    // Focused, not hovered: the opening is sized to the window, so a shorter window moves the row from under a still pointer.
+    await row.focus();
     await expect(margin(page)).toBeVisible();
     await page.setViewportSize({ width: viewportWidth(page), height: 560 });
     await expect
