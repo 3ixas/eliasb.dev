@@ -7,7 +7,6 @@ import "./tokens.css";
 import "./stretch-type.css";
 import "./stretch-shell.css";
 import "./quiet-index.css";
-import "./quiet-opening.css";
 import "./quiet-long-form.css";
 import "./quiet-forced-colors.css";
 import "./shell.css";

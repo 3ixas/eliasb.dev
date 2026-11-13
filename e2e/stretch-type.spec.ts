@@ -62,23 +62,6 @@ test("only the Résumé loads JetBrains Mono, and its sheet sets metadata in it"
   expect(sheetMono.replaceAll('"', "")).toMatch(/^JetBrains Mono/);
 });
 
-test("the Fine cut: section titles and row titles take the agreed values", async ({ page }) => {
-  // The 404 keeps the quiet index's titles and rows until #419; the homepage's are panels since #416.
-  await page.goto("/nothing-here");
-  await page.evaluate(() => document.fonts.ready);
-  const read = (selector: string) =>
-    page.locator(selector).first().evaluate((element) => {
-      const style = getComputedStyle(element);
-      return { weight: style.fontWeight, tracking: Number.parseFloat(style.letterSpacing) / Number.parseFloat(style.fontSize), axes: style.fontVariationSettings };
-    });
-  const title = await read(".qi-title");
-  expect(title.weight).toBe("620");
-  expect(title.tracking).toBeCloseTo(-0.008, 3);
-  const row = await read(".qi-row__title");
-  expect(row.weight).toBe("570");
-  expect(row.tracking).toBeCloseTo(-0.008, 3);
-});
-
 test("the skip link is on the type scale", async ({ page }) => {
   // The quiet index's bold lead-ins in prose retired with the case studies' old long form (#418): points are story.css's.
   await page.goto("/things-i-make/threshold");
@@ -98,11 +81,4 @@ test("homepage sections sit 144 px apart on a wide screen and 96 px on a phone (
   const width = page.viewportSize()!.width;
   const padding = await page.locator("#main-content > section.section").first().evaluate((element) => getComputedStyle(element).paddingTop);
   expect(padding).toBe(width >= 720 ? "144px" : "96px");
-});
-
-test("a long-form page's sections sit 56 px apart", async ({ page }) => {
-  // The 404 keeps the quiet index's long form until #419; Role stories' and case studies' sections are their own specs'.
-  await page.goto("/nothing-here");
-  const margin = await page.locator(".qi-long__section").first().evaluate((element) => getComputedStyle(element).marginTop);
-  expect(margin).toBe("56px");
 });

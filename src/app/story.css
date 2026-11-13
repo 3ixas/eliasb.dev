@@ -535,6 +535,79 @@
   }
 }
 
+/* ---- The 404 (R-25): the title and its line, the address struck through, then the five sections as rows ---- */
+
+.not-found {
+  padding-top: 64px;
+}
+
+.page-head__title {
+  margin: 0;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-title);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.page-head__note {
+  max-width: 28em;
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-prose);
+  line-height: 1.35;
+}
+
+/* The address asked for, struck through, with "Not on file" and "404" at the right. */
+.missing {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: baseline;
+  gap: 8px 24px;
+  margin: 48px 0 0;
+  padding: 20px 0;
+  border-block: 1px solid var(--hair);
+}
+
+.missing s {
+  /* Empty until the browser reads the address; a line's height keeps the row still. */
+  min-height: 1lh;
+  color: var(--muted);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-row);
+  overflow-wrap: anywhere;
+}
+
+.missing span {
+  color: var(--muted);
+  font-size: var(--type-ui);
+}
+
+.missing b {
+  color: var(--cobalt);
+  font-size: var(--type-ui);
+  font-weight: 600;
+}
+
+.not-found__try {
+  padding-top: 96px;
+}
+
+.not-found__note {
+  max-width: 28em;
+  margin: -26px 0 32px;
+  color: var(--muted);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-prose);
+  line-height: 1.35;
+}
+
 /* ---- Under 1260 px: the pass hangs below the text, from a hairline ---- */
 
 @media (max-width: 1259.98px) {
@@ -612,6 +685,18 @@
 
   .case-open__title {
     font-size: clamp(44px, 12vw, 52px);
+  }
+
+  .missing {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .missing s {
+    grid-column: 1 / -1;
+  }
+
+  .not-found__try {
+    padding-top: 72px;
   }
 
   .prd {

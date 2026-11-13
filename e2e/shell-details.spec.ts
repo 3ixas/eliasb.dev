@@ -70,20 +70,11 @@ test.describe("Shell details: separators", () => {
     });
   }
 
-  test("every dot in a metadata line is bound to the item before it", async ({ page }) => {
-    // The 404 is the last page with the quiet index's metadata lines (until #419); a case study has none since #418.
-    for (const route of ["/nothing-here"]) {
-      await page.goto(route);
-      const lines = await page.locator(".qi-long__meta, .stretch-tile__meta, .qi-row__line").allTextContents();
-      expect(lines.length).toBeGreaterThan(0);
-      for (const line of lines) expect(line).not.toMatch(/[^\u00a0]·/u);
-    }
-  });
-
   test("a row's line stays inside its row, even at the narrowest width", async ({ page }) => {
     await page.goto("/nothing-here");
     await page.evaluate(() => document.fonts.ready);
-    const rows = page.locator("main .qi-row");
+    // The quiet index's metadata lines and rows retired with the 404's in #419; its rows are the shared part now.
+    const rows = page.locator("main .row");
     await expect(rows.first()).toBeVisible();
     await expect.poll(() => rows.evaluateAll((all) => all.filter((row) => row.scrollWidth > row.clientWidth).length)).toBe(0);
   });
