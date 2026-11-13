@@ -8,6 +8,8 @@
 /* The desk: the sheet centred on the page, with Download PDF on its top edge at the right (R-24). */
 .stretch-resume__desk {
   display: grid;
+  /* One column the desk's width, so the sheet's 210 mm gives way to a phone (it has max-width: 100%). */
+  grid-template-columns: minmax(0, 1fr);
   justify-items: end;
   gap: 16px;
   width: min(210mm, 100%);
