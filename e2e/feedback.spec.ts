@@ -24,12 +24,13 @@ test.describe("with motion", () => {
   test.use({ reducedMotion: "no-preference" });
 
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await expect(page.locator(".qi-list .qi-row").first()).toBeVisible();
+    // The 404's suggestions are the last quiet rows since the homepage became panels (#416).
+    await page.goto("/nothing-here");
+    await expect(page.locator(".qi-list a.qi-row").first()).toBeVisible();
   });
 
   test("a row's fill is instant in and lets go over 120 ms", async ({ page }) => {
-    const row = page.locator(".qi-list .qi-row").first();
+    const row = page.locator(".qi-list a.qi-row").first();
     await expect(row).toHaveCSS("transition-duration", "0.12s");
     await expect(row).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
     await row.hover();
@@ -38,7 +39,7 @@ test.describe("with motion", () => {
   });
 
   test("pressing a row darkens its fill and scales its object to .97, and letting go returns both", async ({ page }) => {
-    const row = page.locator(".qi-list .qi-row").first();
+    const row = page.locator(".qi-list a.qi-row").first();
     const object = row.locator(".qi-row__object");
     await expect(object).toHaveCSS("transform", "none");
     await hold(page, row);
@@ -64,8 +65,8 @@ test.describe("with reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
 
   test("a press keeps the fill and drops the scale", async ({ page }) => {
-    await page.goto("/");
-    const row = page.locator(".qi-list .qi-row").first();
+    await page.goto("/nothing-here");
+    const row = page.locator(".qi-list a.qi-row").first();
     await hold(page, row);
     await expect(row.locator(".qi-row__object")).toHaveCSS("transform", "none");
     await expect(row).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
@@ -80,7 +81,7 @@ test.describe("with reduced motion", () => {
 
 test.describe("the focus ring", () => {
   test("is 2 px cobalt at 3 px offset on the header's controls, and inside a quiet-index row at −2 px", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/nothing-here");
     await page.keyboard.press("Tab");
     const eclipse = page.locator("[data-site-header] [data-eclipse]");
     await eclipse.focus();

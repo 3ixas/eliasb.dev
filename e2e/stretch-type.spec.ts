@@ -63,7 +63,8 @@ test("only the Résumé loads JetBrains Mono, and its sheet sets metadata in it"
 });
 
 test("the Fine cut: section titles and row titles take the agreed values", async ({ page }) => {
-  await page.goto("/");
+  // The 404 keeps the quiet index's titles and rows until #419; the homepage's are panels since #416.
+  await page.goto("/nothing-here");
   await page.evaluate(() => document.fonts.ready);
   const read = (selector: string) =>
     page.locator(selector).first().evaluate((element) => {
@@ -99,11 +100,11 @@ test("dark mode smooths text to greyscale and light mode keeps the default", asy
   expect(smoothing).toBe(/-dark$/.test(testInfo.project.name) ? "antialiased" : "auto");
 });
 
-test("homepage sections sit 80 px apart on a wide screen and 64 px on a phone", async ({ page }) => {
+test("homepage sections sit 144 px apart on a wide screen and 96 px on a phone (R-03)", async ({ page }) => {
   await page.goto("/");
   const width = page.viewportSize()!.width;
-  const padding = await page.locator("#main-content > section.stretch-section").first().evaluate((element) => getComputedStyle(element).paddingTop);
-  expect(padding).toBe(width >= 820 ? "80px" : "64px");
+  const padding = await page.locator("#main-content > section.section").first().evaluate((element) => getComputedStyle(element).paddingTop);
+  expect(padding).toBe(width >= 720 ? "144px" : "96px");
 });
 
 test("a long-form page's sections sit 56 px apart", async ({ page }) => {

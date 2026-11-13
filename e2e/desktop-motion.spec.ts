@@ -9,7 +9,7 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 const wide = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1180;
 const margin = (page: Page) => page.locator(".qi-margin");
 const rowFor = (page: Page, id: string) => page.locator(`[data-fixture="pair"] [data-look="${id}"]`);
-/* Off the clock's training and book rows on fixed data (/fixtures/off-the-clock, "pair"): the homepage's book depends on Goodreads. */
+/* Off the clock's training and book rows on fixed data (/fixtures/closer-looks, "pair"): the homepage's book depends on Goodreads. */
 const FIRST = "book";
 const NEXT = "training";
 /** The training row's look: the week. */
@@ -52,7 +52,7 @@ test.describe("Desktop motion: the margin", () => {
   test.use({ reducedMotion: "no-preference" });
 
   test.beforeEach(async ({ page }) => {
-    await page.goto("/fixtures/off-the-clock");
+    await page.goto("/fixtures/closer-looks");
     await hydrated(page);
     const first = rowFor(page, FIRST);
     await first.scrollIntoViewIfNeeded();
@@ -240,9 +240,9 @@ test.describe("Desktop motion: reactions finish", () => {
   test.use({ reducedMotion: "no-preference" });
 
   test("the book's title and author arrive with the cover, readable by 300 ms", async ({ page }) => {
-    await page.goto("/fixtures/off-the-clock");
+    await page.goto("/fixtures/closer-looks");
     await hydrated(page);
-    await page.locator("[data-fixture='book'] [data-look='book']").hover();
+    await page.locator("[data-fixture='pair'] [data-look='book']").hover();
     const look = margin(page).locator(".qi-look");
     await expect(look.locator(".qi-look__name")).toBeVisible();
     const opacities = await look.evaluate((element) => {
@@ -261,7 +261,7 @@ test.describe("Desktop motion: reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
 
   test("each look still shows with a 0.2 s fade and no arrival, and a sweep has no glide or fade-out", async ({ page }) => {
-    await page.goto("/fixtures/off-the-clock");
+    await page.goto("/fixtures/closer-looks");
     await hydrated(page);
     await rowFor(page, FIRST).hover();
     const look = margin(page).locator(".qi-look");

@@ -25,8 +25,8 @@ test.describe("Interrupting", () => {
 
   /** Taps the look's trigger and, in the same task, pauses its fold at `at` ms: a slow runner cannot miss a 300 ms transition. Returns the height there. */
   const tapAndPause = (page: Page, at: number) =>
-    page.locator('[data-look-slot="training"]').evaluate(async (slot, time) => {
-      document.querySelector<HTMLElement>('#off-the-clock .qi-row[data-look-tap="training"]')!.click();
+    page.locator('[data-fixture="training"] [data-look-slot="training"]').evaluate(async (slot, time) => {
+      document.querySelector<HTMLElement>('[data-fixture="training"] .qi-row[data-look-tap="training"]')!.click();
       const fold = () => slot.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "grid-template-rows");
       while (!fold()) await new Promise(requestAnimationFrame);
       fold()!.pause();
@@ -36,7 +36,7 @@ test.describe("Interrupting", () => {
     }, at);
   /** The height over the next few frames of whatever fold is now running. */
   const nextHeights = (page: Page) =>
-    page.locator('[data-look-slot="training"]').evaluate(async (slot) => {
+    page.locator('[data-fixture="training"] [data-look-slot="training"]').evaluate(async (slot) => {
       const heights: number[] = [];
       for (let frame = 0; frame < 4; frame++) {
         await new Promise(requestAnimationFrame);
@@ -47,25 +47,25 @@ test.describe("Interrupting", () => {
 
   test("an inline look reversed part way carries on from the height it reached", async ({ page }) => {
     test.skip(wide(page), "Inline looks are for phones and touch");
-    await page.goto("/");
+    await page.goto("/fixtures/closer-looks");
     await hydrated(page);
-    await page.locator('#off-the-clock .qi-row[data-look-tap="training"]').scrollIntoViewIfNeeded();
+    await page.locator('[data-fixture="training"] .qi-row[data-look-tap="training"]').scrollIntoViewIfNeeded();
     // Closing never grows from where opening had got to.
     const opened = await tapAndPause(page, 100);
     expect(opened).toBeGreaterThan(0);
-    await page.locator('#off-the-clock .qi-row[data-look-tap="training"]').evaluate((button) => (button as HTMLElement).click());
+    await page.locator('[data-fixture="training"] .qi-row[data-look-tap="training"]').evaluate((button) => (button as HTMLElement).click());
     for (const height of await nextHeights(page)) expect(height).toBeLessThanOrEqual(opened + 1);
   });
 
   test("an inline look reopened while it folds carries on from the height it had left", async ({ page }) => {
     test.skip(wide(page), "Inline looks are for phones and touch");
-    await page.goto("/");
+    await page.goto("/fixtures/closer-looks");
     await hydrated(page);
-    const trigger = page.locator('#off-the-clock .qi-row[data-look-tap="training"]');
+    const trigger = page.locator('[data-fixture="training"] .qi-row[data-look-tap="training"]');
     await trigger.scrollIntoViewIfNeeded();
     // Opening is finished by seeking to its end, in the task that starts it, not by waiting out its length.
-    await page.locator('[data-look-slot="training"]').evaluate(async (slot) => {
-      document.querySelector<HTMLElement>('#off-the-clock .qi-row[data-look-tap="training"]')!.click();
+    await page.locator('[data-fixture="training"] [data-look-slot="training"]').evaluate(async (slot) => {
+      document.querySelector<HTMLElement>('[data-fixture="training"] .qi-row[data-look-tap="training"]')!.click();
       const fold = () => slot.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "grid-template-rows");
       while (!fold()) await new Promise(requestAnimationFrame);
       fold()!.finish();
@@ -78,7 +78,7 @@ test.describe("Interrupting", () => {
 
   test("after one glide the margin tracks its row exactly as the page scrolls", async ({ page }) => {
     test.skip(!wide(page), "The margin is for wide screens");
-    await page.goto("/fixtures/off-the-clock");
+    await page.goto("/fixtures/closer-looks");
     await hydrated(page);
     // Off the clock's training and book rows on fixed data: the homepage's book depends on Goodreads.
     const bnp = page.locator('[data-fixture="pair"] .qi-row[data-look="training"]');
@@ -205,7 +205,8 @@ test.describe("Reading on a phone", () => {
   test("prose and row lines avoid a lone last word", async ({ page }) => {
     await page.goto("/work/bnp-paribas");
     await expect(page.locator(".qi-long p").first()).toHaveCSS("text-wrap-style", "pretty");
-    await page.goto("/");
+    // The 404's suggestions are the last rows on the site since the homepage became panels (#416).
+    await page.goto("/nothing-here");
     await expect(page.locator(".qi-row__line").first()).toHaveCSS("text-wrap-style", "pretty");
   });
 
@@ -287,7 +288,8 @@ test.describe("Colour", () => {
   test("a theme change crossfades the tiles and GitHub cells with the page", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
-    await hydrated(page);
+    // The homepage has no quiet column to wait on since #416: wait for the theme control itself to hydrate.
+    await page.waitForFunction(() => Object.keys(document.querySelector("[data-eclipse]")!).some((key) => key.startsWith("__reactProps$")));
     await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--gh-1").trim().startsWith("rgb"))).toBe(true);
     // The press and the read share a task, so a slow runner cannot miss the 300 ms crossfade.
     const animated = await page.locator("[data-eclipse]").evaluate(async (button) => {

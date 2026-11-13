@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
-import { bookEntry, filmEntry, githubEntry, historyEntry, makingEntry, OffTheClockList, trainingEntry, type Entry } from "@/components/quiet/off-the-clock";
+import type { ReactNode } from "react";
+import { BookCell, FilmCell, GitHubCell, HistoryCell, OffTheClockPanel } from "@/components/site/off-the-clock-cells";
+import { TrainingCell } from "@/components/site/training-today";
 import { savedHistorySignal } from "@/integrations/history";
 import type { ActivityDay, Book, Film, FilmSignal, GitHubSignal, HistorySignal, LatestRepositorySignal, ReadingSignal } from "@/integrations/types";
 
@@ -120,44 +122,71 @@ const trainingAt = [
   { name: "sunday", at: "2026-11-01T23:30:00Z" },
 ];
 
-/** One row alone in its list, with the controller that shows its closer look. */
-const row = (entry: Entry | null) => <OffTheClockList entries={[entry]} />;
+type Cells = { training: ReactNode; book: ReactNode; film: ReactNode; history: ReactNode; year: ReactNode };
 
-// The live source mark's dot rings, and only one ring plays at a time, so the states that are not about the mark are saved data: no dot.
+/** The whole panel on fixed, saved data, with one cell swapped for the state under test, so each state shows the panel keeping its shape. */
+const panel = (swap: Partial<Cells>) => (
+  <OffTheClockPanel
+    {...{
+      training: <TrainingCell now={trainingAt[1].at} />,
+      book: <BookCell reading={reading({ state: "curated" })} now={now} />,
+      film: <FilmCell signal={diary({ state: "curated" })} now={now} />,
+      history: <HistoryCell history={{ ...week, state: "curated" }} />,
+      year: <GitHubCell github={github({ state: "curated" })} latest={latest({ state: "curated" })} now={now} />,
+      ...swap,
+    }}
+  />
+);
+const long = "The Assassination of Jesse James by the Coward Robert Ford";
+
 const items = [
-  ...trainingAt.map(({ name, at }) => ({ name: `training-${name}`, item: row(trainingEntry(at)) })),
-  // Two rows under one controller, on fixed data: the closer looks' own specs move between them (inline-looks, desktop-motion).
-  { name: "pair", item: <OffTheClockList entries={[trainingEntry(trainingAt[1].at), bookEntry(reading({ state: "curated" }), now)]} /> },
-  { name: "book", item: row(bookEntry(reading({}), now)) },
-  { name: "book-empty", item: row(bookEntry(reading({ book: null }), now)) },
-  { name: "book-unfetched", item: row(bookEntry(reading({ state: "pending", book: null, updatedAt: null }), now)) },
-  { name: "book-stale", item: row(bookEntry(reading({ updatedAt: daysAgo(61) }), now)) },
-  { name: "film", item: row(filmEntry(diary({}), now)) },
-  { name: "film-empty", item: row(filmEntry(diary({ film: null }), now)) },
-  { name: "film-stale", item: row(filmEntry(diary({ updatedAt: daysAgo(61) }), now)) },
-  { name: "film-long", item: row(filmEntry(diary({ state: "curated", film: { ...film, title: "The Assassination of Jesse James by the Coward Robert Ford", year: "2007", rating: 3.5, watchedOn: "2026-10-09" } }), now)) },
-  { name: "film-unrated", item: row(filmEntry(diary({ state: "curated", film: { ...film, rating: null, posterUrl: null } }), now)) },
-  { name: "making", item: row(makingEntry(latest({}))) },
-  { name: "making-no-description", item: row(makingEntry(latest({ state: "curated", repository: { ...repository, description: null } }))) },
-  { name: "making-project", item: row(makingEntry(latest({ state: "curated", repository: projectWithCaseStudy }))) },
-  { name: "making-project-code", item: row(makingEntry(latest({ state: "curated", repository: projectWithoutCaseStudy }))) },
-  { name: "making-none", item: row(makingEntry(latest({ state: "unavailable", repository: null }))) },
-  { name: "github", item: row(githubEntry(github({ state: "curated" }), now)) },
-  { name: "github-live", item: row(githubEntry(github({}), now)) },
-  { name: "github-stale", item: row(githubEntry(github({ updatedAt: daysAgo(4) }), now)) },
-  { name: "github-unavailable", item: row(githubEntry(github({ state: "unavailable", activity: [], total: 0, updatedAt: null }), now)) },
-  { name: "history-week", item: row(historyEntry({ ...week, state: "curated" })) },
-  { name: "history-live", item: row(historyEntry(week)) },
-  { name: "history-one", item: row(historyEntry({ ...week, state: "curated", events: week.events.slice(0, 1) })) },
-  { name: "history-text-only", item: row(historyEntry({ ...week, state: "curated", events: week.events.slice(1, 2) })) },
-  { name: "history-saved", item: row(historyEntry(savedHistorySignal())) },
+  ...trainingAt.map(({ name, at }) => ({ name: `training-${name}`, item: panel({ training: <TrainingCell now={at} /> }) })),
+  { name: "book", item: panel({ book: <BookCell reading={reading({})} now={now} /> }) },
+  { name: "book-empty", item: panel({ book: <BookCell reading={reading({ book: null })} now={now} /> }) },
+  { name: "book-unfetched", item: panel({ book: <BookCell reading={reading({ state: "pending", book: null, updatedAt: null })} now={now} /> }) },
+  { name: "book-stale", item: panel({ book: <BookCell reading={reading({ updatedAt: daysAgo(61) })} now={now} /> }) },
+  { name: "book-uncovered", item: panel({ book: <BookCell reading={reading({ state: "curated", book: { ...book, coverUrl: null } })} now={now} /> }) },
+  { name: "film", item: panel({ film: <FilmCell signal={diary({})} now={now} /> }) },
+  { name: "film-empty", item: panel({ film: <FilmCell signal={diary({ film: null })} now={now} /> }) },
+  { name: "film-stale", item: panel({ film: <FilmCell signal={diary({ updatedAt: daysAgo(61) })} now={now} /> }) },
+  { name: "film-long", item: panel({ film: <FilmCell signal={diary({ state: "curated", film: { ...film, title: long, year: "2007", rating: 3.5, watchedOn: "2026-10-09" } })} now={now} /> }) },
+  { name: "film-unrated", item: panel({ film: <FilmCell signal={diary({ state: "curated", film: { ...film, rating: null, posterUrl: null } })} now={now} /> }) },
+  { name: "making", item: panel({ year: <GitHubCell github={github({ state: "curated" })} latest={latest({})} now={now} /> }) },
+  { name: "making-project", item: panel({ year: <GitHubCell github={github({ state: "curated" })} latest={latest({ state: "curated", repository: projectWithCaseStudy })} now={now} /> }) },
+  { name: "making-project-code", item: panel({ year: <GitHubCell github={github({ state: "curated" })} latest={latest({ state: "curated", repository: projectWithoutCaseStudy })} now={now} /> }) },
+  { name: "making-none", item: panel({ year: <GitHubCell github={github({ state: "curated" })} latest={latest({ state: "unavailable", repository: null })} now={now} /> }) },
+  { name: "github", item: panel({}) },
+  { name: "github-live", item: panel({ year: <GitHubCell github={github({})} latest={latest({ state: "curated" })} now={now} /> }) },
+  { name: "github-stale", item: panel({ year: <GitHubCell github={github({ updatedAt: daysAgo(4) })} latest={latest({ state: "curated" })} now={now} /> }) },
+  { name: "github-unavailable", item: panel({ year: <GitHubCell github={github({ state: "unavailable", activity: [], total: 0, updatedAt: null })} latest={latest({ state: "curated" })} now={now} /> }) },
+  { name: "history-live", item: panel({ history: <HistoryCell history={week} /> }) },
+  { name: "history-one", item: panel({ history: <HistoryCell history={{ ...week, state: "curated", events: week.events.slice(0, 1) }} /> }) },
+  { name: "history-text-only", item: panel({ history: <HistoryCell history={{ ...week, state: "curated", events: week.events.slice(1, 2) }} /> }) },
+  { name: "history-saved", item: panel({ history: <HistoryCell history={savedHistorySignal()} /> }) },
+  // Every feed down at once: the panel still has its three bands.
+  {
+    name: "fallback",
+    item: panel({
+      book: <BookCell reading={reading({ state: "unavailable", book: null, updatedAt: null })} now={now} />,
+      film: <FilmCell signal={diary({ state: "unavailable", film: null, updatedAt: null })} now={now} />,
+      history: <HistoryCell history={savedHistorySignal()} />,
+      year: <GitHubCell github={github({ state: "unavailable", activity: [], total: 0, updatedAt: null })} latest={latest({ state: "unavailable", repository: null })} now={now} />,
+    }),
+  },
+  // The longest titles the feeds could send, at the narrowest width.
+  {
+    name: "long",
+    item: panel({
+      book: <BookCell reading={reading({ state: "curated", book: { ...book, title: "The Extraordinary and Unabridged Chronicles of an Unusually Long Book Title" } })} now={now} />,
+      film: <FilmCell signal={diary({ state: "curated", film: { ...film, title: long } })} now={now} />,
+    }),
+  },
 ];
 
 /**
- * The Off the clock items from fixture feeds, for the end-to-end suite: the
- * training week at fixed moments, and the book, film, history row and GitHub year current,
- * empty, never fetched, stale and with missing parts. It exists only when the
- * server is started with BOARD_FIXTURES=1.
+ * Off the clock's panel from fixture feeds, for the end-to-end suite: the training week at fixed moments, and the book,
+ * film, this week in history, Now making and the GitHub year current, empty, never fetched, stale and with missing parts,
+ * each in a whole panel. It exists only when the server is started with BOARD_FIXTURES=1.
  */
 export default async function OffTheClockFixtures() {
   await connection();
@@ -165,17 +194,14 @@ export default async function OffTheClockFixtures() {
 
   return (
     <div data-stretch-shell>
-      <main id="main-content" tabIndex={-1} className="stretch-wrap">
+      <main id="main-content" tabIndex={-1} className="frame">
         <h1 className="sr-only">Off the clock fixtures</h1>
         <h2 className="sr-only">Off the clock</h2>
         {items.map(({ name, item }) => (
-          <div key={name} data-fixture={name} className="stretch-section">
+          <section key={name} data-fixture={name} className="section" aria-label={name}>
             {item}
-          </div>
+          </section>
         ))}
-        <div data-fixture="layout" className="stretch-section">
-          <OffTheClockList entries={[githubEntry(github({ state: "curated" }), now), trainingEntry(), bookEntry(reading({}), now), filmEntry(diary({}), now), historyEntry(savedHistorySignal()), makingEntry(latest({}))]} />
-        </div>
       </main>
     </div>
   );

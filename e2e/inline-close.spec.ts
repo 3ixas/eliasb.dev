@@ -12,15 +12,15 @@ const hydrated = (page: Page) =>
     return columns.length > 0 && columns.every((column) => Object.keys(column).some((key) => key.startsWith("__reactProps$")));
   });
 
-const row = (page: Page) => page.locator("#off-the-clock .qi-row[data-look-tap='training']");
+const row = (page: Page) => page.locator("[data-fixture='training'] .qi-row[data-look-tap='training']");
 /** Where the row sits on the page, whatever the scroll: a tap scrolls its target into view before it lands. */
 const rowTop = (page: Page) => row(page).evaluate((element) => element.getBoundingClientRect().top + window.scrollY);
-const open = (page: Page) => page.locator("#off-the-clock [data-look-slot='training'] .qi-inline__in");
+const open = (page: Page) => page.locator("[data-fixture='training'] [data-look-slot='training'] .qi-inline__in");
 
 test.describe("Inline closer looks close as smoothly as they open", () => {
   test.beforeEach(async ({ page }) => {
     test.skip(!phone(page), "Inline looks are for phones and touch");
-    await page.goto("/");
+    await page.goto("/fixtures/closer-looks");
     await hydrated(page);
     await row(page).scrollIntoViewIfNeeded();
   });

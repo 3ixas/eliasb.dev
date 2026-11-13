@@ -68,7 +68,7 @@ test.describe("Shell details: separators", () => {
   }
 
   test("every dot in a metadata line is bound to the item before it", async ({ page }) => {
-    for (const route of ["/", "/things-i-make/threshold"]) {
+    for (const route of ["/nothing-here", "/things-i-make/threshold"]) {
       await page.goto(route);
       const lines = await page.locator(".qi-long__meta, .stretch-tile__meta, .qi-row__line").allTextContents();
       expect(lines.length).toBeGreaterThan(0);
@@ -77,7 +77,7 @@ test.describe("Shell details: separators", () => {
   });
 
   test("a row's line stays inside its row, even at the narrowest width", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/nothing-here");
     await page.evaluate(() => document.fonts.ready);
     const rows = page.locator("main .qi-row");
     await expect(rows.first()).toBeVisible();
