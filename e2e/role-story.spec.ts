@@ -353,7 +353,9 @@ for (const slug of roleStorySlugs) {
       }
     });
 
-    test("the keyboard reaches the back link, each screenshot and the next page in order, each with a visible ring", async ({ page }) => {
+    test("the keyboard reaches the back link, each screenshot and the next page in order, each with a visible ring", async ({ page }, testInfo) => {
+      // Safari Tabs to links only with Option held, as a visitor with its default settings does.
+      const tab = testInfo.project.name.startsWith("webkit") ? "Alt+Tab" : "Tab";
       // Everything focusable on the story itself, from the back link to the next page; Say hello is its own spec's.
       const scope = "[data-role-story] article, [data-role-story] nav.story-next";
       // A screenshot's Close button is in its dialog, which is closed.
@@ -362,7 +364,7 @@ for (const slug of roleStorySlugs) {
       const reached: string[] = [];
       await page.locator("body").focus();
       for (let step = 0; step < 40 && reached.length < order.length; step++) {
-        await page.keyboard.press("Tab");
+        await page.keyboard.press(tab);
         const focused = await page.evaluate((within) => {
           const element = document.activeElement as HTMLElement | null;
           if (!element?.closest(within)) return null;
