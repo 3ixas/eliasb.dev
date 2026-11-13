@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
-import { CountUp } from "@/components/quiet/count-up";
+import { Count } from "@/components/parts/on-view";
 import {
   contributionLevel,
   contributionTag,
@@ -62,7 +62,7 @@ export function GitHubYear({ activity, total, mark }: { activity: ActivityDay[];
           parts={[
             <>
               <span className="stretch-gh__count">
-                <CountUp from={0} to={total} format={grouped} whenSeen />
+                <Count to={total} />
               </span>{" "}
               {copy.contributions(totalText).slice(totalText.length + 1)}
             </>,

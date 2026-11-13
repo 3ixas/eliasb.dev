@@ -1,8 +1,9 @@
+import { readdirSync, readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 import { renderedContrast } from "./support/rendered-contrast";
 
 // The passes and panels tokens (src/app/tokens.css; docs/design/DESIGN.md "Tokens" and "Type"), on
-// /fixtures/tokens. The successor of stretch-tokens.spec.ts, which keeps checking the quiet index's
+// /fixtures/tokens. The successor of stretch-tokens.spec.ts (retired with the quiet index in #420); it once kept checking the quiet index's
 // set until #420 removes it.
 
 type Scheme = "light" | "dark";
@@ -141,4 +142,17 @@ test.describe("Text", () => {
     await page.goto("/fixtures/tokens");
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
   });
+});
+
+// DESIGN.md: --sun is the greeting's amber and nothing else, an illustration colour and never an interface colour.
+test("--sun is read only by the lamp's bulb and pool", () => {
+  const readers: string[] = [];
+  for (const file of readdirSync("src/app").filter((name) => name.endsWith(".css"))) {
+    let selector = "";
+    for (const line of readFileSync(`src/app/${file}`, "utf8").split("\n")) {
+      if (line.endsWith("{") && !line.trimStart().startsWith("@")) selector = line.slice(0, -1).trim();
+      if (line.includes("var(--sun)")) readers.push(`${file} ${selector}`);
+    }
+  }
+  expect(readers.sort()).toEqual(["shell.css .scene__lit", "shell.css .scene__pool"]);
 });

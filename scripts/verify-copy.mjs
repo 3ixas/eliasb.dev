@@ -45,14 +45,10 @@ const leaves = (value, path = "") => {
 const modules = {
   siteCopy,
   notFound,
-  // The opening's own words; the runs are the same sentences cut up, and the certificate's description is the Role story's.
+  // The opening's own words; the runs are the same sentences cut up.
   opening: {
     headline: opening.headline,
     support: opening.support,
-    engines: opening.looks.engines,
-    cores: opening.looks.cores,
-    digitisation: { pin: opening.looks.digitisation.pin, line: opening.looks.digitisation.line, bars: opening.looks.digitisation.bars },
-    ownership: opening.looks.ownership.certificate.caption,
   },
   thingsIMake,
   // What the passes print (R-12); the lanyard and band are colours, not words.
@@ -137,28 +133,7 @@ assert.ok(opening.headline.includes("BNP"), "The opening's one BNP is in the h1"
 const openingRows = Object.fromEntries(rows(raw, "### Quiet index · Opening").map(([where, copy]) => [where, copy.replaceAll("*", "")]));
 assert.equal(opening.headline, openingRows["Opening line (`h1`)"], "The opening line");
 assert.equal(opening.support, openingRows["Supporting line"], "The supporting line");
-for (const [name, runs, text] of [["headline", opening.headlineRuns, opening.headline], ["supporting line", opening.supportRuns, opening.support]]) {
-  assert.equal(runs.map((run) => run.text).join(""), text, `The opening's ${name} runs read as the ${name}`);
-}
-
-// The reveal words are the deck's, in reading order, each with the closer look the deck describes.
-const revealRows = rows(raw, "### Quiet index · The reveal words in the opening");
-const reveals = Object.fromEntries(revealRows.map(([word, caption]) => [word, caption.replaceAll("*", "")]));
-assert.deepEqual(
-  [...opening.headlineRuns, ...opening.supportRuns].filter((run) => run.mark && run.mark !== "employer" && run.mark !== "emphasis").map((run) => run.text),
-  Object.keys(reveals),
-  "The opening's reveal words are the deck's",
-);
-const { engines, cores, digitisation, ownership } = opening.looks;
-assert.equal(engines.caption, reveals["pricing and risk engines"], "The simulation's caption");
-assert.ok(raw.includes(`The engines' look is also described as: “${engines.alt}”`), "The deck gives the simulation's accessible description, which says the paths are illustrative");
-assert.equal(cores.caption, reveals["CPU and GPU"], "The cores' caption");
-assert.equal(
-  `${digitisation.pin.label} · ${digitisation.pin.detail}, then: ${digitisation.line} Bars: ${digitisation.bars.map((bar) => bar.label).join(" · ")}`,
-  reveals["digitisation competition"],
-  "The digitisation competition's closer look",
-);
-assert.equal(ownership.certificate.caption, reveals["Take Ownership award"], "The certificate's caption");
+assert.equal(opening.headlineRuns.map((run) => run.text).join(""), opening.headline, "The opening's headline runs read as the headline");
 
 // How I work: four habits. The first two are as in the original three-beat table; the last two are in the quiet index table.
 const keptBeats = rows(raw, "## How I work");
