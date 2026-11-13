@@ -102,8 +102,18 @@
   border-radius: 8px;
 }
 
-.otc__history p[aria-live] {
+.otc__history-text {
+  display: grid;
   max-width: 46em;
+}
+
+/* Every oddity in one cell: the hidden ones hold the band at the tallest, so stepping moves nothing. */
+.otc__history-text > * {
+  grid-area: 1 / 1;
+}
+
+.otc__history-sizer {
+  visibility: hidden;
 }
 
 .otc__history b {

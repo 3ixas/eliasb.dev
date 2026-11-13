@@ -158,7 +158,7 @@ test.describe("Off the clock: this week in history", () => {
     const history = cell(fixture(page, "history-live"), "history");
     await expect(history.getByRole("heading", { level: 3 })).toHaveText(offTheClock.curiosity.label);
     await expect(history.locator("p[aria-live='polite']")).toHaveText("28 September 1924 The first aerial circumnavigation is completed by a team from the US Army.");
-    await expect(history.locator(".otc__credit")).toHaveText("Image: The Museum of Flight · Public domain");
+    await expect(history.locator(".otc__history-now .otc__credit")).toHaveText("Image: The Museum of Flight · Public domain");
     await expect(history.locator("img")).toHaveAttribute("alt", "Douglas World Cruisers on a beach");
     const step = history.getByRole("button");
     await expect(step).toHaveClass(/pill--outline/);
@@ -172,15 +172,22 @@ test.describe("Off the clock: this week in history", () => {
     const history = cell(panel, "history");
     await hydrated(page);
     const step = history.getByRole("button");
-    const before = await Promise.all([boxOf(step), boxOf(cell(panel, "github"))]);
+    // Where the pill and the band below sit: stepping through oddities of every length, with and without a picture, moves neither.
+    // Measured against the document, not the window: a click scrolls its target into view.
+    const place = (locator: Locator) => locator.evaluate((element) => {
+      const { left, top, width } = element.getBoundingClientRect();
+      return [Math.round(left + scrollX), Math.round(top + scrollY), Math.round(width)];
+    });
+    const places = () => Promise.all([place(step), place(cell(panel, "github"))]);
+    const before = await places();
     await step.click();
     await expect(step).toHaveAccessibleName(offTheClock.curiosity.count(2, 3));
     await expect(history.locator("p[aria-live='polite']")).toContainText("A cow wanders into a cathedral");
     await expect(history.locator("img")).toHaveCount(0);
-    const after = await Promise.all([boxOf(step), boxOf(cell(panel, "github"))]);
-    expect(Math.abs(after[0].width - before[0].width)).toBeLessThan(1);
+    expect(await places()).toEqual(before);
     await step.click();
     await expect(history.locator("p[aria-live='polite']")).toContainText("Born 28 September 1852");
+    expect(await places()).toEqual(before);
     await step.click();
     await expect(step).toHaveAccessibleName(offTheClock.curiosity.count(1, 3));
     await expect(history.locator("p[aria-live='polite']")).toContainText("1924");
@@ -192,7 +199,7 @@ test.describe("Off the clock: this week in history", () => {
 
   test("a text-only story has no picture, creator or licence and still reads whole", async ({ page }) => {
     const history = cell(fixture(page, "history-text-only"), "history");
-    await expect(history.locator("img, .otc__credit")).toHaveCount(0);
+    await expect(history.locator("img, .otc__history-now .otc__credit")).toHaveCount(0);
     await expect(history.locator("p[aria-live]")).toContainText("A cow wanders into a cathedral");
   });
 
