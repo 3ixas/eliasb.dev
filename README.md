@@ -2,15 +2,15 @@
 
 The source of [eliasb.dev](https://www.eliasb.dev), my personal site: what I build, how I work, and what my time looks like away from the keyboard.
 
-![The homepage at desktop width in the light theme: the headline "I build pricing and risk engines at BNP Paribas, and products of my own." above a Work section with a row for each employer, each with a small staff pass.](docs/screenshots/quiet-index-desktop-light.webp)
+![The homepage at desktop width in the light theme: the headline "I build pricing and risk engines at BNP Paribas, and products of my own." beside three staff passes hanging on lanyards, for BNP Paribas, Joveen and Optegra.](docs/screenshots/passes-and-panels-desktop-light.webp)
 
-I designed the site as a **quiet index**: simplicity and focus first, with character for anyone who looks closer. Every page is one reading column. Anything that names something real (an employer, a project, a book, a film, a habit) is a row. Point at a row and a closer look appears in the margin; on a phone, tap it and the closer look opens in place. The page is complete from its first frame, and nothing moves unless it means something. The terms I use in the code and docs are defined in [`GLOSSARY.md`](GLOSSARY.md), and the design contract is [`docs/design/DESIGN.md`](docs/design/DESIGN.md).
+I designed the site as **passes and panels**. The first screen is my opening line and the staff passes from my three employers, drawn as real ID cards with their points printed on them. After that, each subject has a panel sized by how much it matters, in its own colour, with its proof drawn on it: a simulation, bars to scale, a screenshot. The page is complete from its first frame, and nothing moves unless it means something. The terms I use in the code and docs are defined in [`GLOSSARY.md`](GLOSSARY.md), and the design contract is [`docs/design/DESIGN.md`](docs/design/DESIGN.md).
 
 | Light | Dark |
 | --- | --- |
-| <img src="docs/screenshots/quiet-index-phone-light.webp" alt="The homepage at phone width in the light theme: the same headline in one column with the Work rows beneath it." width="260"> | <img src="docs/screenshots/quiet-index-phone-dark.webp" alt="The homepage at phone width in the dark theme, with the same headline and rows on a near-black page." width="260"> |
+| <img src="docs/screenshots/passes-and-panels-phone-light.webp" alt="The homepage at phone width in the light theme: the same headline above the three staff passes." width="260"> | <img src="docs/screenshots/passes-and-panels-phone-dark.webp" alt="The homepage at phone width in the dark theme, with the same headline and passes on a near-black page." width="260"> |
 
-![The homepage at desktop width in the dark theme, with the same headline and Work rows on a near-black page.](docs/screenshots/quiet-index-desktop-dark.webp)
+![The homepage at desktop width in the dark theme, with the same headline and staff passes on a near-black page.](docs/screenshots/passes-and-panels-desktop-dark.webp)
 
 ## How the site changed
 
@@ -40,16 +40,22 @@ A well-kept studio wall that I pin things to: the work pinned carefully and clea
 
 A neutral page with one cobalt accent used large, a condensed display face at poster scale, each project in the colours of its own interface, and a two-act typed entrance. My employment came to lead the site, with a Role story for each employer. It grew by addition: every pass added a well-made object and none took one away, until the homepage was a stack of set pieces. The quiet index keeps the content and the data layer, and adds a [removal rule](docs/design/DESIGN.md#the-removal-rule) so the page stays small.
 
-### The quiet index (October 2026 to now)
+### The quiet index (October to November 2026)
 
-The live site, at the top of this page. One 600 px reading column, one 300 px margin, rows instead of set pieces, closer looks instead of extra blocks, and a length budget the tests enforce.
+![The quiet index: the headline "I build pricing and risk engines at BNP Paribas, and products of my own." above a Work section with a row for each employer, each with a small staff pass.](docs/screenshots/history/quiet-index.webp)
+
+One 600 px reading column, one 300 px margin, rows instead of set pieces, closer looks instead of extra blocks, and a length budget the tests enforce. It made the site calm and focused; the next step was to give the strongest work more room and draw its proof on the page.
+
+### Passes and panels (November 2026 to now)
+
+The live site, at the top of this page. The passes are the first thing you see, and each subject's proof is drawn on its panel rather than hidden behind a word. The quiet index's content, data layer and length budget carry over.
 
 ## What is on the site
 
 | Route | What it is |
 | --- | --- |
 | `/` | The homepage: an opening line, then Work, Things I make, How I work, Off the clock and Say hello. It is complete from its first frame. |
-| `/work/bnp-paribas`, `/work/joveen`, `/work/optegra` | Role stories: one page per employer, opening on its staff pass. |
+| `/work/bnp-paribas`, `/work/joveen`, `/work/optegra` | Role stories: one page per employer, opening on its staff pass, with its figures drawn on panels in its colour. |
 | `/things-i-make` | The archive of every project, newest first. `/work` redirects here. |
 | `/things-i-make/threshold`, `/things-i-make/argus-risk`, `/things-i-make/flowtime` | Case studies, each a short visual story with a write-up and a PRD. |
 | `/resume` | The résumé, with a PDF (`public/Elias-Bennett-Resume.pdf`) that a check keeps in step with the page. |
@@ -63,8 +69,8 @@ The live site, at the top of this page. One 600 px reading column, one 300 px ma
 ## Stack
 
 - [Next.js](https://nextjs.org) 16 (App Router) and React 19, written in TypeScript
-- Tailwind CSS 4 for the reset, with the design in plain CSS on custom properties (`src/app/stretch-tokens.css` and the `quiet-*.css` files beside it)
-- Bricolage Grotesque and JetBrains Mono through `next/font`
+- Tailwind CSS 4 for the reset, with the design in plain CSS on custom properties (`src/app/tokens.css`, `parts.css` and a stylesheet per section)
+- Newsreader and Instrument Sans through `next/font` (the Résumé sheet keeps Bricolage Grotesque and JetBrains Mono, which its PDF is drawn in)
 - [Motion](https://motion.dev) for the shared spring that every moving object uses
 - The light and dark setting runs from a small inline script, so the page is served finished and nothing is held at first paint
 - [Playwright](https://playwright.dev) and axe for end-to-end, accessibility and contrast tests

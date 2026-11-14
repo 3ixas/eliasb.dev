@@ -4,7 +4,17 @@ A map from each ticket under [#409](https://github.com/3ixas/eliasb.dev/issues/4
 
 Read with `PASSES-AND-PANELS-SPEC.md` (what to build) and `docs/design/DESIGN.md` (the contract).
 
-## The shape of the code today
+**Status (14 November 2026):** every code ticket is built and merged into `integration/passes-and-panels`: #410 to #420 and #423 to #425. Each ticket's "As built" records what the code became, and each "Left for later" was carried out by the ticket it names; read them as history. What remains, #421, #426, #427 and #422, checks the finished build.
+
+## The shape of the code now
+
+- **Routes** are as below.
+- **Components:** `src/components/parts/` holds the shared parts (the panel, the staff pass and its light, the project panel, the arrivals). `src/components/site/` holds the pages and sections. `src/components/quiet/` is gone.
+- **Styles:** `tokens.css`, `base.css`, `shell.css`, `parts.css`, `pass.css` and one stylesheet per part of the page (`opening.css`, `work.css`, `headed-how.css`, `projects.css`, `off-the-clock.css`, `story.css`, `zoom.css`), plus the Résumé sheet's own `stretch-resume.css`.
+- **Gates:** the table at the end; `verify:retired` keeps the quiet index's names out.
+
+## The shape of the code before the redesign (`cd08075`, 12 November 2026)
+
 
 - **Routes** (`src/app/`): `/` (`page.tsx` → `components/site/homepage.tsx`), `/work/[slug]`, `/things-i-make`, `/things-i-make/[slug]`, `/resume`, `not-found.tsx`, redirects at `/about`, `/library`, `/lab`, the Markdown mirrors `/index.md` and `/llms.txt`, `opengraph-image.tsx` at three levels through `share-card.tsx`, and dev-only `/fixtures/*`.
 - **Components**: `src/components/quiet/` is the quiet index's own parts (rows, closer looks, the pass, the pen, Off the clock's objects). `src/components/site/` is shared across pages (header, greeting, theme, long-form template, Role story, case study, archive, Résumé, GitHub year).

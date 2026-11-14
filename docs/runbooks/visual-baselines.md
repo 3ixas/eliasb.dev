@@ -1,6 +1,6 @@
 # Visual baselines runbook
 
-`e2e/materials.spec.ts` compares pictures of the shared parts' materials (each panel field with its pills, its lighter top edge and the dark glow; the controls on the page; rows on paper) with baselines in `e2e/materials.spec.ts-snapshots/`. It reads `/fixtures/parts`, which exists only with `BOARD_FIXTURES=1`, runs on one Chromium project (`chromium-1440-light`) and takes 6 pictures: three groups, each in light and dark, at 2×. Until #423 it pictured the quiet index's objects from `/fixtures/materials`.
+`e2e/materials.spec.ts` compares pictures of the shared parts' materials (each panel field with its pills, its lighter top edge and the dark glow; the controls on the page; rows on paper) with baselines in `e2e/materials.spec.ts-snapshots/`. It reads `/fixtures/parts`, which exists only with `BOARD_FIXTURES=1`, runs on one Chromium project (`chromium-1440-light`) and takes 6 pictures: three groups, each in light and dark, at 2×.
 
 Baselines must come from the Playwright image CI runs in, because font smoothing differs between macOS and Linux. A `-darwin` picture is never committed.
 
