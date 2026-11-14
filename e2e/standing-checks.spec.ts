@@ -82,7 +82,7 @@ const isInternal = (href: string, origin: string) => {
   return url.origin === origin || siteHosts.has(url.hostname);
 };
 
-test("every page has one h1, a skip link to its content, and its content without script", async ({ page, request }) => {
+test("every page has one h1, a skip link to its content, and its content without script", async ({ page, request, browser, baseURL }) => {
   const routes = await pages(request);
   test.setTimeout(routes.length * perPage);
   for (const route of routes) {
@@ -94,15 +94,18 @@ test("every page has one h1, a skip link to its content, and its content without
       await soft(page.locator("#main-content"), `${route}: the skip link's target`).toHaveCount(1);
     });
   }
-  // Without script: the same pages, with every script refused.
-  await page.route("**/*.js", (route) => route.abort());
+  // Without script: the same pages in a context with JavaScript off, so the inline boot script does not run either.
+  const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
+  const plain = await context.newPage();
   for (const route of routes) {
     await test.step(`${route} without script`, async () => {
-      await page.goto(route);
-      await soft(page.getByRole("heading", { level: 1 }), `${route}: the h1 without script`).toBeVisible();
-      await soft.poll(() => page.locator("#main-content").evaluate((main) => (main as HTMLElement).innerText.trim().length), { message: `${route}: content without script` }).toBeGreaterThan(200);
+      await plain.goto(route);
+      await soft(plain.getByRole("heading", { level: 1 }), `${route}: the h1 without script`).toBeVisible();
+      await soft(plain.locator('nav[aria-label="On this page"] a').first(), `${route}: the header's links without script`).toBeVisible();
+      await soft.poll(() => plain.locator("#main-content").evaluate((main) => (main as HTMLElement).innerText.trim().length), { message: `${route}: content without script` }).toBeGreaterThan(200);
     });
   }
+  await context.close();
 });
 
 test.describe("accessibility on every page", () => {
