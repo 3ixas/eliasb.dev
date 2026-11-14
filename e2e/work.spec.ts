@@ -61,14 +61,14 @@ test.describe("Work: the panels", () => {
     }
   });
 
-  test("BNP Paribas's panel holds one display figure, one chart and two comparisons, and nothing else at display size", async ({ page }) => {
+  test("BNP Paribas's panel holds one display figure, one chart and two comparisons, and nothing else at display size but the employer's name", async ({ page }) => {
     const bnp = panel(page, "bnp-paribas");
     await expect(bnp.locator(".figure__words")).toHaveText(workPanels.bnp.figure.value);
     await expect(bnp.locator(".figure__label")).toHaveText(workPanels.bnp.figure.label);
     await expect(bnp.locator("figure")).toHaveCount(1);
     await expect(bnp.locator(".work-bnp__comparisons li")).toHaveCount(2);
     const display = await bnp.evaluate((element) =>
-      [...element.querySelectorAll("*")].filter((node) => node.childElementCount === 0 && node.textContent?.trim() && parseFloat(getComputedStyle(node).fontSize) >= 48).map((node) => node.textContent),
+      [...element.querySelectorAll("*")].filter((node) => node.childElementCount === 0 && node.textContent?.trim() && !node.matches(".panel__name") && parseFloat(getComputedStyle(node).fontSize) >= 32).map((node) => node.textContent),
     );
     expect(display).toEqual([workPanels.bnp.figure.value]);
   });
@@ -299,4 +299,15 @@ test.describe("Work: reduced motion", () => {
     await expect(plot(page)).not.toHaveAttribute("data-released", "");
     await expect(page.locator(".sim__paths")).toHaveCSS("clip-path", "inset(0px)");
   });
+});
+
+// A visitor reads where I worked first (DESIGN.md "Type"): the employer is larger than the figure on every Work panel.
+test.describe("Work: the employer leads", () => {
+  for (const slug of ["bnp-paribas", "joveen", "optegra"] as const) {
+    test(`${slug}: the employer's name is larger than its figure`, async ({ page }) => {
+      await page.goto("/");
+      const size = (selector: string) => panel(page, slug).locator(selector).first().evaluate((node) => parseFloat(getComputedStyle(node).fontSize));
+      expect(await size(".panel__name")).toBeGreaterThan(await size(slug === "bnp-paribas" ? ".figure__words" : ".figure__value"));
+    });
+  }
 });

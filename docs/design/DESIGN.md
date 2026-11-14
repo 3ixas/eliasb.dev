@@ -99,7 +99,8 @@ Anchors stay `#work`, `#things-i-make`, `#how-i-work`, `#off-the-clock` and `#sa
 
 ## Figures
 
-- **Display figure**: Newsreader 500, `clamp(88px, 9.6vw, 140px)`, lining tabular figures, with its label in Newsreader 20 px beneath. One per panel. BNP Paribas's is words ("Six months") at `clamp(64px, 7vw, 104px)`.
+- **Employer** (a Work panel's name): Newsreader 400, `clamp(52px, 6vw, 88px)`, with role and dates at 20 px beside it (below it on a phone). It is the first read of a Work panel.
+- **Display figure**: Newsreader 500, `clamp(48px, 5vw, 72px)`, lining tabular figures, with its label in Newsreader 20 px beneath. One per panel, a step under its employer. BNP Paribas's is words ("Six months") at `clamp(34px, 3.6vw, 52px)`.
 - **Bars to scale**: a pair of bars from one left edge. The before bar is thin and soft; the after bar is thicker and solid (white on BNP Paribas's green, the panel's ink elsewhere, cobalt on paper). Both sides are named ("An experienced engineer", "Me, new to it"; "Before", "After") and the values are written out. Lengths are in proportion to the content's own amounts.
 - **The simulation**: illustrative simulated paths from "Today" to "Horizon" on hairline axes, a histogram of their endpoints on the right edge, and a dashed white line at their mean labelled "One price". It says it is illustrative in its accessible description. It appears only on the BNP Paribas panel.
 - **The flag** (BNP Paribas's Role story): two lanes, the live path as a solid white line and the new path as a dashed one behind a switch that is off, "off by default".

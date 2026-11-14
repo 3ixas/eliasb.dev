@@ -71,7 +71,7 @@ test.describe("Worst-case data", () => {
 
   test("a figure at its limit stays on one line", async ({ page }) => {
     await open(page);
-    for (const value of await page.locator("[data-case=figures] b, [data-case=projects] .project__figures b").all()) {
+    for (const value of await page.locator("[data-case=figures] b").all()) {
       expect((await value.boundingBox())!.height, (await value.textContent()) ?? "").toBeLessThan(46 * 1.3);
     }
   });

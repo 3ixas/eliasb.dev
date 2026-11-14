@@ -103,27 +103,6 @@
   border-radius: 14px 0 0;
 }
 
-.project__figures {
-  display: flex;
-  flex-wrap: wrap;
-  align-self: end;
-  gap: 12px 36px;
-  margin-top: 32px;
-  font-size: var(--type-small);
-}
-
-.project__figures b {
-  display: block;
-  margin-bottom: 4px;
-  font-family: var(--serif);
-  font-optical-sizing: auto;
-  font-size: 46px;
-  font-weight: 500;
-  font-variant-numeric: lining-nums tabular-nums;
-  line-height: 1;
-  letter-spacing: -0.03em;
-}
-
 /* The panel is itself the control, so its ring is outside it on the page: the page's cobalt, not the panel's ink. */
 .project:focus-visible {
   outline: 2px solid var(--cobalt);

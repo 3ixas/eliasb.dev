@@ -5,7 +5,6 @@ import { ProjectPanel, projectHref } from "@/components/parts/project-panel";
 import { hostLabel } from "@/components/site/host-label";
 import { isInternalHref, SiteLink } from "@/components/site/site-link";
 import { featuredProjects, featuredSlugs, HOMEPAGE_INDEX_ROWS, projectIndex, projects, type Project } from "@/content/projects";
-import { caseStudies } from "@/content/stretch/case-studies";
 import { thingsIMake } from "@/content/stretch/site-copy";
 
 /** A row's line: the shorter one the homepage gives a project, else its own outcome. */
@@ -38,15 +37,13 @@ function ProjectRow({ project }: { project: Project }) {
 }
 
 /**
- * Things I make (DESIGN.md "The homepage, in order" 5, R-17): the first featured project as a wide panel with three of its
- * figures, the other two side by side, then the rest as rows newest first (at most ten), then the archive link with the
+ * Things I make (DESIGN.md "The homepage, in order" 5, R-17): the first featured project as a wide panel, like the other
+ * two a name, a line and its screenshot, with the other two side by side, then the rest as rows newest first (at most ten), then the archive link with the
  * true count.
  */
 export function ThingsIMake() {
   const [wide, ...pair] = featuredProjects(projects, featuredSlugs);
   const others = projectIndex(projects, featuredSlugs).slice(0, HOMEPAGE_INDEX_ROWS);
-  const study = wide && caseStudies[wide.slug as keyof typeof caseStudies];
-  const figures = study ? thingsIMake.wideFigures.map((index) => study.evidence[index]).filter(Boolean) : [];
   return (
     <section id="things-i-make" className="frame section things" aria-labelledby="things-i-make-heading">
       <h2 id="things-i-make-heading" className="section__title">
@@ -55,7 +52,7 @@ export function ThingsIMake() {
       <div className="panels">
         {wide && (
           <OnView motion="rise">
-            <ProjectPanel project={wide} line={rowLine(wide)} wide figures={figures} />
+            <ProjectPanel project={wide} line={rowLine(wide)} wide />
           </OnView>
         )}
         {pair.length > 0 && (
