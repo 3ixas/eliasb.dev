@@ -42,7 +42,6 @@ export const offTheClock = {
     coverAlt: (title: string, author: string) => `Cover of ${title} by ${author}`,
   },
   watched: {
-    kicker: "Admit one",
     label: "Last watched",
     sourceName: "Letterboxd",
     fallback: "Nothing logged yet.",
