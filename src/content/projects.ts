@@ -11,7 +11,7 @@
  * Its one runtime import carries a .ts extension, so Node can load it directly (the
  * contract script) as well as Next.
  */
-import { panelColourProblems, type PanelColours } from "./stretch/story.ts";
+import { panelColourProblems, TEXT_LIMITS, type PanelColours } from "./stretch/story.ts";
 
 /** What the /things-i-make filters group by: Products, Systems or Experiments. */
 export const PROJECT_CATEGORIES = ["products", "systems", "experiments"] as const;
@@ -229,6 +229,7 @@ export function catalogueProblems(
     if (!project.screenshot || !crop || crop.x < 0 || crop.x > 1 || crop.y < 0 || crop.y > 1 || !(crop.zoom >= 1)) {
       problems.push(`"${project.slug}" needs a screenshot and a crop of it (x and y between 0 and 1, zoom at least 1).`);
     }
+    if (project.name.length > TEXT_LIMITS.name) problems.push(`"${project.slug}" has a name longer than ${TEXT_LIMITS.name} characters.`);
     if (!Number.isInteger(project.year)) problems.push(`"${project.slug}" needs a whole-number year.`);
     if (!PROJECT_CATEGORIES.includes(project.category)) {
       problems.push(`"${project.slug}" needs a category: ${PROJECT_CATEGORIES.join(", ")}.`);

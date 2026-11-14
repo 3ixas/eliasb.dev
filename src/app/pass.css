@@ -146,6 +146,15 @@
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.012em;
+  /* Two lines fit under the clip; a longer name ends in an ellipsis. The padding keeps descenders from the cut. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
 }
 
 /* The punched slot shows the page through the card. */

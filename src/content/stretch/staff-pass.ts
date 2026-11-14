@@ -7,7 +7,7 @@
  * tells, so a pass never claims more than the story does.
  */
 import type { RoleStory, RoleStorySlug } from "./role-story.ts";
-import type { EvidenceItem } from "./story.ts";
+import { TEXT_LIMITS, type EvidenceItem } from "./story.ts";
 
 /** An award worn as a pin on the current pass's lanyard: text only, as the pass's pins are not links. */
 export type PassPin = { label: string; detail: string };
@@ -133,9 +133,13 @@ function pointSource(point: PassPoint, story: RoleStory): { text: string } | { p
 export function passProblems(records: Record<RoleStorySlug, PassRecord>, stories: readonly RoleStory[]): string[] {
   return stories.flatMap((story) => {
     const record = records[story.slug];
-    const problems: string[] = headlineIsFromStory(record, story)
-      ? []
-      : [`Staff pass "${story.slug}": the headline "${record.headline.value} · ${record.headline.label}" is not one of its Role story's evidence items or stated facts.`];
+    const problems: string[] = [];
+    if (record.short.length > TEXT_LIMITS.passName) {
+      problems.push(`Staff pass "${story.slug}": the name "${record.short}" is longer than ${TEXT_LIMITS.passName} characters, which the band's two lines hold.`);
+    }
+    if (!headlineIsFromStory(record, story)) {
+      problems.push(`Staff pass "${story.slug}": the headline "${record.headline.value} · ${record.headline.label}" is not one of its Role story's evidence items or stated facts.`);
+    }
     for (const point of record.points) {
       const name = `Staff pass "${story.slug}": the point "${point.lead} · ${point.detail}"`;
       const source = pointSource(point, story);

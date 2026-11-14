@@ -3,7 +3,8 @@ import type { CSSProperties } from "react";
 import { roleStories } from "@/content/stretch/role-stories";
 import type { RoleStorySlug } from "@/content/stretch/role-story";
 import { passName } from "@/content/stretch/pass-name";
-import { passHang, passRecords, passStatus } from "@/content/stretch/staff-pass";
+import { passHang, passRecords, passStatus, type PassRecord } from "@/content/stretch/staff-pass";
+import type { PanelColours } from "@/content/stretch/story";
 
 /** The white-tux portrait, cropped as the pass prints it (DESIGN.md "The staff pass"). */
 const portrait = { src: "/profile/elias-evening-pass.webp", width: 352, height: 426 } as const;
@@ -17,13 +18,34 @@ const portrait = { src: "/profile/elias-evening-pass.webp", width: 352, height: 
  * story's own pass, which has nowhere further to go). Sizes inside are in em of the card's width ÷ 14.5 (pass.css).
  */
 export function StaffPass({ slug, href, lead = false, drop = 1, priority = false }: { slug: RoleStorySlug; href?: string; lead?: boolean; drop?: number; priority?: boolean }) {
-  const { short, points, lanyard } = passRecords[slug];
   const { role, dates, panel } = roleStories[slug];
-  const { state, tilt } = passHang[slug];
+  return <PassCard id={slug} name={passName(slug)} record={passRecords[slug]} hang={passHang[slug]} role={role} dates={dates} panel={panel} href={href} lead={lead} drop={drop} priority={priority} />;
+}
+
+type PassCardProps = {
+  /** Names the clip's gradient, so two passes on a page do not share one. */
+  id: string;
+  name: string;
+  record: PassRecord;
+  hang: (typeof passHang)[RoleStorySlug];
+  role: string;
+  dates: string;
+  panel: PanelColours;
+  href?: string;
+  lead?: boolean;
+  drop?: number;
+  priority?: boolean;
+};
+
+/** The pass from the values it prints, so a fixture can print any values through the same markup. */
+export function PassCard({ id, name, record, hang, role, dates, panel, href, lead = false, drop = 1, priority = false }: PassCardProps) {
+  const { short, points, lanyard } = record;
+  const { state, tilt } = hang;
+  const slug = id;
   const style = { "--field": panel.field, "--band-ink": panel.ink, "--lanyard": lanyard, "--tilt": `${tilt}deg`, "--drop-by": drop } as CSSProperties;
   const Tag = href ? "a" : "div";
   return (
-    <Tag className={lead ? "pass pass--lead" : "pass"} {...(href ? { href } : { role: "img" })} style={style} data-state={state} aria-label={passName(slug)}>
+    <Tag className={lead ? "pass pass--lead" : "pass"} {...(href ? { href } : { role: "img" })} style={style} data-state={state} aria-label={name}>
       <span className="pass__lanyard" aria-hidden="true">
         <i />
         <i />

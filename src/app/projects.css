@@ -27,6 +27,7 @@
   font-size: clamp(32px, 3.4vw, 50px);
   line-height: 1;
   letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
 }
 
 .project__line {

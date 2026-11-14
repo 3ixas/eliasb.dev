@@ -103,6 +103,7 @@
   text-align: right;
   font-size: var(--type-small);
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .panel__meta span {

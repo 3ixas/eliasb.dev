@@ -172,6 +172,13 @@ Carry these over; restyle only where a ticket says so.
 
 No code to replace. They check the finished build; see the tickets.
 
+### States and worst-case data (#426)
+
+- As built: `/fixtures/worst-case` (`BOARD_FIXTURES=1` only, like the other fixtures) prints the worst plausible value for each field through the real parts, at the limits, past them and empty. `e2e/worst-case.spec.ts` holds it at every width and theme of the matrix and at 200% zoom of a 1280 px window.
+- `TEXT_LIMITS` in `src/content/stretch/story.ts` states each value's measured limit (pass name 32 characters, a name 60, a display figure 8); `passProblems`, `roleStoryProblems`, `caseStudyProblems` and `catalogueProblems` refuse a longer one, and `verify:copy` and `verify:catalogue` show each going red.
+- `StaffPass` now hands its values to `PassCard`, which prints any values, so the fixture can pass the card a name no pass has.
+- The checkpoint found and fixed: the pass band ends a third line in an ellipsis instead of running under the clip; `.project__name`, `.next-panel__name` and `.panel__meta` break an unbroken word instead of stretching their panel.
+
 ## The gates
 
 | Script | What it holds | The redesign's effect |

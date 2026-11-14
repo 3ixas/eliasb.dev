@@ -7,6 +7,7 @@
  */
 import type { CaseStudySlug, Project, ProjectImage } from "../projects";
 import {
+  evidenceFigureProblems,
   MAX_EVIDENCE,
   storySectionHasContent,
   type EvidenceItem,
@@ -120,6 +121,7 @@ export function caseStudyProblems(studies: readonly CaseStudy[], catalogue: read
     if (study.evidence.length > MAX_EVIDENCE) {
       problems.push(`Case study "${study.slug}" has more than ${MAX_EVIDENCE} evidence items.`);
     }
+    problems.push(...evidenceFigureProblems(`Case study "${study.slug}"`, study.evidence));
     if (!slugs.includes(study.next) || study.next === study.slug) {
       problems.push(`Case study "${study.slug}" must end with a different case study, not "${study.next}".`);
     }
