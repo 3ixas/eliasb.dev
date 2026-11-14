@@ -147,6 +147,12 @@ Carry these over; restyle only where a ticket says so.
 
 - **Specs:** `standing-checks` (2, but they loop over every page), `forced-colors` (2) with `quiet-forced-colors.css`, `layout-shift` (1), `homepage-signoff` (2: the length budget), `markdown` (4), `craft-precision` (the rest).
 - **Gates:** `verify:craft`, `verify:type-scale` drop the old values; `scripts/js-budget.json` is re-baselined once.
+- **As built (#424):**
+  - `verify:type-scale` keeps the type tokens and the Résumé sheet's three text steps, which only `stretch-resume.css` may read. It caught the GitHub year's base sizes still on those steps; they are on type tokens now. `verify:craft` was rewritten in #420.
+  - `standing-checks` adds, on every page in the sitemap and the 404: one `h1`, the skip link and its target, content and the header's links with JavaScript off, and a ring at least 2 px wide on everything Tab reaches. Axe and AA contrast measured on the rendered page run at Chromium 1440 in both schemes. The width, 13 px floor and link checks were already there.
+  - `forced-colors` adds the staff pass keeping its printed colours.
+  - `homepage-signoff` (8 and 11 screens) and `markdown` already held their criteria.
+  - `scripts/js-budget.json` is re-baselined from CI's build of this branch: `/` 195297 → 192598, `/work/bnp-paribas` 192384 → 189221, `/things-i-make/threshold` 191231 → 188419 gzipped bytes, each about 3 KB lighter for the quiet index's removal.
 
 ### The contract, the glossary and the runbooks (split from #420)
 
