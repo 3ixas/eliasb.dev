@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 /*
- * Forced colours (docs/design/DESIGN.md, "Accessibility"). The browser drops authored backgrounds, and the bars and the
+ * Forced colours (docs/design/DESIGN.md, "Accessibility", R-29): the bars, the GitHub year and the passes keep their data. The browser drops authored backgrounds, and the bars and the
  * GitHub year are drawn with backgrounds, so without their forced-colours rules (parts.css, off-the-clock.css) the bars and the year's levels all come out
  * as the same colour. This holds that the marks that carry data stay apart.
  */
@@ -30,5 +30,14 @@ test.describe("Forced colours", () => {
     });
     test.skip(Object.keys(byLevel).length < 2, "The year shows fewer than two levels today");
     expect(new Set(Object.values(byLevel)).size).toBe(Object.keys(byLevel).length);
+  });
+
+  test("a staff pass keeps its printed colours: it is a picture of a printed card", async ({ page }) => {
+    await page.goto("/");
+    const card = page.locator(".opening .pass__card").first();
+    await expect(card).toHaveCSS("forced-color-adjust", "none");
+    const band = await page.locator(".opening .pass__band").first().evaluate((element) => getComputedStyle(element).backgroundColor);
+    const canvas = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    expect(band).not.toBe(canvas);
   });
 });

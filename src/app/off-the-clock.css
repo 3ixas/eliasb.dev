@@ -295,7 +295,7 @@
 
 .stretch-gh__total {
   margin: 0;
-  font-size: var(--text-body);
+  font-size: var(--type-ui);
   line-height: 1.4;
 }
 
@@ -308,7 +308,7 @@
   margin: 0;
   min-height: 1.4em;
   color: var(--cobalt);
-  font-size: var(--text-label);
+  font-size: var(--type-small);
 }
 
 /* The grid scrolls inside its own column on phones, so the page never does. The padding leaves room for today's ring. */
@@ -343,7 +343,7 @@
 .stretch-gh__months {
   margin-bottom: 6px;
   color: var(--muted);
-  font-size: var(--text-label);
+  font-size: var(--type-label);
   white-space: nowrap;
 }
 
@@ -392,7 +392,7 @@ button.stretch-gh__day[data-selected] {
   align-items: center;
   justify-content: flex-end;
   color: var(--muted);
-  font-size: var(--text-label);
+  font-size: var(--type-label);
 }
 
 .stretch-gh__legend {

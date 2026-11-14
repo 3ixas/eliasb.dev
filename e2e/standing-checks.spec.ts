@@ -1,7 +1,11 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 import nextConfig from "../next.config";
+import { renderedContrast } from "./support/rendered-contrast";
 
-// The mechanical half of Rauno's portfolio checklist, held on every page (#249, #264). Pages come
+// The mechanical half of Rauno's portfolio checklist and the passes and panels standing checks (R-28, R-29), held on
+// every page (#249, #264, #424): one h1, the skip link, content without script, axe, AA contrast, focus rings,
+// external links and no sideways scroll. Pages come
 // from the sitemap when the spec runs, so a new page is covered the moment it ships; the 404 is
 // added by hand because the sitemap leaves it out.
 const notFoundRoute = "/nothing-pinned-here";
@@ -77,6 +81,76 @@ const isInternal = (href: string, origin: string) => {
   const url = new URL(href);
   return url.origin === origin || siteHosts.has(url.hostname);
 };
+
+test("every page has one h1, a skip link to its content, and its content without script", async ({ page, request }) => {
+  const routes = await pages(request);
+  test.setTimeout(routes.length * perPage);
+  for (const route of routes) {
+    await test.step(route, async () => {
+      await open(page, route);
+      await soft(page.getByRole("heading", { level: 1 }), `${route}: one h1`).toHaveCount(1);
+      const skip = page.locator("a.skip-link");
+      await soft(skip, `${route}: the skip link`).toHaveAttribute("href", "#main-content");
+      await soft(page.locator("#main-content"), `${route}: the skip link's target`).toHaveCount(1);
+    });
+  }
+  // Without script: the same pages, with every script refused.
+  await page.route("**/*.js", (route) => route.abort());
+  for (const route of routes) {
+    await test.step(`${route} without script`, async () => {
+      await page.goto(route);
+      await soft(page.getByRole("heading", { level: 1 }), `${route}: the h1 without script`).toBeVisible();
+      await soft.poll(() => page.locator("#main-content").evaluate((main) => (main as HTMLElement).innerText.trim().length), { message: `${route}: content without script` }).toBeGreaterThan(200);
+    });
+  }
+});
+
+test.describe("accessibility on every page", () => {
+  // Axe and the rendered contrast read the page as drawn, which changes with the scheme but not the engine: Chromium at 1440 px, in both schemes.
+  test.beforeEach(({}, testInfo) => {
+    test.skip(!/^chromium-1440-/.test(testInfo.project.name), "Read once per scheme, in Chromium at 1440 px");
+  });
+
+  test("every page has no axe violations, and every text pair passes AA on the rendered page", async ({ page, request }) => {
+    const routes = await pages(request);
+    test.setTimeout(routes.length * perPage * 2);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    for (const route of routes) {
+      await test.step(route, async () => {
+        await open(page, route);
+        const { violations } = await new AxeBuilder({ page }).analyze();
+        soft(violations.map(({ id, nodes }) => `${id} (${nodes.length})`), `${route}: axe`).toEqual([]);
+        const failing = (await renderedContrast(page)).filter((reading) => reading.median < reading.needs || reading.worst < reading.needs);
+        soft(failing.map(({ text, median }) => `${text.slice(0, 40)}: ${median.toFixed(2)}`), `${route}: contrast`).toEqual([]);
+      });
+    }
+  });
+
+  test("every focusable thing on every page shows a ring at least 2 px wide from the keyboard", async ({ page, request }) => {
+    const routes = await pages(request);
+    test.setTimeout(routes.length * perPage);
+    for (const route of routes) {
+      await test.step(route, async () => {
+        await open(page, route);
+        await page.locator("body").focus();
+        const missing: string[] = [];
+        for (let step = 0; step < 40; step++) {
+          await page.keyboard.press("Tab");
+          const focused = await page.evaluate(() => {
+            const element = document.activeElement as HTMLElement | null;
+            if (!element || element === document.body) return null;
+            const style = getComputedStyle(element);
+            const ring = style.outlineStyle !== "none" && parseFloat(style.outlineWidth) >= 2;
+            return { name: (element.getAttribute("aria-label") ?? element.textContent ?? element.tagName).trim().slice(0, 40), ring };
+          });
+          if (!focused) break;
+          if (!focused.ring) missing.push(focused.name);
+        }
+        soft(missing, `${route}: focus rings`).toEqual([]);
+      });
+    }
+  });
+});
 
 test.describe("links", () => {
   test.beforeEach(({}, testInfo) => {
