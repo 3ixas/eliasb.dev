@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { OnView } from "@/components/parts/on-view";
-import { Arrow } from "@/components/parts/panel";
+import { Arrow, OUT } from "@/components/parts/panel";
 import { ProjectPanel, projectHref } from "@/components/parts/project-panel";
 import { hostLabel } from "@/components/site/host-label";
 import { isInternalHref, SiteLink } from "@/components/site/site-link";
@@ -26,7 +26,7 @@ function ProjectRow({ project }: { project: Project }) {
             <>
               {" "}
               <span className="arrow arrow--out" aria-hidden="true">
-                ↗
+                {OUT}
               </span>
               <span className="sr-only"> opens {hostLabel(href)} in a new tab</span>
             </>

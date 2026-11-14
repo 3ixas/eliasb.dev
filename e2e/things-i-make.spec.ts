@@ -65,7 +65,7 @@ test.describe("Things I make", () => {
       await expect(row).toHaveAttribute("href", href);
       if (href.startsWith("http")) {
         await expect(row).toHaveAttribute("target", "_blank");
-        await expect(row.locator(".arrow--out")).toHaveText("↗");
+        await expect(row.locator(".arrow--out")).toHaveText("\u2197\uFE0E");
         await expect(row).toHaveAccessibleName(/opens .+ in a new tab/);
       }
       expect((await boxOf(row)).height).toBeGreaterThanOrEqual(44);

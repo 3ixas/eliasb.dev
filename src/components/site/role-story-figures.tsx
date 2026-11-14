@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { OnView } from "@/components/parts/on-view";
-import { Panel } from "@/components/parts/panel";
+import { OUT, Panel } from "@/components/parts/panel";
 import { SiteLink } from "@/components/site/site-link";
 import { columnImageSizes, StoryImage } from "@/components/site/story-parts";
 import { ZoomableImage } from "@/components/site/zoomable-image";
@@ -102,7 +102,7 @@ function ScreensFigure({ figure }: { figure: Extract<RoleStoryFigure, { kind: "s
       </div>
       <figcaption>
         <SiteLink className="story-fig__source" href={figure.source.href}>
-          {figure.source.label} <span aria-hidden="true">↗</span>
+          {figure.source.label} <span aria-hidden="true">{OUT}</span>
         </SiteLink>
       </figcaption>
     </figure>

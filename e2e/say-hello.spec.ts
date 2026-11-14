@@ -111,7 +111,7 @@ test.describe("Say hello", () => {
       await expect(link).toHaveAttribute("href", profile.links[id]);
       await expect(link).toHaveAttribute("target", "_blank");
       await expect(link).toHaveAttribute("rel", /noreferrer/);
-      await expect(link.locator(".arrow")).toHaveText("↗");
+      await expect(link.locator(".arrow")).toHaveText("\u2197\uFE0E");
       await expect(link).toHaveAccessibleName(new RegExp(`^${label} opens .+ in a new tab$`));
     }
   });
@@ -201,5 +201,14 @@ test.describe("No footer", () => {
       expect(last).toBe(true);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     });
+  }
+});
+
+// iOS draws a bare ↗ as a colour emoji when the page's font lacks it, so every one carries the text-presentation selector.
+test("every ↗ on the page is the text form", async ({ page }) => {
+  for (const route of ["/", "/things-i-make/threshold", "/work/bnp-paribas"]) {
+    await page.goto(route);
+    const bare = await page.evaluate(() => [...document.querySelectorAll("body *:not(script):not(style)")].filter((el) => el.children.length === 0 && /↗(?!︎)/.test(el.textContent ?? "")).map((el) => el.className || el.tagName));
+    expect(bare, route).toEqual([]);
   }
 });

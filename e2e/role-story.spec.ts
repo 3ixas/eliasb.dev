@@ -176,7 +176,7 @@ for (const slug of roleStorySlugs) {
         for (const [key, figure] of Object.entries(story.figures ?? {})) {
           if (figure.kind !== "screens") throw new Error(`${slug}'s figures are screenshots`);
           const block = page.locator(`section#${key} figure`);
-          await expect(block.locator("figcaption")).toHaveText(`${figure.source.label} ↗`);
+          await expect(block.locator("figcaption")).toHaveText(`${figure.source.label} \u2197\uFE0E`);
           await expect(block.locator("figcaption a")).toHaveAttribute("href", figure.source.href);
           await expect(block.locator(".zoom img")).toHaveCount(figure.images.length);
           for (const [index, image] of figure.images.entries()) {
@@ -197,7 +197,7 @@ for (const slug of roleStorySlugs) {
         await expect(shots).toHaveCount(2);
         await expect(shots.first()).toHaveAttribute("data-device", "desktop");
         await expect(shots.last()).toHaveAttribute("data-device", "phone");
-        await expect(page.locator("section#the-role figcaption")).toHaveText("joveen.com ↗");
+        await expect(page.locator("section#the-role figcaption")).toHaveText("joveen.com \u2197\uFE0E");
         await expect
           .poll(async () => {
             const [a, b] = [await shots.first().locator("img").boundingBox(), await shots.last().locator("img").boundingBox()];

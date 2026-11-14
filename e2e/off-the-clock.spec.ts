@@ -92,7 +92,7 @@ test.describe("Off the clock: the book and the film", () => {
     await expect(link).toHaveAttribute("href", /goodreads\.com/);
     await expect(link).toHaveAttribute("target", "_blank");
     await expect(link).toHaveAccessibleName(/^Cover of Dark Age by Pierce Brown Dark Age Now reading · Pierce Brown opens .+ in a new tab$/);
-    await expect(book.locator(".arrow--out")).toHaveText("↗");
+    await expect(book.locator(".arrow--out")).toHaveText("\u2197\uFE0E");
     await expect(book.getByRole("heading", { level: 3 })).toHaveText("Dark Age");
   });
 

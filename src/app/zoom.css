@@ -16,6 +16,11 @@
   cursor: zoom-in;
 }
 
+/* Closing the dialog with a finger or mouse returns focus to the button without drawing its ring (a keyboard user still gets it). */
+.zoom[data-pointer]:focus-visible {
+  outline: none;
+}
+
 .zoom__dialog {
   /* The site's reset zeroes margins; a modal dialog is centred by its auto margins. */
   margin: auto;

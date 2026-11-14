@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
-import { Panel } from "@/components/parts/panel";
+import { OUT, Panel } from "@/components/parts/panel";
 import { GitHubYear } from "@/components/site/github-year";
 import { HistoryBand } from "@/components/site/history-band";
 import { hostLabel } from "@/components/site/host-label";
@@ -37,7 +37,7 @@ function Out({ href }: { href: string }) {
     <>
       {" "}
       <span className="arrow arrow--out" aria-hidden="true">
-        ↗
+        {OUT}
       </span>
       <span className="sr-only"> opens {hostLabel(href)} in a new tab</span>
     </>

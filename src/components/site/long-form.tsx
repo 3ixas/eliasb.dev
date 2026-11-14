@@ -1,3 +1,4 @@
+import { OUT } from "@/components/parts/panel";
 import type { ReactNode } from "react";
 import { FocusHashTarget } from "@/components/site/focus-hash-target";
 import { SayHello } from "@/components/site/say-hello";
@@ -14,9 +15,9 @@ export function Arrowed({ label }: { label: string }) {
   const [, before, words, after] = label.match(/^(?:([←↗]) )?(.*?)(?: ([←↗]))?$/) ?? [];
   return (
     <>
-      {before && <span aria-hidden="true">{before}</span>}
+      {before && <span aria-hidden="true">{before === "↗" ? OUT : before}</span>}
       {words}
-      {after && <span aria-hidden="true">{after}</span>}
+      {after && <span aria-hidden="true">{after === "↗" ? OUT : after}</span>}
     </>
   );
 }
