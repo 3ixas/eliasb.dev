@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import { hostLabel } from "@/components/site/host-label";
 import { isInternalHref, SiteLink } from "@/components/site/site-link";
+import { OUT } from "@/components/parts/panel";
 import type { Project } from "@/content/projects";
 import type { EvidenceItem } from "@/content/stretch/story";
 
@@ -61,7 +62,7 @@ export function ProjectPanel({ project, line, level = 3, wide = false, figures, 
             {external && (
               <>
                 {meta && " "}
-                <span aria-hidden="true">↗</span>
+                <span aria-hidden="true">{OUT}</span>
                 <span className="sr-only"> opens {hostLabel(href)} in a new tab</span>
               </>
             )}

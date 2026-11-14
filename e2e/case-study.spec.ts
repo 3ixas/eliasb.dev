@@ -52,7 +52,7 @@ for (const slug of caseStudySlugs) {
         await expect(link).toHaveAttribute("href", href);
         await expect(link).toHaveAttribute("target", "_blank");
         await expect(link).toHaveAccessibleName(`${name} opens ${hostLabel(href)} in a new tab`);
-        await expect(link.locator(".arrow")).toHaveText("↗");
+        await expect(link.locator(".arrow")).toHaveText("\u2197\uFE0E");
       }
     });
 

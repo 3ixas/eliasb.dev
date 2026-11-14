@@ -94,7 +94,8 @@
   box-shadow: -1px 0 2px rgb(0 0 0 / 0.25);
 }
 
-/* The clip: a crimp, a swivel and a loop. The loop's lower 0.94em is clipped away where its legs go through the slot and behind the card. */
+/* The clip: a crimp, a swivel and a loop that is threaded through the slot: its left leg lies over the card, its right leg goes behind the card
+   (the notch hides it from the card's top edge to the slot) and shows again in the slot. The loop's lower 0.94em is clipped away where both legs go behind the card. */
 .pass__clip {
   position: absolute;
   left: 50%;
@@ -103,7 +104,7 @@
   width: 2.5em;
   height: 4.375em;
   margin-left: -1.25em;
-  clip-path: inset(0 0 0.94em 0);
+  clip-path: polygon(0 0, 100% 0, 100% 1.75em, 50% 1.75em, 50% 2.65em, 100% 2.65em, 100% calc(100% - 0.94em), 0 calc(100% - 0.94em));
   filter: drop-shadow(0 0.08em 0.06em rgb(0 0 0 / 0.45));
 }
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { OUT } from "@/components/parts/panel";
 import { CopyEmail } from "@/components/site/copy-email";
 import { hostLabel } from "@/components/site/host-label";
 import { sectionLabel } from "@/components/site/sections";
@@ -43,7 +44,7 @@ export function SayHello() {
               <a href={profile.links[id]} target="_blank" rel="noreferrer">
                 {label}
                 <span className="arrow arrow--out" aria-hidden="true">
-                  ↗
+                  {OUT}
                 </span>
                 <span className="sr-only"> opens {hostLabel(profile.links[id])} in a new tab</span>
               </a>

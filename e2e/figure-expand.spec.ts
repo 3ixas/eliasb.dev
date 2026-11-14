@@ -113,3 +113,35 @@ for (const { route, trigger } of pages) {
     });
   });
 }
+
+// A finger or mouse that closes the dialog gets focus back on the button without its ring (iOS drew a blue rectangle round
+// the screenshot until the next tap); a key that closes it still gets the ring.
+test.describe("Closing the dialog returns focus without a ring for a pointer", () => {
+  const route = "/things-i-make/threshold";
+  const trigger = ".case-open .zoom";
+
+  test("a click on the dialog closes it, the button is focused and shows no outline", async ({ page }) => {
+    await page.goto(route);
+    const button = page.locator(trigger).first();
+    await expect(button).toBeVisible();
+    await button.click();
+    const dialog = page.locator("dialog.zoom__dialog[open]");
+    await expect(dialog).toBeVisible();
+    await dialog.locator("img").click();
+    await expect(dialog).toHaveCount(0);
+    await expect(button).toBeFocused();
+    await expect(button).toHaveCSS("outline-style", "none");
+  });
+
+  test("Esc closes it, and the button shows the ring", async ({ page }) => {
+    await page.goto(route);
+    const button = page.locator(trigger).first();
+    await button.click();
+    const dialog = page.locator("dialog.zoom__dialog[open]");
+    await expect(dialog).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toHaveCount(0);
+    await expect(button).toBeFocused();
+    await expect(button).toHaveCSS("outline-style", "solid");
+  });
+});

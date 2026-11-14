@@ -43,11 +43,14 @@ export function PanelHead({ name, meta = [], level = 3 }: { name: string; meta?:
   );
 }
 
+/** ↗ with the text-presentation selector: iOS draws a bare ↗ as a colour emoji when the page's font lacks it. */
+export const OUT = "\u2197\uFE0E";
+
 /** The arrow beside a control's words, hidden from assistive technology. `out` is the ↗ of a link that leaves the site. */
 export function Arrow({ out = false }: { out?: boolean }) {
   return (
     <span className={out ? "arrow arrow--out" : "arrow"} aria-hidden="true">
-      {out ? "↗" : "→"}
+      {out ? OUT : "→"}
     </span>
   );
 }
