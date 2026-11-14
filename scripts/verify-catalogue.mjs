@@ -43,6 +43,8 @@ assert.deepEqual(projectIndex(shuffled, ["new-a", "new-b", "mid", "old"]), [], "
 // Every project shown has a screenshot and a crop of it inside the image, zoomed in.
 assert.ok(projects.every((project) => project.screenshot && project.crop), "Every project has a screenshot and a crop");
 assert.match(catalogueProblems([base("a", 2025, { crop: undefined })], [], [])[0], /"a" needs a screenshot and a crop/);
+assert.match(catalogueProblems([base("a", 2025, { name: "x".repeat(61) })], [], [])[0], /"a" has a name longer than 60/);
+assert.deepEqual(catalogueProblems([base("a", 2025, { name: "x".repeat(60) })], [], []), []);
 assert.match(catalogueProblems([base("a", 2025, { screenshot: undefined })], [], [])[0], /needs a screenshot and a crop/);
 assert.match(catalogueProblems([base("a", 2025, { crop: { x: 1.2, y: 0.5, zoom: 2 } })], [], [])[0], /needs a screenshot and a crop/);
 assert.match(catalogueProblems([base("a", 2025, { crop: { x: 0.5, y: 0.5, zoom: 0.5 } })], [], [])[0], /needs a screenshot and a crop/);

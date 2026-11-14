@@ -6,7 +6,9 @@
  */
 import { siteCopy } from "./site-copy.ts";
 import {
+  evidenceFigureProblems,
   MAX_EVIDENCE,
+  TEXT_LIMITS,
   panelColourProblems,
   storySectionHasContent,
   storyText,
@@ -160,6 +162,10 @@ export function roleStoryProblems(stories: readonly RoleStory[]): string[] {
   for (const story of stories) {
     if (story.evidence.length > MAX_EVIDENCE) {
       problems.push(`Role story "${story.slug}" has more than ${MAX_EVIDENCE} evidence items.`);
+    }
+    problems.push(...evidenceFigureProblems(`Role story "${story.slug}"`, story.evidence));
+    if (story.employer.length > TEXT_LIMITS.name) {
+      problems.push(`Role story "${story.slug}" has an employer name longer than ${TEXT_LIMITS.name} characters.`);
     }
     if (story.next !== null && (!slugs.includes(story.next) || story.next === story.slug)) {
       problems.push(`Role story "${story.slug}" must end with a different Role story or none, not "${story.next}".`);

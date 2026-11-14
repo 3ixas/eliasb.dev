@@ -315,6 +315,19 @@ assert.match(roleStoryProblems([{ ...bnp, resume: [...bnp.resume.slice(1), "Went
 assert.match(roleStoryProblems([{ ...bnp, resume: [bnp.resume[0], "Cut a 30–40 minute data load to under 7."] }, ...rest])[0], /"7", which its story does not say/);
 assert.match(roleStoryProblems([{ ...bnp, resume: ["Only one line."] }, ...rest])[0], /1 Résumé lines, not 2 to 4/);
 
+// Every printed value has a stated limit (TEXT_LIMITS), measured on /fixtures/worst-case: a longer one is refused.
+{
+  const long = (n) => "x".repeat(n);
+  const word = (n) => `Long ${long(n - 5)}`;
+  assert.match(roleStoryProblems([{ ...bnp, employer: word(61) }, ...rest]).join("\n"), /employer name longer than 60/);
+  assert.deepEqual(roleStoryProblems([{ ...bnp, employer: word(60) }, ...rest]).filter((p) => /employer name/.test(p)), []);
+  assert.match(roleStoryProblems([{ ...bnp, evidence: [{ value: long(9), label: "a figure" }] }, ...rest]).join("\n"), /the figure ".*", longer than 8/);
+  const study = Object.values(caseStudies)[0];
+  assert.match(caseStudyProblems([{ ...study, evidence: [{ value: long(9), label: "a figure" }] }, ...Object.values(caseStudies).slice(1)], projects).join("\n"), /longer than 8/);
+  assert.match(passProblems({ ...passRecords, joveen: { ...passRecords.joveen, short: word(33) } }, roles)[0], /Staff pass "joveen": the name ".*" is longer than 32/);
+  assert.deepEqual(passProblems({ ...passRecords, joveen: { ...passRecords.joveen, short: word(32) } }, roles), []);
+}
+
 // A Staff pass's headline number is one of its Role story's evidence items or a fact the story states in words
 // (#209), so a pass never claims more than its story does. Each failure names the pass.
 assert.deepEqual(passProblems(passRecords, roles), []);

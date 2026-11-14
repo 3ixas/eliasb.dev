@@ -52,6 +52,17 @@ export type EvidenceItem = { value: string; label: string };
 
 export const MAX_EVIDENCE = 4;
 
+/**
+ * The longest text each printed value can hold, in characters, as measured on the worst-case fixture (/fixtures/worst-case)
+ * at 320 px, at 200% zoom and in dark: a longer one is refused by the content checks and not left to the layout.
+ * The pass band holds two lines; a panel's name wraps anywhere; a display figure stays on one line at 320 px up to "−40,000%".
+ */
+export const TEXT_LIMITS = { passName: 32, name: 60, figure: 8 } as const;
+
+/** Evidence values longer than the display figure can hold, as messages naming `owner`; empty when valid. */
+export const evidenceFigureProblems = (owner: string, evidence: readonly EvidenceItem[]) =>
+  evidence.filter(({ value }) => value.length > TEXT_LIMITS.figure).map(({ value }) => `${owner} has the figure "${value}", longer than ${TEXT_LIMITS.figure} characters.`);
+
 /** True when a section has something to read. */
 export const storySectionHasContent = (section: StorySectionBody | undefined) =>
   Boolean(section && (section.heading || section.paragraphs?.length || section.points?.length));
