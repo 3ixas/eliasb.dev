@@ -44,7 +44,6 @@ test.describe("Off the clock: on the homepage", () => {
     const panel = section.locator(".otc");
     await expect(panel).toHaveClass(/panel--paper/);
     expect(await bands(panel)).toEqual(["training", "reading", "film", "history", "github"]);
-    await expect(section.locator(".qi-row, .qi-list, [data-quiet-column]")).toHaveCount(0);
   });
 
   test("the panel is paper in light and the dark surface in dark", async ({ page }) => {

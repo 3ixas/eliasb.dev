@@ -80,11 +80,8 @@ export function headedProblems(bars: readonly HeadedBar[]): string[] {
   });
 }
 
-/** The small enamel glyphs a Pass pin can carry (src/components/quiet/finished-pass.tsx draws them). */
-export type PinGlyph = "trophy" | "key" | "spark" | "gauge" | "database" | "phone" | "tick" | "branch";
-
-/** A Pass pin in an employer's closer look: its glyph, what it is for in bold, and the cause or date beside it. */
-export type WorkPin = { glyph: PinGlyph; label: string; detail: string };
+/** One of an employer's three results for the Markdown mirror: what it is for in bold, and the cause or date beside it. */
+export type WorkPin = { label: string; detail: string };
 
 /**
  * An employer's row (GLOSSARY.md, Row): the Role story it leads to, then what its closer look shows under
@@ -95,8 +92,6 @@ export type Employer = {
   slug: RoleStorySlug;
   pins: readonly WorkPin[];
   proofs: readonly string[];
-  /** Where the pass's headline figure counts up from, when it is a number that moved (Optegra's pass rate was 62%). */
-  countFrom?: number;
 };
 
 export const work = {
@@ -108,9 +103,9 @@ export const work = {
     {
       slug: "bnp-paribas",
       pins: [
-        { glyph: "trophy", label: "Winner", detail: "Digitisation · 2025" },
-        { glyph: "key", label: "Take Ownership", detail: "Q1 2026" },
-        { glyph: "spark", label: "AI Champion", detail: "2026" },
+        { label: "Winner", detail: "Digitisation · 2025" },
+        { label: "Take Ownership", detail: "Q1 2026" },
+        { label: "AI Champion", detail: "2026" },
       ],
       /** What the pass says beyond its headline number ("Only · C# engineer on the team", from staff-pass.ts). */
       proofs: [
@@ -121,22 +116,20 @@ export const work = {
     {
       slug: "joveen",
       pins: [
-        { glyph: "gauge", label: "Page load, cut by 40%", detail: "Cut page load by 40% by refactoring React components and lazy-loading assets." },
-        { glyph: "database", label: "Key API p95, 520 ms → 230 ms", detail: "Added indexes and rewrote slow queries, starting with the API that mattered most." },
-        { glyph: "phone", label: "Mobile retention, up 30%", detail: "Fixed mobile layout and browser bugs found by a cross-browser testing pipeline." },
+        { label: "Page load, cut by 40%", detail: "Cut page load by 40% by refactoring React components and lazy-loading assets." },
+        { label: "Key API p95, 520 ms → 230 ms", detail: "Added indexes and rewrote slow queries, starting with the API that mattered most." },
+        { label: "Mobile retention, up 30%", detail: "Fixed mobile layout and browser bugs found by a cross-browser testing pipeline." },
       ],
       proofs: [],
-      countFrom: 0,
     },
     {
       slug: "optegra",
       pins: [
-        { glyph: "tick", label: "Core Web Vitals pass rate, 62% → 88%", detail: "Scoped performance fixes with the engineers and ticketed them." },
-        { glyph: "gauge", label: "p95 page load, cut by 30%", detail: "The same scoped, ticketed fixes." },
-        { glyph: "branch", label: "Where the switch started", detail: "The best part of the job was working with the engineers who built our website." },
+        { label: "Core Web Vitals pass rate, 62% → 88%", detail: "Scoped performance fixes with the engineers and ticketed them." },
+        { label: "p95 page load, cut by 30%", detail: "The same scoped, ticketed fixes." },
+        { label: "Where the switch started", detail: "The best part of the job was working with the engineers who built our website." },
       ],
       proofs: [],
-      countFrom: 62,
     },
   ] satisfies readonly Employer[],
   headed: {

@@ -132,6 +132,16 @@ Carry these over; restyle only where a ticket says so.
 
 - **Deletes:** whatever remains in `src/components/quiet/`, `quiet-*.css`, the `--stretch-*` tokens and `[data-stretch-*]` hooks no longer used, Bricolage and DM Mono files, `/fixtures/` pages for retired parts.
 - **Gates:** `verify:retired` names each retired part.
+- **As built:** `src/components/quiet/` is gone, with `/fixtures/closer-looks`, `/fixtures/materials`, `/fixtures/stretch-tokens` and `/fixtures/stretch-type`, and `quiet-index.css`, `quiet-forced-colors.css`, `quiet-opening.css`, `stretch-shell.css`, `stretch-tokens.css` and `stretch-type.css`. What live pages still read moved:
+  - The page hook is `[data-site]` (was `data-stretch-shell`). Its rules (min-height, selection, the page-wide ring now at 2 px cobalt and 3 px offset, a sent-to section's no-ring, `text-wrap: pretty`, dark smoothing and image arrival) are in `shell.css`.
+  - `--sun` and `--dark` (the Eclipse's 0 or 1, was `--stretch-dark`), the sheet's `--text-*` steps and `color-scheme` are in `tokens.css`. `theme.ts` registers the new palette and `--sun` only.
+  - The GitHub year's grid, `DotLine` (now `.dot-line`) and the year's forced-colour rules are in `off-the-clock.css`, on `--year-*`.
+  - `quiet-long-form.css` is `zoom.css`, and `.qi-zoom*` is `.zoom*`.
+  - `github-year.tsx` counts with the shared `Count`.
+  - Fonts: Bricolage Grotesque and JetBrains Mono load only in `resume/layout.tsx`, and the sheet sets them itself in `stretch-resume.css` with Bricolage's local fallback faces. DM Mono is gone, and Tailwind's `font-sans` is Instrument Sans. The sheet, its print styles and the PDF are otherwise untouched; `verify:resume` passes.
+  - Content: the reveal words' `looks`, `revealDescription`, `RevealId` and `supportRuns` are gone from `opening.ts`. The Pass pins keep their words for the Markdown mirror but lose `glyph` and `countFrom`.
+- **Gates:** `verify:craft` now holds one ring (the page-wide rule and the controls' rule at 2 px cobalt and 3 px offset, with the panel, the zoom dialog's Close and the Résumé sheet as named exceptions) and drops the quiet index's row fill, shadow tokens and motion exceptions. `verify:retired` names `qi-*` classes, the quiet components and stylesheets, the Stretch shell, its tokens and hook, closer looks, the margin, reveal words, the pen, the 44 px objects, the old pass and its pins, DM Mono, and Bricolage outside the Résumé sheet.
+- **Specs:** retired with their parts: `desktop-motion`, `phone-motion`, `inline-close`, `inline-looks`, `stretch-tokens` and `stretch-type` (its surviving checks moved to `type.spec` and `tokens.spec`), `craft-precision`'s closer-look interruptions, `homepage-signoff`'s column-width test, `theme`'s tile-edge test, and the absence checks for `qi-*` classes now that `verify:retired` keeps them out. `materials.spec` stays: it pictures `/fixtures/parts`. No screenshot baseline changed.
 
 ### Gates and standing checks (split from #420)
 

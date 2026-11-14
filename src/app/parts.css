@@ -229,6 +229,8 @@
 }
 
 .row__meta {
+  /* Wide enough for a year and ↗ in every font, so a row with an arrow never widens its column and every row keeps one edge. */
+  min-width: 4.5em;
   text-align: right;
   font-size: var(--type-small);
   white-space: nowrap;

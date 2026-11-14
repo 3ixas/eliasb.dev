@@ -14,7 +14,7 @@ import { resumeCopy, resumePdf, resumeSheet } from "@/content/resume";
 export function ResumePage() {
   const sheet = resumeSheet();
   return (
-    <div data-stretch-shell data-resume>
+    <div data-site data-resume>
       <SiteHeader />
       <main id="main-content" tabIndex={-1} className="stretch-resume__desk">
         <a className="button stretch-resume__download" href={resumePdf.href} download>

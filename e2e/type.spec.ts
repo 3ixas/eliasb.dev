@@ -1,8 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
-// The passes and panels faces (layout.tsx, tokens.css; docs/design/DESIGN.md "Type"), on /fixtures/tokens.
-// The successor of stretch-type.spec.ts and font-swap.spec.ts for Newsreader and Instrument Sans; those
-// keep checking Bricolage Grotesque and DM Mono until #420 retires them.
+// The passes and panels faces (layout.tsx, tokens.css; docs/design/DESIGN.md "Type"), on /fixtures/tokens and the pages.
+// Bricolage Grotesque, DM Mono and the Fine cut retired in #420; only the Résumé sheet keeps its own faces.
 
 const serifSteps = ["opening", "title", "section", "panel", "figure", "prose"];
 const sansSteps = ["body", "ui", "small", "label"];
@@ -87,4 +86,58 @@ test.describe("Fallback faces", () => {
       expect(Math.abs(fallback[step].height - real[step].height), `${step} height`).toBeLessThanOrEqual(1);
     }
   });
+});
+
+test.describe("Faces on the pages", () => {
+  test.beforeEach(({}, testInfo) => {
+    test.skip(!/-1440-light$/.test(testInfo.project.name), "Measured once per engine");
+  });
+
+  for (const route of ["/", "/things-i-make", "/things-i-make/threshold", "/work/bnp-paribas", "/nothing-pinned-here"]) {
+    test(`${route} sets its body in Instrument Sans and loads no retired face, from this origin`, async ({ page }) => {
+      await page.goto(route);
+      await page.evaluate(() => document.fonts.ready);
+      const { body, loaded, external } = await page.evaluate(() => ({
+        body: getComputedStyle(document.body).fontFamily,
+        loaded: [...document.fonts].filter((face) => face.status === "loaded").map((face) => face.family.replaceAll('"', "")),
+        external: performance.getEntriesByType("resource").filter((entry) => !entry.name.startsWith(location.origin) && /\.(woff2?|ttf|otf)(\?|$)|fonts\./.test(entry.name)).length,
+      }));
+      expect(body.replaceAll('"', "")).toMatch(/^Instrument Sans/);
+      expect(loaded.filter((family) => /bricolage|dm mono|hanken|jetbrains/i.test(family))).toEqual([]);
+      expect(external, "font requests to another host").toBe(0);
+    });
+  }
+
+  test("only the Résumé loads its sheet's faces, and the sheet sets metadata in JetBrains Mono", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
+    // The sheet's local fallback face is declared everywhere, but nothing outside the Résumé loads a sheet face.
+    expect(await page.evaluate(() => [...document.fonts].some((face) => /JetBrains Mono|Bricolage/.test(face.family) && face.status !== "unloaded"))).toBe(false);
+    await page.goto("/resume");
+    await page.evaluate(() => document.fonts.ready);
+    const sheetMono = await page.locator(".stretch-resume__sheet .stretch-mono").first().evaluate((element) => getComputedStyle(element).fontFamily);
+    expect(sheetMono.replaceAll('"', "")).toMatch(/^JetBrains Mono/);
+    const sheet = await page.locator(".stretch-resume__sheet").evaluate((element) => getComputedStyle(element).fontFamily);
+    expect(sheet.replaceAll('"', "")).toMatch(/^Bricolage Grotesque/);
+  });
+});
+
+test("the skip link is on the type scale", async ({ page }) => {
+  await page.goto("/things-i-make/threshold");
+  await page.evaluate(() => document.fonts.ready);
+  expect(await page.locator(".skip-link").evaluate((element) => getComputedStyle(element).fontSize)).toBe("15px");
+});
+
+test("dark mode smooths text to greyscale and light mode keeps the default", async ({ page }, testInfo) => {
+  await page.goto("/");
+  await expect.poll(() => page.evaluate(() => document.documentElement.dataset.lights)).toBeTruthy();
+  const smoothing = await page.evaluate(() => getComputedStyle(document.body).getPropertyValue("-webkit-font-smoothing"));
+  expect(smoothing).toBe(/-dark$/.test(testInfo.project.name) ? "antialiased" : "auto");
+});
+
+test("homepage sections sit 144 px apart on a wide screen and 96 px on a phone (R-03)", async ({ page }) => {
+  await page.goto("/");
+  const width = page.viewportSize()!.width;
+  const padding = await page.locator("#main-content > section.section").first().evaluate((element) => getComputedStyle(element).paddingTop);
+  expect(padding).toBe(width >= 720 ? "144px" : "96px");
 });

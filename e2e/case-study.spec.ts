@@ -65,7 +65,7 @@ for (const slug of caseStudySlugs) {
 
     test("the landing screenshot sits in the panel, at the right of the text from 1260 px and beneath it under that", async ({ page }) => {
       const shot = opening(page).locator(".case-open__shot");
-      await expect(shot.locator(".qi-zoom img")).toHaveAttribute("alt", project.screenshot!.alt);
+      await expect(shot.locator(".zoom img")).toHaveAttribute("alt", project.screenshot!.alt);
       await expect(shot.locator("img").first()).toHaveCSS("border-radius", "16px");
       const text = opening(page).locator(".case-open__text");
       await expect
@@ -133,7 +133,7 @@ for (const slug of caseStudySlugs) {
       await expect(page.locator("article section .story-fig")).toHaveCount(figures.length);
       for (const { key, figure } of figures) {
         const frame = page.locator(`section#${key} .story-fig`);
-        const image = frame.locator(".qi-zoom img");
+        const image = frame.locator(".zoom img");
         await expect(image).toHaveAttribute("alt", figure.alt);
         await expect(image).toHaveCSS("border-radius", "16px");
         await expect(image).toHaveCSS("box-shadow", /1px/);

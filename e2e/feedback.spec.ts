@@ -62,7 +62,7 @@ test.describe("the focus ring", () => {
 
 test.describe("a screenshot arriving", () => {
   const route = "/things-i-make/threshold";
-  const shot = ".case-open .qi-zoom img";
+  const shot = ".case-open .zoom img";
   // The suite runs with reduced motion, which takes the fade away; the fade is what is measured here.
   test.use({ reducedMotion: "no-preference" });
 

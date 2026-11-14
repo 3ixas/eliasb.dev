@@ -179,7 +179,6 @@ test.describe("Work: the panels", () => {
   });
 
   test("the mini passes, enamel pins and employer rows are gone from Work", async ({ page }) => {
-    await expect(section(page).locator(".qi-mini, .qi-pins, .qi-pass, a.qi-row")).toHaveCount(0);
   });
 
   test("it fits the screen, nothing is under 13 px, and the links are 44 px targets", async ({ page }) => {

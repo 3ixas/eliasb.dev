@@ -164,7 +164,7 @@ for (const slug of roleStorySlugs) {
         const certificate = story.figures!["what-i-took-with-me"]!;
         if (certificate.kind !== "certificate") throw new Error("BNP Paribas's last figure is the certificate");
         await expect(figure.locator("figcaption")).toHaveText(certificate.caption);
-        const image = figure.locator(".qi-zoom img");
+        const image = figure.locator(".zoom img");
         await expect(image).toHaveAttribute("alt", certificate.alt);
         await expect(image).toHaveCSS("border-radius", "16px");
         await expect(image).toHaveCSS("box-shadow", /1px/);
@@ -178,9 +178,9 @@ for (const slug of roleStorySlugs) {
           const block = page.locator(`section#${key} figure`);
           await expect(block.locator("figcaption")).toHaveText(`${figure.source.label} ↗`);
           await expect(block.locator("figcaption a")).toHaveAttribute("href", figure.source.href);
-          await expect(block.locator(".qi-zoom img")).toHaveCount(figure.images.length);
+          await expect(block.locator(".zoom img")).toHaveCount(figure.images.length);
           for (const [index, image] of figure.images.entries()) {
-            const img = block.locator(".qi-zoom img").nth(index);
+            const img = block.locator(".zoom img").nth(index);
             await img.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
             await expect(img).toHaveAttribute("alt", image.alt);
             await expect(img).toHaveCSS("border-radius", "16px");

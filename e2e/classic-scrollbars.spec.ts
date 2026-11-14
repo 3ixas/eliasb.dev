@@ -13,10 +13,10 @@ test.beforeEach(({ page, browserName }) => {
 test("opening a dialog does not move the column", async ({ page }) => {
   await page.goto("/things-i-make/threshold");
   const before = await column(page);
-  const button = page.locator(".case-open .qi-zoom").first();
+  const button = page.locator(".case-open .zoom").first();
   await expect.poll(() => button.evaluate((element) => Object.keys(element).some((key) => key.startsWith("__reactProps$")))).toBe(true);
   await button.click();
-  await expect(page.locator(".qi-zoom__dialog").first()).toBeVisible();
+  await expect(page.locator(".zoom__dialog").first()).toBeVisible();
   expect(await column(page)).toBeCloseTo(before, 1);
 });
 

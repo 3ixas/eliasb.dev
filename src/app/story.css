@@ -469,13 +469,13 @@
   min-width: 0;
 }
 
-.story-fig__shot .qi-zoom {
+.story-fig__shot .zoom {
   display: block;
   width: 100%;
 }
 
 /* The inline image only: the dialog beside it holds the large copy, which keeps its own size. */
-.story-fig__shot .qi-zoom img {
+.story-fig__shot .zoom img {
   display: block;
   width: 100%;
   height: auto;

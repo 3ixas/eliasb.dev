@@ -43,7 +43,6 @@ test.describe("Where I'm headed", () => {
   test("names no destination and no job title", async ({ page }) => {
     const text = await headed(page).innerText();
     for (const retired of ["product engineer", "So far", "Judgement", "Depth", "Range"]) expect(text).not.toContain(retired);
-    await expect(headed(page).locator(".qi-row, .qi-strand, .qi-thread")).toHaveCount(0);
   });
 
   test("the lead sits beside the parts from 1260 px and above them under it", async ({ page }) => {
@@ -77,7 +76,6 @@ test.describe("How I work", () => {
       expect(style.line).toBe("none");
       expect(style.background).not.toBe("rgba(0, 0, 0, 0)");
     }
-    await expect(how(page).locator(".qi-ink, .qi-mark, .qi-number")).toHaveCount(0);
   });
 
   test("the proofs are drawn from the content: the two projects, 57 ticks, a switch that is off, a bar 15% longer", async ({ page }) => {

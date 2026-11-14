@@ -37,14 +37,14 @@ export function ZoomableImage({ src, alt, width, height, sizes, preload }: { src
   };
   return (
     <>
-      <button ref={trigger} type="button" className="qi-zoom" aria-haspopup="dialog" onPointerEnter={want} onPointerDown={want} onFocus={want} onClick={open}>
+      <button ref={trigger} type="button" className="zoom" aria-haspopup="dialog" onPointerEnter={want} onPointerDown={want} onFocus={want} onClick={open}>
         <ArrivalImage src={src} alt={alt} width={width} height={height} sizes={sizes} preload={preload} />
         <span className="sr-only"> (view larger)</span>
       </button>
-      <dialog ref={dialog} className="qi-zoom__dialog" aria-label={alt} onClick={(event) => event.currentTarget.close()} onClose={() => trigger.current?.focus()}>
+      <dialog ref={dialog} className="zoom__dialog" aria-label={alt} onClick={(event) => event.currentTarget.close()} onClose={() => trigger.current?.focus()}>
         {wanted && <Image ref={large} src={src} alt={alt} width={width} height={height} sizes="(min-width: 1200px) 1100px, 96vw" loading="eager" style={{ "--w": width, "--ar": width / height } as CSSProperties} />}
         <form method="dialog">
-          <button className="qi-zoom__close">Close</button>
+          <button className="zoom__close">Close</button>
         </form>
       </dialog>
     </>
