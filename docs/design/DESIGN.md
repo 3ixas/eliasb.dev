@@ -221,7 +221,7 @@ Found in the lens passes and in the three rounds of concepts behind this directi
 - Proof behind a hover.
 - Italic or coloured emphasis inside headings beyond the opening line's two marks.
 - Underlines on text that is not a link.
-- Decorative glows, gradients and shadows in the light theme.
+- Decorative glows, gradients and shadows in the light theme: a panel has no depth there. Two things are the exception, both from the approved prototype: the BNP Paribas panel's radial gradient, and the lift under a screenshot that bleeds off its panel (and the small shadow under the simulation's price tag).
 - Tilted cards and ruled-paper textures as decoration.
 - Display type so large it becomes the subject (the giant "Only").
 - A job title where the work can be described ("AI Champion", "Product engineer").
