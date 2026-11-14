@@ -11,7 +11,7 @@ Read this before running Playwright, the verify scripts or a build on a laptop. 
 
 ## The server the specs run against
 
-The config starts `pnpm start` (a production build) on port 3100 if nothing is listening, and reuses whatever is already there. For a quick loop, start `next dev` on 3100 with `BOARD_FIXTURES=1` instead: the `/fixtures` pages exist only with that variable, and the specs for Off the clock and the tokens need them.
+The config starts `pnpm start` (a production build) on port 3100 if nothing is listening, and reuses whatever is already there. For a quick loop, start the dev server on 3100 instead: `BOARD_FIXTURES=1 pnpm exec next dev -p 3100 -H 127.0.0.1`. The `/fixtures` pages exist only with that variable, and the specs for Off the clock and the tokens need them. Keep `-H 127.0.0.1`: the specs load `http://127.0.0.1`, and without it Next blocks the dev resources from that origin, so the page never hydrates and the specs that need script (Copy, arrival, decode, focus ring, AA) fail as if the build were broken.
 
 - In a worktree, use its own port: `E2E_PORT=3101` (and up) for both the server and `playwright test`. Locally the config reuses any server already on the port, so two worktrees on 3100 means one tests the other's code, with nothing to say so.
 - The dev server is stopped when a turn ends. Check with `curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3100/` and start it again if that is not `200`; the first request after a start compiles the page, so allow a minute.
