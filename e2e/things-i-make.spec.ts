@@ -40,11 +40,10 @@ test.describe("Things I make", () => {
     }
   });
 
-  test("Threshold is wide with three figures from its case study and its screenshot at the right; the other two sit side by side from 720 px", async ({ page }) => {
+  test("Threshold is wide, a name and a line with no figures, and its screenshot at the right; the other two sit side by side from 720 px", async ({ page }) => {
     const wide = panels(page).first();
     await expect(wide).toHaveClass(/project--wide/);
-    const evidence = caseStudies.threshold.evidence;
-    await expect(wide.locator(".project__figures > span")).toHaveText(thingsIMake.wideFigures.map((index) => `${evidence[index].value} ${evidence[index].label}`));
+    await expect(wide.locator("b")).toHaveCount(0);
     const [text, shot] = await Promise.all([boxOf(wide.locator(".project__text")), boxOf(wide.locator(".project__shot"))]);
     if (width(page) >= 1260) expect(shot.x).toBeGreaterThan(text.x + text.width - 1);
     else expect(shot.y).toBeGreaterThan(text.y + text.height - 1);
@@ -148,7 +147,7 @@ test.describe("Things I make", () => {
       await page.evaluate(() => document.fonts.ready);
       const texts = await section(page).innerText();
       const readings = (await renderedContrast(page)).filter((reading) => texts.includes(reading.text));
-      for (const expected of ["Threshold", "user stories", "Argus Risk", "Flowtime", "Home Secretary", "Everything I’ve built"]) {
+      for (const expected of ["Threshold", "Argus Risk", "Flowtime", "Home Secretary", "Everything I’ve built"]) {
         expect(readings.some((reading) => reading.text.includes(expected)), expected).toBe(true);
       }
       expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);

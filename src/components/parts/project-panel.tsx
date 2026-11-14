@@ -4,7 +4,6 @@ import { hostLabel } from "@/components/site/host-label";
 import { isInternalHref, SiteLink } from "@/components/site/site-link";
 import { OUT } from "@/components/parts/panel";
 import type { Project } from "@/content/projects";
-import type { EvidenceItem } from "@/content/stretch/story";
 
 /** A project opens at its case study, else its live site, else its code. */
 export const projectHref = ({ links }: Project) => (links.caseStudy ?? links.live ?? links.code)!;
@@ -18,10 +17,8 @@ type ProjectPanelProps = {
   line: string;
   /** The homepage's sections are h2, so its panels are h3; the archive's h1 makes its panels h2. */
   level?: 2 | 3;
-  /** Threshold on the homepage: the text and its figures at the left, the screenshot bleeding off the right. */
+  /** Threshold on the homepage: the text at the left, the screenshot bleeding off the right. */
   wide?: boolean;
-  /** Figures on the wide panel, from its case study's evidence. */
-  figures?: readonly EvidenceItem[];
   /** The archive prints its type and year. */
   meta?: boolean;
   /** On the first screen, so the screenshot loads at once. */
@@ -34,7 +31,7 @@ type ProjectPanelProps = {
  * project with no case study, on paper to wherever it lives, marked ↗ and opening in a new tab. A project with no
  * screenshot is a complete panel of text. Styles are in projects.css.
  */
-export function ProjectPanel({ project, line, level = 3, wide = false, figures, meta = false, eager = false }: ProjectPanelProps) {
+export function ProjectPanel({ project, line, level = 3, wide = false, meta = false, eager = false }: ProjectPanelProps) {
   const href = projectHref(project);
   const external = !isInternalHref(href);
   const coloured = Boolean(project.links.caseStudy && project.panel);
@@ -47,15 +44,6 @@ export function ProjectPanel({ project, line, level = 3, wide = false, figures, 
       <span className="project__text">
         <Heading className="project__name">{project.name}</Heading>
         <span className="project__line">{line}</span>
-        {figures && figures.length > 0 && (
-          <span className="project__figures">
-            {figures.map(({ value, label }) => (
-              <span key={label}>
-                <b>{value}</b> {label}
-              </span>
-            ))}
-          </span>
-        )}
         {(meta || external) && (
           <span className="project__meta">
             {meta && projectMeta(project)}

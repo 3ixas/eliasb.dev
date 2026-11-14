@@ -78,13 +78,13 @@ export default async function WorstCaseFixtures() {
             Projects
           </h2>
           <div className="panels panels--two">
-            <ProjectPanel project={project({ name: spaced(TEXT_LIMITS.name), outcome: spaced(78), ...noShot })} line={spaced(78)} figures={evidence(MAX_EVIDENCE)} />
+            <ProjectPanel project={project({ name: spaced(TEXT_LIMITS.name), outcome: spaced(78), ...noShot })} line={spaced(78)} />
             <ProjectPanel project={project({ name: unbroken(TEXT_LIMITS.name), ...noShot })} line={spaced(78)} />
-            <ProjectPanel project={project({ name: spaced(78) })} line={spaced(78)} figures={evidence(6)} meta />
+            <ProjectPanel project={project({ name: spaced(78) })} line={spaced(78)} meta />
             <ProjectPanel project={project({ name: "", outcome: "", links: { live: "https://example.com" }, ...noShot, panel: undefined })} line="" />
           </div>
           <div style={{ marginTop: 32 }}>
-            <ProjectPanel project={project({ name: spaced(TEXT_LIMITS.name) })} line={spaced(78)} figures={evidence(6)} wide />
+            <ProjectPanel project={project({ name: spaced(TEXT_LIMITS.name) })} line={spaced(78)} wide />
           </div>
         </section>
 

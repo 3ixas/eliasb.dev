@@ -25,6 +25,7 @@ const scale: { token: string; style: CSSProperties; text: string; measure?: true
   { token: "title", style: { ...serif, lineHeight: 0.95, letterSpacing: "-0.04em" }, text: "BNP Paribas" },
   { token: "section", style: { ...serif, lineHeight: 1 }, text: "Work" },
   { token: "panel", style: serif, text: "Joveen" },
+  { token: "employer", style: { ...serif, lineHeight: 0.95, letterSpacing: "-0.035em" }, text: "Optegra" },
   { token: "figure", style: { ...serif, ...figures, fontWeight: 500, lineHeight: 1 }, text: "−40%" },
   { token: "prose", style: { ...serif, lineHeight: 1.5 }, text: opening.support, measure: true },
   { token: "row", style: { ...serif, fontWeight: 500, letterSpacing: "-0.015em" }, text: "Home Secretary" },
