@@ -29,12 +29,12 @@ export function HistoryBand({ events, dates, source }: { events: HistoryEvent[];
     );
   };
   return (
-    <div className="otc__history" data-otc="history" data-state={source ? "archive" : "live"}>
+    <div className="otc__history otc__section" data-otc="history" data-state={source ? "archive" : "live"}>
+      <h3 className="otc__title">{copy.label}</h3>
       <span className="otc__history-image">
-        {image && <Image src={image.src} alt={image.alt} width={image.width} height={image.height} sizes="64px" />}
+        {image && <Image src={image.src} alt={image.alt} width={image.width} height={image.height} sizes="76px" />}
       </span>
       <div>
-        <h3>{copy.label}</h3>
         {/*
           Every oddity sits in the same cell, hidden but for the one shown, so the band is as tall as the tallest and
           stepping moves nothing below it. The shown one is the one live region, so the change is announced.

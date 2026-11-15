@@ -1,16 +1,28 @@
 /*
- * Off the clock (docs/design/DESIGN.md "The homepage, in order" 7; R-19): one paper panel that follows the theme, in three
- * bands: the training week, the book and the film; this week in history; the GitHub year with Now making. The panel and
- * the pill are parts.css's; the GitHub year's structure is github-year.tsx's, restyled here onto the year ramps.
+ * Off the clock (docs/design/DESIGN.md "The homepage, in order" 7; R-19): one paper panel that follows the theme, as four
+ * sections each under its own heading: Today's workout; On my shelf and screen; this week in history; the GitHub year,
+ * with what I'm building now under its total. The panel and the pill are parts.css's; the GitHub year's structure is github-year.tsx's,
+ * restyled here onto the year ramps.
  */
 
+/* The panel is a stack of sections, each under its own heading and a rule: the workout, the shelf and screen, this week in history, what I'm building now, the GitHub year. */
 .otc {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 40px 32px;
+  display: block;
 }
 
-.otc h3 {
+.otc__section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--hair);
+}
+
+.otc > .otc__section:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.otc :is(h3, h4) {
   font-family: var(--serif);
   font-optical-sizing: auto;
   font-weight: 400;
@@ -21,30 +33,61 @@
   overflow-wrap: anywhere;
 }
 
+/* A section's heading, a step above the titles inside it. */
+.otc .otc__title {
+  margin-bottom: 12px;
+  font-size: 30px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
 .otc p {
   margin-top: 6px;
   color: var(--muted);
   font-size: var(--type-small);
 }
 
-/* ---- The training week ---- */
+/* ---- Today's workout ---- */
 
+.otc__training {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Today's session, large. It is filled in once the day is known and holds its height until then. */
+.otc .otc__today {
+  min-height: 1.05em;
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: clamp(34px, 4vw, 48px);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+/* The week as seven days in a row, each its name over its session; today's is filled with ink. Seven rows on a phone. */
 .otc__week {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 16px;
-  font-size: var(--type-label);
-  font-weight: 600;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 22px;
+  font-size: var(--type-ui);
 }
 
 .otc__week li {
   display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+  align-content: start;
+  gap: 2px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
   color: var(--muted);
   box-shadow: inset 0 0 0 1px var(--hair);
+}
+
+.otc__week li > span:first-child {
+  font-weight: 600;
 }
 
 .otc__week li[data-today] {
@@ -55,11 +98,17 @@
 
 /* ---- The book and the film ---- */
 
+.otc__shelf-cells {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px 32px;
+}
+
 .otc__media {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: start;
-  gap: 16px;
+  gap: 20px;
   color: inherit;
   text-decoration: none;
 }
@@ -70,12 +119,12 @@
 }
 
 .otc__cover {
-  width: 64px;
+  width: 76px;
   height: auto;
   aspect-ratio: 2 / 3;
   object-fit: cover;
-  border-radius: 5px;
-  box-shadow: 0 10px 20px -8px var(--shadow);
+  border-radius: 6px;
+  box-shadow: 0 12px 24px -10px var(--shadow);
 }
 
 .otc__source {
@@ -85,21 +134,29 @@
 /* ---- This week in history ---- */
 
 .otc__history {
-  grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr) auto;
+  grid-template-columns: 76px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 16px 20px;
-  padding-top: 32px;
-  border-top: 1px solid var(--hair);
+  gap: 16px 24px;
+}
+
+.otc__history > .otc__title {
+  grid-column: 1 / -1;
+  margin-bottom: 4px;
+}
+
+/* The picture's slot keeps its height when an oddity has none, so stepping moves nothing. */
+.otc__history-image {
+  display: block;
+  min-height: 76px;
 }
 
 .otc__history-image img {
   display: block;
-  width: 64px;
-  height: 64px;
+  width: 76px;
+  height: 76px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 .otc__history-text {
@@ -139,13 +196,10 @@
 /* ---- The GitHub year and Now making ---- */
 
 .otc__year {
-  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
   align-items: end;
   gap: 8px 32px;
-  padding-top: 32px;
-  border-top: 1px solid var(--hair);
 }
 
 .otc__year > .stretch-gh__total {
@@ -162,7 +216,7 @@
   margin-bottom: 4px;
   font-family: var(--serif);
   font-optical-sizing: auto;
-  font-size: 64px;
+  font-size: 52px;
   font-weight: 400;
   line-height: 0.95;
   letter-spacing: -0.035em;
@@ -173,6 +227,16 @@
   grid-column: 1;
   grid-row: 2 / span 2;
   align-self: end;
+}
+
+.otc__year-side:empty {
+  display: none;
+}
+
+/* Now making's heading is the year band's own subheading, a step under a section's. */
+.otc .otc__subtitle {
+  margin-bottom: 10px;
+  font-size: 24px;
 }
 
 .otc__year > .stretch-gh__readout,
@@ -219,15 +283,31 @@
   font-family: var(--sans);
 }
 
+/* What I'm building now: the live mark, then the repository's name as a link and GitHub's description of it. */
+.otc .otc__live {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
 .otc__making {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   min-height: 44px;
   color: var(--ink);
-  font-size: var(--type-small);
-  font-weight: 500;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: -0.015em;
   text-decoration: none;
+}
+
+.otc .otc__making-line {
+  max-width: 46em;
+  margin-top: 2px;
 }
 
 .otc__dot {
@@ -240,15 +320,7 @@
 /* ---- Narrower ---- */
 
 @media (max-width: 1259.98px) {
-  .otc {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .otc__training {
-    grid-column: 1 / -1;
-  }
-
-  /* The year needs the width to itself: the total and Now making above it, the grid full width. */
+  /* The year needs the width to itself: the total and what I'm building above it, the grid full width. */
   .otc__year {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -260,14 +332,34 @@
   }
 }
 
-@media (max-width: 719.98px) {
-  .otc {
+/* Under 900 px seven days no longer fit in a row: they are seven rows, the name beside its session. */
+@media (max-width: 899.98px) {
+  .otc__week {
     grid-template-columns: minmax(0, 1fr);
-    gap: 28px;
+    gap: 3px;
+  }
+
+  .otc__week li {
+    grid-template-columns: 52px minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0;
+    padding: 6px 14px;
+  }
+}
+
+@media (max-width: 719.98px) {
+  .otc__section {
+    margin-top: 24px;
+    padding-top: 24px;
+  }
+
+
+  .otc__shelf-cells {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .otc__history {
-    grid-template-columns: 64px minmax(0, 1fr);
+    grid-template-columns: 76px minmax(0, 1fr);
     align-items: start;
   }
 
@@ -275,7 +367,6 @@
     grid-column: 1 / -1;
     justify-self: start;
   }
-
 }
 
 @media (forced-colors: active) {

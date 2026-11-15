@@ -126,16 +126,17 @@ The homepage section for my own projects ([#157](https://github.com/3ixas/eliasb
 
 | Item | Live | When the source is empty |
 | --- | --- | --- |
-| Training | Today · {Thursday} / {Upper body gym} · My training week · Zone 2 means slow on purpose. · Photo caption: Out on a run, central London. · Photo alt: Elias mid-run on a rainy street in central London | Authored, so never empty. |
+| Training | Today’s workout · {Upper body gym} · My training week · Zone 2 means slow on purpose. · Photo caption: Out on a run, central London. · Photo alt: Elias mid-run on a rainy street in central London | Authored, so never empty. |
 | Now reading | Now reading · {title} · {author} · Goodreads ↗ | Between books. |
 | Last watched | Admit one · Last watched · {title} · {year} · Letterboxd ↗ | Nothing logged yet. |
 | The Weekly Curiosity | Odd but true, from this week in history · {3} things that happened this week, some stranger than others. · This week in history · {fact} · {year} · {1} of {3} · Live from Wikipedia | From the archive |
-| Now making | ● Now making · {project or repository name} · {GitHub description, when it has one} · View on GitHub ↗ (a project with a case study links its name to the case study instead) | Hidden when GitHub can’t be reached |
+| Now making | What I’m building now · ● Live from GitHub · {project or repository name} · {GitHub description, or the project’s line} · View on GitHub ↗ (a project with a case study links its name to the case study instead) | Hidden when GitHub can’t be reached |
 | GitHub | {1,221} contributions in the past year · Less / More / today · Live from GitHub | From GitHub, as of {date} |
 
 Strings added while building, shipped, and recorded here on 2026-10-09 so `verify:copy` covers them. They were not in the original approved copy; Elias signed them off on 2026-10-09.
 
 - Training week plan (revised 2026-11-08, Elias): Mon Monday Upper body gym · Tue Tuesday Lower body gym · Wed Wednesday Zone 2, assault bike · Thu Thursday Upper body gym · Fri Friday Lower body gym · Sat Saturday Skipping rope intervals · Sun Sunday Assault bike intervals
+- Section headings, signed off by Elias on 2026-11-15 after his phone review: Today’s workout · On my shelf and screen · Odd but true, from this week in history (now above its date row) · What I’m building now
 - Weekly Curiosity: Image:
 - GitHub: GitHub, the past year · Use the arrow keys to move between days.
 

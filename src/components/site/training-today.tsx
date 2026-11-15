@@ -4,7 +4,7 @@ import { useSyncExternalStore } from "react";
 import { offTheClock } from "@/content/stretch/off-the-clock";
 import { londonWeekday } from "@/integrations/signal-mappers";
 
-const { days, week, rowLine } = offTheClock.training;
+const { days, week, title } = offTheClock.training;
 
 function subscribe(onChange: () => void) {
   const timer = window.setInterval(onChange, 60_000);
@@ -25,25 +25,25 @@ function useWeekday(fixed?: string) {
 }
 
 /**
- * Off the clock's first cell (R-19): the training week as seven days with today marked, then today's session. Until the
- * day is known (or with no script) it is the week and the plan's name, which is still a complete cell.
+ * Off the clock's first section (R-19), "Today's workout": today's session large, and the whole week as seven rows with
+ * today marked. Until the day is known (or with no script) the week is all of it, which is still a complete section; the
+ * session's line holds its height, so filling it in moves nothing.
  */
 export function TrainingCell({ now }: { now?: string }) {
   const today = useWeekday(now);
   return (
-    <div className="otc__cell otc__training" data-otc="training">
+    <div className="otc__section otc__training" data-otc="training">
+      <h3 className="otc__title">{title}</h3>
+      <p className="otc__today">{today === null ? "" : days[today].session}</p>
       <ol className="otc__week" aria-label={week}>
         {days.map((day, index) => (
           <li key={day.short} data-today={today === index ? "" : undefined} aria-current={today === index ? "date" : undefined}>
-            <span aria-hidden="true">{day.short[0]}</span>
-            <span className="sr-only">
-              {day.long}: {day.session}
-            </span>
+            <span aria-hidden="true">{day.short}</span>
+            <span className="sr-only">{day.long}: </span>
+            <span>{day.session}</span>
           </li>
         ))}
       </ol>
-      <h3>{today === null ? week : days[today].session}</h3>
-      {today !== null && <p>{rowLine}</p>}
     </div>
   );
 }

@@ -204,3 +204,9 @@ No code to replace. They check the finished build; see the tickets.
 - A Work panel leads with its employer (`--type-employer`, 52 to 88 px, role and dates at 20 px beside it, below it on a phone); the figure drops to `--type-figure` (48 to 72 px) and BNP Paribas's words to 34 to 52 px. `DESIGN.md` "Type" says so.
 - Things I make's Threshold panel shows no figures (`thingsIMake.wideFigures` and `ProjectPanel`'s `figures` are gone); the case study keeps its four.
 - The pass's clip is threaded through the slot and its legs end at the slot's upper edge (`pass.css`); every ↗ carries U+FE0E (`OUT` in `parts/panel.tsx`); closing the zoom dialog by pointer returns focus without a ring (`zoom.css`, `zoomable-image.tsx`).
+
+### Off the clock's headings (#422)
+
+- Four sections, each under a rule: "Today’s workout" (today's session large over the week as seven days in a row, seven rows under 900 px, today filled), "On my shelf and screen" (the book and the film, covers at 76 px), "Odd but true, from this week in history" (the heading now above its date row), and the GitHub year with "What I’m building now" under its total (the live mark, the repository's name, and GitHub's description, or the project's line for a project). The film and book titles are `h4` under the shelf's `h3`. `TrainingCell` keeps today's line at its height until the day is known, so nothing shifts.
+- The four headings are Elias's, signed off on 2026-11-15 and recorded in `docs/content/redesign-copy.md`; `nowMaking.label` is now "What I’m building now" and `training.rowLine` is gone.
+- The homepage's length budget rose to 9 screens at 1440 × 900 and 12 at 390 × 844 (Elias, 2026-11-15); `DESIGN.md` and `e2e/homepage-signoff.spec.ts` say so.

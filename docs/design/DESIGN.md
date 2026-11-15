@@ -25,7 +25,7 @@ A change that breaks one needs Elias's decision, not a judgement in review.
 - **Sections**: 144 px apart (96 px under 720 px). Each opens with its title; Work alone has a subheading.
 - **Panels in a section**: 16 px apart. Two panels side by side stack under 720 px.
 - **Breakpoints**: 1260 px (the opening and wide panels stack), 900 px (the passes scroll sideways), 720 px (phone).
-- **Length**: the homepage stays within 8 screens at 1440 × 900 and 11 at 390 × 844. Something new takes the place of something else. A long-form page has no budget.
+- **Length**: the homepage stays within 9 screens at 1440 × 900 and 12 at 390 × 844 (raised from 8 and 11 on 15 November 2026, when Off the clock gained its headings, a fuller workout and Now making's description). Something new takes the place of something else. A long-form page has no budget.
 
 ## The panel
 
@@ -92,7 +92,7 @@ The name in Newsreader 500 at 20 px, a link to the homepage; the greeting; the f
 4. **Where I'm headed**: one paper panel. The title and lead at the left; three parts at the right, each from a chip naming its source (Optegra, BNP Paribas, Threshold).
 5. **Things I make**: Threshold wide; Argus Risk and Flowtime side by side; the other projects as rows, newest first, at most ten; the link to the Work archive with the true count.
 6. **How I work**: four cards, then the link to Threshold's PRD.
-7. **Off the clock**: one paper panel in three bands. Three cells: the training week and today's session, the book, the film. Then this week in history, full width: the image, its title, the year and the fact, and an outline pill ("1 of 3") that steps to the next oddity in place. Then the GitHub year: the total, with "Now making" and the latest repository beneath it, beside the grid. A stale feed says "From Goodreads, as of 2 Nov"; a feed that is down shows its authored fallback, and the panel keeps its shape.
+7. **Off the clock**: one paper panel in four sections, each under a rule and (the year apart) its own heading. "Today's workout": today's session large over the week as seven days in a row (seven rows under 900 px) with today marked. "On my shelf and screen": the book and the film, each with its cover at 76 px. "Odd but true, from this week in history": the image, the year and the fact, and an outline pill ("1 of 3") that steps to the next oddity in place. And the GitHub year: the total beside the grid, with "What I'm building now" under the total (the live mark, the latest repository's name and GitHub's description of it). A stale feed says "From Goodreads, as of 2 Nov"; a feed that is down shows its authored fallback, and the panel keeps its shape.
 8. **Say hello**, which ends every page.
 
 Anchors stay `#work`, `#things-i-make`, `#how-i-work`, `#off-the-clock` and `#say-hello`.
