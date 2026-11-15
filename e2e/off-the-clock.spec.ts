@@ -82,7 +82,7 @@ test.describe("Off the clock: training", () => {
       await page.goto("/fixtures/off-the-clock");
       const training = cell(fixture(page, `training-${name}`), "training");
       await expect(training.getByRole("heading", { level: 3 })).toHaveText(offTheClock.training.title);
-      await expect(training.locator(".otc__today")).toHaveText(days[index].session);
+      await expect(training.locator(".otc__today > span:last-child")).toHaveText(days[index].session);
       const marked = training.locator(".otc__week li[data-today]");
       await expect(marked).toHaveCount(1);
       await expect(marked).toHaveAttribute("aria-current", "date");
@@ -381,4 +381,18 @@ test.describe("Off the clock: contrast, sizes and layout", () => {
     const days = await cell(panel, "training").locator(".otc__week li").evaluateAll((items) => new Set(items.map((item) => Math.round(item.getBoundingClientRect().top))).size);
     expect(days).toBe(width(page) >= 900 ? 1 : 7);
   });
+});
+
+// Today's session is filled in after the page loads (it knows the day only then), so its line must already be as tall as the
+// longest session at this width, or a phone sees everything below it jump.
+test("filling in today's session moves nothing: its line is as tall with script as without", async ({ browser, page, baseURL }) => {
+  const heightOf = (target: Page) => target.locator("#off-the-clock .otc__today").evaluate((element) => Math.round(element.getBoundingClientRect().height));
+  await page.goto("/");
+  await hydrated(page);
+  const hydratedHeight = await heightOf(page);
+  const bare = await browser.newContext({ javaScriptEnabled: false, viewport: page.viewportSize()!, baseURL });
+  const plain = await bare.newPage();
+  await plain.goto("/");
+  expect(await heightOf(plain)).toBe(hydratedHeight);
+  await bare.close();
 });

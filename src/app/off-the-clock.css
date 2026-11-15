@@ -54,9 +54,9 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-/* Today's session, large. It is filled in once the day is known and holds its height until then. */
+/* Today's session, large. It is filled in once the day is known; the longest session, invisible, holds its height until then. */
 .otc .otc__today {
-  min-height: 1.05em;
+  display: grid;
   margin: 0;
   color: var(--ink);
   font-family: var(--serif);
@@ -64,6 +64,14 @@
   font-size: clamp(34px, 4vw, 48px);
   line-height: 1.05;
   letter-spacing: -0.025em;
+}
+
+.otc__today > * {
+  grid-area: 1 / 1;
+}
+
+.otc__today-sizer {
+  visibility: hidden;
 }
 
 /* The week as seven days in a row, each its name over its session; today's is filled with ink. Seven rows on a phone. */

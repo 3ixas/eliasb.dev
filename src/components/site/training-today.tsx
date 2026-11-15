@@ -6,6 +6,9 @@ import { londonWeekday } from "@/integrations/signal-mappers";
 
 const { days, week, title } = offTheClock.training;
 
+/** The longest session, which an invisible copy holds the line's height to: wrapped at a phone's width it is the tallest. */
+const longest = days.reduce((a, b) => (b.session.length > a.length ? b.session : a), "");
+
 function subscribe(onChange: () => void) {
   const timer = window.setInterval(onChange, 60_000);
   return () => window.clearInterval(timer);
@@ -27,14 +30,19 @@ function useWeekday(fixed?: string) {
 /**
  * Off the clock's first section (R-19), "Today's workout": today's session large, and the whole week as seven rows with
  * today marked. Until the day is known (or with no script) the week is all of it, which is still a complete section; the
- * session's line holds its height, so filling it in moves nothing.
+ * session's line holds the height of the longest session at the current width, so filling it in moves nothing.
  */
 export function TrainingCell({ now }: { now?: string }) {
   const today = useWeekday(now);
   return (
     <div className="otc__section otc__training" data-otc="training">
       <h3 className="otc__title">{title}</h3>
-      <p className="otc__today">{today === null ? "" : days[today].session}</p>
+      <p className="otc__today">
+        <span className="otc__today-sizer" aria-hidden="true">
+          {longest}
+        </span>
+        <span>{today === null ? "" : days[today].session}</span>
+      </p>
       <ol className="otc__week" aria-label={week}>
         {days.map((day, index) => (
           <li key={day.short} data-today={today === index ? "" : undefined} aria-current={today === index ? "date" : undefined}>
