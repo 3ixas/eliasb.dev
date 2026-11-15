@@ -27,6 +27,7 @@ import { offTheClock } from "../src/content/stretch/off-the-clock.ts";
 import { opening } from "../src/content/stretch/opening.ts";
 import { notFound, sayHello, siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy.ts";
 import { headedProblems, shownSource, work } from "../src/content/stretch/work.ts";
+import { comparisonRow, workPanelProblems, workPanels } from "../src/content/stretch/work-panels.ts";
 
 const raw = readFileSync(new URL("../docs/content/redesign-copy.md", import.meta.url), "utf8");
 // Emphasis stars and the {braces} around live values are markup, not words.
@@ -36,7 +37,7 @@ const plain = raw.replace(/\*/g, "").replace(/[{}]/g, "");
 
 const leaves = (value, path = "") => {
   // Links, image paths, a figure's kind and its screens' devices, dates, anchors, category keys and Role story slugs are addresses and data, not words, so the approved copy does not list them.
-  if (typeof value === "string") return /(href|src|writtenOn|\.id|\.glyph|\.slug|\.figures\.[\w-]+\.kind|\.figures\.[\w-]+\.images\[\d+\]\.device|\.category|\.story|\.project|\.restates\[\d+\])$/.test(path) ? [] : [[path, value]];
+  if (typeof value === "string") return /(href|src|writtenOn|\.id|\.glyph|\.slug|\.figures\.[\w-]+\.kind|\.figures\.[\w-]+\.images\[\d+\]\.device|\.category|\.story|\.project|\.restates\[\d+\]|\.drawn\.kind|\.drawn\.projects\[\d+\])$/.test(path) ? [] : [[path, value]];
   if (Array.isArray(value)) return value.flatMap((item, index) => leaves(item, `${path}[${index}]`));
   if (value && typeof value === "object") return Object.entries(value).flatMap(([key, item]) => leaves(item, `${path}.${key}`));
   return [];
@@ -44,16 +45,14 @@ const leaves = (value, path = "") => {
 const modules = {
   siteCopy,
   notFound,
-  // The opening's own words; the runs are the same sentences cut up, and the certificate's description is the Role story's.
+  // The opening's own words; the runs are the same sentences cut up.
   opening: {
     headline: opening.headline,
     support: opening.support,
-    engines: opening.looks.engines,
-    cores: opening.looks.cores,
-    digitisation: { pin: opening.looks.digitisation.pin, line: opening.looks.digitisation.line, bars: opening.looks.digitisation.bars },
-    ownership: opening.looks.ownership.certificate.caption,
   },
   thingsIMake,
+  // What the passes print (R-12); the lanyard and band are colours, not words.
+  passPoints: Object.fromEntries(Object.entries(passRecords).map(([slug, { points }]) => [slug, points.map(({ lead, detail }) => ({ lead, detail }))])),
   sayHello,
   workArchive,
   howIWork,
@@ -83,7 +82,7 @@ const built = [
 ];
 for (const text of built) assert.ok(plain.includes(text), `Built string is not in the approved copy: "${text}"`);
 assert.equal(thingsIMake.note, "Products of my own, from a rental calculator to a risk simulator.");
-assert.equal(thingsIMake.allThings(projects.length), "Everything I’ve built (06) →");
+assert.equal(`${thingsIMake.allThings(projects.length)} →`, "Everything I’ve built (06) →");
 
 // The 404's missing row, section title and note are listed field by field, and each section's line is in the deck's table.
 for (const line of [
@@ -134,45 +133,46 @@ assert.ok(opening.headline.includes("BNP"), "The opening's one BNP is in the h1"
 const openingRows = Object.fromEntries(rows(raw, "### Quiet index · Opening").map(([where, copy]) => [where, copy.replaceAll("*", "")]));
 assert.equal(opening.headline, openingRows["Opening line (`h1`)"], "The opening line");
 assert.equal(opening.support, openingRows["Supporting line"], "The supporting line");
-for (const [name, runs, text] of [["headline", opening.headlineRuns, opening.headline], ["supporting line", opening.supportRuns, opening.support]]) {
-  assert.equal(runs.map((run) => run.text).join(""), text, `The opening's ${name} runs read as the ${name}`);
-}
-
-// The reveal words are the deck's, in reading order, each with the closer look the deck describes.
-const revealRows = rows(raw, "### Quiet index · The reveal words in the opening");
-const reveals = Object.fromEntries(revealRows.map(([word, caption]) => [word, caption.replaceAll("*", "")]));
-assert.deepEqual(
-  [...opening.headlineRuns, ...opening.supportRuns].filter((run) => run.mark && run.mark !== "employer" && run.mark !== "emphasis").map((run) => run.text),
-  Object.keys(reveals),
-  "The opening's reveal words are the deck's",
-);
-const { engines, cores, digitisation, ownership } = opening.looks;
-assert.equal(engines.caption, reveals["pricing and risk engines"], "The simulation's caption");
-assert.ok(raw.includes(`The engines' look is also described as: “${engines.alt}”`), "The deck gives the simulation's accessible description, which says the paths are illustrative");
-assert.equal(cores.caption, reveals["CPU and GPU"], "The cores' caption");
-assert.equal(
-  `${digitisation.pin.label} · ${digitisation.pin.detail}, then: ${digitisation.line} Bars: ${digitisation.bars.map((bar) => bar.label).join(" · ")}`,
-  reveals["digitisation competition"],
-  "The digitisation competition's closer look",
-);
-assert.equal(ownership.certificate.caption, reveals["Take Ownership award"], "The certificate's caption");
+assert.equal(opening.headlineRuns.map((run) => run.text).join(""), opening.headline, "The opening's headline runs read as the headline");
 
 // How I work: four habits. The first two are as in the original three-beat table; the last two are in the quiet index table.
 const keptBeats = rows(raw, "## How I work");
 const quietHow = Object.fromEntries(rows(raw, "### Quiet index · How I work"));
 assert.equal(howIWork.beats.length, 4, "How I work has four habits");
 assert.equal(howIWork.note, quietHow.Note, "How I work: note");
-// The pen underlines a phrase of each proof, so the phrase must be in the proof word for word.
-for (const beat of howIWork.beats) assert.ok(beat.proof.includes(beat.underline), `How I work: "${beat.habit}" has no "${beat.underline}" in its proof to underline`);
+// Each card highlights a phrase of its story, so the phrase must be in the story word for word.
+for (const beat of howIWork.beats) assert.ok(beat.proof.includes(beat.highlight), `How I work: "${beat.habit}" has no "${beat.highlight}" in its story to highlight`);
 assert.deepEqual(
   howIWork.beats.slice(0, 2).map((beat) => [`**${beat.habit}**`, beat.proof]),
   keptBeats.slice(0, 2),
 );
-for (const beat of howIWork.beats.slice(2)) assert.equal(`${beat.proof} Underline: “${beat.underline}”`, quietHow[beat.habit], `How I work: "${beat.habit}"`);
+for (const beat of howIWork.beats.slice(2)) assert.equal(`${beat.proof} Underline: “${beat.highlight}”`, quietHow[beat.habit], `How I work: "${beat.habit}"`);
 // The PRD row and the closer look's caption are the case study's own date, so the two cannot drift apart.
 const prdDate = caseStudies.threshold.prd.date;
 assert.equal(`${howIWork.prd.title} · ${prdDate}`, quietHow["PRD row"], "How I work: the PRD row");
 assert.equal(`${howIWork.prd.title}, ${prdDate}`, raw.match(/^- PRD card caption: (.+)$/m)?.[1], "How I work: the PRD closer look's caption");
+{
+  // The cards' drawn proofs (R-18) and the link to the PRD, as the deck's "Passes and panels" section gives them.
+  const deck = raw.slice(raw.indexOf("## Passes and panels · Where I’m headed and How I work"));
+  const line = (label) => deck.match(new RegExp(`^- ${label}: (.+)$`, "m"))?.[1];
+  const table = deck.split("\n").filter((line) => line.startsWith("|") && !line.startsWith("|---")).map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()));
+  const drawnAs = ({ drawn }) =>
+    drawn.kind === "projects" ? drawn.projects.map((slug) => projects.find((project) => project.slug === slug)?.name).join(" · ")
+    : drawn.kind === "count" ? `${drawn.value}, as ${drawn.value} ticks`
+    : drawn.kind === "switch" ? `A switch, ${drawn.label}`
+    : `${drawn.value}, its bar ${drawn.percent}% longer`;
+  assert.deepEqual(howIWork.beats.map((beat) => [beat.habit, beat.highlight, drawnAs(beat)]), table.filter((row) => howIWork.beats.some((beat) => beat.habit === row[0])), "How I work: the highlights and drawn proofs");
+  assert.equal(`${howIWork.prd.title}, ${prdDate} →`, line("PRD link"), "How I work: the link to the PRD");
+  // A drawing never says more than its story: a count or a change is a number the story states.
+  for (const beat of howIWork.beats) {
+    const { drawn } = beat;
+    const number = drawn.kind === "count" ? String(drawn.value) : drawn.kind === "change" ? String(drawn.percent) : null;
+    if (number) assert.ok(beat.highlight.includes(number), `How I work: "${beat.habit}" draws ${number}, which its highlighted phrase does not state`);
+    if (drawn.kind === "change") assert.equal(drawn.value, `+${drawn.percent}%`, `How I work: "${beat.habit}" writes ${drawn.value} for a ${drawn.percent}% change`);
+    if (drawn.kind === "projects") for (const slug of drawn.projects) assert.ok(beat.proof.includes(projects.find((project) => project.slug === slug)?.name ?? slug), `How I work: "${beat.habit}" draws ${slug}, which its story does not name`);
+  }
+  assert.equal(line("Where I’m headed lead"), work.headed.line, "Where I’m headed: the lead (spec Decisions 2)");
+}
 
 // The approved copy under a `### name` heading, for the sections that follow.
 const copyFor = (name) => {
@@ -194,7 +194,6 @@ for (const { slug, pins } of work.employers) {
   assert.equal(`${story.role} · ${story.dates}`, workRows[`${passRecords[slug].short} row`], `${slug}: the row's line is its Role story's role and dates`);
   assert.equal(pins.length, 3, `${slug}: three Pass pins`);
 }
-assert.ok(workRows["Where I’m headed: heading and line"].includes(`${headed.heading} · ${headed.line}`), "Where I’m headed: heading and line");
 
 const headedCopy = copyFor("Where I’m headed");
 assert.equal(headed.heading, bullet(headedCopy, "Heading"), "Where I’m headed: heading");
@@ -316,6 +315,19 @@ assert.match(roleStoryProblems([{ ...bnp, resume: [...bnp.resume.slice(1), "Went
 assert.match(roleStoryProblems([{ ...bnp, resume: [bnp.resume[0], "Cut a 30–40 minute data load to under 7."] }, ...rest])[0], /"7", which its story does not say/);
 assert.match(roleStoryProblems([{ ...bnp, resume: ["Only one line."] }, ...rest])[0], /1 Résumé lines, not 2 to 4/);
 
+// Every printed value has a stated limit (TEXT_LIMITS), measured on /fixtures/worst-case: a longer one is refused.
+{
+  const long = (n) => "x".repeat(n);
+  const word = (n) => `Long ${long(n - 5)}`;
+  assert.match(roleStoryProblems([{ ...bnp, employer: word(61) }, ...rest]).join("\n"), /employer name longer than 60/);
+  assert.deepEqual(roleStoryProblems([{ ...bnp, employer: word(60) }, ...rest]).filter((p) => /employer name/.test(p)), []);
+  assert.match(roleStoryProblems([{ ...bnp, evidence: [{ value: long(9), label: "a figure" }] }, ...rest]).join("\n"), /the figure ".*", longer than 8/);
+  const study = Object.values(caseStudies)[0];
+  assert.match(caseStudyProblems([{ ...study, evidence: [{ value: long(9), label: "a figure" }] }, ...Object.values(caseStudies).slice(1)], projects).join("\n"), /longer than 8/);
+  assert.match(passProblems({ ...passRecords, joveen: { ...passRecords.joveen, short: word(33) } }, roles)[0], /Staff pass "joveen": the name ".*" is longer than 32/);
+  assert.deepEqual(passProblems({ ...passRecords, joveen: { ...passRecords.joveen, short: word(32) } }, roles), []);
+}
+
 // A Staff pass's headline number is one of its Role story's evidence items or a fact the story states in words
 // (#209), so a pass never claims more than its story does. Each failure names the pass.
 assert.deepEqual(passProblems(passRecords, roles), []);
@@ -331,6 +343,19 @@ assert.equal(passRecords.joveen.pins, undefined, "Only the current pass wears th
   assert.match(claim("bnp-paribas", { value: "Only", label: "C# engineer on the team" })[0], /"bnp-paribas"/, "A stated fact needs the sentence that states it");
   assert.match(claim("bnp-paribas", { value: "Only", label: "C# engineer on the team", quote: "only Rust engineer" })[0], /"bnp-paribas"/, "...and the story must say it");
 }
+{
+  // Every point on a pass is its story's evidence or a fact it states, with no number the source lacks (R-12).
+  const point = (slug, index, replacement) => {
+    const points = [...passRecords[slug].points];
+    points[index] = replacement;
+    return passProblems({ ...passRecords, [slug]: { ...passRecords[slug], points } }, roles);
+  };
+  assert.deepEqual(roleStorySlugs.map((slug) => passRecords[slug].points.length), [3, 3, 3]);
+  assert.match(point("joveen", 1, { lead: "520 → 210 ms", detail: "Key API p95", evidence: 3 })[0], /Staff pass "joveen": the point "520 → 210 ms · Key API p95" says "210", which its source does not/);
+  assert.match(point("optegra", 0, { lead: "62 → 88%", detail: "Core Web Vitals pass rate", evidence: 9 })[0], /names evidence item 9/);
+  assert.match(point("bnp-paribas", 2, { lead: "AI workflow", detail: "Used by every team", quotes: ["used by every team"] })[0], /quotes "used by every team", which its Role story does not say/);
+  assert.match(point("bnp-paribas", 1, { lead: "Take Ownership", detail: "Award, Q2 2026", quotes: ["won a Take Ownership award"] })[0], /says "2", which its source does not/);
+}
 assert.equal(currentPassStatus, "Valid · present");
 assert.equal(passLinkLabel(passRecords.optegra), "The Optegra story →", "The link names the short employer, not Optegra Eye Healthcare & Kensington Medical");
 
@@ -338,6 +363,42 @@ assert.equal(passLinkLabel(passRecords.optegra), "The Optegra story →", "The l
 assert.deepEqual(workArchive.filters.map(({ category }) => category), [null, ...PROJECT_CATEGORIES], "the filters are All, then every category once, in the catalogue's order");
 for (const [what, ids] of [["menu", siteCopy.menu.map(({ id }) => id)], ["Say hello links", sayHello.links.map(({ id }) => id)]]) {
   assert.equal(new Set(ids).size, ids.length, `the ${what} lists each id once`);
+}
+
+// Work's panels (R-13 to R-15): every string as the deck gives it, and every figure and bar its Role story's fact.
+{
+  const from = raw.indexOf("## Passes and panels · Work");
+  const next = raw.indexOf("\n## ", from + 1);
+  const deck = raw.slice(from, next === -1 ? undefined : next);
+  const tables = deck.split("\n").filter((line) => line.startsWith("|") && !line.startsWith("|---")).map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()));
+  const { bnp, roles } = workPanels;
+  assert.equal(workPanels.heading, work.heading, "Work's panels keep Work's heading");
+  assert.equal(workPanels.subheading, work.note, "Work's subheading is its approved note");
+  assert.equal(`${bnp.figure.value} · ${bnp.figure.label}`, bullet(deck, "BNP Paribas figure"), "Work: BNP Paribas's figure");
+  assert.equal(`${bnp.simulation.start} · ${bnp.simulation.end} · ${bnp.simulation.price}`, bullet(deck, "Simulation"), "Work: the simulation's labels");
+  assert.equal(bnp.simulation.caption, bullet(deck, "Simulation caption"), "Work: the simulation's caption");
+  assert.equal(bnp.simulation.description, bullet(deck, "Simulation description"), "Work: the simulation's accessible description");
+  assert.match(bnp.simulation.description, /^Illustrative/, "The simulation says it is illustrative");
+  const story = roleStories[bnp.slug];
+  assert.deepEqual(
+    bnp.comparisons.map((comparison) => [comparisonRow(story, comparison)?.what, `${comparison.before.name} · ${comparison.before.value}`, `${comparison.after.name} · ${comparison.after.value}`]),
+    tables.filter((row) => row.length === 3 && row[0] !== "Comparison" && row[0] !== "Panel" && !["Joveen", "Optegra"].includes(row[0])),
+    "Work: BNP Paribas's comparisons",
+  );
+  assert.deepEqual(
+    roles.flatMap((panel) => panel.pairs.map((pair) => [passRecords[panel.slug].short, pair.what, pair.value])),
+    tables.filter((row) => ["Joveen", "Optegra"].includes(row[0])),
+    "Work: Joveen's and Optegra's pairs",
+  );
+  assert.deepEqual(workPanelProblems(workPanels), []);
+  const pair = (index, replacement) => workPanelProblems({ ...workPanels, roles: [{ ...roles[0], pairs: roles[0].pairs.map((entry, at) => (at === index ? { ...entry, ...replacement } : entry)) }, roles[1]] });
+  assert.match(pair(0, { value: "520 ms → 210 ms", after: 210 })[0], /joveen's "Key API p95" says "210"/, "A pair's number must be its story's");
+  assert.match(pair(0, { after: 200 })[0], /draws 520 against 200, but its value states 520 against 230/, "A bar is drawn at the amount its value states");
+  assert.match(pair(2, { after: 140 })[0], /draws 100 against 140, but its value states 100 against 130/, "A change in per cent is drawn from 100");
+  const comparison = (replacement) => workPanelProblems({ ...workPanels, bnp: { ...bnp, comparisons: [{ ...bnp.comparisons[0], ...replacement }, bnp.comparisons[1]] } });
+  assert.match(comparison({ after: { name: "Me, new to it", value: "an afternoon" } })[0], /writes "an afternoon"/, "A comparison's value is its scale row's");
+  assert.match(comparison({ row: 4 })[0], /scale row 4/);
+  assert.match(workPanelProblems({ ...workPanels, bnp: { ...bnp, figure: { value: "Six months", label: "from zero Rust to production code" } } })[0], /figure .* is not one of its Role story's evidence items/);
 }
 
 console.log("Redesign copy checks passed.");

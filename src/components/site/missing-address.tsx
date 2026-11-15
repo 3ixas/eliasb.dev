@@ -28,11 +28,11 @@ function shortened(path: string) {
 }
 
 /**
- * The address asked for, as the 404's missing row's title (docs/design/DESIGN.md, "The 404"): struck through by
- * the row's CSS. It is the request path, read in the browser: the 404 is prerendered, so the HTML carries no
+ * The address asked for, on the 404's missing line (docs/design/DESIGN.md "The 404"): struck through by the line's
+ * `<s>`. It is the request path, read in the browser: the 404 is prerendered, so the HTML carries no
  * address until then.
  */
 export function MissingAddress() {
   const path = useSyncExternalStore(noSubscription, requestPath, unknownOnServer);
-  return <span className="qi-missing__address stretch-mono">{path === null ? "" : shortened(path)}</span>;
+  return <span className="missing__address">{path === null ? "" : shortened(path)}</span>;
 }

@@ -15,9 +15,9 @@ export const offTheClock = {
   live: (source: string) => `Live from ${source}`,
   fromAsOf: (source: string, date: string) => `From ${source}, as of ${date}`,
   training: {
+    /** The section's heading (Elias, 2026-11-15). */
+    title: "Today’s workout",
     week: "My training week",
-    /** The row's line once today's session is its title. */
-    rowLine: "Today’s session, from my training week",
     photoCaption: "Out on a run, central London.",
     photo: {
       src: "/signals/running-central-london.webp",
@@ -35,6 +35,8 @@ export const offTheClock = {
       { short: "Sun", long: "Sunday", session: "Assault bike intervals" },
     ],
   },
+  /** The heading over the book and the film together (Elias, 2026-11-15). */
+  shelf: { title: "On my shelf and screen" },
   reading: {
     label: "Now reading",
     sourceName: "Goodreads",
@@ -42,7 +44,6 @@ export const offTheClock = {
     coverAlt: (title: string, author: string) => `Cover of ${title} by ${author}`,
   },
   watched: {
-    kicker: "Admit one",
     label: "Last watched",
     sourceName: "Letterboxd",
     fallback: "Nothing logged yet.",
@@ -62,7 +63,8 @@ export const offTheClock = {
     born: (date: string) => `Born ${date}`,
   },
   nowMaking: {
-    label: "Now making",
+    /** The section's heading (Elias, 2026-11-15). */
+    label: "What I’m building now",
     sourceName: "GitHub",
   },
   github: {
@@ -86,11 +88,11 @@ export type NowMakingEntry = { name: string; description: string | null; href: s
  */
 export function nowMakingEntry(
   latest: { name: string; description: string | null; href: string } | null,
-  projects: readonly { name: string; links: { caseStudy?: string; code?: string } }[],
+  projects: readonly { name: string; outcome: string; links: { caseStudy?: string; code?: string } }[],
 ): NowMakingEntry | null {
   if (!latest) return null;
   const project = projects.find(({ links }) => links.code?.toLowerCase() === latest.href.toLowerCase());
   if (!project) return { name: latest.name, description: latest.description, href: latest.href, internal: false };
   const caseStudy = project.links.caseStudy;
-  return { name: project.name, description: null, href: caseStudy ?? latest.href, internal: Boolean(caseStudy) };
+  return { name: project.name, description: project.outcome, href: caseStudy ?? latest.href, internal: Boolean(caseStudy) };
 }

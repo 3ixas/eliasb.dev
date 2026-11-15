@@ -27,28 +27,32 @@ const shift = (page: Page) =>
       }),
   );
 
+/** Every visit runs twice: with the real fonts, and with every font request aborted, so the fallback faces are the ones laid out. */
 for (const route of routes) {
-  test(`${route} shifts by no more than ${budget}`, async ({ page, browserName }, info) => {
-    test.skip(browserName !== "chromium" || !/-(390|1440)-/.test(info.project.name), "Chromium at 390 and 1440 px");
-    await page.goto(route);
-    await page.waitForLoadState("load");
-    await page.evaluate(() => document.fonts.ready);
-    await shift(page);
-    // Scroll to the bottom and back so lazy images and late arrivals are part of the visit.
-    for (const to of ["bottom", "top"] as const) {
-      await page.evaluate(async (target) => {
-        const height = () => document.documentElement.scrollHeight - innerHeight;
-        const step = innerHeight * 0.8;
-        const goal = () => (target === "bottom" ? height() : 0);
-        while (Math.abs(scrollY - goal()) > 1) {
-          scrollTo(0, target === "bottom" ? Math.min(scrollY + step, goal()) : Math.max(scrollY - step, 0));
-          await new Promise(requestAnimationFrame);
-          await new Promise((done) => setTimeout(done, 50));
-        }
-      }, to);
-    }
-    await page.evaluate(() => new Promise(requestAnimationFrame));
-    const total = await page.evaluate(() => (window as unknown as { __shift: () => number }).__shift());
-    expect(total).toBeLessThanOrEqual(budget);
-  });
+  for (const fonts of ["real fonts", "fonts blocked"] as const) {
+    test(`${route} shifts by no more than ${budget} with ${fonts}`, async ({ page, browserName }, info) => {
+      test.skip(browserName !== "chromium" || !/-(390|1440)-/.test(info.project.name), "Chromium at 390 and 1440 px");
+      if (fonts === "fonts blocked") await page.route(/\.(woff2?|ttf|otf)(\?|$)/, (request) => request.abort());
+      await page.goto(route);
+      await page.waitForLoadState("load");
+      if (fonts === "real fonts") await page.evaluate(() => document.fonts.ready);
+      await shift(page);
+      // Scroll to the bottom and back so lazy images and late arrivals are part of the visit.
+      for (const to of ["bottom", "top"] as const) {
+        await page.evaluate(async (target) => {
+          const height = () => document.documentElement.scrollHeight - innerHeight;
+          const step = innerHeight * 0.8;
+          const goal = () => (target === "bottom" ? height() : 0);
+          while (Math.abs(scrollY - goal()) > 1) {
+            scrollTo(0, target === "bottom" ? Math.min(scrollY + step, goal()) : Math.max(scrollY - step, 0));
+            await new Promise(requestAnimationFrame);
+            await new Promise((done) => setTimeout(done, 50));
+          }
+        }, to);
+      }
+      await page.evaluate(() => new Promise(requestAnimationFrame));
+      const total = await page.evaluate(() => (window as unknown as { __shift: () => number }).__shift());
+      expect(total).toBeLessThanOrEqual(budget);
+    });
+  }
 }

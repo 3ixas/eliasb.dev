@@ -124,7 +124,7 @@ Reduced motion shows every end state at once with no movement. Nothing loops. Co
 
 #### R-08 The header
 
-One header on every page: the name (a link to the homepage), the greeting, the five section links, and the theme control, over a 1 px ink rule. It is not sticky. On inner pages the links go to the homepage's sections. Under 720 px the links move behind a Menu button that opens them as a list under the header; Escape or choosing a link closes it.
+One header on every page: the name (a link to the homepage), the greeting, the five section links, and the theme control, over a 1 px ink rule. It is not sticky. On inner pages the links go to the homepage's sections. Under 900 px the links move behind a Menu button that opens them as a list under the header; Escape or choosing a link closes it.
 
 **Acceptance:** the five link labels and targets are the release check's existing ones; the Menu button reports its state with `aria-expanded`; with script off the links show.
 

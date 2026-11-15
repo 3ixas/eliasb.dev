@@ -126,16 +126,17 @@ The homepage section for my own projects ([#157](https://github.com/3ixas/eliasb
 
 | Item | Live | When the source is empty |
 | --- | --- | --- |
-| Training | Today · {Thursday} / {Upper body gym} · My training week · Zone 2 means slow on purpose. · Photo caption: Out on a run, central London. · Photo alt: Elias mid-run on a rainy street in central London | Authored, so never empty. |
+| Training | Today’s workout · {Upper body gym} · My training week · Zone 2 means slow on purpose. · Photo caption: Out on a run, central London. · Photo alt: Elias mid-run on a rainy street in central London | Authored, so never empty. |
 | Now reading | Now reading · {title} · {author} · Goodreads ↗ | Between books. |
 | Last watched | Admit one · Last watched · {title} · {year} · Letterboxd ↗ | Nothing logged yet. |
 | The Weekly Curiosity | Odd but true, from this week in history · {3} things that happened this week, some stranger than others. · This week in history · {fact} · {year} · {1} of {3} · Live from Wikipedia | From the archive |
-| Now making | ● Now making · {project or repository name} · {GitHub description, when it has one} · View on GitHub ↗ (a project with a case study links its name to the case study instead) | Hidden when GitHub can’t be reached |
+| Now making | What I’m building now · ● Live from GitHub · {project or repository name} · {GitHub description, or the project’s line} · View on GitHub ↗ (a project with a case study links its name to the case study instead) | Hidden when GitHub can’t be reached |
 | GitHub | {1,221} contributions in the past year · Less / More / today · Live from GitHub | From GitHub, as of {date} |
 
 Strings added while building, shipped, and recorded here on 2026-10-09 so `verify:copy` covers them. They were not in the original approved copy; Elias signed them off on 2026-10-09.
 
 - Training week plan (revised 2026-11-08, Elias): Mon Monday Upper body gym · Tue Tuesday Lower body gym · Wed Wednesday Zone 2, assault bike · Thu Thursday Upper body gym · Fri Friday Lower body gym · Sat Saturday Skipping rope intervals · Sun Sunday Assault bike intervals
+- Section headings, signed off by Elias on 2026-11-15 after his phone review: Today’s workout · On my shelf and screen · Odd but true, from this week in history (now above its date row) · What I’m building now
 - Weekly Curiosity: Image:
 - GitHub: GitHub, the past year · Use the arrow keys to move between days.
 
@@ -374,3 +375,58 @@ Shared labels: ← Work · Next role · Evidence · section numbers 01–06 ([#1
 - **Facts:** every claim traces to #103, the CV, `src/content/case-files.ts`, or the project specs (Argus `project-spec.md`; Flowtime `project-spec.md`, added 3 January 2026). Threshold’s figures come from the evidence note.
 - **Privacy:** BNP Paribas detail stays at CV level; no colleague names, internal system names, or review context. “The team’s only C# engineer” is CV wording.
 - **Voice:** British spelling, plain verbs, few em-dashes, at most one light touch of humour per section.
+
+## Passes and panels · Staff passes
+
+What each employer's pass prints, as approved in the passes and panels spec (R-12, 11 November 2026). Each point is a lead over a detail; `verify:copy` and `passProblems` check each against its Role story.
+
+| Pass | Lead | Detail |
+|---|---|---|
+| BNP Paribas | Winner | Digitisation competition, 2025 |
+| BNP Paribas | Take Ownership | Award, Q1 2026 |
+| BNP Paribas | AI workflow | Used by several teams |
+| Joveen | −40% | Page load |
+| Joveen | 520 → 230 ms | Key API p95 |
+| Joveen | +30% | Mobile retention |
+| Optegra | 62 → 88% | Core Web Vitals pass rate |
+| Optegra | −30% | p95 page load |
+| Optegra | +15% | Consultation conversion |
+
+## Passes and panels · Work
+
+What Work's panels say, as approved in the passes and panels spec (R-13 to R-15, 11 November 2026). The heading and subheading are Work's own (above). Every figure and bar amount is its Role story's fact: `verify:copy` checks these strings and `workPanelProblems` checks the numbers.
+
+- BNP Paribas figure: Six months · from zero C# to production code
+- Simulation: Today · Horizon · One price
+- Simulation caption: The engines run large simulation-based calculations across several asset classes. Thousands of possible market paths go in; a price and its risk come out.
+- Simulation description: Illustrative simulated paths from today to the horizon, a histogram of where they end on the right edge, and a dashed line at their average, labelled one price.
+
+Screen readers read the description with the figure; nothing shows it on screen. Its words are R-14's own description of the drawing.
+
+| Comparison | Before | After |
+|---|---|---|
+| Integrating a pricer | An experienced engineer · about two weeks | Me, new to it · a couple of days |
+| The competition dashboard’s data load | Before · 30–40 min | After · under 5 min |
+
+| Panel | Pair | Value |
+|---|---|---|
+| Joveen | Key API p95 | 520 ms → 230 ms |
+| Joveen | Time to deploy | 10 min → under 2 |
+| Joveen | Mobile retention | +30% |
+| Optegra | Pass rate | 62% → 88% |
+| Optegra | p95 page load | −30% |
+| Optegra | Consultation conversion | +15% |
+
+## Passes and panels · Where I’m headed and How I work
+
+As approved in the passes and panels spec (R-16 and R-18, 11 November 2026). Where I’m headed is its own section: its three parts keep their titles and “So far” lines from the table above, each under a chip naming its source; it shows no destination label and no job title. How I work’s cards show the habit and its story with the phrase highlighted (no longer underlined), then the proof drawn in the card’s foot. The section notes are gone (the spec’s Decisions 7). `verify:copy` checks every drawn number against its highlighted phrase.
+
+- Where I’m headed lead: I’m working towards the judgement, depth and range to be trusted with what to build, building it well and getting it used. Here’s how far I’ve got on each.
+- PRD link: Threshold’s PRD, 16 April 2026 →
+
+| Habit | Highlighted | Drawn |
+|---|---|---|
+| Start from a real problem. | no clear idea | Threshold · Flowtime |
+| Write it down first. | 57 user stories | 57, as 57 ticks |
+| Ship it so it’s safe to undo. | defaults to off | A switch, Off |
+| Measure whether it works. | rose by 15% | +15%, its bar 15% longer |

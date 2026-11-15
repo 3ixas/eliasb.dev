@@ -124,6 +124,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
       light: { field: "#00965e", ink: "#06120d", swatch: "#053824" },
       dark: { field: "#0b3a28", ink: "#eaf5ef", swatch: "#3ecf8e" },
     },
+    panel: { field: "#00965e", ink: "#04140d" },
     next: "joveen",
   },
   joveen: {
@@ -219,6 +220,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
       light: { field: "#0a0a0a", ink: "#f2f2f2", swatch: "#737373" },
       dark: { field: "#ececec", ink: "#0a0a0a", swatch: "#7a7a7a" },
     },
+    panel: { field: "#0b0b0c", ink: "#f4f4f2" },
     next: "optegra",
   },
   optegra: {
@@ -320,6 +322,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
       light: { field: "#006765", ink: "#f0fbf9", swatch: "#00aa90" },
       dark: { field: "#00aa90", ink: "#04100f", swatch: "#006765" },
     },
+    panel: { field: "#006765", ink: "#f0fbf9" },
     next: null,
   },
 };

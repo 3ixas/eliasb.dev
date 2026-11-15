@@ -1,0 +1,546 @@
+/*
+ * Off the clock (docs/design/DESIGN.md "The homepage, in order" 7; R-19): one paper panel that follows the theme, as four
+ * sections each under its own heading: Today's workout; On my shelf and screen; this week in history; the GitHub year,
+ * with what I'm building now under its total. The panel and the pill are parts.css's; the GitHub year's structure is github-year.tsx's,
+ * restyled here onto the year ramps.
+ */
+
+/* The panel is a stack of sections, each under its own heading and a rule: the workout, the shelf and screen, this week in history, what I'm building now, the GitHub year. */
+.otc {
+  display: block;
+}
+
+.otc__section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--hair);
+}
+
+.otc > .otc__section:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.otc :is(h3, h4) {
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+/* A section's heading, a step above the titles inside it. */
+.otc .otc__title {
+  margin-bottom: 12px;
+  font-size: 30px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.otc p {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: var(--type-small);
+}
+
+/* ---- Today's workout ---- */
+
+.otc__training {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Today's session, large. It is filled in once the day is known; the longest session, invisible, holds its height until then. */
+.otc .otc__today {
+  display: grid;
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: clamp(34px, 4vw, 48px);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+.otc__today > * {
+  grid-area: 1 / 1;
+}
+
+.otc__today-sizer {
+  visibility: hidden;
+}
+
+/* The week as seven days in a row, each its name over its session; today's is filled with ink. Seven rows on a phone. */
+.otc__week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 22px;
+  font-size: var(--type-ui);
+}
+
+.otc__week li {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+
+.otc__week li > span:first-child {
+  font-weight: 600;
+}
+
+.otc__week li[data-today] {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: none;
+}
+
+/* ---- The book and the film ---- */
+
+.otc__shelf-cells {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px 32px;
+}
+
+.otc__media {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* A cell with no cover has none, and no placeholder box. */
+.otc__media:not(:has(.otc__cover)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.otc__cover {
+  width: 76px;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 12px 24px -10px var(--shadow);
+}
+
+.otc__source {
+  font-size: var(--type-label);
+}
+
+/* ---- This week in history ---- */
+
+.otc__history {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px 24px;
+}
+
+.otc__history > .otc__title {
+  grid-column: 1 / -1;
+  margin-bottom: 4px;
+}
+
+/* The picture's slot keeps its height when an oddity has none, so stepping moves nothing. */
+.otc__history-image {
+  display: block;
+  min-height: 76px;
+}
+
+.otc__history-image img {
+  display: block;
+  width: 76px;
+  height: 76px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.otc__history-text {
+  display: grid;
+  max-width: 46em;
+}
+
+/* Every oddity in one cell: the hidden ones hold the band at the tallest, so stepping moves nothing. */
+.otc__history-text > * {
+  grid-area: 1 / 1;
+}
+
+.otc__history-sizer {
+  visibility: hidden;
+}
+
+.otc__history b {
+  margin-right: 4px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-ui);
+  font-weight: 500;
+  font-variant-numeric: lining-nums;
+}
+
+.otc__credit {
+  font-size: var(--type-label);
+}
+
+/* The pill keeps one width whatever the count says, so stepping moves nothing. */
+.otc__step {
+  min-width: 96px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- The GitHub year and Now making ---- */
+
+.otc__year {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+  align-items: end;
+  gap: 8px 32px;
+}
+
+.otc__year > .stretch-gh__total {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--type-ui);
+}
+
+.otc__year .stretch-gh__count {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: 52px;
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.otc__year-side {
+  grid-column: 1;
+  grid-row: 2 / span 2;
+  align-self: end;
+}
+
+.otc__year-side:empty {
+  display: none;
+}
+
+/* Now making's heading is the year band's own subheading, a step under a section's. */
+.otc .otc__subtitle {
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.otc__year > .stretch-gh__readout,
+.otc__year > .stretch-gh__scroll,
+.otc__year > .stretch-gh__foot {
+  grid-column: 2;
+}
+
+.otc__year > .stretch-gh__readout {
+  grid-row: 1;
+  align-self: end;
+  color: var(--cobalt);
+}
+
+.otc__year > .stretch-gh__scroll {
+  grid-row: 2;
+}
+
+.otc__year > .stretch-gh__foot {
+  grid-row: 3;
+  color: var(--muted);
+}
+
+/* The year ramps (tokens.css), light and dark; today is a cobalt ring around its own level. */
+.otc__year .stretch-gh__day {
+  background-color: var(--year-0);
+}
+
+.otc__year .stretch-gh__day[data-level="1"] { background-color: var(--year-1); }
+.otc__year .stretch-gh__day[data-level="2"] { background-color: var(--year-2); }
+.otc__year .stretch-gh__day[data-level="3"] { background-color: var(--year-3); }
+.otc__year .stretch-gh__day[data-level="4"] { background-color: var(--year-4); }
+
+.otc__year .stretch-gh__day[data-today] {
+  box-shadow:
+    0 0 0 1.5px var(--paper),
+    0 0 0 3.5px var(--cobalt);
+}
+
+.otc__year .stretch-gh__months,
+.otc__year .stretch-gh__foot,
+.otc__year .stretch-gh__readout {
+  color: var(--muted);
+  font-family: var(--sans);
+}
+
+/* What I'm building now: the live mark, then the repository's name as a link and GitHub's description of it. */
+.otc .otc__live {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.otc__making {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  text-decoration: none;
+}
+
+.otc .otc__making-line {
+  max-width: 46em;
+  margin-top: 2px;
+}
+
+.otc__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cobalt);
+}
+
+/* ---- Narrower ---- */
+
+@media (max-width: 1259.98px) {
+  /* The year needs the width to itself: the total and what I'm building above it, the grid full width. */
+  .otc__year {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .otc__year > :is(.stretch-gh__total, .stretch-gh__readout, .stretch-gh__scroll, .stretch-gh__foot),
+  .otc__year-side {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+/* Under 900 px seven days no longer fit in a row: they are seven rows, the name beside its session. */
+@media (max-width: 899.98px) {
+  .otc__week {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3px;
+  }
+
+  .otc__week li {
+    grid-template-columns: 52px minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0;
+    padding: 6px 14px;
+  }
+}
+
+@media (max-width: 719.98px) {
+  .otc__section {
+    margin-top: 24px;
+    padding-top: 24px;
+  }
+
+
+  .otc__shelf-cells {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .otc__history {
+    grid-template-columns: 76px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .otc__step {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+
+@media (forced-colors: active) {
+  .otc__week li[data-today] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .otc__dot {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+}
+
+/* ---- The GitHub year's grid (site/github-year.tsx), under Off the clock's own rules above ---- */
+
+.stretch-gh__total {
+  margin: 0;
+  font-size: var(--type-ui);
+  line-height: 1.4;
+}
+
+.stretch-gh__count {
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.stretch-gh__readout {
+  margin: 0;
+  min-height: 1.4em;
+  color: var(--cobalt);
+  font-size: var(--type-small);
+}
+
+/* The grid scrolls inside its own column on phones, so the page never does. The padding leaves room for today's ring. */
+.stretch-gh__scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 4px;
+}
+
+.stretch-gh__sheet {
+  position: relative;
+}
+
+@media (max-width: 760px) {
+  .stretch-gh__sheet {
+    min-width: 700px;
+  }
+
+  /* The edge the grid scrolls off fades, so a cut month label reads as the year continuing. */
+  .stretch-gh__scroll {
+    mask-image: linear-gradient(to right, transparent, #000 28px);
+  }
+}
+
+.stretch-gh__months,
+.stretch-gh__days {
+  display: grid;
+  grid-template-columns: repeat(var(--weeks), minmax(0, 1fr));
+  column-gap: 3px;
+}
+
+.stretch-gh__months {
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: var(--type-label);
+  white-space: nowrap;
+}
+
+.stretch-gh__days {
+  grid-template-rows: repeat(7, auto);
+  grid-auto-flow: column;
+  row-gap: 3px;
+}
+
+/* GitHub's own five levels (--gh-0 to --gh-4), the only place their greens appear. */
+.stretch-gh__day {
+  display: block;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background-color: var(--year-0);
+}
+
+.stretch-gh__day[data-level="1"] { background-color: var(--year-1); }
+.stretch-gh__day[data-level="2"] { background-color: var(--year-2); }
+.stretch-gh__day[data-level="3"] { background-color: var(--year-3); }
+.stretch-gh__day[data-level="4"] { background-color: var(--year-4); }
+
+/* Today is a cobalt ring around its own level, never a fill, so the greens stay true. */
+.stretch-gh__day[data-today] {
+  position: relative;
+  z-index: 1;
+  box-shadow:
+    0 0 0 1.5px var(--page),
+    0 0 0 3.5px var(--cobalt);
+}
+
+button.stretch-gh__day {
+  cursor: pointer;
+}
+
+button.stretch-gh__day[data-selected] {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 1px;
+}
+
+.stretch-gh__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  color: var(--muted);
+  font-size: var(--type-label);
+}
+
+.stretch-gh__legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stretch-gh__legend .stretch-gh__day {
+  width: 12px;
+  height: 12px;
+}
+
+.stretch-gh__legend .stretch-gh__day[data-today] {
+  margin-left: 16px;
+}
+
+/* A line of parts with a dot between them (dot-line.tsx): each dot leads its part in a gutter the line clips, so a part
+ * that starts a new line loses its dot. */
+.dot-line {
+  --dot: 0.8em;
+  display: block;
+  overflow-x: clip;
+}
+
+.dot-line__in {
+  display: block;
+  margin-left: calc(-1 * var(--dot));
+}
+
+.dot-line__part {
+  display: inline-block;
+  padding-left: var(--dot);
+  vertical-align: baseline;
+}
+
+.dot-line__dot {
+  display: inline-block;
+  width: var(--dot);
+  margin-left: calc(-1 * var(--dot));
+  white-space: nowrap;
+}
+
+/* Forced colours keep the year's data: GitHub's five levels, each cell with a hairline so an empty day still shows (R-29). */
+@media (forced-colors: active) {
+  /* The GitHub year keeps GitHub's five levels (they are the data), each cell with a hairline so an empty day still shows. */
+  .stretch-gh__day {
+    forced-color-adjust: none;
+    outline: 1px solid GrayText;
+    outline-offset: -1px;
+  }
+}

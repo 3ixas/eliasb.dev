@@ -2,8 +2,6 @@
 
 The design contract for all of eliasb.dev: the homepage, the shell (header and theme), the Role stories, the Case studies, the Work archive, the Résumé and the 404. It is the only live design reference. When this file and anything else disagree, this file wins.
 
-> **Being built.** Elias approved this direction on 11 November 2026. Until the redesign's tickets ([#409](https://github.com/3ixas/eliasb.dev/issues/409)) land, `main` still runs the quiet index, and a part that has not been replaced yet follows `history/QUIET-INDEX.md` and its gates. Each ticket that replaces a part removes this caveat for that part.
-
 **Keeping it current.** A tweak edits this file in place, in the same pull request as the change. A new direction first copies this file into `history/` with a superseded note at the top, then rewrites it. The directions it replaced are in `history/`: the quiet index (`QUIET-INDEX.md`), the Stretch direction (`STRETCH.md`), the Board (`BOARD.md`) and the Cabinet of Curiosities (`SELECTED-DIRECTION.md`).
 
 The build spec, with acceptance criteria and the order of work, is `docs/specs/PASSES-AND-PANELS-SPEC.md` (requirements `R-01` to `R-40`). How the direction was reached is in `docs/specs/CRAFT-ELEVATION-SPEC.md`. The visual reference is the prototype in `docs/review/2026-11-11-direction-e/` (`index.html`, `bnp.html`, `joveen.html`, `threshold.html`, `things.html`, `404.html`, `resume.html`, and `parts.html` for the states and parts those pages do not show, with `style.css` holding every value below). What each part replaces in the code is in `docs/specs/PASSES-AND-PANELS-CODE-MAP.md`. Where the prototype and this file disagree, this file wins. Terms follow `GLOSSARY.md`; approved copy is in `docs/content/redesign-copy.md`.
@@ -27,7 +25,7 @@ A change that breaks one needs Elias's decision, not a judgement in review.
 - **Sections**: 144 px apart (96 px under 720 px). Each opens with its title; Work alone has a subheading.
 - **Panels in a section**: 16 px apart. Two panels side by side stack under 720 px.
 - **Breakpoints**: 1260 px (the opening and wide panels stack), 900 px (the passes scroll sideways), 720 px (phone).
-- **Length**: the homepage stays within 8 screens at 1440 × 900 and 11 at 390 × 844. Something new takes the place of something else. A long-form page has no budget.
+- **Length**: the homepage stays within 9 screens at 1440 × 900 and 12 at 390 × 844 (raised from 8 and 11 on 15 November 2026, when Off the clock gained its headings, a fuller workout and Now making's description). Something new takes the place of something else. A long-form page has no budget.
 
 ## The panel
 
@@ -70,7 +68,7 @@ One set on every page.
 | Row | The other projects and the 404's suggestions: name, line and metadata on a hairline; the whole row takes the tint on hover |
 | Chip | 13 px / 500 to 600 in a round outline: a stack item, or a source in its colour |
 | Theme control | A 36 px round button in the header |
-| Menu | Under 720 px: a 36 px outline button that opens the section links as a list beneath the header |
+| Menu | Under 900 px: a 36 px outline button that opens the section links as a list beneath the header |
 
 - **Hover** applies only to a hovering fine pointer. Arrows move 4 px.
 - **Press**: 0.97 scale over 150 ms. Reduced motion drops the scale.
@@ -80,7 +78,7 @@ One set on every page.
 
 ## The header (every page)
 
-The name in Newsreader 500 at 20 px, a link to the homepage; the greeting; the five section links (Work, Things I make, How I work, Off the clock, Say hello) in a navigation landmark named "On this page"; and the theme control. It sits over a 1 px ink rule and is 64 px tall. It is not sticky. On an inner page the links go to the homepage's sections. Under 720 px the links are behind Menu; Escape or choosing one closes it. Without script the links show.
+The name in Newsreader 500 at 20 px, a link to the homepage; the greeting; the five section links (Work, Things I make, How I work, Off the clock, Say hello) in a navigation landmark named "On this page"; and the theme control. It sits over a 1 px ink rule and is 64 px tall. It is not sticky. On an inner page the links go to the homepage's sections. Under 900 px, where the full row no longer fits, the links are behind Menu; Escape or choosing one closes it. Without script the links show.
 
 **The greeting** is the existing one, whole: "Hello" before the clock is read and without script, then by the visitor's own time "Kettle’s on." (from 05:00), "Nearly five?" on a weekday or "Nowhere to be?" at the weekend (from 12:00), "Home yet?" (from 17:00), "Still up?" (from 22:00), with its small scene. Hover or focus adds "it’s HH:MM here in London". Its width is reserved for the longest line. It hides under 400 px.
 
@@ -94,14 +92,15 @@ The name in Newsreader 500 at 20 px, a link to the homepage; the greeting; the f
 4. **Where I'm headed**: one paper panel. The title and lead at the left; three parts at the right, each from a chip naming its source (Optegra, BNP Paribas, Threshold).
 5. **Things I make**: Threshold wide; Argus Risk and Flowtime side by side; the other projects as rows, newest first, at most ten; the link to the Work archive with the true count.
 6. **How I work**: four cards, then the link to Threshold's PRD.
-7. **Off the clock**: one paper panel in three bands. Three cells: the training week and today's session, the book, the film. Then this week in history, full width: the image, its title, the year and the fact, and an outline pill ("1 of 3") that steps to the next oddity in place. Then the GitHub year: the total, with "Now making" and the latest repository beneath it, beside the grid. A stale feed says "From Goodreads, as of 2 Nov"; a feed that is down shows its authored fallback, and the panel keeps its shape.
+7. **Off the clock**: one paper panel in four sections, each under a rule and (the year apart) its own heading. "Today's workout": today's session large over the week as seven days in a row (seven rows under 900 px) with today marked. "On my shelf and screen": the book and the film, each with its cover at 76 px. "Odd but true, from this week in history": the image, the year and the fact, and an outline pill ("1 of 3") that steps to the next oddity in place. And the GitHub year: the total beside the grid, with "What I'm building now" under the total (the live mark, the latest repository's name and GitHub's description of it). A stale feed says "From Goodreads, as of 2 Nov"; a feed that is down shows its authored fallback, and the panel keeps its shape.
 8. **Say hello**, which ends every page.
 
 Anchors stay `#work`, `#things-i-make`, `#how-i-work`, `#off-the-clock` and `#say-hello`.
 
 ## Figures
 
-- **Display figure**: Newsreader 500, `clamp(88px, 9.6vw, 140px)`, lining tabular figures, with its label in Newsreader 20 px beneath. One per panel. BNP Paribas's is words ("Six months") at `clamp(64px, 7vw, 104px)`.
+- **Employer** (a Work panel's name): Newsreader 400, `clamp(52px, 6vw, 88px)`, with role and dates at 20 px beside it (below it on a phone). It is the first read of a Work panel.
+- **Display figure**: Newsreader 500, `clamp(48px, 5vw, 72px)`, lining tabular figures, with its label in Newsreader 20 px beneath. One per panel, a step under its employer. BNP Paribas's is words ("Six months") at `clamp(34px, 3.6vw, 52px)`.
 - **Bars to scale**: a pair of bars from one left edge. The before bar is thin and soft; the after bar is thicker and solid (white on BNP Paribas's green, the panel's ink elsewhere, cobalt on paper). Both sides are named ("An experienced engineer", "Me, new to it"; "Before", "After") and the values are written out. Lengths are in proportion to the content's own amounts.
 - **The simulation**: illustrative simulated paths from "Today" to "Horizon" on hairline axes, a histogram of their endpoints on the right edge, and a dashed white line at their mean labelled "One price". It says it is illustrative in its accessible description. It appears only on the BNP Paribas panel.
 - **The flag** (BNP Paribas's Role story): two lanes, the live path as a solid white line and the new path as a dashed one behind a switch that is off, "off by default".
@@ -114,9 +113,9 @@ Four across (two under 1260 px, one under 720 px), upright, on paper with a hair
 
 ## Long-form pages: Role stories and case studies
 
-- **A Role story's opening**: "← Work"; the employer as the `h1` (`clamp(52px, 7vw, 104px)`); role, dates and setting on one muted line; the summary as the lede (`clamp(20px, 1.8vw, 25px)`); the evidence figures; and the employer's Staff pass hanging at the right (below the text under 1260 px).
+- **A Role story's opening**: "← Work"; the employer as the `h1` (`clamp(52px, 7vw, 104px)`, or `clamp(36px, 4.6vw, 72px)` for a name over 24 characters, so Optegra Eye Healthcare & Kensington Medical fits at 320 px); role, dates and setting on one muted line; the summary as the lede (`clamp(20px, 1.8vw, 25px)`); the evidence figures; and the employer's Staff pass hanging at the right (below the text under 1260 px).
 - **A case study's opening**: a panel in the project's colour holding "← Things I make", the title, the description, the stack as chips, Live site and Code as pills, the evidence figures and the landing screenshot.
-- **Sections**: the heading at the left (4 of 12 columns, `clamp(28px, 2.7vw, 40px)`) and the text at the right, at most 760 px wide, with a hairline and 64 px between sections. Paragraphs are Newsreader 20 px at line height 1.5. Points are a Newsreader 500 lead at 23 px over a muted 16.5 px line, with hairlines between. Under 720 px the heading sits above the text. No section numbers, and no "Summary" heading.
+- **Sections**: the heading at the left (4 of 12 columns, `clamp(28px, 2.7vw, 40px)`) and the text at the right, at most 760 px wide, with a hairline and 64 px between sections. Paragraphs are Newsreader 20 px at line height 1.5. Points are a Newsreader 500 lead at 23 px over a muted 16 px line, with hairlines between. Under 720 px the heading sits above the text. No section numbers, and no "Summary" heading.
 - **Figures** sit in the text column with a 14 px muted caption. A Role story's flag and comparisons are on a panel in the employer's colour.
 - **The PRD** is a paper card with a 2 px cobalt rule on top: the quote in Newsreader at `clamp(22px, 2.2vw, 30px)`, and its source and date beneath.
 - **Ending**: the next role or project as a panel in its own colour ("Next role" or "Next project" with its line at the left, the name large at the right), then Say hello.
@@ -223,7 +222,7 @@ Found in the lens passes and in the three rounds of concepts behind this directi
 - Proof behind a hover.
 - Italic or coloured emphasis inside headings beyond the opening line's two marks.
 - Underlines on text that is not a link.
-- Decorative glows, gradients and shadows in the light theme.
+- Decorative glows, gradients and shadows in the light theme: a panel has no depth there. Two things are the exception, both from the approved prototype: the BNP Paribas panel's radial gradient, and the lift under a screenshot that bleeds off its panel (and the small shadow under the simulation's price tag).
 - Tilted cards and ruled-paper textures as decoration.
 - Display type so large it becomes the subject (the giant "Only").
 - A job title where the work can be described ("AI Champion", "Product engineer").

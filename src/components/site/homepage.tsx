@@ -1,13 +1,11 @@
-import { sectionLinks } from "@/components/site/sections";
 import { SiteHeader } from "@/components/site/site-header";
 import { OffTheClock } from "@/components/site/off-the-clock";
-import { HowIWork } from "@/components/quiet/how-i-work";
-import { Opening } from "@/components/quiet/opening";
-import { SayHello } from "@/components/quiet/say-hello";
-import { ThingsIMake } from "@/components/quiet/things-i-make";
-import { Work } from "@/components/quiet/work";
-
-const sayHelloHeadingId = "say-hello-heading";
+import { Opening } from "@/components/site/opening";
+import { SayHello } from "@/components/site/say-hello";
+import { HowIWork } from "@/components/site/how-i-work";
+import { WhereImHeaded } from "@/components/site/where-im-headed";
+import { ThingsIMake } from "@/components/site/things-i-make";
+import { Work } from "@/components/site/work";
 
 /**
  * The Stretch homepage shell: the header, the opening line and five anchored sections
@@ -16,32 +14,22 @@ const sayHelloHeadingId = "say-hello-heading";
  */
 export function Homepage() {
   return (
-    <div data-stretch-shell>
-      <SiteHeader sections={sectionLinks} />
+    <div data-site>
+      <SiteHeader home />
       <main id="main-content" tabIndex={-1}>
         <Opening />
 
-        <section id="work" className="stretch-wrap stretch-section" aria-labelledby="work-heading">
-          <Work />
-        </section>
+        <Work />
+        <WhereImHeaded />
 
-        <section id="things-i-make" className="stretch-wrap stretch-section" aria-labelledby="things-i-make-heading">
-          <ThingsIMake />
-        </section>
+        <ThingsIMake />
 
-        <section id="how-i-work" className="stretch-wrap stretch-section" aria-labelledby="how-i-work-heading">
-          <HowIWork />
-        </section>
+        <HowIWork />
 
-        <section id="off-the-clock" className="stretch-wrap stretch-section" aria-labelledby="off-the-clock-heading">
-          <OffTheClock />
-        </section>
+        <OffTheClock />
 
-        <section id="say-hello" className="stretch-wrap stretch-section" aria-labelledby={sayHelloHeadingId}>
-          <SayHello headingId={sayHelloHeadingId} />
-        </section>
+        <SayHello />
       </main>
-
     </div>
   );
 }

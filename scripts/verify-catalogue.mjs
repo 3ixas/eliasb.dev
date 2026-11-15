@@ -20,6 +20,7 @@ const featurable = (slug) =>
   base(slug, 2026, {
     links: { caseStudy: `/things-i-make/${slug}` },
     colours: { field: "#000000", ink: "#ffffff", swatch: "#808080" },
+    panel: { field: "#000000", ink: "#ffffff" },
   });
 
 // The real catalogue and featured list are valid, and what the site depends on.
@@ -42,13 +43,15 @@ assert.deepEqual(projectIndex(shuffled, ["new-a", "new-b", "mid", "old"]), [], "
 // Every project shown has a screenshot and a crop of it inside the image, zoomed in.
 assert.ok(projects.every((project) => project.screenshot && project.crop), "Every project has a screenshot and a crop");
 assert.match(catalogueProblems([base("a", 2025, { crop: undefined })], [], [])[0], /"a" needs a screenshot and a crop/);
+assert.match(catalogueProblems([base("a", 2025, { name: "x".repeat(61) })], [], [])[0], /"a" has a name longer than 60/);
+assert.deepEqual(catalogueProblems([base("a", 2025, { name: "x".repeat(60) })], [], []), []);
 assert.match(catalogueProblems([base("a", 2025, { screenshot: undefined })], [], [])[0], /needs a screenshot and a crop/);
 assert.match(catalogueProblems([base("a", 2025, { crop: { x: 1.2, y: 0.5, zoom: 2 } })], [], [])[0], /needs a screenshot and a crop/);
 assert.match(catalogueProblems([base("a", 2025, { crop: { x: 0.5, y: 0.5, zoom: 0.5 } })], [], [])[0], /needs a screenshot and a crop/);
 
 // The homepage shows the three featured, then the others newest first, at most ten, and the archive link counts them all.
 assert.equal(HOMEPAGE_INDEX_ROWS, 10);
-assert.equal(thingsIMake.allThings(projects.length), "Everything I’ve built (06) →");
+assert.equal(`${thingsIMake.allThings(projects.length)} →`, "Everything I’ve built (06) →");
 assert.deepEqual([...featuredProjects(projects, featuredSlugs), ...projectIndex(projects, featuredSlugs).slice(0, HOMEPAGE_INDEX_ROWS)].map((project) => project.slug), ["threshold", "argus-risk", "flowtime", "home-secretary", "risk-event-tracker", "ask-professor-past"]);
 const many = Array.from({ length: 14 }, (_, index) => base(`p${index}`, 2000 + index));
 assert.equal(projectIndex(many, []).slice(0, HOMEPAGE_INDEX_ROWS).length, 10);
@@ -67,7 +70,9 @@ assert.match(failing({ ...featurable("a"), links: {} })[0], /needs a case study/
 assert.match(failing({ ...featurable("a"), screenshot: undefined }).join(" "), /Featured project "a" needs a screenshot/);
 assert.match(failing({ ...featurable("a"), colours: undefined })[0], /Featured project "a" needs its colours/);
 assert.match(failing({ ...featurable("a"), colours: { field: "red", ink: "#ffffff", swatch: "#808080" } })[0], /needs its colours/);
-assert.equal(failing({ ...featurable("a"), screenshot: undefined, colours: undefined }).length, 3, "Every problem is reported");
+assert.match(failing({ ...featurable("a"), panel: undefined })[0], /Featured project "a" needs its panel colours/);
+assert.match(failing({ ...featurable("a"), panel: { field: "#777777", ink: "#ffffff" } })[0], /panel ink is 4\.48:1 on its field; it needs 4\.5:1/);
+assert.equal(failing({ ...featurable("a"), screenshot: undefined, colours: undefined, panel: undefined }).length, 4, "Every problem is reported");
 assert.match(catalogueProblems([], ["ghost"], [])[0], /"ghost" is not in the catalogue/);
 
 // At most three, none twice, no duplicate slugs.

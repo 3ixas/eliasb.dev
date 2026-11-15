@@ -205,12 +205,12 @@ function verifyHomepage(markup) {
   verifyPageShell(markup, "/");
   const fullOpening = "I build pricing and risk engines at BNP Paribas, and products of my own.";
   const headlineContent = markup.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? "";
-  // The headline holds only inline markup (reveal words, the employer, the tail's letters), which adds no space between words; plainText would put one at every tag.
+  // The headline holds only inline markup (the employer and "products of my own."), which adds no space between words; plainText would put one at every tag.
   equal(plainText(headlineContent.replace(/<[^>]+>/g, "")), fullOpening, "Homepage headline should be one complete, server-rendered sentence");
   check(!/data-entering|data-entrance/.test(markup), "Homepage content should never be held or marked for an entrance in the server HTML");
   check(/Elias\s+Bennett/.test(plainText(markup)), "Homepage should carry the name as plain text");
 
-  const nav = markup.match(/<nav aria-label="On this page"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] ?? "";
+  const nav = markup.match(/<nav\b[^>]*aria-label="On this page"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] ?? "";
   const navHrefs = hrefs(nav).map(({ href }) => href);
   equal(navHrefs.join("|"), "#work|#things-i-make|#how-i-work|#off-the-clock|#say-hello", "Homepage primary navigation targets");
   const navLabels = [...nav.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/gi)].map(([, content]) => plainText(content));
@@ -240,7 +240,7 @@ function verifyHomepage(markup) {
   // so the release check cannot depend on it; its states are covered by the Off the clock fixtures.
   check(text.includes("Off the clock"), "Homepage should show Off the clock");
 
-  // Say hello: the email, then the résumé, GitHub and LinkedIn as rows, in that order.
+  // Say hello: the email, then the résumé, GitHub and LinkedIn, in that order.
   const helloStart = markup.indexOf('id="say-hello"');
   const helloEnd = markup.indexOf("</main>", helloStart);
   const helloSection = helloStart >= 0 && helloEnd > helloStart ? markup.slice(helloStart, helloEnd) : "";
@@ -248,8 +248,10 @@ function verifyHomepage(markup) {
   const emailAction = hrefs(helloSection).find(({ href }) => href?.startsWith("mailto:"));
   check(emailAction, "Say hello should keep the email action");
   equal(emailAction?.href, "mailto:eliasthebennett@gmail.com", "The email action should write to Elias");
-  const cards = [...helloSection.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].filter(([, tag]) => (attribute(tag, "class") ?? "").includes("qi-row"));
-  const titleOf = ([, , body]) => plainText(body.match(/class="qi-row__title"[^>]*>([\s\S]*?)<\/span>/)?.[1] ?? "");
+  const helloLinks = helloSection.match(/<ul class="say-hello__links"[^>]*>([\s\S]*?)<\/ul>/i)?.[1] ?? "";
+  const cards = [...helloLinks.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)];
+  // A link's name is its words, before the arrow and the new-tab note.
+  const titleOf = ([, , body]) => plainText(body.split("<span")[0]);
   equal(cards.map(titleOf).join("|"), "Résumé|GitHub|LinkedIn", "The links should be the résumé, GitHub and LinkedIn, in that order");
   const resumeCard = cards.find((card) => titleOf(card) === "Résumé");
   equal(attribute(resumeCard?.[1] ?? "", "href"), "/resume", "Say hello's Résumé should open /resume on this site");
@@ -367,7 +369,7 @@ async function verifyHomeSocialMetadata(baseUrl, document) {
   check(metaContent(document, "twitter:image", "name")?.includes("/opengraph-image"), "Homepage Twitter image should be the headline card");
 
   const icon = tags(document, "link").find((tag) => attribute(tag, "rel") === "icon");
-  check(attribute(icon ?? "", "href")?.startsWith("/icon.svg"), "The favicon should be the Bricolage E SVG");
+  check(attribute(icon ?? "", "href")?.startsWith("/icon.svg"), "The favicon should be the E SVG");
   const iconSvg = await fetchAsset(baseUrl, "/icon.svg");
   check(iconSvg.includes("prefers-color-scheme: dark"), "The favicon should carry a dark-tab variant");
 }

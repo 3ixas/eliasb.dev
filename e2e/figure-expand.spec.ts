@@ -1,12 +1,13 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-// A screenshot on a long-form page opens large in the same window: a case study's, and a Role story's.
+// A screenshot on a long-form page opens large in the same window: a case study's, and a Role story's (and its certificate).
 const pages = [
-  { route: "/things-i-make/threshold", trigger: ".qi-case__below .qi-zoom" },
-  { route: "/things-i-make/argus-risk", trigger: "section#decisions .qi-zoom" },
-  { route: "/work/joveen", trigger: ".qi-screens .qi-zoom" },
-  { route: "/work/optegra", trigger: ".qi-screens .qi-zoom" },
+  { route: "/things-i-make/threshold", trigger: ".case-open .zoom" },
+  { route: "/things-i-make/argus-risk", trigger: "section .story-fig .zoom" },
+  { route: "/work/joveen", trigger: ".story-fig .zoom" },
+  { route: "/work/optegra", trigger: ".story-fig .zoom" },
+  { route: "/work/bnp-paribas", trigger: "#take-ownership-certificate .zoom" },
 ];
 
 for (const { route, trigger } of pages) {
@@ -59,6 +60,16 @@ for (const { route, trigger } of pages) {
       expect(clipped).toBeNull();
     });
 
+    test("the Close button's focus ring is white, so it shows on any screenshot", async ({ page }) => {
+      const button = page.locator(trigger).first();
+      await button.focus();
+      await page.keyboard.press("Enter");
+      const close = page.getByRole("dialog").getByRole("button", { name: "Close" });
+      await expect(close).toBeVisible();
+      await close.focus();
+      await expect(close).toHaveCSS("outline-color", "rgb(255, 255, 255)");
+    });
+
     test("Enter opens it from the keyboard; a click on it and its Close button close it", async ({ page }) => {
       const button = page.locator(trigger).first();
       const dialog = page.getByRole("dialog");
@@ -88,7 +99,7 @@ for (const { route, trigger } of pages) {
       await page.reload();
       await page.locator(trigger).first().click();
       const names = () => page.getByRole("dialog").evaluate((dialog) => dialog.getAnimations().map((animation) => (animation as CSSAnimation).animationName));
-      await expect.poll(names).toContain("qi-zoom-in");
+      await expect.poll(names).toContain("zoom-in");
       await page.keyboard.press("Escape");
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.locator(trigger).first().click();
@@ -102,3 +113,35 @@ for (const { route, trigger } of pages) {
     });
   });
 }
+
+// A finger or mouse that closes the dialog gets focus back on the button without its ring (iOS drew a blue rectangle round
+// the screenshot until the next tap); a key that closes it still gets the ring.
+test.describe("Closing the dialog returns focus without a ring for a pointer", () => {
+  const route = "/things-i-make/threshold";
+  const trigger = ".case-open .zoom";
+
+  test("a click on the dialog closes it, the button is focused and shows no outline", async ({ page }) => {
+    await page.goto(route);
+    const button = page.locator(trigger).first();
+    await expect(button).toBeVisible();
+    await button.click();
+    const dialog = page.locator("dialog.zoom__dialog[open]");
+    await expect(dialog).toBeVisible();
+    await dialog.locator("img").click();
+    await expect(dialog).toHaveCount(0);
+    await expect(button).toBeFocused();
+    await expect(button).toHaveCSS("outline-style", "none");
+  });
+
+  test("Esc closes it, and the button shows the ring", async ({ page }) => {
+    await page.goto(route);
+    const button = page.locator(trigger).first();
+    await button.click();
+    const dialog = page.locator("dialog.zoom__dialog[open]");
+    await expect(dialog).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toHaveCount(0);
+    await expect(button).toBeFocused();
+    await expect(button).toHaveCSS("outline-style", "solid");
+  });
+});

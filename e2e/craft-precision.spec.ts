@@ -1,5 +1,4 @@
 import { expect, test, type Page } from "@playwright/test";
-import { heroPortrait } from "../src/content/stretch/media";
 
 /*
  * What a design engineer does first: interrupt things, look for anything blank, and read a phone's line breaks.
@@ -9,111 +8,33 @@ import { heroPortrait } from "../src/content/stretch/media";
 const width = (page: Page) => page.viewportSize()?.width ?? 0;
 const wide = (page: Page) => width(page) >= 1180;
 
-const hydrated = (page: Page) =>
-  page.waitForFunction(() => {
+/**
+ * Hydrated, with the opening's passes at rest: their arrival swing is finished at once, as a motion spec seeks rather
+ * than waits, so a slow engine is not painting it while the fold under test runs.
+ */
+const hydrated = async (page: Page) => {
+  await page.waitForFunction(() => {
     const columns = [...document.querySelectorAll("[data-quiet-column]")];
     return columns.length > 0 && columns.every((column) => Object.keys(column).some((key) => key.startsWith("__reactProps$")));
   });
+  await page.evaluate(() => document.querySelectorAll(".pass").forEach((pass) => pass.getAnimations().forEach((animation) => animation.finish())));
+};
 
-test.describe("Interrupting", () => {
-  test.use({ reducedMotion: "no-preference" });
-
-  /** Taps the look's trigger and, in the same task, pauses its fold at `at` ms: a slow runner cannot miss a 300 ms transition. Returns the height there. */
-  const tapAndPause = (page: Page, at: number) =>
-    page.locator('[data-look-slot="joveen"]').evaluate(async (slot, time) => {
-      document.querySelector<HTMLElement>('#work button[data-look-tap="joveen"]')!.click();
-      const fold = () => slot.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "grid-template-rows");
-      while (!fold()) await new Promise(requestAnimationFrame);
-      fold()!.pause();
-      fold()!.currentTime = time;
-      await new Promise(requestAnimationFrame);
-      return slot.getBoundingClientRect().height;
-    }, at);
-  /** The height over the next few frames of whatever fold is now running. */
-  const nextHeights = (page: Page) =>
-    page.locator('[data-look-slot="joveen"]').evaluate(async (slot) => {
-      const heights: number[] = [];
-      for (let frame = 0; frame < 4; frame++) {
-        await new Promise(requestAnimationFrame);
-        heights.push(slot.getBoundingClientRect().height);
-      }
-      return heights;
-    });
-
-  test("an inline look reversed part way carries on from the height it reached", async ({ page }) => {
-    test.skip(wide(page), "Inline looks are for phones and touch");
-    await page.goto("/");
-    await hydrated(page);
-    await page.locator('#work button[data-look-tap="joveen"]').scrollIntoViewIfNeeded();
-    // Closing never grows from where opening had got to.
-    const opened = await tapAndPause(page, 100);
-    expect(opened).toBeGreaterThan(0);
-    await page.locator('#work button[data-look-tap="joveen"]').evaluate((button) => (button as HTMLElement).click());
-    for (const height of await nextHeights(page)) expect(height).toBeLessThanOrEqual(opened + 1);
-  });
-
-  test("an inline look reopened while it folds carries on from the height it had left", async ({ page }) => {
-    test.skip(wide(page), "Inline looks are for phones and touch");
-    await page.goto("/");
-    await hydrated(page);
-    const trigger = page.locator('#work button[data-look-tap="joveen"]');
-    await trigger.scrollIntoViewIfNeeded();
-    // Opening is finished by seeking to its end, in the task that starts it, not by waiting out its length.
-    await page.locator('[data-look-slot="joveen"]').evaluate(async (slot) => {
-      document.querySelector<HTMLElement>('#work button[data-look-tap="joveen"]')!.click();
-      const fold = () => slot.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "grid-template-rows");
-      while (!fold()) await new Promise(requestAnimationFrame);
-      fold()!.finish();
-      await new Promise(requestAnimationFrame);
-    });
-    const folded = await tapAndPause(page, 100);
-    await trigger.evaluate((button) => (button as HTMLElement).click());
-    for (const height of await nextHeights(page)) expect(height).toBeGreaterThanOrEqual(folded - 1);
-  });
-
-  test("after one glide the margin tracks its row exactly as the page scrolls", async ({ page }) => {
-    test.skip(!wide(page), "The margin is for wide screens");
-    await page.goto("/");
-    await hydrated(page);
-    const bnp = page.locator('.qi-row[data-look="bnp-paribas"]');
-    const joveen = page.locator('.qi-row[data-look="joveen"]');
-    const margin = page.locator(".qi-margin");
-    await bnp.scrollIntoViewIfNeeded();
-    await bnp.hover();
-    await expect(margin).toBeVisible();
-    await joveen.hover();
-    await expect(margin).toHaveAttribute("data-glide", "");
-    await expect.poll(() => margin.evaluate((element) => element.getAnimations().length)).toBe(0);
-    // The glide is over, so a scroll moves the margin at once, with nothing left running to catch up with its row.
-    await page.mouse.wheel(0, 12);
-    await expect(margin).not.toHaveAttribute("data-glide", "");
-    await page.mouse.wheel(0, 12);
-    await page.evaluate(() => new Promise(requestAnimationFrame));
-    expect(await margin.evaluate((element) => element.getAnimations().length)).toBe(0);
-  });
-});
+// Interrupting a closer look retired with the closer looks in #420; a panel's interrupted arrival is parts.spec's.
 
 test.describe("Nothing is blank", () => {
-  test("the header's portrait loads with the document, on a resting fill", async ({ page }) => {
-    await page.goto("/work/bnp-paribas");
-    const portrait = page.locator(".qi-header__face");
-    await expect(portrait).not.toHaveAttribute("loading", "lazy");
-    expect(await page.locator(`link[rel="preload"][as="image"][imagesrcset*="${encodeURIComponent(heroPortrait.src)}"]`).count()).toBe(1);
-    await expect(portrait).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-  });
-
-  test("the first screen of the Work archive has its objects", async ({ page }) => {
+  test("the first screen of the Work archive has its screenshots", async ({ page }) => {
     await page.goto("/things-i-make");
-    const objects = page.locator(".qi-crop img");
-    expect(await objects.count()).toBeGreaterThan(0);
-    for (const object of await objects.all()) await expect(object).toHaveAttribute("loading", "eager");
+    const shots = page.locator(".archive__grid .project__shot img");
+    expect(await shots.count()).toBeGreaterThan(2);
+    for (const shot of (await shots.all()).slice(0, 3)) await expect(shot).toHaveAttribute("loading", "eager");
   });
 
   test("an expanded screenshot has started loading before it opens, and opens on the picture", async ({ page }) => {
     await page.goto("/things-i-make/threshold");
-    const button = page.locator(".qi-case__below .qi-zoom").first();
+    const button = page.locator(".case-open .zoom").first();
     await expect.poll(() => button.evaluate((element) => Object.keys(element).some((key) => key.startsWith("__reactProps$")))).toBe(true);
-    const dialog = page.locator(".qi-zoom__dialog").first();
+    const dialog = page.locator(".zoom__dialog").first();
     await expect(dialog.locator("img")).toHaveCount(0);
     await button.focus();
     await expect(dialog.locator("img")).toHaveCount(1);
@@ -128,7 +49,7 @@ test.describe("Nothing is blank", () => {
 
   test("opening waits for the image to decode, even for a click with nothing before it", async ({ page }) => {
     await page.goto("/things-i-make/threshold");
-    const button = page.locator(".qi-case__below .qi-zoom").first();
+    const button = page.locator(".case-open .zoom").first();
     await expect.poll(() => button.evaluate((element) => Object.keys(element).some((key) => key.startsWith("__reactProps$")))).toBe(true);
     // A click from assistive technology: no pointer or focus first, so nothing has asked for the large image yet.
     await button.evaluate((element) => {
@@ -154,7 +75,7 @@ test.describe("Nothing is blank", () => {
 
   test("a full-column screenshot asks for a full-column file", async ({ page }) => {
     await page.goto("/work/optegra");
-    await expect(page.locator(".qi-screens .qi-zoom img").first()).toHaveAttribute("sizes", "(min-width: 761px) 600px, 100vw");
+    await expect(page.locator(".story-fig .zoom img").first()).toHaveAttribute("sizes", "(min-width: 1260px) 760px, (min-width: 720px) 60vw, 100vw");
   });
 
   test("the site declares a touch icon", async ({ page }) => {
@@ -169,12 +90,12 @@ test.describe("Nothing is blank", () => {
 test.describe("Reading on a phone", () => {
   /** Every visible dot, with whether anything is printed after it, and before it, on its own line. */
   const strandedDots = (page: Page) =>
-    page.locator(".qi-dots").evaluateAll((lines) =>
+    page.locator(".dot-line").evaluateAll((lines) =>
       lines.flatMap((line) => {
         const clipLeft = line.getBoundingClientRect().left;
-        const parts = [...line.querySelectorAll<HTMLElement>(".qi-dots__part")].filter((part) => part.getClientRects().length);
+        const parts = [...line.querySelectorAll<HTMLElement>(".dot-line__part")].filter((part) => part.getClientRects().length);
         return parts.flatMap((part, index) => {
-          const dot = part.querySelector(".qi-dots__dot");
+          const dot = part.querySelector(".dot-line__dot");
           if (!dot) return [];
           const { left, top } = dot.getBoundingClientRect();
           const before = parts[index - 1]?.getBoundingClientRect();
@@ -193,10 +114,10 @@ test.describe("Reading on a phone", () => {
     });
   }
 
-  test("a date range in a Work row stays whole", async ({ page }) => {
+  test("a role and its dates on a Work panel each stay whole", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => document.fonts.ready);
-    const parts = page.locator("#work .qi-row__line .qi-dots__part");
+    const parts = page.locator("#work .panel__meta span");
     expect(await parts.count()).toBeGreaterThan(0);
     for (const part of await parts.all()) {
       const lines = await part.evaluate((element) => new Set([...element.getClientRects()].map((rect) => Math.round(rect.top))).size);
@@ -206,47 +127,17 @@ test.describe("Reading on a phone", () => {
 
   test("prose and row lines avoid a lone last word", async ({ page }) => {
     await page.goto("/work/bnp-paribas");
-    await expect(page.locator(".qi-long p").first()).toHaveCSS("text-wrap-style", "pretty");
-    await page.goto("/");
-    await expect(page.locator(".qi-row__line").first()).toHaveCSS("text-wrap-style", "pretty");
-  });
-
-  test("the portrait and project looks hold the 13 px floor", async ({ page }) => {
-    test.skip(wide(page), "Inline looks are for phones and touch");
-    await page.goto("/");
-    await hydrated(page);
-    const portrait = page.locator('.qi-header button[data-look-tap="face"]');
-    await portrait.click();
-    const caption = page.locator(".qi-header .qi-face-look figcaption");
-    await expect(caption).toBeVisible();
-    const effective = (locator: typeof caption) => locator.evaluate((element) => parseFloat(getComputedStyle(element).fontSize) * (element.closest<HTMLElement>(".qi-look") ? parseFloat(getComputedStyle(element.closest<HTMLElement>(".qi-look")!).zoom || "1") : 1));
-    expect(await effective(caption)).toBeGreaterThanOrEqual(13);
-    await portrait.click();
-    const project = page.locator('#things-i-make .qi-list__item:not([data-card]) button[data-look-tap^="project-"]').first();
-    await project.scrollIntoViewIfNeeded();
-    await project.click();
-    const figcaption = page.locator("#things-i-make .qi-project figcaption");
-    await expect(figcaption).toBeVisible();
-    expect(await effective(figcaption)).toBeGreaterThanOrEqual(13);
-    // Filling its slot stops at the contract's 300 px, even on a tablet.
-    expect((await page.locator("#things-i-make .qi-project").boundingBox())!.width).toBeLessThanOrEqual(300.5);
-  });
-
-  test("the header and the text share one left edge", async ({ page }) => {
-    // On a phone the Résumé's sheet runs edge to edge, so its text is the edge; elsewhere the paper is.
-    const resumeEdge = width(page) < 761 ? "#resume-name" : ".stretch-resume__sheet";
-    for (const [route, text] of [["/work/bnp-paribas", "h1"], ["/resume", resumeEdge]]) {
-      await page.goto(route);
-      const face = await page.locator(".qi-header__face").boundingBox();
-      const edge = await page.locator(text).boundingBox();
-      expect(Math.abs(face!.x - edge!.x), route).toBeLessThanOrEqual(0.6);
-    }
+    await expect(page.locator(".story .prose p").first()).toHaveCSS("text-wrap-style", "pretty");
+    // The 404's suggestions are rows of the shared part since #419.
+    await page.goto("/nothing-here");
+    await expect(page.locator("main .row__line").first()).toHaveCSS("text-wrap-style", "pretty");
   });
 
   test("the greeting is a 44 px target on a phone", async ({ page }) => {
     test.skip(wide(page) || width(page) >= 900, "On a wide screen it is not a button");
+    test.skip(width(page) < 400, "Under 400 px the greeting is not shown");
     await page.goto("/");
-    const greeting = page.locator(".qi-greeting");
+    const greeting = page.locator(".greeting");
     const hits = await greeting.evaluate((element) => {
       const box = element.getBoundingClientRect();
       const x = box.left + box.width / 2;
@@ -261,19 +152,12 @@ test.describe("Reading on a phone", () => {
 test.describe("Alignment and consistency", () => {
   test("a list's metadata keeps one edge, whichever arrow is beside it", async ({ page }) => {
     test.skip(width(page) < 761, "Phones hide the metadata");
-    for (const route of ["/", "/things-i-make"]) {
+    for (const route of ["/"]) {
       await page.goto(route);
-      const lefts = await page.locator(":is(#things-i-make, .qi-archive) .qi-row__meta").evaluateAll((all) => all.map((element) => element.getBoundingClientRect().left));
+      const lefts = await page.locator("#things-i-make .row__meta").evaluateAll((all) => all.map((element) => element.getBoundingClientRect().left));
       expect(lefts.length).toBeGreaterThan(1);
       expect(Math.max(...lefts) - Math.min(...lefts)).toBeLessThan(0.5);
     }
-  });
-
-  test("Pass pins start on the text edge", async ({ page }) => {
-    await page.goto("/work/bnp-paribas");
-    const pins = await page.locator(".qi-pins").first().boundingBox();
-    const title = await page.locator("h1").boundingBox();
-    expect(Math.abs(pins!.x - title!.x)).toBeLessThanOrEqual(0.6);
   });
 
   for (const route of ["/work/joveen", "/work/optegra"]) {
@@ -300,34 +184,40 @@ test.describe("Colour", () => {
     return 0.2126 * x + 0.7152 * y + 0.0722 * z;
   };
 
-  test("a to-scale figure's long bar holds 3:1 on its card", async ({ page }) => {
+  test("a to-scale figure's long bar holds 3:1 on its panel", async ({ page }) => {
     await page.goto("/work/bnp-paribas");
-    const bar = page.locator('.qi-scale__bar[data-kind="before"] .qi-scale__fill').first();
-    await bar.scrollIntoViewIfNeeded();
+    const bar = page.locator("section#what-changed .bar:not(.bar--after)").first();
+    await bar.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
     const colours = await bar.evaluate((element) => {
       const canvas = document.createElement("canvas").getContext("2d", { willReadFrequently: true })!;
-      const pixel = (colour: string) => {
-        canvas.fillStyle = colour;
-        canvas.fillRect(0, 0, 1, 1);
+      const field = getComputedStyle(element.closest(".panel")!).backgroundColor;
+      // The bar is painted over the panel, so a translucent bar is read as the colour it composites to there.
+      const pixel = (...layers: string[]) => {
+        for (const colour of layers) {
+          canvas.fillStyle = colour;
+          canvas.fillRect(0, 0, 1, 1);
+        }
         return [...canvas.getImageData(0, 0, 1, 1).data].slice(0, 3);
       };
-      return { bar: pixel(getComputedStyle(element).backgroundColor), card: pixel(getComputedStyle(element.closest(".qi-figure__card")!).backgroundColor) };
+      return { bar: pixel(field, getComputedStyle(element).backgroundColor), card: pixel(field) };
     });
     const [lighter, darker] = [luminance(colours.bar), luminance(colours.card)].sort((a, b) => b - a);
     expect((lighter + 0.05) / (darker + 0.05)).toBeGreaterThanOrEqual(3);
   });
 
-  test("a theme change crossfades the tiles and GitHub cells with the page", async ({ page }) => {
+  test("a theme change crossfades the palette, the GitHub year and the sun with the page", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
-    await hydrated(page);
-    await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--gh-1").trim().startsWith("rgb"))).toBe(true);
+    // The homepage has no quiet column to wait on since #416: wait for the theme control itself to hydrate.
+    await page.waitForFunction(() => Object.keys(document.querySelector("[data-eclipse]")!).some((key) => key.startsWith("__reactProps$")));
+    await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--year-1").trim().startsWith("rgb"))).toBe(true);
     // The press and the read share a task, so a slow runner cannot miss the 300 ms crossfade.
-    const animated = await page.locator(".stretch-eclipse").first().evaluate(async (button) => {
+    const animated = await page.locator("[data-eclipse]").evaluate(async (button) => {
       (button as HTMLElement).click();
-      await new Promise(requestAnimationFrame);
+      // WebKit can start the crossfade a frame or two after the press: read as soon as it has, well inside its 300 ms.
+      for (let frame = 0; frame < 10 && document.documentElement.getAnimations().length === 0; frame++) await new Promise(requestAnimationFrame);
       return document.documentElement.getAnimations().map((animation) => (animation as CSSTransition).transitionProperty);
     });
-    for (const property of ["--stretch-page", "--stretch-paper", "--stretch-stamp", "--bnp", "--gh-1", "--sun"]) expect(animated).toContain(property);
+    for (const property of ["--page", "--paper", "--ink", "--year-1", "--sun"]) expect(animated).toContain(property);
   });
 });

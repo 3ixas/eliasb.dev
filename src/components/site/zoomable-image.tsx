@@ -26,6 +26,8 @@ export function ZoomableImage({ src, alt, width, height, sizes, preload }: { src
   const want = () => setWanted(true);
   /** One opening at a time: extra clicks while it waits on the image are the same click. */
   const opening = useRef(false);
+  /** Whether the dialog was last handled by touch or mouse: focus still returns to the button, but a pointer user is not shown its ring. */
+  const byPointer = useRef(false);
   const open = async () => {
     if (opening.current) return;
     opening.current = true;
@@ -37,14 +39,27 @@ export function ZoomableImage({ src, alt, width, height, sizes, preload }: { src
   };
   return (
     <>
-      <button ref={trigger} type="button" className="qi-zoom" aria-haspopup="dialog" onPointerEnter={want} onPointerDown={want} onFocus={want} onClick={open}>
+      <button ref={trigger} type="button" className="zoom" aria-haspopup="dialog" onBlur={(event) => delete event.currentTarget.dataset.pointer} onKeyDown={(event) => delete event.currentTarget.dataset.pointer} onPointerEnter={want} onPointerDown={want} onFocus={want} onClick={open}>
         <ArrivalImage src={src} alt={alt} width={width} height={height} sizes={sizes} preload={preload} />
         <span className="sr-only"> (view larger)</span>
       </button>
-      <dialog ref={dialog} className="qi-zoom__dialog" aria-label={alt} onClick={(event) => event.currentTarget.close()} onClose={() => trigger.current?.focus()}>
+      <dialog
+        ref={dialog}
+        className="zoom__dialog"
+        aria-label={alt}
+        onPointerDown={() => (byPointer.current = true)}
+        onKeyDown={() => (byPointer.current = false)}
+        onClick={(event) => event.currentTarget.close()}
+        onClose={() => {
+          const button = trigger.current;
+          if (!button) return;
+          if (byPointer.current) button.dataset.pointer = "";
+          button.focus();
+        }}
+      >
         {wanted && <Image ref={large} src={src} alt={alt} width={width} height={height} sizes="(min-width: 1200px) 1100px, 96vw" loading="eager" style={{ "--w": width, "--ar": width / height } as CSSProperties} />}
         <form method="dialog">
-          <button className="qi-zoom__close">Close</button>
+          <button className="zoom__close">Close</button>
         </form>
       </dialog>
     </>

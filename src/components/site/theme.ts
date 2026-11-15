@@ -18,8 +18,8 @@ export type ThemePreference = Theme | "system";
 
 export const THEME_STORAGE_KEY = "elias-theme";
 
-/** The page background in each theme: `--stretch-page` in stretch-tokens.css. */
-export const TOOLBAR_COLOUR: Record<Theme, string> = { light: "#fbfbf8", dark: "#0d0d12" };
+/** The page background in each theme: `--page` in tokens.css. */
+export const TOOLBAR_COLOUR: Record<Theme, string> = { light: "#eeede9", dark: "#0d0d0f" };
 
 /**
  * Sets the browser's toolbar colour to the page's. The boot script in the root
@@ -71,13 +71,14 @@ let paletteRegistered = false;
  * and the pre-paint preference script both run while the document is parsing. */
 function registerPalette() {
   if (paletteRegistered || typeof CSS.registerProperty !== "function") return;
-  const stretch = ["page", "ink", "muted", "rule", "card", "cobalt", "on-cobalt", "tile-edge", "paper", "newsprint", "graph", "stamp", "paper-rule"].map((name) => `--stretch-${name}`);
-  for (const name of [...stretch, "--bnp", "--sun", "--gh-0", "--gh-1", "--gh-2", "--gh-3", "--gh-4"]) {
+  // tokens.css: the palette, and the greeting's sun.
+  const palette = ["page", "paper", "ink", "muted", "hair", "tint", "cobalt", "green", "year-0", "year-1", "year-2", "year-3", "year-4", "stock", "stock-end", "shadow"].map((name) => `--${name}`);
+  for (const name of ["--sun", ...palette]) {
     CSS.registerProperty({ name, syntax: "<color>", inherits: true, initialValue: "transparent" });
   }
   paletteRegistered = true;
   // Resolve the current palette before a click or device change supplies its target.
-  getComputedStyle(document.documentElement).getPropertyValue("--stretch-page");
+  getComputedStyle(document.documentElement).getPropertyValue("--page");
 }
 
 /** Marks the room as changing, so the stylesheet crossfades it. */
