@@ -80,7 +80,7 @@ const grouped = new Intl.NumberFormat("en-GB");
 
 /**
  * A display figure that counts to its value once, over 1.2 s, when it comes into view. The server writes the finished
- * figure, and only the text node changes, so nothing moves. Tabular figures (DESIGN.md "Type") keep its width steady.
+ * figure, and only the text node changes, so nothing moves. Before printing it is finished at once. Tabular figures (DESIGN.md "Type") keep its width steady.
  */
 export function Count({ to, from = 0, prefix = "", suffix = "" }: { to: number; from?: number; prefix?: string; suffix?: string }) {
   const text = useRef<HTMLSpanElement>(null);
@@ -102,5 +102,14 @@ export function Count({ to, from = 0, prefix = "", suffix = "" }: { to: number; 
     finish: (element) => write(element, to),
   });
   useEffect(() => () => cancelAnimationFrame(frame.current), []);
+  // A printed page has no viewport to arrive in: a figure still armed (or mid-count) prints its finished value.
+  useEffect(() => {
+    const printing = () => {
+      cancelAnimationFrame(frame.current);
+      if (text.current) text.current.textContent = `${prefix}${grouped.format(to)}${suffix}`;
+    };
+    window.addEventListener("beforeprint", printing);
+    return () => window.removeEventListener("beforeprint", printing);
+  }, [to, prefix, suffix]);
   return <span ref={text}>{`${prefix}${grouped.format(to)}${suffix}`}</span>;
 }

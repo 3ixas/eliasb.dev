@@ -274,6 +274,14 @@ test.describe("Arrival", () => {
     await expect(count).toHaveText("−40%");
   });
 
+  test("printing before scrolling there prints the figure's finished value, not the one it starts from", async ({ page }) => {
+    await page.goto(fixture);
+    const count = page.locator("[data-count]");
+    await expect(count).toHaveText("−0%");
+    await page.evaluate(() => window.dispatchEvent(new Event("beforeprint")));
+    await expect(count).toHaveText("−40%");
+  });
+
   test("it is let go when its top passes 85% of the viewport's height, the line that armed it", async ({ page }) => {
     await page.goto(fixture);
     const rise = page.locator("[data-rise]");
