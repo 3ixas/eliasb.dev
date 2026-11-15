@@ -457,19 +457,19 @@ assert.equal(latestRepository([{ name: "x", description: "", html_url: "https://
 assert.equal(latestRepository([], "3ixas"), null);
 const repo = latestRepository(repositories, "3ixas");
 const siteProjects = [
-  { name: "Threshold", links: { caseStudy: "/things-i-make/threshold", code: "https://github.com/3ixas/Threshold" } },
-  { name: "Tracker", links: { code: "https://github.com/3ixas/tracker" } },
+  { name: "Threshold", outcome: "A clearer view of what moving could cost.", links: { caseStudy: "/things-i-make/threshold", code: "https://github.com/3ixas/Threshold" } },
+  { name: "Tracker", outcome: "Event risk, tracked.", links: { code: "https://github.com/3ixas/tracker" } },
 ];
 assert.deepEqual(nowMakingEntry(repo, siteProjects), { name: "eliasb.dev", description: "The site", href: "https://github.com/3ixas/eliasb.dev", internal: false }, "A repository that is not a project keeps its name and description");
 assert.deepEqual(
   nowMakingEntry({ name: "threshold", description: "x", href: "https://github.com/3ixas/threshold" }, siteProjects),
-  { name: "Threshold", description: null, href: "/things-i-make/threshold", internal: true },
-  "A project with a case study links to it, matched on its code link regardless of case",
+  { name: "Threshold", description: "A clearer view of what moving could cost.", href: "/things-i-make/threshold", internal: true },
+  "A project with a case study links to it, matched on its code link regardless of case, and shows the project's own line",
 );
 assert.deepEqual(
   nowMakingEntry({ name: "tracker", description: "x", href: "https://github.com/3ixas/tracker" }, siteProjects),
-  { name: "Tracker", description: null, href: "https://github.com/3ixas/tracker", internal: false },
-  "A project without a case study links to GitHub",
+  { name: "Tracker", description: "Event risk, tracked.", href: "https://github.com/3ixas/tracker", internal: false },
+  "A project without a case study links to GitHub and shows the project's own line",
 );
 assert.equal(nowMakingEntry(null, siteProjects), null, "With no repository there is nothing to show");
 
