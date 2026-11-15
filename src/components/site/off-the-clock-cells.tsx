@@ -50,7 +50,7 @@ function MediaCell({ item, href, cover, title, line, stale }: { item: string; hr
     <>
       {cover}
       <span className="otc__media-text">
-        <h3>{title}</h3>
+        <h4>{title}</h4>
         <p>
           {line}
           {href && <Out href={href} />}
@@ -81,7 +81,7 @@ export function BookCell({ reading, now }: { reading: ReadingSignal; now: Date }
     <MediaCell
       item="reading"
       href={reading.href}
-      cover={book.coverUrl ? <Image className="otc__cover" src={book.coverUrl} alt={copy.reading.coverAlt(book.title, book.author)} width={128} height={192} sizes="64px" /> : null}
+      cover={book.coverUrl ? <Image className="otc__cover" src={book.coverUrl} alt={copy.reading.coverAlt(book.title, book.author)} width={128} height={192} sizes="76px" /> : null}
       title={book.title}
       line={`${copy.reading.label} · ${book.author}`}
       stale={<Stale source={copy.reading.sourceName} status={status} />}
@@ -100,7 +100,7 @@ export function FilmCell({ signal, now }: { signal: FilmSignal; now: Date }) {
     <MediaCell
       item="film"
       href={film.href}
-      cover={film.posterUrl ? <Image className="otc__cover" src={film.posterUrl} alt={copy.watched.posterAlt(film.title, film.year)} width={128} height={192} sizes="64px" /> : null}
+      cover={film.posterUrl ? <Image className="otc__cover" src={film.posterUrl} alt={copy.watched.posterAlt(film.title, film.year)} width={128} height={192} sizes="76px" /> : null}
       title={film.title}
       line={
         watched ? (
@@ -130,18 +130,42 @@ export function HistoryCell({ history }: { history: HistorySignal }) {
   return <HistoryBand events={history.events} dates={history.events.map((event) => printedDate(event, day))} source={day ? undefined : copy.curiosity.fallback} />;
 }
 
-/** The GitHub year's band: the total and, under it, Now making, beside the year's grid. Saved data gone stale says so. */
+/** What I'm building now: its heading, the live mark, the repository's name as a link and its description. */
+function MakingBand({ making, live }: { making: NonNullable<ReturnType<typeof nowMakingEntry>>; live: boolean }) {
+  return (
+    <div className="otc__making-band" data-otc="making">
+      <h3 className="otc__subtitle">{copy.nowMaking.label}</h3>
+      {live && (
+        <p className="otc__live">
+          <i className="otc__dot" aria-hidden="true" />
+          {copy.live(copy.nowMaking.sourceName)}
+        </p>
+      )}
+      <p>
+        <SiteLink href={making.href} className="otc__making">
+          {making.name}
+          {!isInternalHref(making.href) && <Out href={making.href} />}
+        </SiteLink>
+      </p>
+      {making.description && <p className="otc__making-line">{making.description}</p>}
+    </div>
+  );
+}
+
+/**
+ * The GitHub year's band: the total, and under it what I'm building now, beside the year's grid. Saved data gone stale
+ * says so. With no year and nothing being made, the band still has a link to GitHub, so the panel keeps its bands.
+ */
 export function GitHubCell({ github, latest, now }: { github: GitHubSignal; latest: LatestRepositorySignal; now: Date }) {
   const status = pinStatus("github", github, now);
   const making = nowMakingEntry(latest.repository, projects);
   const year = status.kind !== "removed" && github.activity.length > 0;
   return (
-    <div className="otc__year" data-otc="github" data-state={status.kind === "stale" ? "stale" : "current"}>
+    <div className="otc__year otc__section" data-otc="github" data-state={status.kind === "stale" ? "stale" : "current"}>
       <h3 className="sr-only">{copy.github.heading}</h3>
       {year && <GitHubYear activity={github.activity} total={github.total} />}
       <div className="otc__year-side">
         <Stale source={copy.github.sourceName} status={status} />
-        {/* With no year and nothing being made, the band still has something of GitHub's, so the panel keeps its three bands. */}
         {!year && !making && (
           <p>
             <SiteLink href={profile.links.github} className="otc__making">
@@ -150,27 +174,24 @@ export function GitHubCell({ github, latest, now }: { github: GitHubSignal; late
             </SiteLink>
           </p>
         )}
-        {making && (
-          <p data-otc="making">
-            <SiteLink href={making.href} className="otc__making">
-              <i className="otc__dot" aria-hidden="true" />
-              {copy.nowMaking.label} · {making.name}
-              {!isInternalHref(making.href) && <Out href={making.href} />}
-            </SiteLink>
-          </p>
-        )}
+        {making && <MakingBand making={making} live={latest.state === "live"} />}
       </div>
     </div>
   );
 }
 
-/** The one paper panel: three cells, then this week in history, then the GitHub year. */
+/** The one paper panel: its sections, each under a rule: the workout, the shelf and screen, this week in history, the GitHub year. */
 export function OffTheClockPanel({ training, book, film, history, year }: { training: ReactNode; book: ReactNode; film: ReactNode; history: ReactNode; year: ReactNode }) {
   return (
     <Panel className="otc">
       {training}
-      {book}
-      {film}
+      <div className="otc__section otc__shelf" data-otc="shelf">
+        <h3 className="otc__title">{copy.shelf.title}</h3>
+        <div className="otc__shelf-cells">
+          {book}
+          {film}
+        </div>
+      </div>
       {history}
       {year}
     </Panel>

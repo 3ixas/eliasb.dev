@@ -4,9 +4,10 @@ import { offTheClock } from "../src/content/stretch/off-the-clock";
 import { renderedContrast } from "./support/rendered-contrast";
 
 /*
- * Off the clock (docs/design/DESIGN.md "The homepage, in order" 7, R-19, R-30, R-34): one paper panel in three bands,
- * the training week, the book and the film; this week in history; the GitHub year with Now making. Each state is a whole
- * panel on /fixtures/off-the-clock, with one cell swapped, so every test also shows the panel keeping its shape.
+ * Off the clock (docs/design/DESIGN.md "The homepage, in order" 7, R-19, R-30, R-34): one paper panel in four sections,
+ * each under its own heading: Today's workout; the shelf and screen; this week in history; the GitHub year, with what
+ * I'm building now under its total. Each state is a whole panel on /fixtures/off-the-clock, with one cell swapped, so every test also shows the
+ * panel keeping its shape.
  */
 
 const { days } = offTheClock.training;
@@ -29,21 +30,32 @@ const token = (page: Page, name: string) =>
 
 const hydrated = (page: Page) => page.waitForFunction(() => Object.keys(document.querySelector(".otc__week")!).some((key) => key.startsWith("__reactProps$")));
 
-/** The panel's three bands: its cells in the first, then history, then the year. */
+/** The panel's sections in order. */
 const bands = (panel: Locator) =>
   panel.evaluate((element) => [...element.children].map((child) => (child as HTMLElement).dataset.otc ?? child.className));
+const sections = ["training", "shelf", "history", "github"];
 
 test.describe("Off the clock: on the homepage", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
   });
 
-  test("its title, then one paper panel: training, the book and the film, then this week in history, then the GitHub year", async ({ page }) => {
+  test("its title, then one paper panel: the workout, the shelf and screen, this week in history, the GitHub year with what I'm building", async ({ page }) => {
     const section = page.locator("section#off-the-clock");
     await expect(section.getByRole("heading", { level: 2 })).toHaveText(offTheClock.heading);
     const panel = section.locator(".otc");
     await expect(panel).toHaveClass(/panel--paper/);
-    expect(await bands(panel)).toEqual(["training", "reading", "film", "history", "github"]);
+    expect(await bands(panel)).toEqual(sections);
+    await expect(cell(panel, "training").getByRole("heading", { level: 3 })).toHaveText(offTheClock.training.title);
+    await expect(cell(panel, "shelf").getByRole("heading", { level: 3 })).toHaveText(offTheClock.shelf.title);
+    await expect(cell(panel, "history").getByRole("heading", { level: 3 })).toHaveText(offTheClock.curiosity.label);
+  });
+
+  test("a rule separates each section from the one above", async ({ page }) => {
+    const panel = page.locator("section#off-the-clock .otc");
+    const tops = await panel.evaluate((element) => [...element.children].map((child) => getComputedStyle(child).borderTopWidth));
+    expect(tops[0]).toBe("0px");
+    for (const top of tops.slice(1)) expect(top).toBe("1px");
   });
 
   test("the panel is paper in light and the dark surface in dark", async ({ page }) => {
@@ -58,19 +70,19 @@ test.describe("Off the clock: on the homepage", () => {
     await page.route("**/*.js", (route) => route.abort());
     await page.reload();
     const panel = page.locator("#off-the-clock .otc");
-    await expect(cell(panel, "training").getByRole("heading")).toHaveText(offTheClock.training.week);
+    await expect(cell(panel, "training").getByRole("list", { name: offTheClock.training.week })).toBeVisible();
     await expect(cell(panel, "history").locator("p[aria-live]")).not.toBeEmpty();
-    expect(await bands(panel)).toEqual(["training", "reading", "film", "history", "github"]);
+    expect(await bands(panel)).toEqual(sections);
   });
 });
 
 test.describe("Off the clock: training", () => {
   for (const [name, index] of [["monday", 0], ["saturday", 5], ["sunday", 6]] as const) {
-    test(`${name}: the week marks today once and its session is the heading`, async ({ page }) => {
+    test(`${name}: the week marks today once and its session is shown large`, async ({ page }) => {
       await page.goto("/fixtures/off-the-clock");
       const training = cell(fixture(page, `training-${name}`), "training");
-      await expect(training.getByRole("heading", { level: 3 })).toHaveText(days[index].session);
-      await expect(training.locator("p")).toHaveText(offTheClock.training.rowLine);
+      await expect(training.getByRole("heading", { level: 3 })).toHaveText(offTheClock.training.title);
+      await expect(training.locator(".otc__today > span:last-child")).toHaveText(days[index].session);
       const marked = training.locator(".otc__week li[data-today]");
       await expect(marked).toHaveCount(1);
       await expect(marked).toHaveAttribute("aria-current", "date");
@@ -93,14 +105,14 @@ test.describe("Off the clock: the book and the film", () => {
     await expect(link).toHaveAttribute("target", "_blank");
     await expect(link).toHaveAccessibleName(/^Cover of Dark Age by Pierce Brown Dark Age Now reading · Pierce Brown opens .+ in a new tab$/);
     await expect(book.locator(".arrow--out")).toHaveText("\u2197\uFE0E");
-    await expect(book.getByRole("heading", { level: 3 })).toHaveText("Dark Age");
+    await expect(book.getByRole("heading", { level: 4 })).toHaveText("Dark Age");
   });
 
   test("the film links out to Letterboxd, marked ↗: its poster, title, Last watched with its date and stars", async ({ page }) => {
     const film = cell(fixture(page, "film"), "film");
     await expect(film.getByRole("link")).toHaveAttribute("href", /letterboxd\.com/);
     await expect(film.getByRole("link")).toHaveAttribute("target", "_blank");
-    await expect(film.getByRole("heading", { level: 3 })).toHaveText("The Invite");
+    await expect(film.getByRole("heading", { level: 4 })).toHaveText("The Invite");
     await expect(film.locator("p").first()).toContainText("Last watched 14 Sept");
     await expect(film.locator("p").first()).toContainText("★★★★½");
     await expect(film).toContainText("rated 4.5 out of 5");
@@ -113,7 +125,7 @@ test.describe("Off the clock: the book and the film", () => {
   ] as const) {
     test(`${name}: the written fallback, with no cover, no placeholder and nothing to open`, async ({ page }) => {
       const target = cell(fixture(page, name), item);
-      await expect(target.getByRole("heading", { level: 3 })).toHaveText(fallback);
+      await expect(target.getByRole("heading", { level: 4 })).toHaveText(fallback);
       await expect(target.locator("p").first()).toHaveText(label);
       await expect(target.getByRole("link")).toHaveCount(0);
       await expect(target.locator("img, .otc__cover")).toHaveCount(0);
@@ -133,14 +145,14 @@ test.describe("Off the clock: the book and the film", () => {
     await expect(cell(fixture(page, "book-stale"), "reading").locator(".otc__source")).toContainText(offTheClock.fromAsOf("Goodreads", "2 Aug"));
     await expect(cell(fixture(page, "film-stale"), "film").locator(".otc__source")).toContainText("From Letterboxd, as of");
     for (const name of ["book", "film"]) await expect(fixture(page, name).locator(".otc__media .otc__source")).toHaveCount(0);
-    await expect(page.getByText(/^Live from/)).toHaveCount(0);
+    await expect(page.locator(".otc__media").getByText(/^Live from/)).toHaveCount(0);
   });
 
   test("a long title wraps inside its column, and the link carries it whole", async ({ page }) => {
     const panel = fixture(page, "long");
     for (const item of ["reading", "film"]) {
       const target = cell(panel, item);
-      const [box, heading] = await Promise.all([boxOf(target), boxOf(target.getByRole("heading", { level: 3 }))]);
+      const [box, heading] = await Promise.all([boxOf(target), boxOf(target.getByRole("heading", { level: 4 }))]);
       expect(heading.x + heading.width).toBeLessThanOrEqual(box.x + box.width + 1);
     }
     await expect(cell(panel, "film").getByRole("link")).toHaveAccessibleName(/The Assassination of Jesse James by the Coward Robert Ford/);
@@ -214,9 +226,13 @@ test.describe("Off the clock: Now making", () => {
     await page.goto("/fixtures/off-the-clock");
   });
 
-  test("a repository that is not a project links to GitHub, marked ↗, under the year's total", async ({ page }) => {
-    const making = fixture(page, "making").locator("[data-otc='making'] a");
-    await expect(making).toContainText(`${offTheClock.nowMaking.label} · eliasb.dev`);
+  test("a repository that is not a project shows under the year's total: its heading, the live mark, its name linked to GitHub, marked ↗, and its description", async ({ page }) => {
+    const section = fixture(page, "making").locator("[data-otc='making']");
+    await expect(section.getByRole("heading", { level: 3 })).toHaveText(offTheClock.nowMaking.label);
+    await expect(section.locator(".otc__live")).toHaveText(offTheClock.live(offTheClock.nowMaking.sourceName));
+    await expect(section.locator(".otc__making-line")).toHaveText("Personal site for Elias B.");
+    const making = section.locator("a");
+    await expect(making).toContainText("eliasb.dev");
     await expect(making).toHaveAttribute("href", "https://github.com/3ixas/eliasb.dev");
     await expect(making).toHaveAttribute("target", "_blank");
     expect((await boxOf(making)).height).toBeGreaterThanOrEqual(44);
@@ -225,6 +241,7 @@ test.describe("Off the clock: Now making", () => {
   test("a project with a case study shows the project's name, linked to its case study; one without, linked to GitHub", async ({ page }) => {
     await expect(fixture(page, "making-project").locator("[data-otc='making'] a")).toHaveAttribute("href", "/things-i-make/threshold");
     await expect(fixture(page, "making-project").locator("[data-otc='making'] a")).toContainText("Threshold");
+    await expect(fixture(page, "making-project").locator("[data-otc='making'] .otc__making-line")).toHaveText("A clearer view of what moving could cost.");
     await expect(fixture(page, "making-project-code").locator("[data-otc='making'] a")).toHaveAttribute("href", "https://github.com/3ixas/risk-event-tracker");
   });
 
@@ -286,7 +303,7 @@ test.describe("Off the clock: the GitHub year", () => {
     await expect(cell(fixture(page, "github"), "github").locator(".otc__source")).toHaveCount(0);
     const missing = cell(fixture(page, "github-unavailable"), "github");
     await expect(missing.locator("[data-github-days]")).toHaveCount(0);
-    await expect(missing.locator("[data-otc='making'] a")).toBeVisible();
+    await expect(fixture(page, "github-unavailable").locator("[data-otc='making'] a")).toBeVisible();
   });
 
   test("on phones only the grid scrolls sideways, and it opens on today", async ({ page }) => {
@@ -304,7 +321,7 @@ test.describe("Off the clock: every feed down", () => {
   test("the panel keeps its three bands: the fallbacks, the archive's oddity, and GitHub's link", async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
     const panel = fixture(page, "fallback").locator(".otc");
-    expect(await bands(panel)).toEqual(["training", "reading", "film", "history", "github"]);
+    expect(await bands(panel)).toEqual(sections);
     await expect(cell(panel, "reading")).toContainText(offTheClock.reading.fallback);
     await expect(cell(panel, "film")).toContainText(offTheClock.watched.fallback);
     await expect(cell(panel, "history").locator(".otc__source")).toHaveText(offTheClock.curiosity.fallback);
@@ -350,12 +367,32 @@ test.describe("Off the clock: contrast, sizes and layout", () => {
     expect(results.violations).toEqual([]);
   });
 
-  test("the cells sit three across, the training week full width under 1260 px, one column on a phone", async ({ page }) => {
+  test("the sections stack; the book and the film sit side by side from 720 px, and the week sits under today's session, in a row from 900 px", async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
     const panel = fixture(page, "github").locator(".otc");
-    const [training, book, film] = await Promise.all(["training", "reading", "film"].map((item) => boxOf(cell(panel, item))));
-    if (width(page) >= 1260) expect(new Set([training.y, book.y, film.y].map(Math.round)).size).toBe(1);
-    else if (!phone(page)) expect(Math.round(book.y)).toBe(Math.round(film.y));
-    else expect(film.y).toBeGreaterThan(book.y);
+    const [training, shelf, history] = await Promise.all(["training", "shelf", "history"].map((item) => boxOf(cell(panel, item))));
+    expect(shelf.y).toBeGreaterThan(training.y + training.height - 1);
+    expect(history.y).toBeGreaterThan(shelf.y + shelf.height - 1);
+    const [book, film] = await Promise.all(["reading", "film"].map((item) => boxOf(cell(panel, item))));
+    if (phone(page)) expect(film.y).toBeGreaterThan(book.y);
+    else expect(Math.round(book.y)).toBe(Math.round(film.y));
+    const [today, week] = await Promise.all([boxOf(cell(panel, "training").locator(".otc__today")), boxOf(cell(panel, "training").locator(".otc__week"))]);
+    expect(week.y).toBeGreaterThan(today.y + today.height - 1);
+    const days = await cell(panel, "training").locator(".otc__week li").evaluateAll((items) => new Set(items.map((item) => Math.round(item.getBoundingClientRect().top))).size);
+    expect(days).toBe(width(page) >= 900 ? 1 : 7);
   });
+});
+
+// Today's session is filled in after the page loads (it knows the day only then), so its line must already be as tall as the
+// longest session at this width, or a phone sees everything below it jump.
+test("filling in today's session moves nothing: its line is as tall with script as without", async ({ browser, page, baseURL }) => {
+  const heightOf = (target: Page) => target.locator("#off-the-clock .otc__today").evaluate((element) => Math.round(element.getBoundingClientRect().height));
+  await page.goto("/");
+  await hydrated(page);
+  const hydratedHeight = await heightOf(page);
+  const bare = await browser.newContext({ javaScriptEnabled: false, viewport: page.viewportSize()!, baseURL });
+  const plain = await bare.newPage();
+  await plain.goto("/");
+  expect(await heightOf(plain)).toBe(hydratedHeight);
+  await bare.close();
 });
