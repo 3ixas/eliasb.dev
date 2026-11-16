@@ -1,17 +1,16 @@
 /*
- * The 3D staff pass (#448): plain three.js over the CSS pass, which stays as the page's print and its fallback. Loaded
- * only when the pass is in view (lanyard.tsx). The card is laid where the CSS card is, at the same size, so nothing moves
- * when the scene takes over; then it hangs from two plies of strap, swings once and settles. It can be dragged and thrown.
+ * The 3D staff passes (#448): plain three.js over the CSS passes, which stay as the page's print and its fallback. Loaded
+ * only when the passes come into view (lanyard.ts). One canvas covers the stage (the homepage's rail, a Role story's, the
+ * prototype's), scrolling with it where the rail scrolls; each card is laid where its CSS card is, at the same size, so
+ * nothing moves when the scene takes over. Then each hangs from its two plies, swings once and settles.
+ *
+ * A mouse or pen takes hold of a card at once. A touch takes hold only after a short press, so a swipe across the passes
+ * scrolls the page or the rail as before. A press that does not drag follows the pass's link, if it has one.
  */
 import {
   AmbientLight,
-  CanvasTexture,
   Color,
-  CylinderGeometry,
   DirectionalLight,
-  ExtrudeGeometry,
-  Group,
-  Matrix4,
   Mesh,
   MeshPhysicalMaterial,
   MeshStandardMaterial,
@@ -23,38 +22,38 @@ import {
   Raycaster,
   Scene,
   ShadowMaterial,
-  Shape,
   SRGBColorSpace,
-  TubeGeometry,
   VSMShadowMap,
   Vector2,
   Vector3,
   WebGLRenderer,
-  Curve,
 } from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
-import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
-import { paintPrint } from "./face";
-import { Strap, strapMaterial } from "./strap";
-import { Lanyard, STEP, add, cross, normalise, scale, sub, dot, type Vec3 } from "./physics";
+import { HangingPass } from "./hanging";
+import { STEP, type Vec3 } from "./physics";
+import { strapMaterial } from "./strap";
 
-/** The card's thickness against its width: a CR80 card is 0.76 mm on 54 mm. */
-const THICKNESS = 0.76 / 54;
-/** The camera's vertical field of view: long, so the card is not distorted near the edges of the view. */
+/** The camera's vertical field of view: long, so the cards are not distorted near the edges of the view. */
 const FOV = 20;
-/** How far the plies open from vertical, each way (DESIGN.md "The staff pass"). */
-const SPREAD = (4.5 * Math.PI) / 180;
+/** How long a touch rests on a card before it takes hold, and how far a press may wander and still be a tap. */
+const HOLD_MS = 250;
+const SLOP = 8;
+/** The card's lower edge in pass.css. */
+const EDGE = new Color(0xc9c8c1);
+/**
+ * The arrival: each pass is set swinging, the next a little the other way, as if each had just been hung. The swing is
+ * mostly a turn and a sway towards the viewer: sideways it stays within the gap between passes (about 20 px), so a pass
+ * never swings into its neighbour.
+ */
+const ARRIVALS = [
+  { velocity: { x: 0.22, y: 0, z: 0.55 }, spin: 1.8 },
+  { velocity: { x: -0.18, y: 0, z: 0.45 }, spin: -1.5 },
+  { velocity: { x: 0.16, y: 0, z: -0.45 }, spin: 1.3 },
+];
 
-export type Mount = { stage: HTMLElement; pass: HTMLElement; onReady: () => void };
+export type Mount = { stage: HTMLElement; passes: HTMLElement[]; onReady: () => void };
 
-/** Sizes in em of the card's width ÷ 14.5, as pass.css draws them; the card is 1 wide, so an em is 1/14.5. */
-const em = 1 / 14.5;
-
-export async function mountLanyard({ stage, pass, onReady }: Mount): Promise<() => void> {
-  const print = await paintPrint(pass);
-  const card = pass.querySelector<HTMLElement>(".pass__card");
-  if (!card) throw new Error("The pass has no card");
-
+export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<() => void> {
   const renderer = new WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = SRGBColorSpace;
@@ -67,10 +66,11 @@ export async function mountLanyard({ stage, pass, onReady }: Mount): Promise<() 
   canvas.setAttribute("aria-hidden", "true");
 
   const scene = new Scene();
-  const environment = new PMREMGenerator(renderer);
-  scene.environment = environment.fromScene(new RoomEnvironment(), 0.04).texture;
+  const pmrem = new PMREMGenerator(renderer);
+  const environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  pmrem.dispose();
+  scene.environment = environment;
   scene.environmentIntensity = 0.4;
-  environment.dispose();
 
   const camera = new PerspectiveCamera(FOV, 1, 0.1, 100);
   const key = new DirectionalLight(0xffffff, 0.95);
@@ -80,108 +80,65 @@ export async function mountLanyard({ stage, pass, onReady }: Mount): Promise<() 
   key.shadow.blurSamples = 16;
   scene.add(key, key.target, new AmbientLight(0xffffff, 0.12));
 
-  const shadowCatcher = new Mesh(new PlaneGeometry(1, 1), new ShadowMaterial({ opacity: 0.16 }));
-  shadowCatcher.receiveShadow = true;
-  scene.add(shadowCatcher);
+  const shadow = new ShadowMaterial();
+  const backdrop = new Mesh(new PlaneGeometry(1, 1), shadow);
+  backdrop.receiveShadow = true;
+  backdrop.position.z = -0.35;
+  scene.add(backdrop);
 
-  // The card: CR80 with 0.8 em corners and the punched slot, extruded to its thickness.
-  const width = 1;
-  const height = print.aspect;
-  const cardGeometry = cardShape(width, height);
-  const faceTexture = new CanvasTexture(print.canvas);
-  faceTexture.colorSpace = SRGBColorSpace;
-  faceTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-  const surfaceTexture = new CanvasTexture(print.surface);
-  const foilTexture = new CanvasTexture(print.foil);
-  // A laminated card: satin print under a glossy film. Where the hologram is, the print is metal foil under a thin film whose
-  // thickness varies across the disc, so it changes colour as the card turns (the maps are painted in face.ts).
-  const faceMaterial = new MeshPhysicalMaterial({
-    map: faceTexture,
-    roughness: 1,
-    roughnessMap: surfaceTexture,
-    metalness: 1,
-    metalnessMap: surfaceTexture,
-    clearcoat: 0.6,
-    clearcoatRoughness: 0.18,
-    iridescence: 1,
-    iridescenceMap: foilTexture,
-    iridescenceThicknessMap: foilTexture,
-    iridescenceThicknessRange: [250, 750],
-    iridescenceIOR: 1.6,
-    envMap: scene.environment,
-    envMapIntensity: 0.6,
-  });
-  // The edge: the white core of the card, a step greyer than its face (DESIGN.md: a 1.5 px lower edge).
-  const edgeMaterial = new MeshStandardMaterial({ roughness: 0.7 });
-  const cardMesh = new Mesh(cardGeometry, [faceMaterial, edgeMaterial]);
-  cardMesh.castShadow = true;
-  cardMesh.matrixAutoUpdate = false;
-  scene.add(cardMesh);
+  // Shared by every pass: the card's plain back and its edge (the white core, a step greyer than its face), the clip's
+  // nickel-plated steel, brushed along it, and the darker steel of its rivet, lit more by the room than the card is.
+  const back = new MeshStandardMaterial({ roughness: 0.72 });
+  const edge = new MeshStandardMaterial({ roughness: 0.7 });
+  const metal = new MeshPhysicalMaterial({ color: 0xb9bcc3, metalness: 1, roughness: 0.24, anisotropy: 0.6, envMap: environment, envMapIntensity: 1.3 });
+  const rivet = new MeshPhysicalMaterial({ color: 0x55565c, metalness: 1, roughness: 0.4, envMap: environment, envMapIntensity: 1 });
+  const fabrics = new Map<string, MeshPhysicalMaterial>();
+  const anisotropy = renderer.capabilities.getMaxAnisotropy();
+  const fabric = (colour: string) => {
+    if (!fabrics.has(colour)) fabrics.set(colour, strapMaterial(colour, anisotropy));
+    return fabrics.get(colour)!;
+  };
+  const hanging = await Promise.all(passes.map((pass) => HangingPass.paint(pass, { back, edge, metal, rivet, environment, anisotropy, fabric })));
+  hanging.forEach((pass) => scene.add(...pass.meshes));
 
-  // Nickel-plated steel, brushed along the clip, and the darker steel of the rivet; lit more by the room than the card is.
-  const metal = new MeshPhysicalMaterial({ color: 0xb9bcc3, metalness: 1, roughness: 0.24, anisotropy: 0.6, envMap: scene.environment, envMapIntensity: 1.3 });
-  const rivet = new MeshPhysicalMaterial({ color: 0x55565c, metalness: 1, roughness: 0.4, envMap: scene.environment, envMapIntensity: 1 });
-  const clip = clipModel(metal, rivet);
-  clip.matrixAutoUpdate = false;
-  scene.add(clip);
-
-  const strapColour = getComputedStyle(pass).getPropertyValue("--lanyard").trim() || "#0b6b47";
-  const fabric = strapMaterial(strapColour, renderer.capabilities.getMaxAnisotropy());
-  const plies = [new Strap(fabric, -0.6), new Strap(fabric, 0.6)];
-  plies.forEach((ply) => scene.add(ply.mesh));
-
-  // Laying out: the stage's pixels map to world units at the card's plane, where the card's width is 1.
-  let view = { width: 1, height: 1, unit: 1 };
-  let lanyard: Lanyard;
+  // Laying out: the stage's pixels map to world units at the cards' plane, where the widest card's width is 1. Where the
+  // stage scrolls sideways (the homepage's rail on a phone), the canvas spans all it scrolls through.
+  let view = { width: 0, height: 0, unit: 0 };
+  const measure = () => ({ width: stage.scrollWidth, height: stage.clientHeight, unit: Math.max(...hanging.map((pass) => pass.printed.offsetWidth)) });
   const toWorld = (x: number, y: number): Vec3 => ({ x: (x - view.width / 2) / view.unit, y: (view.height / 2 - y) / view.unit, z: 0 });
 
   function layout(arrive: boolean) {
-    view = { width: stage.clientWidth, height: stage.clientHeight, unit: card!.offsetWidth };
-    renderer.setSize(view.width, view.height, false);
+    view = measure();
+    renderer.setSize(view.width, view.height);
     const tall = view.height / view.unit;
+    const wide = view.width / view.unit;
     camera.aspect = view.width / view.height;
     camera.position.set(0, 0, tall / 2 / Math.tan((FOV * Math.PI) / 360));
     camera.far = camera.position.z + 20;
     camera.updateProjectionMatrix();
 
-    const wide = view.width / view.unit;
-    shadowCatcher.scale.set(wide * 1.5, tall * 1.5, 1);
-    shadowCatcher.position.set(0, 0, -0.35);
+    backdrop.scale.set(wide * 1.5, tall * 1.5, 1);
     key.position.set(-tall * 0.5, tall * 0.9, tall * 1.4);
     const reach = Math.max(wide, tall);
     Object.assign(key.shadow.camera, { left: -reach, right: reach, top: reach, bottom: -reach, near: 0.1, far: tall * 4 });
     key.shadow.camera.updateProjectionMatrix();
 
-    const { left, top } = offsetWithin(card!, stage);
-    const centre = toWorld(left + card!.offsetWidth / 2, top + card!.offsetHeight / 2);
-    const hangY = height / 2 - 0.9 * em;
-    const crimp = add(centre, { x: 0, y: hangY + 2.65 * em, z: 0 });
-    const above = tall / 2 + 0.3;
-    const rise = above - crimp.y;
-    const anchors = [-1, 1].map((side) => ({ x: crimp.x + side * Math.tan(SPREAD) * rise, y: above, z: 0 })) as [Vec3, Vec3];
-    lanyard = new Lanyard({ anchors, crimp, centre }, { width, height, hangY });
-    if (arrive) lanyard.push({ x: 1.3, y: 0, z: 0.35 }, 1.6);
+    hanging.forEach((pass, i) => {
+      const card = pass.printed;
+      const { left, top } = offsetWithin(card, stage);
+      pass.layout(toWorld(left + card.offsetWidth / 2, top + card.offsetHeight / 2), card.offsetWidth / view.unit, tall / 2 + 0.3);
+      const { velocity, spin } = ARRIVALS[i % ARRIVALS.length];
+      if (arrive) pass.lanyard.push(velocity, spin);
+    });
     draw();
   }
 
-  const basis = new Matrix4();
   function draw() {
-    const { centre, x, y, z } = lanyard.frame();
-    cardMesh.matrix.copy(basis.makeBasis(v(x), v(y), v(z)).setPosition(centre.x, centre.y, centre.z));
-    cardMesh.matrixWorldNeedsUpdate = true;
-
-    const crimp = lanyard.get(lanyard.crimp);
-    const slot = lanyard.get(lanyard.card[0]);
-    const up = normalise(sub(crimp, slot));
-    const across = normalise(sub(x, scale(up, dot(x, up))));
-    clip.matrix.copy(basis.makeBasis(v(across), v(up), v(cross(across, up))).setPosition(crimp.x, crimp.y, crimp.z));
-    clip.matrixWorldNeedsUpdate = true;
-
-    lanyard.plies.forEach((ply, i) => plies[i].update(ply.map((index) => lanyard.get(index)), across));
+    hanging.forEach((pass) => pass.draw());
     renderer.render(scene, camera);
   }
 
-  // The loop: fixed steps, drawn each frame while the pass is in view and moving.
+  // The loop: fixed steps, drawn each frame while the stage is in view and something is moving.
   let frame = 0;
   let last = 0;
   let owed = 0;
@@ -196,63 +153,105 @@ export async function mountLanyard({ stage, pass, onReady }: Mount): Promise<() 
     owed = Math.min(owed + (now - last) / 1000, 8 * STEP);
     last = now;
     while (owed >= STEP) {
-      lanyard.step();
+      hanging.forEach((pass) => pass.lanyard.step());
       owed -= STEP;
     }
     draw();
     // Off screen the loop ends here; the observer starts it again when the stage returns.
-    if (visible && !lanyard.asleep) frame = requestAnimationFrame(tick);
+    if (visible && hanging.some((pass) => !pass.lanyard.asleep)) frame = requestAnimationFrame(tick);
   }
 
-  // Holding the card: a press on it takes hold where it lands, then the point follows the pointer in its plane.
+  // Holding a card: the point pressed follows the pointer in the card's plane until let go.
   const raycaster = new Raycaster();
   const pointer = new Vector2();
   const plane = new Plane(new Vector3(0, 0, 1), 0);
   const hit = new Vector3();
-  const cast = (event: PointerEvent) => {
+  const aim = (event: PointerEvent) => {
     const box = canvas.getBoundingClientRect();
-    pointer.set(((event.clientX - box.left) / box.width) * 2 - 1, -((event.clientY - box.top) / box.height) * 2 + 1);
-    raycaster.setFromCamera(pointer, camera);
-    cardMesh.updateMatrixWorld();
-    return raycaster.intersectObject(cardMesh, false)[0];
+    raycaster.setFromCamera(pointer.set(((event.clientX - box.left) / box.width) * 2 - 1, -((event.clientY - box.top) / box.height) * 2 + 1), camera);
   };
-  const down = (event: PointerEvent) => {
-    if (event.button !== 0) return;
-    const found = cast(event);
-    if (!found) return;
-    event.preventDefault();
-    canvas.setPointerCapture(event.pointerId);
-    const local = cardMesh.worldToLocal(found.point.clone());
-    plane.constant = -found.point.z;
-    lanyard.hold({ x: local.x, y: local.y, z: local.z }, v3(found.point));
+  const cast = (event: PointerEvent) => {
+    aim(event);
+    hanging.forEach((pass) => pass.card.updateMatrixWorld());
+    const found = raycaster.intersectObjects(hanging.map((pass) => pass.card), false)[0];
+    return found && { pass: hanging.find((pass) => pass.card === found.object)!, point: found.point };
+  };
+
+  type Press = { pass: HangingPass; point: Vector3; id: number; touch: boolean; x: number; y: number; held: boolean; moved: boolean; timer: number };
+  let press: Press | null = null;
+  const grab = () => {
+    if (!press) return;
+    const { pass, point, id } = press;
+    // A pointer that has already gone (a touch ended as its hold began) is not held.
+    try {
+      canvas.setPointerCapture(id);
+    } catch {
+      press = null;
+      return;
+    }
+    plane.constant = -point.z;
+    pass.hold(point);
+    press.held = true;
     canvas.dataset.holding = "";
     run();
   };
+  const down = (event: PointerEvent) => {
+    if (event.button !== 0 || press) return;
+    const found = cast(event);
+    if (!found) return;
+    const touch = event.pointerType === "touch";
+    press = { ...found, id: event.pointerId, touch, x: event.clientX, y: event.clientY, held: false, moved: false, timer: 0 };
+    if (touch) {
+      press.timer = window.setTimeout(grab, HOLD_MS);
+      return;
+    }
+    event.preventDefault();
+    grab();
+  };
   const move = (event: PointerEvent) => {
-    if (lanyard.held) {
-      raycaster.setFromCamera(pointerAt(event), camera);
-      if (raycaster.ray.intersectPlane(plane, hit)) lanyard.move(v3(hit));
+    if (press?.id === event.pointerId) {
+      if (Math.hypot(event.clientX - press.x, event.clientY - press.y) > SLOP) {
+        press.moved = true;
+        // A touch that moves before it takes hold is a swipe: the page or the rail scrolls.
+        clearTimeout(press.timer);
+      }
+      if (press.held) {
+        aim(event);
+        if (raycaster.ray.intersectPlane(plane, hit)) press.pass.lanyard.move({ x: hit.x, y: hit.y, z: hit.z });
+      }
       return;
     }
     if (event.pointerType === "mouse") canvas.style.cursor = cast(event) ? "grab" : "";
   };
-  const pointerAt = (event: PointerEvent) => {
-    const box = canvas.getBoundingClientRect();
-    return pointer.set(((event.clientX - box.left) / box.width) * 2 - 1, -((event.clientY - box.top) / box.height) * 2 + 1);
+  const end = (event: PointerEvent) => {
+    if (press?.id !== event.pointerId) return;
+    const { pass, held, moved, touch, timer } = press;
+    clearTimeout(timer);
+    press = null;
+    if (held) {
+      pass.lanyard.release();
+      delete canvas.dataset.holding;
+      if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+      run();
+    }
+    // A press that did not drag is a click on the pass; a touch held to take hold of the card is not.
+    if (event.type === "pointerup" && !moved && !(touch && held)) pass.link?.click();
   };
-  const up = (event: PointerEvent) => {
-    if (!lanyard.held) return;
-    lanyard.release();
-    delete canvas.dataset.holding;
-    if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
-    run();
+  // Once a touch has taken hold, its moves drag the card rather than scroll, and a long press opens no menu.
+  const holdTouch = (event: TouchEvent) => {
+    if (press?.held && event.cancelable) event.preventDefault();
+  };
+  const noMenu = (event: Event) => {
+    if (press?.touch) event.preventDefault();
   };
   canvas.addEventListener("pointerdown", down);
   canvas.addEventListener("pointermove", move);
-  canvas.addEventListener("pointerup", up);
-  canvas.addEventListener("pointercancel", up);
+  canvas.addEventListener("pointerup", end);
+  canvas.addEventListener("pointercancel", end);
+  canvas.addEventListener("touchmove", holdTouch, { passive: false });
+  canvas.addEventListener("contextmenu", noMenu);
 
-  // Off screen the loop stops; a resize lays the pass out again at rest; a theme change reprints the card stock.
+  // Off screen the loop stops; a resize lays the passes out again at rest; a theme change reprints the card stock.
   const seen = new IntersectionObserver(([entry]) => {
     visible = entry.isIntersecting;
     if (visible) run();
@@ -262,26 +261,24 @@ export async function mountLanyard({ stage, pass, onReady }: Mount): Promise<() 
   const resized = new ResizeObserver(() => {
     cancelAnimationFrame(resizing);
     resizing = requestAnimationFrame(() => {
-      // Observing reports the stage's size once at the start; only a real change of size lays the pass out again.
-      if (stage.clientWidth === view.width && stage.clientHeight === view.height && card!.offsetWidth === view.unit) return;
+      // Observing reports the stage's size once at the start; only a real change of size lays the passes out again.
+      const next = measure();
+      if (next.width === view.width && next.height === view.height && next.unit === view.unit) return;
       layout(false);
     });
   });
-  const reprint = async () => {
-    const next = await paintPrint(pass);
-    for (const [texture, image] of [[faceTexture, next.canvas], [surfaceTexture, next.surface], [foilTexture, next.foil]] as const) {
-      texture.image = image;
-      texture.needsUpdate = true;
-    }
-    shade();
-    draw();
-  };
   const shade = () => {
     const dark = getComputedStyle(document.documentElement).getPropertyValue("--dark").trim() === "1";
-    const shadow = shadowCatcher.material as ShadowMaterial;
     shadow.opacity = dark ? 0.5 : 0.22;
     shadow.color.set(dark ? 0x000000 : 0x1e1c16);
-    edgeMaterial.color.set(getComputedStyle(card!).getPropertyValue("--stock-end").trim() || "#f5f4f0").lerp(EDGE, 0.6);
+    const stock = getComputedStyle(hanging[0].printed).getPropertyValue("--stock-end").trim() || "#f5f4f0";
+    back.color.set(stock);
+    edge.color.set(stock).lerp(EDGE, 0.6);
+  };
+  const reprint = async () => {
+    await Promise.all(hanging.map((pass) => pass.reprint()));
+    shade();
+    draw();
   };
   const themed = new MutationObserver(() => void reprint());
   themed.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
@@ -299,25 +296,20 @@ export async function mountLanyard({ stage, pass, onReady }: Mount): Promise<() 
   return () => {
     cancelAnimationFrame(frame);
     cancelAnimationFrame(resizing);
+    if (press) clearTimeout(press.timer);
     seen.disconnect();
     resized.disconnect();
     themed.disconnect();
     scheme.removeEventListener("change", schemeChanged);
     canvas.remove();
-    scene.traverse((object) => {
-      if (object instanceof Mesh) object.geometry.dispose();
-    });
-    [faceMaterial, edgeMaterial, metal, rivet, fabric, shadowCatcher.material as ShadowMaterial].forEach((material) => material.dispose());
-    [faceTexture, surfaceTexture, foilTexture, fabric.map, fabric.normalMap, scene.environment].forEach((texture) => texture?.dispose());
+    hanging.forEach((pass) => pass.dispose());
+    backdrop.geometry.dispose();
+    [back, edge, metal, rivet, shadow, ...fabrics.values()].forEach((material) => material.dispose());
+    [...fabrics.values()].forEach((material) => [material.map, material.normalMap].forEach((texture) => texture?.dispose()));
+    environment.dispose();
     renderer.dispose();
   };
 }
-
-/** The card's lower edge in pass.css. */
-const EDGE = new Color(0xc9c8c1);
-
-const v = ({ x, y, z }: Vec3) => new Vector3(x, y, z);
-const v3 = ({ x, y, z }: Vector3): Vec3 => ({ x, y, z });
 
 /** The element's layout position within the stage, ignoring transforms (the CSS pass is turned by its tilt). */
 function offsetWithin(element: HTMLElement, stage: HTMLElement) {
@@ -328,85 +320,4 @@ function offsetWithin(element: HTMLElement, stage: HTMLElement) {
     top += at.offsetTop;
   }
   return { left, top };
-}
-
-/** The card, centred on its origin, with the face's UVs on the left half of the print and the back's on the right. */
-function cardShape(width: number, height: number) {
-  const outline = roundedRect(new Shape(), -width / 2, -height / 2, width, height, 0.8 * em);
-  const slotTop = height / 2 - 0.9 * em;
-  outline.holes.push(roundedRect(new Shape(), -1.45 * em, slotTop - 0.8 * em, 2.9 * em, 0.8 * em, 0.4 * em));
-  const bevel = THICKNESS * 0.18;
-  const geometry = new ExtrudeGeometry(outline, { depth: THICKNESS - 2 * bevel, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 2, curveSegments: 12 });
-  geometry.translate(0, 0, -(THICKNESS - 2 * bevel) / 2);
-  const position = geometry.getAttribute("position");
-  const normal = geometry.getAttribute("normal");
-  const uv = geometry.getAttribute("uv");
-  const lids = geometry.groups[0];
-  for (let i = lids.start; i < lids.start + lids.count; i++) {
-    const across = (position.getX(i) + width / 2) / width;
-    const along = (position.getY(i) + height / 2) / height;
-    uv.setXY(i, normal.getZ(i) > 0 ? across * 0.5 : 0.5 + (1 - across) * 0.5, along);
-  }
-  uv.needsUpdate = true;
-  return geometry;
-}
-
-function roundedRect(shape: Shape, x: number, y: number, w: number, h: number, r: number) {
-  shape.moveTo(x + r, y);
-  shape.lineTo(x + w - r, y);
-  shape.quadraticCurveTo(x + w, y, x + w, y + r);
-  shape.lineTo(x + w, y + h - r);
-  shape.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  shape.lineTo(x + r, y + h);
-  shape.quadraticCurveTo(x, y + h, x, y + h - r);
-  shape.lineTo(x, y + r);
-  shape.quadraticCurveTo(x, y, x + r, y);
-  return shape;
-}
-
-/** A loop shaped like a running track, in the plane across the card (y up, z through it), so it threads the slot. */
-class Stadium extends Curve<Vector3> {
-  constructor(private readonly half: number, private readonly top: number, private readonly bottom: number) {
-    super();
-  }
-
-  getPoint(t: number, target = new Vector3()) {
-    const r = this.half;
-    const straight = this.top - this.bottom - 2 * r;
-    const total = 2 * straight + 2 * Math.PI * r;
-    let d = t * total;
-    if (d < straight) return target.set(0, this.top - r - d, r);
-    d -= straight;
-    if (d < Math.PI * r) {
-      const a = d / r;
-      return target.set(0, this.bottom + r - Math.sin(a) * r, Math.cos(a) * r);
-    }
-    d -= Math.PI * r;
-    if (d < straight) return target.set(0, this.bottom + r + d, -r);
-    d -= straight;
-    const a = d / r;
-    return target.set(0, this.top - r + Math.sin(a) * r, -Math.cos(a) * r);
-  }
-}
-
-/** The clip, from the crimp at its origin downwards: a crimp, a swivel and a loop through the slot (DESIGN.md "The staff pass"). */
-function clipModel(metal: MeshPhysicalMaterial, rivetMetal: MeshPhysicalMaterial) {
-  const group = new Group();
-  const crimp = new Mesh(new RoundedBoxGeometry(1.4 * em, 0.95 * em, 0.42 * em, 3, 0.14 * em), metal);
-  crimp.position.y = -0.475 * em;
-  // The rivet through the crimp and the strap, its head proud of both faces.
-  const rivet = new Mesh(new CylinderGeometry(0.17 * em, 0.17 * em, 0.5 * em, 20), rivetMetal);
-  rivet.rotation.x = Math.PI / 2;
-  rivet.position.y = -0.4 * em;
-  group.add(rivet);
-  const swivel = new Mesh(new CylinderGeometry(0.17 * em, 0.17 * em, 0.55 * em, 16), metal);
-  swivel.position.y = -1.2 * em;
-  const tube = 0.12 * em;
-  // The loop's inside rests on the slot's upper edge, 2.65 em below the crimp.
-  const loop = new Mesh(new TubeGeometry(new Stadium(0.32 * em, -1.4 * em, -2.65 * em - 2 * tube), 64, tube, 10, true), metal);
-  for (const part of [crimp, swivel, loop]) {
-    part.castShadow = true;
-    group.add(part);
-  }
-  return group;
 }

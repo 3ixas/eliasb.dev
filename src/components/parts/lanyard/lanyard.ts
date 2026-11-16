@@ -1,20 +1,18 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, type RefObject } from "react";
 
 /**
- * Hangs a staff pass in 3D (#448). The CSS pass inside is the server render, the accessible name and the fallback: with no
- * script, no WebGL or reduced motion it is all there is. When the stage comes near the view, the scene (three.js) loads,
- * paints the card from the pass's own print and takes the pass's place at its exact size; the pass stays in the page,
- * unseen, for assistive technology.
+ * Hangs a stage's staff passes in 3D (#448). The CSS passes inside are the server render, the accessible names and the
+ * fallback: with no script, no WebGL or reduced motion they are all there is. When the stage comes near the view, the
+ * scene (three.js) loads, paints each card from its pass's own print and takes its place at its exact size; the passes
+ * stay in the page, unseen, for assistive technology and the keyboard.
  */
-export function LanyardStage({ className, children }: { className?: string; children: ReactNode }) {
-  const stage = useRef<HTMLDivElement>(null);
-
+export function useLanyard(stage: RefObject<HTMLElement | null>) {
   useEffect(() => {
     const element = stage.current;
-    const pass = element?.querySelector<HTMLElement>(".pass");
-    if (!element || !pass) return;
+    const passes = element ? [...element.querySelectorAll<HTMLElement>(".pass")] : [];
+    if (!element || !passes.length) return;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)");
     let dispose: (() => void) | undefined;
     let cancelled = false;
@@ -25,13 +23,13 @@ export function LanyardStage({ className, children }: { className?: string; chil
       if (!wanted() || !canDraw()) return;
       near.disconnect();
       import("./scene")
-        .then(({ mountLanyard }) => mountLanyard({ stage: element, pass, onReady: () => wanted() && (element.dataset.lanyard = "3d") }))
+        .then(({ mountLanyard }) => mountLanyard({ stage: element, passes, onReady: () => wanted() && (element.dataset.lanyard = "3d") }))
         .then((stop) => (wanted() ? (dispose = stop) : stop()))
         .catch(() => delete element.dataset.lanyard);
     };
     const near = new IntersectionObserver(([entry]) => entry.isIntersecting && start(), { rootMargin: "200px" });
     near.observe(element);
-    // Reduced motion turned on later puts the printed pass back.
+    // Reduced motion turned on later puts the printed passes back.
     const stop = () => {
       if (!still.matches) return;
       dispose?.();
@@ -47,13 +45,7 @@ export function LanyardStage({ className, children }: { className?: string; chil
       dispose?.();
       delete element.dataset.lanyard;
     };
-  }, []);
-
-  return (
-    <div ref={stage} className={className ? `lanyard ${className}` : "lanyard"}>
-      {children}
-    </div>
-  );
+  }, [stage]);
 }
 
 function canDraw() {

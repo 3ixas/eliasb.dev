@@ -4,6 +4,7 @@ import { opening } from "../src/content/stretch/opening";
 import { passName } from "../src/content/stretch/pass-name";
 import { passHang, passRecords, passStatus } from "../src/content/stretch/staff-pass";
 import { renderedContrast } from "./support/rendered-contrast";
+import { withoutScene } from "./support/scene";
 
 /*
  * The homepage's opening (docs/design/DESIGN.md "The homepage, in order" 2 and "The staff pass", R-11 and R-12): the
@@ -185,9 +186,11 @@ test.describe("The staff passes", () => {
     for (const [text, size] of sizes) expect(size, text).toBeGreaterThanOrEqual(13);
   });
 
-  test("passes swing to rest once on arrival, each 80 ms after the last, and rest at once with reduced motion", async ({ browser }) => {
+  test("printed passes swing to rest once on arrival, each 80 ms after the last, and rest at once with reduced motion", async ({ browser }) => {
     for (const reducedMotion of ["no-preference", "reduce"] as const) {
       const context = await browser.newContext({ reducedMotion });
+      // Where the 3D scene can draw, it takes the printed passes' place and swings them itself (lanyard.spec).
+      await withoutScene(context);
       const page = await context.newPage();
       await page.goto("/");
       const swings = await passes(page).evaluateAll((all) =>
@@ -204,8 +207,10 @@ test.describe("The staff passes", () => {
 
   test("on hover a pass leans the other way and catches the light where the pointer is", async ({ page }) => {
     test.skip(!(await page.evaluate(() => matchMedia("(hover: hover) and (pointer: fine)").matches)), "Hover needs a fine pointer");
-    // The suite runs with reduced motion; the hover's lean and light are motion, so the page is loaded again without it.
+    // The suite runs with reduced motion; the hover's lean and light are motion, so the page is loaded again without it,
+    // and without the 3D scene, which takes the printed passes' place wherever it can draw (lanyard.spec).
     await page.emulateMedia({ reducedMotion: "no-preference" });
+    await withoutScene(page);
     await page.reload();
     const pass = passes(page).first();
     await expect.poll(() => pass.evaluate((element) => element.getAnimations().length)).toBe(0);

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
-import { LanyardStage } from "@/components/parts/lanyard/lanyard";
+import { PassLight } from "@/components/parts/pass-light";
 import { StaffPass } from "@/components/parts/staff-pass";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
@@ -18,9 +18,9 @@ export default async function LanyardFixture() {
   return (
     <main id="main-content" tabIndex={-1} style={{ background: "var(--page)", color: "var(--ink)" }}>
       <h1 className="sr-only">Lanyard</h1>
-      <LanyardStage className="lanyard--fixture">
+      <PassLight className="lanyard--fixture">
         <StaffPass slug="bnp-paribas" lead priority />
-      </LanyardStage>
+      </PassLight>
     </main>
   );
 }

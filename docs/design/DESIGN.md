@@ -54,6 +54,7 @@ A printed card hanging from a lanyard. It is an object, so it keeps its printed 
 - **Size and order**: BNP Paribas first, 264 px wide, hanging lowest; Joveen and Optegra 248 px. Every text on a pass is at least 13 px.
 - **Where**: three in the homepage's opening, each linking to its panel in Work; one at the top of each Role story, not a link.
 - **Accessible name**: the pass's whole content as a sentence; the drawing itself is hidden from assistive technology.
+- **In 3D** ([#448](https://github.com/3ixas/eliasb.dev/issues/448), `components/parts/lanyard/`): where the browser has WebGL 2 and motion is on, one canvas hangs the passes of a rail (the homepage's three, a Role story's one) over the printed passes, each card painted from its pass's own print and laid on it at its exact size. The cards hang from woven two-ply straps by a nickel clip, swing once and settle, and can be dragged and thrown. A mouse takes hold at once; a touch takes hold after resting a quarter of a second, so a swipe still scrolls the page or the rail. A click or tap that does not drag follows the pass's link; a Role story's pass has none. The printed passes stay in the page, unseen, for their names, links and the keyboard: a focused pass rings its card. With no script, no WebGL or reduced motion, the printed pass is all there is.
 
 ## Controls
 
@@ -180,7 +181,7 @@ Every text pair passes WCAG 2.2 AA, measured on the rendered page and on every p
 ## Motion
 
 - **Easings**: `--out: cubic-bezier(.22, 1, .36, 1)` for things that settle, `--spring: cubic-bezier(.3, 1.5, .4, 1)` for things that swing.
-- **Passes** swing to rest once on arrival (1.8 s, each 80 ms after the last). On hover a pass leans the other way, catches the light where the pointer is, and its hologram turns.
+- **Passes** swing to rest once on arrival (1.8 s, each 80 ms after the last). On hover a pass leans the other way, catches the light where the pointer is, and its hologram turns. In 3D a pass swings once on its strap where it was printed, within the gap to its neighbour, and settles; its hologram turns its colours as the card turns.
 - **Panels and cards** rise 16 px and fade in once, when 15% in view.
 - **Display figures** count to their value once, over 1.2 s.
 - **Bars** grow from the left once, the after bar 300 ms behind the before.

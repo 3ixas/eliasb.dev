@@ -1,14 +1,17 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
+import { useLanyard } from "@/components/parts/lanyard/lanyard";
 
 /**
- * Holds the passes and lets each catch the light where a fine pointer is (DESIGN.md "Motion"): the sheen follows the
+ * Holds the passes. Where it can, it hangs them in 3D on one canvas (#448, parts/lanyard), to be dragged and thrown.
+ * Otherwise the printed passes catch the light where a fine pointer is (DESIGN.md "Motion"): the sheen follows the
  * pointer and the hologram turns. Hover adds feedback only, so nothing here is needed to read a pass, and with reduced
  * motion or a touch screen nothing moves.
  */
 export function PassLight({ className, children }: { className: string; children: ReactNode }) {
   const rail = useRef<HTMLDivElement>(null);
+  useLanyard(rail);
 
   useEffect(() => {
     const element = rail.current;
@@ -32,7 +35,7 @@ export function PassLight({ className, children }: { className: string; children
   }, []);
 
   return (
-    <div ref={rail} className={className}>
+    <div ref={rail} className={`lanyard ${className}`}>
       {children}
     </div>
   );

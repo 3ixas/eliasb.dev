@@ -47,6 +47,8 @@ export class Strap {
   private readonly curve = new CatmullRomCurve3([], false, "centripetal");
   /** The twist between the crimp and the top, in radians, kept from the last frame so whole turns are not lost. */
   private twist = 0;
+  /** The pass's width against the scene's unit: a smaller pass has a narrower strap. */
+  scale = 1;
 
   /** `layer` sets the two plies a hair apart in depth where they meet at the crimp, so they never show through each other. */
   constructor(material: MeshPhysicalMaterial, private readonly layer: number) {
@@ -100,11 +102,13 @@ export class Strap {
         z: carried[i].z * Math.cos(turn) + cross(tangent, carried[i]).z * Math.sin(turn),
       });
       const n = cross(s, tangent);
-      const centre = { x: samples[i].x + n.x * this.layer * THICKNESS, y: samples[i].y + n.y * this.layer * THICKNESS, z: samples[i].z + n.z * this.layer * THICKNESS };
+      const thick = THICKNESS * this.scale;
+      const wide = WIDTH * this.scale;
+      const centre = { x: samples[i].x + n.x * this.layer * thick, y: samples[i].y + n.y * this.layer * thick, z: samples[i].z + n.z * this.layer * thick };
       if (i > 0) along += Math.hypot(samples[i].x - samples[i - 1].x, samples[i].y - samples[i - 1].y, samples[i].z - samples[i - 1].z);
-      const v = along / WIDTH;
-      const w = WIDTH / 2;
-      const t = THICKNESS / 2;
+      const v = along / wide;
+      const w = wide / 2;
+      const t = thick / 2;
       // Front and back: across the width, a face's thickness out. Edges: across the thickness, at either side.
       this.put(i, 0, centre, n, t, s, w, n, v, [0, 1]);
       this.put(i, 1, centre, n, -t, s, w, scale(n, -1), v, [0, 1]);

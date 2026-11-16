@@ -1,8 +1,7 @@
 /*
  * Paints the card's print onto a canvas from the CSS pass itself (#448): a copy of the pass is laid out off screen, unturned,
  * and every word, rule, photo and mark is drawn where the browser put it. The scene and its fallback print the same values
- * from the same markup (PassCard), so they cannot disagree. The left half of the canvas is the face; the right half is the
- * back, plain stock.
+ * from the same markup (PassCard), so they cannot disagree. The back is plain stock, so it needs no print.
  */
 
 /** The face's width in texture pixels; its height follows the card. */
@@ -44,7 +43,7 @@ function paint(card: HTMLElement, returned: boolean): Print {
   const s = FACE_WIDTH / box.width;
   const height = Math.round(box.height * s);
   const canvas = document.createElement("canvas");
-  canvas.width = FACE_WIDTH * 2;
+  canvas.width = FACE_WIDTH;
   canvas.height = height;
   const context = canvas.getContext("2d");
   if (!context) throw new Error("No 2D canvas");
@@ -55,7 +54,7 @@ function paint(card: HTMLElement, returned: boolean): Print {
   stock.addColorStop(0, style.getPropertyValue("--stock").trim() || "#fff");
   stock.addColorStop(1, style.getPropertyValue("--stock-end").trim() || "#f5f4f0");
   context.fillStyle = stock;
-  context.fillRect(0, 0, FACE_WIDTH * 2, height);
+  context.fillRect(0, 0, FACE_WIDTH, height);
 
   const band = card.querySelector<HTMLElement>(".pass__band");
   if (band) {
@@ -137,7 +136,7 @@ function paint(card: HTMLElement, returned: boolean): Print {
   return { canvas, ...finish, aspect: box.height / box.width };
 }
 
-/** The laminate's satin, the back's plain stock a touch rougher, and the hologram's metal foil and film. */
+/** The laminate's satin, and the hologram's metal foil and film. */
 function paintFinish(card: HTMLElement, box: DOMRect, faceHeight: number) {
   const k = 1 / 4;
   const width = FACE_WIDTH * k;
@@ -145,7 +144,7 @@ function paintFinish(card: HTMLElement, box: DOMRect, faceHeight: number) {
   const surface = document.createElement("canvas");
   const foil = document.createElement("canvas");
   for (const canvas of [surface, foil]) {
-    canvas.width = width * 2;
+    canvas.width = width;
     canvas.height = height;
   }
   const paint = surface.getContext("2d");
@@ -153,10 +152,8 @@ function paintFinish(card: HTMLElement, box: DOMRect, faceHeight: number) {
   if (!paint || !film) throw new Error("No 2D canvas");
   paint.fillStyle = "rgb(0 128 0)";
   paint.fillRect(0, 0, width, height);
-  paint.fillStyle = "rgb(0 184 0)";
-  paint.fillRect(width, 0, width, height);
   film.fillStyle = "#000";
-  film.fillRect(0, 0, width * 2, height);
+  film.fillRect(0, 0, width, height);
 
   const holo = card.querySelector<HTMLElement>(".pass__holo");
   if (holo) {

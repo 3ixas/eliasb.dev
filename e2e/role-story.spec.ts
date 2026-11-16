@@ -6,6 +6,7 @@ import { roleStories, roleStorySlugs } from "../src/content/stretch/role-stories
 import { roleStoryBack, roleStoryCopy, roleStoryDescription, roleStoryName, roleStorySectionKeys, roleStorySectionLabels } from "../src/content/stretch/role-story";
 import { passRecords } from "../src/content/stretch/staff-pass";
 import { renderedContrast } from "./support/rendered-contrast";
+import { withoutScene } from "./support/scene";
 
 /*
  * Role stories (docs/design/DESIGN.md "Long-form pages", R-21): the employer as the title, role, dates and setting on one
@@ -107,7 +108,9 @@ for (const slug of roleStorySlugs) {
         .toBe(true);
     });
 
-    test("the pass swings once on arrival, and not at all with reduced motion", async ({ page }) => {
+    test("the printed pass swings once on arrival, and not at all with reduced motion", async ({ page }) => {
+      // Where the 3D scene can draw, it takes the printed pass's place and swings it itself (lanyard.spec).
+      await withoutScene(page);
       await page.emulateMedia({ reducedMotion: "no-preference" });
       await page.goto(`/work/${slug}`);
       const animations = () => pass(page).evaluate((element) => element.getAnimations().map((a) => `${(a as CSSAnimation).animationName}:${a.effect?.getComputedTiming().iterations}`));

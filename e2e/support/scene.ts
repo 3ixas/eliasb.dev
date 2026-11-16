@@ -1,0 +1,17 @@
+import type { BrowserContext, Page } from "@playwright/test";
+
+/**
+ * Loads pages as a browser without WebGL 2 would, so the printed staff passes stay on screen instead of the 3D scene
+ * (#448, parts/lanyard). For specs about the printed pass's own motion (its arrival swing, its hover lean), which the
+ * scene replaces wherever it can draw.
+ */
+export const withoutScene = (target: Page | BrowserContext) =>
+  target.addInitScript(() => {
+    const getContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, kind: string, ...rest: unknown[]) {
+      return kind === "webgl2" ? null : (getContext as (...args: unknown[]) => unknown).call(this, kind, ...rest);
+    } as typeof getContext;
+  });
+
+/** Whether this browser can draw the scene at all. */
+export const canDrawScene = (page: Page) => page.evaluate(() => Boolean(document.createElement("canvas").getContext("webgl2")));
