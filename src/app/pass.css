@@ -346,6 +346,28 @@
   opacity: 0;
 }
 
+/* While the scene is on its way, the printed passes wait unseen, so a visitor never sees the print and then the swap.
+   The boot script marks the page (data-script) before it paints; lanyard.ts marks the stage waiting, then loading. Before
+   it has, the print shows after 4 s regardless, in case the app's script never runs. The print shows at once with
+   reduced motion, with no script, and when the scene cannot draw, fails or is slow (data-lanyard failed or slow). Only
+   the pass's drawing waits; the pass, its name and its box stay, so nothing shifts. */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-script] .lanyard:not([data-lanyard]) .pass > * {
+    opacity: 0;
+    animation: lanyard-print 0s 4s forwards;
+  }
+
+  .lanyard:is([data-lanyard="waiting"], [data-lanyard="loading"]) .pass > * {
+    opacity: 0;
+  }
+}
+
+@keyframes lanyard-print {
+  to {
+    opacity: 1;
+  }
+}
+
 /* A focused pass shows its ring around the card, where the scene draws it at rest. */
 .lanyard[data-lanyard="3d"] .pass:focus-visible {
   outline: none;

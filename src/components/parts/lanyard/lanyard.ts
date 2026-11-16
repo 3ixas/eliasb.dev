@@ -20,35 +20,47 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
     // Loading takes a moment; if the page is left or reduced motion turns on meanwhile, the scene is not shown.
     const wanted = () => !cancelled && !still.matches;
 
-    // The stage says how far the scene got (`data-lanyard`: loading, 3d, or failed with `data-lanyard-error`; the scene
-    // adds what a frame cost, `data-lanyard-frame`); only 3d hides the printed passes. /fixtures/lanyard prints it, so a
-    // phone with no console can still say what happened. One scene at a time: none starts while one is up or loading.
+    // The stage says how far the scene got (`data-lanyard`: waiting, loading, 3d, or failed with `data-lanyard-error`, or
+    // slow; the scene adds what a frame cost, `data-lanyard-frame`). Waiting, loading and 3d keep the printed passes
+    // unseen (pass.css), so the print never shows and is then swapped; failed and slow show it. /fixtures/lanyard prints
+    // the state, so a phone with no console can still say what happened. One scene at a time: none starts while one is
+    // up or loading.
+    const cannot = cannotDraw();
+    const fail = (reason: string) => {
+      element.dataset.lanyard = "failed";
+      element.dataset.lanyardError = reason;
+    };
+    let slow = 0;
     const start = () => {
       if (!wanted() || dispose || loading) return;
-      const cannot = cannotDraw();
-      if (cannot) {
-        element.dataset.lanyard = "failed";
-        element.dataset.lanyardError = cannot;
-        return;
-      }
+      if (cannot) return fail(cannot);
       near.disconnect();
       element.dataset.lanyard = "loading";
       loading = true;
+      // A scene that takes this long to arrive shows the print meanwhile; it still takes over when it draws.
+      slow = window.setTimeout(() => element.dataset.lanyard === "loading" && (element.dataset.lanyard = "slow"), SLOW_MS);
       import("./scene")
         .then(({ mountLanyard }) => mountLanyard({ stage: element, passes, onReady: () => wanted() && (element.dataset.lanyard = "3d") }))
         .then((stop) => (wanted() ? (dispose = stop) : stop()))
-        .catch((error: unknown) => {
-          element.dataset.lanyard = "failed";
-          element.dataset.lanyardError = error instanceof Error ? error.message : String(error);
-        })
-        .finally(() => (loading = false));
+        .catch((error: unknown) => fail(error instanceof Error ? error.message : String(error)))
+        .finally(() => {
+          loading = false;
+          clearTimeout(slow);
+        });
+    };
+    // The print waits unseen from here, unless the scene cannot draw at all.
+    const wait = () => {
+      if (cannot) fail(cannot);
+      else if (!dispose && !loading) element.setAttribute("data-lanyard", "waiting");
     };
     const near = new IntersectionObserver(([entry]) => entry.isIntersecting && start(), { rootMargin: "200px" });
+    if (wanted()) wait();
     near.observe(element);
     // Reduced motion turned on later puts the printed passes back; turned off again, the passes hang once more when the
     // stage is near the view.
     const changed = () => {
       if (!still.matches) {
+        wait();
         near.observe(element);
         return;
       }
@@ -62,6 +74,7 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
 
     return () => {
       cancelled = true;
+      clearTimeout(slow);
       near.disconnect();
       still.removeEventListener("change", changed);
       dispose?.();
@@ -78,6 +91,9 @@ const SOFTWARE = /swiftshader|llvmpipe|softpipe|software|basic render/i;
 const UNNAMED = /^(webkit )?webgl$|^webkit$|^mozilla$/i;
 
 /** Why this browser should keep the printed passes, or nothing if it can draw the scene on a graphics chip. */
+/** How long the scene may take to arrive before the print shows meanwhile (ms). */
+const SLOW_MS = 5000;
+
 function cannotDraw() {
   try {
     const context = document.createElement("canvas").getContext("webgl2", { failIfMajorPerformanceCaveat: true });
