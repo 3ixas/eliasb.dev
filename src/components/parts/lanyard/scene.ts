@@ -6,6 +6,7 @@
 import {
   AmbientLight,
   CanvasTexture,
+  Color,
   CylinderGeometry,
   DirectionalLight,
   ExtrudeGeometry,
@@ -15,7 +16,6 @@ import {
   MeshPhysicalMaterial,
   MeshStandardMaterial,
   NeutralToneMapping,
-  PCFShadowMap,
   PMREMGenerator,
   PerspectiveCamera,
   Plane,
@@ -26,6 +26,7 @@ import {
   Shape,
   SRGBColorSpace,
   TubeGeometry,
+  VSMShadowMap,
   Vector2,
   Vector3,
   WebGLRenderer,
@@ -59,7 +60,8 @@ export async function mountLanyard({ stage, pass, onReady }: Mount): Promise<() 
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.toneMapping = NeutralToneMapping;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = PCFShadowMap;
+  // Variance shadows blur into a wide penumbra, like the CSS pass's soft shadows; only the backdrop receives them.
+  renderer.shadowMap.type = VSMShadowMap;
   const canvas = renderer.domElement;
   canvas.className = "lanyard__scene";
   canvas.setAttribute("aria-hidden", "true");
@@ -74,8 +76,8 @@ export async function mountLanyard({ stage, pass, onReady }: Mount): Promise<() 
   const key = new DirectionalLight(0xffffff, 0.95);
   key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024);
-  key.shadow.bias = -0.0004;
-  key.shadow.radius = 4;
+  key.shadow.radius = 14;
+  key.shadow.blurSamples = 16;
   scene.add(key, key.target, new AmbientLight(0xffffff, 0.12));
 
   const shadowCatcher = new Mesh(new PlaneGeometry(1, 1), new ShadowMaterial({ opacity: 0.16 }));
@@ -89,15 +91,37 @@ export async function mountLanyard({ stage, pass, onReady }: Mount): Promise<() 
   const faceTexture = new CanvasTexture(print.canvas);
   faceTexture.colorSpace = SRGBColorSpace;
   faceTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-  const faceMaterial = new MeshPhysicalMaterial({ map: faceTexture, roughness: 0.58, clearcoat: 0.55, clearcoatRoughness: 0.3 });
-  const edgeMaterial = new MeshStandardMaterial({ color: 0xe4e2db, roughness: 0.75 });
+  const surfaceTexture = new CanvasTexture(print.surface);
+  const foilTexture = new CanvasTexture(print.foil);
+  // A laminated card: satin print under a glossy film. Where the hologram is, the print is metal foil under a thin film whose
+  // thickness varies across the disc, so it changes colour as the card turns (the maps are painted in face.ts).
+  const faceMaterial = new MeshPhysicalMaterial({
+    map: faceTexture,
+    roughness: 1,
+    roughnessMap: surfaceTexture,
+    metalness: 1,
+    metalnessMap: surfaceTexture,
+    clearcoat: 0.6,
+    clearcoatRoughness: 0.18,
+    iridescence: 1,
+    iridescenceMap: foilTexture,
+    iridescenceThicknessMap: foilTexture,
+    iridescenceThicknessRange: [250, 750],
+    iridescenceIOR: 1.6,
+    envMap: scene.environment,
+    envMapIntensity: 0.6,
+  });
+  // The edge: the white core of the card, a step greyer than its face (DESIGN.md: a 1.5 px lower edge).
+  const edgeMaterial = new MeshStandardMaterial({ roughness: 0.7 });
   const cardMesh = new Mesh(cardGeometry, [faceMaterial, edgeMaterial]);
   cardMesh.castShadow = true;
   cardMesh.matrixAutoUpdate = false;
   scene.add(cardMesh);
 
-  const metal = new MeshStandardMaterial({ color: 0xdcdde1, metalness: 1, roughness: 0.28 });
-  const clip = clipModel(metal);
+  // Nickel-plated steel, brushed along the clip, and the darker steel of the rivet; lit more by the room than the card is.
+  const metal = new MeshPhysicalMaterial({ color: 0xb9bcc3, metalness: 1, roughness: 0.24, anisotropy: 0.6, envMap: scene.environment, envMapIntensity: 1.3 });
+  const rivet = new MeshPhysicalMaterial({ color: 0x55565c, metalness: 1, roughness: 0.4, envMap: scene.environment, envMapIntensity: 1 });
+  const clip = clipModel(metal, rivet);
   clip.matrixAutoUpdate = false;
   scene.add(clip);
 
@@ -244,15 +268,20 @@ export async function mountLanyard({ stage, pass, onReady }: Mount): Promise<() 
     });
   });
   const reprint = async () => {
-    const { canvas: next } = await paintPrint(pass);
-    faceTexture.image = next;
-    faceTexture.needsUpdate = true;
+    const next = await paintPrint(pass);
+    for (const [texture, image] of [[faceTexture, next.canvas], [surfaceTexture, next.surface], [foilTexture, next.foil]] as const) {
+      texture.image = image;
+      texture.needsUpdate = true;
+    }
     shade();
     draw();
   };
   const shade = () => {
     const dark = getComputedStyle(document.documentElement).getPropertyValue("--dark").trim() === "1";
-    (shadowCatcher.material as ShadowMaterial).opacity = dark ? 0.42 : 0.16;
+    const shadow = shadowCatcher.material as ShadowMaterial;
+    shadow.opacity = dark ? 0.5 : 0.22;
+    shadow.color.set(dark ? 0x000000 : 0x1e1c16);
+    edgeMaterial.color.set(getComputedStyle(card!).getPropertyValue("--stock-end").trim() || "#f5f4f0").lerp(EDGE, 0.6);
   };
   const themed = new MutationObserver(() => void reprint());
   themed.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
@@ -278,11 +307,14 @@ export async function mountLanyard({ stage, pass, onReady }: Mount): Promise<() 
     scene.traverse((object) => {
       if (object instanceof Mesh) object.geometry.dispose();
     });
-    [faceMaterial, edgeMaterial, metal, fabric, shadowCatcher.material as ShadowMaterial].forEach((material) => material.dispose());
-    [faceTexture, fabric.map, fabric.normalMap, scene.environment].forEach((texture) => texture?.dispose());
+    [faceMaterial, edgeMaterial, metal, rivet, fabric, shadowCatcher.material as ShadowMaterial].forEach((material) => material.dispose());
+    [faceTexture, surfaceTexture, foilTexture, fabric.map, fabric.normalMap, scene.environment].forEach((texture) => texture?.dispose());
     renderer.dispose();
   };
 }
+
+/** The card's lower edge in pass.css. */
+const EDGE = new Color(0xc9c8c1);
 
 const v = ({ x, y, z }: Vec3) => new Vector3(x, y, z);
 const v3 = ({ x, y, z }: Vector3): Vec3 => ({ x, y, z });
@@ -358,10 +390,15 @@ class Stadium extends Curve<Vector3> {
 }
 
 /** The clip, from the crimp at its origin downwards: a crimp, a swivel and a loop through the slot (DESIGN.md "The staff pass"). */
-function clipModel(metal: MeshStandardMaterial) {
+function clipModel(metal: MeshPhysicalMaterial, rivetMetal: MeshPhysicalMaterial) {
   const group = new Group();
-  const crimp = new Mesh(new RoundedBoxGeometry(1.4 * em, 0.95 * em, 0.42 * em, 2, 0.12 * em), metal);
+  const crimp = new Mesh(new RoundedBoxGeometry(1.4 * em, 0.95 * em, 0.42 * em, 3, 0.14 * em), metal);
   crimp.position.y = -0.475 * em;
+  // The rivet through the crimp and the strap, its head proud of both faces.
+  const rivet = new Mesh(new CylinderGeometry(0.17 * em, 0.17 * em, 0.5 * em, 20), rivetMetal);
+  rivet.rotation.x = Math.PI / 2;
+  rivet.position.y = -0.4 * em;
+  group.add(rivet);
   const swivel = new Mesh(new CylinderGeometry(0.17 * em, 0.17 * em, 0.55 * em, 16), metal);
   swivel.position.y = -1.2 * em;
   const tube = 0.12 * em;

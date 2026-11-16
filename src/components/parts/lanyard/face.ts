@@ -8,7 +8,12 @@
 /** The face's width in texture pixels; its height follows the card. */
 const FACE_WIDTH = 1024;
 
-export type Print = { canvas: HTMLCanvasElement; aspect: number };
+/**
+ * `canvas` is the colour; `surface` and `foil` are data maps over the same layout, at a quarter of the size. `surface`: green
+ * is roughness and blue metalness (three.js reads them from those channels). `foil`: red is where the hologram's film is, and
+ * green the film's thickness, which sets the colour it shows at each angle.
+ */
+export type Print = { canvas: HTMLCanvasElement; surface: HTMLCanvasElement; foil: HTMLCanvasElement; aspect: number };
 
 export async function paintPrint(pass: HTMLElement): Promise<Print> {
   const holder = document.createElement("div");
@@ -128,7 +133,64 @@ function paint(card: HTMLElement, returned: boolean): Print {
   }
 
   paintWords(context, card, box, s);
-  return { canvas, aspect: box.height / box.width };
+  const finish = paintFinish(card, box, height);
+  return { canvas, ...finish, aspect: box.height / box.width };
+}
+
+/** The laminate's satin, the back's plain stock a touch rougher, and the hologram's metal foil and film. */
+function paintFinish(card: HTMLElement, box: DOMRect, faceHeight: number) {
+  const k = 1 / 4;
+  const width = FACE_WIDTH * k;
+  const height = Math.round(faceHeight * k);
+  const surface = document.createElement("canvas");
+  const foil = document.createElement("canvas");
+  for (const canvas of [surface, foil]) {
+    canvas.width = width * 2;
+    canvas.height = height;
+  }
+  const paint = surface.getContext("2d");
+  const film = foil.getContext("2d");
+  if (!paint || !film) throw new Error("No 2D canvas");
+  paint.fillStyle = "rgb(0 128 0)";
+  paint.fillRect(0, 0, width, height);
+  paint.fillStyle = "rgb(0 184 0)";
+  paint.fillRect(width, 0, width, height);
+  film.fillStyle = "#000";
+  film.fillRect(0, 0, width * 2, height);
+
+  const holo = card.querySelector<HTMLElement>(".pass__holo");
+  if (holo) {
+    const rect = holo.getBoundingClientRect();
+    const s = width / box.width;
+    const r = (rect.width / 2) * s;
+    const cx = (rect.left - box.left) * s + r;
+    const cy = (rect.top - box.top) * s + r;
+    // Half metal: bright enough to keep its pastel print, metal enough to catch the room.
+    paint.fillStyle = "rgb(0 70 140)";
+    paint.beginPath();
+    paint.arc(cx, cy, r, 0, Math.PI * 2);
+    paint.fill();
+    // The film: rings and spokes of changing thickness, so each part of the disc turns a different colour as the card moves.
+    const x0 = Math.floor(cx - r);
+    const y0 = Math.floor(cy - r);
+    const size = Math.ceil(r * 2) + 1;
+    const image = film.createImageData(size, size);
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const dx = x0 + x + 0.5 - cx;
+        const dy = y0 + y + 0.5 - cy;
+        const out = Math.hypot(dx, dy) / r;
+        if (out > 1) continue;
+        const phase = (3 * Math.atan2(dy, dx)) / (2 * Math.PI) + 1.4 * out;
+        const i = (y * size + x) * 4;
+        image.data[i] = 255;
+        image.data[i + 1] = 255 * (0.5 - 0.5 * Math.cos(2 * Math.PI * phase));
+        image.data[i + 3] = 255;
+      }
+    }
+    film.putImageData(image, x0, y0);
+  }
+  return { surface, foil };
 }
 
 /**
