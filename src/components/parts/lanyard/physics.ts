@@ -42,10 +42,11 @@ const STRAP_DAMPING = 1.6;
 /** How hard the card is turned back towards the viewer about its vertical axis (rad/s² per radian). */
 const FACING = 26;
 /**
- * Webbing stretches a little: pulled past its length, the strap gives up to this much longer, harder the further it goes,
- * and springs back when let go. The give eases in and out over these times (s), so the card is never jerked.
+ * The strap is elastic: pulled past its length, it stretches by up to this many card widths, harder the further it goes,
+ * and springs back when let go. Measured against the card, not the strap, so a short strap on a phone gives as much. The
+ * give eases in and out over these times (s), so the card is never jerked.
  */
-const STRETCH = 0.45;
+const STRETCH = 1;
 const GIVE_IN = 0.03;
 const GIVE_OUT = 0.45;
 
@@ -65,6 +66,8 @@ export class Lanyard {
   readonly strapLength: number;
   readonly clipLength: number;
   readonly gravity: number;
+  /** How far the strap can stretch, in world units. */
+  private readonly room: number;
   private grab: { weights: number[]; target: Vec3; reach: number } | null = null;
   private still = 0;
   /** How far the strap is stretched now (1 is its own length), and how far the pull asks it to be. */
@@ -73,6 +76,7 @@ export class Lanyard {
 
   constructor(rest: Rest, shape: CardShape) {
     const { width, height, hangY } = shape;
+    this.room = width * STRETCH;
     const depth = width / 2;
     this.local = [
       { x: 0, y: hangY, z: 0 },
@@ -220,11 +224,11 @@ export class Lanyard {
 
   /**
    * How far the pointer pulls past the cord's reach asks the strap to stretch: ever less the further it goes, up to
-   * STRETCH. Only the strap stretches; the clip and the card do not.
+   * STRETCH card widths. Only the strap stretches; the clip and the card do not.
    */
   private pulled({ target, reach }: { target: Vec3; reach: number }) {
     const over = Math.max(0, distance(target, midpoint(this.get(1), this.get(2))) - reach);
-    const room = this.strapLength * STRETCH;
+    const room = this.room;
     return 1 + (room * (1 - Math.exp(-over / room))) / this.strapLength;
   }
 
