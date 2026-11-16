@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { withoutScene } from "./support/scene";
 
 // Motion on the finished page: hover that only moves things where there is a hover. (How I work's pen, which drew with the scroll, retired in #414.)
 test.describe("Hover that needs a hover", () => {
@@ -22,6 +23,9 @@ test.describe("Hover that needs a hover", () => {
 
 test.describe("One self-running motion on screen at a time", () => {
   test.use({ reducedMotion: "no-preference" });
+  // The 3D passes are not a self-running motion (they swing once and sleep), and where the browser draws in software, as
+  // CI's does, the scene times one frame and keeps the printed passes, a pause that would shift the others' timing.
+  test.beforeEach(({ page }) => withoutScene(page));
 
   /** The name of every animation playing on its own, on an element that is on screen right now: one entry per running animation. */
   const selfRunning = (page: Page) =>

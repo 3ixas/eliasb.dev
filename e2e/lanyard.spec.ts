@@ -68,7 +68,15 @@ test.describe("The 3D staff passes", () => {
     await expect(scene(page)).toHaveCount(1);
     await expect(scene(page)).toHaveAttribute("aria-hidden", "true");
     // The canvas spans all the rail scrolls through, so it scrolls with the passes on a phone.
-    await expect.poll(() => rail(page).evaluate((element) => [element.scrollWidth, element.clientHeight])).toEqual(await scene(page).evaluate((canvas: HTMLCanvasElement) => [canvas.offsetWidth, canvas.offsetHeight]));
+    // Both read together: the scene lays itself out again when the fonts or the window change the rail.
+    await expect
+      .poll(() =>
+        rail(page).evaluate((element) => {
+          const canvas = element.querySelector<HTMLCanvasElement>("canvas.lanyard__scene")!;
+          return [element.scrollWidth - canvas.offsetWidth, element.clientHeight - canvas.offsetHeight];
+        }),
+      )
+      .toEqual([0, 0]);
     const passes = rail(page).locator(".pass");
     await expect(passes).toHaveCount(3);
     for (const [index, slug] of slugs.entries()) {

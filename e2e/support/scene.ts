@@ -14,8 +14,10 @@ export const withoutScene = (target: Page | BrowserContext) =>
   });
 
 /**
- * Lets the scene draw on a software renderer. The scene keeps the printed passes where WebGL runs on the processor
- * (lanyard.ts), which is how headless Chromium draws, in CI and here; specs about the scene itself report a graphics chip.
+ * Lets the scene run on a software renderer. The scene keeps the printed passes where WebGL runs on the processor
+ * (lanyard.ts, scene.ts), which is how headless browsers draw in CI, where one frame takes seconds and holds up the
+ * page's input. Specs about the scene's behaviour (its links, drags, sizes and shifts, not its pixels) report a graphics
+ * chip and skip the drawing itself: the scene, its physics and its hit tests run as they would.
  */
 export const withScene = (page: Page) =>
   page.addInitScript(() => {
@@ -26,8 +28,11 @@ export const withScene = (page: Page) =>
       delete relaxed.failIfMajorPerformanceCaveat;
       return (getContext as (...args: unknown[]) => unknown).call(this, kind, relaxed);
     } as typeof getContext;
-    // The scene times one frame, read back once drawn, and keeps the printed passes if it is slow, as software rendering is.
-    WebGL2RenderingContext.prototype.readPixels = () => {};
+    // The scene times one frame, read back once drawn, and keeps the printed passes if it is slow, as software rendering is;
+    // here the draws themselves are skipped, so a frame costs nothing.
+    for (const name of ["readPixels", "drawArrays", "drawElements", "drawArraysInstanced", "drawElementsInstanced", "drawRangeElements"] as const) {
+      WebGL2RenderingContext.prototype[name] = () => {};
+    }
     const getParameter = WebGL2RenderingContext.prototype.getParameter;
     WebGL2RenderingContext.prototype.getParameter = function (this: WebGL2RenderingContext, name: number) {
       // WEBGL_debug_renderer_info's UNMASKED_RENDERER_WEBGL.
