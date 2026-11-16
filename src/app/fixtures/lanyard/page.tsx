@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
-import { PassLight } from "@/components/parts/pass-light";
-import { StaffPass } from "@/components/parts/staff-pass";
+import { Opening } from "@/components/site/opening";
+import { LanyardStatus } from "./status";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 /*
- * The 3D staff pass's prototype (#448): the current pass hanging alone, to judge its weight, swing and print on a preview
- * before the homepage and the Role stories change. Like the other fixtures it is absent in production; unlike them it is
- * also served on Vercel's previews, where Elias judges each round.
+ * The 3D staff passes' check page (#448): the homepage's opening, its three passes hanging in 3D, with a line under it
+ * saying how far the scene got, so a phone with no console can show why it fell back to the printed passes. Like the
+ * other fixtures it is absent in production; unlike them it is also served on Vercel's previews, where Elias judges it.
  */
 export default async function LanyardFixture() {
   await connection();
@@ -17,10 +17,8 @@ export default async function LanyardFixture() {
 
   return (
     <main id="main-content" tabIndex={-1} style={{ background: "var(--page)", color: "var(--ink)" }}>
-      <h1 className="sr-only">Lanyard</h1>
-      <PassLight className="lanyard--fixture">
-        <StaffPass slug="bnp-paribas" lead priority />
-      </PassLight>
+      <Opening />
+      <LanyardStatus />
     </main>
   );
 }

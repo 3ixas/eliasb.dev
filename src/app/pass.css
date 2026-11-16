@@ -360,11 +360,3 @@
   outline: 2px solid var(--cobalt);
   outline-offset: 3px;
 }
-
-/* The prototype's stage (/fixtures/lanyard): one screen, the pass hanging from its top edge in the middle. */
-.lanyard--fixture {
-  display: flex;
-  justify-content: center;
-  height: min(100svh, 900px);
-  overflow: hidden;
-}

@@ -19,13 +19,24 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
     // Loading takes a moment; if the page is left or reduced motion turns on meanwhile, the scene is not shown.
     const wanted = () => !cancelled && !still.matches;
 
+    // The stage says how far the scene got (`data-lanyard`: loading, 3d, or failed with `data-lanyard-error`); only 3d
+    // hides the printed passes. /fixtures/lanyard prints it, so a phone with no console can still say what happened.
     const start = () => {
-      if (!wanted() || !canDraw()) return;
+      if (!wanted()) return;
+      if (!canDraw()) {
+        element.dataset.lanyard = "failed";
+        element.dataset.lanyardError = "No WebGL 2";
+        return;
+      }
       near.disconnect();
+      element.dataset.lanyard = "loading";
       import("./scene")
         .then(({ mountLanyard }) => mountLanyard({ stage: element, passes, onReady: () => wanted() && (element.dataset.lanyard = "3d") }))
         .then((stop) => (wanted() ? (dispose = stop) : stop()))
-        .catch(() => delete element.dataset.lanyard);
+        .catch((error: unknown) => {
+          element.dataset.lanyard = "failed";
+          element.dataset.lanyardError = error instanceof Error ? error.message : String(error);
+        });
     };
     const near = new IntersectionObserver(([entry]) => entry.isIntersecting && start(), { rootMargin: "200px" });
     near.observe(element);
@@ -35,6 +46,7 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
       dispose?.();
       dispose = undefined;
       delete element.dataset.lanyard;
+      delete element.dataset.lanyardError;
     };
     still.addEventListener("change", stop);
 
@@ -44,6 +56,7 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
       still.removeEventListener("change", stop);
       dispose?.();
       delete element.dataset.lanyard;
+      delete element.dataset.lanyardError;
     };
   }, [stage]);
 }

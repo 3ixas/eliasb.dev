@@ -6,6 +6,8 @@
 
 /** The face's width in texture pixels; its height follows the card. */
 const FACE_WIDTH = 1024;
+/** How long the print waits for a photo, in milliseconds. */
+const PHOTO_WAIT = 4000;
 
 /**
  * `canvas` is the colour; `surface` and `foil` are data maps over the same layout, at a quarter of the size. `surface`: green
@@ -31,7 +33,14 @@ export async function paintPrint(pass: HTMLElement): Promise<Print> {
     const card = copy.querySelector<HTMLElement>(".pass__card");
     if (!card) throw new Error("The pass has no card to paint");
     await document.fonts.ready;
-    await Promise.all([...card.querySelectorAll("img")].map((image) => image.decode().catch(() => undefined)));
+    // The copy is off screen, where a lazy image may never load (iOS Safari leaves it waiting): it loads at once, and the
+    // print waits for it a few seconds at most, then prints without the photo rather than not at all.
+    await Promise.all(
+      [...card.querySelectorAll("img")].map((image) => {
+        image.loading = "eager";
+        return Promise.race([image.decode().catch(() => undefined), new Promise((done) => setTimeout(done, PHOTO_WAIT))]);
+      }),
+    );
     return paint(card, copy.dataset.state === "returned");
   } finally {
     holder.remove();
