@@ -16,8 +16,21 @@ test("a software renderer keeps the printed passes", async ({ page, browserName 
   await page.goto("/");
   await rail(page).scrollIntoViewIfNeeded();
   await expect(rail(page)).toHaveAttribute("data-lanyard", "failed");
-  await expect(rail(page)).toHaveAttribute("data-lanyard-error", /^Software renderer/);
+  await expect(rail(page)).toHaveAttribute("data-lanyard-error", /^(Software renderer|No hardware WebGL 2)/);
   await expect(scene(page)).toHaveCount(0);
+});
+
+test("headless WebKit, which draws in software in CI, keeps the printed passes", async ({ page, browserName }, info) => {
+  test.skip(browserName !== "webkit" || !info.project.name.includes("-1440-light"), "WebKit, once");
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  await rail(page).scrollIntoViewIfNeeded();
+  await expect(rail(page)).toHaveAttribute("data-lanyard", /^(failed|3d)$/);
+  const state = await rail(page).evaluate((element) => `${element.dataset.lanyard} ${element.dataset.lanyardError ?? ""}`);
+  info.annotations.push({ type: "renderer", description: state });
+  console.log(`WebKit scene: ${state}`);
+  // In CI, where WebKit draws in software, the printed passes stay; on a Mac it has the GPU and may draw.
+  if (process.env.CI) expect(state).toMatch(/^failed /);
 });
 
 const slugs = ["bnp-paribas", "joveen", "optegra"] as const;

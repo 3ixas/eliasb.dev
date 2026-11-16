@@ -19,6 +19,13 @@ export const withoutScene = (target: Page | BrowserContext) =>
  */
 export const withScene = (page: Page) =>
   page.addInitScript(() => {
+    // CI's Chromium also reports software rendering as a major performance caveat.
+    const getContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, kind: string, options?: Record<string, unknown>) {
+      const relaxed = { ...options };
+      delete relaxed.failIfMajorPerformanceCaveat;
+      return (getContext as (...args: unknown[]) => unknown).call(this, kind, relaxed);
+    } as typeof getContext;
     const getParameter = WebGL2RenderingContext.prototype.getParameter;
     WebGL2RenderingContext.prototype.getParameter = function (this: WebGL2RenderingContext, name: number) {
       // WEBGL_debug_renderer_info's UNMASKED_RENDERER_WEBGL.

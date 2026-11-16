@@ -73,6 +73,8 @@ function cannotDraw() {
     const info = context.getExtension("WEBGL_debug_renderer_info");
     const renderer = info ? String(context.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "";
     context.getExtension("WEBGL_lose_context")?.loseContext();
+    // A browser that will not name its renderer may be drawing on the processor; Safari names Apple's GPU.
+    if (!renderer) return "Unnamed renderer";
     return SOFTWARE.test(renderer) ? `Software renderer (${renderer})` : null;
   } catch {
     return "No WebGL 2";
