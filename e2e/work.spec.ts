@@ -271,6 +271,41 @@ test.describe("Work: arriving", () => {
     await expect(panel(page, "optegra").locator(".figure__value")).toHaveText("88%");
   });
 
+  test("Joveen's key API p95 fills in its own time: 520 ms against 230 ms, together and at a constant rate", async ({ page }) => {
+    const joveen = panel(page, "joveen");
+    await expect(joveen.locator("[data-grow]")).toHaveAttribute("data-armed", "");
+    await joveen.locator(".measure--ms").first().evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+    await expect(joveen.locator("[data-grow]")).not.toHaveAttribute("data-armed", "");
+    // Pause both fills and seek them to where the faster one ends, rather than wait them out.
+    const fills = await joveen.locator(".measure--ms .bar").evaluateAll((bars) =>
+      bars.map((bar) => {
+        const fill = bar.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "transform")!;
+        fill.pause();
+        const { duration, delay } = fill.effect!.getComputedTiming();
+        fill.currentTime = Number(delay) + 230;
+        const scale = new DOMMatrix(getComputedStyle(bar).transform).a;
+        fill.finish();
+        return { duration: Number(duration), delay: Number(delay), scale };
+      }),
+    );
+    const [before, after] = fills;
+    // Each fill lasts its value, within 20 ms.
+    expect(Math.abs(before.duration - 520)).toBeLessThanOrEqual(20);
+    expect(Math.abs(after.duration - 230)).toBeLessThanOrEqual(20);
+    expect(after.delay).toBe(before.delay);
+    // At 230 ms the after bar is full and the before bar, filling at the same rate, is 230 / 520 of the way.
+    expect(after.scale).toBeCloseTo(1, 2);
+    expect(before.scale).toBeCloseTo(230 / 520, 2);
+  });
+
+  test("BNP Paribas's working days arrive a square at a time, before then after", async ({ page }) => {
+    const days = panel(page, "bnp-paribas").locator(".measure--days");
+    const delays = await days.evaluateAll((sides) => sides.map((side) => [...side.children].map((square) => parseFloat(getComputedStyle(square).transitionDelay.split(",")[0]))));
+    expect(delays.map((side) => side.length)).toEqual([10, 2]);
+    for (const side of delays) expect(side).toEqual([...side].sort((a, b) => a - b));
+    expect(delays[1][0]).toBeGreaterThan(delays[0][0]);
+  });
+
   test("the simulation arrives in order: the paths draw over 1.1 s, the histogram grows from 1.1 s, the price line appears at 1.8 s", async ({ page }) => {
     await expect(plot(page)).toHaveAttribute("data-armed", "");
     await page.locator(".sim").scrollIntoViewIfNeeded();

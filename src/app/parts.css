@@ -338,6 +338,53 @@
   transform: scaleX(0);
 }
 
+/*
+ * A latency fills in its own time (#456): the 520 ms bar takes 520 ms and the 230 ms bar 230 ms, both starting
+ * together and at a constant rate, so the faster one is felt finishing first.
+ */
+[data-grow] .measure--ms .bar {
+  transition: transform var(--fill) linear 150ms;
+}
+
+/* Working days arrive a square at a time, 60 ms apart; minutes a tick at a time from zero, 14 ms apart. After follows before. */
+[data-grow] :is(.measure--days i, .measure--minutes i:not([data-at="off"])) {
+  transition: opacity 240ms var(--out), transform 320ms var(--out);
+  transition-delay: calc(150ms + var(--i) * var(--step));
+}
+
+[data-grow] .measure--days {
+  --step: 60ms;
+}
+
+[data-grow] .measure--minutes {
+  --step: 14ms;
+}
+
+[data-grow] .measure--minutes i:not([data-at="off"]) {
+  transform-origin: center bottom;
+}
+
+[data-grow] :is(.measure--days, .measure--minutes)[data-side="after"] i:not([data-at="off"]) {
+  transition-delay: calc(450ms + var(--i) * var(--step));
+}
+
+[data-grow][data-armed] .measure--days i {
+  opacity: 0;
+  transform: scale(0.4);
+}
+
+[data-grow][data-armed] .measure--minutes i:not([data-at="off"]) {
+  transform: scaleY(0);
+}
+
+/*
+ * Arming is instant: only the release is a transition. Otherwise the arm itself starts one towards zero, and a release
+ * inside its delay reverses it, which the browser shortens to nothing.
+ */
+[data-grow][data-armed] :is(.bar, .measure--days i, .measure--minutes i) {
+  transition-property: none;
+}
+
 /* ---- Comparisons in their own units (#456) ---- */
 
 /*
@@ -547,7 +594,7 @@
 /* A printed page has no viewport to arrive in. */
 @media print {
   [data-armed],
-  [data-armed] .bar {
+  [data-armed] :is(.bar, .measure--days i, .measure--minutes i) {
     opacity: 1 !important;
     transform: none !important;
   }

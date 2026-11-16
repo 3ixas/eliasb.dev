@@ -36,6 +36,8 @@ const motionTransitions = [
   ['.pass__sheen', 'a staff pass catches the light'],
   ['[data-rise]', 'a panel or card rises into view (DESIGN.md "Motion")'],
   ['[data-grow] .bar', 'bars to scale grow from the left'],
+  ['[data-grow] .measure--ms', 'a latency fills in its own time'],
+  ['[data-grow] :is(.measure--days', 'working days arrive a square at a time, minutes a tick at a time'],
   ['.project__shot', "a project's screenshot lifts on hover (DESIGN.md \"Motion\")"],
   ['.sim__plot[data-released] .sim__paths', "the simulation's paths draw from the left"],
   ['.sim__plot[data-released] .sim__bin', "the simulation's histogram grows"],

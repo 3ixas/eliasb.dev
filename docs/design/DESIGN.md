@@ -184,7 +184,7 @@ Every text pair passes WCAG 2.2 AA, measured on the rendered page and on every p
 - **Passes** swing to rest once on arrival (1.8 s, each 80 ms after the last). On hover a pass leans the other way, catches the light where the pointer is, and its hologram turns. In 3D a pass swings once on its strap where it was printed, within the gap to its neighbour, and settles; its hologram turns its colours as the card turns.
 - **Panels and cards** rise 16 px and fade in once, when 15% in view.
 - **Display figures** count to their value once, over 1.2 s.
-- **Bars** grow from the left once, the after bar 300 ms behind the before. Day squares and minute ticks are drawn still.
+- **Comparisons** arrive once, in their own unit. A latency's bars fill in their real time, together and at a constant rate: 520 ms takes 520 ms and 230 ms takes 230 ms, so the faster one is felt finishing first. Working days arrive a square at a time (60 ms apart) and minutes a tick at a time from zero (14 ms apart), after following before by 300 ms. Other bars grow from the left, the after bar 300 ms behind the before. Arming is instant; only the arrival moves.
 - **The simulation**: the paths draw over about 1.1 s, the histogram grows, the price line appears last. It is drawn when it comes into view, never before first paint.
 - **Screenshots** in a project panel lift 10 px on hover.
 - **Theme changes** crossfade over 0.3 s.
