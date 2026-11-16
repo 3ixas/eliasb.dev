@@ -168,6 +168,25 @@ test.describe("The 3D staff passes", () => {
     await expect(scene(page)).toHaveCount(1);
   });
 
+  test("the printed passes never show before the scene takes over", async ({ page }) => {
+    // Every frame from the first paint: the print's opacity, until the scene has drawn.
+    await page.addInitScript(() => {
+      const seen: string[] = ((window as unknown as { printSeen: string[] }).printSeen = []);
+      const sample = () => {
+        const rail = document.querySelector<HTMLElement>(".opening__rail");
+        const card = rail?.querySelector(".pass__card");
+        if (card && rail!.dataset.lanyard !== "3d") seen.push(getComputedStyle(card).opacity);
+        if (rail?.dataset.lanyard !== "3d") requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
+    await page.goto("/");
+    await hung(page);
+    const seen = await page.evaluate(() => (window as unknown as { printSeen: string[] }).printSeen);
+    expect(seen.length).toBeGreaterThan(0);
+    expect(seen.filter((opacity) => opacity !== "0")).toEqual([]);
+  });
+
   test("the scene shifts nothing on the page", async ({ page }) => {
     await page.goto("/");
     const total = page.evaluate(
