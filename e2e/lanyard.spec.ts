@@ -1,13 +1,24 @@
 import { expect, test, type Page } from "@playwright/test";
 import { passName } from "../src/content/stretch/pass-name";
-import { canDrawScene } from "./support/scene";
+import { canDrawScene, withScene } from "./support/scene";
 
 /*
  * The 3D staff passes (#448, parts/lanyard; DESIGN.md "The staff pass"): where the browser can draw them and motion is on,
  * one scene hangs the homepage's three passes, and another a Role story's pass, over the printed passes, which stay in the
  * page for their names, links and the keyboard. A click on a homepage card follows its link and a drag does not.
  * Drawn in Chromium at the phone and desktop widths; a browser without WebGL 2 keeps the printed passes (opening.spec).
+ * Headless Chromium renders in software, where the scene would keep the printed passes, so these specs report a GPU.
  */
+
+test("a software renderer keeps the printed passes", async ({ page, browserName }) => {
+  test.skip(browserName !== "chromium", "Headless Chromium renders in software");
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  await rail(page).scrollIntoViewIfNeeded();
+  await expect(rail(page)).toHaveAttribute("data-lanyard", "failed");
+  await expect(rail(page)).toHaveAttribute("data-lanyard-error", /^Software renderer/);
+  await expect(scene(page)).toHaveCount(0);
+});
 
 const slugs = ["bnp-paribas", "joveen", "optegra"] as const;
 const rail = (page: Page) => page.locator(".opening__rail");
@@ -28,8 +39,9 @@ const centreOf = async (page: Page, index: number) => {
 test.describe("The 3D staff passes", () => {
   test.use({ reducedMotion: "no-preference" });
 
-  test.beforeEach(({ browserName }, info) => {
+  test.beforeEach(async ({ page, browserName }, info) => {
     test.skip(browserName !== "chromium" || !/-(390|1440)-/.test(info.project.name), "Chromium at 390 and 1440 px");
+    await withScene(page);
   });
 
   test("the homepage's three passes hang in one scene, which spans the rail, and keep their names and links", async ({ page }) => {

@@ -54,7 +54,7 @@ const ARRIVALS = [
 export type Mount = { stage: HTMLElement; passes: HTMLElement[]; onReady: () => void };
 
 export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<() => void> {
-  const renderer = new WebGLRenderer({ antialias: true, alpha: true });
+  const renderer = new WebGLRenderer({ antialias: true, alpha: true, failIfMajorPerformanceCaveat: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.toneMapping = NeutralToneMapping;

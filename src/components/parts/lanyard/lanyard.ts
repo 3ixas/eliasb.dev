@@ -23,9 +23,10 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
     // hides the printed passes. /fixtures/lanyard prints it, so a phone with no console can still say what happened.
     const start = () => {
       if (!wanted()) return;
-      if (!canDraw()) {
+      const cannot = cannotDraw();
+      if (cannot) {
         element.dataset.lanyard = "failed";
-        element.dataset.lanyardError = "No WebGL 2";
+        element.dataset.lanyardError = cannot;
         return;
       }
       near.disconnect();
@@ -61,12 +62,19 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
   }, [stage]);
 }
 
-function canDraw() {
+/** Renderers that draw on the processor, not a graphics chip: the scene would take the page's time from everything else. */
+const SOFTWARE = /swiftshader|llvmpipe|softpipe|software|basic render/i;
+
+/** Why this browser should keep the printed passes, or nothing if it can draw the scene on a graphics chip. */
+function cannotDraw() {
   try {
-    const context = document.createElement("canvas").getContext("webgl2");
-    context?.getExtension("WEBGL_lose_context")?.loseContext();
-    return Boolean(context);
+    const context = document.createElement("canvas").getContext("webgl2", { failIfMajorPerformanceCaveat: true });
+    if (!context) return "No hardware WebGL 2";
+    const info = context.getExtension("WEBGL_debug_renderer_info");
+    const renderer = info ? String(context.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "";
+    context.getExtension("WEBGL_lose_context")?.loseContext();
+    return SOFTWARE.test(renderer) ? `Software renderer (${renderer})` : null;
   } catch {
-    return false;
+    return "No WebGL 2";
   }
 }

@@ -13,5 +13,18 @@ export const withoutScene = (target: Page | BrowserContext) =>
     } as typeof getContext;
   });
 
+/**
+ * Lets the scene draw on a software renderer. The scene keeps the printed passes where WebGL runs on the processor
+ * (lanyard.ts), which is how headless Chromium draws, in CI and here; specs about the scene itself report a graphics chip.
+ */
+export const withScene = (page: Page) =>
+  page.addInitScript(() => {
+    const getParameter = WebGL2RenderingContext.prototype.getParameter;
+    WebGL2RenderingContext.prototype.getParameter = function (this: WebGL2RenderingContext, name: number) {
+      // WEBGL_debug_renderer_info's UNMASKED_RENDERER_WEBGL.
+      return name === 0x9246 ? "Test GPU" : getParameter.call(this, name);
+    };
+  });
+
 /** Whether this browser can draw the scene at all. */
 export const canDrawScene = (page: Page) => page.evaluate(() => Boolean(document.createElement("canvas").getContext("webgl2")));
