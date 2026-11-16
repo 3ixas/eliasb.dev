@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
+import { MeasurePair } from "@/components/parts/measure";
 import { OnView } from "@/components/parts/on-view";
 import { Arrow } from "@/components/parts/panel";
 import { caseStudies } from "@/content/stretch/case-studies";
@@ -54,8 +55,7 @@ function Drawn({ proof }: { proof: BeatProof }) {
         <>
           <b>{proof.value}</b>
           <OnView motion="grow" className="drawn__bars">
-            <i className="bar" style={{ "--share": 100 / (100 + proof.percent) } as CSSProperties} aria-hidden="true" />
-            <i className="bar bar--after" style={{ "--share": 1 } as CSSProperties} aria-hidden="true" />
+            <MeasurePair measure={{ unit: "change", before: { amount: 100 }, after: { amount: 100 + proof.percent } }} />
           </OnView>
         </>
       );

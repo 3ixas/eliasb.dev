@@ -102,7 +102,7 @@ Anchors stay `#work`, `#things-i-make`, `#how-i-work`, `#off-the-clock` and `#sa
 
 - **Employer** (a Work panel's name): Newsreader 400, `clamp(52px, 6vw, 88px)`, with role and dates at 20 px beside it (below it on a phone). It is the first read of a Work panel.
 - **Display figure**: Newsreader 500, `clamp(48px, 5vw, 72px)`, lining tabular figures, with its label in Newsreader 20 px beneath. One per panel, a step under its employer. BNP Paribas's is words ("Six months") at `clamp(34px, 3.6vw, 52px)`.
-- **Bars to scale**: a pair of bars from one left edge. The before bar is thin and soft; the after bar is thicker and solid (white on BNP Paribas's green, the panel's ink elsewhere, cobalt on paper). Both sides are named ("An experienced engineer", "Me, new to it"; "Before", "After") and the values are written out. Lengths are in proportion to the content's own amounts.
+- **Comparisons, each in its own unit** ([#456](https://github.com/3ixas/eliasb.dev/issues/456)): the drawing says what the number says. A latency is two bars over a tick every 100 ms. Working days are same-size squares, grouped in working weeks: ten against two. Minutes are a tick a minute on the pair's one scale, every fifth taller; the minutes it took are full height, and the uncertain minutes of a range ("30–40") or a bound ("under 5") are short. A rate is one 0 to 100 axis with before filled to its mark and the gain to after solid between the marks. A change in per cent with no absolute is before at 100 against after to scale. Before is soft and after solid (white on BNP Paribas's green, the panel's ink elsewhere, cobalt on paper); bars are thin before and thicker after. Both sides are named ("An experienced engineer", "Me, new to it"; "Before", "After") and the values are written out. Every amount is the content's own, checked against its words.
 - **The simulation**: illustrative simulated paths from "Today" to "Horizon" on hairline axes, a histogram of their endpoints on the right edge, and a dashed white line at their mean labelled "One price". It says it is illustrative in its accessible description. It appears only on the BNP Paribas panel.
 - **The flag** (BNP Paribas's Role story): two lanes, the live path as a solid white line and the new path as a dashed one behind a switch that is off, "off by default".
 - **Screenshots**: 12 px radius inside a panel, bleeding off its lower or right edge; 16 px with a hairline edge in a long-form column. In a long-form column a screenshot is also a button that opens it large in a dialog.
@@ -184,7 +184,7 @@ Every text pair passes WCAG 2.2 AA, measured on the rendered page and on every p
 - **Passes** swing to rest once on arrival (1.8 s, each 80 ms after the last). On hover a pass leans the other way, catches the light where the pointer is, and its hologram turns. In 3D a pass swings once on its strap where it was printed, within the gap to its neighbour, and settles; its hologram turns its colours as the card turns.
 - **Panels and cards** rise 16 px and fade in once, when 15% in view.
 - **Display figures** count to their value once, over 1.2 s.
-- **Bars** grow from the left once, the after bar 300 ms behind the before.
+- **Bars** grow from the left once, the after bar 300 ms behind the before. Day squares and minute ticks are drawn still.
 - **The simulation**: the paths draw over about 1.1 s, the histogram grows, the price line appears last. It is drawn when it comes into view, never before first paint.
 - **Screenshots** in a project panel lift 10 px on hover.
 - **Theme changes** crossfade over 0.3 s.
@@ -208,7 +208,7 @@ What holds the finish in place. Each rule is checked by a gate, or by hand where
 - **One `h1` per page**: the opening line on the homepage, the title elsewhere. Section titles are `h2`; an employer or project name inside a section is `h3`.
 - **Every drawing has its content as text.** A pass's accessible name is its print. A bar pair's values are written beside it. The simulation has an accessible description.
 - **Keyboard**: everything that can be pressed is reachable in reading order, and focus is always visible. Menu closes on Escape and returns focus to its button.
-- **Forced colours** keep the data and the drawings: bars take the text colour (before) and the highlight (after), the GitHub year keeps its five levels with a hairline on each cell, and passes keep the colours they were drawn in.
+- **Forced colours** keep the data and the drawings: bars, day squares and minute ticks take the text colour (before) and the highlight (after), and their scales grey, the GitHub year keeps its five levels with a hairline on each cell, and passes keep the colours they were drawn in.
 - **Reduced motion**: see Motion.
 - **The standing checks** hold: the skip link, content in the server HTML and complete without script, axe, AA contrast, 3:1 focus rings, external links marked `↗` that open in a new tab, the theme rules, and each page's title, description and social image.
 - **Overflow**: nothing scrolls sideways from 320 to 1440 px except the pass rail and the GitHub year on a phone, which scroll inside themselves. No state widens the page. 200% zoom holds.

@@ -3,6 +3,7 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { roleStories } from "../src/content/stretch/role-stories";
 import { passRecords } from "../src/content/stretch/staff-pass";
 import { comparisonRow, workPanels } from "../src/content/stretch/work-panels";
+import { drawn, expectDrawn } from "./support/measure";
 import { renderedContrast } from "./support/rendered-contrast";
 
 /*
@@ -23,10 +24,6 @@ const hydrated = (page: Page) =>
     const element = document.querySelector(".sim__plot");
     return !!element && Object.keys(element).some((key) => key.startsWith("__reactProps$"));
   });
-
-/** Each bar's drawn width, before then after, for every comparison or pair in a panel, in reading order. */
-const barWidths = (scope: Locator, item: string) =>
-  scope.locator(item).evaluateAll((items) => items.map((element) => [...element.querySelectorAll(".bar")].map((bar) => bar.getBoundingClientRect().width)));
 
 test.describe("Work: the panels", () => {
   test.beforeEach(async ({ page }) => {
@@ -73,10 +70,10 @@ test.describe("Work: the panels", () => {
     expect(display).toEqual([workPanels.bnp.figure.value]);
   });
 
-  test("each comparison names both sides and writes their values, with bars in proportion to the Role story's amounts", async ({ page }) => {
+  test("each comparison names both sides and writes their values, drawn in its own unit from the Role story's amounts", async ({ page }) => {
     const story = roleStories["bnp-paribas"];
     const items = panel(page, "bnp-paribas").locator(".work-bnp__comparisons li");
-    const widths = await barWidths(panel(page, "bnp-paribas"), ".work-bnp__comparisons li");
+    const drawings = await drawn(panel(page, "bnp-paribas"), ".work-bnp__comparisons li");
     for (const [index, comparison] of workPanels.bnp.comparisons.entries()) {
       const row = comparisonRow(story, comparison)!;
       await expect(items.nth(index).getByRole("heading", { level: 4 })).toHaveText(row.what);
@@ -84,28 +81,31 @@ test.describe("Work: the panels", () => {
         await expect(items.nth(index)).toContainText(side.name);
         await expect(items.nth(index)).toContainText(side.value);
       }
-      const [before, after] = widths[index];
-      expect(after / before, row.what).toBeCloseTo(row.after.amount / row.before.amount, 2);
+      expectDrawn(drawings[index], row, row.what);
     }
-    // 10 and 2 working days; 40 and 5 minutes (R-14).
-    expect(widths.map(([before, after]) => Math.round((after / before) * 1000) / 1000)).toEqual([0.2, 0.125]);
+    // Ten working days against two; 30–40 minutes against under 5, on one scale of 40 (R-14).
+    expect(drawings[0].days).toEqual([10, 2]);
+    expect(drawings[1].minutes).toEqual([
+      { on: 30, range: 10, scale: 40 },
+      { on: 0, range: 5, scale: 40 },
+    ]);
   });
 
-  test("Joveen and Optegra each show a display figure and its label, three pairs to scale with their values, and the link to the story", async ({ page }) => {
+  test("Joveen and Optegra each show a display figure and its label, three pairs drawn in their units with their values, and the link to the story", async ({ page }) => {
     for (const { slug, figure, pairs } of workPanels.roles) {
       const evidence = roleStories[slug].evidence[figure.evidence];
       await expect(panel(page, slug).locator(".figure__value")).toHaveText(evidence.value);
       await expect(panel(page, slug).locator(".figure__label")).toHaveText(evidence.label);
       const rows = panel(page, slug).locator(".pair");
       await expect(rows).toHaveCount(3);
-      const widths = await barWidths(panel(page, slug), ".pair");
+      const drawings = await drawn(panel(page, slug), ".pair");
       for (const [index, pair] of pairs.entries()) {
         await expect(rows.nth(index).locator(".pair__what")).toHaveText(pair.what);
         await expect(rows.nth(index).locator(".pair__value")).toHaveText(pair.value);
-        const [before, after] = widths[index];
-        // A bar too narrow to read is a collapsed track: side by side at 720 to 1000 px the panels are at their narrowest.
-        expect(Math.max(before, after), `${slug}: ${pair.what} has room for its bars`).toBeGreaterThan(120);
-        expect(after / before, `${slug}: ${pair.what}`).toBeCloseTo(pair.after / pair.before, 2);
+        // A drawing too narrow to read is a collapsed track: side by side at 720 to 1000 px the panels are at their narrowest.
+        const room = await rows.nth(index).locator(".measure-pair").evaluate((element) => element.getBoundingClientRect().width);
+        expect(room, `${slug}: ${pair.what} has room for its drawing`).toBeGreaterThan(120);
+        expectDrawn(drawings[index], pair, `${slug}: ${pair.what}`);
       }
     }
   });

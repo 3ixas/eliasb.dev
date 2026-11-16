@@ -1,21 +1,27 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
+import { MeasurePair, MeasureSide } from "@/components/parts/measure";
 import { Count, OnView } from "@/components/parts/on-view";
 import { Arrow, Panel, PanelHead } from "@/components/parts/panel";
 import { featuredSlugs, projects } from "@/content/projects";
 import { caseStudies } from "@/content/stretch/case-studies";
 import { roleStories, roleStorySlugs } from "@/content/stretch/role-stories";
+import { workPanels } from "@/content/stretch/work-panels";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 const featured = featuredSlugs.map((slug) => projects.find((project) => project.slug === slug)!);
+const bnpScale = roleStories["bnp-paribas"].figures?.["what-changed"];
+const bnpRows = bnpScale?.kind === "scale" ? bnpScale.rows : [];
+// One pair of each unit the Work panels draw: a latency, minutes with a bound, a rate and a change.
+const pairs = [workPanels.roles[0].pairs[0], workPanels.roles[0].pairs[1], workPanels.roles[1].pairs[0], workPanels.roles[1].pairs[1]];
 const others = projects.filter((project) => !(featuredSlugs as readonly string[]).includes(project.slug));
 
 /**
  * The shared parts (parts.css; DESIGN.md "The panel", "Controls" and "Motion") on the page and on every panel field,
  * as the prototype's parts.html shows them, for the end-to-end suite and its pictures. Its groups carry `data-shot`
- * for e2e/materials.spec.ts. Below the fold it holds a panel that rises, a figure that counts and bars that grow.
+ * for e2e/materials.spec.ts. Comparisons shows one of each unit's drawing (#456). Below the fold it holds a panel that rises, a figure that counts and bars that grow.
  * It exists only when the server is started with BOARD_FIXTURES=1.
  */
 export default async function PartsFixtures() {
@@ -124,6 +130,45 @@ export default async function PartsFixtures() {
                         {project.year} <Arrow />
                       </span>
                     </a>
+                  </li>
+                ))}
+              </ul>
+            </Panel>
+          </div>
+        </section>
+
+        <section className="section" aria-labelledby="comparisons">
+          <h2 id="comparisons" className="section__title">
+            Comparisons
+          </h2>
+          <div className="panels panels--two">
+            <Panel colours={roleStories["bnp-paribas"].panel} className="story-fig__panel" data-shot="comparisons-sides">
+              <ul className="cmps">
+                {bnpRows.map((row) => (
+                  <li key={row.what} data-unit={row.unit}>
+                    <h3>{row.what}</h3>
+                    <p className="cmp">
+                      <span>Before</span>
+                      <b>{row.before.label}</b>
+                      <MeasureSide measure={row} side="before" />
+                    </p>
+                    <p className="cmp cmp--after">
+                      <span>After</span>
+                      <b>{row.after.label}</b>
+                      <MeasureSide measure={row} side="after" />
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </Panel>
+            <Panel colours={roleStories.optegra.panel} className="story-fig__panel" data-shot="comparisons-pairs">
+              <ul style={{ display: "grid", gap: 24, margin: 0, padding: 0, listStyle: "none", fontSize: "var(--type-small)" }}>
+                {pairs.map((pair) => (
+                  <li key={pair.what} data-unit={pair.unit} style={{ display: "grid", gap: 8 }}>
+                    <span>
+                      {pair.what} · <b>{pair.value}</b>
+                    </span>
+                    <MeasurePair measure={pair} />
                   </li>
                 ))}
               </ul>

@@ -12,9 +12,11 @@ test.describe("Forced colours", () => {
     test.skip(browserName !== "chromium", "Forced-colours emulation is held on Chromium");
   });
 
-  test("a to-scale comparison's before and after bars are different colours, and neither is the page's", async ({ page }) => {
+  test("a comparison's before and after sides are different colours, and neither is the page's", async ({ page }) => {
     await page.goto("/work/bnp-paribas");
-    const fills = await page.locator("section#what-changed .bar").evaluateAll((elements) => elements.map((element) => getComputedStyle(element).backgroundColor));
+    const fills = await page
+      .locator('section#what-changed :is(.measure--days i, .measure--minutes i[data-at="on"], .measure--minutes i[data-at="range"])')
+      .evaluateAll((elements) => elements.map((element) => getComputedStyle(element).backgroundColor));
     const page_ = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
     expect(fills.length).toBeGreaterThanOrEqual(2);
     expect(new Set(fills).size).toBeGreaterThan(1);

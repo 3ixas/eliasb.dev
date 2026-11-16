@@ -338,25 +338,120 @@
   transform: scaleX(0);
 }
 
-/* ---- Bars to scale ---- */
+/* ---- Comparisons in their own units (#456) ---- */
 
 /*
- * Every bar is `.bar` with --share, its length as a share of the longer of its pair. The before bar is thin and soft,
- * the after bar thicker and solid; whatever holds them sets --soft and --solid. A comparison (`.cmp`) is its name and
- * value on one line over its bar.
+ * Every comparison is drawn in its unit by components/parts/measure.tsx. Whatever holds one sets --soft (before) and
+ * --solid (after), and may set --thin and --thick, the before and after weights. A bar (`.bar`, with --share, its
+ * length as a share of the pair's scale) draws a latency, a rate or a change; working days are squares; minutes are
+ * ticks. A comparison (`.cmp`) is its name and value on one line over its drawing.
  */
 .bar {
   display: block;
   width: calc(var(--share) * 100%);
-  height: 6px;
-  border-radius: 3px;
+  height: var(--thin, 6px);
+  border-radius: calc(var(--thin, 6px) / 2);
   background: var(--soft);
 }
 
 .bar--after {
-  height: 12px;
-  border-radius: 6px;
+  height: var(--thick, 12px);
+  border-radius: calc(var(--thick, 12px) / 2);
   background: var(--solid);
+}
+
+.measure {
+  --faint: color-mix(in srgb, var(--solid) 16%, transparent);
+}
+
+/* A latency: its bar over a tick every 100 ms of the pair's scale. */
+.measure--ms {
+  display: block;
+  padding-bottom: 7px;
+  background: repeating-linear-gradient(to right, var(--faint) 0 1px, transparent 1px calc(100% / var(--steps))) left bottom / 100% 4px no-repeat;
+}
+
+/* Working days: one same-size square a day, a wider gap after each working week. */
+.measure--days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.measure--days i {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--soft);
+}
+
+.measure--days[data-side="after"] i {
+  background: var(--solid);
+}
+
+.measure--days i:nth-child(5n):not(:last-child) {
+  margin-right: 5px;
+}
+
+/* Minutes: a tick a minute across the pair's one scale, every fifth taller; minutes it took full height, uncertain ones short. */
+.measure--minutes {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 12px;
+}
+
+.measure--minutes[data-side="after"] {
+  height: 16px;
+}
+
+.measure--minutes i {
+  width: 2px;
+  height: 30%;
+  border-radius: 1px;
+  background: var(--faint);
+}
+
+.measure--minutes i[data-fifth] {
+  height: 55%;
+}
+
+.measure--minutes i[data-at="on"] {
+  height: 100%;
+  background: var(--soft);
+}
+
+.measure--minutes i[data-at="range"] {
+  height: 60%;
+  background: var(--soft);
+}
+
+.measure--minutes[data-side="after"] i:is([data-at="on"], [data-at="range"]) {
+  background: var(--solid);
+}
+
+/* A rate: one 0 to 100 axis, before as far as its mark, the gain to after solid between the two marks. */
+.measure--rate {
+  display: grid;
+  align-items: center;
+  min-height: var(--thick, 12px);
+  background: linear-gradient(var(--faint), var(--faint)) left center / 100% 1px no-repeat;
+}
+
+.measure--rate .bar {
+  grid-area: 1 / 1;
+  width: calc(var(--from) * 100%);
+}
+
+.measure--rate .bar--after {
+  width: calc((var(--to) - var(--from)) * 100%);
+  margin-left: calc(var(--from) * 100%);
+  border-radius: 0 calc(var(--thick, 12px) / 2) calc(var(--thick, 12px) / 2) 0;
+}
+
+.measure-pair {
+  display: grid;
+  gap: 4px;
 }
 
 .cmp {
@@ -372,7 +467,7 @@
   font-variant-numeric: lining-nums tabular-nums;
 }
 
-.cmp .bar {
+.cmp .measure {
   grid-column: 1 / -1;
 }
 
@@ -428,14 +523,23 @@
   }
 }
 
-/* Forced colours keep the data: before bars in the text colour, after bars in the highlight (R-29). */
+/* Forced colours keep the data: before in the text colour, after in the highlight, the scales in grey (R-29). */
 @media (forced-colors: active) {
-  .bar {
+  .bar,
+  .measure {
     forced-color-adjust: none;
+    --faint: GrayText;
+  }
+
+  .bar,
+  .measure--days i,
+  .measure--minutes i:is([data-at="on"], [data-at="range"]) {
     background: CanvasText;
   }
 
-  .bar--after {
+  .bar--after,
+  .measure--days[data-side="after"] i,
+  .measure--minutes[data-side="after"] i:is([data-at="on"], [data-at="range"]) {
     background: Highlight;
   }
 }

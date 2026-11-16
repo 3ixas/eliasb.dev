@@ -184,9 +184,9 @@ test.describe("Colour", () => {
     return 0.2126 * x + 0.7152 * y + 0.0722 * z;
   };
 
-  test("a to-scale figure's long bar holds 3:1 on its panel", async ({ page }) => {
+  test("a to-scale figure's before side holds 3:1 on its panel", async ({ page }) => {
     await page.goto("/work/bnp-paribas");
-    const bar = page.locator("section#what-changed .bar:not(.bar--after)").first();
+    const bar = page.locator('section#what-changed .measure--days[data-side="before"] i').first();
     await bar.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
     const colours = await bar.evaluate((element) => {
       const canvas = document.createElement("canvas").getContext("2d", { willReadFrequently: true })!;
