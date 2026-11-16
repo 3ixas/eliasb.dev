@@ -274,15 +274,26 @@ test.describe("Work: arriving", () => {
   test("Joveen's key API p95 fills in its own time: 520 ms against 230 ms, together and at a constant rate", async ({ page }) => {
     const joveen = panel(page, "joveen");
     await expect(joveen.locator("[data-grow]")).toHaveAttribute("data-armed", "");
-    await joveen.locator(".measure--ms").first().evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
-    await expect(joveen.locator("[data-grow]")).not.toHaveAttribute("data-armed", "");
-    // Pause both fills and seek them to where the faster one ends, rather than wait them out.
-    const fills = await joveen.locator(".measure--ms .bar").evaluateAll((bars) =>
-      bars.map((bar) => {
+    // Catch each fill as it is created and pause it there, so none can finish before it is read, however slow the runner.
+    await joveen.evaluate((element) => {
+      const caught: Animation[] = [];
+      (window as unknown as { fills: Animation[] }).fills = caught;
+      element.addEventListener("transitionrun", (event: TransitionEvent) => {
+        const bar = event.target as Element;
+        if (event.propertyName !== "transform" || !bar.matches(".measure--ms .bar")) return;
         const fill = bar.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "transform")!;
         fill.pause();
+        caught[[...element.querySelectorAll(".measure--ms .bar")].indexOf(bar)] = fill;
+      });
+    });
+    await joveen.locator(".measure--ms").first().evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+    await expect.poll(() => page.evaluate(() => (window as unknown as { fills: Animation[] }).fills.filter(Boolean).length)).toBe(2);
+    // Seek both fills to where the faster one ends, rather than wait them out.
+    const fills = await joveen.evaluate((element) =>
+      (window as unknown as { fills: Animation[] }).fills.map((fill, index) => {
         const { duration, delay } = fill.effect!.getComputedTiming();
         fill.currentTime = Number(delay) + 230;
+        const bar = element.querySelectorAll(".measure--ms .bar")[index];
         const scale = new DOMMatrix(getComputedStyle(bar).transform).a;
         fill.finish();
         return { duration: Number(duration), delay: Number(delay), scale };
