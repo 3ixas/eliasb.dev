@@ -315,3 +315,34 @@
     transition: none;
   }
 }
+
+/* The 3D pass (#448, parts/lanyard): the scene's canvas covers the stage, and once it has drawn, the printed pass under it is
+   kept for its name and its box but not seen. Its arrival swing and lean stop, so its box stays where the card was laid. */
+.lanyard {
+  position: relative;
+}
+
+.lanyard__scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+}
+
+.lanyard__scene[data-holding] {
+  cursor: grabbing;
+}
+
+.lanyard[data-lanyard="3d"] .pass {
+  opacity: 0;
+  animation: none;
+}
+
+/* The prototype's stage (/fixtures/lanyard): one screen, the pass hanging from its top edge in the middle. */
+.lanyard--fixture {
+  display: flex;
+  justify-content: center;
+  height: min(100svh, 900px);
+  overflow: hidden;
+}
