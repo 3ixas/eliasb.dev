@@ -184,7 +184,8 @@ export async function mountLanyard({ stage, pass, onReady }: Mount): Promise<() 
       owed -= STEP;
     }
     draw();
-    if (!lanyard.asleep) frame = requestAnimationFrame(tick);
+    // Off screen the loop ends here; the observer starts it again when the stage returns.
+    if (visible && !lanyard.asleep) frame = requestAnimationFrame(tick);
   }
 
   // Holding the card: a press on it takes hold where it lands, then the point follows the pointer in its plane.
@@ -244,7 +245,11 @@ export async function mountLanyard({ stage, pass, onReady }: Mount): Promise<() 
   let resizing = 0;
   const resized = new ResizeObserver(() => {
     cancelAnimationFrame(resizing);
-    resizing = requestAnimationFrame(() => layout(false));
+    resizing = requestAnimationFrame(() => {
+      // Observing reports the stage's size once at the start; only a real change of size lays the pass out again.
+      if (stage.clientWidth === view.width && stage.clientHeight === view.height && card!.offsetWidth === view.unit) return;
+      layout(false);
+    });
   });
   const reprint = async () => {
     const { canvas: next } = await paintPrint(pass);
