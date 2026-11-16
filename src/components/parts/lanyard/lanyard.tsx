@@ -18,13 +18,15 @@ export function LanyardStage({ className, children }: { className?: string; chil
     const still = window.matchMedia("(prefers-reduced-motion: reduce)");
     let dispose: (() => void) | undefined;
     let cancelled = false;
+    // Loading takes a moment; if the page is left or reduced motion turns on meanwhile, the scene is not shown.
+    const wanted = () => !cancelled && !still.matches;
 
     const start = () => {
-      if (still.matches || !canDraw()) return;
+      if (!wanted() || !canDraw()) return;
       near.disconnect();
       import("./scene")
-        .then(({ mountLanyard }) => mountLanyard({ stage: element, pass, onReady: () => (element.dataset.lanyard = "3d") }))
-        .then((stop) => (cancelled ? stop() : (dispose = stop)))
+        .then(({ mountLanyard }) => mountLanyard({ stage: element, pass, onReady: () => wanted() && (element.dataset.lanyard = "3d") }))
+        .then((stop) => (wanted() ? (dispose = stop) : stop()))
         .catch(() => delete element.dataset.lanyard);
     };
     const near = new IntersectionObserver(([entry]) => entry.isIntersecting && start(), { rootMargin: "200px" });
