@@ -66,6 +66,30 @@ test.describe("The 3D staff passes", () => {
     await expect(page).toHaveURL(/#bnp-paribas$/);
   });
 
+  test("a Ctrl or Cmd click on a card opens its link in a new tab, as on the printed pass", async ({ page, context }, info) => {
+    test.skip(!info.project.name.includes("-1440-"), "A mouse, at the desktop width");
+    await page.goto("/");
+    await hung(page);
+    const { x, y } = await centreOf(page, 0);
+    const opened = context.waitForEvent("page");
+    await page.keyboard.down("ControlOrMeta");
+    await page.mouse.click(x, y);
+    await page.keyboard.up("ControlOrMeta");
+    expect((await opened).url()).toMatch(/#bnp-paribas$/);
+    expect(new URL(page.url()).hash).toBe("");
+  });
+
+  test("the canvas narrows with the rail when the window does", async ({ page }, info) => {
+    test.skip(!info.project.name.includes("-390-"), "From a tablet width down to the phone's");
+    await page.setViewportSize({ width: 820, height: 844 });
+    await page.goto("/");
+    await hung(page);
+    await page.setViewportSize({ width: 390, height: 844 });
+    // The canvas spans the passes and no further: the rail scrolls exactly as far as without it.
+    const content = () => rail(page).evaluate((element) => Math.max(...[...element.querySelectorAll<HTMLElement>(".pass")].map((pass) => pass.offsetLeft + pass.offsetWidth)) + parseFloat(getComputedStyle(element).paddingRight));
+    await expect.poll(async () => Math.abs((await scene(page).evaluate((canvas: HTMLCanvasElement) => canvas.offsetWidth)) - (await content()))).toBeLessThanOrEqual(1);
+  });
+
   test("a Role story's pass hangs in its own scene, and a click on it goes nowhere", async ({ page }, info) => {
     test.skip(!info.project.name.includes("-1440-"), "A mouse, at the desktop width");
     await page.goto("/work/joveen");

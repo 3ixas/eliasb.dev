@@ -104,7 +104,15 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
   // Laying out: the stage's pixels map to world units at the cards' plane, where the widest card's width is 1. Where the
   // stage scrolls sideways (the homepage's rail on a phone), the canvas spans all it scrolls through.
   let view = { width: 0, height: 0, unit: 0 };
-  const measure = () => ({ width: stage.scrollWidth, height: stage.clientHeight, unit: Math.max(...hanging.map((pass) => pass.printed.offsetWidth)) });
+  const measure = () => ({ width: contentWidth(), height: stage.clientHeight, unit: Math.max(...hanging.map((pass) => pass.printed.offsetWidth)) });
+  // The canvas itself overflows the stage at its last size, so it is taken out of the measure: a narrower stage shrinks it.
+  const contentWidth = () => {
+    const was = canvas.style.width;
+    canvas.style.width = "0";
+    const width = stage.scrollWidth;
+    canvas.style.width = was;
+    return width;
+  };
   const toWorld = (x: number, y: number): Vec3 => ({ x: (x - view.width / 2) / view.unit, y: (view.height / 2 - y) / view.unit, z: 0 });
 
   function layout(arrive: boolean) {
@@ -177,7 +185,7 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     return found && { pass: hanging.find((pass) => pass.card === found.object)!, point: found.point };
   };
 
-  type Press = { pass: HangingPass; point: Vector3; id: number; touch: boolean; x: number; y: number; held: boolean; moved: boolean; timer: number };
+  type Press = { pass: HangingPass; point: Vector3; id: number; touch: boolean; x: number; y: number; held: boolean; moved: boolean; timer: number; middle: boolean };
   let press: Press | null = null;
   const grab = () => {
     if (!press) return;
@@ -196,11 +204,17 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     run();
   };
   const down = (event: PointerEvent) => {
-    if (event.button !== 0 || press) return;
+    if (event.button > 1 || press) return;
     const found = cast(event);
     if (!found) return;
     const touch = event.pointerType === "touch";
-    press = { ...found, id: event.pointerId, touch, x: event.clientX, y: event.clientY, held: false, moved: false, timer: 0 };
+    const middle = event.button === 1;
+    press = { ...found, id: event.pointerId, touch, x: event.clientX, y: event.clientY, held: false, moved: false, timer: 0, middle };
+    // A middle press only opens the link, as it would on the printed pass; it never takes hold.
+    if (middle) {
+      if (found.pass.link) event.preventDefault();
+      return;
+    }
     if (touch) {
       press.timer = window.setTimeout(grab, HOLD_MS);
       return;
@@ -225,7 +239,7 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
   };
   const end = (event: PointerEvent) => {
     if (press?.id !== event.pointerId) return;
-    const { pass, held, moved, touch, timer } = press;
+    const { pass, held, moved, touch, timer, middle } = press;
     clearTimeout(timer);
     press = null;
     if (held) {
@@ -234,8 +248,11 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
       if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
       run();
     }
-    // A press that did not drag is a click on the pass; a touch held to take hold of the card is not.
-    if (event.type === "pointerup" && !moved && !(touch && held)) pass.link?.click();
+    // A press that did not drag is a click on the pass; a touch held to take hold of the card is not. A middle click, or
+    // one with Ctrl, Cmd or Shift, opens the link in a new tab as the printed link would.
+    if (event.type !== "pointerup" || moved || (touch && held) || !pass.link) return;
+    if (middle || event.ctrlKey || event.metaKey || event.shiftKey) window.open(pass.link.href, "_blank", "noopener");
+    else pass.link.click();
   };
   // Once a touch has taken hold, its moves drag the card rather than scroll, and a long press opens no menu.
   const holdTouch = (event: TouchEvent) => {
