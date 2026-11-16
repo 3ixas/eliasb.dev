@@ -1,0 +1,94 @@
+"use client";
+
+import { useEffect, type RefObject } from "react";
+
+/**
+ * Hangs a stage's staff passes in 3D (#448). The CSS passes inside are the server render, the accessible names and the
+ * fallback: with no script, no WebGL or reduced motion they are all there is. When the stage comes near the view, the
+ * scene (three.js) loads, paints each card from its pass's own print and takes its place at its exact size; the passes
+ * stay in the page, unseen, for assistive technology and the keyboard.
+ */
+export function useLanyard(stage: RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const element = stage.current;
+    const passes = element ? [...element.querySelectorAll<HTMLElement>(".pass")] : [];
+    if (!element || !passes.length) return;
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let dispose: (() => void) | undefined;
+    let loading = false;
+    let cancelled = false;
+    // Loading takes a moment; if the page is left or reduced motion turns on meanwhile, the scene is not shown.
+    const wanted = () => !cancelled && !still.matches;
+
+    // The stage says how far the scene got (`data-lanyard`: loading, 3d, or failed with `data-lanyard-error`; the scene
+    // adds what a frame cost, `data-lanyard-frame`); only 3d hides the printed passes. /fixtures/lanyard prints it, so a
+    // phone with no console can still say what happened. One scene at a time: none starts while one is up or loading.
+    const start = () => {
+      if (!wanted() || dispose || loading) return;
+      const cannot = cannotDraw();
+      if (cannot) {
+        element.dataset.lanyard = "failed";
+        element.dataset.lanyardError = cannot;
+        return;
+      }
+      near.disconnect();
+      element.dataset.lanyard = "loading";
+      loading = true;
+      import("./scene")
+        .then(({ mountLanyard }) => mountLanyard({ stage: element, passes, onReady: () => wanted() && (element.dataset.lanyard = "3d") }))
+        .then((stop) => (wanted() ? (dispose = stop) : stop()))
+        .catch((error: unknown) => {
+          element.dataset.lanyard = "failed";
+          element.dataset.lanyardError = error instanceof Error ? error.message : String(error);
+        })
+        .finally(() => (loading = false));
+    };
+    const near = new IntersectionObserver(([entry]) => entry.isIntersecting && start(), { rootMargin: "200px" });
+    near.observe(element);
+    // Reduced motion turned on later puts the printed passes back; turned off again, the passes hang once more when the
+    // stage is near the view.
+    const changed = () => {
+      if (!still.matches) {
+        near.observe(element);
+        return;
+      }
+      dispose?.();
+      dispose = undefined;
+      delete element.dataset.lanyard;
+      delete element.dataset.lanyardError;
+      delete element.dataset.lanyardFrame;
+    };
+    still.addEventListener("change", changed);
+
+    return () => {
+      cancelled = true;
+      near.disconnect();
+      still.removeEventListener("change", changed);
+      dispose?.();
+      delete element.dataset.lanyard;
+      delete element.dataset.lanyardError;
+      delete element.dataset.lanyardFrame;
+    };
+  }, [stage]);
+}
+
+/** Renderers that draw on the processor, not a graphics chip: the scene would take the page's time from everything else. */
+const SOFTWARE = /swiftshader|llvmpipe|softpipe|software|basic render/i;
+/** What a browser says when it hides its renderer's name. */
+const UNNAMED = /^(webkit )?webgl$|^webkit$|^mozilla$/i;
+
+/** Why this browser should keep the printed passes, or nothing if it can draw the scene on a graphics chip. */
+function cannotDraw() {
+  try {
+    const context = document.createElement("canvas").getContext("webgl2", { failIfMajorPerformanceCaveat: true });
+    if (!context) return "No hardware WebGL 2";
+    const info = context.getExtension("WEBGL_debug_renderer_info");
+    const renderer = info ? String(context.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "";
+    context.getExtension("WEBGL_lose_context")?.loseContext();
+    // A browser that will not name its renderer, or names only itself, may be drawing on the processor; Safari names Apple's GPU.
+    if (!renderer || UNNAMED.test(renderer)) return `Unnamed renderer (${renderer})`;
+    return SOFTWARE.test(renderer) ? `Software renderer (${renderer})` : null;
+  } catch {
+    return "No WebGL 2";
+  }
+}

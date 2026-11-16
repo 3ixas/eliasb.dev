@@ -315,3 +315,48 @@
     transition: none;
   }
 }
+
+/* The 3D passes (#448, parts/lanyard): the scene's canvas covers the stage from its top left, as wide as all the stage scrolls
+   through (the scene sets its size), and once it has drawn, the printed passes under it are kept for their names, their
+   boxes and the keyboard but not seen. Their arrival swing and lean stop, so each box stays where its card was laid.
+   Touches pan and zoom as on the page; the scene takes a touch only once it has rested on a card. */
+.lanyard {
+  position: relative;
+}
+
+.lanyard__scene {
+  position: absolute;
+  top: 0;
+  left: 0;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+.lanyard__scene[data-holding] {
+  cursor: grabbing;
+}
+
+.lanyard[data-lanyard="3d"] .pass {
+  transform: none;
+  animation: none;
+}
+
+.lanyard[data-lanyard="3d"] .pass > * {
+  opacity: 0;
+}
+
+/* A focused pass shows its ring around the card, where the scene draws it at rest. */
+.lanyard[data-lanyard="3d"] .pass:focus-visible {
+  outline: none;
+}
+
+.lanyard[data-lanyard="3d"] .pass:focus-visible::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 23em;
+  border-radius: 0.8em;
+  outline: 2px solid var(--cobalt);
+  outline-offset: 3px;
+}
