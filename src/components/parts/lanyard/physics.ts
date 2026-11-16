@@ -41,6 +41,13 @@ const CARD_DAMPING = 0.55;
 const STRAP_DAMPING = 1.6;
 /** How hard the card is turned back towards the viewer about its vertical axis (rad/s² per radian). */
 const FACING = 26;
+/**
+ * Webbing stretches a little: pulled past its length, the strap gives up to this much longer, harder the further it goes,
+ * and springs back when let go. The give eases in and out over these times (s), so the card is never jerked.
+ */
+const STRETCH = 0.45;
+const GIVE_IN = 0.03;
+const GIVE_OUT = 0.45;
 
 type Link = { a: number; b: number; length: number; mode: "rigid" | "rope" | "apart" };
 
@@ -60,6 +67,9 @@ export class Lanyard {
   readonly gravity: number;
   private grab: { weights: number[]; target: Vec3; reach: number } | null = null;
   private still = 0;
+  /** How far the strap is stretched now (1 is its own length), and how far the pull asks it to be. */
+  private give = 1;
+  private wantGive = 1;
 
   constructor(rest: Rest, shape: CardShape) {
     const { width, height, hangY } = shape;
@@ -187,35 +197,54 @@ export class Lanyard {
   }
 
   move(target: Vec3) {
-    if (this.grab) this.grab.target = this.withinReach(target, this.grab.reach);
+    if (this.grab) this.grab.target = target;
   }
 
   release() {
     this.grab = null;
+    this.wantGive = 1;
   }
 
   get held() {
     return this.grab !== null;
   }
 
-  /** True once nothing has moved for a second and the card is not held: the loop can sleep. */
+  /** True once nothing has moved for a second, the card is not held and the strap is back to its length: the loop can sleep. */
   get asleep() {
-    return !this.grab && this.still > 1 / STEP;
+    return !this.grab && this.give === 1 && this.still > 1 / STEP;
   }
 
   wake() {
     this.still = 0;
   }
 
-  private withinReach(target: Vec3, reach: number): Vec3 {
+  /**
+   * How far the pointer pulls past the cord's reach asks the strap to stretch: ever less the further it goes, up to
+   * STRETCH. Only the strap stretches; the clip and the card do not.
+   */
+  private pulled({ target, reach }: { target: Vec3; reach: number }) {
+    const over = Math.max(0, distance(target, midpoint(this.get(1), this.get(2))) - reach);
+    const room = this.strapLength * STRETCH;
+    return 1 + (room * (1 - Math.exp(-over / room))) / this.strapLength;
+  }
+
+  /** The held point's target, within what the strap reaches as stretched now, so the hold never strains the strap. */
+  private withinReach({ target, reach }: { target: Vec3; reach: number }): Vec3 {
     const pivot = midpoint(this.get(1), this.get(2));
     const away = sub(target, pivot);
     const length = Math.hypot(away.x, away.y, away.z);
-    return length > reach ? add(pivot, scale(away, reach / length)) : target;
+    const allowed = reach + this.strapLength * (this.give - 1);
+    return length > allowed ? add(pivot, scale(away, allowed / length)) : target;
   }
 
   step() {
     const { pos, prev, inverseMass } = this;
+    // The strap's give follows the pull, quickly while held and more slowly as it springs back.
+    if (this.grab) this.wantGive = this.pulled(this.grab);
+    const ease = this.wantGive > this.give ? GIVE_IN : GIVE_OUT;
+    this.give += (this.wantGive - this.give) * Math.min(1, STEP / ease);
+    if (Math.abs(this.give - this.wantGive) < 1e-4) this.give = this.wantGive;
+    const aim = this.grab && this.withinReach(this.grab);
     const card = new Set(this.card);
     let fastest = 0;
     for (let index = 0; index < inverseMass.length; index++) {
@@ -232,7 +261,7 @@ export class Lanyard {
     this.face();
     for (let iteration = 0; iteration < ITERATIONS; iteration++) {
       for (const link of this.links) this.solve(link);
-      if (this.grab) this.pull(this.grab);
+      if (this.grab && aim) this.pull(this.grab.weights, aim);
     }
     this.still = fastest < 2e-5 ? this.still + 1 : 0;
   }
@@ -254,8 +283,10 @@ export class Lanyard {
     }
   }
 
-  private solve({ a, b, length, mode }: Link) {
+  private solve({ a, b, length: rest, mode }: Link) {
     const { pos, inverseMass } = this;
+    // The strap and its tethers stretch with the give; the clip and the card are rigid.
+    const length = mode === "rigid" ? rest : rest * this.give;
     const wa = inverseMass[a];
     const wb = inverseMass[b];
     if (wa + wb === 0) return;
@@ -277,7 +308,7 @@ export class Lanyard {
   }
 
   /** Moves the held point to its target, sharing the move among the four particles that carry it by their weights. */
-  private pull({ weights, target }: { weights: number[]; target: Vec3 }) {
+  private pull(weights: number[], target: Vec3) {
     const carriers = this.card.slice(0, 4);
     const now = carriers.reduce((sum, index, i) => add(sum, scale(this.get(index), weights[i])), { x: 0, y: 0, z: 0 });
     const gap = sub(target, now);
