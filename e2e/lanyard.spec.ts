@@ -91,6 +91,21 @@ test.describe("The 3D staff passes", () => {
     expect(new URL(page.url()).hash).toBe("");
   });
 
+  test("a middle press let go off the canvas leaves the cards working", async ({ page }, info) => {
+    test.skip(!info.project.name.includes("-1440-"), "A mouse, at the desktop width");
+    await page.goto("/");
+    await hung(page);
+    const { x, y } = await centreOf(page, 0);
+    await page.mouse.move(x, y);
+    await page.mouse.down({ button: "middle" });
+    await page.mouse.move(5, 5, { steps: 4 });
+    await page.mouse.up({ button: "middle" });
+    await page.waitForTimeout(1500);
+    const rest = await centreOf(page, 0);
+    await page.mouse.click(rest.x, rest.y);
+    await expect(page).toHaveURL(/#bnp-paribas$/);
+  });
+
   test("the canvas narrows with the rail when the window does", async ({ page }, info) => {
     test.skip(!info.project.name.includes("-390-"), "From a tablet width down to the phone's");
     await page.setViewportSize({ width: 820, height: 844 });

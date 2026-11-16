@@ -210,9 +210,15 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     const touch = event.pointerType === "touch";
     const middle = event.button === 1;
     press = { ...found, id: event.pointerId, touch, x: event.clientX, y: event.clientY, held: false, moved: false, timer: 0, middle };
-    // A middle press only opens the link, as it would on the printed pass; it never takes hold.
+    // A middle press only opens the link, as it would on the printed pass; it never takes hold. It is captured, so its
+    // release reaches the canvas wherever it happens and the press is always cleared.
     if (middle) {
       if (found.pass.link) event.preventDefault();
+      try {
+        canvas.setPointerCapture(event.pointerId);
+      } catch {
+        press = null;
+      }
       return;
     }
     if (touch) {
@@ -245,9 +251,9 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     if (held) {
       pass.lanyard.release();
       delete canvas.dataset.holding;
-      if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
       run();
     }
+    if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
     // A press that did not drag is a click on the pass; a touch held to take hold of the card is not. A middle click, or
     // one with Ctrl, Cmd or Shift, opens the link in a new tab as the printed link would.
     if (event.type !== "pointerup" || moved || (touch && held) || !pass.link) return;
