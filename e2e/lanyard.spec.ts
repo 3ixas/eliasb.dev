@@ -156,6 +156,18 @@ test.describe("The 3D staff passes", () => {
     expect(page.url()).toMatch(/\/work\/joveen$/);
   });
 
+  test("reduced motion turned on puts the printed passes back, and turned off hangs them again", async ({ page }, info) => {
+    test.skip(!info.project.name.includes("-1440-"), "Once, at the desktop width");
+    await page.goto("/");
+    await hung(page);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await expect(scene(page)).toHaveCount(0);
+    await expect(rail(page)).not.toHaveAttribute("data-lanyard", /./);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await expect(rail(page)).toHaveAttribute("data-lanyard", "3d", { timeout: 15_000 });
+    await expect(scene(page)).toHaveCount(1);
+  });
+
   test("the scene shifts nothing on the page", async ({ page }) => {
     await page.goto("/");
     const total = page.evaluate(

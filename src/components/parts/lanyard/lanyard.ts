@@ -15,15 +15,16 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
     if (!element || !passes.length) return;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)");
     let dispose: (() => void) | undefined;
+    let loading = false;
     let cancelled = false;
     // Loading takes a moment; if the page is left or reduced motion turns on meanwhile, the scene is not shown.
     const wanted = () => !cancelled && !still.matches;
 
     // The stage says how far the scene got (`data-lanyard`: loading, 3d, or failed with `data-lanyard-error`; the scene
-    // adds what a frame cost, `data-lanyard-frame`); only 3d
-    // hides the printed passes. /fixtures/lanyard prints it, so a phone with no console can still say what happened.
+    // adds what a frame cost, `data-lanyard-frame`); only 3d hides the printed passes. /fixtures/lanyard prints it, so a
+    // phone with no console can still say what happened. One scene at a time: none starts while one is up or loading.
     const start = () => {
-      if (!wanted()) return;
+      if (!wanted() || dispose || loading) return;
       const cannot = cannotDraw();
       if (cannot) {
         element.dataset.lanyard = "failed";
@@ -32,30 +33,37 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
       }
       near.disconnect();
       element.dataset.lanyard = "loading";
+      loading = true;
       import("./scene")
         .then(({ mountLanyard }) => mountLanyard({ stage: element, passes, onReady: () => wanted() && (element.dataset.lanyard = "3d") }))
         .then((stop) => (wanted() ? (dispose = stop) : stop()))
         .catch((error: unknown) => {
           element.dataset.lanyard = "failed";
           element.dataset.lanyardError = error instanceof Error ? error.message : String(error);
-        });
+        })
+        .finally(() => (loading = false));
     };
     const near = new IntersectionObserver(([entry]) => entry.isIntersecting && start(), { rootMargin: "200px" });
     near.observe(element);
-    // Reduced motion turned on later puts the printed passes back.
-    const stop = () => {
-      if (!still.matches) return;
+    // Reduced motion turned on later puts the printed passes back; turned off again, the passes hang once more when the
+    // stage is near the view.
+    const changed = () => {
+      if (!still.matches) {
+        near.observe(element);
+        return;
+      }
       dispose?.();
       dispose = undefined;
       delete element.dataset.lanyard;
       delete element.dataset.lanyardError;
+      delete element.dataset.lanyardFrame;
     };
-    still.addEventListener("change", stop);
+    still.addEventListener("change", changed);
 
     return () => {
       cancelled = true;
       near.disconnect();
-      still.removeEventListener("change", stop);
+      still.removeEventListener("change", changed);
       dispose?.();
       delete element.dataset.lanyard;
       delete element.dataset.lanyardError;
