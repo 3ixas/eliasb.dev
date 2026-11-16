@@ -26,6 +26,8 @@ export const withScene = (page: Page) =>
       delete relaxed.failIfMajorPerformanceCaveat;
       return (getContext as (...args: unknown[]) => unknown).call(this, kind, relaxed);
     } as typeof getContext;
+    // The scene times one frame, read back once drawn, and keeps the printed passes if it is slow, as software rendering is.
+    WebGL2RenderingContext.prototype.readPixels = () => {};
     const getParameter = WebGL2RenderingContext.prototype.getParameter;
     WebGL2RenderingContext.prototype.getParameter = function (this: WebGL2RenderingContext, name: number) {
       // WEBGL_debug_renderer_info's UNMASKED_RENDERER_WEBGL.

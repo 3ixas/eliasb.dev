@@ -19,7 +19,8 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
     // Loading takes a moment; if the page is left or reduced motion turns on meanwhile, the scene is not shown.
     const wanted = () => !cancelled && !still.matches;
 
-    // The stage says how far the scene got (`data-lanyard`: loading, 3d, or failed with `data-lanyard-error`); only 3d
+    // The stage says how far the scene got (`data-lanyard`: loading, 3d, or failed with `data-lanyard-error`; the scene
+    // adds what a frame cost, `data-lanyard-frame`); only 3d
     // hides the printed passes. /fixtures/lanyard prints it, so a phone with no console can still say what happened.
     const start = () => {
       if (!wanted()) return;
@@ -58,12 +59,15 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
       dispose?.();
       delete element.dataset.lanyard;
       delete element.dataset.lanyardError;
+      delete element.dataset.lanyardFrame;
     };
   }, [stage]);
 }
 
 /** Renderers that draw on the processor, not a graphics chip: the scene would take the page's time from everything else. */
 const SOFTWARE = /swiftshader|llvmpipe|softpipe|software|basic render/i;
+/** What a browser says when it hides its renderer's name. */
+const UNNAMED = /^(webkit )?webgl$|^webkit$|^mozilla$/i;
 
 /** Why this browser should keep the printed passes, or nothing if it can draw the scene on a graphics chip. */
 function cannotDraw() {
@@ -73,8 +77,8 @@ function cannotDraw() {
     const info = context.getExtension("WEBGL_debug_renderer_info");
     const renderer = info ? String(context.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "";
     context.getExtension("WEBGL_lose_context")?.loseContext();
-    // A browser that will not name its renderer may be drawing on the processor; Safari names Apple's GPU.
-    if (!renderer) return "Unnamed renderer";
+    // A browser that will not name its renderer, or names only itself, may be drawing on the processor; Safari names Apple's GPU.
+    if (!renderer || UNNAMED.test(renderer)) return `Unnamed renderer (${renderer})`;
     return SOFTWARE.test(renderer) ? `Software renderer (${renderer})` : null;
   } catch {
     return "No WebGL 2";

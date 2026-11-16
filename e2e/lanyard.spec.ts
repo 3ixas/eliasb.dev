@@ -26,7 +26,12 @@ test("headless WebKit, which draws in software in CI, keeps the printed passes",
   await page.goto("/");
   await rail(page).scrollIntoViewIfNeeded();
   await expect(rail(page)).toHaveAttribute("data-lanyard", /^(failed|3d)$/);
-  const state = await rail(page).evaluate((element) => `${element.dataset.lanyard} ${element.dataset.lanyardError ?? ""}`);
+  const state = await rail(page).evaluate((element) => {
+    const gl = document.createElement("canvas").getContext("webgl2");
+    const info = gl?.getExtension("WEBGL_debug_renderer_info");
+    const named = info ? gl!.getParameter(info.UNMASKED_RENDERER_WEBGL) : "(no debug info)";
+    return `${element.dataset.lanyard} ${element.dataset.lanyardError ?? ""} | frame ${element.dataset.lanyardFrame ?? "-"} | renderer ${named} | ${gl?.getParameter(gl.RENDERER)} | ${gl?.getParameter(gl.VENDOR)}`;
+  });
   info.annotations.push({ type: "renderer", description: state });
   console.log(`WebKit scene: ${state}`);
   // In CI, where WebKit draws in software, the printed passes stay; on a Mac it has the GPU and may draw.

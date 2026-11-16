@@ -38,6 +38,8 @@ const FOV = 20;
 /** How long a touch rests on a card before it takes hold, and how far a press may wander and still be a tap. */
 const HOLD_MS = 250;
 const SLOP = 8;
+/** A frame that takes longer than this (ms) is drawn on the processor, not a graphics chip. */
+const SLOW = 50;
 /** The card's lower edge in pass.css. */
 const EDGE = new Color(0xc9c8c1);
 /**
@@ -311,14 +313,7 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
   const schemeChanged = () => void reprint();
   scheme.addEventListener("change", schemeChanged);
 
-  shade();
-  stage.append(canvas);
-  layout(true);
-  resized.observe(stage);
-  onReady();
-  run();
-
-  return () => {
+  const dispose = () => {
     cancelAnimationFrame(frame);
     cancelAnimationFrame(resizing);
     if (press) clearTimeout(press.timer);
@@ -334,6 +329,27 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     environment.dispose();
     renderer.dispose();
   };
+
+  shade();
+  stage.append(canvas);
+  layout(true);
+  // The first frame compiled the shaders; the second, read back once drawn, says what a frame costs here. Drawn on the
+  // processor (a software renderer that names itself as a GPU), it would take the page's time from everything else, so
+  // the printed passes stay. Reading one pixel waits for the frame to finish, as finish() does not everywhere.
+  const gl = renderer.getContext();
+  const started = performance.now();
+  renderer.render(scene, camera);
+  gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
+  const cost = performance.now() - started;
+  stage.dataset.lanyardFrame = `${Math.round(cost)} ms`;
+  if (cost > SLOW) {
+    dispose();
+    throw new Error(`Too slow to draw (${Math.round(cost)} ms a frame)`);
+  }
+  resized.observe(stage);
+  onReady();
+  run();
+  return dispose;
 }
 
 /** The element's layout position within the stage, ignoring transforms (the CSS pass is turned by its tilt). */
