@@ -68,8 +68,9 @@ jobs:
   e2e:
     if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository }}
     runs-on: ubuntu-latest
-    # Shards take 8 to 12 minutes in the image (#272), so 20 leaves room for a slow pull.
-    timeout-minutes: 20
+    # Shards take 9 to 15 minutes in the image (#272), but the eighth took 18.6 on main by
+    # November 2026 and the 3D staff pass's specs (#448) took it past 20, so 25 leaves room.
+    timeout-minutes: 25
     # The image carries Chromium, WebKit and their system packages, so nothing is
     # downloaded or apt-installed per run. That install used to stall shards for the whole
     # 30 minutes (#271): WebKit needs about 300 apt packages, and the runner's Ubuntu mirror
