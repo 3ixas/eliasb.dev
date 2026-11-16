@@ -280,8 +280,10 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     shade();
     draw();
   };
+  // With motion on, the palette crossfades while the root carries data-theme-changing (theme.ts), so the stock is read
+  // again when that mark goes, once the colours have settled.
   const themed = new MutationObserver(() => void reprint());
-  themed.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  themed.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-theme-changing"] });
   const scheme = window.matchMedia("(prefers-color-scheme: dark)");
   const schemeChanged = () => void reprint();
   scheme.addEventListener("change", schemeChanged);
