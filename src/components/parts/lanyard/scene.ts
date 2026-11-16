@@ -5,14 +5,9 @@
  */
 import {
   AmbientLight,
-  BufferAttribute,
-  BufferGeometry,
   CanvasTexture,
-  CatmullRomCurve3,
-  ClampToEdgeWrapping,
   CylinderGeometry,
   DirectionalLight,
-  DoubleSide,
   ExtrudeGeometry,
   Group,
   Matrix4,
@@ -26,7 +21,6 @@ import {
   Plane,
   PlaneGeometry,
   Raycaster,
-  RepeatWrapping,
   Scene,
   ShadowMaterial,
   Shape,
@@ -40,6 +34,7 @@ import {
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { paintPrint } from "./face";
+import { Strap, strapMaterial } from "./strap";
 import { Lanyard, STEP, add, cross, normalise, scale, sub, dot, type Vec3 } from "./physics";
 
 /** The card's thickness against its width: a CR80 card is 0.76 mm on 54 mm. */
@@ -48,8 +43,6 @@ const THICKNESS = 0.76 / 54;
 const FOV = 20;
 /** How far the plies open from vertical, each way (DESIGN.md "The staff pass"). */
 const SPREAD = (4.5 * Math.PI) / 180;
-/** Samples along each ply's ribbon. */
-const RIBBON_SAMPLES = 48;
 
 export type Mount = { stage: HTMLElement; pass: HTMLElement; onReady: () => void };
 
@@ -109,10 +102,9 @@ export async function mountLanyard({ stage, pass, onReady }: Mount): Promise<() 
   scene.add(clip);
 
   const strapColour = getComputedStyle(pass).getPropertyValue("--lanyard").trim() || "#0b6b47";
-  const weave = weaveTexture(strapColour);
-  const strapMaterial = new MeshStandardMaterial({ map: weave, roughness: 0.92, side: DoubleSide });
-  const ribbons = [new Ribbon(strapMaterial), new Ribbon(strapMaterial)];
-  ribbons.forEach((ribbon) => scene.add(ribbon.mesh));
+  const fabric = strapMaterial(strapColour, renderer.capabilities.getMaxAnisotropy());
+  const plies = [new Strap(fabric, -0.6), new Strap(fabric, 0.6)];
+  plies.forEach((ply) => scene.add(ply.mesh));
 
   // Laying out: the stage's pixels map to world units at the card's plane, where the card's width is 1.
   let view = { width: 1, height: 1, unit: 1 };
@@ -161,7 +153,7 @@ export async function mountLanyard({ stage, pass, onReady }: Mount): Promise<() 
     clip.matrix.copy(basis.makeBasis(v(across), v(up), v(cross(across, up))).setPosition(crimp.x, crimp.y, crimp.z));
     clip.matrixWorldNeedsUpdate = true;
 
-    lanyard.plies.forEach((ply, i) => ribbons[i].update(ply.map((index) => lanyard.get(index)), across));
+    lanyard.plies.forEach((ply, i) => plies[i].update(ply.map((index) => lanyard.get(index)), across));
     renderer.render(scene, camera);
   }
 
@@ -286,8 +278,8 @@ export async function mountLanyard({ stage, pass, onReady }: Mount): Promise<() 
     scene.traverse((object) => {
       if (object instanceof Mesh) object.geometry.dispose();
     });
-    [faceMaterial, edgeMaterial, metal, strapMaterial, shadowCatcher.material as ShadowMaterial].forEach((material) => material.dispose());
-    [faceTexture, weave, scene.environment].forEach((texture) => texture?.dispose());
+    [faceMaterial, edgeMaterial, metal, fabric, shadowCatcher.material as ShadowMaterial].forEach((material) => material.dispose());
+    [faceTexture, fabric.map, fabric.normalMap, scene.environment].forEach((texture) => texture?.dispose());
     renderer.dispose();
   };
 }
@@ -380,96 +372,4 @@ function clipModel(metal: MeshStandardMaterial) {
     group.add(part);
   }
   return group;
-}
-
-/**
- * A ply of woven strap: a ribbon through the ply's particles that keeps its width as it twists. Its sideways direction
- * starts as the card's and is carried up the ribbon without turning about it (parallel transport), so the strap twists
- * with the card and never folds flat to the viewer.
- */
-class Ribbon {
-  readonly mesh: Mesh;
-  private readonly positions = new Float32Array(RIBBON_SAMPLES * 2 * 3);
-  private readonly normals = new Float32Array(RIBBON_SAMPLES * 2 * 3);
-  private readonly uvs = new Float32Array(RIBBON_SAMPLES * 2 * 2);
-  private readonly geometry = new BufferGeometry();
-  private readonly curve = new CatmullRomCurve3([], false, "centripetal");
-
-  constructor(material: MeshStandardMaterial) {
-    const index: number[] = [];
-    for (let i = 0; i < RIBBON_SAMPLES - 1; i++) {
-      const a = i * 2;
-      index.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
-    }
-    this.geometry.setIndex(index);
-    this.geometry.setAttribute("position", new BufferAttribute(this.positions, 3));
-    this.geometry.setAttribute("normal", new BufferAttribute(this.normals, 3));
-    this.geometry.setAttribute("uv", new BufferAttribute(this.uvs, 2));
-    this.mesh = new Mesh(this.geometry, material);
-    this.mesh.castShadow = true;
-    this.mesh.frustumCulled = false;
-  }
-
-  update(points: Vec3[], across: Vec3) {
-    this.curve.points = points.map(v);
-    const samples = this.curve.getSpacedPoints(RIBBON_SAMPLES - 1);
-    const half = (1 * em) / 2;
-    let side = across;
-    let along = 0;
-    for (let i = 0; i < RIBBON_SAMPLES; i++) {
-      const here = v3(samples[i]);
-      const next = v3(samples[Math.min(i + 1, RIBBON_SAMPLES - 1)]);
-      const before = v3(samples[Math.max(i - 1, 0)]);
-      const tangent = normalise(sub(next, before));
-      side = normalise(sub(side, scale(tangent, dot(side, tangent))));
-      const facing = cross(side, tangent);
-      if (i > 0) along += Math.hypot(here.x - samples[i - 1].x, here.y - samples[i - 1].y, here.z - samples[i - 1].z);
-      for (const [k, sign] of [[0, -1], [1, 1]] as const) {
-        const at = (i * 2 + k) * 3;
-        this.positions[at] = here.x + side.x * half * sign;
-        this.positions[at + 1] = here.y + side.y * half * sign;
-        this.positions[at + 2] = here.z + side.z * half * sign;
-        this.normals[at] = facing.x;
-        this.normals[at + 1] = facing.y;
-        this.normals[at + 2] = facing.z;
-        this.uvs[(i * 2 + k) * 2] = k;
-        this.uvs[(i * 2 + k) * 2 + 1] = along / (1 * em);
-      }
-    }
-    for (const name of ["position", "normal", "uv"]) this.geometry.getAttribute(name).needsUpdate = true;
-  }
-}
-
-/** The strap's weave: a fine twill in the employer's colour, darker at the edges where the webbing rolls. */
-function weaveTexture(colour: string) {
-  const canvas = document.createElement("canvas");
-  canvas.width = 64;
-  canvas.height = 64;
-  const context = canvas.getContext("2d")!;
-  context.fillStyle = colour;
-  context.fillRect(0, 0, 64, 64);
-  for (let i = -64; i < 128; i += 4) {
-    context.strokeStyle = "rgb(255 255 255 / 0.09)";
-    context.beginPath();
-    context.moveTo(i, 0);
-    context.lineTo(i + 64, 64);
-    context.stroke();
-    context.strokeStyle = "rgb(0 0 0 / 0.12)";
-    context.beginPath();
-    context.moveTo(i + 2, 64);
-    context.lineTo(i + 66, 0);
-    context.stroke();
-  }
-  const edges = context.createLinearGradient(0, 0, 64, 0);
-  edges.addColorStop(0, "rgb(0 0 0 / 0.3)");
-  edges.addColorStop(0.18, "rgb(0 0 0 / 0)");
-  edges.addColorStop(0.82, "rgb(0 0 0 / 0)");
-  edges.addColorStop(1, "rgb(0 0 0 / 0.3)");
-  context.fillStyle = edges;
-  context.fillRect(0, 0, 64, 64);
-  const texture = new CanvasTexture(canvas);
-  texture.colorSpace = SRGBColorSpace;
-  texture.wrapS = ClampToEdgeWrapping;
-  texture.wrapT = RepeatWrapping;
-  return texture;
 }
