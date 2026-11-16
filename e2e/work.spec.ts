@@ -278,9 +278,10 @@ test.describe("Work: arriving", () => {
     await joveen.evaluate((element) => {
       const caught: Animation[] = [];
       (window as unknown as { fills: Animation[] }).fills = caught;
-      element.addEventListener("transitionrun", (event: TransitionEvent) => {
-        const bar = event.target as Element;
-        if (event.propertyName !== "transform" || !bar.matches(".measure--ms .bar")) return;
+      element.addEventListener("transitionrun", (event) => {
+        const { target, propertyName } = event as TransitionEvent;
+        const bar = target as Element;
+        if (propertyName !== "transform" || !bar.matches(".measure--ms .bar")) return;
         const fill = bar.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "transform")!;
         fill.pause();
         caught[[...element.querySelectorAll(".measure--ms .bar")].indexOf(bar)] = fill;
