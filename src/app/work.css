@@ -130,10 +130,19 @@
 .sim {
   grid-area: sim;
   display: grid;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: auto 1fr auto;
   gap: 34px;
   min-width: 0;
   padding-block: 44px 40px;
+}
+
+/* What the chart shows, named above it as the comparisons below are (#457). */
+.sim__title {
+  margin-bottom: -10px;
+  font-family: var(--sans);
+  font-size: var(--type-ui);
+  font-weight: 500;
+  line-height: 1.3;
 }
 
 /* The plot takes the panel's width (#457), leaving room at its right for the endpoints' dots (120 px) and the price label. */

@@ -28,10 +28,13 @@ function StoryLink({ slug, outline = false }: { slug: RoleStorySlug; outline?: b
 
 /** The illustrative paths, where they end as a dot each, stacked by band at the right edge, and a dashed line at their mean labelled "One price". */
 function Simulation() {
-  const { start, end, price, caption, description } = workPanels.bnp.simulation;
+  const { title, start, end, price, caption, description } = workPanels.bnp.simulation;
   const { bins, meanBin, mean } = simulation();
   return (
-    <figure className="sim" aria-describedby="sim-description">
+    <figure className="sim" aria-labelledby="sim-title" aria-describedby="sim-description">
+      <h4 id="sim-title" className="sim__title">
+        {title}
+      </h4>
       <SimulationPlot>
         <div className="sim__hist" style={{ "--most": Math.max(...bins) } as CSSProperties} aria-hidden="true">
           {bins.map((count, index) => (

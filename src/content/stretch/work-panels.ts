@@ -34,7 +34,8 @@ export type BnpPanel = {
   slug: "bnp-paribas";
   /** "Six months" over "from zero C# to production code": the evidence item "Six · months from zero C# …", split after its first word. */
   figure: { value: string; label: string };
-  simulation: { start: string; end: string; price: string; caption: string; description: string };
+  /** `title` names what the chart shows, above it (#457), so a reader knows before the caption. */
+  simulation: { title: string; start: string; end: string; price: string; caption: string; description: string };
   comparisons: readonly [Comparison, Comparison];
 };
 
@@ -47,6 +48,7 @@ export const workPanels = {
     slug: "bnp-paribas",
     figure: { value: "Six months", label: "from zero C# to production code" },
     simulation: {
+      title: "How the pricing engines work",
       start: "Today",
       end: "Horizon",
       price: "One price",

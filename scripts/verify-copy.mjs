@@ -375,6 +375,7 @@ for (const [what, ids] of [["menu", siteCopy.menu.map(({ id }) => id)], ["Say he
   assert.equal(workPanels.heading, work.heading, "Work's panels keep Work's heading");
   assert.equal(workPanels.subheading, work.note, "Work's subheading is its approved note");
   assert.equal(`${bnp.figure.value} · ${bnp.figure.label}`, bullet(deck, "BNP Paribas figure"), "Work: BNP Paribas's figure");
+  assert.equal(bnp.simulation.title, bullet(deck, "Simulation heading"), "Work: the simulation's heading");
   assert.equal(`${bnp.simulation.start} · ${bnp.simulation.end} · ${bnp.simulation.price}`, bullet(deck, "Simulation"), "Work: the simulation's labels");
   assert.equal(bnp.simulation.caption, bullet(deck, "Simulation caption"), "Work: the simulation's caption");
   assert.equal(bnp.simulation.description, bullet(deck, "Simulation description"), "Work: the simulation's accessible description");
