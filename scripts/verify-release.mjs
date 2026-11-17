@@ -267,7 +267,7 @@ function verifyHomepage(markup) {
   const imageTags = tags(markup, "img");
   check(imageTags.length >= 5, "Homepage should render its portrait, project and signal imagery");
   check(imageTags.every((tag) => attribute(tag, "alt") !== null), "Every homepage image should declare alternative text");
-  check(markup.includes("Threshold landing page"), "Threshold imagery should have meaningful alternative text");
+  check(markup.includes("answer for a room in Hackney"), "Threshold imagery should have meaningful alternative text");
   check(imageTags.some((tag) => (attribute(tag, "srcset") ?? "").includes("/_next/image")), "Homepage imagery should use responsive Next Image sources");
 
   // Nothing from the retired Board, or from the sources dropped before it.
