@@ -23,7 +23,10 @@ function StoryLink({ slug, outline = false }: { slug: RoleStorySlug; outline?: b
   );
 }
 
-/** BNP Paribas, full width and green: its figure, two comparisons in their own units and the link to its story; the simulation is on its Role story (#457). */
+/**
+ * BNP Paribas, full width and green: its name over its role and dates, its figure and the link to its story on the left,
+ * two comparisons in their own units on the right (#458); the simulation is on its Role story (#457).
+ */
 function BnpPanel() {
   const { slug, figure, comparisons } = workPanels.bnp;
   const story = roleStories[slug];
@@ -102,7 +105,7 @@ function RolePanelView({ panel }: { panel: RolePanel }) {
 /**
  * Work (DESIGN.md "The homepage, in order" 3, R-13 to R-15): the title and its subheading, BNP Paribas full width,
  * then Joveen and Optegra side by side. Each panel carries its employer's slug as its id, which the opening's passes
- * link to.
+ * link to. Joveen's and Optegra's panels share their rows, so their rules and links stay level (#458).
  */
 export function Work() {
   return (
@@ -113,7 +116,7 @@ export function Work() {
       <p className="work__subheading">{workPanels.subheading}</p>
       <div className="panels">
         <BnpPanel />
-        <div className="panels panels--two">
+        <div className="panels panels--two panels--aligned">
           {workPanels.roles.map((panel) => (
             <RolePanelView key={panel.slug} panel={panel} />
           ))}

@@ -18,26 +18,57 @@
   text-wrap: balance;
 }
 
+/*
+ * Every Work panel (#458): one structure in three. The name leads, with its role over its dates directly under it;
+ * then the figure a clear step down and its quiet label; then the evidence under a hairline; then the story link.
+ */
 .work .panel {
   --soft: color-mix(in srgb, var(--panel-ink) 26%, transparent);
   --solid: var(--panel-ink);
   scroll-margin-top: 24px;
-  /* In dark a hairline of the panel's ink holds its edge: Joveen's near-black field is otherwise one step off the page. */
-  box-shadow: inset 0 0 0 1px light-dark(transparent, color-mix(in srgb, var(--panel-ink) 14%, transparent));
+  /*
+   * Surface (#458): a card lit from above, in both themes. Its edges catch the light, a highlight along the top inside and a shade along the bottom,
+   * over an exact 1 px edge (in light its own ink; in dark a faint white rim on every panel, so BNP Paribas's dark ink
+   * does not leave its edge unseen on the dark page); and it sits on the page with a close contact shadow and a soft, wide one
+   * tinted by its own field, so the green panel casts green, not grey. In dark the shadows are black and deeper.
+   */
+  /* The dark theme's rim: a faint white line, as strong on each field as Joveen's reads on near-black. */
+  --rim: rgb(255 255 255 / 0.16);
+  --cast: light-dark(color-mix(in srgb, var(--field) 42%, transparent), rgb(0 0 0 / 0.55));
+  box-shadow:
+    inset 0 1px 0 light-dark(rgb(255 255 255 / 0.22), rgb(255 255 255 / 0.14)),
+    inset 0 -1px 0 rgb(0 0 0 / 0.14),
+    inset 0 0 0 1px light-dark(color-mix(in srgb, var(--panel-ink) 9%, transparent), var(--rim)),
+    0 1px 2px light-dark(rgb(20 20 18 / 0.08), rgb(0 0 0 / 0.5)),
+    0 6px 14px -6px var(--cast),
+    0 28px 56px -28px var(--cast);
 }
 
 /* ---- The employer leads ---- */
 
-/* What a visitor reads first is where I worked: the employer large, my role and dates beside it, and the figure a step under. */
+/* What a visitor reads first is where I worked: the employer large, my role over my dates under it, one unit at every width. */
+.work .panel__head {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
 .work .panel__name {
   font-size: var(--type-employer);
   line-height: 0.95;
   letter-spacing: -0.035em;
 }
 
+/* Role over dates, a line each, so neither breaks mid-phrase where a panel is narrow. */
 .work .panel__meta {
+  margin-left: 0;
+  text-align: left;
   font-size: var(--type-prose);
   line-height: 1.35;
+}
+
+.work .panel__meta span {
+  white-space: nowrap;
 }
 
 /* ---- Figures ---- */
@@ -51,13 +82,13 @@
   font-variant-numeric: lining-nums tabular-nums;
 }
 
+/* A clear step under the employer: the three panels' figures rank alike, BNP Paribas's words a touch smaller than a number. */
 .figure__value {
   font-size: var(--type-figure);
-  line-height: 0.9;
+  line-height: 0.95;
   letter-spacing: -0.04em;
 }
 
-/* BNP Paribas's figure is words, so it is a step smaller than a number. */
 .figure__words {
   font-size: clamp(34px, 3.6vw, 52px);
   line-height: 1;
@@ -67,7 +98,7 @@
 
 .figure__label {
   display: block;
-  margin-top: 12px;
+  margin-top: 10px;
   font-family: var(--serif);
   font-optical-sizing: auto;
   font-size: var(--type-prose);
@@ -79,6 +110,8 @@
 /* Green, lifting from #2cbd86 at the top left to its field, and never darker than the field (R-04). */
 .work .work-bnp {
   --solid: #fff;
+  /* On the bright green a faint rim vanishes, so it is stronger here to read as Joveen's and Optegra's do. */
+  --rim: rgb(255 255 255 / 0.42);
   display: grid;
   grid-template:
     "head" auto
@@ -86,6 +119,7 @@
     "comparisons" auto
     "story" auto
     / minmax(0, 1fr);
+  /* Already lit from its top left; it is never deepened at its foot, where its dark ink would fall under AA. */
   background: radial-gradient(120% 110% at 10% -10%, #2cbd86 0%, #0fa56d 46%, var(--field) 100%);
 }
 
@@ -95,7 +129,7 @@
 
 .work-bnp__figure {
   grid-area: figure;
-  padding-block: 56px 0;
+  padding-top: 56px;
 }
 
 /* As Joveen's and Optegra's pairs sit under their figures: the rule 32 px below the figure's words. */
@@ -126,6 +160,52 @@
   margin-top: 36px;
 }
 
+/*
+ * From 1000 px, two columns: on the left who and what (the name over its role and dates, then "Six months" and its
+ * label, then the story link), on the right the evidence (each comparison under its own hairline, the first level with
+ * the name). Every element keeps one of the panel's two left edges.
+ */
+@media (min-width: 1000px) {
+  .work .work-bnp {
+    grid-template:
+      "head comparisons" auto
+      "figure comparisons" 1fr
+      "story comparisons" auto
+      / minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: 72px;
+  }
+
+  .work-bnp__figure {
+    padding-block: 64px 48px;
+  }
+
+  .work-bnp__comparisons {
+    margin-top: 0;
+  }
+
+  .work-bnp__comparisons ul {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .work-bnp__comparisons li {
+    padding-block: 22px 26px;
+    border-top: 1px solid var(--line);
+  }
+
+  .work-bnp__comparisons li:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .work-bnp > .work__story {
+    align-self: end;
+    margin-top: 0;
+  }
+}
+
 /* ---- Joveen and Optegra ---- */
 
 .work-role__arrival,
@@ -133,14 +213,44 @@
   height: 100%;
 }
 
-.work-role {
+.work .work-role {
   display: grid;
   grid-template-rows: auto auto 1fr auto;
   padding: 36px 40px 40px;
+  /* Lit from above: lighter at the top, the field itself by the middle, a touch deeper at the foot. */
+  background: linear-gradient(
+    180deg,
+    light-dark(color-mix(in srgb, var(--field), #fff 5%), color-mix(in srgb, var(--field), #fff 7%)) 0%,
+    var(--field) 55%,
+    color-mix(in srgb, var(--field), #000 8%) 100%
+  );
 }
 
 .work-role__figure {
-  margin-top: 52px;
+  margin-top: 56px;
+}
+
+/*
+ * Side by side, Joveen and Optegra share their rows (subgrid), so a label that runs to two lines on one panel moves the
+ * other's rule with it: the rules, the evidence and the links stay level across the pair.
+ */
+@media (min-width: 720px) {
+  .panels--aligned {
+    grid-template-rows: repeat(4, auto);
+    row-gap: 0;
+  }
+
+  .panels--aligned > .work-role__arrival {
+    display: grid;
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+  }
+
+  .panels--aligned .work-role {
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+    row-gap: 0;
+  }
 }
 
 /* The pairs lay out by their own width, not the window's: side by side at 720 to 1000 px a panel is too narrow for the label, bars and value in one row. */
@@ -188,18 +298,7 @@
 
 /* ---- Narrower ---- */
 
-@media (max-width: 1259.98px) {
-  .work-bnp__figure {
-    padding-top: 44px;
-  }
-}
-
 @media (max-width: 719.98px) {
-  .work .panel__meta {
-    margin-left: 0;
-    text-align: left;
-  }
-
   .work__subheading {
     margin: -16px 0 28px;
   }
@@ -213,7 +312,7 @@
     gap: 28px;
   }
 
-  .work-role {
+  .work .work-role {
     padding: 26px 22px 28px;
   }
 

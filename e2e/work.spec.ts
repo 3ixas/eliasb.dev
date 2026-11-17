@@ -226,18 +226,22 @@ test.describe("Work: arriving", () => {
   test("Joveen's key API p95 fills in its own time: 520 ms against 230 ms, together and at a constant rate", async ({ page }) => {
     const joveen = panel(page, "joveen");
     await expect(joveen.locator("[data-grow]")).toHaveAttribute("data-armed", "");
-    // Catch each fill as it is created and pause it there, so none can finish before it is read, however slow the runner.
+    // Catch the fills the moment the bars are let go and pause them, so none can finish before it is read, however slow the
+    // runner. A mutation observer's callback runs before the next frame; CI's WebKit does not reliably fire transitionrun.
     await joveen.evaluate((element) => {
       const caught: Animation[] = [];
       (window as unknown as { fills: Animation[] }).fills = caught;
-      element.addEventListener("transitionrun", (event) => {
-        const { target, propertyName } = event as TransitionEvent;
-        const bar = target as Element;
-        if (propertyName !== "transform" || !bar.matches(".measure--ms .bar")) return;
-        const fill = bar.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "transform")!;
-        fill.pause();
-        caught[[...element.querySelectorAll(".measure--ms .bar")].indexOf(bar)] = fill;
+      const grow = element.querySelector("[data-grow]")!;
+      const watcher = new MutationObserver(() => {
+        if (grow.hasAttribute("data-armed")) return;
+        watcher.disconnect();
+        for (const bar of element.querySelectorAll(".measure--ms .bar")) {
+          const fill = bar.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "transform");
+          fill?.pause();
+          if (fill) caught.push(fill);
+        }
       });
+      watcher.observe(grow, { attributes: true, attributeFilter: ["data-armed"] });
     });
     await joveen.locator(".measure--ms").first().evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
     await expect.poll(() => page.evaluate(() => (window as unknown as { fills: Animation[] }).fills.filter(Boolean).length)).toBe(2);
@@ -284,6 +288,50 @@ test.describe("Work: reduced motion", () => {
 });
 
 // A visitor reads where I worked first (DESIGN.md "Type"): the employer is larger than the figure on every Work panel.
+// One structure in three panels (#458): the name over its role and dates, the figure, the evidence, the link.
+test.describe("Work: the panels' composition", () => {
+  test.use({ reducedMotion: "reduce" });
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+    await settled(page);
+  });
+
+  test("each panel's role and dates sit directly under its name, left-aligned, role over dates", async ({ page }) => {
+    for (const slug of slugs) {
+      const [name, meta, lines] = await panel(page, slug).evaluate((element) => {
+        const box = (selector: string) => element.querySelector(selector)!.getBoundingClientRect();
+        const spans = [...element.querySelectorAll(".panel__meta span")].map((span) => span.getBoundingClientRect());
+        return [box(".panel__name"), box(".panel__meta"), spans.map((span) => ({ top: span.top, left: span.left }))];
+      });
+      expect(meta.top, `${slug}: under the name`).toBeGreaterThanOrEqual(name.bottom - 1);
+      expect(meta.top - name.bottom, `${slug}: directly under it`).toBeLessThan(24);
+      expect(Math.abs(meta.left - name.left), `${slug}: on the name's left edge`).toBeLessThan(2);
+      expect(lines.length, slug).toBe(2);
+      expect(lines[1].top, `${slug}: dates under role`).toBeGreaterThan(lines[0].top);
+    }
+  });
+
+  test("from 1000 px BNP Paribas is two columns: who and what at the left, the comparisons at the right from the name's top", async ({ page }) => {
+    test.skip(width(page) < 1000, "Stacked below 1000 px");
+    const bnp = panel(page, "bnp-paribas");
+    const [name, figure, story, comparisons] = await Promise.all(
+      [".panel__name", ".work-bnp__figure", ".work__story", ".work-bnp__comparisons"].map((selector) => boxOf(bnp.locator(selector).first())),
+    );
+    for (const left of [figure, story]) expect(Math.abs(left.x - name.x)).toBeLessThan(2);
+    expect(comparisons.x).toBeGreaterThan(name.x + name.width);
+    expect(Math.abs(comparisons.y - name.y)).toBeLessThan(24);
+  });
+
+  test("side by side, Joveen's and Optegra's rules and links are level", async ({ page }) => {
+    test.skip(width(page) < 720, "Stacked below 720 px");
+    const tops = (selector: string) => page.locator(`.work-role ${selector}`).evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().top));
+    const [rules, links] = await Promise.all([tops(".pairs"), tops(".work__story")]);
+    expect(Math.abs(rules[0] - rules[1])).toBeLessThan(1);
+    expect(Math.abs(links[0] - links[1])).toBeLessThan(1);
+  });
+});
+
 test.describe("Work: the employer leads", () => {
   for (const slug of ["bnp-paribas", "joveen", "optegra"] as const) {
     test(`${slug}: the employer's name is larger than its figure`, async ({ page }) => {
