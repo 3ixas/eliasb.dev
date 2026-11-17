@@ -400,7 +400,7 @@ What Work's panels say, as approved in the passes and panels spec (R-13 to R-15,
 - Simulation heading: How the pricing engines work
 - Simulation: Today · Horizon · One price
 - Simulation controls: Run again · Paths · 10 · 100 · 1,000
-- Simulation settled, read to a screen reader when a run settles: {1,000} paths: one price, {1.2}% {above / below} today. · {10} paths: one price, level with today.
+- Simulation settled, read to a screen reader when a run settles (signed off by Elias on 17 November 2026): {1,000} paths: one price, {1.2}% {above / below} today. · {10} paths: one price, level with today.
 - Simulation caption: The engines run large simulation-based calculations across several asset classes. Thousands of possible market paths go in; a price and its risk come out.
 - Simulation description: Illustrative simulated paths from today to the horizon, a histogram of where they end on the right edge, and a dashed line at their average, labelled one price.
 
