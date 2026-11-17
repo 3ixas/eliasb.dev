@@ -397,8 +397,12 @@
   border-radius: 16px;
 }
 
-/* The flag: today's path solid, the new one dashed behind a switch that is off. */
+/*
+ * The flag (#461): today's path solid, the new one dashed behind a switch that is off. Switched on, the new path is
+ * solid and today's is dashed, and a request travels the path taken: one value arriving, never a loop.
+ */
 .lanes {
+  --trip: 0.9s;
   display: grid;
   gap: 26px;
 }
@@ -418,29 +422,42 @@
 }
 
 .lane i {
+  position: relative;
   grid-column: 1 / -1;
   height: 0;
   border-top: 3px solid var(--panel-ink);
   border-radius: 2px;
+  transition: opacity 0.2s var(--out);
 }
 
 .lane--new {
   grid-template-columns: auto minmax(0, 1fr) auto;
 }
 
-.lane--new i {
+.lane--new i,
+.lanes[data-on] .lane:not(.lane--new) i {
   grid-column: 2;
   border-top: 2px dashed var(--panel-ink);
   opacity: 0.55;
+}
+
+.lanes[data-on] .lane:not(.lane--new) i {
+  grid-column: 1 / -1;
+}
+
+.lanes[data-on] .lane--new i {
+  border-top: 3px solid var(--panel-ink);
+  opacity: 1;
 }
 
 .lane b {
   font-weight: 600;
 }
 
-/* A switch in the off position: the knob sits at the left. */
+/* A switch in the off position: the knob sits at the left; on, at the right. */
 .lane__switch {
   position: relative;
+  display: block;
   width: 34px;
   height: 20px;
   border: 1.5px solid var(--panel-ink);
@@ -456,6 +473,75 @@
   height: 11px;
   border-radius: 50%;
   background: var(--panel-ink);
+  transition: translate 0.2s var(--out);
+}
+
+/* The control: a 44 px target around the drawn switch, its margins taking back the room so the lanes keep their places. */
+.lane__flip {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -12px -5px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.lane__flip[aria-checked="true"] .lane__switch {
+  background: var(--panel-ink);
+}
+
+.lane__flip[aria-checked="true"] .lane__switch::after {
+  translate: 14px 0;
+  background: var(--field);
+}
+
+/* A request: a dot that travels the path taken from its start to its end, once. Served from the cache, it makes a short, quick trip. */
+.lane__request {
+  position: absolute;
+  top: -6.5px;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--panel-ink);
+  animation: lane-request var(--trip) var(--out) forwards;
+}
+
+.lane__request[data-cached] {
+  animation-duration: calc(var(--trip) / 3);
+}
+
+@keyframes lane-request {
+  from {
+    left: 0;
+    opacity: 1;
+  }
+
+  85% {
+    opacity: 1;
+  }
+
+  to {
+    left: calc(100% - 10px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lane__request {
+    display: none;
+  }
+
+  .lane i,
+  .lane__switch::after {
+    transition: none;
+  }
 }
 
 /* The comparisons: two side by side, each a title and its two bars to scale. */
@@ -755,5 +841,21 @@
   .lane__switch::after {
     forced-color-adjust: none;
     background: CanvasText;
+  }
+
+  /* On, the switch fills with the highlight and its knob takes the canvas, as a system switch does. */
+  .lane__flip[aria-checked="true"] .lane__switch {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background: Highlight;
+  }
+
+  .lane__flip[aria-checked="true"] .lane__switch::after {
+    background: Canvas;
+  }
+
+  .lane__request {
+    forced-color-adjust: none;
+    background: Highlight;
   }
 }
