@@ -255,7 +255,7 @@ test.describe("Arrival", () => {
     const grow = page.locator("[data-grow]");
     await expect(rise).toHaveAttribute("data-armed", "");
     await expect(grow).toHaveAttribute("data-armed", "");
-    expect(await shown(count)).toBe("−0%");
+    await expect.poll(() => shown(count)).toBe("−0%");
     await expect(count.locator(".sr-only")).toHaveText("−40%");
 
     await page.locator("#arrivals").evaluate((element) => element.scrollIntoView({ block: "start", behavior: "instant" }));
@@ -283,15 +283,15 @@ test.describe("Arrival", () => {
     await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
     await page.locator("#arrivals").evaluate((element) => element.scrollIntoView({ block: "start", behavior: "instant" }));
     await expect(rise).not.toHaveAttribute("data-armed");
-    expect(await shown(count)).toBe("−40%");
+    await expect.poll(() => shown(count)).toBe("−40%");
   });
 
   test("printing before scrolling there prints the figure's finished value, not the one it starts from", async ({ page }) => {
     await page.goto(fixture);
     const count = page.locator("[data-count]");
-    expect(await shown(count)).toBe("−0%");
+    await expect.poll(() => shown(count)).toBe("−0%");
     await page.emulateMedia({ media: "print" });
-    expect(await shown(count)).toBe("−40%");
+    await expect.poll(() => shown(count)).toBe("−40%");
   });
 
   test("it is let go when its top passes 85% of the viewport's height, the line that armed it", async ({ page }) => {
@@ -318,7 +318,7 @@ test.describe("Arrival", () => {
 test.describe("Arrival, held back from no one", () => {
   test("with reduced motion everything is in its end state at once", async ({ page }) => {
     await page.goto(fixture);
-    expect(await shown(page.locator("[data-count]"))).toBe("−40%");
+    await expect.poll(() => shown(page.locator("[data-count]"))).toBe("−40%");
     await expect(page.locator("[data-armed]")).toHaveCount(0);
   });
 
@@ -326,7 +326,7 @@ test.describe("Arrival, held back from no one", () => {
     const context = await browser.newContext({ javaScriptEnabled: false, reducedMotion: "no-preference" });
     const page = await context.newPage();
     await page.goto(fixture);
-    expect(await shown(page.locator("[data-count]"))).toBe("−40%");
+    await expect.poll(() => shown(page.locator("[data-count]"))).toBe("−40%");
     await expect(page.locator("[data-armed]")).toHaveCount(0);
     await expect(page.locator("[data-rise]")).toHaveCSS("opacity", "1");
     await context.close();

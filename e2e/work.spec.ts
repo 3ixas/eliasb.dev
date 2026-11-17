@@ -95,7 +95,7 @@ test.describe("Work: the panels", () => {
   test("Joveen and Optegra each show a display figure and its label, three pairs drawn in their units with their values, and the link to the story", async ({ page }) => {
     for (const { slug, figure, pairs } of workPanels.roles) {
       const evidence = roleStories[slug].evidence[figure.evidence];
-      expect(await shown(panel(page, slug).locator(".figure__value"))).toBe(evidence.value);
+      await expect.poll(() => shown(panel(page, slug).locator(".figure__value"))).toBe(evidence.value);
       await expect(panel(page, slug).locator(".figure__label")).toHaveText(evidence.label);
       const rows = panel(page, slug).locator(".pair");
       await expect(rows).toHaveCount(3);
@@ -245,8 +245,8 @@ test.describe("Work: arriving", () => {
 
   test("below the fold the figures wait at their start, the bars and the simulation are armed, and each arrives once in view", async ({ page }) => {
     const joveen = panel(page, "joveen");
-    expect(await shown(joveen.locator(".figure__value"))).toBe("−0%");
-    expect(await shown(panel(page, "optegra").locator(".figure__value"))).toBe("62%");
+    await expect.poll(() => shown(joveen.locator(".figure__value"))).toBe("−0%");
+    await expect.poll(() => shown(panel(page, "optegra").locator(".figure__value"))).toBe("62%");
     // A screen reader is read the value, never the start.
     await expect(joveen.locator(".figure__value .sr-only")).toHaveText("−40%");
     await expect(plot(page)).toHaveAttribute("data-armed", "");
@@ -348,7 +348,7 @@ test.describe("Work: reduced motion", () => {
     await page.goto("/");
     await hydrated(page);
     await expect(section(page).locator("[data-armed]")).toHaveCount(0);
-    expect(await shown(panel(page, "joveen").locator(".figure__value"))).toBe("−40%");
+    await expect.poll(() => shown(panel(page, "joveen").locator(".figure__value"))).toBe("−40%");
     await page.locator(".sim").scrollIntoViewIfNeeded();
     await expect(plot(page)).toHaveAttribute("data-drawn", "");
     await expect(plot(page)).not.toHaveAttribute("data-released", "");
