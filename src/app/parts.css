@@ -94,7 +94,7 @@
 }
 
 /*
- * A field whose ink is darker than it (Panel marks it) is a bright field: never deepened at its foot, where its text
+ * A field whose ink is darker than it (panelSurface marks it) is a bright field: never deepened at its foot, where its text
  * would fall under AA (BNP Paribas: 4.46:1), and given a stronger dark rim, since a faint one vanishes on it.
  */
 .panel--dark-ink {

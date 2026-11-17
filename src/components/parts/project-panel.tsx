@@ -1,8 +1,7 @@
 import Image from "next/image";
-import type { CSSProperties } from "react";
 import { hostLabel } from "@/components/site/host-label";
 import { isInternalHref, SiteLink } from "@/components/site/site-link";
-import { OUT } from "@/components/parts/panel";
+import { OUT, panelSurface } from "@/components/parts/panel";
 import type { Project } from "@/content/projects";
 
 /** A project opens at its case study, else its live site, else its code. */
@@ -35,12 +34,12 @@ export function ProjectPanel({ project, line, level = 3, wide = false, meta = fa
   const href = projectHref(project);
   const external = !isInternalHref(href);
   const coloured = Boolean(project.links.caseStudy && project.panel);
-  const style = coloured ? ({ "--field": project.panel!.field, "--panel-ink": project.panel!.ink } as CSSProperties) : undefined;
-  const classes = ["panel", "project", coloured ? "panel--glow" : "panel--paper", wide ? "project--wide" : null, project.screenshot ? null : "project--text"].filter(Boolean).join(" ");
+  const surface = panelSurface(coloured ? project.panel : undefined, { glow: coloured });
+  const classes = [surface.className, "project", wide ? "project--wide" : null, project.screenshot ? null : "project--text"].filter(Boolean).join(" ");
   const Heading = level === 2 ? "h2" : "h3";
   const { screenshot } = project;
   return (
-    <SiteLink href={href} className={classes} style={style}>
+    <SiteLink href={href} className={classes} style={surface.style}>
       <span className="project__text">
         <Heading className="project__name">{project.name}</Heading>
         <span className="project__line">{line}</span>
