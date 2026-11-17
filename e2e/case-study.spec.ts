@@ -64,7 +64,7 @@ for (const slug of caseStudySlugs) {
       for (const item of await list.getByRole("listitem").all()) expect(await item.evaluate((element) => element.scrollWidth <= element.clientWidth + 0.5)).toBe(true);
     });
 
-    test("the landing screenshot sits in the panel, at the right of the text from 1260 px and beneath it under that", async ({ page }) => {
+    test("the screenshot sits in the panel, at the right of the text from 960 px and beneath it under that", async ({ page }) => {
       const shot = opening(page).locator(".case-open__shot");
       await expect(shot.locator(".zoom img")).toHaveAttribute("alt", project.screenshot!.alt);
       await expect(shot.locator("img").first()).toHaveCSS("border-radius", "16px");
@@ -72,7 +72,7 @@ for (const slug of caseStudySlugs) {
       await expect
         .poll(async () => {
           const [t, s] = [(await text.boundingBox())!, (await shot.boundingBox())!];
-          return width(page) >= 1260 ? s.x >= t.x + t.width - 1 : s.y >= t.y + t.height - 1;
+          return width(page) >= 960 ? s.x >= t.x + t.width - 1 : s.y >= t.y + t.height - 1;
         })
         .toBe(true);
     });

@@ -24,7 +24,7 @@ A change that breaks one needs Elias's decision, not a judgement in review.
 - **The page**: `max-width: 1344px`, centred, with 32 px gutters (16 px under 720 px).
 - **Sections**: 144 px apart (96 px under 720 px). Each opens with its title; Work alone has a subheading.
 - **Panels in a section**: 16 px apart. Two panels side by side stack under 720 px.
-- **Breakpoints**: 1260 px (the opening and wide panels stack), 900 px (the passes scroll sideways), 720 px (phone).
+- **Breakpoints**: 1260 px (the homepage's opening and wide panels stack), 960 px (a Role story's or case study's opening stacks, [#461](https://github.com/3ixas/eliasb.dev/issues/461)), 900 px (the passes scroll sideways), 720 px (phone).
 - **Length**: the homepage stays within 9 screens at 1440 × 900 and 12 at 390 × 844 (raised from 8 and 11 on 15 November 2026, when Off the clock gained its headings, a fuller workout and Now making's description). Something new takes the place of something else. A long-form page has no budget.
 
 ## The panel
@@ -115,7 +115,7 @@ Four across (two under 1260 px, one under 720 px), upright, on paper with a hair
 
 ## Long-form pages: Role stories and case studies
 
-- **A Role story's opening**: "← Work"; the employer as the `h1` (`clamp(52px, 7vw, 104px)`, or `clamp(36px, 4.6vw, 72px)` for a name over 24 characters, so Optegra Eye Healthcare & Kensington Medical fits at 320 px); role, dates and setting on one muted line; the summary as the lede (`clamp(20px, 1.8vw, 25px)`); the evidence figures; and the employer's Staff pass hanging at the right (below the text under 1260 px).
+- **A Role story's opening**: "← Work"; the employer as the `h1` (`clamp(52px, 7vw, 104px)`, or `clamp(36px, 4.6vw, 72px)` for a name over 24 characters, so Optegra Eye Healthcare & Kensington Medical fits at 320 px); role, dates and setting on one muted line; the summary as the lede (`clamp(20px, 1.8vw, 25px)`); the evidence figures; and the employer's Staff pass hanging at the right (below the text under 960 px, so a laptop-sized window keeps the right of the opening filled).
 - **A case study's opening**: a panel in the project's colour holding "← Things I make", the title, the description, the stack as chips, Live site and Code as pills, the evidence figures and the screenshot of the product at work (Threshold's answer, Flowtime's earned break: [#460](https://github.com/3ixas/eliasb.dev/issues/460)).
 - **Sections**: the heading at the left (4 of 12 columns, `clamp(28px, 2.7vw, 40px)`) and the text at the right, at most 760 px wide, with a hairline and 64 px between sections. From 720 px the heading stays in view 32 px from the top beside its section as it scrolls and lets go at the section's end ([#461](https://github.com/3ixas/eliasb.dev/issues/461)). A figure takes the text side's whole width, past the text's measure; none spans the page, since it would pass beneath the heading held beside it. Paragraphs are Newsreader 20 px at line height 1.5. Points are a Newsreader 500 lead at 23 px over a muted 16 px line, with hairlines between. Under 720 px the heading sits above the text. No section numbers, and no "Summary" heading.
 - **Figures** sit in the text column with a 14 px muted caption. A Role story's flag and comparisons are on a panel in the employer's colour.
