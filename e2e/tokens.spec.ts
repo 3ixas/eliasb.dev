@@ -63,7 +63,7 @@ const scale = (width: number): Record<string, number> => ({
   section: clamp(36, 3.6, 52, width),
   panel: clamp(30, 3, 42, width),
   employer: clamp(52, 6, 88, width),
-  figure: clamp(48, 5, 72, width),
+  figure: clamp(40, 3.8, 56, width),
   prose: width < 720 ? 19 : 20,
   row: 22,
   link: 19,

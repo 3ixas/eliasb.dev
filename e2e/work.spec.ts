@@ -226,18 +226,22 @@ test.describe("Work: arriving", () => {
   test("Joveen's key API p95 fills in its own time: 520 ms against 230 ms, together and at a constant rate", async ({ page }) => {
     const joveen = panel(page, "joveen");
     await expect(joveen.locator("[data-grow]")).toHaveAttribute("data-armed", "");
-    // Catch each fill as it is created and pause it there, so none can finish before it is read, however slow the runner.
+    // Catch the fills the moment the bars are let go and pause them, so none can finish before it is read, however slow the
+    // runner. A mutation observer's callback runs before the next frame; CI's WebKit does not reliably fire transitionrun.
     await joveen.evaluate((element) => {
       const caught: Animation[] = [];
       (window as unknown as { fills: Animation[] }).fills = caught;
-      element.addEventListener("transitionrun", (event) => {
-        const { target, propertyName } = event as TransitionEvent;
-        const bar = target as Element;
-        if (propertyName !== "transform" || !bar.matches(".measure--ms .bar")) return;
-        const fill = bar.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "transform")!;
-        fill.pause();
-        caught[[...element.querySelectorAll(".measure--ms .bar")].indexOf(bar)] = fill;
+      const grow = element.querySelector("[data-grow]")!;
+      const watcher = new MutationObserver(() => {
+        if (grow.hasAttribute("data-armed")) return;
+        watcher.disconnect();
+        for (const bar of element.querySelectorAll(".measure--ms .bar")) {
+          const fill = bar.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "transform");
+          fill?.pause();
+          if (fill) caught.push(fill);
+        }
       });
+      watcher.observe(grow, { attributes: true, attributeFilter: ["data-armed"] });
     });
     await joveen.locator(".measure--ms").first().evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
     await expect.poll(() => page.evaluate(() => (window as unknown as { fills: Animation[] }).fills.filter(Boolean).length)).toBe(2);
