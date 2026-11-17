@@ -60,7 +60,7 @@ test.describe("Work archive: the catalogue", () => {
       } else {
         await expect(panel).toHaveAttribute("href", (project.links.live ?? project.links.code)!);
         await expect(panel).toHaveAttribute("target", "_blank");
-        await expect(panel).toHaveClass(/panel--paper/);
+        await expect(panel).toHaveClass(/surface--paper/);
         await expect(panel.locator(".project__meta")).toContainText("↗");
         await expect(panel).toHaveAccessibleName(/opens .+ in a new tab/);
       }
@@ -68,7 +68,7 @@ test.describe("Work archive: the catalogue", () => {
   });
 
   test("every panel casts its own colour; in dark a project with a case study also glows in it", async ({ page }) => {
-    const shadows = () => panels(page).evaluateAll((all) => all.map((panel) => [panel.classList.contains("panel--glow"), getComputedStyle(panel).boxShadow] as const));
+    const shadows = () => panels(page).evaluateAll((all) => all.map((panel) => [panel.classList.contains("surface--glow"), getComputedStyle(panel).boxShadow] as const));
     // The glow is the last layer, its colour transparent in light and on a panel without one, so it draws nothing there.
     const unlit = /rgba\([^)]*, 0\) 0px 50px 90px -56px$/;
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });

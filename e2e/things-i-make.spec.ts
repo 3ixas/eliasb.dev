@@ -94,7 +94,7 @@ test.describe("Things I make", () => {
     await page.reload();
     for (const shadow of await shadows()) expect(shadow).not.toMatch(unlit);
     // A bright field (its ink darker than it) takes the stronger rim in dark, as on every panel (parts.css).
-    const rims = await panels(page).evaluateAll((all) => all.map((panel) => [panel.classList.contains("panel--dark-ink"), getComputedStyle(panel, "::after").boxShadow] as const));
+    const rims = await panels(page).evaluateAll((all) => all.map((panel) => [panel.classList.contains("surface--bright"), getComputedStyle(panel, "::after").boxShadow] as const));
     expect(rims.filter(([bright]) => bright).length).toBeGreaterThan(0);
     for (const [bright, edges] of rims) if (bright) expect(edges).toContain("rgba(255, 255, 255, 0.42) 0px 0px 0px 1px inset");
   });

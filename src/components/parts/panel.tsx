@@ -19,8 +19,8 @@ type PanelProps = {
  */
 export function panelSurface(colours: PanelColours | undefined, { glow = false }: { glow?: boolean } = {}) {
   const style = colours ? ({ "--field": colours.field, "--panel-ink": colours.ink } as CSSProperties) : undefined;
-  const kind = colours ? (luminance(colours.ink) < luminance(colours.field) ? "panel--dark-ink" : null) : "panel--paper";
-  return { className: ["panel", kind, glow ? "panel--glow" : null].filter(Boolean).join(" "), style };
+  const kind = colours ? (luminance(colours.ink) < luminance(colours.field) ? "surface--bright" : null) : "surface--paper";
+  return { className: ["panel surface", kind, glow ? "surface--glow" : null].filter(Boolean).join(" "), style };
 }
 
 /** The block that holds one subject (DESIGN.md "The panel"; GLOSSARY.md, Panel). Styles are in parts.css. */
