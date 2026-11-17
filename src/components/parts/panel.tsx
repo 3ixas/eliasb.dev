@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import type { PanelColours } from "@/content/stretch/story";
+import { luminance, type PanelColours } from "@/content/stretch/story";
 
 type PanelProps = {
   /** The subject's field and ink, kept in both themes; without them the panel is paper and follows the theme. */
@@ -12,12 +12,22 @@ type PanelProps = {
   children: ReactNode;
 } & Omit<React.HTMLAttributes<HTMLElement>, "className" | "children" | "style">;
 
+/**
+ * A panel's surface, for every element that draws one (Panel, ProjectPanel, NextPanel): its classes and its colours.
+ * Without colours it is paper and follows the theme. A field whose ink is darker than it is bright: parts.css never
+ * deepens its foot and gives it the stronger dark rim. `glow` is a project's glow in its own colour in the dark theme.
+ */
+export function panelSurface(colours: PanelColours | undefined, { glow = false }: { glow?: boolean } = {}) {
+  const style = colours ? ({ "--field": colours.field, "--panel-ink": colours.ink } as CSSProperties) : undefined;
+  const kind = colours ? (luminance(colours.ink) < luminance(colours.field) ? "surface--bright" : null) : "surface--paper";
+  return { className: ["panel surface", kind, glow ? "surface--glow" : null].filter(Boolean).join(" "), style };
+}
+
 /** The block that holds one subject (DESIGN.md "The panel"; GLOSSARY.md, Panel). Styles are in parts.css. */
 export function Panel({ colours, glow = false, as: Tag = "div", className, children, ...rest }: PanelProps) {
-  const style = colours ? ({ "--field": colours.field, "--panel-ink": colours.ink } as CSSProperties) : undefined;
-  const classes = ["panel", colours ? null : "panel--paper", glow ? "panel--glow" : null, className].filter(Boolean).join(" ");
+  const surface = panelSurface(colours, { glow });
   return (
-    <Tag className={classes} style={style} {...rest}>
+    <Tag className={className ? `${surface.className} ${className}` : surface.className} style={surface.style} {...rest}>
       {children}
     </Tag>
   );

@@ -43,40 +43,84 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-/* ---- The panel (R-04) ---- */
+/* ---- The surface (#458, #476) ---- */
 
-.panel {
+/*
+ * Every panel and card is lit from above, in both themes. Its edges catch the light, a highlight along the top inside
+ * and a shade along the bottom, over an exact 1 px edge (in light its own ink; in dark a faint white rim, so a field
+ * with dark ink keeps its edge on the dark page); its field is a touch lighter at the top and deeper at the foot; and
+ * it sits on the page with a close contact shadow and a soft, wide one tinted by its own field, so a green panel casts
+ * green, not grey. In dark the shadows are black and deeper.
+ *
+ * Whatever wears it tunes the knobs, never the shadows: --rim (the dark rim), --edge (the light one), --cast (the tinted
+ * shadow), --lit and --foot (the field at its top and foot), --glow (a project's colour in the dark).
+ */
+.surface {
   --field: var(--paper);
   --panel-ink: var(--ink);
-  --line: color-mix(in srgb, var(--panel-ink) 30%, transparent);
+  --rim: rgb(255 255 255 / 0.16);
+  --edge: color-mix(in srgb, var(--panel-ink) 9%, transparent);
+  --cast: light-dark(color-mix(in srgb, var(--field) 42%, transparent), rgb(0 0 0 / 0.55));
+  --lit: light-dark(color-mix(in srgb, var(--field), #fff 5%), color-mix(in srgb, var(--field), #fff 7%));
+  --foot: color-mix(in srgb, var(--field), #000 8%);
+  --glow: transparent;
   position: relative;
   isolation: isolate;
-  overflow: hidden;
-  padding: 44px;
-  border-radius: 28px;
-  background: var(--field);
+  background-color: var(--field);
+  background-image: linear-gradient(180deg, var(--lit) 0%, var(--field) 55%, var(--foot) 100%);
   color: var(--panel-ink);
+  box-shadow:
+    0 1px 2px light-dark(rgb(20 20 18 / 0.08), rgb(0 0 0 / 0.5)),
+    0 6px 14px -6px var(--cast),
+    0 28px 56px -28px var(--cast),
+    0 50px 90px -56px var(--glow);
 }
 
-/* The 1 px lighter top edge, inside the curve. */
-.panel::after {
+/* The edges sit over whatever fills the surface, so an image to its edge still has them. */
+.surface::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18);
+  box-shadow:
+    inset 0 1px 0 light-dark(rgb(255 255 255 / 0.36), rgb(255 255 255 / 0.3)),
+    inset 0 -1px 0 rgb(0 0 0 / 0.14),
+    inset 0 0 0 1px light-dark(var(--edge), var(--rim));
   pointer-events: none;
 }
 
-/* A panel that follows the theme: paper, with a hairline so it holds its edge on the page in both themes. */
-.panel--paper {
-  --line: var(--hair);
-  box-shadow: inset 0 0 0 1px var(--hair);
+/* ---- The panel (R-04): a surface in a panel's shape ---- */
+
+.panel {
+  --line: color-mix(in srgb, var(--panel-ink) 30%, transparent);
+  overflow: hidden;
+  padding: 44px;
+  border-radius: 28px;
 }
 
-/* In the dark theme a project's panel glows in its own colour; in light it has no depth at all. */
-.panel--glow {
-  box-shadow: 0 50px 90px -56px light-dark(transparent, color-mix(in srgb, var(--field) 70%, transparent));
+/* ---- A surface's kinds (after the panel, so paper's --line wins over the panel's) ---- */
+
+/*
+ * A field whose ink is darker than it (panelSurface marks it) is a bright field: never deepened at its foot, where its text
+ * would fall under AA (BNP Paribas: 4.46:1), and given a stronger dark rim, since a faint one vanishes on it.
+ */
+.surface--bright {
+  --foot: var(--field);
+  --rim: rgb(255 255 255 / 0.42);
+}
+
+/* A surface that follows the theme: paper, its edge the page's hairline in both themes and its shadow neutral, not paper-white. */
+.surface--paper {
+  --line: var(--hair);
+  --edge: var(--hair);
+  --rim: var(--hair);
+  --cast: light-dark(rgb(20 20 18 / 0.12), rgb(0 0 0 / 0.55));
+  --foot: light-dark(color-mix(in srgb, var(--field), #000 3%), color-mix(in srgb, var(--field), #000 8%));
+}
+
+/* In the dark theme a project's panel glows in its own colour as well. */
+.surface--glow {
+  --glow: light-dark(transparent, color-mix(in srgb, var(--field) 70%, transparent));
 }
 
 .panel__head {
@@ -625,8 +669,13 @@
   }
 }
 
-/* Forced colours keep the data: before in the text colour, after in the highlight, the scales in grey (R-29). */
+/* Forced colours keep the data: before in the text colour, after in the highlight, the scales in grey (R-29). Shadows are dropped there, so a surface keeps its edge as an outline. */
 @media (forced-colors: active) {
+  .surface {
+    outline: 1px solid CanvasText;
+    outline-offset: -1px;
+  }
+
   .bar,
   .measure {
     forced-color-adjust: none;

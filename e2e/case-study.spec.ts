@@ -108,7 +108,7 @@ for (const slug of caseStudySlugs) {
       }
     });
 
-    test("the PRD is a paper card with a cobalt rule: the quote in Newsreader, then its source and date", async ({ page }) => {
+    test("the PRD is a lit paper card with a cobalt rule: the quote in Newsreader, then its source and date", async ({ page }) => {
       const card = page.locator("section#written-down-first figure.prd");
       await expect(card).toHaveCount(1);
       await expect(card).toHaveCSS("border-top-width", "2px");
@@ -120,6 +120,9 @@ for (const slug of caseStudySlugs) {
         return colour;
       });
       await expect(card).toHaveCSS("border-top-color", cobalt);
+      // A paper surface (#476): lit from above, its edge the hairline, over a neutral shadow.
+      await expect(card).toHaveClass(/\bsurface surface--paper\b/);
+      await expect(card).toHaveCSS("box-shadow", /0px 6px 14px -6px/);
       await expect(card.locator("blockquote")).toHaveText(`“${study.prd.quote}”`);
       await expect(card.locator("blockquote")).toHaveCSS("font-family", /Newsreader/);
       for (const around of [study.prd.lead, study.prd.after]) if (around) await expect(card).toContainText(around);

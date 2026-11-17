@@ -66,7 +66,7 @@ function Drawn({ proof }: { proof: BeatProof }) {
 function Card({ beat }: { beat: Beat }) {
   return (
     <li>
-      <OnView motion="rise" className="card">
+      <OnView motion="rise" className="card surface surface--paper">
         <h3>{beat.habit}</h3>
         <p>
           <Highlighted story={beat.proof} phrase={beat.highlight} />

@@ -17,6 +17,10 @@ _Avoid_: Board, a playful theme of props (its play comes from scale, colour and 
 The block that holds one subject in the passes and panels direction, Elias's approved redesign ([#409](https://github.com/3ixas/eliasb.dev/issues/409); `docs/design/DESIGN.md`). It is sized by how much the subject matters, takes the subject's own field and ink (an **Employer colour** or **Project colour**) or paper that follows the theme, and carries its proof on its face: a display figure, a chart, bars to scale or a screenshot. BNP Paribas's is the largest. A panel never carries a **Staff pass**'s furniture ("Valid · present", a barcode).
 _Avoid_: Card (a card sits inside a panel), tile, section
 
+**Surface**:
+The light every **Panel** and card is drawn in ([#476](https://github.com/3ixas/eliasb.dev/issues/476); `parts.css` `.surface`): lit from above, with edges that catch the light and a shadow tinted by its own field. A panel is a surface in a panel's shape; How I work's cards are paper surfaces. A surface tunes its knobs, never its own shadows.
+_Avoid_: Elevation, shadow (one layer of it), material (the **Staff pass**'s own)
+
 **Dock**:
 Retired ([#302](https://github.com/3ixas/eliasb.dev/issues/302)). It was a compact **Closer look** fixed at the bottom of a phone screen. On phones a closer look now opens inline, under the row or paragraph that was tapped, and only when tapped.
 _Avoid_: Bottom sheet, drawer, a closer look that appears as the page scrolls

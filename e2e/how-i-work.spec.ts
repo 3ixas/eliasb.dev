@@ -29,7 +29,7 @@ test.describe("Where I'm headed", () => {
     const order = await page.locator("#main-content > section").evaluateAll((all) => all.map((section) => section.id || section.getAttribute("aria-labelledby")));
     expect(order.indexOf("headed-heading")).toBe(order.indexOf("work") + 1);
     await expect(headed(page).getByRole("heading", { level: 2 })).toHaveText(work.headed.heading);
-    await expect(headed(page).locator(".panel--paper")).toHaveCount(1);
+    await expect(headed(page).locator(".surface--paper")).toHaveCount(1);
     await expect(headed(page).locator(".headed__lead p")).toHaveText(work.headed.line);
     const parts = headed(page).locator(".headed__parts > li");
     await expect(parts).toHaveCount(3);
@@ -67,6 +67,9 @@ test.describe("How I work", () => {
       await expect(card.locator("p")).toHaveText(beat.proof);
       await expect(card.locator("mark")).toHaveText(beat.highlight);
       await expect(card.locator(".card__proof")).toBeVisible();
+      // A paper surface (#476): lit from above, its edge the hairline, over a neutral shadow.
+      await expect(card).toHaveClass(/\bsurface surface--paper\b/);
+      await expect(card).toHaveCSS("box-shadow", /0px 6px 14px -6px/);
     }
   });
 

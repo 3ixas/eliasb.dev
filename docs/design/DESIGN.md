@@ -31,13 +31,12 @@ A change that breaks one needs Elias's decision, not a judgement in review.
 
 | Part | Spec |
 |---|---|
-| Shape | 28 px radius (22 px under 720 px); a 1 px lighter top edge inside; contents clipped |
+| Shape | 28 px radius (22 px under 720 px); contents clipped |
 | Field and ink | The subject's own colour and its ink, or paper and ink for a panel that follows the theme |
 | Header | The name at the left (`clamp(30px, 3vw, 42px)`, Newsreader); role and dates at the right in 14.5 px, two lines, where there are any. A Work panel puts them under the name instead (see "The homepage, in order") |
 | Padding | 40 to 44 px (26 × 22 px under 720 px) |
 | Inside | Cards, figures and tiles take a 16 px radius; images 12 px; pills are fully round |
-| Depth | Allowed in both themes where it makes a panel read as a made object: light from above, edges that catch it, a shadow tinted by the panel's own colour (Elias retired "no depth in light" on 17 November 2026). It never costs AA. In dark a project panel also glows in its own colour (`0 50px 90px -56px`, the field at 70%) |
-| Work panels ([#458](https://github.com/3ixas/eliasb.dev/issues/458)) | A card lit from above, in both themes. A 1 px highlight along the top inside edge and a 1 px shade along the bottom, over an exact 1 px edge (the panel's ink in light; in dark a white rim at 16%, 42% on BNP Paribas's bright green so it reads as the others do); a close contact shadow and a soft, wide one tinted by the panel's own field (black in dark). Joveen's and Optegra's fields are a touch lighter at the top and deeper at the foot; BNP Paribas keeps its own lift and is never deepened, where its dark ink would fall under AA. Text is AA at every point of every field |
+| Depth ([#458](https://github.com/3ixas/eliasb.dev/issues/458), [#476](https://github.com/3ixas/eliasb.dev/issues/476)) | Every panel and card is a surface lit from above (`.surface`), in both themes (Elias retired "no depth in light" on 17 November 2026). A 1 px highlight along the top inside edge and a 1 px shade along the bottom, over an exact 1 px edge: the panel's ink at 9% in light (paper's hairline on paper); in dark a white rim at 16%, 42% on a bright field so it still reads. A close contact shadow and a soft, wide one tinted by the panel's own field (neutral on paper, black in dark). The field runs a touch lighter at the top and deeper at the foot. A bright field (its ink darker than it: BNP Paribas, Threshold, Argus Risk) is never deepened, where its ink would fall under AA. Text is AA at every point of every field. In dark a project panel also glows in its own colour (`0 50px 90px -56px`, the field at 70%). In forced colours the shadows give way to a 1 px outline. A surface tunes its knobs (`--rim`, `--edge`, `--cast`, `--lit`, `--foot`, `--glow` in `parts.css`), never its own shadows. How I work's cards and a case study's PRD card are paper surfaces; cells and tiles inside a panel stay flat |
 
 Pass furniture ("Valid · present", "Returned", a barcode) never appears on a panel.
 

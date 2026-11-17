@@ -45,7 +45,7 @@ test.describe("Off the clock: on the homepage", () => {
     const section = page.locator("section#off-the-clock");
     await expect(section.getByRole("heading", { level: 2 })).toHaveText(offTheClock.heading);
     const panel = section.locator(".otc");
-    await expect(panel).toHaveClass(/panel--paper/);
+    await expect(panel).toHaveClass(/surface--paper/);
     expect(await bands(panel)).toEqual(sections);
     await expect(cell(panel, "training").getByRole("heading", { level: 3 })).toHaveText(offTheClock.training.title);
     await expect(cell(panel, "shelf").getByRole("heading", { level: 3 })).toHaveText(offTheClock.shelf.title);

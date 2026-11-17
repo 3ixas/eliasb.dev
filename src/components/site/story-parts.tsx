@@ -1,7 +1,7 @@
 import Link from "next/link";
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Count } from "@/components/parts/on-view";
-import { Arrow } from "@/components/parts/panel";
+import { Arrow, panelSurface } from "@/components/parts/panel";
 import { Arrowed } from "@/components/site/long-form";
 import { ZoomableImage } from "@/components/site/zoomable-image";
 import type { EvidenceItem, PanelColours, StorySectionBody } from "@/content/stretch/story";
@@ -95,10 +95,10 @@ export function StoryImage({ id, src, alt, width, height, caption }: { id?: stri
 
 /** The page's end before Say hello: the next page as a panel in its own colour, its label and line at the left and its name large at the right. */
 export function NextPanel({ label, href, name, line, colours }: { label: string; href: string; name: string; line: string; colours: PanelColours }) {
-  const style = { "--field": colours.field, "--panel-ink": colours.ink } as CSSProperties;
+  const surface = panelSurface(colours);
   return (
     <nav className="frame story-next" aria-label={label}>
-      <Link className="panel next-panel" href={href} style={style}>
+      <Link className={`${surface.className} next-panel`} href={href} style={surface.style}>
         <span className="next-panel__line">
           <span>{label}</span> <span>{line}</span>
         </span>

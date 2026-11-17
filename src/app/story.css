@@ -231,9 +231,8 @@
   margin: 0;
   padding: 36px 40px;
   border-top: 2px solid var(--cobalt);
+  /* A paper surface (parts.css): lit from above, its edge the hairline, a neutral shadow. */
   border-radius: 16px;
-  background: var(--paper);
-  box-shadow: inset 0 0 0 1px var(--hair);
 }
 
 .prd__quote {
@@ -374,8 +373,6 @@
   --solid: var(--panel-ink);
   padding: 32px 36px 36px;
   border-radius: 16px;
-  /* In dark a hairline of the panel's ink holds its edge, as on Work's panels. */
-  box-shadow: inset 0 0 0 1px light-dark(transparent, color-mix(in srgb, var(--panel-ink) 14%, transparent));
 }
 
 /* The flag: today's path solid, the new one dashed behind a switch that is off. */

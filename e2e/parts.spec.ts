@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { roleStories, roleStorySlugs } from "../src/content/stretch/role-stories";
 import { featuredSlugs, projects } from "../src/content/projects";
+import { luminance } from "../src/content/stretch/story";
 import { renderedContrast } from "./support/rendered-contrast";
 import { shown } from "./support/roll";
 
@@ -37,7 +38,7 @@ const style = (target: Locator, ...properties: string[]) =>
   }, properties);
 
 test.describe("The panel", () => {
-  test("has its radius, padding and lighter top edge at this width, in its field and ink", async ({ page }) => {
+  test("has its radius and padding at this width, in its field and ink", async ({ page }) => {
     await page.goto(fixture);
     for (const [slug, { field, ink }] of fields) {
       const panel = page.locator(`[data-panel="${slug}"]`);
@@ -48,8 +49,30 @@ test.describe("The panel", () => {
         "background-color": rgb(field),
         color: rgb(ink),
       });
-      const edge = await panel.evaluate((element) => getComputedStyle(element, "::after").boxShadow);
-      expect(edge, `${slug}'s top edge`).toBe("rgba(255, 255, 255, 0.18) 0px 1px 0px 0px inset");
+    }
+  });
+
+  // Depth (#458, #476): every panel is lit from above, with a rim, and casts a shadow tinted by its own field.
+  test("every panel is lit from above: a top highlight, a foot shade and a rim over a tinted shadow", async ({ page }, testInfo) => {
+    await page.goto(fixture);
+    const dark = testInfo.project.name.endsWith("-dark");
+    for (const [slug, { field, ink }] of fields) {
+      const panel = page.locator(`[data-panel="${slug}"]`);
+      const edges = await panel.evaluate((element) => getComputedStyle(element, "::after").boxShadow);
+      expect(edges, `${slug}'s top highlight`).toContain(dark ? "rgba(255, 255, 255, 0.3) 0px 1px 0px 0px inset" : "rgba(255, 255, 255, 0.36) 0px 1px 0px 0px inset");
+      expect(edges, `${slug}'s foot shade`).toContain("rgba(0, 0, 0, 0.14) 0px -1px 0px 0px inset");
+      // In dark, a bright field (its ink darker than it) takes the stronger rim; in light, the rim is its own ink.
+      const bright = luminance(ink) < luminance(field);
+      if (dark) expect(edges, `${slug}'s rim`).toContain(`rgba(255, 255, 255, ${bright ? "0.42" : "0.16"}) 0px 0px 0px 1px inset`);
+      else expect(edges, `${slug}'s rim`).toMatch(/0px 0px 0px 1px inset$/);
+      const cast = (await style(panel, "box-shadow"))["box-shadow"];
+      expect(cast, `${slug}'s shadows`).toMatch(/0px 6px 14px -6px.*0px 28px 56px -28px/);
+      if (dark) expect(cast, `${slug}'s shadow in dark`).toContain("rgba(0, 0, 0, 0.55) 0px 6px 14px -6px");
+      else expect(cast, `${slug}'s shadow in its own colour`).not.toContain("rgba(0, 0, 0, 0.55)");
+      // Lighter at the top; deeper at the foot only where its ink is light, so its text keeps AA there.
+      const image = (await style(panel, "background-image"))["background-image"];
+      expect(image, `${slug}'s field`).toMatch(/^linear-gradient/);
+      expect(image.endsWith(`${rgb(field)} 100%)`), `${slug}'s foot is its field`).toBe(bright);
     }
   });
 
@@ -69,10 +92,11 @@ test.describe("The panel", () => {
     const paper = await style(page.locator('[data-panel="paper"]'), "background-color", "box-shadow");
     const dark = testInfo.project.name.endsWith("-dark");
     expect(paper["background-color"]).toBe(dark ? "rgb(25, 25, 28)" : "rgb(251, 251, 249)");
-    expect(paper["box-shadow"]).toContain("inset");
+    const hair = dark ? "rgba(240, 239, 235, 0.16)" : "rgba(20, 20, 22, 0.14)";
+    expect(await page.locator('[data-panel="paper"]').evaluate((element) => getComputedStyle(element, "::after").boxShadow)).toContain(`${hair} 0px 0px 0px 1px inset`);
     const glow = (await style(page.locator('[data-panel="threshold"]'), "box-shadow"))["box-shadow"];
-    if (dark) expect(glow).toMatch(/0px 50px 90px -56px/);
-    else expect(glow).toMatch(/^(none|rgba\(0, 0, 0, 0\) 0px 50px 90px -56px)$/);
+    // The glow is Threshold's field at 70%, which the browser writes as a color() in sRGB.
+    expect(glow).toMatch(dark ? /color\(srgb 0\.77\d* 0\.56\d* 0\.36\d* \/ 0\.7\) 0px 50px 90px -56px$/ : /rgba\(0, 0, 0, 0\) 0px 50px 90px -56px$/);
   });
 });
 
@@ -257,14 +281,19 @@ test.describe("Arrival", () => {
     await expect(grow).toHaveAttribute("data-armed", "");
     await expect.poll(() => shown(count)).toBe("−0%");
     await expect(count.locator(".sr-only")).toHaveText("−40%");
-    // Catch the tens digit's roll as it is created and pause it there, so it cannot finish before it is read.
+    // Catch the tens digit's roll the moment it starts and pause it, so it cannot finish before it is read, however slow
+    // the runner. It starts when the last armed element around it (the figure, the panel rising with it) is let go; a
+    // mutation observer's callback runs before the next frame, where CI's WebKit does not reliably fire transitionrun
+    // (as in work.spec's fills).
     await count.locator(".roll__strip").first().evaluate((strip) => {
-      strip.addEventListener("transitionrun", (event) => {
-        if ((event as TransitionEvent).propertyName !== "transform") return;
-        const roll = strip.getAnimations()[0];
-        roll.pause();
-        (window as unknown as { roll: Animation }).roll = roll;
+      const watcher = new MutationObserver(() => {
+        const animation = strip.getAnimations().find((each) => (each as CSSTransition).transitionProperty === "transform");
+        if (!animation) return;
+        watcher.disconnect();
+        animation.pause();
+        (window as unknown as { roll: Animation }).roll = animation;
       });
+      watcher.observe(document.body, { attributes: true, attributeFilter: ["data-armed"], subtree: true });
     });
 
     await page.locator("#arrivals").evaluate((element) => element.scrollIntoView({ block: "start", behavior: "instant" }));

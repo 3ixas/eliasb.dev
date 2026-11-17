@@ -96,7 +96,7 @@ function OutLink({ href, label, outline = false }: { href: string; label: string
 function PrdCard({ study }: { study: CaseStudy }) {
   const { lead, quote, after, date } = study.prd;
   return (
-    <figure className="prd">
+    <figure className="prd surface surface--paper">
       {lead && <p className="prd__around">{lead}</p>}
       <blockquote className="prd__quote">“{quote}”</blockquote>
       {after && <p className="prd__around">{after}</p>}
