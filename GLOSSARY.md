@@ -54,7 +54,7 @@ The homepage section of four habits (start from a real problem, write it down fi
 _Avoid_: Claims of users or impact, colour fields (colour belongs to Work and Things I make)
 
 **Work**:
-The first section after the opening (R-13 to R-15): BNP Paribas's **Panel**, full width and green, with its figure, the simulation, two comparisons to scale and the link to its **Role story**; then Joveen's and Optegra's panels side by side, each with a display figure and three before-and-after pairs. Each panel carries its employer's slug as its id, which the opening's **Staff passes** link to. **Where I'm headed** follows as its own section. Employment leads, so Work comes before **Things I make** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
+The first section after the opening (R-13 to R-15): BNP Paribas's **Panel**, full width and green, with its figure, two comparisons in their own units and the link to its **Role story**, whose The role carries the pricing engines' simulation ([#457](https://github.com/3ixas/eliasb.dev/issues/457)); then Joveen's and Optegra's panels side by side, each with a display figure and three before-and-after pairs. Each panel carries its employer's slug as its id, which the opening's **Staff passes** link to. **Where I'm headed** follows as its own section. Employment leads, so Work comes before **Things I make** ([#157](https://github.com/3ixas/eliasb.dev/issues/157)).
 _Avoid_: Experience, CV, calling Elias's own projects "Work"
 
 **Staff pass**:

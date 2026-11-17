@@ -2,7 +2,6 @@ import Link from "next/link";
 import { MeasurePair, MeasureSide } from "@/components/parts/measure";
 import { OnView, Count } from "@/components/parts/on-view";
 import { Arrow, Panel, PanelHead } from "@/components/parts/panel";
-import { SimulationPlot } from "@/components/site/simulation-plot";
 import { roleStories } from "@/content/stretch/role-stories";
 import type { RoleStorySlug } from "@/content/stretch/role-story";
 import { passRecords } from "@/content/stretch/staff-pass";
@@ -24,25 +23,7 @@ function StoryLink({ slug, outline = false }: { slug: RoleStorySlug; outline?: b
   );
 }
 
-/** The simulation: its heading, the plot and its controls (simulation-plot.tsx), its description and its caption. */
-function Simulation() {
-  const { title, caption, description } = workPanels.bnp.simulation;
-  return (
-    <figure className="sim" aria-labelledby="sim-title" aria-describedby="sim-description">
-      <h4 id="sim-title" className="sim__title">
-        {title}
-      </h4>
-      <SimulationPlot />
-      {/* Read as the figure's description and shown nowhere: the caption says what the engines do, this says what is drawn. */}
-      <p id="sim-description" hidden>
-        {description}
-      </p>
-      <figcaption>{caption}</figcaption>
-    </figure>
-  );
-}
-
-/** BNP Paribas, full width and green: its figure, the simulation, two comparisons in their own units and the link to its story. */
+/** BNP Paribas, full width and green: its figure, two comparisons in their own units and the link to its story; the simulation is on its Role story (#457). */
 function BnpPanel() {
   const { slug, figure, comparisons } = workPanels.bnp;
   const story = roleStories[slug];
@@ -54,7 +35,6 @@ function BnpPanel() {
           <span className="figure__words">{figure.value}</span>
           <span className="figure__label">{figure.label}</span>
         </p>
-        <Simulation />
         <OnView motion="grow" className="work-bnp__comparisons">
           <ul>
             {comparisons.map((comparison) => {

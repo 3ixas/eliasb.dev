@@ -5,26 +5,23 @@ import { passRecords } from "../src/content/stretch/staff-pass";
 import { comparisonRow, workPanels } from "../src/content/stretch/work-panels";
 import { drawn, expectDrawn } from "./support/measure";
 import { shown } from "./support/roll";
-import { SIM, simulate, simulation } from "../src/components/site/simulation-model";
-import { simulationCopy } from "../src/content/stretch/simulation-copy";
 import { renderedContrast } from "./support/rendered-contrast";
 
 /*
  * Work (docs/design/DESIGN.md "The homepage, in order" 3 and "Figures", R-13 to R-15): the title and subheading,
- * BNP Paribas's panel with its figure, the simulation and two comparisons, then Joveen and Optegra side by side with a
+ * BNP Paribas's panel with its figure and two comparisons (its simulation is simulation.spec.ts), then Joveen and Optegra side by side with a
  * display figure and three pairs each.
  */
 
 const section = (page: Page) => page.locator("section#work");
 const slugs = ["bnp-paribas", "joveen", "optegra"] as const;
 const panel = (page: Page, slug: string) => page.locator(`#${slug}`);
-const plot = (page: Page) => page.locator(".sim__plot");
 const width = (page: Page) => page.viewportSize()?.width ?? 0;
 const boxOf = async (locator: Locator) => (await locator.boundingBox())!;
 const settled = (page: Page) => page.evaluate(() => document.fonts.ready.then(() => true));
 const hydrated = (page: Page) =>
   page.waitForFunction(() => {
-    const element = document.querySelector(".sim__plot");
+    const element = document.querySelector("#joveen .roll");
     return !!element && Object.keys(element).some((key) => key.startsWith("__reactProps$"));
   });
 
@@ -61,11 +58,12 @@ test.describe("Work: the panels", () => {
     }
   });
 
-  test("BNP Paribas's panel holds one display figure, one chart and two comparisons, and nothing else at display size but the employer's name", async ({ page }) => {
+  test("BNP Paribas's panel holds one display figure and two comparisons, and nothing else at display size but the employer's name", async ({ page }) => {
     const bnp = panel(page, "bnp-paribas");
     await expect(bnp.locator(".figure__words")).toHaveText(workPanels.bnp.figure.value);
     await expect(bnp.locator(".figure__label")).toHaveText(workPanels.bnp.figure.label);
-    await expect(bnp.locator("figure")).toHaveCount(1);
+    // Its simulation is on its Role story (#457).
+    await expect(bnp.locator("figure")).toHaveCount(0);
     await expect(bnp.locator(".work-bnp__comparisons li")).toHaveCount(2);
     const display = await bnp.evaluate((element) =>
       [...element.querySelectorAll("*")].filter((node) => node.childElementCount === 0 && node.textContent?.trim() && !node.matches(".panel__name") && parseFloat(getComputedStyle(node).fontSize) >= 32).map((node) => node.textContent),
@@ -113,53 +111,12 @@ test.describe("Work: the panels", () => {
     }
   });
 
-  test("the simulation: its bins sum to the number of paths, the price line sits at the mean of the endpoints, and it says it is illustrative", async ({ page }) => {
-    const sim = page.locator(".sim");
-    await expect(sim).toHaveAccessibleDescription(/^Illustrative simulated paths/);
-    await expect(sim.locator("figcaption")).toHaveText(workPanels.bnp.simulation.caption);
-    await expect(sim.locator(".sim__price")).toHaveText(workPanels.bnp.simulation.price);
-    await expect(sim.locator(".sim__x")).toHaveText([workPanels.bnp.simulation.start, workPanels.bnp.simulation.end]);
-    await sim.scrollIntoViewIfNeeded();
-    await expect(plot(page)).toHaveAttribute("data-drawn", String(SIM.paths));
-    const { mean } = simulation();
-    const reading = await plot(page).evaluate((element, at) => {
-      const box = element.getBoundingClientRect();
-      const line = element.querySelector(".sim__price")!.getBoundingClientRect();
-      const canvas = element.querySelector<HTMLCanvasElement>(".sim__paths")!;
-      const pixels = canvas.getContext("2d")!.getImageData(0, 0, canvas.width, canvas.height).data;
-      let painted = 0;
-      for (let index = 3; index < pixels.length; index += 4) if (pixels[index] > 0) painted += 1;
-      return {
-        bins: [...element.querySelectorAll<HTMLElement>(".sim__bin")].map((bin) => [Number(bin.dataset.count), bin.querySelectorAll("i").length]),
-        offset: Math.abs(line.top - (box.top + at * box.height)),
-        painted: painted / (canvas.width * canvas.height),
-      };
-    }, mean);
-    // Each endpoint is one dot in its band (a hundred walks is one a dot), and the bands hold every walk.
-    for (const [count, dots] of reading.bins) expect(dots).toBe(count);
-    expect(reading.bins.reduce((sum, [count]) => sum + count, 0)).toBe(SIM.paths);
-    expect(reading.offset).toBeLessThan(1.5);
-    // The walks are painted: a cloud, not an empty canvas.
-    expect(reading.painted).toBeGreaterThan(0.05);
-  });
-
-  test("the simulation's walks are painted only when it comes into view, and are not in the server's HTML", async ({ page }) => {
-    const html = await (await page.request.get("/")).text();
-    expect(html).toMatch(/<canvas class="sim__paths"[^>]*><\/canvas>/);
-    await page.setViewportSize({ width: width(page), height: 700 });
-    await page.goto("/");
-    await hydrated(page);
-    await expect(plot(page)).not.toHaveAttribute("data-drawn");
-    await page.locator(".sim").scrollIntoViewIfNeeded();
-    await expect(plot(page)).toHaveAttribute("data-drawn", String(SIM.paths));
-  });
-
   test("without script every panel's text, the histogram and the price line are there", async ({ page }) => {
     await page.route("**/*.js", (route) => route.abort());
     await page.reload();
     for (const slug of slugs) await expect(panel(page, slug)).toBeVisible();
-    await expect(page.locator(".sim__bin")).toHaveCount(17);
-    await expect(page.locator(".sim__price")).toBeVisible();
+    // The simulation is on BNP Paribas's Role story, not the homepage (#457).
+    await expect(page.locator(".sim")).toHaveCount(0);
     for (const { pairs } of workPanels.roles) for (const pair of pairs) await expect(section(page)).toContainText(pair.value);
   });
 
@@ -219,13 +176,11 @@ test.describe("Work: the panels", () => {
       await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
       await page.reload();
       await settled(page);
-      await page.locator(".sim").scrollIntoViewIfNeeded();
-      await expect(plot(page)).toHaveAttribute("data-drawn", String(SIM.paths));
       // The axis labels are hidden from assistive technology, which the measure skips, so they are measured with it shown.
       await page.evaluate(() => document.querySelectorAll("#work .panel [aria-hidden='true']").forEach((element) => element.removeAttribute("aria-hidden")));
       const texts = await section(page).evaluate((element) => [...element.querySelectorAll(".work__subheading, .panel")].map((part) => (part as HTMLElement).innerText).join("\n"));
       const readings = (await renderedContrast(page)).filter((reading) => texts.includes(reading.text));
-      for (const expected of [workPanels.subheading.slice(0, 20), "Six months", "One price", "Horizon", "Key API p95", "Consultation", "The Optegra story"]) {
+      for (const expected of [workPanels.subheading.slice(0, 20), "Six months", "Key API p95", "Consultation", "The Optegra story"]) {
         expect(readings.some((reading) => reading.text.includes(expected)), expected).toBe(true);
       }
       expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);
@@ -248,17 +203,13 @@ test.describe("Work: arriving", () => {
     await hydrated(page);
   });
 
-  test("below the fold the figures wait at their start, the bars and the simulation are armed, and each arrives once in view", async ({ page }) => {
+  test("below the fold the figures wait at their start, the bars are armed, and each arrives once in view", async ({ page }) => {
     const joveen = panel(page, "joveen");
     await expect.poll(() => shown(joveen.locator(".figure__value"))).toBe("−0%");
     await expect.poll(() => shown(panel(page, "optegra").locator(".figure__value"))).toBe("62%");
     // A screen reader is read the value, never the start.
     await expect(joveen.locator(".figure__value .sr-only")).toHaveText("−40%");
-    await expect(plot(page)).toHaveAttribute("data-armed", "");
     await expect(joveen.locator("[data-grow]")).toHaveAttribute("data-armed", "");
-    // The simulation's arrival is stepped by the clock in its own test below.
-    await page.locator(".sim").scrollIntoViewIfNeeded();
-    await expect(plot(page)).toHaveAttribute("data-arrived");
     await joveen.scrollIntoViewIfNeeded();
     await expect(joveen.locator("[data-grow]")).not.toHaveAttribute("data-armed", "");
     await expect(joveen.locator(".roll")).not.toHaveAttribute("data-armed", "");
@@ -319,135 +270,16 @@ test.describe("Work: arriving", () => {
     expect(delays[1][0]).toBeGreaterThan(delays[0][0]);
   });
 
-  test("the simulation arrives walk by walk over 1.6 s: each endpoint lands as a dot, and the price follows the mean so far and settles on the run's", async ({ page }) => {
-    await page.clock.install();
-    await page.goto("/");
-    await hydrated(page);
-    // Hold the clock still, so only runFor moves the arrival.
-    await page.clock.pauseAt(new Date(Date.now() + 60_000));
-    const landed = page.locator(".sim__bin i[data-landed]");
-    const at = () => page.locator(".sim__price").evaluate((element) => Number((element as HTMLElement).style.getPropertyValue("--at")));
-    await expect(plot(page)).toHaveAttribute("data-armed", "");
-    await expect(landed).toHaveCount(0);
-    await page.locator(".sim").scrollIntoViewIfNeeded();
-    // Step the clock a frame at a time until the first walk is in, then halfway: nothing is waited out.
-    await expect.poll(async () => {
-      await page.clock.runFor(16);
-      return plot(page).getAttribute("data-arrived");
-    }).not.toBeNull();
-    await page.clock.runFor(SIM.arrival / 2);
-    // Read in one go, so no frame falls between the count, the dots and the price.
-    const state = await plot(page).evaluate((element) => ({
-      arrived: Number(element.getAttribute("data-arrived")),
-      landed: element.querySelectorAll(".sim__bin i[data-landed]").length,
-      at: Number(element.querySelector<HTMLElement>(".sim__price")!.style.getPropertyValue("--at")),
-    }));
-    expect(state.arrived).toBeGreaterThan(SIM.paths * 0.35);
-    expect(state.arrived).toBeLessThan(SIM.paths * 0.75);
-    expect(state.landed).toBe(state.arrived);
-    const { ends, mean } = simulation();
-    expect(state.at).toBeCloseTo(ends.slice(0, state.arrived).reduce((sum, end) => sum + end, 0) / state.arrived / SIM.height, 9);
-    await page.clock.runFor(SIM.arrival);
-    await expect(plot(page)).toHaveAttribute("data-drawn", String(SIM.paths));
-    await expect(plot(page)).not.toHaveAttribute("data-armed");
-    await expect(landed).toHaveCount(SIM.paths);
-    expect(await at()).toBeCloseTo(mean, 9);
-  });
-});
-
-test.describe("Work: the simulation's controls", () => {
-  const step = (page: Page, label: string) => page.locator(".sim__step", { hasText: new RegExp(`^${label}$`) });
-  const again = (page: Page) => page.getByRole("button", { name: simulationCopy.again });
-  const settled = (page: Page, count: number) => expect(plot(page)).toHaveAttribute("data-drawn", String(count));
-
-  test.beforeEach(async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/");
-    await hydrated(page);
-    await page.locator(".sim").scrollIntoViewIfNeeded();
-    await settled(page, SIM.paths);
-  });
-
-  test("Paths sets 10, 100 or 1,000 walks, reports which is pressed, and tells a screen reader the run's paths and price", async ({ page }) => {
-    await expect(page.getByRole("group", { name: simulationCopy.paths }).getByRole("button")).toHaveText(["10", "100", "1,000"]);
-    await expect(step(page, "100")).toHaveAttribute("aria-pressed", "true");
-    for (const [label, count] of [["10", 10], ["1,000", 1000], ["100", 100]] as const) {
-      await step(page, label).click();
-      await settled(page, count);
-      await expect(step(page, label)).toHaveAttribute("aria-pressed", "true");
-      const seed = Number(await plot(page).getAttribute("data-seed"));
-      const run = simulate(seed, count);
-      const bins = await page.locator(".sim__bin").evaluateAll((elements) => elements.map((element) => Number((element as HTMLElement).dataset.count)));
-      expect(bins).toEqual(run.bins);
-      // A dot is a walk, or ten walks at a thousand, and a band with any walks shows one.
-      const per = count >= 1000 ? 10 : 1;
-      const dots = await page.locator(".sim__bin").evaluateAll((elements) => elements.map((element) => element.querySelectorAll("i").length));
-      expect(dots).toEqual(run.bins.map((walks) => Math.ceil(walks / per)));
-      await expect(page.locator(".sim [aria-live='polite']")).toHaveText(simulationCopy.settled(new Intl.NumberFormat("en-GB").format(count), run.change));
-    }
-  });
-
-  test("Run again draws a new set from a new seed, with the same number of walks, and moves the price to its mean", async ({ page }) => {
-    const before = await plot(page).getAttribute("data-seed");
-    await again(page).click();
-    await expect(plot(page)).not.toHaveAttribute("data-seed", before!);
-    await settled(page, SIM.paths);
-    const run = simulate(Number(await plot(page).getAttribute("data-seed")), SIM.paths);
-    const offset = await plot(page).evaluate((element, at) => {
-      const box = element.getBoundingClientRect();
-      return Math.abs(element.querySelector(".sim__price")!.getBoundingClientRect().top - (box.top + at * box.height));
-    }, run.mean);
-    expect(offset).toBeLessThan(1.5);
-  });
-
-  test("the controls are buttons of at least 44 px, in reading order after the plot", async ({ page }, testInfo) => {
-    // Safari moves focus to buttons with Option-Tab unless its setting says otherwise.
-    const tab = testInfo.project.name.startsWith("webkit") ? "Alt+Tab" : "Tab";
-    for (const button of [again(page), step(page, "10"), step(page, "100"), step(page, "1,000")]) {
-      const box = (await button.boundingBox())!;
-      expect(Math.min(box.width, box.height)).toBeGreaterThanOrEqual(44);
-    }
-    await again(page).focus();
-    const reached = [await page.evaluate(() => document.activeElement?.textContent)];
-    for (let index = 0; index < 3; index += 1) {
-      await page.keyboard.press(tab);
-      reached.push(await page.evaluate(() => document.activeElement?.textContent));
-    }
-    expect(reached).toEqual([simulationCopy.again, "10", "100", "1,000"]);
-  });
-
-  test("a control pressed mid-arrival starts the new run cleanly, and nothing of the old one is left", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "no-preference" });
-    await page.clock.install();
-    await page.reload();
-    await hydrated(page);
-    await page.clock.pauseAt(new Date(Date.now() + 60_000));
-    await page.locator(".sim").scrollIntoViewIfNeeded();
-    await step(page, "10").click();
-    await page.clock.runFor(SIM.arrival / 2);
-    expect(Number(await plot(page).getAttribute("data-arrived"))).toBeLessThan(10);
-    await step(page, "1,000").click();
-    await page.clock.runFor(SIM.arrival * 1.5);
-    await settled(page, 1000);
-    await expect(plot(page)).not.toHaveAttribute("data-armed");
-    const dots = page.locator(".sim__bin i");
-    await expect(page.locator(".sim__bin i[data-landed]")).toHaveCount(await dots.count());
-    expect(await page.locator(".sim__bin").evaluateAll((elements) => elements.reduce((sum, element) => sum + Number((element as HTMLElement).dataset.count), 0))).toBe(1000);
-  });
 });
 
 test.describe("Work: reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
 
-  test("everything is at its end state: the figures written, the bars full and the simulation drawn on sight with nothing armed", async ({ page }) => {
+  test("everything is at its end state: the figures written and the bars full, with nothing armed", async ({ page }) => {
     await page.goto("/");
     await hydrated(page);
     await expect(section(page).locator("[data-armed]")).toHaveCount(0);
     await expect.poll(() => shown(panel(page, "joveen").locator(".figure__value"))).toBe("−40%");
-    await page.locator(".sim").scrollIntoViewIfNeeded();
-    await expect(plot(page)).toHaveAttribute("data-drawn", String(SIM.paths));
-    await expect(plot(page)).not.toHaveAttribute("data-released", "");
-    await expect(page.locator(".sim__bin i[data-landed]")).toHaveCount(0);
   });
 });
 

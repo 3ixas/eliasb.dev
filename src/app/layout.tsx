@@ -13,6 +13,7 @@ import "./headed-how.css";
 import "./projects.css";
 import "./off-the-clock.css";
 import "./story.css";
+import "./simulation.css";
 import "./stretch-resume.css";
 
 // Self-hosted at build time by next/font, so no request goes to Google when a visitor loads a page.

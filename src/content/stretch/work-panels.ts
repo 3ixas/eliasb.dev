@@ -1,6 +1,6 @@
 /*
  * Work's panels (docs/design/DESIGN.md "The homepage, in order" 3, R-13 to R-15): BNP Paribas full width with its
- * figure, the simulation and two comparisons, then Joveen and Optegra with a display figure and three before and
+ * figure and two comparisons (its simulation is on its Role story: simulation-copy.ts), then Joveen and Optegra with a display figure and three before and
  * after pairs each, every one drawn in its own unit (`measure.ts`). The words are the passes and panels spec's, listed in docs/content/redesign-copy.md
  * ("Passes and panels · Work") and checked there by verify:copy. Every figure and every bar's amount is a fact its
  * Role story already tells, and `workPanelProblems` fails when one drifts.
@@ -8,7 +8,6 @@
  * Its runtime imports carry a .ts extension, so Node can load it directly as well as Next.
  */
 import { measureProblems, sidesOf, type Measure } from "./measure.ts";
-import { simulationCopy } from "./simulation-copy.ts";
 import { roleStories } from "./role-stories.ts";
 import type { RoleStory, RoleStorySlug } from "./role-story.ts";
 import { storyText } from "./story.ts";
@@ -36,7 +35,6 @@ export type BnpPanel = {
   /** "Six months" over "from zero C# to production code": the evidence item "Six · months from zero C# …", split after its first word. */
   figure: { value: string; label: string };
   /** `title` names what the chart shows, above it (#457), so a reader knows before the caption. */
-  simulation: typeof simulationCopy;
 
   comparisons: readonly [Comparison, Comparison];
 };
@@ -49,7 +47,6 @@ export const workPanels = {
   bnp: {
     slug: "bnp-paribas",
     figure: { value: "Six months", label: "from zero C# to production code" },
-    simulation: simulationCopy,
     comparisons: [
       { row: 0, before: { name: "An experienced engineer", value: "about two weeks" }, after: { name: "Me, new to it", value: "a couple of days" } },
       { row: 1, before: { name: "Before", value: "30–40 min" }, after: { name: "After", value: "under 5 min" } },

@@ -1,0 +1,257 @@
+/*
+ * The BNP Paribas simulation (docs/design/DESIGN.md "Figures" and "Motion", #457): on its Role story, under The role,
+ * on a panel in the employer's colour (role-story-figures.tsx; the plot and its controls are simulation-plot.tsx). The
+ * walks are a canvas; the server draws the axes, a dot per endpoint and the price line. Whatever holds it sets --soft,
+ * the dots' colour.
+ */
+
+.sim {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: 34px;
+  min-width: 0;
+  padding-block: 44px 40px;
+}
+
+/* What the chart shows, named above it as the comparisons below are (#457). */
+.sim__title {
+  margin-bottom: -10px;
+  font-family: var(--sans);
+  font-size: var(--type-ui);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+/* The plot takes the panel's width (#457), leaving room at its right for the endpoints' dots (120 px) and the price label. */
+.sim__plot {
+  --hist: 120px;
+  /* Past the dots, room for the price's label at the end of its line, so it never covers an endpoint. */
+  --label: 96px;
+  position: relative;
+  min-height: 340px;
+  margin-right: calc(var(--hist) + 12px + var(--label));
+  border-left: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.sim__paths {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* The canvas paints in its own text colour (simulation-plot.tsx), so forced colours turn the walks the text colour. */
+.sim__paths {
+  color: var(--panel-ink);
+}
+
+.sim__hist {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: var(--hist);
+  padding-left: 6px;
+}
+
+/*
+ * Each endpoint is a dot, stacked from the plot's edge in the band it ends in; the fullest band fills the width at
+ * most. A dot is a share of the width, drawn at 80% (`scale`) so neighbours stay apart. A dot is one walk, or ten
+ * when there are a thousand (`data-per`, simulation-plot.tsx), so a band never crowds.
+ */
+.sim__bin {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-height: 0;
+}
+
+.sim__bin i {
+  flex: 0 0 auto;
+  width: min(7px, calc(100% / var(--most)));
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--soft);
+  scale: 0.8;
+}
+
+.sim__bin[data-mean] i {
+  background: #fff;
+}
+
+/* The mean of the endpoints: a dashed white line across the plot and the histogram, labelled at its right. */
+.sim__price {
+  position: absolute;
+  top: calc(var(--at) * 100%);
+  left: 0;
+  right: calc(-1 * var(--hist) - 12px - var(--label));
+  border-top: 1.5px dashed rgb(255 255 255 / 0.9);
+}
+
+.sim__price b {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: #fff;
+  color: #00643f;
+  font-family: var(--sans);
+  font-size: var(--type-label);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  transform: translateY(-50%);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.18);
+}
+
+.sim__x {
+  position: absolute;
+  top: calc(100% + 8px);
+  font-size: var(--type-label);
+}
+
+.sim__x--start {
+  left: 0;
+}
+
+.sim__x--end {
+  right: 0;
+}
+
+/* The controls (#457): "Run again", then Paths as three steps in one outline, the pressed step filled with the ink. */
+.sim__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin-top: 6px;
+}
+
+.sim__steps {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-size: var(--type-ui);
+}
+
+.sim__steps > span {
+  padding-inline: 14px 8px;
+}
+
+.sim__step {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--panel-ink);
+  font: inherit;
+  font-variant-numeric: lining-nums tabular-nums;
+  cursor: pointer;
+  transition: background-color 150ms var(--out), color 150ms var(--out);
+}
+
+.sim__step[aria-pressed="true"] {
+  background: var(--panel-ink);
+  color: var(--field);
+}
+
+.sim figcaption {
+  max-width: 36em;
+  font-size: var(--type-ui);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/*
+ * Arrival, for a plot that starts below the fold (simulation-plot.tsx, #457): the script paints the walks one after
+ * another and lands each endpoint's dot (`data-landed`), sliding in from the plot's edge; "One price" appears with the
+ * first walk and follows the mean so far (`--at`), settling as the walks add up. Arming hides only what has not
+ * arrived, and nothing transitions until it does.
+ */
+.sim__plot[data-armed] .sim__bin i:not([data-landed]) {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.sim__plot[data-armed] .sim__bin i[data-landed] {
+  transition: opacity 200ms var(--out), transform 320ms var(--out);
+}
+
+.sim__plot[data-armed] .sim__price:not([data-pricing]) {
+  opacity: 0;
+}
+
+.sim__plot[data-armed] .sim__price[data-pricing] {
+  transition: opacity 200ms var(--out), top 120ms linear;
+}
+
+/* On a Role story's panel the panel's padding holds it, and its caption is in the panel's ink, not the page's muted caption colour. */
+.story-fig__panel--sim .sim {
+  padding-block: 0;
+}
+
+.story-fig__panel--sim .sim figcaption {
+  margin: 0;
+  color: inherit;
+}
+
+/* ---- Phone ---- */
+
+@media (max-width: 719.98px) {
+  .sim {
+    gap: 30px;
+    padding-block: 32px 28px;
+  }
+
+  /* On a phone the label sits above the end of its line, over the dots, rather than taking width from the walks. */
+  .sim__plot {
+    --hist: 64px;
+    --label: 0px;
+    min-height: 240px;
+  }
+
+  .sim__price b {
+    transform: translateY(calc(-100% - 6px));
+  }
+}
+
+/* Forced colours keep the data: the walks and the endpoints in the text colour, the mean and the price line in the highlight (R-29). */
+@media (forced-colors: active) {
+  .sim__bin i,
+  .sim__price {
+    forced-color-adjust: none;
+  }
+
+  .sim__bin i {
+    background: CanvasText;
+  }
+
+  .sim__bin[data-mean] i {
+    background: Highlight;
+  }
+
+  .sim__price {
+    border-top-color: Highlight;
+  }
+
+  .sim__paths {
+    color: CanvasText;
+  }
+
+  .sim__step[aria-pressed="true"] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+}

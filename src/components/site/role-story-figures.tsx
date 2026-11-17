@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { MeasureSide } from "@/components/parts/measure";
 import { OnView } from "@/components/parts/on-view";
 import { OUT, Panel } from "@/components/parts/panel";
+import { Simulation } from "@/components/site/simulation";
 import { SiteLink } from "@/components/site/site-link";
 import { columnImageSizes, StoryImage } from "@/components/site/story-parts";
 import { ZoomableImage } from "@/components/site/zoomable-image";
@@ -19,6 +20,14 @@ export function RoleStoryFigureBlock({ figure, panel }: { figure: RoleStoryFigur
       return <FlagFigure figure={figure} panel={panel} />;
     case "scale":
       return <ScaleFigure figure={figure} panel={panel} />;
+    case "simulation":
+      return (
+        <div className="story-fig">
+          <Panel colours={panel} className="story-fig__panel story-fig__panel--sim">
+            <Simulation />
+          </Panel>
+        </div>
+      );
     case "screens":
       return <ScreensFigure figure={figure} />;
     case "certificate":

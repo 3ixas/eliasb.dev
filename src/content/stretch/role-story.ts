@@ -64,6 +64,10 @@ export type RoleStoryFigure =
       caption: string;
     }
   | {
+      /** The pricing engines' simulation, which a visitor can run (#457); its words are `simulationCopy`. */
+      kind: "simulation";
+    }
+  | {
       kind: "scale";
       /** Each row is one measurement, drawn in its own unit (`content/stretch/measure.ts`), both sides to one scale. */
       rows: readonly { what: string; unit: Unit; before: ScaleBar; after: ScaleBar }[];
