@@ -41,9 +41,8 @@ const motionTransitions = [
   ['[data-grow] .measure--ms', 'a latency fills in its own time'],
   ['[data-grow] :is(.measure--days', 'working days arrive a square at a time, minutes a tick at a time'],
   ['.project__shot', "a project's screenshot lifts on hover (DESIGN.md \"Motion\")"],
-  ['.sim__plot[data-released] .sim__paths', "the simulation's paths draw from the left"],
-  ['.sim__plot[data-released] .sim__bin', "the simulation's histogram grows"],
-  ['.sim__plot[data-released] .sim__price', "the simulation's price line appears last"],
+  ['.sim__plot[data-armed] .sim__bin i[data-landed]', "the simulation's endpoints land as dots"],
+  ['.sim__plot[data-armed] .sim__price[data-pricing]', "the simulation's price follows the mean so far and settles"],
   [':root[data-theme-changing]', 'the theme changes'],
 ];
 

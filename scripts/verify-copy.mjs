@@ -28,6 +28,7 @@ import { opening } from "../src/content/stretch/opening.ts";
 import { notFound, sayHello, siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy.ts";
 import { headedProblems, shownSource, work } from "../src/content/stretch/work.ts";
 import { comparisonRow, workPanelProblems, workPanels } from "../src/content/stretch/work-panels.ts";
+import { simulationCopy } from "../src/content/stretch/simulation-copy.ts";
 
 const raw = readFileSync(new URL("../docs/content/redesign-copy.md", import.meta.url), "utf8");
 // Emphasis stars and the {braces} around live values are markup, not words.
@@ -43,6 +44,7 @@ const leaves = (value, path = "") => {
   return [];
 };
 const modules = {
+  simulationCopy,
   siteCopy,
   notFound,
   // The opening's own words; the runs are the same sentences cut up.
@@ -375,10 +377,14 @@ for (const [what, ids] of [["menu", siteCopy.menu.map(({ id }) => id)], ["Say he
   assert.equal(workPanels.heading, work.heading, "Work's panels keep Work's heading");
   assert.equal(workPanels.subheading, work.note, "Work's subheading is its approved note");
   assert.equal(`${bnp.figure.value} · ${bnp.figure.label}`, bullet(deck, "BNP Paribas figure"), "Work: BNP Paribas's figure");
-  assert.equal(`${bnp.simulation.start} · ${bnp.simulation.end} · ${bnp.simulation.price}`, bullet(deck, "Simulation"), "Work: the simulation's labels");
-  assert.equal(bnp.simulation.caption, bullet(deck, "Simulation caption"), "Work: the simulation's caption");
-  assert.equal(bnp.simulation.description, bullet(deck, "Simulation description"), "Work: the simulation's accessible description");
-  assert.match(bnp.simulation.description, /^Illustrative/, "The simulation says it is illustrative");
+  assert.equal(simulationCopy.title, bullet(deck, "Simulation heading"), "Work: the simulation's heading");
+  assert.equal(`${simulationCopy.again} · ${simulationCopy.paths} · 10 · 100 · 1,000`, bullet(deck, "Simulation controls"), "Work: the simulation's controls");
+  assert.equal(simulationCopy.settled("1,000", 0.012), "1,000 paths: one price, 1.2% above today.", "Work: a settled run is read with its price");
+  assert.equal(simulationCopy.settled("10", -0.0004), "10 paths: one price, level with today.", "Work: a price that rounds to nothing is level");
+  assert.equal(`${simulationCopy.start} · ${simulationCopy.end} · ${simulationCopy.price}`, bullet(deck, "Simulation"), "Work: the simulation's labels");
+  assert.equal(simulationCopy.caption, bullet(deck, "Simulation caption"), "Work: the simulation's caption");
+  assert.equal(simulationCopy.description, bullet(deck, "Simulation description"), "Work: the simulation's accessible description");
+  assert.match(simulationCopy.description, /^Illustrative/, "The simulation says it is illustrative");
   const story = roleStories[bnp.slug];
   assert.deepEqual(
     bnp.comparisons.map((comparison) => [comparisonRow(story, comparison)?.what, `${comparison.before.name} · ${comparison.before.value}`, `${comparison.after.name} · ${comparison.after.value}`]),

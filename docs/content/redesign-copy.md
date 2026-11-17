@@ -397,11 +397,14 @@ What each employer's pass prints, as approved in the passes and panels spec (R-1
 What Work's panels say, as approved in the passes and panels spec (R-13 to R-15, 11 November 2026). The heading and subheading are Work's own (above). Every figure and bar amount is its Role story's fact: `verify:copy` checks these strings and `workPanelProblems` checks the numbers.
 
 - BNP Paribas figure: Six months · from zero C# to production code
+- Simulation heading: How the pricing engines work
 - Simulation: Today · Horizon · One price
+- Simulation controls: Run again · Paths · 10 · 100 · 1,000
+- Simulation settled, read to a screen reader when a run settles (signed off by Elias on 17 November 2026): {1,000} paths: one price, {1.2}% {above / below} today. · {10} paths: one price, level with today.
 - Simulation caption: The engines run large simulation-based calculations across several asset classes. Thousands of possible market paths go in; a price and its risk come out.
 - Simulation description: Illustrative simulated paths from today to the horizon, a histogram of where they end on the right edge, and a dashed line at their average, labelled one price.
 
-Screen readers read the description with the figure; nothing shows it on screen. Its words are R-14's own description of the drawing.
+The simulation heading was proposed on 17 November 2026 at Elias's request, so a reader knows what the chart shows before reaching its caption ([#457](https://github.com/3ixas/eliasb.dev/issues/457)); Elias signed it off on 17 November 2026, with the controls' words for round 3: the button "Run again", and the steps "10", "100", "1,000" grouped as "Paths". Screen readers read the description with the figure; nothing shows it on screen. Its words are R-14's own description of the drawing.
 
 | Comparison | Before | After |
 |---|---|---|

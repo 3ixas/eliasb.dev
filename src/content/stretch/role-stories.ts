@@ -74,6 +74,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
       },
     },
     figures: {
+      "the-role": { kind: "simulation" },
       decisions: {
         kind: "flag",
         live: "Live pricing · today’s path",

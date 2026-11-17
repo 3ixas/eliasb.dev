@@ -1,10 +1,7 @@
 import Link from "next/link";
-import type { CSSProperties } from "react";
 import { MeasurePair, MeasureSide } from "@/components/parts/measure";
 import { OnView, Count } from "@/components/parts/on-view";
 import { Arrow, Panel, PanelHead } from "@/components/parts/panel";
-import { simulation } from "@/components/site/simulation-model";
-import { SimulationPlot } from "@/components/site/simulation-plot";
 import { roleStories } from "@/content/stretch/role-stories";
 import type { RoleStorySlug } from "@/content/stretch/role-story";
 import { passRecords } from "@/content/stretch/staff-pass";
@@ -26,45 +23,7 @@ function StoryLink({ slug, outline = false }: { slug: RoleStorySlug; outline?: b
   );
 }
 
-/** The illustrative paths, the histogram of where they end, and a dashed line at their mean labelled "One price". */
-function Simulation() {
-  const { start, end, price, caption, description } = workPanels.bnp.simulation;
-  const { bins, meanBin, mean } = simulation();
-  const most = Math.max(...bins);
-  return (
-    <figure className="sim" aria-describedby="sim-description">
-      <SimulationPlot>
-        <div className="sim__hist" aria-hidden="true">
-          {bins.map((count, index) => (
-            <i
-              key={index}
-              className="sim__bin"
-              data-count={count}
-              data-mean={index === meanBin ? "" : undefined}
-              style={{ "--share": count ? Math.max(count / most, 0.06) : 0 } as CSSProperties}
-            />
-          ))}
-        </div>
-        <span className="sim__price" style={{ "--at": mean } as CSSProperties}>
-          <b>{price}</b>
-        </span>
-        <span className="sim__x sim__x--start" aria-hidden="true">
-          {start}
-        </span>
-        <span className="sim__x sim__x--end" aria-hidden="true">
-          {end}
-        </span>
-      </SimulationPlot>
-      {/* Read as the figure's description and shown nowhere: the caption says what the engines do, this says what is drawn. */}
-      <p id="sim-description" hidden>
-        {description}
-      </p>
-      <figcaption>{caption}</figcaption>
-    </figure>
-  );
-}
-
-/** BNP Paribas, full width and green: its figure, the simulation, two comparisons in their own units and the link to its story. */
+/** BNP Paribas, full width and green: its figure, two comparisons in their own units and the link to its story; the simulation is on its Role story (#457). */
 function BnpPanel() {
   const { slug, figure, comparisons } = workPanels.bnp;
   const story = roleStories[slug];
@@ -76,7 +35,6 @@ function BnpPanel() {
           <span className="figure__words">{figure.value}</span>
           <span className="figure__label">{figure.label}</span>
         </p>
-        <Simulation />
         <OnView motion="grow" className="work-bnp__comparisons">
           <ul>
             {comparisons.map((comparison) => {

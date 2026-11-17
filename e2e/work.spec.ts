@@ -9,20 +9,19 @@ import { renderedContrast } from "./support/rendered-contrast";
 
 /*
  * Work (docs/design/DESIGN.md "The homepage, in order" 3 and "Figures", R-13 to R-15): the title and subheading,
- * BNP Paribas's panel with its figure, the simulation and two comparisons, then Joveen and Optegra side by side with a
+ * BNP Paribas's panel with its figure and two comparisons (its simulation is simulation.spec.ts), then Joveen and Optegra side by side with a
  * display figure and three pairs each.
  */
 
 const section = (page: Page) => page.locator("section#work");
 const slugs = ["bnp-paribas", "joveen", "optegra"] as const;
 const panel = (page: Page, slug: string) => page.locator(`#${slug}`);
-const plot = (page: Page) => page.locator(".sim__plot");
 const width = (page: Page) => page.viewportSize()?.width ?? 0;
 const boxOf = async (locator: Locator) => (await locator.boundingBox())!;
 const settled = (page: Page) => page.evaluate(() => document.fonts.ready.then(() => true));
 const hydrated = (page: Page) =>
   page.waitForFunction(() => {
-    const element = document.querySelector(".sim__plot");
+    const element = document.querySelector("#joveen .roll");
     return !!element && Object.keys(element).some((key) => key.startsWith("__reactProps$"));
   });
 
@@ -59,11 +58,12 @@ test.describe("Work: the panels", () => {
     }
   });
 
-  test("BNP Paribas's panel holds one display figure, one chart and two comparisons, and nothing else at display size but the employer's name", async ({ page }) => {
+  test("BNP Paribas's panel holds one display figure and two comparisons, and nothing else at display size but the employer's name", async ({ page }) => {
     const bnp = panel(page, "bnp-paribas");
     await expect(bnp.locator(".figure__words")).toHaveText(workPanels.bnp.figure.value);
     await expect(bnp.locator(".figure__label")).toHaveText(workPanels.bnp.figure.label);
-    await expect(bnp.locator("figure")).toHaveCount(1);
+    // Its simulation is on its Role story (#457).
+    await expect(bnp.locator("figure")).toHaveCount(0);
     await expect(bnp.locator(".work-bnp__comparisons li")).toHaveCount(2);
     const display = await bnp.evaluate((element) =>
       [...element.querySelectorAll("*")].filter((node) => node.childElementCount === 0 && node.textContent?.trim() && !node.matches(".panel__name") && parseFloat(getComputedStyle(node).fontSize) >= 32).map((node) => node.textContent),
@@ -111,50 +111,12 @@ test.describe("Work: the panels", () => {
     }
   });
 
-  test("the simulation: its bins sum to the number of paths, the price line sits at the mean of the endpoints, and it says it is illustrative", async ({ page }) => {
-    const sim = page.locator(".sim");
-    await expect(sim).toHaveAccessibleDescription(/^Illustrative simulated paths/);
-    await expect(sim.locator("figcaption")).toHaveText(workPanels.bnp.simulation.caption);
-    await expect(sim.locator(".sim__price")).toHaveText(workPanels.bnp.simulation.price);
-    await expect(sim.locator(".sim__x")).toHaveText([workPanels.bnp.simulation.start, workPanels.bnp.simulation.end]);
-    await sim.scrollIntoViewIfNeeded();
-    await expect(plot(page)).toHaveAttribute("data-drawn", "");
-    const reading = await plot(page).evaluate((element) => {
-      const paths = [...element.querySelectorAll(".sim__paths path")];
-      const ends = paths.map((path) => Number(path.getAttribute("d")!.trim().split(/\s+/).at(-1)));
-      const viewBox = element.querySelector("svg")!.viewBox.baseVal;
-      const mean = ends.reduce((sum, end) => sum + end, 0) / ends.length / viewBox.height;
-      const box = element.getBoundingClientRect();
-      const line = element.querySelector(".sim__price")!.getBoundingClientRect();
-      return {
-        paths: paths.length,
-        expected: Number(element.getAttribute("data-paths")),
-        bins: [...element.querySelectorAll<HTMLElement>(".sim__bin")].reduce((sum, bin) => sum + Number(bin.dataset.count), 0),
-        offset: Math.abs(line.top - (box.top + mean * box.height)),
-      };
-    });
-    expect(reading.paths).toBe(reading.expected);
-    expect(reading.bins).toBe(reading.paths);
-    expect(reading.offset).toBeLessThan(1.5);
-  });
-
-  test("the simulation's paths are drawn only when it comes into view, and are not in the server's HTML", async ({ page }) => {
-    const html = await (await page.request.get("/")).text();
-    expect(html).not.toMatch(/class="sim__paths"[^>]*>\s*<path/);
-    await page.setViewportSize({ width: width(page), height: 700 });
-    await page.goto("/");
-    await hydrated(page);
-    await expect(page.locator(".sim__paths path")).toHaveCount(0);
-    await page.locator(".sim").scrollIntoViewIfNeeded();
-    await expect(page.locator(".sim__paths path")).toHaveCount(70);
-  });
-
   test("without script every panel's text, the histogram and the price line are there", async ({ page }) => {
     await page.route("**/*.js", (route) => route.abort());
     await page.reload();
     for (const slug of slugs) await expect(panel(page, slug)).toBeVisible();
-    await expect(page.locator(".sim__bin")).toHaveCount(17);
-    await expect(page.locator(".sim__price")).toBeVisible();
+    // The simulation is on BNP Paribas's Role story, not the homepage (#457).
+    await expect(page.locator(".sim")).toHaveCount(0);
     for (const { pairs } of workPanels.roles) for (const pair of pairs) await expect(section(page)).toContainText(pair.value);
   });
 
@@ -214,13 +176,11 @@ test.describe("Work: the panels", () => {
       await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
       await page.reload();
       await settled(page);
-      await page.locator(".sim").scrollIntoViewIfNeeded();
-      await expect(plot(page)).toHaveAttribute("data-drawn", "");
       // The axis labels are hidden from assistive technology, which the measure skips, so they are measured with it shown.
       await page.evaluate(() => document.querySelectorAll("#work .panel [aria-hidden='true']").forEach((element) => element.removeAttribute("aria-hidden")));
       const texts = await section(page).evaluate((element) => [...element.querySelectorAll(".work__subheading, .panel")].map((part) => (part as HTMLElement).innerText).join("\n"));
       const readings = (await renderedContrast(page)).filter((reading) => texts.includes(reading.text));
-      for (const expected of [workPanels.subheading.slice(0, 20), "Six months", "One price", "Horizon", "Key API p95", "Consultation", "The Optegra story"]) {
+      for (const expected of [workPanels.subheading.slice(0, 20), "Six months", "Key API p95", "Consultation", "The Optegra story"]) {
         expect(readings.some((reading) => reading.text.includes(expected)), expected).toBe(true);
       }
       expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);
@@ -243,29 +203,13 @@ test.describe("Work: arriving", () => {
     await hydrated(page);
   });
 
-  test("below the fold the figures wait at their start, the bars and the simulation are armed, and each arrives once in view", async ({ page }) => {
+  test("below the fold the figures wait at their start, the bars are armed, and each arrives once in view", async ({ page }) => {
     const joveen = panel(page, "joveen");
     await expect.poll(() => shown(joveen.locator(".figure__value"))).toBe("−0%");
     await expect.poll(() => shown(panel(page, "optegra").locator(".figure__value"))).toBe("62%");
     // A screen reader is read the value, never the start.
     await expect(joveen.locator(".figure__value .sr-only")).toHaveText("−40%");
-    await expect(plot(page)).toHaveAttribute("data-armed", "");
     await expect(joveen.locator("[data-grow]")).toHaveAttribute("data-armed", "");
-    await page.locator(".sim").scrollIntoViewIfNeeded();
-    await expect(plot(page)).toHaveAttribute("data-released", "");
-    await expect(plot(page)).not.toHaveAttribute("data-armed", "");
-    // Seek the draw instead of waiting it out: halfway through, part of the paths is drawn, and at the end all of them.
-    const halfway = await page.locator(".sim__paths").evaluate((element) => {
-      const draw = element.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "clip-path")!;
-      draw.pause();
-      draw.currentTime = 550;
-      return getComputedStyle(element).clipPath;
-    });
-    const hidden = Number(halfway.match(/inset\(0px ([\d.]+)%/)?.[1]);
-    expect(hidden, halfway).toBeGreaterThan(0);
-    expect(hidden, halfway).toBeLessThan(100);
-    await plot(page).evaluate((element) => element.getAnimations({ subtree: true }).forEach((animation) => animation.finish()));
-    await expect(page.locator(".sim__paths")).toHaveCSS("clip-path", "inset(0px)");
     await joveen.scrollIntoViewIfNeeded();
     await expect(joveen.locator("[data-grow]")).not.toHaveAttribute("data-armed", "");
     await expect(joveen.locator(".roll")).not.toHaveAttribute("data-armed", "");
@@ -326,33 +270,16 @@ test.describe("Work: arriving", () => {
     expect(delays[1][0]).toBeGreaterThan(delays[0][0]);
   });
 
-  test("the simulation arrives in order: the paths draw over 1.1 s, the histogram grows from 1.1 s, the price line appears at 1.8 s", async ({ page }) => {
-    await expect(plot(page)).toHaveAttribute("data-armed", "");
-    await page.locator(".sim").scrollIntoViewIfNeeded();
-    await expect(plot(page)).toHaveAttribute("data-released", "");
-    const [paths, bin, price] = await Promise.all([
-      page.locator(".sim__paths").evaluate((element) => [getComputedStyle(element).transitionProperty, getComputedStyle(element).transitionDuration]),
-      page.locator(".sim__bin").first().evaluate((element) => [getComputedStyle(element).transitionDuration, getComputedStyle(element).transitionDelay]),
-      page.locator(".sim__price").evaluate((element) => getComputedStyle(element).transitionDelay),
-    ]);
-    expect(paths).toEqual(["clip-path", "1.1s"]);
-    expect(bin).toEqual(["0.9s", "1.1s"]);
-    expect(price).toBe("1.8s");
-  });
 });
 
 test.describe("Work: reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
 
-  test("everything is at its end state: the figures written, the bars full and the simulation drawn on sight with nothing armed", async ({ page }) => {
+  test("everything is at its end state: the figures written and the bars full, with nothing armed", async ({ page }) => {
     await page.goto("/");
     await hydrated(page);
     await expect(section(page).locator("[data-armed]")).toHaveCount(0);
     await expect.poll(() => shown(panel(page, "joveen").locator(".figure__value"))).toBe("−40%");
-    await page.locator(".sim").scrollIntoViewIfNeeded();
-    await expect(plot(page)).toHaveAttribute("data-drawn", "");
-    await expect(plot(page)).not.toHaveAttribute("data-released", "");
-    await expect(page.locator(".sim__paths")).toHaveCSS("clip-path", "inset(0px)");
   });
 });
 
