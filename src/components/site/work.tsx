@@ -26,23 +26,20 @@ function StoryLink({ slug, outline = false }: { slug: RoleStorySlug; outline?: b
   );
 }
 
-/** The illustrative paths, the histogram of where they end, and a dashed line at their mean labelled "One price". */
+/** The illustrative paths, where they end as a dot each, stacked by band at the right edge, and a dashed line at their mean labelled "One price". */
 function Simulation() {
   const { start, end, price, caption, description } = workPanels.bnp.simulation;
   const { bins, meanBin, mean } = simulation();
-  const most = Math.max(...bins);
   return (
     <figure className="sim" aria-describedby="sim-description">
       <SimulationPlot>
-        <div className="sim__hist" aria-hidden="true">
+        <div className="sim__hist" style={{ "--most": Math.max(...bins) } as CSSProperties} aria-hidden="true">
           {bins.map((count, index) => (
-            <i
-              key={index}
-              className="sim__bin"
-              data-count={count}
-              data-mean={index === meanBin ? "" : undefined}
-              style={{ "--share": count ? Math.max(count / most, 0.06) : 0 } as CSSProperties}
-            />
+            <span key={index} className="sim__bin" data-count={count} data-mean={index === meanBin ? "" : undefined}>
+              {Array.from({ length: count }, (_, dot) => (
+                <i key={dot} />
+              ))}
+            </span>
           ))}
         </div>
         <span className="sim__price" style={{ "--at": mean } as CSSProperties}>

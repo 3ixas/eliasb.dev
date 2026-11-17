@@ -5,6 +5,7 @@ import { passRecords } from "../src/content/stretch/staff-pass";
 import { comparisonRow, workPanels } from "../src/content/stretch/work-panels";
 import { drawn, expectDrawn } from "./support/measure";
 import { shown } from "./support/roll";
+import { SIM, simulation } from "../src/components/site/simulation-model";
 import { renderedContrast } from "./support/rendered-contrast";
 
 /*
@@ -118,35 +119,38 @@ test.describe("Work: the panels", () => {
     await expect(sim.locator(".sim__price")).toHaveText(workPanels.bnp.simulation.price);
     await expect(sim.locator(".sim__x")).toHaveText([workPanels.bnp.simulation.start, workPanels.bnp.simulation.end]);
     await sim.scrollIntoViewIfNeeded();
-    await expect(plot(page)).toHaveAttribute("data-drawn", "");
-    const reading = await plot(page).evaluate((element) => {
-      const paths = [...element.querySelectorAll(".sim__paths path")];
-      const ends = paths.map((path) => Number(path.getAttribute("d")!.trim().split(/\s+/).at(-1)));
-      const viewBox = element.querySelector("svg")!.viewBox.baseVal;
-      const mean = ends.reduce((sum, end) => sum + end, 0) / ends.length / viewBox.height;
+    await expect(plot(page)).toHaveAttribute("data-drawn", String(SIM.paths));
+    const { mean } = simulation();
+    const reading = await plot(page).evaluate((element, at) => {
       const box = element.getBoundingClientRect();
       const line = element.querySelector(".sim__price")!.getBoundingClientRect();
+      const canvas = element.querySelector<HTMLCanvasElement>(".sim__paths")!;
+      const pixels = canvas.getContext("2d")!.getImageData(0, 0, canvas.width, canvas.height).data;
+      let painted = 0;
+      for (let index = 3; index < pixels.length; index += 4) if (pixels[index] > 0) painted += 1;
       return {
-        paths: paths.length,
-        expected: Number(element.getAttribute("data-paths")),
-        bins: [...element.querySelectorAll<HTMLElement>(".sim__bin")].reduce((sum, bin) => sum + Number(bin.dataset.count), 0),
-        offset: Math.abs(line.top - (box.top + mean * box.height)),
+        bins: [...element.querySelectorAll<HTMLElement>(".sim__bin")].map((bin) => [Number(bin.dataset.count), bin.querySelectorAll("i").length]),
+        offset: Math.abs(line.top - (box.top + at * box.height)),
+        painted: painted / (canvas.width * canvas.height),
       };
-    });
-    expect(reading.paths).toBe(reading.expected);
-    expect(reading.bins).toBe(reading.paths);
+    }, mean);
+    // Each endpoint is one dot in its band, and the bands hold every walk.
+    for (const [count, dots] of reading.bins) expect(dots).toBe(count);
+    expect(reading.bins.reduce((sum, [count]) => sum + count, 0)).toBe(SIM.paths);
     expect(reading.offset).toBeLessThan(1.5);
+    // The walks are painted: a cloud, not an empty canvas.
+    expect(reading.painted).toBeGreaterThan(0.05);
   });
 
-  test("the simulation's paths are drawn only when it comes into view, and are not in the server's HTML", async ({ page }) => {
+  test("the simulation's walks are painted only when it comes into view, and are not in the server's HTML", async ({ page }) => {
     const html = await (await page.request.get("/")).text();
-    expect(html).not.toMatch(/class="sim__paths"[^>]*>\s*<path/);
+    expect(html).toMatch(/<canvas class="sim__paths"[^>]*><\/canvas>/);
     await page.setViewportSize({ width: width(page), height: 700 });
     await page.goto("/");
     await hydrated(page);
-    await expect(page.locator(".sim__paths path")).toHaveCount(0);
+    await expect(plot(page)).not.toHaveAttribute("data-drawn");
     await page.locator(".sim").scrollIntoViewIfNeeded();
-    await expect(page.locator(".sim__paths path")).toHaveCount(70);
+    await expect(plot(page)).toHaveAttribute("data-drawn", String(SIM.paths));
   });
 
   test("without script every panel's text, the histogram and the price line are there", async ({ page }) => {
@@ -215,7 +219,7 @@ test.describe("Work: the panels", () => {
       await page.reload();
       await settled(page);
       await page.locator(".sim").scrollIntoViewIfNeeded();
-      await expect(plot(page)).toHaveAttribute("data-drawn", "");
+      await expect(plot(page)).toHaveAttribute("data-drawn", String(SIM.paths));
       // The axis labels are hidden from assistive technology, which the measure skips, so they are measured with it shown.
       await page.evaluate(() => document.querySelectorAll("#work .panel [aria-hidden='true']").forEach((element) => element.removeAttribute("aria-hidden")));
       const texts = await section(page).evaluate((element) => [...element.querySelectorAll(".work__subheading, .panel")].map((part) => (part as HTMLElement).innerText).join("\n"));
@@ -350,7 +354,7 @@ test.describe("Work: reduced motion", () => {
     await expect(section(page).locator("[data-armed]")).toHaveCount(0);
     await expect.poll(() => shown(panel(page, "joveen").locator(".figure__value"))).toBe("−40%");
     await page.locator(".sim").scrollIntoViewIfNeeded();
-    await expect(plot(page)).toHaveAttribute("data-drawn", "");
+    await expect(plot(page)).toHaveAttribute("data-drawn", String(SIM.paths));
     await expect(plot(page)).not.toHaveAttribute("data-released", "");
     await expect(page.locator(".sim__paths")).toHaveCSS("clip-path", "inset(0px)");
   });

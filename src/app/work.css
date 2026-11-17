@@ -81,12 +81,12 @@
   --solid: #fff;
   display: grid;
   grid-template:
-    "head head" auto
-    "figure sim" 1fr
-    "comparisons comparisons" auto
-    "story story" auto
-    / 5fr 7fr;
-  column-gap: 56px;
+    "head" auto
+    "figure" auto
+    "sim" auto
+    "comparisons" auto
+    "story" auto
+    / minmax(0, 1fr);
   background: radial-gradient(120% 110% at 10% -10%, #2cbd86 0%, #0fa56d 46%, var(--field) 100%);
 }
 
@@ -96,8 +96,7 @@
 
 .work-bnp__figure {
   grid-area: figure;
-  align-self: center;
-  padding-block: 56px;
+  padding-block: 56px 0;
 }
 
 .work-bnp__comparisons {
@@ -137,12 +136,14 @@
   padding-block: 44px 40px;
 }
 
-/* The plot leaves room at its right for the histogram (72 px) and the price label. */
+/* The plot takes the panel's width (#457), leaving room at its right for the endpoints' dots (120 px) and the price label. */
 .sim__plot {
-  --hist: 72px;
+  --hist: 120px;
+  /* Past the dots, room for the price's label at the end of its line, so it never covers an endpoint. */
+  --label: 96px;
   position: relative;
-  min-height: 280px;
-  margin-right: calc(var(--hist) + 12px);
+  min-height: 340px;
+  margin-right: calc(var(--hist) + 12px + var(--label));
   border-left: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
@@ -157,12 +158,9 @@
   clip-path: inset(0);
 }
 
-.sim__paths path {
-  fill: none;
-  stroke: var(--panel-ink);
-  stroke-width: 1;
-  opacity: 0.17;
-  vector-effect: non-scaling-stroke;
+/* The canvas paints in its own text colour (simulation-plot.tsx), so forced colours turn the walks the text colour. */
+.sim__paths {
+  color: var(--panel-ink);
 }
 
 .sim__hist {
@@ -177,15 +175,25 @@
   padding-left: 6px;
 }
 
+/* Each endpoint is a dot, stacked from the plot's edge in the band it ends in; the fullest band fills the width. */
 .sim__bin {
+  display: flex;
   flex: 1;
-  width: calc(var(--share) * 100%);
-  border-radius: 0 2px 2px 0;
-  background: var(--soft);
+  align-items: center;
+  gap: 1px;
+  min-height: 0;
   transform-origin: left center;
 }
 
-.sim__bin[data-mean] {
+.sim__bin i {
+  flex: 0 0 auto;
+  width: min(6px, calc((100% - (var(--most) - 1) * 1px) / var(--most)));
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--soft);
+}
+
+.sim__bin[data-mean] i {
   background: #fff;
 }
 
@@ -194,14 +202,14 @@
   position: absolute;
   top: calc(var(--at) * 100%);
   left: 0;
-  right: calc(-1 * var(--hist) - 12px);
+  right: calc(-1 * var(--hist) - 12px - var(--label));
   border-top: 1.5px dashed rgb(255 255 255 / 0.9);
 }
 
 .sim__price b {
   position: absolute;
   top: 0;
-  right: -6px;
+  right: 0;
   padding: 5px 11px;
   border-radius: 999px;
   background: #fff;
@@ -328,18 +336,8 @@
 /* ---- Narrower ---- */
 
 @media (max-width: 1259.98px) {
-  .work .work-bnp {
-    grid-template:
-      "head" auto
-      "figure" auto
-      "sim" auto
-      "comparisons" auto
-      "story" auto
-      / minmax(0, 1fr);
-  }
-
   .work-bnp__figure {
-    padding-block: 44px 0;
+    padding-top: 44px;
   }
 }
 
@@ -367,10 +365,15 @@
     padding-block: 32px 28px;
   }
 
+  /* On a phone the label sits above the end of its line, over the dots, rather than taking width from the walks. */
   .sim__plot {
-    --hist: 50px;
-    min-height: 210px;
-    margin-right: calc(var(--hist) + 10px);
+    --hist: 64px;
+    --label: 0px;
+    min-height: 240px;
+  }
+
+  .sim__price b {
+    transform: translateY(calc(-100% - 6px));
   }
 
   .work-role {
@@ -405,18 +408,26 @@
   }
 }
 
-/* Forced colours keep the data: the histogram in the text colour, its mean in the highlight, as the bars do (R-29). */
+/* Forced colours keep the data: the walks and the endpoints in the text colour, the mean and the price line in the highlight (R-29). */
 @media (forced-colors: active) {
-  .sim__bin {
+  .sim__bin i,
+  .sim__price {
     forced-color-adjust: none;
+  }
+
+  .sim__bin i {
     background: CanvasText;
   }
 
-  .sim__bin[data-mean] {
+  .sim__bin[data-mean] i {
     background: Highlight;
   }
 
-  .sim__paths path {
-    stroke: CanvasText;
+  .sim__price {
+    border-top-color: Highlight;
+  }
+
+  .sim__paths {
+    color: CanvasText;
   }
 }
