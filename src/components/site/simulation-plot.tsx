@@ -114,6 +114,8 @@ export function SimulationPlot() {
     element.setAttribute("data-armed", "");
     price?.removeAttribute("data-pricing");
     const dots = new Map([...element.querySelectorAll<HTMLElement>(".sim__bin i[data-walk]")].map((dot) => [Number(dot.dataset.walk), dot]));
+    // Pressing the step already chosen draws the same run again, and React keeps its dots: clear what landed before.
+    for (const dot of dots.values()) dot.removeAttribute("data-landed");
     const started = performance.now();
     let sum = 0;
     let frame = 0;

@@ -41,22 +41,26 @@ test.describe("The simulation", () => {
     const reading = await plot(page).evaluate((element, at) => {
       const box = element.getBoundingClientRect();
       const line = element.querySelector(".sim__price")!.getBoundingClientRect();
-      const canvas = element.querySelector<HTMLCanvasElement>(".sim__paths")!;
-      const pixels = canvas.getContext("2d")!.getImageData(0, 0, canvas.width, canvas.height).data;
-      let painted = 0;
-      for (let index = 3; index < pixels.length; index += 4) if (pixels[index] > 0) painted += 1;
       return {
         bins: [...element.querySelectorAll<HTMLElement>(".sim__bin")].map((bin) => [Number(bin.dataset.count), bin.querySelectorAll("i").length]),
         offset: Math.abs(line.top - (box.top + at * box.height)),
-        painted: painted / (canvas.width * canvas.height),
       };
     }, mean);
     // Each endpoint is one dot in its band (a hundred walks is one a dot), and the bands hold every walk.
     for (const [count, dots] of reading.bins) expect(dots).toBe(count);
     expect(reading.bins.reduce((sum, [count]) => sum + count, 0)).toBe(SIM.paths);
     expect(reading.offset).toBeLessThan(1.5);
-    // The walks are painted: a cloud, not an empty canvas.
-    expect(reading.painted).toBeGreaterThan(0.05);
+    // The walks are painted: a cloud, not an empty canvas. The paint follows the settled marker by an effect, so poll it.
+    const painted = () =>
+      plot(page).evaluate((element) => {
+        const canvas = element.querySelector<HTMLCanvasElement>(".sim__paths")!;
+        if (!canvas.width || !canvas.height) return 0;
+        const pixels = canvas.getContext("2d")!.getImageData(0, 0, canvas.width, canvas.height).data;
+        let count = 0;
+        for (let index = 3; index < pixels.length; index += 4) if (pixels[index] > 0) count += 1;
+        return count / (canvas.width * canvas.height);
+      });
+    await expect.poll(painted).toBeGreaterThan(0.05);
   });
 
   test("the simulation's walks are painted only when it comes into view, and are not in the server's HTML", async ({ page }) => {
@@ -184,6 +188,23 @@ test.describe("The simulation's controls", () => {
       reached.push(await page.evaluate(() => document.activeElement?.textContent));
     }
     expect(reached).toEqual([simulationCopy.again, "10", "100", "1,000"]);
+  });
+
+  test("pressing the step already chosen draws the run again from an empty plot: no dot is left landed from before", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.clock.install();
+    await page.reload();
+    await hydrated(page);
+    await page.clock.pauseAt(new Date(Date.now() + 60_000));
+    await page.locator(".sim").scrollIntoViewIfNeeded();
+    // One run arrives in full, so every dot has landed, then the same step is pressed again.
+    await step(page, "100").click();
+    await page.clock.runFor(SIM.arrival * 1.5);
+    await settled(page, SIM.paths);
+    await expect(page.locator(".sim__bin i[data-landed]")).toHaveCount(SIM.paths);
+    await step(page, "100").click();
+    await page.clock.runFor(16);
+    expect(Number(await page.locator(".sim__bin i[data-landed]").count())).toBeLessThan(SIM.paths / 4);
   });
 
   test("a control pressed mid-arrival starts the new run cleanly, and nothing of the old one is left", async ({ page }) => {
