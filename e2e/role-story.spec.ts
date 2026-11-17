@@ -167,6 +167,62 @@ for (const slug of roleStorySlugs) {
         await expect(scale).toContainText("under 5 min");
       });
 
+      test("the flag is a switch you can flip: off as it shipped, by pointer and keyboard, its state announced, the new path taken when on", async ({ page }) => {
+        const lanes = page.locator("section#decisions .lanes");
+        const flag = page.getByRole("switch", { name: "New path · no stale file · cached" });
+        await expect(flag).toHaveAttribute("aria-checked", "false");
+        await expect(flag).toHaveAccessibleDescription("off by default");
+        // A 44 px target around the drawn switch.
+        const box = (await flag.boundingBox())!;
+        expect([box.width, box.height]).toEqual([44, 44]);
+        await flag.click();
+        await expect(flag).toHaveAttribute("aria-checked", "true");
+        await expect(lanes).toHaveAttribute("data-on", "");
+        await expect(lanes.locator(".lane--new i")).toHaveCSS("border-top-style", "solid");
+        await expect(lanes.locator(".lane:not(.lane--new) i")).toHaveCSS("border-top-style", "dashed");
+        await flag.focus();
+        await page.keyboard.press("Space");
+        await expect(flag).toHaveAttribute("aria-checked", "false");
+        await page.keyboard.press("Enter");
+        await expect(flag).toHaveAttribute("aria-checked", "true");
+      });
+
+      test("switched on, one request travels the new path and a second comes from the cache; a switch mid-trip starts the new trip, and nothing loops", async ({ page }) => {
+        await page.emulateMedia({ reducedMotion: "no-preference" });
+        const flag = page.getByRole("switch", { name: "New path · no stale file · cached" });
+        const request = page.locator("section#decisions .lane__request");
+        await flag.click();
+        await expect(page.locator("section#decisions .lane--new .lane__request")).toHaveCount(1);
+        // Seek the first trip to its end rather than wait it out: the cached one follows on the same path, and is quicker.
+        await request.evaluate((element) => element.getAnimations().forEach((animation) => animation.finish()));
+        await expect(page.locator("section#decisions .lane--new .lane__request[data-cached]")).toHaveCount(1);
+        const durations = await request.evaluate((element) => element.getAnimations().map((animation) => Number(animation.effect!.getComputedTiming().duration)));
+        expect(durations[0]).toBeLessThan(400);
+        await request.evaluate((element) => element.getAnimations().forEach((animation) => animation.finish()));
+        await expect(request).toHaveCount(1);
+        // Switched off mid-trip, the request is on today's path at once.
+        await flag.click();
+        await expect(page.locator("section#decisions .lane:not(.lane--new) .lane__request")).toHaveCount(1);
+        await expect(page.locator("section#decisions .lane--new .lane__request")).toHaveCount(0);
+        await request.evaluate((element) => element.getAnimations().forEach((animation) => animation.finish()));
+        expect(await request.evaluate((element) => element.getAnimations().filter((animation) => animation.playState === "running").length)).toBe(0);
+      });
+
+      test("with reduced motion the flag still switches and no request travels; without script it is the still figure, drawn off", async ({ page, browser }) => {
+        await page.emulateMedia({ reducedMotion: "reduce" });
+        const flag = page.getByRole("switch", { name: "New path · no stale file · cached" });
+        await flag.click();
+        await expect(flag).toHaveAttribute("aria-checked", "true");
+        await expect(page.locator("section#decisions .lane__request")).toHaveCSS("display", "none");
+        const context = await browser.newContext({ javaScriptEnabled: false });
+        const still = await context.newPage();
+        await still.goto(page.url());
+        await expect(still.getByRole("switch")).toHaveCount(0);
+        await expect(still.locator("section#decisions .lane__switch")).toHaveCount(1);
+        await expect(still.locator("section#decisions .lanes")).not.toHaveAttribute("data-on");
+        await context.close();
+      });
+
       test("each comparison is drawn in its own unit: ten day squares against two, and minutes on one scale with the range and the bound drawn short", async ({ page }) => {
         await page.emulateMedia({ reducedMotion: "reduce" });
         await page.reload();
@@ -392,6 +448,8 @@ for (const slug of roleStorySlugs) {
       const tab = testInfo.project.name.startsWith("webkit") ? "Alt+Tab" : "Tab";
       // Everything focusable on the story itself, from the back link to the next page; Say hello is its own spec's.
       const scope = "[data-role-story] article, [data-role-story] nav.story-next";
+      // The flag's switch exists once the page has hydrated; before it, the figure is drawn still.
+      if (slug === "bnp-paribas") await expect(page.getByRole("switch")).toHaveCount(1);
       // A screenshot's Close button is in its dialog, which is closed.
       const order = await page.locator(`:is(${scope}) :is(a, button):not(dialog *)`).evaluateAll((elements) => elements.map((element) => element.textContent?.trim() ?? ""));
       expect(order.length).toBeGreaterThan(1);

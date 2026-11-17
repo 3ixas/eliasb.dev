@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { MeasureSide } from "@/components/parts/measure";
 import { OnView } from "@/components/parts/on-view";
 import { OUT, Panel } from "@/components/parts/panel";
+import { FlagLanes } from "@/components/site/flag-lanes";
 import { Simulation } from "@/components/site/simulation";
 import { SiteLink } from "@/components/site/site-link";
 import { columnImageSizes, StoryImage } from "@/components/site/story-parts";
@@ -40,18 +41,7 @@ function FlagFigure({ figure, panel }: { figure: Extract<RoleStoryFigure, { kind
   return (
     <figure className="story-fig">
       <Panel colours={panel} className="story-fig__panel">
-        <div className="lanes">
-          <p className="lane">
-            <span>{figure.live}</span>
-            <i aria-hidden="true" />
-          </p>
-          <p className="lane lane--new">
-            <span>{figure.toggled}</span>
-            <span className="lane__switch" aria-hidden="true" />
-            <i aria-hidden="true" />
-            <b>{figure.state}</b>
-          </p>
-        </div>
+        <FlagLanes live={figure.live} toggled={figure.toggled} state={figure.state} />
       </Panel>
       <figcaption>{figure.caption}</figcaption>
     </figure>
