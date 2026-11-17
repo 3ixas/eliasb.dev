@@ -70,7 +70,8 @@ function ScaleFigure({ figure, panel }: { figure: Extract<RoleStoryFigure, { kin
                 <h3>{row.what}</h3>
                 <p className="cmp">
                   <span>Before</span>
-                  <b>{row.before.label}</b>
+                  {/* A change in per cent has no words before it: its bar is the 100 the change is measured from. */}
+                  {row.before.label && <b>{row.before.label}</b>}
                   <MeasureSide measure={row} side="before" />
                 </p>
                 <p className="cmp cmp--after">
