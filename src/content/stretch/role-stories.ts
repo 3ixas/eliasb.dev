@@ -174,7 +174,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
       },
       "what-changed": {
         paragraphs: [
-          "Cloud costs fell by 18%.",
+          "Page load fell by 40% once the front end did less up front, and mobile retention rose by 30% after the cross-browser fixes. Indexes and rewritten queries took the key API’s p95 from 520 ms to 230 ms, and deploys went from 10 minutes to under 2. Cloud costs fell by 18%.",
         ],
       },
       "what-i-took-with-me": {
@@ -203,6 +203,17 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
           },
         ],
         source: { href: "https://www.joveen.com/", label: "joveen.com" },
+      },
+      // Each of its evidence figures, drawn in its own unit (#461): a change in per cent from 100, minutes, and a latency.
+      "what-changed": {
+        kind: "scale",
+        rows: [
+          { what: "Page load", unit: "change", before: { label: "", amount: 100 }, after: { label: "−40%", amount: 60 } },
+          { what: "Time to deploy", unit: "minutes", before: { label: "10 min", amount: 10 }, after: { label: "under 2 min", amount: 2, under: true } },
+          { what: "Mobile retention", unit: "change", before: { label: "", amount: 100 }, after: { label: "+30%", amount: 130 } },
+          { what: "Key API p95", unit: "ms", before: { label: "520 ms", amount: 520 }, after: { label: "230 ms", amount: 230 } },
+        ],
+        caption: "Bars to scale. A change in per cent is drawn from 100.",
       },
     },
     resume: [
@@ -292,7 +303,8 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
           label: "Optegra’s homepage in June 2024, on the Wayback Machine",
         },
       },
-      "what-changed": {
+      // The page split tests shaped, beside "Test, then build"; the numbers are drawn where the story tells them (#461).
+      decisions: {
         kind: "screens",
         images: [
           {
@@ -307,6 +319,15 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
           href: "https://web.archive.org/web/20240613032246/https://www.optegra.com/dry-amd-treatment/",
           label: "Optegra’s dry AMD page in June 2024, on the Wayback Machine",
         },
+      },
+      "what-changed": {
+        kind: "scale",
+        rows: [
+          { what: "Core Web Vitals pass rate", unit: "rate", before: { label: "62%", amount: 62 }, after: { label: "88%", amount: 88 } },
+          { what: "p95 page load", unit: "change", before: { label: "", amount: 100 }, after: { label: "−30%", amount: 70 } },
+          { what: "Consultation conversion", unit: "change", before: { label: "", amount: 100 }, after: { label: "+15%", amount: 115 } },
+        ],
+        caption: "Bars to scale. A change in per cent is drawn from 100.",
       },
     },
     resume: [

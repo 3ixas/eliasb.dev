@@ -249,6 +249,7 @@ No code to replace. They check the finished build; see the tickets.
 
 - **Part 1, the long-form layout (shared with case studies, `story.css`):** `.story-section__title` is `position: sticky; top: 32px; align-self: start` from 720 px. `.story-section__body` has no width of its own; its children other than `.story-fig` keep `max-width: 760px`, so a figure fills the text side (837 px at 1440). A page-spanning figure was tried for the simulation and dropped: it slid beneath the held heading. Approved by Elias (17 November).
 - **Part 1b, the openings (Elias, 17 November: the right of an opening sat empty on laptop-sized windows):** `.story-open` and `.case-open` stack under 960 px instead of 1260 px (`story.css`), so from 960 px a Role story's pass and a case study's screenshot stay beside the text. `case-study.tsx`'s opening `sizes` gains a 960 px step; `columnImageSizes` asks for 840 px, the width figures reached in part 1.
+- **Part 2, the drawn numbers (copy approved by Elias, 17 November):** Joveen and Optegra each gain a `scale` figure under `what-changed` in `role-stories.ts`, one row per evidence item (four and three), drawn by `ScaleFigure` with the #456 units; a change row's empty before label prints no words (`role-story-figures.tsx`). Optegra's dry AMD screenshot moved to `decisions` to free the slot. Joveen's What changed gains its approved words. `.story-fig__panel + figcaption` sits 24 px down: under Joveen's black panel its cast shadow put the muted caption at 4.38:1.
 
 ### #448 follow-up: the pass swings free of its rail
 

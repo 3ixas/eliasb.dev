@@ -191,8 +191,10 @@ for (const slug of roleStorySlugs) {
 
     if (slug === "joveen" || slug === "optegra") {
       test("its screenshots sit under their sections with a hairline edge, captioned with their source", async ({ page }) => {
+        // Its numbers are drawn as scale figures (#461); every other figure is a screenshot.
         for (const [key, figure] of Object.entries(story.figures ?? {})) {
-          if (figure.kind !== "screens") throw new Error(`${slug}'s figures are screenshots`);
+          if (figure.kind === "scale") continue;
+          if (figure.kind !== "screens") throw new Error(`${slug}'s other figures are screenshots`);
           const block = page.locator(`section#${key} figure`);
           await expect(block.locator("figcaption")).toHaveText(`${figure.source.label} \u2197\uFE0E`);
           await expect(block.locator("figcaption a")).toHaveAttribute("href", figure.source.href);
@@ -225,9 +227,23 @@ for (const slug of roleStorySlugs) {
       });
     }
 
+    if (slug === "joveen" || slug === "optegra") {
+      test("every number in its evidence is drawn once, in What changed, with its value written beside it (#461)", async ({ page }) => {
+        const figure = story.figures?.["what-changed"];
+        if (figure?.kind !== "scale") throw new Error(`${slug}'s What changed draws its numbers`);
+        const rows = page.locator("section#what-changed .cmps > li");
+        await expect(rows).toHaveCount(figure.rows.length);
+        expect(figure.rows.length).toBe(story.evidence.length);
+        for (const [index, row] of figure.rows.entries()) {
+          await expect(rows.nth(index).locator("h3")).toHaveText(row.what);
+          await expect(rows.nth(index).locator(".cmp--after b")).toHaveText(row.after.label);
+        }
+      });
+    }
+
     if (slug === "optegra") {
       test("the Optegra links say in plain words what and when, and go to their Wayback snapshot", async ({ page }) => {
-        for (const key of ["the-role", "what-changed"]) {
+        for (const key of ["the-role", "decisions"]) {
           const link = page.locator(`section#${key} figcaption a`);
           await expect(link).toContainText("June 2024");
           await expect(link).toContainText("Wayback Machine");
