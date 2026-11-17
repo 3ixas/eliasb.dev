@@ -185,7 +185,7 @@ export default async function PartsFixtures() {
             <Panel colours={roleStories.joveen.panel} data-panel="rise">
               <PanelHead name={roleStories.joveen.employer} meta={[roleStories.joveen.role, roleStories.joveen.dates]} />
               <p data-count style={{ marginTop: 40, fontFamily: "var(--serif)", fontWeight: 500, fontSize: "var(--type-figure)", lineHeight: 1, fontVariantNumeric: "lining-nums tabular-nums" }}>
-                <Count to={40} prefix="−" suffix="%" />
+                <Count value="−40%" />
               </p>
               <p style={{ fontFamily: "var(--serif)", fontSize: "var(--type-prose)" }}>page load</p>
               <OnView motion="grow">

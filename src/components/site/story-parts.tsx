@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
+import { Count } from "@/components/parts/on-view";
 import { Arrow } from "@/components/parts/panel";
 import { Arrowed } from "@/components/site/long-form";
 import { ZoomableImage } from "@/components/site/zoomable-image";
@@ -60,14 +61,17 @@ export function StoryText({ body }: { body: StorySectionBody }) {
   );
 }
 
-/** The evidence figures: each value large in Newsreader over its words, wrapping two by two on a phone. */
+/** The evidence figures: each value large in Newsreader over its words, wrapping two by two on a phone; a number rolls to its value once. */
 export function EvidenceFigures({ evidence }: { evidence: readonly EvidenceItem[] }) {
   if (evidence.length === 0) return null;
   return (
     <ul className="story-figures" aria-label="Evidence">
       {evidence.map(({ value, label }) => (
         <li key={label}>
-          <b>{value}</b> {label}
+          <b>
+            <Count value={value} />
+          </b>{" "}
+          {label}
         </li>
       ))}
     </ul>

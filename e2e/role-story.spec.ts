@@ -6,6 +6,7 @@ import { roleStories, roleStorySlugs } from "../src/content/stretch/role-stories
 import { roleStoryBack, roleStoryCopy, roleStoryDescription, roleStoryName, roleStorySectionKeys, roleStorySectionLabels } from "../src/content/stretch/role-story";
 import { passRecords } from "../src/content/stretch/staff-pass";
 import { drawn, expectDrawn } from "./support/measure";
+import { spoken } from "./support/roll";
 import { renderedContrast } from "./support/rendered-contrast";
 import { withoutScene } from "./support/scene";
 
@@ -48,7 +49,7 @@ for (const slug of roleStorySlugs) {
 
     test("the opening shows the story's evidence figures, each value over its words", async ({ page }) => {
       const list = opening(page).getByRole("list", { name: "Evidence" });
-      await expect(list.getByRole("listitem")).toHaveText(story.evidence.map(({ value, label }) => `${value} ${label}`));
+      expect(await spoken(list.getByRole("listitem"))).toEqual(story.evidence.map(({ value, label }) => `${value} ${label}`));
       await expect(list.locator("b").first()).toHaveCSS("font-family", /Newsreader/);
     });
 

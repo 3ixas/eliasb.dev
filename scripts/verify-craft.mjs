@@ -36,6 +36,8 @@ const motionTransitions = [
   ['.pass__sheen', 'a staff pass catches the light'],
   ['[data-rise]', 'a panel or card rises into view (DESIGN.md "Motion")'],
   ['[data-grow] .bar', 'bars to scale grow from the left'],
+  ['.roll__strip', 'a figure rolls its digits to its value'],
+  ['.roll__face > span', 'the digits a rolling figure gains fade in'],
   ['[data-grow] .measure--ms', 'a latency fills in its own time'],
   ['[data-grow] :is(.measure--days', 'working days arrive a square at a time, minutes a tick at a time'],
   ['.project__shot', "a project's screenshot lifts on hover (DESIGN.md \"Motion\")"],

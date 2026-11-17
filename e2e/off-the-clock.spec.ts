@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { offTheClock } from "../src/content/stretch/off-the-clock";
 import { renderedContrast } from "./support/rendered-contrast";
+import { spoken } from "./support/roll";
 
 /*
  * Off the clock (docs/design/DESIGN.md "The homepage, in order" 7, R-19, R-30, R-34): one paper panel in four sections,
@@ -263,7 +264,7 @@ test.describe("Off the clock: the GitHub year", () => {
     const days = card.locator("[data-github-days]");
     await expect(days.locator("button")).toHaveCount(365);
     await expect(days).toHaveAttribute("aria-label", /^GitHub contributions over the past year: [\d,]+\.$/);
-    await expect(card.locator(".stretch-gh__total")).toContainText(`${await totalOf(card)} contributions in the past year`);
+    expect((await spoken(card.locator(".stretch-gh__total")))[0]).toContain(`${await totalOf(card)} contributions in the past year`);
     await expect(card.locator(".stretch-gh__legend")).toContainText(offTheClock.github.legend.less);
     await expect(card.locator(".stretch-gh__legend")).toContainText(offTheClock.github.legend.more);
   });

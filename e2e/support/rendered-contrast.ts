@@ -85,7 +85,15 @@ async function measureOnce(page: Page): Promise<ContrastReading[]> {
       const node = walker.currentNode;
       const element = node.parentElement;
       if (!node.textContent?.trim() || !element) continue;
-      if (element.closest("[aria-hidden='true'], .sr-only, script, style, noscript, [hidden]")) continue;
+      // A rolling figure (#456) is seen on its face, which assistive technology skips for its value: measure the digit
+      // each window shows, not the digits rolled out of it.
+      const face = element.closest(".roll__face");
+      if (element.closest(face ? ".sr-only, [hidden]" : "[aria-hidden='true'], .sr-only, script, style, noscript, [hidden]")) continue;
+      if (face && element.parentElement?.matches(".roll__strip")) {
+        const window = element.closest(".roll__digit")!.getBoundingClientRect();
+        const own = element.getBoundingClientRect();
+        if (own.top < window.top || own.bottom > window.bottom) continue;
+      }
       if (!element.checkVisibility({ opacityProperty: true, visibilityProperty: true })) continue;
       const range = document.createRange();
       range.selectNodeContents(node);

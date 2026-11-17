@@ -174,7 +174,7 @@ Every text pair passes WCAG 2.2 AA, measured on the rendered page and on every p
 - **Newsreader** (variable, optical size on) for the opening line, titles, figures, ledes, prose and the email. **Instrument Sans** for interface text, labels, captions and the stories on the habit cards. Both self-hosted through `next/font`, with fallback faces scaled to their measured widths. Only the Résumé sheet keeps JetBrains Mono.
 - **Scale**: opening line `clamp(36px, 3.7vw, 54px)` at line height 1.05 and −0.028 em; page titles `clamp(52px, 7vw, 104px)`; section titles `clamp(36px, 3.6vw, 52px)`; panel titles `clamp(30px, 3vw, 42px)`; prose 20 px; interface 15 to 16 px; small text 13 to 14.5 px.
 - **One floor.** Nothing a visitor reads is smaller than 13 px, on the page or printed on a pass.
-- **Figures** are lining and tabular wherever they are compared or count up.
+- **Figures** are lining and tabular wherever they are compared or roll.
 - **No italics for emphasis and no uppercase display.** Emphasis is colour (the opening line) or the highlight (a habit's proof).
 - **Lines of parts** (a role and its dates) wrap between parts; a dot never starts or ends a line.
 
@@ -183,12 +183,12 @@ Every text pair passes WCAG 2.2 AA, measured on the rendered page and on every p
 - **Easings**: `--out: cubic-bezier(.22, 1, .36, 1)` for things that settle, `--spring: cubic-bezier(.3, 1.5, .4, 1)` for things that swing.
 - **Passes** swing to rest once on arrival (1.8 s, each 80 ms after the last). On hover a pass leans the other way, catches the light where the pointer is, and its hologram turns. In 3D a pass swings once on its strap where it was printed, within the gap to its neighbour, and settles; its hologram turns its colours as the card turns.
 - **Panels and cards** rise 16 px and fade in once, when 15% in view.
-- **Display figures** count to their value once, over 1.2 s.
+- **Display and evidence figures** roll to their value once, over 1.2 s: each digit turns, behind a window that fades at its top and bottom, from its start digit to its own, all together; digits the start does not reach fade in. A screen reader is given the value, never the rolling digits.
 - **Comparisons** arrive once, in their own unit. A latency's bars fill in their real time, together and at a constant rate: 520 ms takes 520 ms and 230 ms takes 230 ms, so the faster one is felt finishing first. Working days arrive a square at a time (60 ms apart) and minutes a tick at a time from zero (14 ms apart), after following before by 300 ms. Other bars grow from the left, the after bar 300 ms behind the before. Arming is instant; only the arrival moves.
 - **The simulation**: the paths draw over about 1.1 s, the histogram grows, the price line appears last. It is drawn when it comes into view, never before first paint.
 - **Screenshots** in a project panel lift 10 px on hover.
 - **Theme changes** crossfade over 0.3 s.
-- **Reduced motion** shows every end state at once: nothing swings, rises, counts or draws, and theme changes are instant. Content never waits for motion.
+- **Reduced motion** shows every end state at once: nothing swings, rises, rolls or draws, and theme changes are instant. Content never waits for motion.
 
 ## Craft bar
 

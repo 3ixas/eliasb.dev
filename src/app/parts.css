@@ -385,6 +385,61 @@
   transition-property: none;
 }
 
+/* ---- Rolling figures (#456) ---- */
+
+/*
+ * A figure that rolls (components/parts/on-view.tsx `Count`): each digit is a strip of 0 to 9, a line and a gap apart
+ * (--roll-step; the gap is wider than the fade, so no neighbour shows at rest), seen through a window a line tall that
+ * fades at its top and bottom, so the digits passing it read as a roll. The strip
+ * stands at its digit (`--to`); armed below the fold it stands at the start's (`--from`) and the digits the start does
+ * not reach are unseen. Arming is instant; the release rolls every digit together over 1.2 s.
+ */
+.roll__face {
+  --roll-step: calc(1lh + 0.4em);
+  display: inline-flex;
+  font-variant-numeric: lining-nums tabular-nums;
+  user-select: none;
+}
+
+.roll__face > span {
+  display: block;
+  height: 1lh;
+  white-space: pre;
+  transition: opacity 600ms var(--out);
+}
+
+.roll__face > .roll__digit {
+  height: calc(1lh + 0.3em);
+  margin-block: -0.15em;
+  padding-block: 0.15em;
+  overflow: hidden;
+  mask-image: linear-gradient(transparent, #000 0.15em, #000 calc(100% - 0.15em), transparent);
+}
+
+.roll__strip {
+  display: block;
+  transform: translateY(calc(var(--to) * -1 * var(--roll-step)));
+  transition: transform 1.2s var(--out);
+}
+
+.roll__strip > span {
+  display: block;
+  height: 1lh;
+  margin-bottom: calc(var(--roll-step) - 1lh);
+}
+
+[data-armed] .roll__strip {
+  transform: translateY(calc(var(--from) * -1 * var(--roll-step)));
+}
+
+[data-armed] .roll__face > [data-lead] {
+  opacity: 0;
+}
+
+[data-armed] :is(.roll__strip, .roll__face > span) {
+  transition-property: none;
+}
+
 /* ---- Comparisons in their own units (#456) ---- */
 
 /*
@@ -594,8 +649,12 @@
 /* A printed page has no viewport to arrive in. */
 @media print {
   [data-armed],
-  [data-armed] :is(.bar, .measure--days i, .measure--minutes i) {
+  [data-armed] :is(.bar, .measure--days i, .measure--minutes i, .roll__face > span) {
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  [data-armed] .roll__strip {
+    transform: translateY(calc(var(--to) * -1 * var(--roll-step))) !important;
   }
 }

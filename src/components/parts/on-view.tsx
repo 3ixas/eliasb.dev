@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, type CSSProperties, type ReactNode, type RefObject } from "react";
 
 type Arrival = {
   /** Sets the start state. */
@@ -75,41 +75,64 @@ export function OnView({ motion, className, children }: { motion: "rise" | "grow
   );
 }
 
-const COUNT_MS = 1200;
-const grouped = new Intl.NumberFormat("en-GB");
+/** A figure's characters: its digits, which roll, and the rest, which stay. `lead` marks those the start value does not reach. */
+type Glyph = { char: string; digit?: number; from?: number; lead: boolean };
 
 /**
- * A display figure that counts to its value once, over 1.2 s, when it comes into view. The server writes the finished
- * figure, and only the text node changes, so nothing moves. Before printing it is finished at once. Tabular figures (DESIGN.md "Type") keep its width steady.
+ * "−40%", "230 ms" or "1,234" as glyphs rolling from `from`, or undefined when it is not one number with at most a sign
+ * before and a per cent or a short unit after: "Six", "Nov 2025" and "2-minute", a number joined to a word, stay as
+ * they are. The start's digits line up with the value's from the right.
  */
-export function Count({ to, from = 0, prefix = "", suffix = "" }: { to: number; from?: number; prefix?: string; suffix?: string }) {
-  const text = useRef<HTMLSpanElement>(null);
-  const write = (element: HTMLElement, value: number) => {
-    element.textContent = `${prefix}${grouped.format(value)}${suffix}`;
-  };
-  const frame = useRef(0);
-  useFirstSight(text, {
-    arm: (element) => write(element, from),
-    release: (element) => {
-      const started = performance.now();
-      const step = (now: number) => {
-        const progress = Math.min((now - started) / COUNT_MS, 1);
-        write(element, Math.round(from + (to - from) * (1 - (1 - progress) ** 3)));
-        if (progress < 1) frame.current = requestAnimationFrame(step);
-      };
-      frame.current = requestAnimationFrame(step);
-    },
-    finish: (element) => write(element, to),
+function rolling(value: string, from: number): Glyph[] | undefined {
+  const match = value.match(/^([−+]?)(\d{1,3}(?:,\d{3})+|\d+)(%| [a-z]{1,3})?$/);
+  if (!match) return undefined;
+  const [, prefix, number, suffix = ""] = match;
+  const start = String(Math.trunc(Math.abs(from)));
+  let place = [...number].filter((char) => /\d/.test(char)).length;
+  const glyphs = [...number].map((char): Glyph => {
+    const reached = place <= start.length;
+    if (!/\d/.test(char)) return { char, lead: !reached };
+    const digit = Number(char);
+    const glyph = { char, digit, from: reached ? Number(start[start.length - place]) : 0, lead: !reached };
+    place -= 1;
+    return glyph;
   });
-  useEffect(() => () => cancelAnimationFrame(frame.current), []);
-  // A printed page has no viewport to arrive in: a figure still armed (or mid-count) prints its finished value.
-  useEffect(() => {
-    const printing = () => {
-      cancelAnimationFrame(frame.current);
-      if (text.current) text.current.textContent = `${prefix}${grouped.format(to)}${suffix}`;
-    };
-    window.addEventListener("beforeprint", printing);
-    return () => window.removeEventListener("beforeprint", printing);
-  }, [to, prefix, suffix]);
-  return <span ref={text}>{`${prefix}${grouped.format(to)}${suffix}`}</span>;
+  return [...(prefix ? [{ char: prefix, lead: false }] : []), ...glyphs, ...(suffix ? [{ char: suffix, lead: false }] : [])];
+}
+
+const DIGITS = [..."0123456789"];
+
+/**
+ * A display or evidence figure that rolls to its value once, over 1.2 s, when it comes into view (#456): each digit is
+ * a column of 0 to 9 behind a fading window, turned from its start digit to its own, and the digits the start does not
+ * reach fade in. Styles are in parts.css. A screen reader reads the value, never the columns; without script, with
+ * reduced motion, in view on arrival or in print it is the finished figure. A value that is not one number is as it is.
+ */
+export function Count({ value, from = 0 }: { value: string; from?: number }) {
+  const box = useRef<HTMLSpanElement>(null);
+  useFirstSight(box, lift);
+  const glyphs = rolling(value, from);
+  if (!glyphs) return value;
+  return (
+    <span ref={box} className="roll">
+      <span className="sr-only">{value}</span>
+      <span className="roll__face" aria-hidden="true">
+        {glyphs.map(({ char, digit, from: start, lead }, index) =>
+          digit === undefined ? (
+            <span key={index} data-lead={lead ? "" : undefined}>
+              {char}
+            </span>
+          ) : (
+            <span key={index} className="roll__digit" data-lead={lead ? "" : undefined} style={{ "--to": digit, "--from": start } as CSSProperties}>
+              <span className="roll__strip">
+                {DIGITS.map((shown) => (
+                  <span key={shown}>{shown}</span>
+                ))}
+              </span>
+            </span>
+          ),
+        )}
+      </span>
+    </span>
+  );
 }

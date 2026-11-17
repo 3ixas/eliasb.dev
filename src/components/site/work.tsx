@@ -8,7 +8,7 @@ import { SimulationPlot } from "@/components/site/simulation-plot";
 import { roleStories } from "@/content/stretch/role-stories";
 import type { RoleStorySlug } from "@/content/stretch/role-story";
 import { passRecords } from "@/content/stretch/staff-pass";
-import { comparisonRow, countable, displayFigure, workPanels, type Pair, type RolePanel } from "@/content/stretch/work-panels";
+import { comparisonRow, displayFigure, workPanels, type Pair, type RolePanel } from "@/content/stretch/work-panels";
 
 /** The panel's header: the employer's short name (as on its pass), with its role and dates at the right. */
 function Head({ slug }: { slug: RoleStorySlug }) {
@@ -116,17 +116,16 @@ function PairRow({ pair }: { pair: Pair }) {
   );
 }
 
-/** Joveen or Optegra: a display figure that counts to its value once, three pairs in their units and the link to the story. */
+/** Joveen or Optegra: a display figure that rolls to its value once, three pairs in their units and the link to the story. */
 function RolePanelView({ panel }: { panel: RolePanel }) {
   const story = roleStories[panel.slug];
   const { value, label } = displayFigure(story, panel.figure)!;
-  const counted = countable(value);
   return (
     <OnView motion="rise" className="work-role__arrival">
       <Panel id={panel.slug} colours={story.panel} className="work-role">
         <Head slug={panel.slug} />
         <p className="work-role__figure">
-          <span className="figure__value">{counted ? <Count from={panel.figure.from} to={counted.to} prefix={counted.prefix} suffix={counted.suffix} /> : value}</span>
+          <span className="figure__value"><Count value={value} from={panel.figure.from} /></span>
           <span className="figure__label">{label}</span>
         </p>
         <OnView motion="grow">

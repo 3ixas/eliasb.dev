@@ -27,7 +27,7 @@ export type Comparison = { row: number; before: Side; after: Side };
  */
 export type Pair = Measure & { what: string; value: string };
 
-/** A display figure: one of the story's evidence items, counting from `from` when it is a number that moved. */
+/** A display figure: one of the story's evidence items, rolling from `from` when it is a number that moved. */
 export type DisplayFigure = { evidence: number; from: number };
 
 export type BnpPanel = {
@@ -93,14 +93,6 @@ export function comparisonRow(story: RoleStory, { row }: Comparison) {
 /** A display figure's value and label, split as the panel shows them: the evidence item itself. */
 export function displayFigure(story: RoleStory, { evidence }: DisplayFigure) {
   return story.evidence[evidence];
-}
-
-/** "−40%" as its sign, size and suffix, so the figure can count up to its size behind a fixed sign (the content's U+2212 minus). */
-export function countable(value: string): { prefix: string; to: number; suffix: string } | undefined {
-  const match = value.match(/^([−+]?)(\d+)(\D*)$/);
-  if (!match) return undefined;
-  const [, prefix, digits, suffix] = match;
-  return { prefix, to: Number(digits), suffix };
 }
 
 const numbersIn = (text: string) => text.match(/\d+/g) ?? [];
