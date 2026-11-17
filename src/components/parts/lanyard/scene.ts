@@ -40,6 +40,8 @@ const HOLD_MS = 250;
 const SLOP = 8;
 /** A frame that takes longer than this (ms) is drawn on the processor, not a graphics chip. */
 const SLOW = 50;
+/** How far the canvas draws below its stage: as far as the rails' clip lets a card hang (opening.css, story.css). At the sides it reaches the window's edges. */
+const BLEED = 320;
 /** The card's lower edge in pass.css. */
 const EDGE = new Color(0xc9c8c1);
 /**
@@ -56,7 +58,10 @@ const ARRIVALS = [
 export type Mount = { stage: HTMLElement; passes: HTMLElement[]; onReady: () => void };
 
 export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<() => void> {
-  const renderer = new WebGLRenderer({ antialias: true, alpha: true, failIfMajorPerformanceCaveat: true });
+  // The canvas reaches the window's sides, and multisampling resolves all of it every frame: at twice the pixels it cost
+  // six times the frame (37 ms against 6). On a 2x screen the pixels themselves smooth the card's edges, so it is kept
+  // for 1x screens, where the canvas has a quarter of the pixels.
+  const renderer = new WebGLRenderer({ antialias: window.devicePixelRatio < 2, alpha: true, failIfMajorPerformanceCaveat: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.toneMapping = NeutralToneMapping;
@@ -66,6 +71,11 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
   const canvas = renderer.domElement;
   canvas.className = "lanyard__scene";
   canvas.setAttribute("aria-hidden", "true");
+  // The canvas draws past the stage, so a card swung to the side is never cut at the stage's edge; it takes no pointer,
+  // so the text beside it stays live. The pad, the stage's own size, is what a pointer takes hold of a card through.
+  const pad = document.createElement("div");
+  pad.className = "lanyard__pad";
+  pad.setAttribute("aria-hidden", "true");
 
   const scene = new Scene();
   const pmrem = new PMREMGenerator(renderer);
@@ -105,24 +115,42 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
 
   // Laying out: the stage's pixels map to world units at the cards' plane, where the widest card's width is 1. Where the
   // stage scrolls sideways (the homepage's rail on a phone), the canvas spans all it scrolls through.
-  let view = { width: 0, height: 0, unit: 0 };
-  const measure = () => ({ width: contentWidth(), height: stage.clientHeight, unit: Math.max(...hanging.map((pass) => pass.printed.offsetWidth)) });
-  // The canvas itself overflows the stage at its last size, so it is taken out of the measure: a narrower stage shrinks it.
+  let view = { width: 0, height: 0, unit: 0, left: 0, right: 0, bottom: 0 };
+  const measure = () => ({ width: contentWidth(), height: stage.clientHeight, unit: Math.max(...hanging.map((pass) => pass.printed.offsetWidth)), ...bleed() });
+  // The canvas and the pad overflow the stage at their last size, so they are taken out of the measure: a narrower stage
+  // shrinks them.
   const contentWidth = () => {
-    const was = canvas.style.width;
-    canvas.style.width = "0";
+    const was = [canvas.style.width, pad.style.width];
+    canvas.style.width = pad.style.width = "0";
     const width = stage.scrollWidth;
-    canvas.style.width = was;
+    [canvas.style.width, pad.style.width] = was;
     return width;
   };
-  const toWorld = (x: number, y: number): Vec3 => ({ x: (x - view.width / 2) / view.unit, y: (view.height / 2 - y) / view.unit, z: 0 });
+  // How far the canvas draws past the stage: to the window's sides, wherever a card is swung, but never past them, which
+  // would scroll the page sideways; BLEED below; and not at all where the stage scrolls sideways itself.
+  const bleed = () => {
+    if (getComputedStyle(stage).overflowX !== "visible") return { left: 0, right: 0, bottom: 0 };
+    const { left, right } = stage.getBoundingClientRect();
+    const side = (room: number) => Math.max(0, Math.floor(room));
+    return { left: side(left), right: side(document.documentElement.clientWidth - right), bottom: BLEED };
+  };
+  // A point in the stage, in world units: the camera looks at the middle of the canvas, which reaches past the stage.
+  const toWorld = (x: number, y: number): Vec3 => {
+    const width = view.left + view.width + view.right;
+    const height = view.height + view.bottom;
+    return { x: (view.left + x - width / 2) / view.unit, y: (height / 2 - y) / view.unit, z: 0 };
+  };
 
   function layout(arrive: boolean) {
     view = measure();
-    renderer.setSize(view.width, view.height);
-    const tall = view.height / view.unit;
-    const wide = view.width / view.unit;
-    camera.aspect = view.width / view.height;
+    const width = view.left + view.width + view.right;
+    const height = view.height + view.bottom;
+    renderer.setSize(width, height);
+    canvas.style.left = `${-view.left}px`;
+    Object.assign(pad.style, { width: `${view.width}px`, height: `${view.height}px` });
+    const tall = height / view.unit;
+    const wide = width / view.unit;
+    camera.aspect = width / height;
     camera.position.set(0, 0, tall / 2 / Math.tan((FOV * Math.PI) / 360));
     camera.far = camera.position.z + 20;
     camera.updateProjectionMatrix();
@@ -194,7 +222,7 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     const { pass, point, id } = press;
     // A pointer that has already gone (a touch ended as its hold began) is not held.
     try {
-      canvas.setPointerCapture(id);
+      pad.setPointerCapture(id);
     } catch {
       press = null;
       return;
@@ -202,7 +230,7 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     plane.constant = -point.z;
     pass.hold(point);
     press.held = true;
-    canvas.dataset.holding = "";
+    pad.dataset.holding = "";
     run();
   };
   const down = (event: PointerEvent) => {
@@ -213,11 +241,11 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     const middle = event.button === 1;
     press = { ...found, id: event.pointerId, touch, x: event.clientX, y: event.clientY, held: false, moved: false, timer: 0, middle };
     // A middle press only opens the link, as it would on the printed pass; it never takes hold. It is captured, so its
-    // release reaches the canvas wherever it happens and the press is always cleared.
+    // release reaches the pad wherever it happens and the press is always cleared.
     if (middle) {
       if (found.pass.link) event.preventDefault();
       try {
-        canvas.setPointerCapture(event.pointerId);
+        pad.setPointerCapture(event.pointerId);
       } catch {
         press = null;
       }
@@ -243,7 +271,7 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
       }
       return;
     }
-    if (event.pointerType === "mouse") canvas.style.cursor = cast(event) ? "grab" : "";
+    if (event.pointerType === "mouse") pad.style.cursor = cast(event) ? "grab" : "";
   };
   const end = (event: PointerEvent) => {
     if (press?.id !== event.pointerId) return;
@@ -252,10 +280,10 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     press = null;
     if (held) {
       pass.lanyard.release();
-      delete canvas.dataset.holding;
+      delete pad.dataset.holding;
       run();
     }
-    if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+    if (pad.hasPointerCapture(event.pointerId)) pad.releasePointerCapture(event.pointerId);
     // A press that did not drag is a click on the pass; a touch held to take hold of the card is not. A middle click, or
     // one with Ctrl, Cmd or Shift, opens the link in a new tab as the printed link would.
     if (event.type !== "pointerup" || moved || (touch && held) || !pass.link) return;
@@ -269,12 +297,12 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
   const noMenu = (event: Event) => {
     if (press?.touch) event.preventDefault();
   };
-  canvas.addEventListener("pointerdown", down);
-  canvas.addEventListener("pointermove", move);
-  canvas.addEventListener("pointerup", end);
-  canvas.addEventListener("pointercancel", end);
-  canvas.addEventListener("touchmove", holdTouch, { passive: false });
-  canvas.addEventListener("contextmenu", noMenu);
+  pad.addEventListener("pointerdown", down);
+  pad.addEventListener("pointermove", move);
+  pad.addEventListener("pointerup", end);
+  pad.addEventListener("pointercancel", end);
+  pad.addEventListener("touchmove", holdTouch, { passive: false });
+  pad.addEventListener("contextmenu", noMenu);
 
   // Off screen the loop stops; a resize lays the passes out again at rest; a theme change reprints the card stock.
   const seen = new IntersectionObserver(([entry]) => {
@@ -282,16 +310,18 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     if (visible) run();
   });
   seen.observe(stage);
+  // The stage resizing, or the window around it (which moves the stage and so how far the canvas reaches past it), lays
+  // the passes out again; observing reports the stage's size once at the start, so only a real change does.
   let resizing = 0;
-  const resized = new ResizeObserver(() => {
+  const relayout = () => {
     cancelAnimationFrame(resizing);
     resizing = requestAnimationFrame(() => {
-      // Observing reports the stage's size once at the start; only a real change of size lays the passes out again.
       const next = measure();
-      if (next.width === view.width && next.height === view.height && next.unit === view.unit) return;
+      if ((["width", "height", "unit", "left", "right", "bottom"] as const).every((key) => next[key] === view[key])) return;
       layout(false);
     });
-  });
+  };
+  const resized = new ResizeObserver(relayout);
   const shade = () => {
     const dark = getComputedStyle(document.documentElement).getPropertyValue("--dark").trim() === "1";
     shadow.opacity = dark ? 0.5 : 0.22;
@@ -319,9 +349,11 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     if (press) clearTimeout(press.timer);
     seen.disconnect();
     resized.disconnect();
+    window.removeEventListener("resize", relayout);
     themed.disconnect();
     scheme.removeEventListener("change", schemeChanged);
     canvas.remove();
+    pad.remove();
     hanging.forEach((pass) => pass.dispose());
     backdrop.geometry.dispose();
     [back, edge, metal, rivet, shadow, ...fabrics.values()].forEach((material) => material.dispose());
@@ -331,14 +363,14 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
   };
 
   shade();
-  stage.append(canvas);
+  stage.append(canvas, pad);
   layout(true);
   // The first frame compiled the shaders; the second, read back once drawn, says what a frame costs here. Drawn on the
   // processor (a software renderer that names itself as a GPU), it would take the page's time from everything else, so
   // the printed passes stay. Reading one pixel waits for the frame to finish, as finish() does not everywhere.
   const gl = renderer.getContext();
   const started = performance.now();
-  renderer.render(scene, camera);
+  draw();
   gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
   const cost = performance.now() - started;
   stage.dataset.lanyardFrame = `${Math.round(cost)} ms`;
@@ -347,6 +379,7 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     throw new Error(`Too slow to draw (${Math.round(cost)} ms a frame)`);
   }
   resized.observe(stage);
+  window.addEventListener("resize", relayout);
   onReady();
   run();
   return dispose;

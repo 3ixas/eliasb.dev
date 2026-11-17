@@ -248,3 +248,8 @@ No code to replace. They check the finished build; see the tickets.
 ### #461 Role stories
 
 - **Part 1, the long-form layout (shared with case studies, `story.css`):** `.story-section__title` is `position: sticky; top: 32px; align-self: start` from 720 px. `.story-section__body` has no width of its own; its children other than `.story-fig` keep `max-width: 760px`, so a figure fills the text side (837 px at 1440). A page-spanning figure was tried for the simulation and dropped: it slid beneath the held heading.
+
+### #448 follow-up: the pass swings free of its rail
+
+- **Why (Elias, 17 November):** swung to the side, the 3D pass was cut at the rail's edge, "a mental reminder that this is just in some awkward coded box".
+- **As built (`lanyard/scene.ts`, `pass.css`, the rails' `clip-path`):** the canvas draws past the stage to the window's sides and `BLEED` (320 px) below, never past the window and not at all where the stage scrolls sideways (the homepage's rail on a phone). It has `pointer-events: none`; `.lanyard__pad`, the stage's own size, takes the pointer, its capture, the grab cursor and `data-holding`. `toWorld` and the camera centre on the whole canvas. The window's resize lays the scene out again, as the stage's does. `.opening__rail` and `.story-open__rail` clip at `inset(0 -100vw -320px -100vw)`. Antialiasing is on only below a device pixel ratio of 2: multisampling the window-wide canvas took a frame from 6 to 37 ms at 2×.

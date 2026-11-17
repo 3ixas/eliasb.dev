@@ -141,7 +141,7 @@
   justify-content: center;
   align-items: flex-start;
   padding-bottom: 48px;
-  clip-path: inset(0 -200px -200px -200px);
+  clip-path: inset(0 -100vw -320px -100vw);
 }
 
 /* ---- A case study's opening: a panel in the project's colour ---- */
