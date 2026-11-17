@@ -5,7 +5,8 @@ import { passRecords } from "../src/content/stretch/staff-pass";
 import { comparisonRow, workPanels } from "../src/content/stretch/work-panels";
 import { drawn, expectDrawn } from "./support/measure";
 import { shown } from "./support/roll";
-import { SIM, simulation } from "../src/components/site/simulation-model";
+import { SIM, simulate, simulation } from "../src/components/site/simulation-model";
+import { simulationCopy } from "../src/content/stretch/simulation-copy";
 import { renderedContrast } from "./support/rendered-contrast";
 
 /*
@@ -134,7 +135,7 @@ test.describe("Work: the panels", () => {
         painted: painted / (canvas.width * canvas.height),
       };
     }, mean);
-    // Each endpoint is one dot in its band, and the bands hold every walk.
+    // Each endpoint is one dot in its band (a hundred walks is one a dot), and the bands hold every walk.
     for (const [count, dots] of reading.bins) expect(dots).toBe(count);
     expect(reading.bins.reduce((sum, [count]) => sum + count, 0)).toBe(SIM.paths);
     expect(reading.offset).toBeLessThan(1.5);
@@ -351,6 +352,87 @@ test.describe("Work: arriving", () => {
     await expect(plot(page)).not.toHaveAttribute("data-armed");
     await expect(landed).toHaveCount(SIM.paths);
     expect(await at()).toBeCloseTo(mean, 9);
+  });
+});
+
+test.describe("Work: the simulation's controls", () => {
+  const step = (page: Page, label: string) => page.locator(".sim__step", { hasText: new RegExp(`^${label}$`) });
+  const again = (page: Page) => page.getByRole("button", { name: simulationCopy.again });
+  const settled = (page: Page, count: number) => expect(plot(page)).toHaveAttribute("data-drawn", String(count));
+
+  test.beforeEach(async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    await hydrated(page);
+    await page.locator(".sim").scrollIntoViewIfNeeded();
+    await settled(page, SIM.paths);
+  });
+
+  test("Paths sets 10, 100 or 1,000 walks, reports which is pressed, and tells a screen reader the run's paths and price", async ({ page }) => {
+    await expect(page.getByRole("group", { name: simulationCopy.paths }).getByRole("button")).toHaveText(["10", "100", "1,000"]);
+    await expect(step(page, "100")).toHaveAttribute("aria-pressed", "true");
+    for (const [label, count] of [["10", 10], ["1,000", 1000], ["100", 100]] as const) {
+      await step(page, label).click();
+      await settled(page, count);
+      await expect(step(page, label)).toHaveAttribute("aria-pressed", "true");
+      const seed = Number(await plot(page).getAttribute("data-seed"));
+      const run = simulate(seed, count);
+      const bins = await page.locator(".sim__bin").evaluateAll((elements) => elements.map((element) => Number((element as HTMLElement).dataset.count)));
+      expect(bins).toEqual(run.bins);
+      // A dot is a walk, or ten walks at a thousand, and a band with any walks shows one.
+      const per = count >= 1000 ? 10 : 1;
+      const dots = await page.locator(".sim__bin").evaluateAll((elements) => elements.map((element) => element.querySelectorAll("i").length));
+      expect(dots).toEqual(run.bins.map((walks) => Math.ceil(walks / per)));
+      await expect(page.locator(".sim [aria-live='polite']")).toHaveText(simulationCopy.settled(new Intl.NumberFormat("en-GB").format(count), run.change));
+    }
+  });
+
+  test("Run again draws a new set from a new seed, with the same number of walks, and moves the price to its mean", async ({ page }) => {
+    const before = await plot(page).getAttribute("data-seed");
+    await again(page).click();
+    await expect(plot(page)).not.toHaveAttribute("data-seed", before!);
+    await settled(page, SIM.paths);
+    const run = simulate(Number(await plot(page).getAttribute("data-seed")), SIM.paths);
+    const offset = await plot(page).evaluate((element, at) => {
+      const box = element.getBoundingClientRect();
+      return Math.abs(element.querySelector(".sim__price")!.getBoundingClientRect().top - (box.top + at * box.height));
+    }, run.mean);
+    expect(offset).toBeLessThan(1.5);
+  });
+
+  test("the controls are buttons of at least 44 px, in reading order after the plot", async ({ page }, testInfo) => {
+    // Safari moves focus to buttons with Option-Tab unless its setting says otherwise.
+    const tab = testInfo.project.name.startsWith("webkit") ? "Alt+Tab" : "Tab";
+    for (const button of [again(page), step(page, "10"), step(page, "100"), step(page, "1,000")]) {
+      const box = (await button.boundingBox())!;
+      expect(Math.min(box.width, box.height)).toBeGreaterThanOrEqual(44);
+    }
+    await again(page).focus();
+    const reached = [await page.evaluate(() => document.activeElement?.textContent)];
+    for (let index = 0; index < 3; index += 1) {
+      await page.keyboard.press(tab);
+      reached.push(await page.evaluate(() => document.activeElement?.textContent));
+    }
+    expect(reached).toEqual([simulationCopy.again, "10", "100", "1,000"]);
+  });
+
+  test("a control pressed mid-arrival starts the new run cleanly, and nothing of the old one is left", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.clock.install();
+    await page.reload();
+    await hydrated(page);
+    await page.clock.pauseAt(new Date(Date.now() + 60_000));
+    await page.locator(".sim").scrollIntoViewIfNeeded();
+    await step(page, "10").click();
+    await page.clock.runFor(SIM.arrival / 2);
+    expect(Number(await plot(page).getAttribute("data-arrived"))).toBeLessThan(10);
+    await step(page, "1,000").click();
+    await page.clock.runFor(SIM.arrival * 1.5);
+    await settled(page, 1000);
+    await expect(plot(page)).not.toHaveAttribute("data-armed");
+    const dots = page.locator(".sim__bin i");
+    await expect(page.locator(".sim__bin i[data-landed]")).toHaveCount(await dots.count());
+    expect(await page.locator(".sim__bin").evaluateAll((elements) => elements.reduce((sum, element) => sum + Number((element as HTMLElement).dataset.count), 0))).toBe(1000);
   });
 });
 

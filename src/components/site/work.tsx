@@ -1,9 +1,7 @@
 import Link from "next/link";
-import type { CSSProperties } from "react";
 import { MeasurePair, MeasureSide } from "@/components/parts/measure";
 import { OnView, Count } from "@/components/parts/on-view";
 import { Arrow, Panel, PanelHead } from "@/components/parts/panel";
-import { simulation } from "@/components/site/simulation-model";
 import { SimulationPlot } from "@/components/site/simulation-plot";
 import { roleStories } from "@/content/stretch/role-stories";
 import type { RoleStorySlug } from "@/content/stretch/role-story";
@@ -26,35 +24,15 @@ function StoryLink({ slug, outline = false }: { slug: RoleStorySlug; outline?: b
   );
 }
 
-/** The illustrative paths, where they end as a dot each, stacked by band at the right edge, and a dashed line at their mean labelled "One price". */
+/** The simulation: its heading, the plot and its controls (simulation-plot.tsx), its description and its caption. */
 function Simulation() {
-  const { title, start, end, price, caption, description } = workPanels.bnp.simulation;
-  const { bins, members, meanBin, mean } = simulation();
+  const { title, caption, description } = workPanels.bnp.simulation;
   return (
     <figure className="sim" aria-labelledby="sim-title" aria-describedby="sim-description">
       <h4 id="sim-title" className="sim__title">
         {title}
       </h4>
-      <SimulationPlot>
-        <div className="sim__hist" style={{ "--most": Math.max(...bins) } as CSSProperties} aria-hidden="true">
-          {bins.map((count, index) => (
-            <span key={index} className="sim__bin" data-count={count} data-mean={index === meanBin ? "" : undefined}>
-              {members[index].map((walk) => (
-                <i key={walk} data-walk={walk} />
-              ))}
-            </span>
-          ))}
-        </div>
-        <span className="sim__price" style={{ "--at": mean } as CSSProperties}>
-          <b>{price}</b>
-        </span>
-        <span className="sim__x sim__x--start" aria-hidden="true">
-          {start}
-        </span>
-        <span className="sim__x sim__x--end" aria-hidden="true">
-          {end}
-        </span>
-      </SimulationPlot>
+      <SimulationPlot />
       {/* Read as the figure's description and shown nowhere: the caption says what the engines do, this says what is drawn. */}
       <p id="sim-description" hidden>
         {description}

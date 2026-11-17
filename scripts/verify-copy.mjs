@@ -376,6 +376,9 @@ for (const [what, ids] of [["menu", siteCopy.menu.map(({ id }) => id)], ["Say he
   assert.equal(workPanels.subheading, work.note, "Work's subheading is its approved note");
   assert.equal(`${bnp.figure.value} · ${bnp.figure.label}`, bullet(deck, "BNP Paribas figure"), "Work: BNP Paribas's figure");
   assert.equal(bnp.simulation.title, bullet(deck, "Simulation heading"), "Work: the simulation's heading");
+  assert.equal(`${bnp.simulation.again} · ${bnp.simulation.paths} · 10 · 100 · 1,000`, bullet(deck, "Simulation controls"), "Work: the simulation's controls");
+  assert.equal(bnp.simulation.settled("1,000", 0.012), "1,000 paths: one price, 1.2% above today.", "Work: a settled run is read with its price");
+  assert.equal(bnp.simulation.settled("10", -0.0004), "10 paths: one price, level with today.", "Work: a price that rounds to nothing is level");
   assert.equal(`${bnp.simulation.start} · ${bnp.simulation.end} · ${bnp.simulation.price}`, bullet(deck, "Simulation"), "Work: the simulation's labels");
   assert.equal(bnp.simulation.caption, bullet(deck, "Simulation caption"), "Work: the simulation's caption");
   assert.equal(bnp.simulation.description, bullet(deck, "Simulation description"), "Work: the simulation's accessible description");

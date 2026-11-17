@@ -130,7 +130,7 @@
 .sim {
   grid-area: sim;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto 1fr auto auto;
   gap: 34px;
   min-width: 0;
   padding-block: 44px 40px;
@@ -182,21 +182,25 @@
   padding-left: 6px;
 }
 
-/* Each endpoint is a dot, stacked from the plot's edge in the band it ends in; the fullest band fills the width. */
+/*
+ * Each endpoint is a dot, stacked from the plot's edge in the band it ends in; the fullest band fills the width at
+ * most. A dot is a share of the width, drawn at 80% (`scale`) so neighbours stay apart. A dot is one walk, or ten
+ * when there are a thousand (`data-per`, simulation-plot.tsx), so a band never crowds.
+ */
 .sim__bin {
   display: flex;
   flex: 1;
   align-items: center;
-  gap: 1px;
   min-height: 0;
 }
 
 .sim__bin i {
   flex: 0 0 auto;
-  width: min(6px, calc((100% - (var(--most) - 1) * 1px) / var(--most)));
+  width: min(7px, calc(100% / var(--most)));
   aspect-ratio: 1;
   border-radius: 50%;
   background: var(--soft);
+  scale: 0.8;
 }
 
 .sim__bin[data-mean] i {
@@ -241,6 +245,48 @@
 
 .sim__x--end {
   right: 0;
+}
+
+/* The controls (#457): "Run again", then Paths as three steps in one outline, the pressed step filled with the ink. */
+.sim__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin-top: 6px;
+}
+
+.sim__steps {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-size: var(--type-ui);
+}
+
+.sim__steps > span {
+  padding-inline: 14px 8px;
+}
+
+.sim__step {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--panel-ink);
+  font: inherit;
+  font-variant-numeric: lining-nums tabular-nums;
+  cursor: pointer;
+  transition: background-color 150ms var(--out), color 150ms var(--out);
+}
+
+.sim__step[aria-pressed="true"] {
+  background: var(--panel-ink);
+  color: var(--field);
 }
 
 .sim figcaption {
@@ -429,5 +475,11 @@
 
   .sim__paths {
     color: CanvasText;
+  }
+
+  .sim__step[aria-pressed="true"] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
   }
 }

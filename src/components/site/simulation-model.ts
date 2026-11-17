@@ -37,6 +37,8 @@ export type Simulation = {
   meanBin: number;
   /** The mean of the endpoints, as a fraction of the plot's height from its top. */
   mean: number;
+  /** The same mean as a change from today's level: 0.012 is 1.2% above it. Illustrative, like everything here. */
+  change: number;
   /** The walks drawn to stand out: those ending at the 10th, 50th and 90th percentiles, so they show the spread. */
   featured: readonly number[];
 };
@@ -60,7 +62,8 @@ export function simulate(seed: number = SIM.seed, paths: number = SIM.paths): Si
   const meanHeight = ends.reduce((sum, end) => sum + end, 0) / ends.length;
   const order = ends.map((end, index) => [end, index] as const).sort((a, b) => a[0] - b[0]);
   const featured = [0.1, 0.5, 0.9].map((share) => order[Math.min(order.length - 1, Math.floor(share * order.length))][1]);
-  return { seed, walks, ends, bins, members, meanBin: binOf(meanHeight), mean: meanHeight / SIM.height, featured };
+  const change = (SIM.height / 2 - meanHeight) / SCALE;
+  return { seed, walks, ends, bins, members, meanBin: binOf(meanHeight), mean: meanHeight / SIM.height, change, featured };
 }
 
 let memo: Simulation | undefined;
