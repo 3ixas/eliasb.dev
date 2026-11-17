@@ -172,24 +172,61 @@
   }
 }
 
-/* The name and its role and dates are one unit at every width: the role and dates directly under the name. */
-.work-bnp--composed .panel__head {
+/* On every composed panel the name and its role and dates are one unit at every width: the role and dates directly under the name, a line each. */
+:is(.work-bnp--composed, .work-role--composed) .panel__head {
   flex-direction: column;
   align-items: flex-start;
-  gap: 14px;
+  gap: 12px;
 }
 
-.work-bnp--composed .panel__meta {
+:is(.work-bnp--composed, .work-role--composed) .panel__meta {
   margin-left: 0;
   text-align: left;
 }
 
-.work-bnp--composed .panel__meta span {
-  display: inline;
+/* Role over dates, a line each, so neither breaks mid-phrase where the panel is narrow. */
+:is(.work-bnp--composed, .work-role--composed) .panel__meta span {
+  white-space: nowrap;
 }
 
-.work-bnp--composed .panel__meta span + span::before {
-  content: " · ";
+/*
+ * Joveen and Optegra composed (#458, round 2): the name leads, the figure is a clear step under it, at BNP Paribas's
+ * figure size, so the three panels rank alike (name, figure, label, evidence), and its label stays quiet beneath.
+ */
+.work-role--composed .figure__value {
+  font-size: clamp(40px, 3.8vw, 56px);
+  line-height: 0.95;
+}
+
+.work-role--composed .work-role__figure {
+  margin-top: 56px;
+}
+
+.work-role--composed .figure__label {
+  margin-top: 10px;
+}
+
+/*
+ * Side by side, Joveen and Optegra share their rows (subgrid), so a label that runs to two lines on one panel moves the
+ * other's rule with it: the rules, the evidence and the links stay level across the pair.
+ */
+@media (min-width: 720px) {
+  .panels--aligned {
+    grid-template-rows: repeat(4, auto);
+    row-gap: 0;
+  }
+
+  .panels--aligned > .work-role__arrival {
+    display: grid;
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+  }
+
+  .panels--aligned .work-role--composed {
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+    row-gap: 0;
+  }
 }
 
 /* ---- Joveen and Optegra ---- */

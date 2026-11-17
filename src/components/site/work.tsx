@@ -79,12 +79,12 @@ function PairRow({ pair }: { pair: Pair }) {
 }
 
 /** Joveen or Optegra: a display figure that rolls to its value once, three pairs in their units and the link to the story. */
-function RolePanelView({ panel }: { panel: RolePanel }) {
+function RolePanelView({ panel, composed = false }: { panel: RolePanel; composed?: boolean }) {
   const story = roleStories[panel.slug];
   const { value, label } = displayFigure(story, panel.figure)!;
   return (
     <OnView motion="rise" className="work-role__arrival">
-      <Panel id={panel.slug} colours={story.panel} className="work-role">
+      <Panel id={panel.slug} colours={story.panel} className={composed ? "work-role work-role--composed" : "work-role"}>
         <Head slug={panel.slug} />
         <p className="work-role__figure">
           <span className="figure__value"><Count value={value} from={panel.figure.from} /></span>
@@ -117,9 +117,9 @@ export function Work({ composed = false }: { composed?: boolean }) {
       <p className="work__subheading">{workPanels.subheading}</p>
       <div className="panels">
         <BnpPanel composed={composed} />
-        <div className="panels panels--two">
+        <div className={composed ? "panels panels--two panels--aligned" : "panels panels--two"}>
           {workPanels.roles.map((panel) => (
-            <RolePanelView key={panel.slug} panel={panel} />
+            <RolePanelView key={panel.slug} panel={panel} composed={composed} />
           ))}
         </div>
       </div>
