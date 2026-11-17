@@ -214,7 +214,10 @@
     padding-block: 32px 28px;
   }
 
-  /* On a phone the label sits above the end of its line, over the dots, rather than taking width from the walks. */
+  /*
+   * On a phone the label takes no width from the walks: it sits above the line inside the plot, just short of the dots,
+   * so it covers only the faint walks and never an endpoint.
+   */
   .sim__plot {
     --hist: 64px;
     --label: 0px;
@@ -222,6 +225,7 @@
   }
 
   .sim__price b {
+    right: calc(var(--hist) + 18px);
     transform: translateY(calc(-100% - 6px));
   }
 }
