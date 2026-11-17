@@ -402,7 +402,7 @@ What Work's panels say, as approved in the passes and panels spec (R-13 to R-15,
 - Simulation caption: The engines run large simulation-based calculations across several asset classes. Thousands of possible market paths go in; a price and its risk come out.
 - Simulation description: Illustrative simulated paths from today to the horizon, a histogram of where they end on the right edge, and a dashed line at their average, labelled one price.
 
-The simulation heading was proposed on 17 November 2026 at Elias's request, so a reader knows what the chart shows before reaching its caption ([#457](https://github.com/3ixas/eliasb.dev/issues/457)); it awaits his sign-off. Screen readers read the description with the figure; nothing shows it on screen. Its words are R-14's own description of the drawing.
+The simulation heading was proposed on 17 November 2026 at Elias's request, so a reader knows what the chart shows before reaching its caption ([#457](https://github.com/3ixas/eliasb.dev/issues/457)); Elias signed it off on 17 November 2026, with the controls' words for round 3: the button "Run again", and the steps "10", "100", "1,000" grouped as "Paths". Screen readers read the description with the figure; nothing shows it on screen. Its words are R-14's own description of the drawing.
 
 | Comparison | Before | After |
 |---|---|---|

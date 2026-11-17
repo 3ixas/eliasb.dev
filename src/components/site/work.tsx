@@ -29,7 +29,7 @@ function StoryLink({ slug, outline = false }: { slug: RoleStorySlug; outline?: b
 /** The illustrative paths, where they end as a dot each, stacked by band at the right edge, and a dashed line at their mean labelled "One price". */
 function Simulation() {
   const { title, start, end, price, caption, description } = workPanels.bnp.simulation;
-  const { bins, meanBin, mean } = simulation();
+  const { bins, members, meanBin, mean } = simulation();
   return (
     <figure className="sim" aria-labelledby="sim-title" aria-describedby="sim-description">
       <h4 id="sim-title" className="sim__title">
@@ -39,8 +39,8 @@ function Simulation() {
         <div className="sim__hist" style={{ "--most": Math.max(...bins) } as CSSProperties} aria-hidden="true">
           {bins.map((count, index) => (
             <span key={index} className="sim__bin" data-count={count} data-mean={index === meanBin ? "" : undefined}>
-              {Array.from({ length: count }, (_, dot) => (
-                <i key={dot} />
+              {members[index].map((walk) => (
+                <i key={walk} data-walk={walk} />
               ))}
             </span>
           ))}

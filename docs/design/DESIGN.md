@@ -185,7 +185,7 @@ Every text pair passes WCAG 2.2 AA, measured on the rendered page and on every p
 - **Panels and cards** rise 16 px and fade in once, when 15% in view.
 - **Display and evidence figures** roll to their value once, over 1.2 s: each digit turns, behind a window that fades at its top and bottom, from its start digit to its own, all together; digits the start does not reach fade in. A screen reader is given the value, never the rolling digits.
 - **Comparisons** arrive once, in their own unit. A latency's bars fill in their real time, together and at a constant rate: 520 ms takes 520 ms and 230 ms takes 230 ms, so the faster one is felt finishing first. Working days arrive a square at a time (60 ms apart) and minutes a tick at a time from zero (14 ms apart), after following before by 300 ms. Other bars grow from the left, the after bar 300 ms behind the before. Arming is instant; only the arrival moves.
-- **The simulation**: the paths draw over about 1.1 s, the histogram grows, the price line appears last. It is drawn when it comes into view, never before first paint.
+- **The simulation** arrives once, walk by walk over 1.6 s ([#457](https://github.com/3ixas/eliasb.dev/issues/457)): each endpoint lands as a dot, sliding into its band, and "One price" appears with the first walk and follows the mean of the walks so far, so it wobbles and then settles as they add up; the featured three stand out last. It is drawn when it comes into view, never before first paint.
 - **Screenshots** in a project panel lift 10 px on hover.
 - **Theme changes** crossfade over 0.3 s.
 - **Reduced motion** shows every end state at once: nothing swings, rises, rolls or draws, and theme changes are instant. Content never waits for motion.

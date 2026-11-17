@@ -255,21 +255,9 @@ test.describe("Work: arriving", () => {
     await expect(joveen.locator(".figure__value .sr-only")).toHaveText("−40%");
     await expect(plot(page)).toHaveAttribute("data-armed", "");
     await expect(joveen.locator("[data-grow]")).toHaveAttribute("data-armed", "");
+    // The simulation's arrival is stepped by the clock in its own test below.
     await page.locator(".sim").scrollIntoViewIfNeeded();
-    await expect(plot(page)).toHaveAttribute("data-released", "");
-    await expect(plot(page)).not.toHaveAttribute("data-armed", "");
-    // Seek the draw instead of waiting it out: halfway through, part of the paths is drawn, and at the end all of them.
-    const halfway = await page.locator(".sim__paths").evaluate((element) => {
-      const draw = element.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "clip-path")!;
-      draw.pause();
-      draw.currentTime = 550;
-      return getComputedStyle(element).clipPath;
-    });
-    const hidden = Number(halfway.match(/inset\(0px ([\d.]+)%/)?.[1]);
-    expect(hidden, halfway).toBeGreaterThan(0);
-    expect(hidden, halfway).toBeLessThan(100);
-    await plot(page).evaluate((element) => element.getAnimations({ subtree: true }).forEach((animation) => animation.finish()));
-    await expect(page.locator(".sim__paths")).toHaveCSS("clip-path", "inset(0px)");
+    await expect(plot(page)).toHaveAttribute("data-arrived");
     await joveen.scrollIntoViewIfNeeded();
     await expect(joveen.locator("[data-grow]")).not.toHaveAttribute("data-armed", "");
     await expect(joveen.locator(".roll")).not.toHaveAttribute("data-armed", "");
@@ -330,18 +318,39 @@ test.describe("Work: arriving", () => {
     expect(delays[1][0]).toBeGreaterThan(delays[0][0]);
   });
 
-  test("the simulation arrives in order: the paths draw over 1.1 s, the histogram grows from 1.1 s, the price line appears at 1.8 s", async ({ page }) => {
+  test("the simulation arrives walk by walk over 1.6 s: each endpoint lands as a dot, and the price follows the mean so far and settles on the run's", async ({ page }) => {
+    await page.clock.install();
+    await page.goto("/");
+    await hydrated(page);
+    // Hold the clock still, so only runFor moves the arrival.
+    await page.clock.pauseAt(new Date(Date.now() + 60_000));
+    const landed = page.locator(".sim__bin i[data-landed]");
+    const at = () => page.locator(".sim__price").evaluate((element) => Number((element as HTMLElement).style.getPropertyValue("--at")));
     await expect(plot(page)).toHaveAttribute("data-armed", "");
+    await expect(landed).toHaveCount(0);
     await page.locator(".sim").scrollIntoViewIfNeeded();
-    await expect(plot(page)).toHaveAttribute("data-released", "");
-    const [paths, bin, price] = await Promise.all([
-      page.locator(".sim__paths").evaluate((element) => [getComputedStyle(element).transitionProperty, getComputedStyle(element).transitionDuration]),
-      page.locator(".sim__bin").first().evaluate((element) => [getComputedStyle(element).transitionDuration, getComputedStyle(element).transitionDelay]),
-      page.locator(".sim__price").evaluate((element) => getComputedStyle(element).transitionDelay),
-    ]);
-    expect(paths).toEqual(["clip-path", "1.1s"]);
-    expect(bin).toEqual(["0.9s", "1.1s"]);
-    expect(price).toBe("1.8s");
+    // Step the clock a frame at a time until the first walk is in, then halfway: nothing is waited out.
+    await expect.poll(async () => {
+      await page.clock.runFor(16);
+      return plot(page).getAttribute("data-arrived");
+    }).not.toBeNull();
+    await page.clock.runFor(SIM.arrival / 2);
+    // Read in one go, so no frame falls between the count, the dots and the price.
+    const state = await plot(page).evaluate((element) => ({
+      arrived: Number(element.getAttribute("data-arrived")),
+      landed: element.querySelectorAll(".sim__bin i[data-landed]").length,
+      at: Number(element.querySelector<HTMLElement>(".sim__price")!.style.getPropertyValue("--at")),
+    }));
+    expect(state.arrived).toBeGreaterThan(SIM.paths * 0.35);
+    expect(state.arrived).toBeLessThan(SIM.paths * 0.75);
+    expect(state.landed).toBe(state.arrived);
+    const { ends, mean } = simulation();
+    expect(state.at).toBeCloseTo(ends.slice(0, state.arrived).reduce((sum, end) => sum + end, 0) / state.arrived / SIM.height, 9);
+    await page.clock.runFor(SIM.arrival);
+    await expect(plot(page)).toHaveAttribute("data-drawn", String(SIM.paths));
+    await expect(plot(page)).not.toHaveAttribute("data-armed");
+    await expect(landed).toHaveCount(SIM.paths);
+    expect(await at()).toBeCloseTo(mean, 9);
   });
 });
 
@@ -356,7 +365,7 @@ test.describe("Work: reduced motion", () => {
     await page.locator(".sim").scrollIntoViewIfNeeded();
     await expect(plot(page)).toHaveAttribute("data-drawn", String(SIM.paths));
     await expect(plot(page)).not.toHaveAttribute("data-released", "");
-    await expect(page.locator(".sim__paths")).toHaveCSS("clip-path", "inset(0px)");
+    await expect(page.locator(".sim__bin i[data-landed]")).toHaveCount(0);
   });
 });
 

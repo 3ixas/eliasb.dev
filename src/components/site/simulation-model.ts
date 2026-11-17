@@ -8,8 +8,8 @@
  * It has no imports, so Node can load it directly as well as Next.
  */
 
-/** The drawing's own units, stretched to the plot; the steps a visitor can choose; the default run. */
-export const SIM = { steps: 100, width: 700, height: 380, bins: 17, counts: [10, 100, 1000], paths: 100, seed: 9137 } as const;
+/** The drawing's own units, stretched to the plot; the steps a visitor can choose; the default run; how long a run takes to arrive. */
+export const SIM = { steps: 100, width: 700, height: 380, bins: 17, counts: [10, 100, 1000], paths: 100, seed: 9137, arrival: 1600 } as const;
 
 /** Units of height per unit of value, so the walks fill the plot without leaving it often. */
 const SCALE = 215;
@@ -31,6 +31,8 @@ export type Simulation = {
   ends: readonly number[];
   /** How many walks end in each band of the right edge, top band first. They sum to the number of walks. */
   bins: readonly number[];
+  /** The walks that end in each band, in the order they arrive, so each endpoint's dot knows its walk. */
+  members: readonly (readonly number[])[];
   /** The bin the mean falls in. */
   meanBin: number;
   /** The mean of the endpoints, as a fraction of the plot's height from its top. */
@@ -52,12 +54,13 @@ export function simulate(seed: number = SIM.seed, paths: number = SIM.paths): Si
     return [heightOf(0), ...Array.from({ length: SIM.steps }, () => heightOf((value += step * gauss())))];
   });
   const ends = walks.map((walk) => walk[SIM.steps]);
-  const bins = Array<number>(SIM.bins).fill(0);
-  for (const end of ends) bins[binOf(end)] += 1;
+  const members = Array.from({ length: SIM.bins }, (): number[] => []);
+  ends.forEach((end, index) => members[binOf(end)].push(index));
+  const bins = members.map((walks) => walks.length);
   const meanHeight = ends.reduce((sum, end) => sum + end, 0) / ends.length;
   const order = ends.map((end, index) => [end, index] as const).sort((a, b) => a[0] - b[0]);
   const featured = [0.1, 0.5, 0.9].map((share) => order[Math.min(order.length - 1, Math.floor(share * order.length))][1]);
-  return { seed, walks, ends, bins, meanBin: binOf(meanHeight), mean: meanHeight / SIM.height, featured };
+  return { seed, walks, ends, bins, members, meanBin: binOf(meanHeight), mean: meanHeight / SIM.height, featured };
 }
 
 let memo: Simulation | undefined;

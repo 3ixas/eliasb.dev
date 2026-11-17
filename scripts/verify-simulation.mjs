@@ -15,6 +15,8 @@ for (const count of SIM.counts) {
     const mean = run.ends.reduce((sum, end) => sum + end, 0) / count / SIM.height;
     assert.ok(Math.abs(run.mean - mean) < 1e-12, `${where}: the price is the mean of the endpoints`);
     assert.equal(run.meanBin, binOf(mean * SIM.height), `${where}: the mean's bin`);
+    assert.deepEqual(run.members.flat().sort((a, b) => a - b), Array.from({ length: count }, (_, index) => index), `${where}: every walk has one dot`);
+    assert.ok(run.members.every((walks, bin) => walks.every((index) => binOf(run.ends[index]) === bin)), `${where}: each dot is in its walk's band`);
     assert.equal(run.featured.length, 3, `${where}: three walks stand out`);
     assert.ok(run.featured.every((index) => index >= 0 && index < count), `${where}: featured walks exist`);
   }
