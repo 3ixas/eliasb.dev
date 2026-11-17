@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { MeasurePair, MeasureSide } from "@/components/parts/measure";
 import { OnView, Count } from "@/components/parts/on-view";
 import { Arrow, Panel, PanelHead } from "@/components/parts/panel";
 import { simulation } from "@/components/site/simulation-model";
@@ -7,10 +8,7 @@ import { SimulationPlot } from "@/components/site/simulation-plot";
 import { roleStories } from "@/content/stretch/role-stories";
 import type { RoleStorySlug } from "@/content/stretch/role-story";
 import { passRecords } from "@/content/stretch/staff-pass";
-import { comparisonRow, countable, displayFigure, workPanels, type Pair, type RolePanel } from "@/content/stretch/work-panels";
-
-/** A bar's length as a share of the longer of its pair, so both are drawn to one scale. */
-const share = (amount: number, longest: number) => ({ "--share": amount / longest }) as CSSProperties;
+import { comparisonRow, displayFigure, workPanels, type Pair, type RolePanel } from "@/content/stretch/work-panels";
 
 /** The panel's header: the employer's short name (as on its pass), with its role and dates at the right. */
 function Head({ slug }: { slug: RoleStorySlug }) {
@@ -66,7 +64,7 @@ function Simulation() {
   );
 }
 
-/** BNP Paribas, full width and green: its figure, the simulation, two comparisons to scale and the link to its story. */
+/** BNP Paribas, full width and green: its figure, the simulation, two comparisons in their own units and the link to its story. */
 function BnpPanel() {
   const { slug, figure, comparisons } = workPanels.bnp;
   const story = roleStories[slug];
@@ -83,19 +81,18 @@ function BnpPanel() {
           <ul>
             {comparisons.map((comparison) => {
               const row = comparisonRow(story, comparison)!;
-              const longest = Math.max(row.before.amount, row.after.amount);
               return (
                 <li key={row.what}>
                   <h4>{row.what}</h4>
                   <p className="cmp">
                     <span>{comparison.before.name}</span>
                     <b>{comparison.before.value}</b>
-                    <i className="bar" style={share(row.before.amount, longest)} aria-hidden="true" />
+                    <MeasureSide measure={row} side="before" />
                   </p>
                   <p className="cmp cmp--after">
                     <span>{comparison.after.name}</span>
                     <b>{comparison.after.value}</b>
-                    <i className="bar bar--after" style={share(row.after.amount, longest)} aria-hidden="true" />
+                    <MeasureSide measure={row} side="after" />
                   </p>
                 </li>
               );
@@ -108,30 +105,27 @@ function BnpPanel() {
   );
 }
 
-/** One before and after pair: what moved, its two bars from one left edge, and the value written out at the right. */
+/** One before and after pair: what moved, the pair drawn in its unit, and the value written out at the right. */
 function PairRow({ pair }: { pair: Pair }) {
-  const longest = Math.max(pair.before, pair.after);
   return (
     <li className="pair">
       <span className="pair__what">{pair.what}</span>
-      <i className="bar" style={share(pair.before, longest)} aria-hidden="true" />
-      <i className="bar bar--after" style={share(pair.after, longest)} aria-hidden="true" />
+      <MeasurePair measure={pair} />
       <b className="pair__value">{pair.value}</b>
     </li>
   );
 }
 
-/** Joveen or Optegra: a display figure that counts to its value once, three pairs to scale and the link to the story. */
+/** Joveen or Optegra: a display figure that rolls to its value once, three pairs in their units and the link to the story. */
 function RolePanelView({ panel }: { panel: RolePanel }) {
   const story = roleStories[panel.slug];
   const { value, label } = displayFigure(story, panel.figure)!;
-  const counted = countable(value);
   return (
     <OnView motion="rise" className="work-role__arrival">
       <Panel id={panel.slug} colours={story.panel} className="work-role">
         <Head slug={panel.slug} />
         <p className="work-role__figure">
-          <span className="figure__value">{counted ? <Count from={panel.figure.from} to={counted.to} prefix={counted.prefix} suffix={counted.suffix} /> : value}</span>
+          <span className="figure__value"><Count value={value} from={panel.figure.from} /></span>
           <span className="figure__label">{label}</span>
         </p>
         <OnView motion="grow">

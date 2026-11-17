@@ -5,6 +5,7 @@ import { projects } from "../src/content/projects";
 import { caseStudies, caseStudySlugs } from "../src/content/stretch/case-studies";
 import { caseStudyCopy, caseStudySectionKeys, caseStudySectionLabels } from "../src/content/stretch/case-study";
 import { renderedContrast } from "./support/rendered-contrast";
+import { spoken } from "./support/roll";
 
 /*
  * Case studies (docs/design/DESIGN.md "Long-form pages", R-22): a panel in the project's colour holding the back link,
@@ -58,7 +59,7 @@ for (const slug of caseStudySlugs) {
 
     test("the evidence figures are in the opening, and four of them wrap without overflow", async ({ page }) => {
       const list = opening(page).getByRole("list", { name: "Evidence" });
-      await expect(list.getByRole("listitem")).toHaveText(study.evidence.map(({ value, label }) => `${value} ${label}`));
+      expect(await spoken(list.getByRole("listitem"))).toEqual(study.evidence.map(({ value, label }) => `${value} ${label}`));
       expect(await list.evaluate((element) => element.scrollWidth <= element.clientWidth + 0.5)).toBe(true);
       for (const item of await list.getByRole("listitem").all()) expect(await item.evaluate((element) => element.scrollWidth <= element.clientWidth + 0.5)).toBe(true);
     });

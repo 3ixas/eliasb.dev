@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { MeasureSide } from "@/components/parts/measure";
 import { OnView } from "@/components/parts/on-view";
 import { OUT, Panel } from "@/components/parts/panel";
 import { SiteLink } from "@/components/site/site-link";
@@ -48,31 +49,28 @@ function FlagFigure({ figure, panel }: { figure: Extract<RoleStoryFigure, { kind
   );
 }
 
-/** Each comparison's two bars share a unit, so their lengths compare; they grow to their share once, arriving below the fold. */
+/** Each comparison drawn in its own unit, both sides to one scale; its bars grow to their share once, arriving below the fold. */
 function ScaleFigure({ figure, panel }: { figure: Extract<RoleStoryFigure, { kind: "scale" }>; panel: PanelColours }) {
   return (
     <figure className="story-fig">
       <Panel colours={panel} className="story-fig__panel">
         <OnView motion="grow">
           <ul className="cmps">
-            {figure.rows.map(({ what, before, after }) => {
-              const longest = Math.max(before.amount, after.amount);
-              return (
-                <li key={what}>
-                  <h3>{what}</h3>
-                  <p className="cmp">
-                    <span>Before</span>
-                    <b>{before.label}</b>
-                    <i className="bar" style={{ "--share": before.amount / longest } as CSSProperties} aria-hidden="true" />
-                  </p>
-                  <p className="cmp cmp--after">
-                    <span>After</span>
-                    <b>{after.label}</b>
-                    <i className="bar bar--after" style={{ "--share": after.amount / longest } as CSSProperties} aria-hidden="true" />
-                  </p>
-                </li>
-              );
-            })}
+            {figure.rows.map((row) => (
+              <li key={row.what}>
+                <h3>{row.what}</h3>
+                <p className="cmp">
+                  <span>Before</span>
+                  <b>{row.before.label}</b>
+                  <MeasureSide measure={row} side="before" />
+                </p>
+                <p className="cmp cmp--after">
+                  <span>After</span>
+                  <b>{row.after.label}</b>
+                  <MeasureSide measure={row} side="after" />
+                </p>
+              </li>
+            ))}
           </ul>
         </OnView>
       </Panel>

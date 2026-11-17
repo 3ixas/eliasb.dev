@@ -3,8 +3,8 @@
  * panel with its figure, the simulation and two comparisons, and Joveen's and Optegra's panels with a display figure
  * and three pairs. The panel, the pill and the arrivals are parts.css's; this file lays out what is on the panels.
  *
- * Bars to scale (`.bar`, `.cmp`) are parts.css's: here the after bar is white on BNP Paribas's green and the panel's
- * ink elsewhere.
+ * Comparisons (`.measure`, `.cmp`) are parts.css's: here the after side is white on BNP Paribas's green and the panel's
+ * ink elsewhere, and a pair's weights are lighter.
  */
 
 .work__subheading {
@@ -284,6 +284,8 @@
 
 /* The pairs lay out by their own width, not the window's: side by side at 720 to 1000 px a panel is too narrow for the label, bars and value in one row. */
 .pairs {
+  --thin: 5px;
+  --thick: 9px;
   container-type: inline-size;
   display: grid;
   align-content: start;
@@ -305,14 +307,9 @@
   grid-row: 1 / span 2;
 }
 
-.pair .bar {
+.pair .measure-pair {
   grid-column: 2;
-  height: 5px;
-}
-
-.pair .bar--after {
-  height: 9px;
-  border-radius: 5px;
+  grid-row: 1 / span 2;
 }
 
 .pair__value {
@@ -402,8 +399,9 @@
     min-width: 0;
   }
 
-  .pair .bar {
+  .pair .measure-pair {
     grid-column: 1 / -1;
+    grid-row: 2;
   }
 }
 

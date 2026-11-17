@@ -3,6 +3,8 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { roleStories } from "../src/content/stretch/role-stories";
 import { passRecords } from "../src/content/stretch/staff-pass";
 import { comparisonRow, workPanels } from "../src/content/stretch/work-panels";
+import { drawn, expectDrawn } from "./support/measure";
+import { shown } from "./support/roll";
 import { renderedContrast } from "./support/rendered-contrast";
 
 /*
@@ -23,10 +25,6 @@ const hydrated = (page: Page) =>
     const element = document.querySelector(".sim__plot");
     return !!element && Object.keys(element).some((key) => key.startsWith("__reactProps$"));
   });
-
-/** Each bar's drawn width, before then after, for every comparison or pair in a panel, in reading order. */
-const barWidths = (scope: Locator, item: string) =>
-  scope.locator(item).evaluateAll((items) => items.map((element) => [...element.querySelectorAll(".bar")].map((bar) => bar.getBoundingClientRect().width)));
 
 test.describe("Work: the panels", () => {
   test.beforeEach(async ({ page }) => {
@@ -73,10 +71,10 @@ test.describe("Work: the panels", () => {
     expect(display).toEqual([workPanels.bnp.figure.value]);
   });
 
-  test("each comparison names both sides and writes their values, with bars in proportion to the Role story's amounts", async ({ page }) => {
+  test("each comparison names both sides and writes their values, drawn in its own unit from the Role story's amounts", async ({ page }) => {
     const story = roleStories["bnp-paribas"];
     const items = panel(page, "bnp-paribas").locator(".work-bnp__comparisons li");
-    const widths = await barWidths(panel(page, "bnp-paribas"), ".work-bnp__comparisons li");
+    const drawings = await drawn(panel(page, "bnp-paribas"), ".work-bnp__comparisons li");
     for (const [index, comparison] of workPanels.bnp.comparisons.entries()) {
       const row = comparisonRow(story, comparison)!;
       await expect(items.nth(index).getByRole("heading", { level: 4 })).toHaveText(row.what);
@@ -84,28 +82,31 @@ test.describe("Work: the panels", () => {
         await expect(items.nth(index)).toContainText(side.name);
         await expect(items.nth(index)).toContainText(side.value);
       }
-      const [before, after] = widths[index];
-      expect(after / before, row.what).toBeCloseTo(row.after.amount / row.before.amount, 2);
+      expectDrawn(drawings[index], row, row.what);
     }
-    // 10 and 2 working days; 40 and 5 minutes (R-14).
-    expect(widths.map(([before, after]) => Math.round((after / before) * 1000) / 1000)).toEqual([0.2, 0.125]);
+    // Ten working days against two; 30–40 minutes against under 5, on one scale of 40 (R-14).
+    expect(drawings[0].days).toEqual([10, 2]);
+    expect(drawings[1].minutes).toEqual([
+      { on: 30, range: 10, scale: 40 },
+      { on: 0, range: 5, scale: 40 },
+    ]);
   });
 
-  test("Joveen and Optegra each show a display figure and its label, three pairs to scale with their values, and the link to the story", async ({ page }) => {
+  test("Joveen and Optegra each show a display figure and its label, three pairs drawn in their units with their values, and the link to the story", async ({ page }) => {
     for (const { slug, figure, pairs } of workPanels.roles) {
       const evidence = roleStories[slug].evidence[figure.evidence];
-      await expect(panel(page, slug).locator(".figure__value")).toHaveText(evidence.value);
+      await expect.poll(() => shown(panel(page, slug).locator(".figure__value"))).toBe(evidence.value);
       await expect(panel(page, slug).locator(".figure__label")).toHaveText(evidence.label);
       const rows = panel(page, slug).locator(".pair");
       await expect(rows).toHaveCount(3);
-      const widths = await barWidths(panel(page, slug), ".pair");
+      const drawings = await drawn(panel(page, slug), ".pair");
       for (const [index, pair] of pairs.entries()) {
         await expect(rows.nth(index).locator(".pair__what")).toHaveText(pair.what);
         await expect(rows.nth(index).locator(".pair__value")).toHaveText(pair.value);
-        const [before, after] = widths[index];
-        // A bar too narrow to read is a collapsed track: side by side at 720 to 1000 px the panels are at their narrowest.
-        expect(Math.max(before, after), `${slug}: ${pair.what} has room for its bars`).toBeGreaterThan(120);
-        expect(after / before, `${slug}: ${pair.what}`).toBeCloseTo(pair.after / pair.before, 2);
+        // A drawing too narrow to read is a collapsed track: side by side at 720 to 1000 px the panels are at their narrowest.
+        const room = await rows.nth(index).locator(".measure-pair").evaluate((element) => element.getBoundingClientRect().width);
+        expect(room, `${slug}: ${pair.what} has room for its drawing`).toBeGreaterThan(120);
+        expectDrawn(drawings[index], pair, `${slug}: ${pair.what}`);
       }
     }
   });
@@ -244,8 +245,10 @@ test.describe("Work: arriving", () => {
 
   test("below the fold the figures wait at their start, the bars and the simulation are armed, and each arrives once in view", async ({ page }) => {
     const joveen = panel(page, "joveen");
-    await expect(joveen.locator(".figure__value")).toHaveText("−0%");
-    await expect(panel(page, "optegra").locator(".figure__value")).toHaveText("62%");
+    await expect.poll(() => shown(joveen.locator(".figure__value"))).toBe("−0%");
+    await expect.poll(() => shown(panel(page, "optegra").locator(".figure__value"))).toBe("62%");
+    // A screen reader is read the value, never the start.
+    await expect(joveen.locator(".figure__value .sr-only")).toHaveText("−40%");
     await expect(plot(page)).toHaveAttribute("data-armed", "");
     await expect(joveen.locator("[data-grow]")).toHaveAttribute("data-armed", "");
     await page.locator(".sim").scrollIntoViewIfNeeded();
@@ -265,10 +268,62 @@ test.describe("Work: arriving", () => {
     await expect(page.locator(".sim__paths")).toHaveCSS("clip-path", "inset(0px)");
     await joveen.scrollIntoViewIfNeeded();
     await expect(joveen.locator("[data-grow]")).not.toHaveAttribute("data-armed", "");
-    await expect(joveen.locator(".figure__value")).toHaveText("−40%");
+    await expect(joveen.locator(".roll")).not.toHaveAttribute("data-armed", "");
+    await joveen.locator(".figure__value").evaluate((element) => element.getAnimations({ subtree: true }).forEach((animation) => animation.finish()));
+    await expect.poll(() => shown(joveen.locator(".figure__value"))).toBe("−40%");
     // On a phone Optegra is stacked under Joveen, so it arrives only when it is scrolled to.
-    await panel(page, "optegra").locator(".figure__value").evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
-    await expect(panel(page, "optegra").locator(".figure__value")).toHaveText("88%");
+    const optegra = panel(page, "optegra").locator(".figure__value");
+    await optegra.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+    await expect(optegra.locator(".roll")).not.toHaveAttribute("data-armed", "");
+    await optegra.evaluate((element) => element.getAnimations({ subtree: true }).forEach((animation) => animation.finish()));
+    await expect.poll(() => shown(optegra)).toBe("88%");
+  });
+
+  test("Joveen's key API p95 fills in its own time: 520 ms against 230 ms, together and at a constant rate", async ({ page }) => {
+    const joveen = panel(page, "joveen");
+    await expect(joveen.locator("[data-grow]")).toHaveAttribute("data-armed", "");
+    // Catch each fill as it is created and pause it there, so none can finish before it is read, however slow the runner.
+    await joveen.evaluate((element) => {
+      const caught: Animation[] = [];
+      (window as unknown as { fills: Animation[] }).fills = caught;
+      element.addEventListener("transitionrun", (event) => {
+        const { target, propertyName } = event as TransitionEvent;
+        const bar = target as Element;
+        if (propertyName !== "transform" || !bar.matches(".measure--ms .bar")) return;
+        const fill = bar.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "transform")!;
+        fill.pause();
+        caught[[...element.querySelectorAll(".measure--ms .bar")].indexOf(bar)] = fill;
+      });
+    });
+    await joveen.locator(".measure--ms").first().evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+    await expect.poll(() => page.evaluate(() => (window as unknown as { fills: Animation[] }).fills.filter(Boolean).length)).toBe(2);
+    // Seek both fills to where the faster one ends, rather than wait them out.
+    const fills = await joveen.evaluate((element) =>
+      (window as unknown as { fills: Animation[] }).fills.map((fill, index) => {
+        const { duration, delay } = fill.effect!.getComputedTiming();
+        fill.currentTime = Number(delay) + 230;
+        const bar = element.querySelectorAll(".measure--ms .bar")[index];
+        const scale = new DOMMatrix(getComputedStyle(bar).transform).a;
+        fill.finish();
+        return { duration: Number(duration), delay: Number(delay), scale };
+      }),
+    );
+    const [before, after] = fills;
+    // Each fill lasts its value, within 20 ms.
+    expect(Math.abs(before.duration - 520)).toBeLessThanOrEqual(20);
+    expect(Math.abs(after.duration - 230)).toBeLessThanOrEqual(20);
+    expect(after.delay).toBe(before.delay);
+    // At 230 ms the after bar is full and the before bar, filling at the same rate, is 230 / 520 of the way.
+    expect(after.scale).toBeCloseTo(1, 2);
+    expect(before.scale).toBeCloseTo(230 / 520, 2);
+  });
+
+  test("BNP Paribas's working days arrive a square at a time, before then after", async ({ page }) => {
+    const days = panel(page, "bnp-paribas").locator(".measure--days");
+    const delays = await days.evaluateAll((sides) => sides.map((side) => [...side.children].map((square) => parseFloat(getComputedStyle(square).transitionDelay.split(",")[0]))));
+    expect(delays.map((side) => side.length)).toEqual([10, 2]);
+    for (const side of delays) expect(side).toEqual([...side].sort((a, b) => a - b));
+    expect(delays[1][0]).toBeGreaterThan(delays[0][0]);
   });
 
   test("the simulation arrives in order: the paths draw over 1.1 s, the histogram grows from 1.1 s, the price line appears at 1.8 s", async ({ page }) => {
@@ -293,7 +348,7 @@ test.describe("Work: reduced motion", () => {
     await page.goto("/");
     await hydrated(page);
     await expect(section(page).locator("[data-armed]")).toHaveCount(0);
-    await expect(panel(page, "joveen").locator(".figure__value")).toHaveText("−40%");
+    await expect.poll(() => shown(panel(page, "joveen").locator(".figure__value"))).toBe("−40%");
     await page.locator(".sim").scrollIntoViewIfNeeded();
     await expect(plot(page)).toHaveAttribute("data-drawn", "");
     await expect(plot(page)).not.toHaveAttribute("data-released", "");

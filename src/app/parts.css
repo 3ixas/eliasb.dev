@@ -338,25 +338,222 @@
   transform: scaleX(0);
 }
 
-/* ---- Bars to scale ---- */
+/*
+ * A latency fills in its own time (#456): the 520 ms bar takes 520 ms and the 230 ms bar 230 ms, both starting
+ * together and at a constant rate, so the faster one is felt finishing first.
+ */
+[data-grow] .measure--ms .bar {
+  transition: transform var(--fill) linear 150ms;
+}
+
+/* Working days arrive a square at a time, 60 ms apart; minutes a tick at a time from zero, 14 ms apart. After follows before. */
+[data-grow] :is(.measure--days i, .measure--minutes i:not([data-at="off"])) {
+  transition: opacity 240ms var(--out), transform 320ms var(--out);
+  transition-delay: calc(150ms + var(--i) * var(--step));
+}
+
+[data-grow] .measure--days {
+  --step: 60ms;
+}
+
+[data-grow] .measure--minutes {
+  --step: 14ms;
+}
+
+[data-grow] .measure--minutes i:not([data-at="off"]) {
+  transform-origin: center bottom;
+}
+
+[data-grow] :is(.measure--days, .measure--minutes)[data-side="after"] i:not([data-at="off"]) {
+  transition-delay: calc(450ms + var(--i) * var(--step));
+}
+
+[data-grow][data-armed] .measure--days i {
+  opacity: 0;
+  transform: scale(0.4);
+}
+
+[data-grow][data-armed] .measure--minutes i:not([data-at="off"]) {
+  transform: scaleY(0);
+}
 
 /*
- * Every bar is `.bar` with --share, its length as a share of the longer of its pair. The before bar is thin and soft,
- * the after bar thicker and solid; whatever holds them sets --soft and --solid. A comparison (`.cmp`) is its name and
- * value on one line over its bar.
+ * Arming is instant: only the release is a transition. Otherwise the arm itself starts one towards zero, and a release
+ * inside its delay reverses it, which the browser shortens to nothing.
+ */
+[data-grow][data-armed] :is(.bar, .measure--days i, .measure--minutes i) {
+  transition-property: none;
+}
+
+/* ---- Rolling figures (#456) ---- */
+
+/*
+ * A figure that rolls (components/parts/on-view.tsx `Count`): each digit is a strip of 0 to 9, a line and a gap apart
+ * (--roll-step; the gap is wider than the fade, so no neighbour shows at rest), seen through a window a line tall that
+ * fades at its top and bottom, so the digits passing it read as a roll. The strip
+ * stands at its digit (`--to`); armed below the fold it stands at the start's (`--from`) and the digits the start does
+ * not reach are unseen. Arming is instant; the release rolls every digit together over 1.2 s.
+ */
+.roll__face {
+  --roll-step: calc(1lh + 0.4em);
+  display: inline-flex;
+  font-variant-numeric: lining-nums tabular-nums;
+  user-select: none;
+}
+
+.roll__face > span {
+  display: block;
+  height: 1lh;
+  white-space: pre;
+  transition: opacity 600ms var(--out);
+}
+
+.roll__face > .roll__digit {
+  height: calc(1lh + 0.3em);
+  margin-block: -0.15em;
+  padding-block: 0.15em;
+  overflow: hidden;
+  mask-image: linear-gradient(transparent, #000 0.15em, #000 calc(100% - 0.15em), transparent);
+}
+
+.roll__strip {
+  display: block;
+  transform: translateY(calc(var(--to) * -1 * var(--roll-step)));
+  transition: transform 1.2s var(--out);
+}
+
+.roll__strip > span {
+  display: block;
+  height: 1lh;
+  margin-bottom: calc(var(--roll-step) - 1lh);
+}
+
+[data-armed] .roll__strip {
+  transform: translateY(calc(var(--from) * -1 * var(--roll-step)));
+}
+
+[data-armed] .roll__face > [data-lead] {
+  opacity: 0;
+}
+
+[data-armed] :is(.roll__strip, .roll__face > span) {
+  transition-property: none;
+}
+
+/* ---- Comparisons in their own units (#456) ---- */
+
+/*
+ * Every comparison is drawn in its unit by components/parts/measure.tsx. Whatever holds one sets --soft (before) and
+ * --solid (after), and may set --thin and --thick, the before and after weights. A bar (`.bar`, with --share, its
+ * length as a share of the pair's scale) draws a latency, a rate or a change; working days are squares; minutes are
+ * ticks. A comparison (`.cmp`) is its name and value on one line over its drawing.
  */
 .bar {
   display: block;
   width: calc(var(--share) * 100%);
-  height: 6px;
-  border-radius: 3px;
+  height: var(--thin, 6px);
+  border-radius: calc(var(--thin, 6px) / 2);
   background: var(--soft);
 }
 
 .bar--after {
-  height: 12px;
-  border-radius: 6px;
+  height: var(--thick, 12px);
+  border-radius: calc(var(--thick, 12px) / 2);
   background: var(--solid);
+}
+
+.measure {
+  --faint: color-mix(in srgb, var(--solid) 16%, transparent);
+}
+
+/* A latency: its bar over a tick every 100 ms of the pair's scale. */
+.measure--ms {
+  display: block;
+  padding-bottom: 7px;
+  background: repeating-linear-gradient(to right, var(--faint) 0 1px, transparent 1px calc(100% / var(--steps))) left bottom / 100% 4px no-repeat;
+}
+
+/* Working days: one same-size square a day, a wider gap after each working week. */
+.measure--days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.measure--days i {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--soft);
+}
+
+.measure--days[data-side="after"] i {
+  background: var(--solid);
+}
+
+.measure--days i:nth-child(5n):not(:last-child) {
+  margin-right: 5px;
+}
+
+/* Minutes: a tick a minute across the pair's one scale, every fifth taller; minutes it took full height, uncertain ones short. */
+.measure--minutes {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 12px;
+}
+
+.measure--minutes[data-side="after"] {
+  height: 16px;
+}
+
+.measure--minutes i {
+  width: 2px;
+  height: 30%;
+  border-radius: 1px;
+  background: var(--faint);
+}
+
+.measure--minutes i[data-fifth] {
+  height: 55%;
+}
+
+.measure--minutes i[data-at="on"] {
+  height: 100%;
+  background: var(--soft);
+}
+
+.measure--minutes i[data-at="range"] {
+  height: 60%;
+  background: var(--soft);
+}
+
+.measure--minutes[data-side="after"] i:is([data-at="on"], [data-at="range"]) {
+  background: var(--solid);
+}
+
+/* A rate: one 0 to 100 axis, before as far as its mark, the gain to after solid between the two marks. */
+.measure--rate {
+  display: grid;
+  align-items: center;
+  min-height: var(--thick, 12px);
+  background: linear-gradient(var(--faint), var(--faint)) left center / 100% 1px no-repeat;
+}
+
+.measure--rate .bar {
+  grid-area: 1 / 1;
+  width: calc(var(--from) * 100%);
+}
+
+.measure--rate .bar--after {
+  width: calc((var(--to) - var(--from)) * 100%);
+  margin-left: calc(var(--from) * 100%);
+  border-radius: 0 calc(var(--thick, 12px) / 2) calc(var(--thick, 12px) / 2) 0;
+}
+
+.measure-pair {
+  display: grid;
+  gap: 4px;
 }
 
 .cmp {
@@ -372,7 +569,7 @@
   font-variant-numeric: lining-nums tabular-nums;
 }
 
-.cmp .bar {
+.cmp .measure {
   grid-column: 1 / -1;
 }
 
@@ -428,14 +625,23 @@
   }
 }
 
-/* Forced colours keep the data: before bars in the text colour, after bars in the highlight (R-29). */
+/* Forced colours keep the data: before in the text colour, after in the highlight, the scales in grey (R-29). */
 @media (forced-colors: active) {
-  .bar {
+  .bar,
+  .measure {
     forced-color-adjust: none;
+    --faint: GrayText;
+  }
+
+  .bar,
+  .measure--days i,
+  .measure--minutes i:is([data-at="on"], [data-at="range"]) {
     background: CanvasText;
   }
 
-  .bar--after {
+  .bar--after,
+  .measure--days[data-side="after"] i,
+  .measure--minutes[data-side="after"] i:is([data-at="on"], [data-at="range"]) {
     background: Highlight;
   }
 }
@@ -443,8 +649,12 @@
 /* A printed page has no viewport to arrive in. */
 @media print {
   [data-armed],
-  [data-armed] .bar {
+  [data-armed] :is(.bar, .measure--days i, .measure--minutes i, .roll__face > span) {
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  [data-armed] .roll__strip {
+    transform: translateY(calc(var(--to) * -1 * var(--roll-step))) !important;
   }
 }

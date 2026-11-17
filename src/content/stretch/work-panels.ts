@@ -1,12 +1,13 @@
 /*
  * Work's panels (docs/design/DESIGN.md "The homepage, in order" 3, R-13 to R-15): BNP Paribas full width with its
  * figure, the simulation and two comparisons, then Joveen and Optegra with a display figure and three before and
- * after pairs each. The words are the passes and panels spec's, listed in docs/content/redesign-copy.md
+ * after pairs each, every one drawn in its own unit (`measure.ts`). The words are the passes and panels spec's, listed in docs/content/redesign-copy.md
  * ("Passes and panels · Work") and checked there by verify:copy. Every figure and every bar's amount is a fact its
  * Role story already tells, and `workPanelProblems` fails when one drifts.
  *
  * Its runtime imports carry a .ts extension, so Node can load it directly as well as Next.
  */
+import { measureProblems, sidesOf, type Measure } from "./measure.ts";
 import { roleStories } from "./role-stories.ts";
 import type { RoleStory, RoleStorySlug } from "./role-story.ts";
 import { storyText } from "./story.ts";
@@ -22,11 +23,11 @@ export type Comparison = { row: number; before: Side; after: Side };
 
 /**
  * A before and after pair on Joveen's or Optegra's panel: what moved, its value as the story states it, and the two
- * bar amounts in one unit. A change stated as a percentage is drawn from 100 (`+30%` is 100 against 130).
+ * amounts in the pair's unit. A change stated as a percentage is drawn from 100 (`+30%` is 100 against 130).
  */
-export type Pair = { what: string; value: string; before: number; after: number };
+export type Pair = Measure & { what: string; value: string };
 
-/** A display figure: one of the story's evidence items, counting from `from` when it is a number that moved. */
+/** A display figure: one of the story's evidence items, rolling from `from` when it is a number that moved. */
 export type DisplayFigure = { evidence: number; from: number };
 
 export type BnpPanel = {
@@ -65,18 +66,18 @@ export const workPanels = {
       slug: "joveen",
       figure: { evidence: 0, from: 0 },
       pairs: [
-        { what: "Key API p95", value: "520 ms → 230 ms", before: 520, after: 230 },
-        { what: "Time to deploy", value: "10 min → under 2", before: 10, after: 2 },
-        { what: "Mobile retention", value: "+30%", before: 100, after: 130 },
+        { what: "Key API p95", value: "520 ms → 230 ms", unit: "ms", before: { amount: 520 }, after: { amount: 230 } },
+        { what: "Time to deploy", value: "10 min → under 2", unit: "minutes", before: { amount: 10 }, after: { amount: 2, under: true } },
+        { what: "Mobile retention", value: "+30%", unit: "change", before: { amount: 100 }, after: { amount: 130 } },
       ],
     },
     {
       slug: "optegra",
       figure: { evidence: 0, from: 62 },
       pairs: [
-        { what: "Pass rate", value: "62% → 88%", before: 62, after: 88 },
-        { what: "p95 page load", value: "−30%", before: 100, after: 70 },
-        { what: "Consultation conversion", value: "+15%", before: 100, after: 115 },
+        { what: "Pass rate", value: "62% → 88%", unit: "rate", before: { amount: 62 }, after: { amount: 88 } },
+        { what: "p95 page load", value: "−30%", unit: "change", before: { amount: 100 }, after: { amount: 70 } },
+        { what: "Consultation conversion", value: "+15%", unit: "change", before: { amount: 100 }, after: { amount: 115 } },
       ],
     },
   ] satisfies readonly RolePanel[],
@@ -94,28 +95,13 @@ export function displayFigure(story: RoleStory, { evidence }: DisplayFigure) {
   return story.evidence[evidence];
 }
 
-/** "−40%" as its sign, size and suffix, so the figure can count up to its size behind a fixed sign (the content's U+2212 minus). */
-export function countable(value: string): { prefix: string; to: number; suffix: string } | undefined {
-  const match = value.match(/^([−+]?)(\d+)(\D*)$/);
-  if (!match) return undefined;
-  const [, prefix, digits, suffix] = match;
-  return { prefix, to: Number(digits), suffix };
-}
-
 const numbersIn = (text: string) => text.match(/\d+/g) ?? [];
 
-/** The two amounts a pair's value states: both numbers when it says "a → b", or 100 and 100 ± n when it is a change of n%. */
-function statedAmounts(value: string): [number, number] | undefined {
-  const change = value.match(/^([−+])(\d+)%$/);
-  if (change) return [100, 100 + Number(change[2]) * (change[1] === "−" ? -1 : 1)];
-  const numbers = numbersIn(value).map(Number);
-  return numbers.length === 2 ? [numbers[0], numbers[1]] : undefined;
-}
-
 /**
- * Work's panels as messages naming what is wrong; empty when every figure and bar is its Role story's own fact.
- * A comparison's values must be in its scale row's labels; a pair's numbers must be in its story, and its bars must
- * be the amounts its value states, so a bar cannot be longer than the fact it draws.
+ * Work's panels as messages naming what is wrong; empty when every figure and drawing is its Role story's own fact.
+ * A comparison's values must be in its scale row's labels, which the Role story checks against the row's amounts; a
+ * pair's numbers must be in its story, and it must draw the amounts its value states in its unit, so a drawing cannot
+ * say more than the fact it draws.
  */
 export function workPanelProblems(panels: typeof workPanels, stories: Record<RoleStorySlug, RoleStory> = roleStories): string[] {
   const problems: string[] = [];
@@ -139,10 +125,7 @@ export function workPanelProblems(panels: typeof workPanels, stories: Record<Rol
     for (const pair of panel.pairs) {
       const unsaid = numbersIn(pair.value).find((number) => !said.includes(number));
       if (unsaid) problems.push(`Work: ${panel.slug}'s "${pair.what}" says "${unsaid}", which its Role story does not.`);
-      const stated = statedAmounts(pair.value);
-      if (!stated) problems.push(`Work: ${panel.slug}'s "${pair.what}" value "${pair.value}" states neither two amounts nor a change in per cent.`);
-      else if (stated[0] !== pair.before || stated[1] !== pair.after)
-        problems.push(`Work: ${panel.slug}'s "${pair.what}" draws ${pair.before} against ${pair.after}, but its value states ${stated[0]} against ${stated[1]}.`);
+      problems.push(...measureProblems(`Work: ${panel.slug}'s "${pair.what}"`, pair, sidesOf(pair.value)));
     }
   }
   return problems;

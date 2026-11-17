@@ -36,8 +36,8 @@ const plain = raw.replace(/\*/g, "").replace(/[{}]/g, "");
 // ---- Every string in the typed modules is in the approved copy ----------------------------
 
 const leaves = (value, path = "") => {
-  // Links, image paths, a figure's kind and its screens' devices, dates, anchors, category keys and Role story slugs are addresses and data, not words, so the approved copy does not list them.
-  if (typeof value === "string") return /(href|src|writtenOn|\.id|\.glyph|\.slug|\.figures\.[\w-]+\.kind|\.figures\.[\w-]+\.images\[\d+\]\.device|\.category|\.story|\.project|\.restates\[\d+\]|\.drawn\.kind|\.drawn\.projects\[\d+\])$/.test(path) ? [] : [[path, value]];
+  // Links, image paths, a figure's kind, a comparison's unit and its screens' devices, dates, anchors, category keys and Role story slugs are addresses and data, not words, so the approved copy does not list them.
+  if (typeof value === "string") return /(href|src|writtenOn|\.id|\.glyph|\.slug|\.figures\.[\w-]+\.kind|\.rows\[\d+\]\.unit|\.pairs\[\d+\]\.unit|\.figures\.[\w-]+\.images\[\d+\]\.device|\.category|\.story|\.project|\.restates\[\d+\]|\.drawn\.kind|\.drawn\.projects\[\d+\])$/.test(path) ? [] : [[path, value]];
   if (Array.isArray(value)) return value.flatMap((item, index) => leaves(item, `${path}[${index}]`));
   if (value && typeof value === "object") return Object.entries(value).flatMap(([key, item]) => leaves(item, `${path}.${key}`));
   return [];
@@ -392,9 +392,18 @@ for (const [what, ids] of [["menu", siteCopy.menu.map(({ id }) => id)], ["Say he
   );
   assert.deepEqual(workPanelProblems(workPanels), []);
   const pair = (index, replacement) => workPanelProblems({ ...workPanels, roles: [{ ...roles[0], pairs: roles[0].pairs.map((entry, at) => (at === index ? { ...entry, ...replacement } : entry)) }, roles[1]] });
-  assert.match(pair(0, { value: "520 ms → 210 ms", after: 210 })[0], /joveen's "Key API p95" says "210"/, "A pair's number must be its story's");
-  assert.match(pair(0, { after: 200 })[0], /draws 520 against 200, but its value states 520 against 230/, "A bar is drawn at the amount its value states");
-  assert.match(pair(2, { after: 140 })[0], /draws 100 against 140, but its value states 100 against 130/, "A change in per cent is drawn from 100");
+  assert.match(pair(0, { value: "520 ms → 210 ms", after: { amount: 210 } })[0], /joveen's "Key API p95" says "210"/, "A pair's number must be its story's");
+  assert.match(pair(0, { after: { amount: 200 } })[0], /after side draws 200 ms, but its words state 230/, "A bar is drawn at the amount its value states");
+  assert.match(pair(2, { after: { amount: 140 } })[0], /after side draws 140 change, but its words state 130/, "A change in per cent is drawn from 100");
+  assert.match(pair(1, { after: { amount: 2 } })[0], /after side draws 2 minutes, but its words state under 2/, "An upper bound is drawn as one");
+  assert.match(pair(0, { unit: "rate" })[0], /words "520 ms" state no amount in rate/, "A pair is drawn in the unit its words are in");
+  const scaleRow = (index, replacement) => {
+    const figure = story.figures["what-changed"];
+    const changed = { ...story, figures: { ...story.figures, "what-changed": { ...figure, rows: figure.rows.map((row, at) => (at === index ? { ...row, ...replacement } : row)) } } };
+    return roleStoryProblems(Object.values(roleStories).map((entry) => (entry.slug === story.slug ? changed : entry)));
+  };
+  assert.match(scaleRow(0, { before: { label: "about two weeks, experienced", amount: 14 } })[0], /before side draws 14 working-days, but its words state 10/, "Two weeks are ten working days");
+  assert.match(scaleRow(1, { before: { label: "30–40 min", amount: 40 } })[0], /before side draws 40 minutes, but its words state 30–40/, "A range is drawn as one");
   const comparison = (replacement) => workPanelProblems({ ...workPanels, bnp: { ...bnp, comparisons: [{ ...bnp.comparisons[0], ...replacement }, bnp.comparisons[1]] } });
   assert.match(comparison({ after: { name: "Me, new to it", value: "an afternoon" } })[0], /writes "an afternoon"/, "A comparison's value is its scale row's");
   assert.match(comparison({ row: 4 })[0], /scale row 4/);

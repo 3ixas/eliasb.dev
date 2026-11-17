@@ -81,19 +81,21 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
         state: "off by default",
         caption: "Protect the blast radius",
       },
-      // Lengths are in one unit per row: working days (two weeks taken as ten) and minutes (30–40 drawn at 40, under 5 at 5).
+      // Each row in its own unit: working days (two weeks taken as ten), and minutes, 30–40 as a range and under 5 as a bound.
       "what-changed": {
         kind: "scale",
         rows: [
           {
             what: "Integrating a pricer",
+            unit: "working-days",
             before: { label: "about two weeks, experienced", amount: 10 },
             after: { label: "a couple of days, new to it", amount: 2 },
           },
           {
             what: "The competition dashboard’s data load",
-            before: { label: "30–40 min", amount: 40 },
-            after: { label: "under 5 min", amount: 5 },
+            unit: "minutes",
+            before: { label: "30–40 min", amount: 40, least: 30 },
+            after: { label: "under 5 min", amount: 5, under: true },
           },
         ],
         caption: "Bars to scale. Two weeks is taken as ten working days.",

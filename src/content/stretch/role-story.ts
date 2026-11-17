@@ -4,6 +4,7 @@
  * (the opening, sections, evidence figures) and differs in what it tells: an
  * employer, a role and the years there, in the employer's colour.
  */
+import { measureProblems, type Amount, type Unit } from "./measure.ts";
 import { siteCopy } from "./site-copy.ts";
 import {
   evidenceFigureProblems,
@@ -49,8 +50,8 @@ export const roleStoryCopy = { nextRole: "Next role" } as const;
 /** The one back link every Role story shares: the homepage's Work section. */
 export const roleStoryBack = { label: siteCopy.header.backToWork, href: "/#work" } as const;
 
-/** A before-and-after bar: the words say it, the number sets its length. */
-export type ScaleBar = { label: string; amount: number };
+/** One side of a before and after: the words say it, and its amount, in the row's unit, sets what is drawn. */
+export type ScaleBar = Amount & { label: string };
 
 /** One figure a Role story attaches to a section, drawn only from the story's own facts. */
 export type RoleStoryFigure =
@@ -64,8 +65,8 @@ export type RoleStoryFigure =
     }
   | {
       kind: "scale";
-      /** Each row is one measurement; both bars share its unit, so the lengths compare. */
-      rows: readonly { what: string; before: ScaleBar; after: ScaleBar }[];
+      /** Each row is one measurement, drawn in its own unit (`content/stretch/measure.ts`), both sides to one scale. */
+      rows: readonly { what: string; unit: Unit; before: ScaleBar; after: ScaleBar }[];
       caption: string;
     }
   | {
@@ -175,6 +176,10 @@ export function roleStoryProblems(stories: readonly RoleStory[]): string[] {
     }
     problems.push(...resumeLineProblems(story));
     problems.push(...panelColourProblems(`Role story "${story.slug}"`, story.panel));
+    for (const figure of Object.values(story.figures ?? {})) {
+      if (figure.kind !== "scale") continue;
+      for (const row of figure.rows) problems.push(...measureProblems(`Role story "${story.slug}", "${row.what}"`, row, [row.before.label, row.after.label]));
+    }
     for (const key of roleStorySectionKeys) {
       if (!storySectionHasContent(story.sections[key])) {
         problems.push(`Role story "${story.slug}" has an empty "${key}" section.`);

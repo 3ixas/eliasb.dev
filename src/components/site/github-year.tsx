@@ -18,7 +18,7 @@ const copy = offTheClock.github;
 const grouped = (value: number) => String(Math.round(value)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
 /**
- * The GitHub year as squares in GitHub's own greens, with today ringed in cobalt. Its total counts up the first
+ * The GitHub year as squares in GitHub's own greens, with today ringed in cobalt. Its total rolls up the first
  * time it is on screen. Hover, focus or tap a day to read its count. On phones the grid scrolls sideways inside its
  * own column and opens on today, with its left edge faded. `mark` is the source mark that ends the total's line.
  */
@@ -62,7 +62,7 @@ export function GitHubYear({ activity, total, mark }: { activity: ActivityDay[];
           parts={[
             <>
               <span className="stretch-gh__count">
-                <Count to={total} />
+                <Count value={totalText} />
               </span>{" "}
               {copy.contributions(totalText).slice(totalText.length + 1)}
             </>,

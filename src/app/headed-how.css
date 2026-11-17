@@ -198,23 +198,15 @@
 }
 
 .drawn__bars {
-  display: grid;
+  --soft: var(--hair);
+  --solid: var(--cobalt);
+  --thin: 5px;
+  --thick: 9px;
   flex: 1;
+}
+
+.drawn__bars .measure-pair {
   gap: 3px;
-}
-
-.drawn__bars .bar {
-  display: block;
-  width: calc(var(--share) * 100%);
-  height: 5px;
-  border-radius: 3px;
-  background: var(--hair);
-}
-
-.drawn__bars .bar--after {
-  height: 9px;
-  border-radius: 5px;
-  background: var(--cobalt);
 }
 
 .how__prd {
@@ -255,16 +247,14 @@
   }
 }
 
-/* Forced colours keep the drawings: ticks and the after bar in the highlight, the before bar and the switch in the text colour. */
+/* Forced colours keep the drawings: ticks in the highlight, the switch in the text colour (the bars are parts.css's). */
 @media (forced-colors: active) {
-  .drawn__bars .bar,
   .drawn__switch::after {
     forced-color-adjust: none;
     background: CanvasText;
   }
 
   .drawn__ticks i,
-  .drawn__bars .bar--after,
   .drawn__dot::before {
     forced-color-adjust: none;
     background: Highlight;

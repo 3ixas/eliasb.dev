@@ -5,6 +5,8 @@ import { passName } from "../src/content/stretch/pass-name";
 import { roleStories, roleStorySlugs } from "../src/content/stretch/role-stories";
 import { roleStoryBack, roleStoryCopy, roleStoryDescription, roleStoryName, roleStorySectionKeys, roleStorySectionLabels } from "../src/content/stretch/role-story";
 import { passRecords } from "../src/content/stretch/staff-pass";
+import { drawn, expectDrawn } from "./support/measure";
+import { spoken } from "./support/roll";
 import { renderedContrast } from "./support/rendered-contrast";
 import { withoutScene } from "./support/scene";
 
@@ -47,7 +49,7 @@ for (const slug of roleStorySlugs) {
 
     test("the opening shows the story's evidence figures, each value over its words", async ({ page }) => {
       const list = opening(page).getByRole("list", { name: "Evidence" });
-      await expect(list.getByRole("listitem")).toHaveText(story.evidence.map(({ value, label }) => `${value} ${label}`));
+      expect(await spoken(list.getByRole("listitem"))).toEqual(story.evidence.map(({ value, label }) => `${value} ${label}`));
       await expect(list.locator("b").first()).toHaveCSS("font-family", /Newsreader/);
     });
 
@@ -142,24 +144,14 @@ for (const slug of roleStorySlugs) {
         await expect(scale).toContainText("under 5 min");
       });
 
-      test("the comparisons' bars are to scale once they have come into view", async ({ page }) => {
-        await page.emulateMedia({ reducedMotion: "no-preference" });
-        await page.reload();
-        const rows = page.locator("section#what-changed .cmps > li");
-        await expect(rows).toHaveCount(2);
-        await rows.first().evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
-        // About ten working days against a couple (2 in 10); 30–40 min drawn at 40 against under 5 (5 in 40).
-        for (const [index, ratio] of [0.2, 0.125].entries()) {
-          const [before, after] = [rows.nth(index).locator(".bar:not(.bar--after)"), rows.nth(index).locator(".bar--after")];
-          await expect.poll(async () => (await after.boundingBox())!.width / (await before.boundingBox())!.width).toBeCloseTo(ratio, 2);
-        }
-      });
-
-      test("the bars are drawn at their share at once with reduced motion", async ({ page }) => {
+      test("each comparison is drawn in its own unit: ten day squares against two, and minutes on one scale with the range and the bound drawn short", async ({ page }) => {
         await page.emulateMedia({ reducedMotion: "reduce" });
         await page.reload();
-        const row = page.locator("section#what-changed .cmps > li").first();
-        await expect.poll(async () => (await row.locator(".bar--after").boundingBox())!.width / (await row.locator(".bar:not(.bar--after)").boundingBox())!.width).toBeCloseTo(0.2, 2);
+        const scale = story.figures!["what-changed"]!;
+        if (scale.kind !== "scale") throw new Error("BNP Paribas's What changed figure is the scale");
+        await expect(page.locator("section#what-changed .cmps > li")).toHaveCount(scale.rows.length);
+        const drawings = await drawn(page.locator("section#what-changed"), ".cmps > li");
+        for (const [index, row] of scale.rows.entries()) expectDrawn(drawings[index], row, row.what);
       });
 
       test("the certificate sits under What I took with me with a hairline edge, its caption and its own address", async ({ page }) => {

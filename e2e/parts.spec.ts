@@ -2,6 +2,7 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { roleStories, roleStorySlugs } from "../src/content/stretch/role-stories";
 import { featuredSlugs, projects } from "../src/content/projects";
 import { renderedContrast } from "./support/rendered-contrast";
+import { shown } from "./support/roll";
 
 // The shared parts (src/app/parts.css; docs/design/DESIGN.md "The panel", "Controls" and "Motion"), on
 // /fixtures/parts. The successor of feedback.spec.ts, craft-precision.spec.ts's press and interruption checks and
@@ -246,7 +247,7 @@ test.describe("Focus", () => {
 test.describe("Arrival", () => {
   test.use({ reducedMotion: "no-preference" });
 
-  test("below the fold, a panel rises, its figure counts and its bars grow, once, ending where the server drew them", async ({ page }) => {
+  test("below the fold, a panel rises, its figure rolls and its bars grow, once, ending where the server drew them", async ({ page }) => {
     await page.clock.install();
     await page.goto(fixture);
     const rise = page.locator("[data-rise]");
@@ -254,32 +255,52 @@ test.describe("Arrival", () => {
     const grow = page.locator("[data-grow]");
     await expect(rise).toHaveAttribute("data-armed", "");
     await expect(grow).toHaveAttribute("data-armed", "");
-    await expect(count).toHaveText("−0%");
+    await expect.poll(() => shown(count)).toBe("−0%");
+    await expect(count.locator(".sr-only")).toHaveText("−40%");
+    // Catch the tens digit's roll as it is created and pause it there, so it cannot finish before it is read.
+    await count.locator(".roll__strip").first().evaluate((strip) => {
+      strip.addEventListener("transitionrun", (event) => {
+        if ((event as TransitionEvent).propertyName !== "transform") return;
+        const roll = strip.getAnimations()[0];
+        roll.pause();
+        (window as unknown as { roll: Animation }).roll = roll;
+      });
+    });
 
     await page.locator("#arrivals").evaluate((element) => element.scrollIntoView({ block: "start", behavior: "instant" }));
     await expect(rise).not.toHaveAttribute("data-armed");
     await expect(grow).not.toHaveAttribute("data-armed");
+    await expect(count.locator(".roll")).not.toHaveAttribute("data-armed");
+    // Seeked halfway, the tens digit stands between its start and its value: it rolls rather than jumps.
+    await expect.poll(() => page.evaluate(() => "roll" in window)).toBe(true);
+    const between = await count.locator(".roll__strip").first().evaluate((strip) => {
+      const { roll } = window as unknown as { roll: Animation };
+      roll.currentTime = 600;
+      const digit = getComputedStyle(strip.children[0]);
+      return -new DOMMatrix(getComputedStyle(strip).transform).f / (parseFloat(digit.height) + parseFloat(digit.marginBottom));
+    });
+    expect(between).toBeGreaterThan(0.5);
+    expect(between).toBeLessThan(4);
     // Seek every transition to its end rather than wait it out.
     await page.evaluate(() => document.getAnimations().forEach((animation) => animation.finish()));
     await expect(rise).toHaveCSS("opacity", "1");
     await expect(rise).toHaveCSS("transform", "none");
     await expect(grow.locator(".bar--after")).toHaveCSS("transform", "none");
-    await page.clock.runFor(1300);
-    await expect(count).toHaveText("−40%");
+    await expect.poll(() => shown(count)).toBe("−40%");
 
     // Once: scrolling away and back does not arm it again.
     await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
     await page.locator("#arrivals").evaluate((element) => element.scrollIntoView({ block: "start", behavior: "instant" }));
     await expect(rise).not.toHaveAttribute("data-armed");
-    await expect(count).toHaveText("−40%");
+    await expect.poll(() => shown(count)).toBe("−40%");
   });
 
   test("printing before scrolling there prints the figure's finished value, not the one it starts from", async ({ page }) => {
     await page.goto(fixture);
     const count = page.locator("[data-count]");
-    await expect(count).toHaveText("−0%");
-    await page.evaluate(() => window.dispatchEvent(new Event("beforeprint")));
-    await expect(count).toHaveText("−40%");
+    await expect.poll(() => shown(count)).toBe("−0%");
+    await page.emulateMedia({ media: "print" });
+    await expect.poll(() => shown(count)).toBe("−40%");
   });
 
   test("it is let go when its top passes 85% of the viewport's height, the line that armed it", async ({ page }) => {
@@ -306,7 +327,7 @@ test.describe("Arrival", () => {
 test.describe("Arrival, held back from no one", () => {
   test("with reduced motion everything is in its end state at once", async ({ page }) => {
     await page.goto(fixture);
-    await expect(page.locator("[data-count]")).toHaveText("−40%");
+    await expect.poll(() => shown(page.locator("[data-count]"))).toBe("−40%");
     await expect(page.locator("[data-armed]")).toHaveCount(0);
   });
 
@@ -314,7 +335,7 @@ test.describe("Arrival, held back from no one", () => {
     const context = await browser.newContext({ javaScriptEnabled: false, reducedMotion: "no-preference" });
     const page = await context.newPage();
     await page.goto(fixture);
-    await expect(page.locator("[data-count]")).toHaveText("−40%");
+    await expect.poll(() => shown(page.locator("[data-count]"))).toBe("−40%");
     await expect(page.locator("[data-armed]")).toHaveCount(0);
     await expect(page.locator("[data-rise]")).toHaveCSS("opacity", "1");
     await context.close();
