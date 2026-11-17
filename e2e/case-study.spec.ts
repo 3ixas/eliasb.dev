@@ -129,7 +129,7 @@ for (const slug of caseStudySlugs) {
       await expect(card.locator("figcaption")).toHaveText(study.prd.date ? `${caseStudyCopy.fromPrd} · ${study.prd.date}` : caseStudyCopy.fromPrd);
     });
 
-    test("figures sit in the text column with a hairline edge and their captions", async ({ page }) => {
+    test("figures take the text side's whole width, with a hairline edge and their captions", async ({ page }) => {
       const figures = caseStudySectionKeys.flatMap((key) => {
         const figure = study.sections[key].figure;
         return figure ? [{ key, figure }] : [];
@@ -142,7 +142,9 @@ for (const slug of caseStudySlugs) {
         await expect(image).toHaveCSS("border-radius", "16px");
         await expect(image).toHaveCSS("box-shadow", /1px/);
         await expect(frame.locator("figcaption")).toHaveText(figure.caption);
-        expect((await frame.boundingBox())!.width).toBeLessThanOrEqual(760.5);
+        // A figure takes the text side's whole width, past the text's 760 px measure (#461).
+        const side = (await page.locator(`section#${key} .story-section__body`).boundingBox())!.width;
+        expect(Math.abs((await frame.boundingBox())!.width - side)).toBeLessThan(1);
       }
     });
 

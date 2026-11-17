@@ -72,12 +72,28 @@ for (const slug of roleStorySlugs) {
             return width(page) >= 720 ? b.x >= h.x + h.width - 1 && Math.abs(b.y - h.y) < 24 : b.y >= h.y + h.height - 1;
           })
           .toBe(true);
-        expect((await body.boundingBox())!.width).toBeLessThanOrEqual(760.5);
+        // The text keeps its 760 px measure; a figure may take the text side's whole width (#461).
+        for (const text of await body.locator(":scope > :not(.story-fig)").all()) expect((await text.boundingBox())!.width).toBeLessThanOrEqual(760.5);
       }
       // A hairline and 64 px between sections (44 px on a phone).
       const section = page.locator(`section#${sectionKeys[1]}`);
       await expect(section).toHaveCSS("padding-top", width(page) < 720 ? "44px" : "64px");
       await expect(section).toHaveCSS("border-top-width", "1px");
+    });
+
+    test("from 720 px a section's heading stays in view beside its text as the section scrolls, and lets go at its end", async ({ page }) => {
+      test.skip(width(page) < 720, "A phone sets the heading above its text.");
+      // The tallest section is the one a heading has furthest to travel beside.
+      const tallest = await page.locator("section.story-section").evaluateAll((sections) => sections.sort((a, b) => b.clientHeight - a.clientHeight)[0].id);
+      const section = page.locator(`section#${tallest}`);
+      const heading = section.locator("h2");
+      await expect(heading).toHaveCSS("position", "sticky");
+      // Scrolled to the section's middle, the heading is held 32 px from the top, inside its section.
+      await section.evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY + element.clientHeight / 2 - 200));
+      await expect.poll(async () => Math.round((await heading.boundingBox())!.y)).toBe(32);
+      // Scrolled past it, the heading has left with its section rather than covering the next one.
+      await section.evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().bottom + window.scrollY));
+      await expect.poll(async () => (await heading.boundingBox())!.y + (await heading.boundingBox())!.height).toBeLessThanOrEqual(1);
     });
 
     test("its paragraphs are Newsreader at 20 px (19 on a phone), and its points a 23 px serif lead over a muted line", async ({ page }) => {

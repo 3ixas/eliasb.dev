@@ -298,9 +298,26 @@
   text-wrap: balance;
 }
 
+/* The text keeps its 760 px measure; a figure takes the text side's whole width (#461). */
 .story-section__body {
   min-width: 0;
+}
+
+.story-section__body > :not(.story-fig) {
   max-width: 760px;
+}
+
+/*
+ * From 720 px the heading stays in view beside its section while the section scrolls, and lets go at its end, so the
+ * left of the page is never empty beside a long section. No figure spans under it: one that did would pass beneath the
+ * heading held beside it.
+ */
+@media (min-width: 720px) {
+  .story-section__title {
+    position: sticky;
+    top: 32px;
+    align-self: start;
+  }
 }
 
 .prose p {

@@ -244,3 +244,7 @@ No code to replace. They check the finished build; see the tickets.
 ### #460 Project pictures recaptured
 
 - **As built:** `projects.ts` points each project at its new picture: `threshold/answer.webp` (the "Can I afford this?" answer for a room in Hackney, live site, 2×), `flowtime/break.webp` (38 minutes focused, an 8-minute break offered; the live site under Playwright's clock, 2×), `risk-event-tracker/request.webp` (Swagger's executed POST and its 201, a local run, 2×), `argus/dashboard.webp` and `home-secretary/coming-up.webp` (earlier captures re-cropped). Ask Professor Past keeps `chat.webp`. The landing, idle timer, route list and full-dashboard files are gone. Argus Risk's recapture waits for Docker (its Kafka and Postgres stack); Home Secretary's for a signed-in session; Ask Professor Past's for paid OpenAI answers (Elias, 17 November).
+
+### #461 Role stories
+
+- **Part 1, the long-form layout (shared with case studies, `story.css`):** `.story-section__title` is `position: sticky; top: 32px; align-self: start` from 720 px. `.story-section__body` has no width of its own; its children other than `.story-fig` keep `max-width: 760px`, so a figure fills the text side (837 px at 1440). A page-spanning figure was tried for the simulation and dropped: it slid beneath the held heading.
