@@ -257,15 +257,24 @@ test.describe("Arrival", () => {
     await expect(grow).toHaveAttribute("data-armed", "");
     await expect.poll(() => shown(count)).toBe("−0%");
     await expect(count.locator(".sr-only")).toHaveText("−40%");
+    // Catch the tens digit's roll as it is created and pause it there, so it cannot finish before it is read.
+    await count.locator(".roll__strip").first().evaluate((strip) => {
+      strip.addEventListener("transitionrun", (event) => {
+        if ((event as TransitionEvent).propertyName !== "transform") return;
+        const roll = strip.getAnimations()[0];
+        roll.pause();
+        (window as unknown as { roll: Animation }).roll = roll;
+      });
+    });
 
     await page.locator("#arrivals").evaluate((element) => element.scrollIntoView({ block: "start", behavior: "instant" }));
     await expect(rise).not.toHaveAttribute("data-armed");
     await expect(grow).not.toHaveAttribute("data-armed");
     await expect(count.locator(".roll")).not.toHaveAttribute("data-armed");
     // Seeked halfway, the tens digit stands between its start and its value: it rolls rather than jumps.
+    await expect.poll(() => page.evaluate(() => "roll" in window)).toBe(true);
     const between = await count.locator(".roll__strip").first().evaluate((strip) => {
-      const roll = strip.getAnimations()[0];
-      roll.pause();
+      const { roll } = window as unknown as { roll: Animation };
       roll.currentTime = 600;
       const digit = getComputedStyle(strip.children[0]);
       return -new DOMMatrix(getComputedStyle(strip).transform).f / (parseFloat(digit.height) + parseFloat(digit.marginBottom));
