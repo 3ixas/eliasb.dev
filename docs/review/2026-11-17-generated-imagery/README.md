@@ -10,7 +10,7 @@ One clear yes: **the 3D staff pass's materials**, the webbing and the hologram's
 
 | Part | Verdict | Why |
 |---|---|---|
-| The 3D pass's materials (#448) | **Yes** | The weave, foil and card stock are procedural canvases today. A photographic, tileable texture for each (webbing tinted per employer, foil, near-white stock) adds the detail a held, turned card shows close up. They feed the existing `map` and `normalMap` slots, so the scene's structure stays. Samples below. |
+| The 3D pass's materials (#448) | **Yes** | The weave, foil and card stock are procedural canvases today. A photographic, tileable texture for the webbing (tinted per employer) and the foil adds the detail a held, turned card shows close up; the card stock stays procedural (its sample is below). They feed the existing `map` and `normalMap` slots, so the scene's structure stays. Samples below. |
 | Share cards (#469) | No: render the real pass | The card should carry the object, and the object exists: capture the site's own pass (its print, or a still from the 3D scene) rather than generate a likeness that would drift from it. |
 | The favicon (#469) | Not yet | A favicon is a crisp mark at 16 to 32 px, which wants vector. Generation could explore concepts, but #469 already has two candidates; revisit only if neither lands. |
 | The greeting's scenes (#467) | No | 30 px scenes with moving parts (the steam, the minute hand, the lamp's pool) need vector parts to animate; a raster at that size blurs and cannot move. |
