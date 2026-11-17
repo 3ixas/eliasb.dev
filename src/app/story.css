@@ -146,7 +146,7 @@
 
 /* ---- A case study's opening: a panel in the project's colour ---- */
 
-/* The text at the left, the landing screenshot at the right; under 1260 px the screenshot follows the text. */
+/* The text at the left, the screenshot at the right; under 960 px the screenshot follows the text. */
 .case-open {
   display: grid;
   grid-template:
@@ -625,7 +625,11 @@
 
 /* ---- Under 1260 px: the pass hangs below the text, from a hairline ---- */
 
-@media (max-width: 1259.98px) {
+/*
+ * Under 960 px the opening stacks: the pass (or a case study's screenshot) follows the text. From 960 px there is room
+ * for both side by side, so a laptop-sized window keeps the right of the opening filled (#461).
+ */
+@media (max-width: 959.98px) {
   .story-open {
     grid-template-columns: minmax(0, 1fr);
     min-height: 0;

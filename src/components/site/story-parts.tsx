@@ -79,7 +79,7 @@ export function EvidenceFigures({ evidence }: { evidence: readonly EvidenceItem[
 }
 
 /** Desktop column widths for an image in the text column: at most 760 px, 8 of 12 columns, or the page on a phone. */
-export const columnImageSizes = "(min-width: 1260px) 760px, (min-width: 720px) 60vw, 100vw";
+export const columnImageSizes = "(min-width: 1260px) 840px, (min-width: 720px) 64vw, 100vw";
 
 /** A screenshot or a certificate in the text column, as it is: 16 px corners, a hairline edge, opening large in a dialog, and its caption beneath. */
 export function StoryImage({ id, src, alt, width, height, caption }: { id?: string; src: string; alt: string; width: number; height: number; caption: ReactNode }) {

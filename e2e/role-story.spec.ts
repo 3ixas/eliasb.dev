@@ -116,12 +116,19 @@ for (const slug of roleStorySlugs) {
       await expect(opening(page).locator(".pass a, a.pass")).toHaveCount(0);
     });
 
-    test("the pass hangs at the right of the text from 1260 px, and below it under that", async ({ page }) => {
+    test("on a laptop-sized window (1024 px) the pass still hangs beside the text, so the opening's right is never empty", async ({ page }) => {
+      await page.setViewportSize({ width: 1024, height: 768 });
+      const text = page.locator(".story-open__text");
+      await expect.poll(async () => (await pass(page).boundingBox())!.x >= (await text.boundingBox())!.x + (await text.boundingBox())!.width - 1).toBe(true);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    });
+
+    test("the pass hangs at the right of the text from 960 px, and below it under that", async ({ page }) => {
       const text = opening(page).locator(".story-open__text");
       await expect
         .poll(async () => {
           const [t, p] = [(await text.boundingBox())!, (await pass(page).locator(".pass__card").boundingBox())!];
-          return width(page) >= 1260 ? p.x >= t.x + t.width - 1 : p.y >= t.y + t.height - 1;
+          return width(page) >= 960 ? p.x >= t.x + t.width - 1 : p.y >= t.y + t.height - 1;
         })
         .toBe(true);
     });
