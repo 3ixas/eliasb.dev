@@ -75,7 +75,7 @@ test.describe("Nothing is blank", () => {
 
   test("a full-column screenshot asks for a full-column file", async ({ page }) => {
     await page.goto("/work/optegra");
-    await expect(page.locator(".story-fig .zoom img").first()).toHaveAttribute("sizes", "(min-width: 1260px) 760px, (min-width: 720px) 60vw, 100vw");
+    await expect(page.locator(".story-fig .zoom img").first()).toHaveAttribute("sizes", "(min-width: 1260px) 840px, (min-width: 720px) 64vw, 100vw");
   });
 
   test("the site declares a touch icon", async ({ page }) => {

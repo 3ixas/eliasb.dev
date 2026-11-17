@@ -47,7 +47,7 @@ function projectFor(slug: string): Project & Required<Pick<Project, "panel" | "s
   return project as Project & Required<Pick<Project, "panel" | "screenshot">>;
 }
 
-/** The opening panel: the text at the left, the landing screenshot at the right (beneath under 1260 px). */
+/** The opening panel: the text at the left, the screenshot at the right (beneath under 960 px). */
 function Opening({ study, project }: { study: CaseStudy; project: ReturnType<typeof projectFor> }) {
   const { links, screenshot } = project;
   return (
@@ -75,7 +75,7 @@ function Opening({ study, project }: { study: CaseStudy; project: ReturnType<typ
         <EvidenceFigures evidence={study.evidence} />
       </div>
       <div className="case-open__shot story-fig__shot">
-        <ZoomableImage src={screenshot.src} alt={screenshot.alt} width={screenshot.width} height={screenshot.height} sizes="(min-width: 1260px) 720px, 92vw" preload />
+        <ZoomableImage src={screenshot.src} alt={screenshot.alt} width={screenshot.width} height={screenshot.height} sizes="(min-width: 1260px) 720px, (min-width: 960px) 56vw, 92vw" preload />
       </div>
     </Panel>
   );
