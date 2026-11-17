@@ -24,16 +24,15 @@ function StoryLink({ slug, outline = false }: { slug: RoleStorySlug; outline?: b
 }
 
 /**
- * BNP Paribas, full width and green: its figure, two comparisons in their own units and the link to its story; the
- * simulation is on its Role story (#457). `composed` is #458's composition, shown on /fixtures/work-panels until Elias
- * approves it for the homepage.
+ * BNP Paribas, full width and green: its name over its role and dates, its figure and the link to its story on the left,
+ * two comparisons in their own units on the right (#458); the simulation is on its Role story (#457).
  */
-function BnpPanel({ composed = false }: { composed?: boolean }) {
+function BnpPanel() {
   const { slug, figure, comparisons } = workPanels.bnp;
   const story = roleStories[slug];
   return (
     <OnView motion="rise">
-      <Panel id={slug} colours={story.panel} className={composed ? "work-bnp work-bnp--composed" : "work-bnp"}>
+      <Panel id={slug} colours={story.panel} className="work-bnp">
         <Head slug={slug} />
         <p className="work-bnp__figure">
           <span className="figure__words">{figure.value}</span>
@@ -79,12 +78,12 @@ function PairRow({ pair }: { pair: Pair }) {
 }
 
 /** Joveen or Optegra: a display figure that rolls to its value once, three pairs in their units and the link to the story. */
-function RolePanelView({ panel, composed = false }: { panel: RolePanel; composed?: boolean }) {
+function RolePanelView({ panel }: { panel: RolePanel }) {
   const story = roleStories[panel.slug];
   const { value, label } = displayFigure(story, panel.figure)!;
   return (
     <OnView motion="rise" className="work-role__arrival">
-      <Panel id={panel.slug} colours={story.panel} className={composed ? "work-role work-role--composed" : "work-role"}>
+      <Panel id={panel.slug} colours={story.panel} className="work-role">
         <Head slug={panel.slug} />
         <p className="work-role__figure">
           <span className="figure__value"><Count value={value} from={panel.figure.from} /></span>
@@ -106,9 +105,9 @@ function RolePanelView({ panel, composed = false }: { panel: RolePanel; composed
 /**
  * Work (DESIGN.md "The homepage, in order" 3, R-13 to R-15): the title and its subheading, BNP Paribas full width,
  * then Joveen and Optegra side by side. Each panel carries its employer's slug as its id, which the opening's passes
- * link to. `composed` shows #458's composition, on its fixture only.
+ * link to. Joveen's and Optegra's panels share their rows, so their rules and links stay level (#458).
  */
-export function Work({ composed = false }: { composed?: boolean }) {
+export function Work() {
   return (
     <section id="work" className="frame section work" aria-labelledby="work-heading">
       <h2 id="work-heading" className="section__title">
@@ -116,10 +115,10 @@ export function Work({ composed = false }: { composed?: boolean }) {
       </h2>
       <p className="work__subheading">{workPanels.subheading}</p>
       <div className="panels">
-        <BnpPanel composed={composed} />
-        <div className={composed ? "panels panels--two panels--aligned" : "panels panels--two"}>
+        <BnpPanel />
+        <div className="panels panels--two panels--aligned">
           {workPanels.roles.map((panel) => (
-            <RolePanelView key={panel.slug} panel={panel} composed={composed} />
+            <RolePanelView key={panel.slug} panel={panel} />
           ))}
         </div>
       </div>

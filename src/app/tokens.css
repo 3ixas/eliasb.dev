@@ -55,7 +55,7 @@
   --type-panel: clamp(30px, 3vw, 42px);
   /* A Work panel leads with its employer; its figure is the supporting number, a step under it. */
   --type-employer: clamp(52px, 6vw, 88px);
-  --type-figure: clamp(48px, 5vw, 72px);
+  --type-figure: clamp(40px, 3.8vw, 56px);
   --type-prose: 20px;
   /* A Role story's lede, and a point's serif lead in a long-form section. */
   --type-lede: clamp(20px, 1.8vw, 25px);

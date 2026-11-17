@@ -18,26 +18,49 @@
   text-wrap: balance;
 }
 
+/*
+ * Every Work panel (#458): one structure in three. The name leads, with its role over its dates directly under it;
+ * then the figure a clear step down and its quiet label; then the evidence under a hairline; then the story link.
+ */
 .work .panel {
   --soft: color-mix(in srgb, var(--panel-ink) 26%, transparent);
   --solid: var(--panel-ink);
   scroll-margin-top: 24px;
-  /* In dark a hairline of the panel's ink holds its edge: Joveen's near-black field is otherwise one step off the page. */
-  box-shadow: inset 0 0 0 1px light-dark(transparent, color-mix(in srgb, var(--panel-ink) 14%, transparent));
+  /*
+   * Surface: in light a panel has no depth (DESIGN.md "What this design avoids"), so it takes only an exact 1 px inner
+   * edge in its own ink. In dark it gains depth: a 1 px highlight along its top edge, and (Joveen and Optegra) a field
+   * lifting slightly towards the top, so Joveen's near-black field stands off the page without a glow.
+   */
+  box-shadow:
+    inset 0 1px 0 light-dark(transparent, rgb(255 255 255 / 0.12)),
+    inset 0 0 0 1px light-dark(color-mix(in srgb, var(--panel-ink) 9%, transparent), color-mix(in srgb, var(--panel-ink) 16%, transparent));
 }
 
 /* ---- The employer leads ---- */
 
-/* What a visitor reads first is where I worked: the employer large, my role and dates beside it, and the figure a step under. */
+/* What a visitor reads first is where I worked: the employer large, my role over my dates under it, one unit at every width. */
+.work .panel__head {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
 .work .panel__name {
   font-size: var(--type-employer);
   line-height: 0.95;
   letter-spacing: -0.035em;
 }
 
+/* Role over dates, a line each, so neither breaks mid-phrase where a panel is narrow. */
 .work .panel__meta {
+  margin-left: 0;
+  text-align: left;
   font-size: var(--type-prose);
   line-height: 1.35;
+}
+
+.work .panel__meta span {
+  white-space: nowrap;
 }
 
 /* ---- Figures ---- */
@@ -51,13 +74,13 @@
   font-variant-numeric: lining-nums tabular-nums;
 }
 
+/* A clear step under the employer: the three panels' figures rank alike, BNP Paribas's words a touch smaller than a number. */
 .figure__value {
   font-size: var(--type-figure);
-  line-height: 0.9;
+  line-height: 0.95;
   letter-spacing: -0.04em;
 }
 
-/* BNP Paribas's figure is words, so it is a step smaller than a number. */
 .figure__words {
   font-size: clamp(34px, 3.6vw, 52px);
   line-height: 1;
@@ -67,7 +90,7 @@
 
 .figure__label {
   display: block;
-  margin-top: 12px;
+  margin-top: 10px;
   font-family: var(--serif);
   font-optical-sizing: auto;
   font-size: var(--type-prose);
@@ -95,7 +118,7 @@
 
 .work-bnp__figure {
   grid-area: figure;
-  padding-block: 56px 0;
+  padding-top: 56px;
 }
 
 /* As Joveen's and Optegra's pairs sit under their figures: the rule 32 px below the figure's words. */
@@ -127,13 +150,12 @@
 }
 
 /*
- * #458's composition, on /fixtures/work-panels until approved. Two columns from 1000 px: on the left who and what (the
- * name with its role and dates directly under it, then "Six months" and its label, then the story link), on the right
- * the evidence (each comparison under its own hairline, from the name's top to the link's foot). Every element keeps
- * one of the panel's two left edges.
+ * From 1000 px, two columns: on the left who and what (the name over its role and dates, then "Six months" and its
+ * label, then the story link), on the right the evidence (each comparison under its own hairline, the first level with
+ * the name). Every element keeps one of the panel's two left edges.
  */
 @media (min-width: 1000px) {
-  .work .work-bnp--composed {
+  .work .work-bnp {
     grid-template:
       "head comparisons" auto
       "figure comparisons" 1fr
@@ -142,68 +164,53 @@
     column-gap: 72px;
   }
 
-  .work-bnp--composed .work-bnp__figure {
+  .work-bnp__figure {
     padding-block: 64px 48px;
   }
 
-  .work-bnp--composed .work-bnp__comparisons {
+  .work-bnp__comparisons {
     margin-top: 0;
   }
 
-  .work-bnp--composed .work-bnp__comparisons ul {
+  .work-bnp__comparisons ul {
     grid-template-columns: minmax(0, 1fr);
     gap: 0;
     padding-top: 0;
     border-top: 0;
   }
 
-  .work-bnp--composed .work-bnp__comparisons li {
+  .work-bnp__comparisons li {
     padding-block: 22px 26px;
     border-top: 1px solid var(--line);
   }
 
-  .work-bnp--composed .work-bnp__comparisons li:first-child {
+  .work-bnp__comparisons li:first-child {
     padding-top: 0;
     border-top: 0;
   }
 
-  .work-bnp--composed > .work__story {
+  .work-bnp > .work__story {
     align-self: end;
+    margin-top: 0;
   }
 }
 
-/* On every composed panel the name and its role and dates are one unit at every width: the role and dates directly under the name, a line each. */
-:is(.work-bnp--composed, .work-role--composed) .panel__head {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
+/* ---- Joveen and Optegra ---- */
+
+.work-role__arrival,
+.work-role {
+  height: 100%;
 }
 
-:is(.work-bnp--composed, .work-role--composed) .panel__meta {
-  margin-left: 0;
-  text-align: left;
+.work .work-role {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  padding: 36px 40px 40px;
+  background: linear-gradient(180deg, light-dark(var(--field), color-mix(in srgb, var(--field), #fff 7%)) 0%, var(--field) 60%);
 }
 
-/* Role over dates, a line each, so neither breaks mid-phrase where the panel is narrow. */
-:is(.work-bnp--composed, .work-role--composed) .panel__meta span {
-  white-space: nowrap;
-}
-
-/*
- * Joveen and Optegra composed (#458, round 2): the name leads, the figure is a clear step under it, at BNP Paribas's
- * figure size, so the three panels rank alike (name, figure, label, evidence), and its label stays quiet beneath.
- */
-.work-role--composed .figure__value {
-  font-size: clamp(40px, 3.8vw, 56px);
-  line-height: 0.95;
-}
-
-.work-role--composed .work-role__figure {
+.work-role__figure {
   margin-top: 56px;
-}
-
-.work-role--composed .figure__label {
-  margin-top: 10px;
 }
 
 /*
@@ -222,44 +229,11 @@
     grid-template-rows: subgrid;
   }
 
-  .panels--aligned .work-role--composed {
+  .panels--aligned .work-role {
     grid-row: span 4;
     grid-template-rows: subgrid;
     row-gap: 0;
   }
-}
-
-/*
- * Surface (#458, round 3), on the composed panels. In light a panel has no depth (DESIGN.md "What this design avoids"),
- * so it takes only an exact 1 px inner edge in its own ink. In dark it gains depth: a 1 px highlight along its top edge
- * and its field lifting slightly towards the top, so Joveen's near-black field stands off the page without a glow.
- * BNP Paribas keeps its own gradient and takes the edges.
- */
-.work :is(.work-bnp--composed, .work-role--composed) {
-  box-shadow:
-    inset 0 1px 0 light-dark(transparent, rgb(255 255 255 / 0.12)),
-    inset 0 0 0 1px light-dark(color-mix(in srgb, var(--panel-ink) 9%, transparent), color-mix(in srgb, var(--panel-ink) 16%, transparent));
-}
-
-.work .work-role--composed {
-  background: linear-gradient(180deg, light-dark(var(--field), color-mix(in srgb, var(--field), #fff 7%)) 0%, var(--field) 60%);
-}
-
-/* ---- Joveen and Optegra ---- */
-
-.work-role__arrival,
-.work-role {
-  height: 100%;
-}
-
-.work-role {
-  display: grid;
-  grid-template-rows: auto auto 1fr auto;
-  padding: 36px 40px 40px;
-}
-
-.work-role__figure {
-  margin-top: 52px;
 }
 
 /* The pairs lay out by their own width, not the window's: side by side at 720 to 1000 px a panel is too narrow for the label, bars and value in one row. */
@@ -307,18 +281,7 @@
 
 /* ---- Narrower ---- */
 
-@media (max-width: 1259.98px) {
-  .work-bnp__figure {
-    padding-top: 44px;
-  }
-}
-
 @media (max-width: 719.98px) {
-  .work .panel__meta {
-    margin-left: 0;
-    text-align: left;
-  }
-
   .work__subheading {
     margin: -16px 0 28px;
   }
@@ -332,7 +295,7 @@
     gap: 28px;
   }
 
-  .work-role {
+  .work .work-role {
     padding: 26px 22px 28px;
   }
 
