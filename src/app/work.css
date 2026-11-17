@@ -229,6 +229,22 @@
   }
 }
 
+/*
+ * Surface (#458, round 3), on the composed panels. In light a panel has no depth (DESIGN.md "What this design avoids"),
+ * so it takes only an exact 1 px inner edge in its own ink. In dark it gains depth: a 1 px highlight along its top edge
+ * and its field lifting slightly towards the top, so Joveen's near-black field stands off the page without a glow.
+ * BNP Paribas keeps its own gradient and takes the edges.
+ */
+.work :is(.work-bnp--composed, .work-role--composed) {
+  box-shadow:
+    inset 0 1px 0 light-dark(transparent, rgb(255 255 255 / 0.12)),
+    inset 0 0 0 1px light-dark(color-mix(in srgb, var(--panel-ink) 9%, transparent), color-mix(in srgb, var(--panel-ink) 16%, transparent));
+}
+
+.work .work-role--composed {
+  background: linear-gradient(180deg, light-dark(var(--field), color-mix(in srgb, var(--field), #fff 7%)) 0%, var(--field) 60%);
+}
+
 /* ---- Joveen and Optegra ---- */
 
 .work-role__arrival,
