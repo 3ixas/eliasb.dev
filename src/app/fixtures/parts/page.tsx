@@ -22,11 +22,11 @@ const others = projects.filter((project) => !(featuredSlugs as readonly string[]
  * The shared parts (parts.css; DESIGN.md "The panel", "Controls" and "Motion") on the page and on every panel field,
  * as the prototype's parts.html shows them, for the end-to-end suite and its pictures. Its groups carry `data-shot`
  * for e2e/materials.spec.ts. Comparisons shows one of each unit's drawing (#456). Below the fold it holds a panel that rises, a figure that counts and bars that grow.
- * It exists only when the server is started with BOARD_FIXTURES=1.
+ * It exists on Vercel previews, for Elias to judge (#476), and when the server is started with BOARD_FIXTURES=1, never in production.
  */
 export default async function PartsFixtures() {
   await connection();
-  if (process.env.BOARD_FIXTURES !== "1") notFound();
+  if (process.env.BOARD_FIXTURES !== "1" && process.env.VERCEL_ENV !== "preview") notFound();
 
   return (
     <main id="main-content" tabIndex={-1} style={{ minHeight: "100vh", background: "var(--page)", color: "var(--ink)", fontFamily: "var(--sans)", paddingBottom: 144 }}>
