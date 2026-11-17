@@ -126,6 +126,72 @@
   margin-top: 36px;
 }
 
+/*
+ * #458's composition, on /fixtures/work-panels until approved. Two columns from 1000 px: on the left who and what (the
+ * name with its role and dates directly under it, then "Six months" and its label, then the story link), on the right
+ * the evidence (each comparison under its own hairline, from the name's top to the link's foot). Every element keeps
+ * one of the panel's two left edges.
+ */
+@media (min-width: 1000px) {
+  .work .work-bnp--composed {
+    grid-template:
+      "head comparisons" auto
+      "figure comparisons" 1fr
+      "story comparisons" auto
+      / minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: 72px;
+  }
+
+  .work-bnp--composed .work-bnp__figure {
+    padding-block: 64px 48px;
+  }
+
+  .work-bnp--composed .work-bnp__comparisons {
+    margin-top: 0;
+  }
+
+  .work-bnp--composed .work-bnp__comparisons ul {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .work-bnp--composed .work-bnp__comparisons li {
+    padding-block: 22px 26px;
+    border-top: 1px solid var(--line);
+  }
+
+  .work-bnp--composed .work-bnp__comparisons li:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .work-bnp--composed > .work__story {
+    align-self: end;
+  }
+}
+
+/* The name and its role and dates are one unit at every width: the role and dates directly under the name. */
+.work-bnp--composed .panel__head {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.work-bnp--composed .panel__meta {
+  margin-left: 0;
+  text-align: left;
+}
+
+.work-bnp--composed .panel__meta span {
+  display: inline;
+}
+
+.work-bnp--composed .panel__meta span + span::before {
+  content: " · ";
+}
+
 /* ---- Joveen and Optegra ---- */
 
 .work-role__arrival,

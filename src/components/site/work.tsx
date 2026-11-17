@@ -23,13 +23,17 @@ function StoryLink({ slug, outline = false }: { slug: RoleStorySlug; outline?: b
   );
 }
 
-/** BNP Paribas, full width and green: its figure, two comparisons in their own units and the link to its story; the simulation is on its Role story (#457). */
-function BnpPanel() {
+/**
+ * BNP Paribas, full width and green: its figure, two comparisons in their own units and the link to its story; the
+ * simulation is on its Role story (#457). `composed` is #458's composition, shown on /fixtures/work-panels until Elias
+ * approves it for the homepage.
+ */
+function BnpPanel({ composed = false }: { composed?: boolean }) {
   const { slug, figure, comparisons } = workPanels.bnp;
   const story = roleStories[slug];
   return (
     <OnView motion="rise">
-      <Panel id={slug} colours={story.panel} className="work-bnp">
+      <Panel id={slug} colours={story.panel} className={composed ? "work-bnp work-bnp--composed" : "work-bnp"}>
         <Head slug={slug} />
         <p className="work-bnp__figure">
           <span className="figure__words">{figure.value}</span>
@@ -102,9 +106,9 @@ function RolePanelView({ panel }: { panel: RolePanel }) {
 /**
  * Work (DESIGN.md "The homepage, in order" 3, R-13 to R-15): the title and its subheading, BNP Paribas full width,
  * then Joveen and Optegra side by side. Each panel carries its employer's slug as its id, which the opening's passes
- * link to.
+ * link to. `composed` shows #458's composition, on its fixture only.
  */
-export function Work() {
+export function Work({ composed = false }: { composed?: boolean }) {
   return (
     <section id="work" className="frame section work" aria-labelledby="work-heading">
       <h2 id="work-heading" className="section__title">
@@ -112,7 +116,7 @@ export function Work() {
       </h2>
       <p className="work__subheading">{workPanels.subheading}</p>
       <div className="panels">
-        <BnpPanel />
+        <BnpPanel composed={composed} />
         <div className="panels panels--two">
           {workPanels.roles.map((panel) => (
             <RolePanelView key={panel.slug} panel={panel} />
