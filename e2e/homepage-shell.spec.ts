@@ -513,6 +513,20 @@ test.describe("The header greeting", () => {
     await context.close();
   });
 
+  test("on a wide screen London's time is one line beside the greeting at every width, never a narrow column", async ({ browser }) => {
+    for (const width of [960, 1100, 1440, 1920]) {
+      const context = await browser.newContext({ viewport: { width, height: 800 }, reducedMotion: "reduce" });
+      const page = await context.newPage();
+      await page.goto("/");
+      await greeting(page).hover();
+      const line = page.locator(".greeting__more > span > span");
+      await expect(page.locator(".greeting__more")).toHaveCSS("opacity", "1");
+      const lineHeight = parseFloat(await line.evaluate((element) => getComputedStyle(element).lineHeight));
+      expect((await line.boundingBox())!.height, `${width} px`).toBeLessThan(lineHeight * 1.5);
+      await context.close();
+    }
+  });
+
   test("below a wide screen the greeting is a button: a tap opens London's time on its own line, and a second tap puts it away", async ({ browser }) => {
     // 414 px: the greeting hides under 400.
     const context = await browser.newContext({ viewport: { width: 414, height: 896 }, hasTouch: true, isMobile: true });

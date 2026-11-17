@@ -67,16 +67,34 @@ test.describe("The 3D staff passes", () => {
     await hung(page);
     await expect(scene(page)).toHaveCount(1);
     await expect(scene(page)).toHaveAttribute("aria-hidden", "true");
-    // The canvas spans all the rail scrolls through, so it scrolls with the passes on a phone.
-    // Both read together: the scene lays itself out again when the fonts or the window change the rail.
+    // The pad a pointer takes hold through spans all the rail scrolls through, so it scrolls with the passes on a phone.
+    // The canvas draws past it, so a card swung to the side is not cut at the rail's edge (#448): never past the window's
+    // sides, and not at all where the rail scrolls sideways. Both read together: the scene lays itself out again when the
+    // fonts or the window change the rail.
     await expect
       .poll(() =>
         rail(page).evaluate((element) => {
+          const pad = element.querySelector<HTMLElement>(".lanyard__pad")!;
           const canvas = element.querySelector<HTMLCanvasElement>("canvas.lanyard__scene")!;
-          return [element.scrollWidth - canvas.offsetWidth, element.clientHeight - canvas.offsetHeight];
+          // Measured as the scene measures: without the canvas, which reaches past the rail.
+          const was = canvas.style.width;
+          canvas.style.width = "0";
+          const width = element.scrollWidth;
+          canvas.style.width = was;
+          return [width - pad.offsetWidth, element.clientHeight - pad.offsetHeight];
         }),
       )
       .toEqual([0, 0]);
+    const reach = await rail(page).evaluate((element) => {
+      const canvas = element.querySelector<HTMLCanvasElement>("canvas.lanyard__scene")!.getBoundingClientRect();
+      const stage = element.getBoundingClientRect();
+      return { left: Math.round(stage.left - canvas.left), right: Math.round(canvas.right - stage.right), within: canvas.right <= document.documentElement.clientWidth + 0.5, scrolls: getComputedStyle(element).overflowX !== "visible" };
+    });
+    // Where the rail scrolls (a phone) the canvas spans what it scrolls through and no more; elsewhere it reaches past the
+    // rail's left and stays inside the window.
+    if (reach.scrolls) expect(reach.left).toBe(0);
+    else expect([reach.left > 0, reach.within]).toEqual([true, true]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
     const passes = rail(page).locator(".pass");
     await expect(passes).toHaveCount(3);
     for (const [index, slug] of slugs.entries()) {
@@ -141,6 +159,25 @@ test.describe("The 3D staff passes", () => {
     // The canvas spans the passes and no further: the rail scrolls exactly as far as without it.
     const content = () => rail(page).evaluate((element) => Math.max(...[...element.querySelectorAll<HTMLElement>(".pass")].map((pass) => pass.offsetLeft + pass.offsetWidth)) + parseFloat(getComputedStyle(element).paddingRight));
     await expect.poll(async () => Math.abs((await scene(page).evaluate((canvas: HTMLCanvasElement) => canvas.offsetWidth)) - (await content()))).toBeLessThanOrEqual(1);
+  });
+
+  test("the canvas reaches the window's sides, so a swung card is not cut, and follows the window without scrolling the page", async ({ page }, info) => {
+    test.skip(!info.project.name.includes("-1440-"), "A wide window");
+    await page.setViewportSize({ width: 1920, height: 1000 });
+    await page.goto("/work/bnp-paribas");
+    const stage = page.locator(".story-open__rail");
+    await hung(page, stage);
+    const reach = () =>
+      stage.evaluate((element) => {
+        const canvas = element.querySelector("canvas.lanyard__scene")!.getBoundingClientRect();
+        // Within a pixel of each side (the stage sits at a fraction of a pixel), and the page does not scroll sideways.
+        const near = (gap: number) => Math.abs(gap) <= 1;
+        return [near(canvas.left), near(document.documentElement.clientWidth - canvas.right), document.documentElement.scrollWidth <= document.documentElement.clientWidth];
+      });
+    await expect.poll(reach).toEqual([true, true, true]);
+    // Above 1440 px the stage keeps its size as the window narrows; the canvas still follows the window's sides.
+    await page.setViewportSize({ width: 1600, height: 1000 });
+    await expect.poll(reach).toEqual([true, true, true]);
   });
 
   test("a Role story's pass hangs in its own scene, and a click on it goes nowhere", async ({ page }, info) => {

@@ -317,14 +317,23 @@
 }
 
 /* The 3D passes (#448, parts/lanyard): the scene's canvas covers the stage from its top left, as wide as all the stage scrolls
-   through (the scene sets its size), and once it has drawn, the printed passes under it are kept for their names, their
+   through and past it to the window's sides and 320 px below (the scene sets its size), and once it has drawn, the printed passes under it are kept for their names, their
    boxes and the keyboard but not seen. Their arrival swing and lean stop, so each box stays where its card was laid.
    Touches pan and zoom as on the page; the scene takes a touch only once it has rested on a card. */
 .lanyard {
   position: relative;
 }
 
+/* The canvas draws past the stage (the scene sets its offset), so a swung card is never cut at the stage's edge, and it
+   takes no pointer. The pad over the stage is what takes hold of a card. */
 .lanyard__scene {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.lanyard__pad {
   position: absolute;
   top: 0;
   left: 0;
@@ -333,7 +342,7 @@
   user-select: none;
 }
 
-.lanyard__scene[data-holding] {
+.lanyard__pad[data-holding] {
   cursor: grabbing;
 }
 

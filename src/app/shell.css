@@ -358,10 +358,12 @@ html:has([data-site]) {
 }
 
 @media (hover: hover) and (min-width: 900px) {
+  /* Its own width, on one line: hung beyond the words, it would otherwise wrap to the greeting's narrow box. */
   .greeting__more {
     position: absolute;
     left: 100%;
     display: block;
+    width: max-content;
     padding-left: 6px;
     opacity: 0;
     visibility: visible;
