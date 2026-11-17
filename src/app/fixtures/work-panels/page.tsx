@@ -7,11 +7,12 @@ export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 /**
  * #458's composition of the Work panels, before it reaches the homepage: Work as the homepage draws it, with the panels
- * in their composed state. It exists only when the server is started with BOARD_FIXTURES=1.
+ * in their composed state, for Elias to judge on a preview. It exists on Vercel previews and when the server is started
+ * with BOARD_FIXTURES=1, never in production.
  */
 export default async function WorkPanelsFixture() {
   await connection();
-  if (process.env.BOARD_FIXTURES !== "1") notFound();
+  if (process.env.BOARD_FIXTURES !== "1" && process.env.VERCEL_ENV !== "preview") notFound();
   return (
     <main id="main-content" tabIndex={-1} style={{ minHeight: "100vh", background: "var(--page)", color: "var(--ink)", fontFamily: "var(--sans)", paddingBottom: 144 }}>
       <Work composed />
