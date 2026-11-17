@@ -26,22 +26,6 @@
   --soft: color-mix(in srgb, var(--panel-ink) 26%, transparent);
   --solid: var(--panel-ink);
   scroll-margin-top: 24px;
-  /*
-   * Surface (#458): a card lit from above, in both themes. Its edges catch the light, a highlight along the top inside and a shade along the bottom,
-   * over an exact 1 px edge (in light its own ink; in dark a faint white rim on every panel, so BNP Paribas's dark ink
-   * does not leave its edge unseen on the dark page); and it sits on the page with a close contact shadow and a soft, wide one
-   * tinted by its own field, so the green panel casts green, not grey. In dark the shadows are black and deeper.
-   */
-  /* The dark theme's rim: a faint white line, as strong on each field as Joveen's reads on near-black. */
-  --rim: rgb(255 255 255 / 0.16);
-  --cast: light-dark(color-mix(in srgb, var(--field) 42%, transparent), rgb(0 0 0 / 0.55));
-  box-shadow:
-    inset 0 1px 0 light-dark(rgb(255 255 255 / 0.22), rgb(255 255 255 / 0.14)),
-    inset 0 -1px 0 rgb(0 0 0 / 0.14),
-    inset 0 0 0 1px light-dark(color-mix(in srgb, var(--panel-ink) 9%, transparent), var(--rim)),
-    0 1px 2px light-dark(rgb(20 20 18 / 0.08), rgb(0 0 0 / 0.5)),
-    0 6px 14px -6px var(--cast),
-    0 28px 56px -28px var(--cast);
 }
 
 /* ---- The employer leads ---- */
@@ -110,8 +94,6 @@
 /* Green, lifting from #2cbd86 at the top left to its field, and never darker than the field (R-04). */
 .work .work-bnp {
   --solid: #fff;
-  /* On the bright green a faint rim vanishes, so it is stronger here to read as Joveen's and Optegra's do. */
-  --rim: rgb(255 255 255 / 0.42);
   display: grid;
   grid-template:
     "head" auto
@@ -217,13 +199,6 @@
   display: grid;
   grid-template-rows: auto auto 1fr auto;
   padding: 36px 40px 40px;
-  /* Lit from above: lighter at the top, the field itself by the middle, a touch deeper at the foot. */
-  background: linear-gradient(
-    180deg,
-    light-dark(color-mix(in srgb, var(--field), #fff 5%), color-mix(in srgb, var(--field), #fff 7%)) 0%,
-    var(--field) 55%,
-    color-mix(in srgb, var(--field), #000 8%) 100%
-  );
 }
 
 .work-role__figure {

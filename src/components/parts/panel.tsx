@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import type { PanelColours } from "@/content/stretch/story";
+import { luminance, type PanelColours } from "@/content/stretch/story";
 
 type PanelProps = {
   /** The subject's field and ink, kept in both themes; without them the panel is paper and follows the theme. */
@@ -15,7 +15,7 @@ type PanelProps = {
 /** The block that holds one subject (DESIGN.md "The panel"; GLOSSARY.md, Panel). Styles are in parts.css. */
 export function Panel({ colours, glow = false, as: Tag = "div", className, children, ...rest }: PanelProps) {
   const style = colours ? ({ "--field": colours.field, "--panel-ink": colours.ink } as CSSProperties) : undefined;
-  const classes = ["panel", colours ? null : "panel--paper", glow ? "panel--glow" : null, className].filter(Boolean).join(" ");
+  const classes = ["panel", colours ? (luminance(colours.ink) < luminance(colours.field) ? "panel--dark-ink" : null) : "panel--paper", glow ? "panel--glow" : null, className].filter(Boolean).join(" ");
   return (
     <Tag className={classes} style={style} {...rest}>
       {children}

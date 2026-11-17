@@ -67,18 +67,24 @@ test.describe("Work archive: the catalogue", () => {
     }
   });
 
-  test("in dark a project with a case study glows in its own colour; in light no panel has a shadow", async ({ page }) => {
+  test("every panel casts its own colour; in dark a project with a case study also glows in it", async ({ page }) => {
+    const shadows = () => panels(page).evaluateAll((all) => all.map((panel) => [panel.classList.contains("panel--glow"), getComputedStyle(panel).boxShadow] as const));
+    // The glow is the last layer, its colour transparent in light and on a panel without one, so it draws nothing there.
+    const unlit = /rgba\([^)]*, 0\) 0px 50px 90px -56px$/;
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
     await page.reload();
-    const shadows = () => panels(page).evaluateAll((all) => all.map((panel) => [panel.classList.contains("panel--glow"), getComputedStyle(panel).boxShadow]));
-    // The glow's colour is transparent in light, so it draws nothing.
-    const noShadow = (shadow: string) => shadow === "none" || /^rgba\([^)]*, 0\) /.test(shadow);
-    for (const [glow, shadow] of await shadows()) if (glow) expect(noShadow(shadow as string), shadow as string).toBe(true);
+    for (const [, shadow] of await shadows()) {
+      expect(shadow).toMatch(/0px 6px 14px -6px/);
+      expect(shadow).toMatch(unlit);
+    }
     await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" });
     await page.reload();
     const dark = await shadows();
     expect(dark.filter(([glow]) => glow)).toHaveLength(3);
-    for (const [glow, shadow] of dark) if (glow) expect(shadow).toMatch(/-56px/);
+    for (const [glow, shadow] of dark) {
+      if (glow) expect(shadow).not.toMatch(unlit);
+      else expect(shadow).toMatch(unlit);
+    }
   });
 
   test("the header has the way home and the links to the homepage's sections", async ({ page }) => {

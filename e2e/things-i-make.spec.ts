@@ -80,15 +80,19 @@ test.describe("Things I make", () => {
   test("the phone carousel, the 44 px objects and the closer looks are gone", async ({ page }) => {
   });
 
-  test("in light no panel has a shadow; in dark each glows in its own colour", async ({ page }) => {
+  test("every panel casts its own colour in light, and in dark each also glows in it", async ({ page }) => {
+    const shadows = () => panels(page).evaluateAll((all) => all.map((panel) => getComputedStyle(panel).boxShadow));
+    // The glow is the last layer, its colour transparent in light, so it draws nothing there.
+    const unlit = /rgba\([^)]*, 0\) 0px 50px 90px -56px$/;
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
     await page.reload();
-    // The glow's colour is transparent in light, so it draws nothing.
-    const noShadow = (shadow: string) => shadow === "none" || /^rgba\([^)]*, 0\) /.test(shadow);
-    for (const shadow of await panels(page).evaluateAll((all) => all.map((panel) => getComputedStyle(panel).boxShadow))) expect(noShadow(shadow), shadow).toBe(true);
+    for (const shadow of await shadows()) {
+      expect(shadow).toMatch(/0px 6px 14px -6px/);
+      expect(shadow).toMatch(unlit);
+    }
     await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" });
     await page.reload();
-    for (const panel of await panels(page).all()) await expect(panel).toHaveCSS("box-shadow", /-56px/);
+    for (const shadow of await shadows()) expect(shadow).not.toMatch(unlit);
   });
 
   test("it is complete without script", async ({ page }) => {
