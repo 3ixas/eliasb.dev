@@ -36,8 +36,8 @@ A change that breaks one needs Elias's decision, not a judgement in review.
 | Header | The name at the left (`clamp(30px, 3vw, 42px)`, Newsreader); role and dates at the right in 14.5 px, two lines, where there are any. A Work panel puts them under the name instead (see "The homepage, in order") |
 | Padding | 40 to 44 px (26 × 22 px under 720 px) |
 | Inside | Cards, figures and tiles take a 16 px radius; images 12 px; pills are fully round |
-| Depth | None in light. In dark a project panel glows in its own colour (`0 50px 90px -56px`, the field at 70%) |
-| Work panels ([#458](https://github.com/3ixas/eliasb.dev/issues/458)) | An exact 1 px inner edge in the panel's ink (9% in light, 16% in dark). In dark only, a 1 px highlight along the top edge, and Joveen's and Optegra's fields lift towards the top (7% white, gone by 60%), with text still AA at the lightest point |
+| Depth | Allowed in both themes where it makes a panel read as a made object: light from above, edges that catch it, a shadow tinted by the panel's own colour (Elias retired "no depth in light" on 17 November 2026). It never costs AA. In dark a project panel also glows in its own colour (`0 50px 90px -56px`, the field at 70%) |
+| Work panels ([#458](https://github.com/3ixas/eliasb.dev/issues/458)) | A card lit from above, in both themes. A 1 px highlight along the top inside edge and a 1 px shade along the bottom, over an exact 1 px edge in the panel's ink; a close contact shadow and a soft, wide one tinted by the panel's own field (black in dark). Joveen's and Optegra's fields are a touch lighter at the top and deeper at the foot; BNP Paribas keeps its own lift and is never deepened, where its dark ink would fall under AA. Text is AA at every point of every field |
 
 Pass furniture ("Valid · present", "Returned", a barcode) never appears on a panel.
 
@@ -225,7 +225,7 @@ Found in the lens passes and in the three rounds of concepts behind this directi
 - Proof behind a hover.
 - Italic or coloured emphasis inside headings beyond the opening line's two marks.
 - Underlines on text that is not a link.
-- Decorative glows, gradients and shadows in the light theme: a panel has no depth there. Two things are the exception, both from the approved prototype: the BNP Paribas panel's radial gradient, and the lift under a screenshot that bleeds off its panel (and the small shadow under the simulation's price tag).
+- Decoration for its own sake: a glow, gradient or shadow that does not model light on an object (Elias retired the old "no depth in light" rule on 17 November 2026, [#458](https://github.com/3ixas/eliasb.dev/issues/458): depth that makes a surface read as made is welcome in both themes).
 - Tilted cards and ruled-paper textures as decoration.
 - Display type so large it becomes the subject (the giant "Only").
 - A job title where the work can be described ("AI Champion", "Product engineer").

@@ -27,13 +27,18 @@
   --solid: var(--panel-ink);
   scroll-margin-top: 24px;
   /*
-   * Surface: in light a panel has no depth (DESIGN.md "What this design avoids"), so it takes only an exact 1 px inner
-   * edge in its own ink. In dark it gains depth: a 1 px highlight along its top edge, and (Joveen and Optegra) a field
-   * lifting slightly towards the top, so Joveen's near-black field stands off the page without a glow.
+   * Surface (#458): a card lit from above, in both themes. Its edges catch the light, a highlight along the top inside and a shade along the bottom,
+   * over an exact 1 px edge in its own ink; and it sits on the page with a close contact shadow and a soft, wide one
+   * tinted by its own field, so the green panel casts green, not grey. In dark the shadows are black and deeper.
    */
+  --cast: light-dark(color-mix(in srgb, var(--field) 42%, transparent), rgb(0 0 0 / 0.55));
   box-shadow:
-    inset 0 1px 0 light-dark(transparent, rgb(255 255 255 / 0.12)),
-    inset 0 0 0 1px light-dark(color-mix(in srgb, var(--panel-ink) 9%, transparent), color-mix(in srgb, var(--panel-ink) 16%, transparent));
+    inset 0 1px 0 light-dark(rgb(255 255 255 / 0.22), rgb(255 255 255 / 0.14)),
+    inset 0 -1px 0 rgb(0 0 0 / 0.14),
+    inset 0 0 0 1px light-dark(color-mix(in srgb, var(--panel-ink) 9%, transparent), color-mix(in srgb, var(--panel-ink) 16%, transparent)),
+    0 1px 2px light-dark(rgb(20 20 18 / 0.08), rgb(0 0 0 / 0.5)),
+    0 6px 14px -6px var(--cast),
+    0 28px 56px -28px var(--cast);
 }
 
 /* ---- The employer leads ---- */
@@ -109,6 +114,7 @@
     "comparisons" auto
     "story" auto
     / minmax(0, 1fr);
+  /* Already lit from its top left; it is never deepened at its foot, where its dark ink would fall under AA. */
   background: radial-gradient(120% 110% at 10% -10%, #2cbd86 0%, #0fa56d 46%, var(--field) 100%);
 }
 
@@ -206,7 +212,13 @@
   display: grid;
   grid-template-rows: auto auto 1fr auto;
   padding: 36px 40px 40px;
-  background: linear-gradient(180deg, light-dark(var(--field), color-mix(in srgb, var(--field), #fff 7%)) 0%, var(--field) 60%);
+  /* Lit from above: lighter at the top, the field itself by the middle, a touch deeper at the foot. */
+  background: linear-gradient(
+    180deg,
+    light-dark(color-mix(in srgb, var(--field), #fff 5%), color-mix(in srgb, var(--field), #fff 7%)) 0%,
+    var(--field) 55%,
+    color-mix(in srgb, var(--field), #000 8%) 100%
+  );
 }
 
 .work-role__figure {
