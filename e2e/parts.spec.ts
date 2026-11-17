@@ -281,14 +281,19 @@ test.describe("Arrival", () => {
     await expect(grow).toHaveAttribute("data-armed", "");
     await expect.poll(() => shown(count)).toBe("−0%");
     await expect(count.locator(".sr-only")).toHaveText("−40%");
-    // Catch the tens digit's roll as it is created and pause it there, so it cannot finish before it is read.
+    // Catch the tens digit's roll the moment it starts and pause it, so it cannot finish before it is read, however slow
+    // the runner. It starts when the last armed element around it (the figure, the panel rising with it) is let go; a
+    // mutation observer's callback runs before the next frame, where CI's WebKit does not reliably fire transitionrun
+    // (as in work.spec's fills).
     await count.locator(".roll__strip").first().evaluate((strip) => {
-      strip.addEventListener("transitionrun", (event) => {
-        if ((event as TransitionEvent).propertyName !== "transform") return;
-        const roll = strip.getAnimations()[0];
-        roll.pause();
-        (window as unknown as { roll: Animation }).roll = roll;
+      const watcher = new MutationObserver(() => {
+        const animation = strip.getAnimations().find((each) => (each as CSSTransition).transitionProperty === "transform");
+        if (!animation) return;
+        watcher.disconnect();
+        animation.pause();
+        (window as unknown as { roll: Animation }).roll = animation;
       });
+      watcher.observe(document.body, { attributes: true, attributeFilter: ["data-armed"], subtree: true });
     });
 
     await page.locator("#arrivals").evaluate((element) => element.scrollIntoView({ block: "start", behavior: "instant" }));
