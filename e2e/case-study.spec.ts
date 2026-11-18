@@ -231,9 +231,10 @@ for (const slug of caseStudySlugs) {
       const order = await page.locator(`:is(${scope}) :is(a, button, select):not(dialog *):visible`).evaluateAll((elements) => elements.map((element) => element.textContent?.trim() ?? ""));
       expect(order.length).toBeGreaterThan(3);
       const reached: string[] = [];
-      await page.locator("body").focus();
+      // Start on the back link: scrolling the figure into view above may have moved where Tab would start from the body.
+      await page.locator(`:is(${scope}) :is(a, button, select):not(dialog *):visible`).first().focus();
       for (let step = 0; step < 50 && reached.length < order.length; step++) {
-        await page.keyboard.press(tab);
+        if (step > 0) await page.keyboard.press(tab);
         const focused = await page.evaluate((within) => {
           const element = document.activeElement as HTMLElement | null;
           if (!element?.closest(within)) return null;

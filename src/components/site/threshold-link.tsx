@@ -51,8 +51,8 @@ export function ThresholdLinkView({ choice, changed = [], choose }: { choice: Th
 /** One choice: its label over a native select, drawn as the page's outline control. Held still until the island works it. */
 function Choice({ id, label, value, options, onChange }: { id: string; label: string; value: string; options: readonly (readonly [string, string])[]; onChange?: (event: ChangeEvent<HTMLSelectElement>) => void }) {
   return (
-    <label className="tlink__choice" htmlFor={id}>
-      <span>{label}</span>
+    <div className="tlink__choice">
+      <label htmlFor={id}>{label}</label>
       <span className="tlink__select">
         <select id={id} value={value} onChange={onChange} disabled={!onChange}>
           {options.map(([option, name]) => (
@@ -62,6 +62,6 @@ function Choice({ id, label, value, options, onChange }: { id: string; label: st
           ))}
         </select>
       </span>
-    </label>
+    </div>
   );
 }
