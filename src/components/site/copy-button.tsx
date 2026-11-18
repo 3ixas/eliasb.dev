@@ -12,7 +12,7 @@ const useHydrated = () => useSyncExternalStore(() => () => {}, () => true, () =>
  * refuses the clipboard, the button selects the text as shown (the element `textId` names) instead, ready to copy by
  * hand, with no new words.
  */
-export function CopyButton({ text, textId, label, done }: { text: string; textId: string; label: string; done: string }) {
+export function CopyButton({ text, textId, label, done, className }: { text: string; textId: string; label: string; done: string; className?: string }) {
   const ready = useHydrated();
   const [copied, setCopied] = useState(false);
   const timer = useRef(0);
@@ -34,7 +34,7 @@ export function CopyButton({ text, textId, label, done }: { text: string; textId
 
   return (
     <>
-      <button type="button" className="button copy-button" hidden={!ready} data-copied={copied ? "" : undefined} onClick={copy}>
+      <button type="button" className={className ? `button copy-button ${className}` : "button copy-button"} hidden={!ready} data-copied={copied ? "" : undefined} onClick={copy}>
         <span className="copy-button__word">{copied ? done : label}</span>
         <span className="copy-button__room" aria-hidden="true">
           {label}

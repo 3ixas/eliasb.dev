@@ -42,7 +42,7 @@ export function ThresholdLinkView({ choice, changed = [], choose }: { choice: Th
         <output id={`${ID}-address`} className="tlink__address" htmlFor={`${ID}-city ${ID}-district ${ID}-place`}>
           <span className="tlink__host">{new URL(THRESHOLD_ORIGIN).host}</span>/{part("city")}?district={part("district")}&amp;type={part("place")}
         </output>
-        <CopyButton text={thresholdLink(choice)} textId={`${ID}-address`} label={copy.copy} done={copy.copied} />
+        <CopyButton text={thresholdLink(choice)} textId={`${ID}-address`} label={copy.copy} done={copy.copied} className="working-fig__control" />
       </div>
     </div>
   );
@@ -54,7 +54,7 @@ function Choice({ id, label, value, options, onChange }: { id: string; label: st
     <div className="tlink__choice">
       <label htmlFor={id}>{label}</label>
       <span className="tlink__select">
-        <select id={id} value={value} onChange={onChange} disabled={!onChange}>
+        <select id={id} className="working-fig__control" value={value} onChange={onChange} disabled={!onChange}>
           {options.map(([option, name]) => (
             <option key={option} value={option}>
               {name}

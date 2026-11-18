@@ -266,9 +266,17 @@ No code to replace. They check the finished build; see the tickets.
 - **Copy:** Say hello's `CopyEmail` became `CopyButton` (`text`, `textId`) in `site/copy-button.tsx`, used by both.
 - **Specs:** `case-study` (the figure, its format, a new city's first district, 44 px labelled controls, the output, Copy and its refusal, no script), `motion` (200 ms and 1.2 s; nothing under reduced motion).
 
+### No coloured edges: tinted working figures and the PRD's hanging mark (Elias, 18 November 2026)
+
+- **Why:** a coloured stripe along one edge of a panel reads as a typical AI design tell. Full-colour figures were tried and dropped: they melted into the project's own panels and read flat.
+- **The shell:** `WorkingFigure` takes the project's `colours` (`PanelColours`) instead of `accent`, as `--project` and `--project-ink`. `.working-fig__frame.surface` sets `--field` to paper mixed with 13% of the project's colour, so the surface's own lighting and cast shadow work on the tint. `.working-fig__control` is a raised key in `--project`/`--project-ink` (lit top, short cast shadow, 0.97 press, cobalt ring, turned over when `data-copied`); a figure puts it on whatever a visitor presses. `CopyButton` takes an optional `className` for it.
+- **Threshold:** its selects and Copy link are keys; the chevron takes `--project-ink`.
+- **The PRD:** `.prd` has no top rule. `PrdCard` puts the opening “ in `.prd__mark`, absolutely placed in the card's margin in cobalt at 2.2em, so the quote's text still reads “…”. Phones give the card 30 px at the left for it.
+- **Specs:** `case-study` (no top rule on the PRD or the figure; the mark cobalt and within the card's margin; the figure's surface is not plain paper; its keys are the project's field and ink).
+
 ### #463 Case studies: Argus Risk's numbers with their history
 
-- **On the shell, unchanged:** the second working figure uses `WorkingFigure` and `lazyIsland` through their props only. `case-study.tsx`'s `workingFigures` gains `"argus-provenance"`, and Argus's Decisions section names it (`working`), with `positions.webp` as its still.
+- **On the shell, unchanged by #463 itself:** the second working figure uses `WorkingFigure` and `lazyIsland` through their props only. `case-study.tsx`'s `workingFigures` gains `"argus-provenance"`, and Argus's Decisions section names it (`working`), with `positions.webp` as its still.
 - **The figure (`components/site/`):** `argus-provenance.tsx` (`ArgusProvenanceView`, shared by server and client) draws a list of positions, each a disclosure button (`aria-expanded`, `aria-controls`) over a `dl` of its source and age, and New event (the Button) with a polite status. `argus-provenance-live.tsx` keeps each price's arrival time; an age is now minus that, and the clock ticks once a second only while a number is open and the figure intersects the viewport. New event steps the oldest position's price by the next of `priceSteps`, a fixed sequence, so a visit and a spec see the same numbers. `argus-provenance-island.tsx` is the island.
 - **Data and copy:** `content/stretch/argus-provenance.ts`, from `3ixas/argus-risk` `main`: seeded instruments (`InstrumentRepository.cs`), `PriceTick` on `market-data.prices`, `FxRate`, unrealised P&L as `RiskCalculator` works it out, and `StalenessThreshold` (5 s).
 - **Shared motion:** the arrival keyframes are `working-arrive` and `working-wash` on `.working-fig [data-new]`, for every working figure (they were Threshold's `tlink-*`).

@@ -15,7 +15,7 @@ const panelId = (symbol: string) => `${ID}-${symbol.replace(/\W/g, "-")}`;
 /**
  * Argus Risk's numbers with their history (#463, the case study's Decisions): three positions' unrealised P&L, each a
  * disclosure that opens the price tick it came from and how old that price is, and New event, which brings a new price
- * for the oldest. The server draws it closed with the controls held still; the island (argus-provenance-live.tsx) draws
+ * for the oldest. New event is a key in Argus's colour, and a number rises into one while it is open (WorkingFigure). The server draws it closed with the controls held still; the island (argus-provenance-live.tsx) draws
  * the same markup with its handlers, so the working figure takes the drawing's place without a pixel moving. A changed
  * value is keyed by itself, so it arrives afresh (story.css). The age is text that the island updates once a second
  * while its number is open and on screen; it never animates.
@@ -54,7 +54,7 @@ export function ArgusProvenanceView({
               <span className="argus__symbol">{symbol}</span>
               <button
                 type="button"
-                className="argus__value"
+                className={isOpen ? "argus__value working-fig__control" : "argus__value"}
                 aria-expanded={isOpen}
                 aria-controls={panelId(symbol)}
                 disabled={!toggle}
@@ -90,7 +90,7 @@ export function ArgusProvenanceView({
         })}
       </ul>
       <div className="argus__foot">
-        <button type="button" className="button" disabled={!newEvent} onClick={newEvent}>
+        <button type="button" className="button working-fig__control" disabled={!newEvent} onClick={newEvent}>
           {copy.newEvent}
         </button>
         <span className="sr-only" role="status">
