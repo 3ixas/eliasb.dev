@@ -265,3 +265,11 @@ No code to replace. They check the finished build; see the tickets.
 - **Round 2 (the link's lines):** `.tlink__part` is `white-space: nowrap`, so a district never splits at its hyphen. `.tlink__bar` aligns to the top, so Copy link beside the address (from 720 px) does not move as the link wraps (one line at 1440, up to five at 720). Under 720 px the address keeps `min-height` for three lines, four under 360 px: measured across every district and place, 390 px needs at most three and 320 px four.
 - **Copy:** Say hello's `CopyEmail` became `CopyButton` (`text`, `textId`) in `site/copy-button.tsx`, used by both.
 - **Specs:** `case-study` (the figure, its format, a new city's first district, 44 px labelled controls, the output, Copy and its refusal, no script), `motion` (200 ms and 1.2 s; nothing under reduced motion).
+
+### No coloured edges: tinted working figures and the PRD's hanging mark (Elias, 18 November 2026)
+
+- **Why:** a coloured stripe along one edge of a panel reads as a typical AI design tell. Full-colour figures were tried and dropped: they melted into the project's own panels and read flat.
+- **The shell:** `WorkingFigure` takes the project's `colours` (`PanelColours`) instead of `accent`, as `--project` and `--project-ink`. `.working-fig__frame.surface` sets `--field` to paper mixed with 13% of the project's colour, so the surface's own lighting and cast shadow work on the tint. `.working-fig__control` is a raised key in `--project`/`--project-ink` (lit top, short cast shadow, 0.97 press, cobalt ring, turned over when `data-copied`); a figure puts it on whatever a visitor presses. `CopyButton` takes an optional `className` for it.
+- **Threshold:** its selects and Copy link are keys; the chevron takes `--project-ink`.
+- **The PRD:** `.prd` has no top rule. `PrdCard` puts the opening “ in `.prd__mark`, absolutely placed in the card's margin in cobalt at 2.2em, so the quote's text still reads “…”. Phones give the card 30 px at the left for it.
+- **Specs:** `case-study` (no top rule on the PRD or the figure; the mark cobalt and within the card's margin; the figure's surface is not plain paper; its keys are the project's field and ink).
