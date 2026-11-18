@@ -9,6 +9,7 @@ import { ThresholdLinkIsland } from "@/components/site/threshold-link-island";
 import { ZoomableImage } from "@/components/site/zoomable-image";
 import { projects, type Project } from "@/content/projects";
 import { caseStudyCopy, caseStudySectionKeys, caseStudySectionLabels, type CaseStudy, type CaseStudySection } from "@/content/stretch/case-study";
+import type { PanelColours } from "@/content/stretch/story";
 import { thresholdLinkCopy, thresholdStart } from "@/content/stretch/threshold-link";
 
 /** "Live site" from "Live site ↗": the pill draws its own arrow. */
@@ -34,7 +35,7 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
             <StorySection key={key} id={key} title={heading ?? caseStudySectionLabels[key]}>
               <StoryText body={body} />
               {key === "written-down-first" && <PrdCard study={study} />}
-              {figure && <SectionFigure figure={figure} working={working} accent={project.panel.field} />}
+              {figure && <SectionFigure figure={figure} working={working} colours={project.panel} />}
             </StorySection>
           );
         })}
@@ -57,12 +58,12 @@ const workingFigures = {
 } as const;
 
 /** A section's screenshot, or the working figure that takes its place with the screenshot kept for a visitor without script. */
-function SectionFigure({ figure, working, accent }: Required<Pick<CaseStudySection, "figure">> & Pick<CaseStudySection, "working"> & { accent: string }) {
+function SectionFigure({ figure, working, colours }: Required<Pick<CaseStudySection, "figure">> & Pick<CaseStudySection, "working"> & { colours: PanelColours }) {
   const still = <StoryImage src={figure.src} alt={figure.alt} width={figure.width} height={figure.height} caption={figure.caption} />;
   if (!working) return still;
   const { caption, drawn } = workingFigures[working];
   return (
-    <WorkingFigure caption={caption} accent={accent} still={still}>
+    <WorkingFigure caption={caption} colours={colours} still={still}>
       {drawn}
     </WorkingFigure>
   );
@@ -120,13 +121,16 @@ function OutLink({ href, label, outline = false }: { href: string; label: string
   );
 }
 
-/** The line from the project's own spec on a paper card with a cobalt rule: the quote in Newsreader, then its source and date. */
+/** The line from the project's own spec on a paper card: the quote in Newsreader, its opening mark hanging in cobalt, then its source and date. */
 function PrdCard({ study }: { study: CaseStudy }) {
   const { lead, quote, after, date } = study.prd;
   return (
     <figure className="prd surface surface--paper">
       {lead && <p className="prd__around">{lead}</p>}
-      <blockquote className="prd__quote">“{quote}”</blockquote>
+      <blockquote className="prd__quote">
+        <span className="prd__mark">“</span>
+        {quote}”
+      </blockquote>
       {after && <p className="prd__around">{after}</p>}
       <figcaption>{date ? `${caseStudyCopy.fromPrd} · ${date}` : caseStudyCopy.fromPrd}</figcaption>
     </figure>

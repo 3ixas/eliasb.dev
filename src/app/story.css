@@ -230,12 +230,24 @@
 .prd {
   margin: 0;
   padding: 36px 40px;
-  border-top: 2px solid var(--cobalt);
   /* A paper surface (parts.css): lit from above, its edge the hairline, a neutral shadow. */
   border-radius: 16px;
 }
 
+/* The quote's opening mark hangs in the margin in cobalt, large, as a printed pull quote's does: the colour marks the words, not the card. */
+.prd__mark {
+  position: absolute;
+  top: -0.14em;
+  right: calc(100% + 0.06em);
+  color: var(--cobalt);
+  /* 2.2 times the quote's own clamp(22px, 2.2vw, 30px). */
+  font-size: clamp(48px, 4.84vw, 66px);
+  font-weight: 500;
+  line-height: 1;
+}
+
 .prd__quote {
+  position: relative;
   margin: 0;
   font-family: var(--serif);
   font-optical-sizing: auto;
@@ -809,8 +821,9 @@
     padding-top: 72px;
   }
 
+  /* Room at the left for the hanging quote mark. */
   .prd {
-    padding: 26px 22px;
+    padding: 26px 22px 26px 30px;
   }
 
   .cmps {
@@ -869,10 +882,66 @@
   margin: 36px 0 0;
 }
 
-.working-fig__frame {
+/* Paper tinted with the project's colour, lit and cast like every surface (parts.css), so it rises off the page. */
+.working-fig__frame.surface {
+  --field: color-mix(in oklab, var(--project) 13%, var(--paper));
   padding: 28px 32px 32px;
-  border-top: 2px solid var(--accent);
   border-radius: 16px;
+}
+
+/*
+ * What a visitor presses in a working figure: a raised key in the project's full colour, lit along its top and casting a
+ * short shadow, pressed down 0.97 as every control is. Its ring is the page's cobalt, outside it on the tinted paper.
+ */
+.working-fig .working-fig__control {
+  border: 1px solid transparent;
+  background: var(--project);
+  color: var(--project-ink);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.25),
+    0 1px 2px rgb(0 0 0 / 0.18),
+    0 6px 14px -8px rgb(0 0 0 / 0.45);
+  transition:
+    transform 0.15s var(--out),
+    filter 0.15s var(--out);
+}
+
+.working-fig__control:enabled:active {
+  transform: scale(0.97);
+}
+
+/* Copied: the key turns over, the project's ink with its colour as the words, as the page's Copy fills with ink. */
+.working-fig .working-fig__control[data-copied] {
+  background: var(--project-ink);
+  color: var(--project);
+}
+
+.working-fig__control:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .working-fig__control:enabled:hover {
+    filter: brightness(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .working-fig__control {
+    transition: none;
+  }
+
+  .working-fig__control:enabled:active {
+    transform: none;
+  }
+}
+
+/* Forced colours: a key keeps its outline, in the text colour. */
+@media (forced-colors: active) {
+  .working-fig .working-fig__control {
+    border-color: CanvasText;
+  }
 }
 
 .working-fig figcaption {
@@ -919,8 +988,8 @@
   right: 18px;
   width: 7px;
   height: 7px;
-  border-right: 1.5px solid var(--ink);
-  border-bottom: 1.5px solid var(--ink);
+  border-right: 1.5px solid var(--project-ink);
+  border-bottom: 1.5px solid var(--project-ink);
   transform: translateY(-70%) rotate(45deg);
   pointer-events: none;
 }
@@ -931,24 +1000,15 @@
   width: 100%;
   min-height: 44px;
   padding: 0 40px 0 18px;
-  border: 1px solid var(--ink);
   border-radius: 999px;
-  background: transparent;
-  color: var(--ink);
   font: 500 var(--type-ui) / 1.2 var(--sans);
   text-overflow: ellipsis;
-  transition: background-color 0.15s var(--out);
 }
 
 /* Held still while the island loads: drawn as it will work, never greyed. */
 .tlink select:disabled {
   opacity: 1;
-  color: var(--ink);
-}
-
-.tlink select:focus-visible {
-  outline: 2px solid var(--cobalt);
-  outline-offset: 3px;
+  color: var(--project-ink);
 }
 
 .tlink option {
@@ -1001,7 +1061,7 @@
 
 @keyframes tlink-wash {
   from {
-    background: color-mix(in srgb, var(--accent) 38%, transparent);
+    background: color-mix(in srgb, var(--project) 38%, transparent);
   }
 }
 
@@ -1011,14 +1071,8 @@
   visibility: hidden;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .tlink select:enabled:hover {
-    background: var(--tint);
-  }
-}
-
 @media (max-width: 719.98px) {
-  .working-fig__frame {
+  .working-fig__frame.surface {
     padding: 22px 20px 24px;
   }
 
@@ -1051,10 +1105,6 @@
 @media (prefers-reduced-motion: reduce) {
   .tlink__part[data-new] {
     animation: none;
-  }
-
-  .tlink select {
-    transition: none;
   }
 }
 

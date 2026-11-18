@@ -11,7 +11,7 @@ import { spoken } from "./support/roll";
 /*
  * Case studies (docs/design/DESIGN.md "Long-form pages", R-22): a panel in the project's colour holding the back link,
  * the name, the description, the stack, Live site and Code, the evidence figures and the landing screenshot; the
- * sections in the Role story's layout; the PRD as a paper card with a cobalt rule; then the next project as a panel.
+ * sections in the Role story's layout; the PRD as a paper card, its opening quote mark hanging in cobalt; then the next project as a panel.
  */
 
 const schemes = ["light", "dark"] as const;
@@ -109,10 +109,10 @@ for (const slug of caseStudySlugs) {
       }
     });
 
-    test("the PRD is a lit paper card with a cobalt rule: the quote in Newsreader, then its source and date", async ({ page }) => {
+    test("the PRD is a lit paper card with no coloured edge: the quote in Newsreader, its opening mark hanging in cobalt, then its source and date", async ({ page }) => {
       const card = page.locator("section#written-down-first figure.prd");
       await expect(card).toHaveCount(1);
-      await expect(card).toHaveCSS("border-top-width", "2px");
+      await expect(card).toHaveCSS("border-top-width", "0px");
       const cobalt = await page.evaluate(() => {
         const probe = document.body.appendChild(document.createElement("i"));
         probe.style.color = "var(--cobalt)";
@@ -120,7 +120,12 @@ for (const slug of caseStudySlugs) {
         probe.remove();
         return colour;
       });
-      await expect(card).toHaveCSS("border-top-color", cobalt);
+      // The mark hangs outside the quote's measure, in the card's margin.
+      const mark = card.locator(".prd__mark");
+      await expect(mark).toHaveText("“");
+      await expect(mark).toHaveCSS("color", cobalt);
+      expect((await mark.boundingBox())!.x + (await mark.boundingBox())!.width).toBeLessThanOrEqual((await card.locator("blockquote").boundingBox())!.x + 1);
+      expect((await mark.boundingBox())!.x).toBeGreaterThanOrEqual((await card.boundingBox())!.x);
       // A paper surface (#476): lit from above, its edge the hairline, over a neutral shadow.
       await expect(card).toHaveClass(/\bsurface surface--paper\b/);
       await expect(card).toHaveCSS("box-shadow", /0px 6px 14px -6px/);
@@ -313,8 +318,22 @@ test.describe("Case study: Threshold's working link", () => {
   test("it takes the screenshot's place on paper under Threshold's colour, with its own caption, and loads only as it nears the view", async ({ page }) => {
     await expect(figure(page)).toBeVisible();
     await expect(page.locator("section#how-its-built .working-fig__still")).toBeHidden();
+    // A lit surface tinted with Threshold's colour, with no coloured edge; the full colour is on the keys a visitor presses.
+    const threshold = projects.find(({ slug }) => slug === "threshold")!.panel!;
     await expect(figure(page).locator(".working-fig__frame")).toHaveClass(/\bsurface surface--paper\b/);
-    await expect(figure(page).locator(".working-fig__frame")).toHaveCSS("border-top-color", rgb(projects.find(({ slug }) => slug === "threshold")!.panel!.field));
+    await expect(figure(page).locator(".working-fig__frame")).toHaveCSS("border-top-width", "0px");
+    const paper = await page.evaluate(() => {
+      const probe = document.body.appendChild(document.createElement("i"));
+      probe.style.color = "var(--paper)";
+      const colour = getComputedStyle(probe).color;
+      probe.remove();
+      return colour;
+    });
+    await expect(figure(page).locator(".working-fig__frame")).not.toHaveCSS("background-color", paper);
+    for (const key of await figure(page).locator(".working-fig__control").all()) {
+      await expect(key).toHaveCSS("background-color", rgb(threshold.field));
+      await expect(key).toHaveCSS("color", rgb(threshold.ink));
+    }
     await expect(figure(page).locator("figcaption")).toHaveText(thresholdLinkCopy.caption);
     // Drawn by the server at its start, the choices held still until the island arrives: once the page has hydrated
     // (Say hello's Copy shows), a figure more than 600 px below the view is still the drawing.
