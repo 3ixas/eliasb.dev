@@ -198,6 +198,7 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
             text: "Come back to an unfinished session and Flowtime asks what to do.",
           },
         ],
+        working: "flowtime-break",
       },
       "how-its-built": {
         heading: "Everything stays in your browser.",

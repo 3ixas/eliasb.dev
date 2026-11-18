@@ -50,7 +50,7 @@ A project's own page at `/things-i-make/[slug]`, short, with its **Project colou
 _Avoid_: Case file, long write-up
 
 **Working figure**:
-A slice of a product inside a **Case study**, placed where the prose says what the product does, that a visitor can use rather than read about: Threshold's link that rewrites itself as you choose a city, district and place ([#462](https://github.com/3ixas/eliasb.dev/issues/462)). It does one job with the product's real options and real output, never the whole product or an embed. Without script it is the screenshot it replaces.
+A slice of a product inside a **Case study**, placed where the prose says what the product does, that a visitor can use rather than read about: Threshold's link that rewrites itself as you choose a city, district and place ([#462](https://github.com/3ixas/eliasb.dev/issues/462)). It does one job with the product's real options and real output, never the whole product or an embed. Without script it is the screenshot it replaces, or, where there was none (Flowtime's break, [#464](https://github.com/3ixas/eliasb.dev/issues/464)), its own drawing held at its start.
 _Avoid_: Demo, widget, embed, interactive
 
 **Project index**:

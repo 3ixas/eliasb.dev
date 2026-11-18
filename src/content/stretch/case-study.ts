@@ -52,8 +52,11 @@ export type SectionFigure = ProjectImage & { caption: string };
 export type CaseStudySection = StorySectionBody & {
   /** A figure can attach to any section. */
   figure?: SectionFigure;
-  /** A working figure in the figure's place (#462), drawn by case-study.tsx; the figure stays as what a visitor without script sees. */
-  working?: "threshold-link" | "argus-provenance";
+  /**
+   * A working figure in the figure's place (#462), drawn by case-study.tsx; the figure stays as what a visitor without
+   * script sees. With no figure, the working figure's own drawing at its start is that still (#464).
+   */
+  working?: "threshold-link" | "argus-provenance" | "flowtime-break";
 };
 
 /** A line from the project's own spec, shown on the inline Sheet. */

@@ -6,6 +6,8 @@ import { SiteLink } from "@/components/site/site-link";
 import { EvidenceFigures, NextPanel, StoryBack, StoryImage, StorySection, StoryText } from "@/components/site/story-parts";
 import { ArgusProvenanceView } from "@/components/site/argus-provenance";
 import { ArgusProvenanceIsland } from "@/components/site/argus-provenance-island";
+import { FlowtimeBreakView } from "@/components/site/flowtime-break";
+import { FlowtimeBreakIsland } from "@/components/site/flowtime-break-island";
 import { ThresholdLinkView } from "@/components/site/threshold-link";
 import { ThresholdLinkIsland } from "@/components/site/threshold-link-island";
 import { ZoomableImage } from "@/components/site/zoomable-image";
@@ -13,6 +15,7 @@ import { projects, type Project } from "@/content/projects";
 import { caseStudyCopy, caseStudySectionKeys, caseStudySectionLabels, type CaseStudy, type CaseStudySection } from "@/content/stretch/case-study";
 import type { PanelColours } from "@/content/stretch/story";
 import { argusPositions, argusProvenanceCopy } from "@/content/stretch/argus-provenance";
+import { flowtimeBreakCopy, focusRange } from "@/content/stretch/flowtime-break";
 import { thresholdLinkCopy, thresholdStart } from "@/content/stretch/threshold-link";
 
 /** "Live site" from "Live site ↗": the pill draws its own arrow. */
@@ -38,7 +41,7 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
             <StorySection key={key} id={key} title={heading ?? caseStudySectionLabels[key]}>
               <StoryText body={body} />
               {key === "written-down-first" && <PrdCard study={study} />}
-              {figure && <SectionFigure figure={figure} working={working} colours={project.panel} />}
+              {(figure || working) && <SectionFigure figure={figure} working={working} colours={project.panel} />}
             </StorySection>
           );
         })}
@@ -66,11 +69,22 @@ const workingFigures = {
       </ArgusProvenanceIsland>
     ),
   },
+  "flowtime-break": {
+    caption: flowtimeBreakCopy.caption,
+    drawn: (
+      <FlowtimeBreakIsland>
+        <FlowtimeBreakView focus={focusRange.start} />
+      </FlowtimeBreakIsland>
+    ),
+  },
 } as const;
 
-/** A section's screenshot, or the working figure that takes its place with the screenshot kept for a visitor without script. */
-function SectionFigure({ figure, working, colours }: Required<Pick<CaseStudySection, "figure">> & Pick<CaseStudySection, "working"> & { colours: PanelColours }) {
-  const still = <StoryImage src={figure.src} alt={figure.alt} width={figure.width} height={figure.height} caption={figure.caption} />;
+/**
+ * A section's screenshot, or the working figure that takes its place with the screenshot kept for a visitor without
+ * script. A working figure with no screenshot behind it (Flowtime's break) is its own still, drawn at its start.
+ */
+function SectionFigure({ figure, working, colours }: Pick<CaseStudySection, "figure" | "working"> & { colours: PanelColours }) {
+  const still = figure && <StoryImage src={figure.src} alt={figure.alt} width={figure.width} height={figure.height} caption={figure.caption} />;
   if (!working) return still;
   const { caption, drawn } = workingFigures[working];
   return (

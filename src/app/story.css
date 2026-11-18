@@ -879,6 +879,11 @@
  * screenshot it stands in for, with that screenshot's caption.
  */
 .working-fig {
+  /* A key's light and cast shadow, shared by every control a visitor presses here, a slider's thumb included. */
+  --key-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.25),
+    0 1px 2px rgb(0 0 0 / 0.18),
+    0 6px 14px -8px rgb(0 0 0 / 0.45);
   margin: 36px 0 0;
 }
 
@@ -897,10 +902,7 @@
   border: 1px solid transparent;
   background: var(--project);
   color: var(--project-ink);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.25),
-    0 1px 2px rgb(0 0 0 / 0.18),
-    0 6px 14px -8px rgb(0 0 0 / 0.45);
+  box-shadow: var(--key-shadow);
   transition:
     transform 0.15s var(--out),
     filter 0.15s var(--out);
@@ -951,7 +953,7 @@
   line-height: 1.4;
 }
 
-:root:not([data-script]) .working-fig,
+:root:not([data-script]) .working-fig[data-still],
 :root[data-script] .working-fig__still {
   display: none;
 }
@@ -1267,5 +1269,167 @@
   .argus__value,
   .argus__chevron {
     transition: none;
+  }
+}
+
+/*
+ * Flowtime's break (#464; site/flowtime-break.tsx): a native range for the minutes of focus, its thumb a key in
+ * Flowtime's colour, over Flowtime's focus and break and a Pomodoro's 25 and 5, each a tick a minute on the slider's one
+ * scale (#456's minutes, parts.css). Flowtime's are solid in cobalt, the page's colour on paper; a Pomodoro's soft. The
+ * track and thumb are drawn once each in custom properties: WebKit and Gecko need their own pseudo-elements, and a
+ * selector list mixing the two is dropped whole.
+ */
+.ftbreak {
+  --soft: color-mix(in srgb, var(--ink) 42%, transparent);
+  --solid: var(--cobalt);
+  --thumb: 28px;
+}
+
+.ftbreak__control {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: var(--type-label);
+  font-weight: 500;
+}
+
+/* A 44 px row to press anywhere along; the track fills to the thumb's centre in cobalt, as Flowtime's Focus does below. */
+.ftbreak__range {
+  --fill: var(--solid);
+  --rest: color-mix(in srgb, var(--ink) 16%, transparent);
+  --track: linear-gradient(to right, var(--fill) 0 calc(var(--thumb) / 2 + var(--filled) * (100% - var(--thumb))), var(--rest) 0);
+  --thumb-fill: var(--project);
+  --thumb-edge: var(--project-ink);
+  --thumb-press: scale(1);
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+
+.ftbreak__range:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.ftbreak__range:enabled:active {
+  --thumb-press: scale(0.97);
+}
+
+.ftbreak__range:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+.ftbreak__range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--track);
+}
+
+.ftbreak__range::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--track);
+}
+
+/* The thumb is a key (.working-fig's --key-shadow): Flowtime's field ringed in its ink, pressing to 0.97. */
+.ftbreak__range::-webkit-slider-thumb {
+  appearance: none;
+  width: var(--thumb);
+  height: var(--thumb);
+  margin-top: calc((6px - var(--thumb)) / 2);
+  border: 2px solid var(--thumb-edge);
+  border-radius: 50%;
+  background: var(--thumb-fill);
+  box-shadow: var(--key-shadow);
+  transform: var(--thumb-press);
+  transition: transform 0.15s var(--out);
+}
+
+.ftbreak__range::-moz-range-thumb {
+  box-sizing: border-box;
+  width: var(--thumb);
+  height: var(--thumb);
+  border: 2px solid var(--thumb-edge);
+  border-radius: 50%;
+  background: var(--thumb-fill);
+  box-shadow: var(--key-shadow);
+  transform: var(--thumb-press);
+  transition: transform 0.15s var(--out);
+}
+
+.ftbreak__rounds {
+  display: grid;
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.ftbreak__name {
+  margin: 0;
+  font-size: var(--type-ui);
+  font-weight: 600;
+}
+
+.ftbreak .cmp {
+  margin-top: 10px;
+}
+
+/* The round is named once; its lines' names are plain and their minutes carry the weight. */
+.ftbreak .cmp--after span {
+  font-weight: 400;
+}
+
+/* A number's wash sits behind its words. */
+.ftbreak .cmp b {
+  justify-self: end;
+  padding: 0 4px;
+}
+
+/* A round's minutes follow the slider: ticks grow and fill as it moves (named in verify-craft.mjs). */
+.ftbreak .measure--minutes i {
+  transition:
+    height 0.15s var(--out),
+    background-color 0.15s var(--out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ftbreak .measure--minutes i,
+  .ftbreak__range::-webkit-slider-thumb {
+    transition: none;
+  }
+
+  .ftbreak__range::-moz-range-thumb {
+    transition: none;
+  }
+
+  .ftbreak__range:enabled:active {
+    --thumb-press: none;
+  }
+}
+
+/* Forced colours: the track in GrayText filled in Highlight, the thumb Highlight ringed in CanvasText, and the ring CanvasText. */
+@media (forced-colors: active) {
+  .ftbreak__range {
+    forced-color-adjust: none;
+    --fill: Highlight;
+    --rest: GrayText;
+    --thumb-fill: Highlight;
+    --thumb-edge: CanvasText;
+    /* The one ring keeps its rule; here its colour is the system's text, since the slider keeps its own colours. */
+    --cobalt: CanvasText;
+  }
+
+  .ftbreak__range::-webkit-slider-thumb {
+    box-shadow: none;
+  }
+
+  .ftbreak__range::-moz-range-thumb {
+    box-shadow: none;
   }
 }
