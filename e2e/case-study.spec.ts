@@ -442,9 +442,12 @@ test.describe("Case study: Argus Risk's numbers with their history", () => {
     await expect(figure(page).locator(".argus[data-live]")).toHaveCount(1);
   };
 
+  // The clock is installed and then held, so an age moves only when a spec moves it: an installed clock otherwise runs in
+  // real time, and a slow runner would see the age tick before it reads it.
   test.beforeEach(async ({ page }) => {
     await page.clock.install();
     await page.goto("/things-i-make/argus-risk");
+    await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 50);
   });
 
   test("it takes the screenshot's place, says it is illustrative, and starts closed", async ({ page }) => {
