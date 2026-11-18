@@ -131,6 +131,7 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
           height: 1716,
           caption: "Open positions, each with its live price and how fresh it is.",
         },
+        working: "argus-provenance",
       },
       "how-its-built": {
         heading: "Four services and a stream.",

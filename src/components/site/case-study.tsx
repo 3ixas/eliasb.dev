@@ -4,11 +4,14 @@ import { hostLabel } from "@/components/site/host-label";
 import { LongForm } from "@/components/site/long-form";
 import { SiteLink } from "@/components/site/site-link";
 import { EvidenceFigures, NextPanel, StoryBack, StoryImage, StorySection, StoryText } from "@/components/site/story-parts";
+import { ArgusProvenanceView } from "@/components/site/argus-provenance";
+import { ArgusProvenanceIsland } from "@/components/site/argus-provenance-island";
 import { ThresholdLinkView } from "@/components/site/threshold-link";
 import { ThresholdLinkIsland } from "@/components/site/threshold-link-island";
 import { ZoomableImage } from "@/components/site/zoomable-image";
 import { projects, type Project } from "@/content/projects";
 import { caseStudyCopy, caseStudySectionKeys, caseStudySectionLabels, type CaseStudy, type CaseStudySection } from "@/content/stretch/case-study";
+import { argusPositions, argusProvenanceCopy } from "@/content/stretch/argus-provenance";
 import { thresholdLinkCopy, thresholdStart } from "@/content/stretch/threshold-link";
 
 /** "Live site" from "Live site ↗": the pill draws its own arrow. */
@@ -52,6 +55,14 @@ const workingFigures = {
       <ThresholdLinkIsland>
         <ThresholdLinkView choice={thresholdStart} />
       </ThresholdLinkIsland>
+    ),
+  },
+  "argus-provenance": {
+    caption: argusProvenanceCopy.caption,
+    drawn: (
+      <ArgusProvenanceIsland>
+        <ArgusProvenanceView positions={argusPositions} />
+      </ArgusProvenanceIsland>
     ),
   },
 } as const;

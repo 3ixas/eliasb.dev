@@ -5,6 +5,7 @@ import { projects } from "../src/content/projects";
 import { caseStudies, caseStudySlugs } from "../src/content/stretch/case-studies";
 import { caseStudyCopy, caseStudySectionKeys, caseStudySectionLabels } from "../src/content/stretch/case-study";
 import { firstDistrict, thresholdLink, thresholdLinkCopy, thresholdStart } from "../src/content/stretch/threshold-link";
+import { argusPositions, argusProvenanceCopy, formatUsd, pricedAt, priceSteps, unrealisedUsd } from "../src/content/stretch/argus-provenance";
 import { renderedContrast } from "./support/rendered-contrast";
 import { spoken } from "./support/roll";
 
@@ -225,8 +226,10 @@ for (const slug of caseStudySlugs) {
       const tab = testInfo.project.name.startsWith("webkit") ? "Alt+Tab" : "Tab";
       const scope = "[data-case-study] article, [data-case-study] nav.story-next";
       // The working figure's choices are in the order too; its screenshot, shown only without script, is not.
-      await page.locator(".tlink").evaluateAll(async (figures) => figures.forEach((figure) => figure.scrollIntoView()));
-      await expect(page.locator(".tlink:not([data-live])")).toHaveCount(0);
+      for (const working of await page.locator(".working-fig").all()) {
+        await working.scrollIntoViewIfNeeded();
+        await expect(working.locator("[data-live]")).toHaveCount(1);
+      }
       await page.evaluate(() => scrollTo(0, 0));
       const order = await page.locator(`:is(${scope}) :is(a, button, select):not(dialog *):visible`).evaluateAll((elements) => elements.map((element) => element.textContent?.trim() ?? ""));
       expect(order.length).toBeGreaterThan(3);
@@ -401,6 +404,86 @@ test.describe("Case study: Threshold's working link", () => {
       const still = caseStudies.threshold.sections["how-its-built"].figure!;
       await expect(figure(page)).toBeHidden();
       const shot = page.locator("section#how-its-built .working-fig__still .story-fig");
+      await expect(shot.locator("img").first()).toHaveAttribute("alt", still.alt);
+      await expect(shot.locator("figcaption")).toHaveText(still.caption);
+    });
+  });
+});
+
+/*
+ * Argus Risk's numbers with their history (#463): under "Show the number with its history.", each position's P&L opens
+ * the price tick it came from and that price's age, which counts while open; New event brings a new price for the oldest.
+ */
+test.describe("Case study: Argus Risk's numbers with their history", () => {
+  const figure = (page: Page) => page.locator("section#decisions figure.working-fig");
+  const number = (page: Page, symbol: string) => figure(page).getByRole("button", { name: new RegExp(`^${symbol.replace(".", "\\.")} `) });
+  const source = (page: Page, symbol: string) => figure(page).locator(`#argus-provenance-${symbol.replace(/\W/g, "-")}`);
+  const live = async (page: Page) => {
+    await figure(page).scrollIntoViewIfNeeded();
+    await expect(figure(page).locator(".argus[data-live]")).toHaveCount(1);
+  };
+
+  test.beforeEach(async ({ page }) => {
+    await page.clock.install();
+    await page.goto("/things-i-make/argus-risk");
+  });
+
+  test("it takes the screenshot's place, says it is illustrative, and starts closed", async ({ page }) => {
+    await expect(figure(page)).toBeVisible();
+    await expect(page.locator("section#decisions .working-fig__still")).toBeHidden();
+    await expect(figure(page).locator("figcaption")).toHaveText(argusProvenanceCopy.caption);
+    await expect(figure(page).getByRole("list")).toHaveAccessibleDescription(argusProvenanceCopy.description);
+    await live(page);
+    for (const position of argusPositions) {
+      await expect(number(page, position.symbol)).toHaveAccessibleName(`${position.symbol} ${formatUsd(unrealisedUsd(position))}`);
+      await expect(number(page, position.symbol)).toHaveAttribute("aria-expanded", "false");
+      await expect(source(page, position.symbol)).toBeHidden();
+    }
+  });
+
+  test("a number opens on its source and its age, which counts while open and marks the price stale past 5 s", async ({ page }) => {
+    await live(page);
+    const [first] = argusPositions;
+    await number(page, first.symbol).click();
+    await expect(number(page, first.symbol)).toHaveAttribute("aria-expanded", "true");
+    await expect(source(page, first.symbol)).toContainText(argusProvenanceCopy.topic);
+    await expect(source(page, first.symbol)).toContainText(pricedAt(first));
+    await expect(source(page, first.symbol)).toContainText(`${argusProvenanceCopy.age}${first.age} s`);
+    await expect(source(page, first.symbol)).not.toContainText(argusProvenanceCopy.stale);
+    await page.clock.runFor(5000);
+    await expect(source(page, first.symbol)).toContainText(`${first.age + 5} s`);
+    await expect(source(page, first.symbol).locator(".argus__stale")).toHaveText(argusProvenanceCopy.stale);
+    await number(page, first.symbol).press("Enter");
+    await expect(source(page, first.symbol)).toBeHidden();
+  });
+
+  test("New event brings a new price for the oldest: its number, its source and its age change, it opens, and it is announced", async ({ page }) => {
+    await live(page);
+    const oldest = argusPositions.reduce((a, b) => (b.age > a.age ? b : a));
+    const next = { ...oldest, price: Math.round(oldest.price * (1 + priceSteps[0]) * 100) / 100 };
+    await figure(page).getByRole("button", { name: argusProvenanceCopy.newEvent }).click();
+    await expect(number(page, oldest.symbol)).toHaveAccessibleName(`${oldest.symbol} ${formatUsd(unrealisedUsd(next))}`);
+    await expect(number(page, oldest.symbol)).toHaveAttribute("aria-expanded", "true");
+    await expect(source(page, oldest.symbol)).toContainText(pricedAt(next));
+    await expect(source(page, oldest.symbol)).toContainText(`${argusProvenanceCopy.age}0 s`);
+    await expect(figure(page).getByRole("status")).toHaveText(argusProvenanceCopy.announce(oldest.symbol, formatUsd(unrealisedUsd(next))));
+  });
+
+  test("every control is a button of at least 44 px, reached by the keyboard", async ({ page }) => {
+    await live(page);
+    for (const button of await figure(page).getByRole("button").all()) {
+      await expect(button).toBeEnabled();
+      expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    }
+  });
+
+  test.describe("without script", () => {
+    test.use({ javaScriptEnabled: false });
+
+    test("it is the screenshot with its caption, as before", async ({ page }) => {
+      const still = caseStudies["argus-risk"].sections.decisions.figure!;
+      await expect(figure(page)).toBeHidden();
+      const shot = page.locator("section#decisions .working-fig__still .story-fig");
       await expect(shot.locator("img").first()).toHaveAttribute("alt", still.alt);
       await expect(shot.locator("figcaption")).toHaveText(still.caption);
     });

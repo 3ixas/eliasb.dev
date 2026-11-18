@@ -87,7 +87,7 @@ test.describe("Threshold's link rewrites itself", () => {
   test("with motion, the changed part arrives in 200 ms and its wash fades over 1.2 s", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await choosePlace(page);
-    await expect.poll(() => animations(page)).toEqual(["tlink-arrive 200", "tlink-wash 1200"]);
+    await expect.poll(() => animations(page)).toEqual(["working-arrive 200", "working-wash 1200"]);
   });
 
   test("with reduced motion, the link changes and nothing moves", async ({ page }) => {

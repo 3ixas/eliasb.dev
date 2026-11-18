@@ -53,7 +53,7 @@ export type CaseStudySection = StorySectionBody & {
   /** A figure can attach to any section. */
   figure?: SectionFigure;
   /** A working figure in the figure's place (#462), drawn by case-study.tsx; the figure stays as what a visitor without script sees. */
-  working?: "threshold-link";
+  working?: "threshold-link" | "argus-provenance";
 };
 
 /** A line from the project's own spec, shown on the inline Sheet. */
