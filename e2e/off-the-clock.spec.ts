@@ -205,7 +205,7 @@ test.describe("Off the clock: this week in history", () => {
     await page.goto("/fixtures/off-the-clock");
   });
 
-  test("picture first, across the panel: the picture, the title, the date and fact as its caption, its credit, and an outline pill that counts", async ({ page }) => {
+  test("a newspaper's front page across the panel: the nameplate, the photograph, the dateline and fact, its credit, and an outline pill that counts", async ({ page }) => {
     const history = cell(fixture(page, "history-live"), "history");
     await expect(history.getByRole("heading", { level: 3 })).toHaveText(offTheClock.curiosity.label);
     await expect(history.locator("p[aria-live='polite']")).toHaveText("28 September 1924 The first aerial circumnavigation is completed by a team from the US Army.");
@@ -229,7 +229,8 @@ test.describe("Off the clock: this week in history", () => {
       const { left, top, width } = element.getBoundingClientRect();
       return [Math.round(left + scrollX), Math.round(top + scrollY), Math.round(width)];
     });
-    const places = () => Promise.all([place(step), place(cell(panel, "github"))]);
+    // The photograph's frame is part of it: one size whichever oddity shows, pictured or not.
+    const places = () => Promise.all([place(step), place(cell(panel, "github")), place(history.locator(".otc__history-image"))]);
     const before = await places();
     await step.click();
     await expect(step).toHaveAccessibleName(offTheClock.curiosity.count(2, 3));
@@ -245,6 +246,18 @@ test.describe("Off the clock: this week in history", () => {
     await expect(history.locator("p[aria-live='polite']")).toContainText("1924");
   });
 
+  test("the longest fact the feed keeps stays on the newspaper: the story's space grows and nothing spills", async ({ page }) => {
+    const panel = fixture(page, "history-long");
+    const [paper, caption] = await Promise.all([boxOf(panel.locator(".otc__paper")), boxOf(panel.locator(".otc__history-caption"))]);
+    expect(caption.y).toBeGreaterThanOrEqual(paper.y);
+    expect(caption.y + caption.height).toBeLessThanOrEqual(paper.y + paper.height + 1);
+    expect(await panel.locator(".otc__history-caption").evaluate((element) => element.scrollHeight <= element.clientHeight + 1)).toBe(true);
+    const [step, picture] = await Promise.all([boxOf(panel.locator(".otc__step")), boxOf(panel.locator(".otc__paper-picture"))]);
+    expect(step.y + step.height).toBeLessThanOrEqual(caption.y + caption.height + 1);
+    // Wide, the story sits beside the photograph and never over it.
+    if (tiers(page)) expect(caption.x).toBeGreaterThanOrEqual(picture.x + picture.width - 4);
+  });
+
   test("with one oddity there is nothing to step", async ({ page }) => {
     await expect(cell(fixture(page, "history-one"), "history").getByRole("button")).toHaveCount(0);
   });
@@ -258,7 +271,8 @@ test.describe("Off the clock: this week in history", () => {
     await expect(year).toHaveText("1781");
     await expect(year).toHaveAttribute("aria-hidden", "true");
     const frame = await boxOf(history.locator(".otc__history-image"));
-    expect(frame.width / frame.height).toBeCloseTo(tiers(page) ? 1.5 : 4 / 3, 1);
+    expect(frame.width).toBeGreaterThan(100);
+    expect(frame.height).toBeGreaterThan(60);
   });
 
   test("without a live week it is the archive, and says so", async ({ page }) => {
@@ -290,6 +304,18 @@ test.describe("Off the clock: Now making", () => {
     await expect(fixture(page, "making-project").locator("[data-otc='making'] a")).toContainText("Threshold");
     await expect(fixture(page, "making-project").locator("[data-otc='making'] .otc__making-line")).toHaveText("A clearer view of what moving could cost.");
     await expect(fixture(page, "making-project-code").locator("[data-otc='making'] a")).toHaveAttribute("href", "https://github.com/3ixas/risk-event-tracker");
+  });
+
+  test("on the laptop's screen the name is a whole link of at least 44 px, inside the screen, even when long", async ({ page }) => {
+    for (const name of ["making", "making-long"]) {
+      const screen = fixture(page, name).locator(".otc__laptop-screen");
+      const [frame, link] = await Promise.all([boxOf(screen), boxOf(screen.getByRole("link"))]);
+      expect(link.height, name).toBeGreaterThanOrEqual(44);
+      expect(link.x, name).toBeGreaterThanOrEqual(frame.x - 1);
+      expect(link.x + link.width, name).toBeLessThanOrEqual(frame.x + frame.width + 1);
+      expect(link.y + link.height, name).toBeLessThanOrEqual(frame.y + frame.height + 1);
+      await expect(screen.locator(".otc__ide-tab")).toHaveText(offTheClock.nowMaking.file);
+    }
   });
 
   test("with no repository there is no Now making, and the year keeps its band", async ({ page }) => {
@@ -387,6 +413,9 @@ test.describe("Off the clock: contrast, sizes and layout", () => {
       await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
       await page.goto("/fixtures/off-the-clock");
       await page.evaluate(() => document.fonts.ready);
+      // Hydration must finish in every panel before panels are removed: the page hydrates in pieces, and removing a panel
+      // first makes React rebuild the tree when it gets there, so every position measured before that is stale.
+      await page.waitForFunction(() => [...document.querySelectorAll(".otc__week, .otc__history")].every((element) => Object.keys(element).some((key) => key.startsWith("__react"))));
       // Measure the states that carry every kind of text: the cells, history's credit, a stale line and the year.
       await page.evaluate(() => document.querySelectorAll("[data-fixture]").forEach((element) => {
         if (!["history-live", "book-stale", "github", "fallback"].includes((element as HTMLElement).dataset.fixture!)) element.remove();
@@ -431,17 +460,18 @@ test.describe("Off the clock: contrast, sizes and layout", () => {
     expect(Math.round(book.y)).toBe(Math.round(film.y));
   });
 
-  test("the week: with script, a strip of seven letters on a phone and seven rows of day and session from 960 px; read the same at both", async ({ page }) => {
+  test("the week on the calendar's page: with script, a strip of seven glyphs and letters at every width, read as each day and its session", async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
     const training = cell(fixture(page, "training-saturday"), "training");
     const [today, week] = await Promise.all([boxOf(training.locator(".otc__today")), boxOf(training.locator(".otc__week"))]);
     expect(week.y).toBeGreaterThan(today.y + today.height - 1);
-    const rows = await training.locator(".otc__week li").evaluateAll((items) => new Set(items.map((item) => Math.round(item.getBoundingClientRect().top))).size);
-    expect(rows).toBe(tiers(page) ? 7 : 1);
-    await expect(training.locator(".otc__week-letter").first()).toBeVisible({ visible: !tiers(page) });
-    // On a phone the session is read but clipped to a pixel, as .sr-only is.
-    expect((await boxOf(training.locator(".otc__week-session").first())).width > 2).toBe(tiers(page));
+    await expect.poll(() => training.locator(".otc__week li").evaluateAll((items) => new Set(items.map((item) => Math.round(item.getBoundingClientRect().top))).size)).toBe(1);
+    await expect(training.locator(".otc__week-letter").first()).toBeVisible();
+    await expect(training.locator(".otc__week li .otc__glyph")).toHaveCount(7);
+    // The session is read but clipped to a pixel, as .sr-only is.
+    expect((await boxOf(training.locator(".otc__week-session").first())).width).toBeLessThanOrEqual(2);
     await expect(training.getByRole("listitem").nth(5)).toContainText(`${days[5].long}: ${days[5].session}`);
+    await expect(training.locator(".otc__day-band")).toHaveText(days[5].long);
   });
 });
 

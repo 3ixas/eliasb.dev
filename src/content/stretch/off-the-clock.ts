@@ -54,7 +54,7 @@ export const offTheClock = {
     label: "Odd but true, from this week in history",
     /** The row's line for a week with several oddities. */
     rowLine: (n: number) => `${n} things that happened this week, some stranger than others.`,
-    /** Stamped on the clipping, which restamps as the row cycles. */
+    /** The newspaper's nameplate (#465). */
     stamp: "This week in history",
     count: (position: number, total: number) => `${position} of ${total}`,
     sourceName: "Wikipedia",
@@ -66,6 +66,8 @@ export const offTheClock = {
     /** The section's heading (Elias, 2026-11-15). */
     label: "What I’m building now",
     sourceName: "GitHub",
+    /** The file open on the laptop's screen, its tab's name (#465, awaiting Elias's sign-off). */
+    file: "README.md",
   },
   github: {
     /** Heard by screen readers only; the visible line leads with the total. */

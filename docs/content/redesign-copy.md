@@ -130,7 +130,7 @@ The homepage section for my own projects ([#157](https://github.com/3ixas/eliasb
 | Now reading | Now reading · {title} · {author} · Goodreads ↗ | Between books. |
 | Last watched | Admit one · Last watched · {title} · {year} · Letterboxd ↗ | Nothing logged yet. |
 | The Weekly Curiosity | Odd but true, from this week in history · {3} things that happened this week, some stranger than others. · This week in history · {fact} · {year} · {1} of {3} · Live from Wikipedia | From the archive |
-| Now making | What I’m building now · ● Live from GitHub · {project or repository name} · {GitHub description, or the project’s line} · View on GitHub ↗ (a project with a case study links its name to the case study instead) | Hidden when GitHub can’t be reached |
+| Now making | What I’m building now · ● Live from GitHub · {project or repository name} · {GitHub description, or the project’s line} · View on GitHub ↗ (a project with a case study links its name to the case study instead) · On the laptop's screen (#465, proposed 18 November 2026, awaiting sign-off), the editor's tab: README.md | Hidden when GitHub can’t be reached |
 | GitHub | {1,221} contributions in the past year · Less / More / today · Live from GitHub | From GitHub, as of {date} |
 
 Strings added while building, shipped, and recorded here on 2026-10-09 so `verify:copy` covers them. They were not in the original approved copy; Elias signed them off on 2026-10-09.

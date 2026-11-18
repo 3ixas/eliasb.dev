@@ -78,7 +78,7 @@ The homepage section for Elias's own projects: **Featured work** above the **Pro
 _Avoid_: Work (that means employment), On my own
 
 **Off the clock**:
-The homepage section for Elias's own time: one paper **Panel** composed as one spread (DESIGN.md "The homepage, in order" 7, R-19, [#465](https://github.com/3ixas/eliasb.dev/issues/465)). Today's workout as one strong line over his week; the book he is reading and the film he last watched as objects on one shelf line (a book with its page edges, a poster on a glowing screen); this week in history, picture first, stepping through three facts; and his GitHub year as the base, with **Now making** beneath its total. Each item is a **Live signal** with a fallback, and stale saved data says where and when it is from.
+The homepage section for Elias's own time: one paper **Panel** composed as one spread of real objects (DESIGN.md "The homepage, in order" 7, R-19, [#465](https://github.com/3ixas/eliasb.dev/issues/465)). Today's workout on a desk calendar; the book he is reading and the film he last watched on one shelf line (a book with its page edges, a poster on a cinema's screen); this week in history on a newspaper's front page, stepping through three facts; and his GitHub year as the base, with **Now making** on a laptop's screen. Each item is a **Live signal** with a fallback, and stale saved data says where and when it is from.
 _Avoid_: Library, Personal signals, Board
 
 **Now making**:

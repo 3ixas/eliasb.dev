@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 /*
  * Forced colours (docs/design/DESIGN.md, "Accessibility", R-29): the bars, the GitHub year and the passes keep their data. The browser drops authored backgrounds, and the bars and the
- * GitHub year are drawn with backgrounds, so without their forced-colours rules (parts.css, off-the-clock.css) the bars and the year's levels all come out
+ * GitHub year are drawn with backgrounds, so without their forced-colours rules (parts.css, github-year.css) the bars and the year's levels all come out
  * as the same colour. This holds that the marks that carry data stay apart.
  */
 test.describe("Forced colours", () => {
@@ -37,7 +37,7 @@ test.describe("Forced colours", () => {
     await expect(figure.locator(".ftbreak__range")).toHaveCSS("forced-color-adjust", "none");
   });
 
-  test("Off the clock keeps today's mark and the book's and screen's edges", async ({ page }) => {
+  test("Off the clock keeps today's mark, the book's and screen's edges, and its pictured objects' own colours", async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
     const panel = page.locator("[data-fixture='training-saturday']");
     const highlight = await page.evaluate(() => {
@@ -47,16 +47,15 @@ test.describe("Forced colours", () => {
       probe.remove();
       return colour;
     });
-    // Today's mark is the highlight: its rule on a phone, its dot from 960 px. The other days' rules stay drawn in GrayText.
-    const wide = page.viewportSize()!.width >= 960;
-    const mark = await panel.locator(wide ? ".otc__week li[data-today] .otc__week-day" : ".otc__week li[data-today]").evaluate((element, pseudo) => getComputedStyle(element, pseudo).backgroundColor, wide ? "::before" : "::after");
+    // Today's mark is the highlight, its rule under the strip; the other days' rules stay drawn in GrayText.
+    const mark = await panel.locator(".otc__week li[data-today]").evaluate((element) => getComputedStyle(element, "::after").backgroundColor);
     expect(mark).toBe(highlight);
-    if (!wide) {
-      const others = await panel.locator(".otc__week li:not([data-today])").evaluateAll((items) => items.map((item) => getComputedStyle(item, "::after").backgroundColor));
-      for (const rule of others) expect(rule).not.toBe(highlight);
-      expect(new Set(others).size).toBe(1);
-    }
+    const others = await panel.locator(".otc__week li:not([data-today])").evaluateAll((items) => items.map((item) => getComputedStyle(item, "::after").backgroundColor));
+    for (const rule of others) expect(rule).not.toBe(highlight);
+    expect(new Set(others).size).toBe(1);
     for (const object of [".otc__book img", ".otc__screen"]) await expect(panel.locator(object)).toHaveCSS("outline-style", "solid");
+    // The pictured objects keep their own colours, so their words stay dark on paper and light on the screen.
+    for (const object of [".otc__day", ".otc__paper", ".otc__laptop-screen"]) await expect(panel.locator(object)).toHaveCSS("forced-color-adjust", "none");
   });
 
   test("the GitHub year's levels are not all one colour", async ({ page }) => {

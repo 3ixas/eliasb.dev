@@ -11,6 +11,7 @@ import "./opening.css";
 import "./work.css";
 import "./headed-how.css";
 import "./projects.css";
+import "./github-year.css";
 import "./off-the-clock.css";
 import "./story.css";
 import "./simulation.css";

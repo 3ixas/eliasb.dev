@@ -161,19 +161,50 @@ function MakingBand({ making, live }: { making: NonNullable<ReturnType<typeof no
   return (
     <div className="otc__making-band" data-otc="making">
       <h3 className="otc__subtitle">{copy.nowMaking.label}</h3>
-      {live && (
-        <p className="otc__live">
-          <i className="otc__dot" aria-hidden="true" />
-          {copy.live(copy.nowMaking.sourceName)}
-        </p>
-      )}
-      <p>
-        <SiteLink href={making.href} className="otc__making">
-          {making.name}
-          {!isInternalHref(making.href) && <Out href={making.href} />}
-        </SiteLink>
-      </p>
-      {making.description && <p className="otc__making-line">{making.description}</p>}
+      {/*
+        A laptop (#465; the picture generated for the site, its screen left blank): what I'm building is on its screen,
+        the live mark, the name as a link and its description, laid over the screen's dark rectangle.
+      */}
+      <div className="otc__laptop">
+        <Image className="otc__laptop-image" src="/signals/laptop.webp" alt="" width={760} height={570} sizes="380px" aria-hidden="true" />
+        {/*
+          The screen is a code editor: its window bar with the file's tab, a line number before each line, the repository's
+          name as the README's heading (a link, marked ↗ when it leaves the site) over its description, and the live
+          mark in the status bar. Only the heading's link and the words are read; the window's furniture is a picture.
+        */}
+        <div className="otc__laptop-screen otc__ide">
+          <div className="otc__ide-bar" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+            <span className="otc__ide-tab">{copy.nowMaking.file}</span>
+          </div>
+          <div className="otc__ide-body">
+            <div className="otc__ide-code">
+              <p>
+                <span className="otc__ide-mark" aria-hidden="true">
+                  #
+                </span>
+                <SiteLink href={making.href} className="otc__making">
+                  <span className="otc__making-name">{making.name}</span>
+                  {!isInternalHref(making.href) && <Out href={making.href} />}
+                </SiteLink>
+              </p>
+              {making.description && (
+                <p className="otc__making-line">
+                  <span>{making.description}</span>
+                </p>
+              )}
+            </div>
+          </div>
+          {live && (
+            <p className="otc__live otc__ide-status">
+              <i className="otc__dot" aria-hidden="true" />
+              {copy.live(copy.nowMaking.sourceName)}
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

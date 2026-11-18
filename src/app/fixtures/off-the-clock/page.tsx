@@ -154,6 +154,19 @@ const items = [
   { name: "making", item: panel({ year: <GitHubCell github={github({ state: "curated" })} latest={latest({})} now={now} /> }) },
   { name: "making-project", item: panel({ year: <GitHubCell github={github({ state: "curated" })} latest={latest({ state: "curated", repository: projectWithCaseStudy })} now={now} /> }) },
   { name: "making-project-code", item: panel({ year: <GitHubCell github={github({ state: "curated" })} latest={latest({ state: "curated", repository: projectWithoutCaseStudy })} now={now} /> }) },
+  // A repository with the longest name and description GitHub shows, on the laptop's screen (#465).
+  {
+    name: "making-long",
+    item: panel({
+      year: (
+        <GitHubCell
+          github={github({ state: "curated" })}
+          latest={latest({ state: "curated", repository: { ...repository, name: "an-unusually-long-repository-name-for-testing", description: "A description long enough to run past two lines on the laptop's screen, so the screen has to clamp it rather than spill over the keyboard." } })}
+          now={now}
+        />
+      ),
+    }),
+  },
   { name: "making-none", item: panel({ year: <GitHubCell github={github({ state: "curated" })} latest={latest({ state: "unavailable", repository: null })} now={now} /> }) },
   { name: "github", item: panel({}) },
   { name: "github-live", item: panel({ year: <GitHubCell github={github({})} latest={latest({ state: "curated" })} now={now} /> }) },
@@ -162,6 +175,21 @@ const items = [
   { name: "history-live", item: panel({ history: <HistoryCell history={week} /> }) },
   { name: "history-one", item: panel({ history: <HistoryCell history={{ ...week, state: "curated", events: week.events.slice(0, 1) }} /> }) },
   { name: "history-text-only", item: panel({ history: <HistoryCell history={{ ...week, state: "curated", events: week.events.slice(1, 2) }} /> }) },
+  // The longest fact the history feed keeps (260 characters, history.ts): the newspaper's story grows to hold it (#465).
+  {
+    name: "history-long",
+    item: panel({
+      history: (
+        <HistoryCell
+          history={{
+            ...week,
+            state: "curated",
+            events: [{ ...week.events[0], text: "A ".concat("very ".repeat(24), "long account of an expedition that flew around the whole world in stages, stopping in dozens of countries, mending its aircraft on beaches and frozen lakes, and arriving home months later to a parade.").slice(0, 260) }, ...week.events.slice(1)],
+          }}
+        />
+      ),
+    }),
+  },
   { name: "history-saved", item: panel({ history: <HistoryCell history={savedHistorySignal()} /> }) },
   // Every feed down at once: the panel still has its three bands.
   {

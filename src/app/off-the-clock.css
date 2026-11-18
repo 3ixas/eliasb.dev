@@ -1,9 +1,9 @@
 /*
  * Off the clock (docs/design/DESIGN.md "The homepage, in order" 7; R-19; #465): one paper panel that follows the theme,
- * composed as one spread: Today's workout as one strong line over the week; the book and the film as objects on one
- * shelf line; this week's oddity picture first; and the GitHub year, with what I'm building now, as the base. On a phone
- * the sections stack under rules; from 960 px they are three tiers. The panel and the pill are parts.css's; the GitHub
- * year's structure is github-year.tsx's, restyled here onto the year ramps.
+ * composed as one spread of real objects: the workout on a desk calendar; the book and the film (on a cinema's poster
+ * screen) on one shelf line; this week's oddity on a newspaper's front page; and the GitHub year as the base, with what
+ * I'm building now on a laptop. On a phone the sections stack under rules; from 960 px they are three tiers. The panel
+ * and the pill are parts.css's; the GitHub year's grid is github-year.css's, restyled here onto the year ramps.
  */
 
 /* On a phone the panel is a stack of sections, each under its own heading and a rule. */
@@ -48,21 +48,82 @@
   font-size: var(--type-small);
 }
 
-/* ---- Today's workout: one strong line over the week ---- */
+/* ---- Today's workout: a desk calendar's page ---- */
 
 .otc__training {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  container-type: inline-size;
+}
+
+/*
+ * The calendar is a picture (calendar.webp, 1402 × 1122, generated for the site): rings, a paper header and its page
+ * stack on a cool neutral paper. It is a nine-slice frame (border-image): its head and foot keep the picture's
+ * proportions and today's page stretches to what it holds. Positions are fractions of the picture in container widths
+ * (cqw), so they scale with it. Its colours are its own in both themes, as an object's are.
+ */
+.otc__day {
+  --ink: #1f1d1a;
+  --muted: #5a554e;
+  --hair: rgb(31 29 26 / 0.2);
+  --tint: rgb(31 29 26 / 0.07);
+  position: relative;
+  border: solid transparent;
+  border-width: calc(100cqw * 436 / 1402) calc(100cqw * 167 / 1402) calc(100cqw * 86 / 1402) calc(100cqw * 157 / 1402);
+  border-image: url("/signals/calendar.webp") 38.86% 11.91% 7.66% 11.2% fill / 1 / 0 stretch;
+  background: #ecebe8 padding-box;
+  color: var(--ink);
+}
+
+/* The weekday on a calendar's red band across the page's head, where the picture left room for it. */
+.otc__day-band {
+  position: absolute;
+  top: calc(100cqw * -123 / 1402);
+  right: calc(100cqw * 8 / 1402);
+  left: calc(100cqw * 8 / 1402);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100cqw * 123 / 1402);
+  background: #d6342a;
+  color: #fff;
+  font-size: var(--type-label);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.otc__day-page {
+  display: grid;
+  justify-items: center;
+  padding: 12px 8px 10px;
+  text-align: center;
+}
+
+/* Today's glyph, in a slot of one size so filling it in moves nothing. */
+.otc__day-glyph {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: var(--ink);
+}
+
+.otc__day-glyph .otc__glyph {
+  width: 40px;
+  height: 40px;
+  color: inherit;
 }
 
 /* Today's session, large. It is filled in once the day is known; the longest session, invisible, holds its height until then. */
 .otc .otc__today {
   display: grid;
-  margin: 0;
+  margin: 6px 0 0;
   color: var(--ink);
   font-family: var(--serif);
   font-optical-sizing: auto;
-  font-size: clamp(38px, 4.4vw, 52px);
+  font-size: clamp(34px, 3.4vw, 46px);
   line-height: 1.02;
   letter-spacing: -0.03em;
   text-wrap: balance;
@@ -76,29 +137,34 @@
   visibility: hidden;
 }
 
+/* A session's glyph: the gym's dumbbell, the bike's wheels, the rope. */
+.otc__glyph {
+  width: 22px;
+  height: 22px;
+  color: var(--muted);
+}
+
 /*
- * The week is its rows: each day and its session, today in ink with a dot. On a phone, once the page has script (the
- * boot script marks it before first paint, so nothing changes once seen), the rows become a quiet strip: a letter a day
- * over a short rule, today's in ink, each day and its session still read (sr-only, training-today.tsx). Without script
- * a phone keeps the rows, so the week is still there to read while today's line is blank.
+ * The week along the page's foot. Without script it is the week's rows, each day and its session (today is not known
+ * to mark); with script (the boot script marks the page before first paint, so nothing changes once seen) it is a strip,
+ * a glyph and a letter a day over a short rule, today's in ink on a tint, each day and its session still read (sr-only).
  */
 .otc__week {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  margin-top: 22px;
+  width: 100%;
+  margin-top: 18px;
   color: var(--muted);
   font-size: var(--type-ui);
+  text-align: start;
 }
 
 .otc__week li {
   display: grid;
-  grid-template-columns: 7.5em minmax(0, 1fr);
-  padding: 9px 0;
+  grid-template-columns: 30px 7.5em minmax(0, 1fr);
+  align-items: center;
+  padding: 8px 0;
   border-top: 1px solid var(--hair);
-}
-
-.otc__week li:last-child {
-  border-bottom: 1px solid var(--hair);
 }
 
 .otc__week-letter {
@@ -113,48 +179,46 @@
   color: var(--ink);
 }
 
-.otc__week li[data-today] .otc__week-day::before {
-  content: "";
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin: 0 8px 1px -15px;
-  border-radius: 50%;
-  background: currentColor;
+.otc__week li[data-today] .otc__glyph {
+  color: var(--ink);
 }
 
-@media (max-width: 959.98px) {
-  :root[data-script] .otc__week {
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    column-gap: 4px;
-    margin-top: 18px;
-    font-size: var(--type-label);
-    font-weight: 600;
-  }
+:root[data-script] .otc__week {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  column-gap: 4px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--hair);
+  font-size: var(--type-label);
+  font-weight: 600;
+}
 
-  :root[data-script] .otc__week li {
-    grid-template-columns: none;
-    justify-items: center;
-    gap: 6px;
-    padding: 0;
-    border: 0;
-  }
+:root[data-script] .otc__week li {
+  grid-template-columns: none;
+  justify-items: center;
+  gap: 4px;
+  padding: 6px 0 0;
+  border: 0;
+  border-radius: 8px;
+}
 
-  :root[data-script] .otc__week-letter {
-    display: block;
-  }
+:root[data-script] .otc__week-letter {
+  display: block;
+}
 
-  :root[data-script] .otc__week li::after {
-    content: "";
-    width: 100%;
-    height: 3px;
-    border-radius: 2px;
-    background: var(--hair);
-  }
+:root[data-script] .otc__week li::after {
+  content: "";
+  width: 70%;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--hair);
+}
 
-  :root[data-script] .otc__week li[data-today]::after {
-    background: var(--ink);
-  }
+:root[data-script] .otc__week li[data-today] {
+  background: var(--tint);
+}
+
+:root[data-script] .otc__week li[data-today]::after {
+  background: var(--ink);
 }
 
 /* ---- The book and the film as objects on one shelf line ---- */
@@ -245,22 +309,30 @@
   pointer-events: none;
 }
 
-/* The film: a screen in the poster's own format, a dark frame round it, the poster's colours glowing past its edges. */
+/*
+ * The film on a cinema's poster screen, a picture (poster-screen.webp, 1086 × 1448, generated for the site): a
+ * brushed-metal case with the poster in its window, the poster's colours glowing past its edges.
+ */
 .otc__screen {
+  /* The window, measured from the picture: the poster and the glass's light are laid in it. */
+  --win-top: 6.15%;
+  --win-left: 10.96%;
+  --win-width: 77.9%;
+  --win-height: 87.84%;
   position: relative;
   isolation: isolate;
   display: block;
-  padding: 4px;
-  border-radius: 6px;
-  background: #050506;
-  box-shadow:
-    0 0 0 1px rgb(255 255 255 / 0.1),
-    0 22px 30px -18px var(--shadow);
+  aspect-ratio: 1086 / 1448;
+  background: url("/signals/poster-screen.webp") 0 0 / 100% 100% no-repeat;
 }
 
-.otc__screen-poster {
-  position: relative;
-  border-radius: 2px;
+/* An absolutely placed image does not stretch to its insets, so the poster takes the window's size. */
+.otc__screen .otc__screen-poster {
+  position: absolute;
+  top: var(--win-top);
+  left: var(--win-left);
+  width: var(--win-width);
+  height: var(--win-height);
 }
 
 .otc__screen-glow {
@@ -279,8 +351,10 @@
 .otc__screen::after {
   content: "";
   position: absolute;
-  inset: 4px;
-  border-radius: 2px;
+  top: var(--win-top);
+  left: var(--win-left);
+  width: var(--win-width);
+  height: var(--win-height);
   background: linear-gradient(118deg, rgb(255 255 255 / 0.1) 0, rgb(255 255 255 / 0) 42%);
   pointer-events: none;
 }
@@ -289,21 +363,84 @@
   font-size: var(--type-label);
 }
 
-/* ---- This week in history: picture first, the fact its caption ---- */
+/* ---- This week in history: a newspaper ---- */
 
 .otc__history {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  container-type: inline-size;
 }
 
-/* The picture's frame is always there at one size: an oddity with no picture shows its year in it, so stepping moves nothing. */
+/*
+ * The newspaper is a picture (newspaper-phone.webp, 1086 × 1448, and newspaper-wide.webp, 1586 × 992, generated for the
+ * site): an aged broadsheet's front page with its rules, columns and fold, its photograph and story cut out and the
+ * live ones laid in. On a phone it is a nine-slice frame (border-image) whose story's space stretches; wide it lies flat
+ * at its own proportions. Its inks are its own in both themes, and it redefines the panel's ink and line for the pill.
+ */
+.otc__paper {
+  --ink: #1f1d1a;
+  --muted: #5a554e;
+  --hair: rgb(31 29 26 / 0.2);
+  --tint: rgb(31 29 26 / 0.06);
+  --paper: #e5cca7;
+  --panel-ink: #1f1d1a;
+  --line: rgb(31 29 26 / 0.3);
+  position: relative;
+  display: block;
+  border: solid transparent;
+  border-width: calc(100cqw * 803 / 1086) calc(100cqw * 79 / 1086) calc(100cqw * 282 / 1086) calc(100cqw * 79 / 1086);
+  border-image: url("/signals/newspaper-phone.webp") 55.46% 7.27% 19.48% 7.27% fill / 1 / 0 stretch;
+  background: var(--paper) padding-box;
+  color: var(--ink);
+}
+
+/* The nameplate, set in its band in the site's serif: generated lettering would not read. */
+.otc .otc__nameplate {
+  position: absolute;
+  top: calc(100cqw * -703 / 1086);
+  right: calc(100cqw * 21 / 1086);
+  left: calc(100cqw * 21 / 1086);
+  display: grid;
+  place-items: center;
+  height: calc(100cqw * 130 / 1086);
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: clamp(24px, 8cqw, 52px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+/* The photograph covers its cut-out and the 3 px the cut took past it, so no edge of the page shows round it. */
+.otc__paper-picture {
+  position: absolute;
+  top: calc(100cqw * -513 / 1086);
+  left: calc(100cqw * -5 / 1086);
+  width: calc(100cqw * 937 / 1086);
+  height: calc(100cqw * 467 / 1086);
+}
+
+/* The story, centred as a front page's lead is, on the paper's own colour. */
+.otc__history-caption {
+  padding: 10px 6px 12px;
+  background: var(--paper);
+  text-align: center;
+}
+
+/*
+ * The lead photograph, in greys as newsprint prints it; with no picture, the frame is newsprint with the year on it. It
+ * fills its place out of flow, so what it holds never sizes the page and stepping moves nothing.
+ */
 .otc__history-image {
+  position: absolute;
+  inset: 0;
   display: grid;
   place-items: center;
   overflow: hidden;
-  aspect-ratio: 4 / 3;
-  border-radius: 14px;
-  background: var(--tint);
+  background: var(--paper);
 }
 
 .otc__history-image img {
@@ -311,6 +448,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  filter: grayscale(1) contrast(1.06);
 }
 
 .otc__history-year {
@@ -323,16 +461,11 @@
   font-variant-numeric: lining-nums;
 }
 
-.otc__history-caption {
-  margin-top: 14px;
-}
-
 .otc__history-text {
   display: grid;
-  max-width: 46em;
 }
 
-/* Every oddity in one cell: the hidden ones hold the caption at the tallest, so stepping moves nothing. */
+/* Every oddity in one cell: the hidden ones hold the page at the tallest, so stepping moves nothing. */
 .otc__history-text > * {
   grid-area: 1 / 1;
 }
@@ -344,20 +477,37 @@
 .otc__history-text p:first-child {
   margin-top: 0;
   color: var(--ink);
-  font-size: var(--type-body);
-  line-height: 1.45;
 }
 
-.otc__history b {
-  margin-right: 4px;
+/* The dateline over the story, in spaced capitals under a rule. */
+.otc__dateline {
+  display: block;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--hair);
+  color: var(--muted);
+  font-size: var(--type-label);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-variant-numeric: lining-nums;
+}
+
+/* The fact, set as the headline. */
+.otc__story {
+  display: block;
   font-family: var(--serif);
   font-optical-sizing: auto;
-  font-weight: 500;
-  font-variant-numeric: lining-nums;
+  font-size: var(--type-row);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
 }
 
 .otc__credit {
   font-size: var(--type-label);
+  font-style: italic;
 }
 
 /* The pill keeps one width whatever the count says, so stepping moves nothing. */
@@ -370,9 +520,7 @@
 /* ---- From 960 px: three tiers ---- */
 
 /*
- * The workout beside the shelf, a hairline between; this week's oddity across the panel, its picture at the left and
- * its heading and caption at the right; the GitHub year as the base. The week shows its rows here: each day and its
- * session, today in ink with a dot.
+ * The workout beside the shelf, a hairline between; the newspaper across the panel; the GitHub year as the base.
  */
 @media (min-width: 960px) {
   .otc {
@@ -401,40 +549,54 @@
     column-gap: 40px;
   }
 
-  /* Beside the shelf the session line is a size smaller, so the longest session still takes one line at 1440. */
-  .otc .otc__today {
-    font-size: clamp(34px, 3vw, 44px);
-  }
-
   .otc__media-text h4 {
     font-size: 26px;
   }
 
-  .otc__history {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    column-gap: 56px;
+  /*
+   * Wide, the front page lies flat (newspaper-wide.webp, 1586 × 992), a nine-slice frame like the phone's: the
+   * photograph and the story share the cut-out's row, which is the picture's height at least and grows with a long
+   * story, so the story never spills.
+   */
+  .otc__paper {
+    --paper: #e5d7be;
+    border-width: calc(100cqw * 248 / 1586) calc(100cqw * 116 / 1586) calc(100cqw * 283 / 1586) calc(100cqw * 271 / 1586);
+    border-image: url("/signals/newspaper-wide.webp") 25% 7.31% 28.53% 17.09% fill / 1 / 0 stretch;
   }
 
-  .otc__history > .otc__title {
-    grid-column: 2;
-    grid-row: 1;
-    align-self: end;
+  .otc .otc__nameplate {
+    top: calc(100cqw * -158 / 1586);
+    right: calc(100cqw * 4 / 1586);
+    left: calc(100cqw * -151 / 1586);
+    height: calc(100cqw * 120 / 1586);
   }
 
-  .otc__history-image {
-    grid-column: 1;
-    grid-row: 1 / span 2;
-    aspect-ratio: 3 / 2;
+  /* The cut-out's row: the photograph and the story side by side, covering the cut and the 3 px it took past it. */
+  .otc__paper-body {
+    display: grid;
+    grid-template-columns: 725fr 474fr;
+    min-height: calc(100cqw * 466 / 1586);
+    margin: calc(100cqw * -3 / 1586);
+  }
+
+  /* In the row, not over the page's head: the phone's offsets do not apply. */
+  .otc__paper-picture {
+    position: relative;
+    inset: auto;
+    width: auto;
+    height: auto;
   }
 
   .otc__history-caption {
-    grid-column: 2;
-    grid-row: 2;
-    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 20px;
   }
 
-  .otc__history-text p:first-child {
-    font-size: var(--type-prose);
+  .otc__story {
+    font-size: clamp(26px, 2.2vw, 32px);
   }
 }
 
@@ -528,7 +690,144 @@
   font-family: var(--sans);
 }
 
-/* What I'm building now: the live mark, then the repository's name as a link and GitHub's description of it. */
+/*
+ * What I'm building now, on a laptop: a picture of one (public/signals/laptop.webp, generated for the site with its
+ * screen left blank and its background clear), with the live mark, the name and the description laid over the screen's
+ * dark rectangle, measured from the picture. The screen has its own inks in both themes, as a lit screen does.
+ */
+.otc__laptop {
+  position: relative;
+  width: min(100%, 380px);
+  aspect-ratio: 1448 / 1086;
+}
+
+.otc__laptop-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 16px 18px rgb(0 0 0 / 0.18));
+}
+
+.otc__laptop-screen {
+  --ink: #e9eaee;
+  --muted: #9aa0ab;
+  --cobalt: #8fa3ff;
+  --panel-ink: #e9eaee;
+  --line: rgb(233 234 238 / 0.3);
+  position: absolute;
+  top: 7.6%;
+  right: 11.9%;
+  bottom: 35.6%;
+  left: 11.9%;
+  overflow: hidden;
+  border-radius: 2px;
+  color: var(--ink);
+}
+
+/* The editor: a window bar with its file's tab, the code under a gutter of line numbers, and a status bar. */
+.otc__ide {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  background: #12151c;
+  font-size: var(--type-label);
+}
+
+.otc__ide-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 0 0 7px;
+  background: #0b0d12;
+}
+
+.otc__ide-bar i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3a3f4a;
+}
+
+.otc__ide-tab {
+  margin-left: 8px;
+  padding: 3px 10px;
+  border-top: 1px solid var(--cobalt);
+  background: #12151c;
+  color: var(--ink);
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+.otc__ide-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  padding: 6px 10px 6px 6px;
+  container-type: inline-size;
+  counter-reset: line;
+}
+
+/* Each line of the file numbered in a gutter, as an editor shows it; the numbers are a picture (CSS content). */
+.otc__ide-code > p {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  counter-increment: line;
+}
+
+.otc__ide-code > p::before {
+  content: counter(line);
+  flex: none;
+  width: 1.2em;
+  color: #4b5160;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: var(--type-label);
+  text-align: right;
+}
+
+/* The README's heading: a markdown hash in cobalt before the name, which is the link. */
+.otc__ide-mark {
+  color: var(--cobalt);
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: var(--type-ui);
+}
+
+.otc__making-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The description takes two lines at most, one on a small screen. */
+.otc .otc__making-line {
+  margin-top: 0;
+  color: var(--muted);
+  font-size: var(--type-label);
+  line-height: 1.35;
+}
+
+.otc__ide .otc__making-line > * {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+@container (max-width: 250px) {
+  .otc__ide .otc__making-line > * {
+    -webkit-line-clamp: 1;
+  }
+}
+
+/* The status bar: the live mark, as an editor shows its branch and sync. */
+.otc .otc__ide-status {
+  padding: 1px 8px;
+  background: #1b2030;
+  color: var(--muted);
+  font-size: var(--type-label);
+}
+
 .otc .otc__live {
   display: flex;
   align-items: center;
@@ -536,23 +835,26 @@
   margin: 0;
 }
 
+/*
+ * The name, the README's heading and the link: one line on the screen, a long one ending in an ellipsis, the link still
+ * carrying it whole. It lies above the status bar, so its focus ring is never painted over.
+ */
 .otc__making {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  max-width: 100%;
   min-height: 44px;
   color: var(--ink);
   font-family: var(--serif);
   font-optical-sizing: auto;
-  font-size: 26px;
+  font-size: var(--type-row);
   font-weight: 400;
   letter-spacing: -0.015em;
   text-decoration: none;
-}
-
-.otc .otc__making-line {
-  max-width: 46em;
-  margin-top: 2px;
 }
 
 .otc__dot {
@@ -577,28 +879,28 @@
   }
 }
 
-@media (max-width: 719.98px) {
-  .otc__section {
-    margin-top: 24px;
-    padding-top: 24px;
-  }
-}
-
 @media (forced-colors: active) {
+  /* The calendar, the newspaper and the laptop's screen are pictures of objects: they keep their own colours, as a staff pass
+     keeps its printed ones, so their words stay dark on paper and light on the screen. */
+  .otc__day,
+  .otc__paper,
+  .otc__laptop-screen {
+    forced-color-adjust: none;
+  }
+
   /* The objects keep their edges: shadows and the screen's frame do not paint here. */
   .otc__book img,
   .otc__screen {
     outline: 1px solid CanvasText;
   }
 
-  /* The strip keeps its rules in GrayText; today keeps its mark, the strip's rule and the row's dot, in the highlight. */
+  /* The strip keeps its rules in GrayText; today's rule is the highlight. */
   :root[data-script] .otc__week li::after {
     forced-color-adjust: none;
     background: GrayText;
   }
 
-  :root[data-script] .otc__week li[data-today]::after,
-  .otc__week li[data-today] .otc__week-day::before {
+  :root[data-script] .otc__week li[data-today]::after {
     forced-color-adjust: none;
     background: Highlight;
   }
@@ -610,160 +912,5 @@
   .otc__dot {
     forced-color-adjust: none;
     background: CanvasText;
-  }
-}
-
-/* ---- The GitHub year's grid (site/github-year.tsx), under Off the clock's own rules above ---- */
-
-.stretch-gh__total {
-  margin: 0;
-  font-size: var(--type-ui);
-  line-height: 1.4;
-}
-
-.stretch-gh__count {
-  font-weight: 650;
-  font-variant-numeric: tabular-nums;
-}
-
-.stretch-gh__readout {
-  margin: 0;
-  min-height: 1.4em;
-  color: var(--cobalt);
-  font-size: var(--type-small);
-}
-
-/* The grid scrolls inside its own column on phones, so the page never does. The padding leaves room for today's ring. */
-.stretch-gh__scroll {
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  padding: 4px;
-}
-
-.stretch-gh__sheet {
-  position: relative;
-}
-
-@media (max-width: 760px) {
-  .stretch-gh__sheet {
-    min-width: 700px;
-  }
-
-  /* The edge the grid scrolls off fades, so a cut month label reads as the year continuing. */
-  .stretch-gh__scroll {
-    mask-image: linear-gradient(to right, transparent, #000 28px);
-  }
-}
-
-.stretch-gh__months,
-.stretch-gh__days {
-  display: grid;
-  grid-template-columns: repeat(var(--weeks), minmax(0, 1fr));
-  column-gap: 3px;
-}
-
-.stretch-gh__months {
-  margin-bottom: 6px;
-  color: var(--muted);
-  font-size: var(--type-label);
-  white-space: nowrap;
-}
-
-.stretch-gh__days {
-  grid-template-rows: repeat(7, auto);
-  grid-auto-flow: column;
-  row-gap: 3px;
-}
-
-/* GitHub's own five levels (--gh-0 to --gh-4), the only place their greens appear. */
-.stretch-gh__day {
-  display: block;
-  aspect-ratio: 1;
-  padding: 0;
-  border: 0;
-  border-radius: 2px;
-  background-color: var(--year-0);
-}
-
-.stretch-gh__day[data-level="1"] { background-color: var(--year-1); }
-.stretch-gh__day[data-level="2"] { background-color: var(--year-2); }
-.stretch-gh__day[data-level="3"] { background-color: var(--year-3); }
-.stretch-gh__day[data-level="4"] { background-color: var(--year-4); }
-
-/* Today is a cobalt ring around its own level, never a fill, so the greens stay true. */
-.stretch-gh__day[data-today] {
-  position: relative;
-  z-index: 1;
-  box-shadow:
-    0 0 0 1.5px var(--page),
-    0 0 0 3.5px var(--cobalt);
-}
-
-button.stretch-gh__day {
-  cursor: pointer;
-}
-
-button.stretch-gh__day[data-selected] {
-  outline: 2px solid var(--cobalt);
-  outline-offset: 1px;
-}
-
-.stretch-gh__foot {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-end;
-  color: var(--muted);
-  font-size: var(--type-label);
-}
-
-.stretch-gh__legend {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.stretch-gh__legend .stretch-gh__day {
-  width: 12px;
-  height: 12px;
-}
-
-.stretch-gh__legend .stretch-gh__day[data-today] {
-  margin-left: 16px;
-}
-
-/* A line of parts with a dot between them (dot-line.tsx): each dot leads its part in a gutter the line clips, so a part
- * that starts a new line loses its dot. */
-.dot-line {
-  --dot: 0.8em;
-  display: block;
-  overflow-x: clip;
-}
-
-.dot-line__in {
-  display: block;
-  margin-left: calc(-1 * var(--dot));
-}
-
-.dot-line__part {
-  display: inline-block;
-  padding-left: var(--dot);
-  vertical-align: baseline;
-}
-
-.dot-line__dot {
-  display: inline-block;
-  width: var(--dot);
-  margin-left: calc(-1 * var(--dot));
-  white-space: nowrap;
-}
-
-/* Forced colours keep the year's data: GitHub's five levels, each cell with a hairline so an empty day still shows (R-29). */
-@media (forced-colors: active) {
-  /* The GitHub year keeps GitHub's five levels (they are the data), each cell with a hairline so an empty day still shows. */
-  .stretch-gh__day {
-    forced-color-adjust: none;
-    outline: 1px solid GrayText;
-    outline-offset: -1px;
   }
 }
