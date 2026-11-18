@@ -956,9 +956,10 @@
   color: var(--ink);
 }
 
+/* Copy link sits level with the address's first line, so it stays put as a longer link takes more lines. */
 .tlink__bar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   margin-top: 24px;
 }
@@ -980,8 +981,10 @@
   color: var(--muted);
 }
 
+/* A value never breaks at its own hyphen ("richmond-" / "thames"); the link breaks between its parts instead. */
 .tlink__part {
   border-radius: 4px;
+  white-space: nowrap;
 }
 
 .tlink__part[data-new] {
@@ -1032,10 +1035,16 @@
     flex-wrap: wrap;
   }
 
-  /* Two lines of room, so a longer district never pushes Copy down a line. */
+  /* Room for the longest link, so a longer district never pushes Copy down: three lines at 390 px, four at 320. */
   .tlink__address {
     flex-basis: 100%;
-    min-height: calc(2 * 1.45em + 22px);
+    min-height: calc(3 * 1.45em + 22px);
+  }
+}
+
+@media (max-width: 359.98px) {
+  .tlink__address {
+    min-height: calc(4 * 1.45em + 22px);
   }
 }
 
