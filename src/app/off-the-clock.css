@@ -338,7 +338,11 @@
 .otc__screen-glow {
   position: absolute;
   z-index: -1;
-  inset: 4% -5% -2%;
+  /* An absolutely placed image does not stretch to its insets, so the glow takes its size as well as its place. */
+  top: 4%;
+  left: -5%;
+  width: 110%;
+  height: 98%;
   border-radius: 12px;
   object-fit: cover;
   filter: blur(30px) saturate(1.6);
