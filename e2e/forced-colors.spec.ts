@@ -23,6 +23,20 @@ test.describe("Forced colours", () => {
     for (const fill of fills) expect(fill).not.toBe(page_);
   });
 
+  test("Flowtime's break keeps its minutes apart from a Pomodoro's, and its slider keeps its track and thumb", async ({ page }) => {
+    await page.goto("/things-i-make/flowtime");
+    const figure = page.locator("section#decisions .ftbreak");
+    const fill = (side: string) =>
+      figure.locator(`.measure--minutes[data-side="${side}"] i[data-at="on"]`).evaluateAll((elements) => [...new Set(elements.map((element) => getComputedStyle(element).backgroundColor))]);
+    const page_ = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    const [flowtime, pomodoro] = [await fill("after"), await fill("before")];
+    expect(flowtime).toHaveLength(1);
+    expect(pomodoro).toHaveLength(1);
+    expect(flowtime[0]).not.toBe(pomodoro[0]);
+    for (const colour of [...flowtime, ...pomodoro]) expect(colour).not.toBe(page_);
+    await expect(figure.locator(".ftbreak__range")).toHaveCSS("forced-color-adjust", "none");
+  });
+
   test("the GitHub year's levels are not all one colour", async ({ page }) => {
     await page.goto("/");
     const byLevel = await page.locator(".stretch-gh__day[data-level]").evaluateAll((elements) => {

@@ -8,7 +8,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 /** Largest sum the craft bar allows: one first load of Threshold measured 0.0051, so 0.01 leaves room without letting a jump through. */
 const budget = 0.01;
-const routes = ["/", "/work/bnp-paribas", "/things-i-make/threshold"];
+const routes = ["/", "/work/bnp-paribas", "/things-i-make/threshold", "/things-i-make/flowtime"];
 
 const shift = (page: Page) =>
   page.evaluate(

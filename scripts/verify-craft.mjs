@@ -43,6 +43,7 @@ const motionTransitions = [
   ['.project__shot', "a project's screenshot lifts on hover (DESIGN.md \"Motion\")"],
   ['.sim__plot[data-armed] .sim__bin i[data-landed]', "the simulation's endpoints land as dots"],
   ['.sim__plot[data-armed] .sim__price[data-pricing]', "the simulation's price follows the mean so far and settles"],
+  ['.ftbreak .measure--minutes i', "Flowtime's minutes follow its slider"],
   [':root[data-theme-changing]', 'the theme changes'],
 ];
 

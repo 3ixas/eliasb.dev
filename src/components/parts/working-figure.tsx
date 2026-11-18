@@ -11,17 +11,17 @@ import type { PanelColours } from "@/content/stretch/story";
  * `children` is the figure as the server draws it: its starting state, laid out exactly as it will be once it works, so
  * first paint never waits on script and nothing moves when the island takes over. Wrap it in an island made with
  * `lazyIsland` (lazy-island.tsx), which loads the working version as the figure nears the viewport. Without script the
- * frame is not shown at all: `still` is, the picture with its caption that the page carried before. Styles are in
- * story.css.
+ * frame is not shown at all: `still` is, the picture with its caption that the page carried before. A figure with no
+ * `still` (Flowtime's break, #464) shows its drawing without script, held at its start. Styles are in story.css.
  */
-export function WorkingFigure({ caption, colours, still, children }: { caption: string; colours: PanelColours; still: ReactNode; children: ReactNode }) {
+export function WorkingFigure({ caption, colours, still, children }: { caption: string; colours: PanelColours; still?: ReactNode; children: ReactNode }) {
   return (
     <>
-      <figure className="working-fig" style={{ "--project": colours.field, "--project-ink": colours.ink } as CSSProperties}>
+      <figure className="working-fig" data-still={still ? "" : undefined} style={{ "--project": colours.field, "--project-ink": colours.ink } as CSSProperties}>
         <div className="working-fig__frame surface surface--paper">{children}</div>
         <figcaption>{caption}</figcaption>
       </figure>
-      <div className="working-fig__still">{still}</div>
+      {still && <div className="working-fig__still">{still}</div>}
     </>
   );
 }

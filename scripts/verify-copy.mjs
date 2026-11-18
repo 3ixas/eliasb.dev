@@ -31,6 +31,7 @@ import { comparisonRow, workPanelProblems, workPanels } from "../src/content/str
 import { simulationCopy } from "../src/content/stretch/simulation-copy.ts";
 import { thresholdLinkCopy } from "../src/content/stretch/threshold-link.ts";
 import { argusProvenanceCopy } from "../src/content/stretch/argus-provenance.ts";
+import { flowtimeBreakCopy } from "../src/content/stretch/flowtime-break.ts";
 
 const raw = readFileSync(new URL("../docs/content/redesign-copy.md", import.meta.url), "utf8");
 // Emphasis stars and the {braces} around live values are markup, not words.
@@ -51,6 +52,8 @@ const modules = {
   thresholdLinkCopy,
   // Argus's working figure's words; its symbols, prices and rates are illustrative data.
   argusProvenanceCopy,
+  // Flowtime's working figure's words; its minutes are Flowtime's rule.
+  flowtimeBreakCopy,
   siteCopy,
   notFound,
   // The opening's own words; the runs are the same sentences cut up.
@@ -88,6 +91,8 @@ const built = [
   ...["Goodreads", "Letterboxd", "GitHub", "Wikipedia"].map(offTheClock.live),
   offTheClock.fromAsOf("Goodreads", "date"),
   argusProvenanceCopy.announce("symbol", "value"),
+  flowtimeBreakCopy.minutes("n"),
+  flowtimeBreakCopy.valueText("focus", "break"),
 ];
 for (const text of built) assert.ok(plain.includes(text), `Built string is not in the approved copy: "${text}"`);
 assert.equal(thingsIMake.note, "Products of my own, from a rental calculator to a risk simulator.");

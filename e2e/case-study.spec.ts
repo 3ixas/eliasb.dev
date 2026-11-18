@@ -6,6 +6,7 @@ import { caseStudies, caseStudySlugs } from "../src/content/stretch/case-studies
 import { caseStudyCopy, caseStudySectionKeys, caseStudySectionLabels } from "../src/content/stretch/case-study";
 import { firstDistrict, thresholdLink, thresholdLinkCopy, thresholdStart } from "../src/content/stretch/threshold-link";
 import { argusPositions, argusProvenanceCopy, formatUsd, pricedAt, priceSteps, unrealisedUsd } from "../src/content/stretch/argus-provenance";
+import { breakMinutes, flowtimeBreakCopy, focusRange, pomodoro } from "../src/content/stretch/flowtime-break";
 import { renderedContrast } from "./support/rendered-contrast";
 import { spoken } from "./support/roll";
 
@@ -236,11 +237,11 @@ for (const slug of caseStudySlugs) {
         await expect(working.locator("[data-live]")).toHaveCount(1);
       }
       await page.evaluate(() => scrollTo(0, 0));
-      const order = await page.locator(`:is(${scope}) :is(a, button, select):not(dialog *):visible`).evaluateAll((elements) => elements.map((element) => element.textContent?.trim() ?? ""));
+      const order = await page.locator(`:is(${scope}) :is(a, button, select, input):not(dialog *):visible`).evaluateAll((elements) => elements.map((element) => element.textContent?.trim() ?? ""));
       expect(order.length).toBeGreaterThan(3);
       const reached: string[] = [];
       // Start on the back link: scrolling the figure into view above may have moved where Tab would start from the body.
-      await page.locator(`:is(${scope}) :is(a, button, select):not(dialog *):visible`).first().focus();
+      await page.locator(`:is(${scope}) :is(a, button, select, input):not(dialog *):visible`).first().focus();
       for (let step = 0; step < 50 && reached.length < order.length; step++) {
         if (step > 0) await page.keyboard.press(tab);
         const focused = await page.evaluate((within) => {
@@ -518,6 +519,99 @@ test.describe("Case study: Argus Risk's numbers with their history", () => {
       const shot = page.locator("section#decisions .working-fig__still .story-fig");
       await expect(shot.locator("img").first()).toHaveAttribute("alt", still.alt);
       await expect(shot.locator("figcaption")).toHaveText(still.caption);
+    });
+  });
+});
+
+test.describe("Case study: Flowtime's break that follows the focus", () => {
+  const figure = (page: Page) => page.locator("section#decisions figure.working-fig");
+  const slider = (page: Page) => figure(page).getByRole("slider", { name: flowtimeBreakCopy.slider });
+  const round = (page: Page, name: string) => figure(page).locator(".ftbreak__round").filter({ has: page.getByText(name, { exact: true }) });
+  const line = (page: Page, name: string, row: string) => round(page, name).locator(".cmp").filter({ has: page.getByText(row, { exact: true }) });
+  // The minutes a line draws: its ticks that are on, which must match the minutes it writes.
+  const drawn = (page: Page, name: string, row: string) => line(page, name, row).locator('.measure--minutes i[data-at="on"]').count();
+  const live = async (page: Page) => {
+    await figure(page).scrollIntoViewIfNeeded();
+    await expect(figure(page).locator(".ftbreak[data-live]")).toHaveCount(1);
+  };
+  const expectFlowtime = async (page: Page, focus: number) => {
+    const rest = breakMinutes(focus);
+    await expect(slider(page)).toHaveValue(String(focus));
+    await expect(slider(page)).toHaveAttribute("aria-valuetext", flowtimeBreakCopy.valueText(focus, rest));
+    await expect(line(page, flowtimeBreakCopy.flowtime, flowtimeBreakCopy.focus).locator("b")).toHaveText(flowtimeBreakCopy.minutes(focus));
+    await expect(line(page, flowtimeBreakCopy.flowtime, flowtimeBreakCopy.break).locator("b")).toHaveText(flowtimeBreakCopy.minutes(rest));
+    await expect.poll(() => drawn(page, flowtimeBreakCopy.flowtime, flowtimeBreakCopy.focus)).toBe(focus);
+    await expect.poll(() => drawn(page, flowtimeBreakCopy.flowtime, flowtimeBreakCopy.break)).toBe(rest);
+  };
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/things-i-make/flowtime");
+  });
+
+  test("it sits under Decisions on Flowtime's tinted paper, drawn at its start, with a Pomodoro's 25 and 5 beneath it", async ({ page }) => {
+    await expect(figure(page)).toBeVisible();
+    await expect(figure(page).locator("figcaption")).toHaveText(flowtimeBreakCopy.caption);
+    await expect(figure(page).locator(".working-fig__frame")).toHaveClass(/\bsurface surface--paper\b/);
+    await live(page);
+    await expectFlowtime(page, focusRange.start);
+    await expect(line(page, flowtimeBreakCopy.pomodoro, flowtimeBreakCopy.focus).locator("b")).toHaveText(flowtimeBreakCopy.minutes(pomodoro.focus));
+    await expect(line(page, flowtimeBreakCopy.pomodoro, flowtimeBreakCopy.break).locator("b")).toHaveText(flowtimeBreakCopy.minutes(pomodoro.rest));
+    expect(await drawn(page, flowtimeBreakCopy.pomodoro, flowtimeBreakCopy.focus)).toBe(pomodoro.focus);
+    expect(await drawn(page, flowtimeBreakCopy.pomodoro, flowtimeBreakCopy.break)).toBe(pomodoro.rest);
+    // Every line is drawn on the slider's one scale, so the proportion is the drawing's.
+    for (const ticks of await figure(page).locator(".measure--minutes").all()) await expect(ticks.locator("i")).toHaveCount(focusRange.max);
+  });
+
+  test("the keyboard steps the slider a minute at a time, and the break is Flowtime's rule at every value", async ({ page }) => {
+    await live(page);
+    await slider(page).focus();
+    await page.keyboard.press("ArrowRight");
+    await expectFlowtime(page, focusRange.start + 1);
+    await page.keyboard.press("Home");
+    await expectFlowtime(page, focusRange.min);
+    await page.keyboard.press("End");
+    await expectFlowtime(page, focusRange.max);
+    await page.keyboard.press("ArrowLeft");
+    await expectFlowtime(page, focusRange.max - 1);
+  });
+
+  test("a press along the slider sets the focus there, and the slider is 44 px tall", async ({ page }) => {
+    await live(page);
+    const box = (await slider(page).boundingBox())!;
+    expect(box.height).toBeGreaterThanOrEqual(44);
+    // The far right end of the track is the most focus the slider takes.
+    await page.mouse.click(box.x + box.width - 2, box.y + box.height / 2);
+    await expectFlowtime(page, focusRange.max);
+  });
+
+  test("dragging the thumb moves the focus with it, and the break follows", async ({ page }) => {
+    await live(page);
+    const box = (await slider(page).boundingBox())!;
+    const thumbAt = (minutes: number) => box.x + 14 + ((minutes - focusRange.min) / (focusRange.max - focusRange.min)) * (box.width - 28);
+    await page.mouse.move(thumbAt(focusRange.start), box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(thumbAt(20), box.y + box.height / 2, { steps: 8 });
+    await page.mouse.up();
+    await expectFlowtime(page, 20);
+  });
+
+  test("with reduced motion, the minutes jump to length", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await live(page);
+    await expect(figure(page).locator(".measure--minutes i").first()).toHaveCSS("transition-duration", "0s");
+  });
+
+  test.describe("without script", () => {
+    test.use({ javaScriptEnabled: false });
+
+    test("it is a still picture at its start, with its caption, and announces no dead slider", async ({ page }) => {
+      await expect(figure(page)).toBeVisible();
+      const held = figure(page).locator(".ftbreak__range");
+      await expect(held).toBeDisabled();
+      await expect(held).toHaveValue(String(focusRange.start));
+      await expect(figure(page).getByRole("slider")).toHaveCount(0);
+      await expect(line(page, flowtimeBreakCopy.flowtime, flowtimeBreakCopy.break).locator("b")).toHaveText(flowtimeBreakCopy.minutes(breakMinutes(focusRange.start)));
+      await expect(figure(page).locator("figcaption")).toHaveText(flowtimeBreakCopy.caption);
     });
   });
 });
