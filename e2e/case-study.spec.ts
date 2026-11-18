@@ -373,6 +373,27 @@ test.describe("Case study: Threshold's working link", () => {
     await expect.poll(() => page.evaluate(() => window.getSelection()?.toString())).toBe(shown(thresholdLink(thresholdStart)));
   });
 
+  test("a value never breaks across lines, and the link's room holds for the longest, so Copy link never moves", async ({ page }) => {
+    await live(page);
+    // On a phone Copy link sits under the address, which keeps room for the longest link; wider, it sits beside it, level with its first line.
+    const copy = figure(page).getByRole("button", { name: thresholdLinkCopy.copy });
+    const tops = new Set<number>();
+    for (const [city, district, place] of [
+      ["zurich", "kreis-1", "room"],
+      ["london", "kensington-chelsea", "studio"],
+      ["london", "city-of-london", "studio"],
+      ["basel", "kleinbasel-nord", "1bed"],
+    ]) {
+      await figure(page).getByLabel(thresholdLinkCopy.city, { exact: true }).selectOption(city);
+      await figure(page).getByLabel(thresholdLinkCopy.district, { exact: true }).selectOption(district);
+      await figure(page).getByLabel(thresholdLinkCopy.place, { exact: true }).selectOption(place);
+      await expect(address(page)).toContainText(`district=${district}&type=${place}`);
+      for (const part of await figure(page).locator(".tlink__part").all()) expect(await part.evaluate((element) => element.getClientRects().length)).toBe(1);
+      tops.add(Math.round((await copy.boundingBox())!.y + (await page.evaluate(() => scrollY))));
+    }
+    expect([...tops]).toHaveLength(1);
+  });
+
   test.describe("without script", () => {
     test.use({ javaScriptEnabled: false });
 
