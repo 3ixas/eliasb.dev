@@ -49,6 +49,10 @@ _Avoid_: Employer logos, recolouring employers in the Cobalt accent
 A project's own page at `/things-i-make/[slug]`, short, with its **Project colour** carried by its screenshots: Where it started, What I wrote down first, Decisions, How it's built, Where it stands, What I'd do next, then the next project. Every number comes from the project's own records, and "Where it stands" says plainly what isn't launched or measured ([#112](https://github.com/3ixas/eliasb.dev/issues/112)). Its back link, "← Things I make", returns to the Things I make index ([#248](https://github.com/3ixas/eliasb.dev/issues/248)).
 _Avoid_: Case file, long write-up
 
+**Working figure**:
+A slice of a product inside a **Case study**, placed where the prose says what the product does, that a visitor can use rather than read about: Threshold's link that rewrites itself as you choose a city, district and place ([#462](https://github.com/3ixas/eliasb.dev/issues/462)). It does one job with the product's real options and real output, never the whole product or an embed. Without script it is the screenshot it replaces.
+_Avoid_: Demo, widget, embed, interactive
+
 **Project index**:
 The newest-first list under **Featured work** that holds every other project worth talking through in an interview. Each row has a number, name, one-line outcome, type, and year, with a screenshot that previews on hover or focus. It shows about ten rows, then links to the **Work archive**.
 _Avoid_: Grid of every project, filters on the homepage

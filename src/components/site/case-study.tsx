@@ -1,11 +1,15 @@
 import { Arrow, Panel } from "@/components/parts/panel";
+import { WorkingFigure } from "@/components/parts/working-figure";
 import { hostLabel } from "@/components/site/host-label";
 import { LongForm } from "@/components/site/long-form";
 import { SiteLink } from "@/components/site/site-link";
 import { EvidenceFigures, NextPanel, StoryBack, StoryImage, StorySection, StoryText } from "@/components/site/story-parts";
+import { ThresholdLinkView } from "@/components/site/threshold-link";
+import { ThresholdLinkIsland } from "@/components/site/threshold-link-island";
 import { ZoomableImage } from "@/components/site/zoomable-image";
 import { projects, type Project } from "@/content/projects";
-import { caseStudyCopy, caseStudySectionKeys, caseStudySectionLabels, type CaseStudy } from "@/content/stretch/case-study";
+import { caseStudyCopy, caseStudySectionKeys, caseStudySectionLabels, type CaseStudy, type CaseStudySection } from "@/content/stretch/case-study";
+import { thresholdLinkCopy, thresholdStart } from "@/content/stretch/threshold-link";
 
 /** "Live site" from "Live site ↗": the pill draws its own arrow. */
 const words = (label: string) => label.replace(/ ↗$/, "");
@@ -25,18 +29,42 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
       <article className="frame story" aria-labelledby="case-study-title">
         <Opening study={study} project={project} />
         {caseStudySectionKeys.map((key) => {
-          const { heading, figure, ...body } = study.sections[key];
+          const { heading, figure, working, ...body } = study.sections[key];
           return (
             <StorySection key={key} id={key} title={heading ?? caseStudySectionLabels[key]}>
               <StoryText body={body} />
               {key === "written-down-first" && <PrdCard study={study} />}
-              {figure && <StoryImage src={figure.src} alt={figure.alt} width={figure.width} height={figure.height} caption={figure.caption} />}
+              {figure && <SectionFigure figure={figure} working={working} accent={project.panel.field} />}
             </StorySection>
           );
         })}
       </article>
       <NextPanel label={caseStudyCopy.nextProject} href={`/things-i-make/${next.slug}`} name={next.name} line={next.outcome} colours={next.panel!} />
     </LongForm>
+  );
+}
+
+/** The working figures, each drawn at its start for the server and taken over by its island (#462). */
+const workingFigures = {
+  "threshold-link": {
+    caption: thresholdLinkCopy.caption,
+    drawn: (
+      <ThresholdLinkIsland>
+        <ThresholdLinkView choice={thresholdStart} />
+      </ThresholdLinkIsland>
+    ),
+  },
+} as const;
+
+/** A section's screenshot, or the working figure that takes its place with the screenshot kept for a visitor without script. */
+function SectionFigure({ figure, working, accent }: Required<Pick<CaseStudySection, "figure">> & Pick<CaseStudySection, "working"> & { accent: string }) {
+  const still = <StoryImage src={figure.src} alt={figure.alt} width={figure.width} height={figure.height} caption={figure.caption} />;
+  if (!working) return still;
+  const { caption, drawn } = workingFigures[working];
+  return (
+    <WorkingFigure caption={caption} accent={accent} still={still}>
+      {drawn}
+    </WorkingFigure>
   );
 }
 

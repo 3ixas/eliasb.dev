@@ -29,6 +29,7 @@ import { notFound, sayHello, siteCopy, thingsIMake, workArchive } from "../src/c
 import { headedProblems, shownSource, work } from "../src/content/stretch/work.ts";
 import { comparisonRow, workPanelProblems, workPanels } from "../src/content/stretch/work-panels.ts";
 import { simulationCopy } from "../src/content/stretch/simulation-copy.ts";
+import { thresholdLinkCopy } from "../src/content/stretch/threshold-link.ts";
 
 const raw = readFileSync(new URL("../docs/content/redesign-copy.md", import.meta.url), "utf8");
 // Emphasis stars and the {braces} around live values are markup, not words.
@@ -45,6 +46,8 @@ const leaves = (value, path = "") => {
 };
 const modules = {
   simulationCopy,
+  // The working link's own words; its cities, districts and places are Threshold's data.
+  thresholdLinkCopy,
   siteCopy,
   notFound,
   // The opening's own words; the runs are the same sentences cut up.
