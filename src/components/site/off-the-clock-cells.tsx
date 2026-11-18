@@ -44,11 +44,37 @@ function Out({ href }: { href: string }) {
   );
 }
 
-/** A cell for the book or the film: a link out with its cover, or, with nothing to show, its fallback line and no cover. */
-function MediaCell({ item, href, cover, title, line, stale }: { item: string; href: string | null; cover: ReactNode; title: string; line: ReactNode; stale?: ReactNode }) {
+/** The objects' size: a book or a poster at most 220 px wide, at every width (a Goodreads cover is 300 px wide). */
+const OBJECT_SIZES = "220px";
+
+/** The book as an object (#465): its cover straight on, a crease at the spine, its page edges stepping out behind it. */
+function BookObject({ src, alt }: { src: string; alt: string }) {
+  return (
+    <span className="otc__book">
+      <Image src={src} alt={alt} width={300} height={450} sizes={OBJECT_SIZES} />
+    </span>
+  );
+}
+
+/** The film on a screen in its poster's own format (#465), the poster's colours glowing around the frame. */
+function ScreenObject({ src, alt }: { src: string; alt: string }) {
+  return (
+    <span className="otc__screen">
+      <Image className="otc__screen-glow" src={src} alt="" width={300} height={450} sizes={OBJECT_SIZES} aria-hidden="true" />
+      <Image className="otc__screen-poster" src={src} alt={alt} width={300} height={450} sizes={OBJECT_SIZES} />
+    </span>
+  );
+}
+
+/**
+ * A cell for the book or the film: a link out with its object over its words, or, with nothing to show, its fallback
+ * line and no object. Without a cover it is type only; the shelf's two cells share their rows (subgrid), so the words
+ * start on one line whatever stands above them.
+ */
+function MediaCell({ item, href, object, title, line, stale }: { item: string; href: string | null; object: ReactNode; title: string; line: ReactNode; stale?: ReactNode }) {
   const body = (
     <>
-      {cover}
+      {object && <span className="otc__object">{object}</span>}
       <span className="otc__media-text">
         <h4>{title}</h4>
         <p>
@@ -76,12 +102,12 @@ function MediaCell({ item, href, cover, title, line, stale }: { item: string; hr
 export function BookCell({ reading, now }: { reading: ReadingSignal; now: Date }) {
   const { book } = reading;
   const status = pinStatus("reading", reading, now);
-  if (!book) return <MediaCell item="reading" href={null} cover={null} title={copy.reading.fallback} line={copy.reading.label} />;
+  if (!book) return <MediaCell item="reading" href={null} object={null} title={copy.reading.fallback} line={copy.reading.label} />;
   return (
     <MediaCell
       item="reading"
       href={reading.href}
-      cover={book.coverUrl ? <Image className="otc__cover" src={book.coverUrl} alt={copy.reading.coverAlt(book.title, book.author)} width={128} height={192} sizes="76px" /> : null}
+      object={book.coverUrl ? <BookObject src={book.coverUrl} alt={copy.reading.coverAlt(book.title, book.author)} /> : null}
       title={book.title}
       line={`${copy.reading.label} · ${book.author}`}
       stale={<Stale source={copy.reading.sourceName} status={status} />}
@@ -93,14 +119,14 @@ export function BookCell({ reading, now }: { reading: ReadingSignal; now: Date }
 export function FilmCell({ signal, now }: { signal: FilmSignal; now: Date }) {
   const { film } = signal;
   const status = pinStatus("film", signal, now);
-  if (!film) return <MediaCell item="film" href={null} cover={null} title={copy.watched.fallback} line={copy.watched.label} />;
+  if (!film) return <MediaCell item="film" href={null} object={null} title={copy.watched.fallback} line={copy.watched.label} />;
   const day = film.watchedOn ? asOfDate(new Date(`${film.watchedOn}T12:00:00Z`)) : null;
   const watched = filmLine(day, film.rating, copy.watched.label);
   return (
     <MediaCell
       item="film"
       href={film.href}
-      cover={film.posterUrl ? <Image className="otc__cover" src={film.posterUrl} alt={copy.watched.posterAlt(film.title, film.year)} width={128} height={192} sizes="76px" /> : null}
+      object={film.posterUrl ? <ScreenObject src={film.posterUrl} alt={copy.watched.posterAlt(film.title, film.year)} /> : null}
       title={film.title}
       line={
         watched ? (
@@ -180,7 +206,11 @@ export function GitHubCell({ github, latest, now }: { github: GitHubSignal; late
   );
 }
 
-/** The one paper panel: its sections, each under a rule: the workout, the shelf and screen, this week in history, the GitHub year. */
+/**
+ * The one paper panel (#465): one composition. On a phone its sections stack under rules: the workout, the shelf and
+ * screen, this week in history, the GitHub year. From 960 px they are three tiers: the workout beside the shelf, the
+ * oddity across the panel, and the year as the base (off-the-clock.css).
+ */
 export function OffTheClockPanel({ training, book, film, history, year }: { training: ReactNode; book: ReactNode; film: ReactNode; history: ReactNode; year: ReactNode }) {
   return (
     <Panel className="otc">

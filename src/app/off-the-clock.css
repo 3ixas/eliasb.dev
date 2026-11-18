@@ -1,11 +1,12 @@
 /*
- * Off the clock (docs/design/DESIGN.md "The homepage, in order" 7; R-19): one paper panel that follows the theme, as four
- * sections each under its own heading: Today's workout; On my shelf and screen; this week in history; the GitHub year,
- * with what I'm building now under its total. The panel and the pill are parts.css's; the GitHub year's structure is github-year.tsx's,
- * restyled here onto the year ramps.
+ * Off the clock (docs/design/DESIGN.md "The homepage, in order" 7; R-19; #465): one paper panel that follows the theme,
+ * composed as one spread: Today's workout as one strong line over the week; the book and the film as objects on one
+ * shelf line; this week's oddity picture first; and the GitHub year, with what I'm building now, as the base. On a phone
+ * the sections stack under rules; from 960 px they are three tiers. The panel and the pill are parts.css's; the GitHub
+ * year's structure is github-year.tsx's, restyled here onto the year ramps.
  */
 
-/* The panel is a stack of sections, each under its own heading and a rule: the workout, the shelf and screen, this week in history, what I'm building now, the GitHub year. */
+/* On a phone the panel is a stack of sections, each under its own heading and a rule. */
 .otc {
   display: block;
 }
@@ -47,7 +48,7 @@
   font-size: var(--type-small);
 }
 
-/* ---- Today's workout ---- */
+/* ---- Today's workout: one strong line over the week ---- */
 
 .otc__training {
   display: grid;
@@ -61,9 +62,10 @@
   color: var(--ink);
   font-family: var(--serif);
   font-optical-sizing: auto;
-  font-size: clamp(34px, 4vw, 48px);
-  line-height: 1.05;
-  letter-spacing: -0.025em;
+  font-size: clamp(38px, 4.4vw, 52px);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
 }
 
 .otc__today > * {
@@ -74,97 +76,202 @@
   visibility: hidden;
 }
 
-/* The week as seven days in a row, each its name over its session; today's is filled with ink. Seven rows on a phone. */
+/* On a phone the week is a quiet strip: a letter a day over a short rule, today's letter and rule in ink. */
 .otc__week {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 8px;
-  margin-top: 22px;
-  font-size: var(--type-ui);
+  column-gap: 4px;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: var(--type-label);
+  font-weight: 600;
 }
 
 .otc__week li {
   display: grid;
-  align-content: start;
-  gap: 2px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  overflow-wrap: anywhere;
-  color: var(--muted);
-  box-shadow: inset 0 0 0 1px var(--hair);
+  justify-items: center;
+  gap: 6px;
 }
 
-.otc__week li > span:first-child {
-  font-weight: 600;
+.otc__week li::after {
+  content: "";
+  width: 100%;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--hair);
 }
 
 .otc__week li[data-today] {
-  background: var(--ink);
-  color: var(--paper);
-  box-shadow: none;
+  color: var(--ink);
 }
 
-/* ---- The book and the film ---- */
+.otc__week li[data-today]::after {
+  background: var(--ink);
+}
 
+/* ---- The book and the film as objects on one shelf line ---- */
+
+/* The book and the film stand on one line and their words start on one line beneath, whatever stands above them. */
 .otc__shelf-cells {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px 32px;
+  grid-template-rows: auto auto;
+  column-gap: 24px;
+}
+
+.otc__cell {
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
 }
 
 .otc__media {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: start;
-  gap: 20px;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+  row-gap: 14px;
   color: inherit;
   text-decoration: none;
 }
 
-/* A cell with no cover has none, and no placeholder box. */
-.otc__media:not(:has(.otc__cover)) {
-  grid-template-columns: minmax(0, 1fr);
+/* An object is at most 220 px wide at every width, the size its cover is drawn at. */
+.otc__object {
+  display: block;
+  align-self: end;
+  grid-row: 1;
+  width: min(100%, 220px);
 }
 
-.otc__cover {
-  width: 76px;
+.otc__media-text {
+  grid-row: 2;
+}
+
+.otc__media-text h4 {
+  font-size: var(--type-row);
+}
+
+.otc__media-text p {
+  margin-top: 4px;
+}
+
+/* The book: its cover straight on, a crease at the spine, its page edges stepping out behind its right and bottom edges. */
+.otc__book {
+  position: relative;
+  display: block;
+  padding: 0 8px 8px 0;
+}
+
+.otc__book img,
+.otc__screen-poster {
+  display: block;
+  width: 100%;
   height: auto;
   aspect-ratio: 2 / 3;
   object-fit: cover;
+}
+
+/* The page edges are paper mixed with the panel's own, so in dark they are paper in shadow, not lit cream. */
+.otc__book img {
+  --edge: color-mix(in srgb, #f4f1ea 72%, var(--paper));
+  --edge-line: color-mix(in srgb, #bdb4a3 72%, var(--paper));
+  border-radius: 2px 4px 4px 2px;
+  box-shadow:
+    2px 2px 0 0 var(--edge),
+    3px 3px 0 0 var(--edge-line),
+    4px 4px 0 0 var(--edge),
+    5px 5px 0 0 var(--edge-line),
+    6px 6px 0 0 var(--edge),
+    7px 7px 0 0 var(--edge-line),
+    10px 18px 28px -10px var(--shadow);
+}
+
+.otc__book::after {
+  content: "";
+  position: absolute;
+  inset: 0 8px 8px 0;
+  border-radius: 2px 4px 4px 2px;
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.28) 0, rgb(255 255 255 / 0.22) 2.5%, rgb(0 0 0 / 0.08) 5%, transparent 8%);
+  pointer-events: none;
+}
+
+/* The film: a screen in the poster's own format, a dark frame round it, the poster's colours glowing past its edges. */
+.otc__screen {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  padding: 4px;
   border-radius: 6px;
-  box-shadow: 0 12px 24px -10px var(--shadow);
+  background: #050506;
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.1),
+    0 22px 30px -18px var(--shadow);
+}
+
+.otc__screen-poster {
+  position: relative;
+  border-radius: 2px;
+}
+
+.otc__screen-glow {
+  position: absolute;
+  z-index: -1;
+  inset: 4% -5% -2%;
+  border-radius: 12px;
+  object-fit: cover;
+  filter: blur(30px) saturate(1.6);
+  opacity: 0.95;
+}
+
+/* The glass catches the light across its top-left. */
+.otc__screen::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 2px;
+  background: linear-gradient(118deg, rgb(255 255 255 / 0.1) 0, rgb(255 255 255 / 0) 42%);
+  pointer-events: none;
 }
 
 .otc__source {
   font-size: var(--type-label);
 }
 
-/* ---- This week in history ---- */
+/* ---- This week in history: picture first, the fact its caption ---- */
 
 .otc__history {
   display: grid;
-  grid-template-columns: 76px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 16px 24px;
+  grid-template-columns: minmax(0, 1fr);
 }
 
-.otc__history > .otc__title {
-  grid-column: 1 / -1;
-  margin-bottom: 4px;
-}
-
-/* The picture's slot keeps its height when an oddity has none, so stepping moves nothing. */
+/* The picture's frame is always there at one size: an oddity with no picture shows its year in it, so stepping moves nothing. */
 .otc__history-image {
-  display: block;
-  min-height: 76px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
+  background: var(--tint);
 }
 
 .otc__history-image img {
   display: block;
-  width: 76px;
-  height: 76px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border-radius: 10px;
+}
+
+.otc__history-year {
+  color: var(--ink);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: clamp(72px, 9vw, 120px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: lining-nums;
+}
+
+.otc__history-caption {
+  margin-top: 14px;
 }
 
 .otc__history-text {
@@ -172,7 +279,7 @@
   max-width: 46em;
 }
 
-/* Every oddity in one cell: the hidden ones hold the band at the tallest, so stepping moves nothing. */
+/* Every oddity in one cell: the hidden ones hold the caption at the tallest, so stepping moves nothing. */
 .otc__history-text > * {
   grid-area: 1 / 1;
 }
@@ -181,12 +288,17 @@
   visibility: hidden;
 }
 
+.otc__history-text p:first-child {
+  margin-top: 0;
+  color: var(--ink);
+  font-size: var(--type-body);
+  line-height: 1.45;
+}
+
 .otc__history b {
   margin-right: 4px;
-  color: var(--ink);
   font-family: var(--serif);
   font-optical-sizing: auto;
-  font-size: var(--type-ui);
   font-weight: 500;
   font-variant-numeric: lining-nums;
 }
@@ -198,7 +310,116 @@
 /* The pill keeps one width whatever the count says, so stepping moves nothing. */
 .otc__step {
   min-width: 96px;
+  margin-top: 16px;
   font-variant-numeric: tabular-nums;
+}
+
+/* ---- From 960 px: three tiers ---- */
+
+/*
+ * The workout beside the shelf, a hairline between; this week's oddity across the panel, its picture at the left and
+ * its heading and caption at the right; the GitHub year as the base. The week shows its rows here: each day and its
+ * session, today in ink with a dot.
+ */
+@media (min-width: 960px) {
+  .otc {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas:
+      "training shelf"
+      "history history"
+      "year year";
+    column-gap: 56px;
+  }
+
+  .otc > .otc__training { grid-area: training; }
+  .otc > .otc__history { grid-area: history; }
+  .otc > .otc__year { grid-area: year; }
+
+  .otc > .otc__shelf {
+    grid-area: shelf;
+    margin-top: 0;
+    padding: 0 0 0 56px;
+    border-top: 0;
+    border-left: 1px solid var(--hair);
+  }
+
+  .otc__shelf-cells {
+    column-gap: 40px;
+  }
+
+  /* Beside the shelf the session line is a size smaller, so the longest session still takes one line at 1440. */
+  .otc .otc__today {
+    font-size: clamp(34px, 3vw, 44px);
+  }
+
+  .otc__media-text h4 {
+    font-size: 26px;
+  }
+
+  .otc__week {
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 22px;
+    font-size: var(--type-ui);
+    font-weight: 400;
+  }
+
+  .otc__week li {
+    grid-template-columns: 7.5em minmax(0, 1fr);
+    justify-items: start;
+    padding: 9px 0;
+    border-top: 1px solid var(--hair);
+  }
+
+  .otc__week li:last-child {
+    border-bottom: 1px solid var(--hair);
+  }
+
+  .otc__week li::after,
+  .otc__week-letter {
+    display: none;
+  }
+
+  .otc__week-day {
+    font-weight: 600;
+  }
+
+  .otc__week li[data-today] .otc__week-day::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin: 0 8px 1px -15px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .otc__history {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: 56px;
+  }
+
+  .otc__history > .otc__title {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+  }
+
+  .otc__history-image {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    aspect-ratio: 3 / 2;
+  }
+
+  .otc__history-caption {
+    grid-column: 2;
+    grid-row: 2;
+    margin-top: 0;
+  }
+
+  .otc__history-text p:first-child {
+    font-size: var(--type-prose);
+  }
 }
 
 /* ---- The GitHub year and Now making ---- */
@@ -340,48 +561,34 @@
   }
 }
 
-/* Under 900 px seven days no longer fit in a row: they are seven rows, the name beside its session. */
-@media (max-width: 899.98px) {
-  .otc__week {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 3px;
-  }
-
-  .otc__week li {
-    grid-template-columns: 52px minmax(0, 1fr);
-    align-items: baseline;
-    gap: 0;
-    padding: 6px 14px;
-  }
-}
-
 @media (max-width: 719.98px) {
   .otc__section {
     margin-top: 24px;
     padding-top: 24px;
   }
-
-
-  .otc__shelf-cells {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .otc__history {
-    grid-template-columns: 76px minmax(0, 1fr);
-    align-items: start;
-  }
-
-  .otc__step {
-    grid-column: 1 / -1;
-    justify-self: start;
-  }
 }
 
 @media (forced-colors: active) {
-  .otc__week li[data-today] {
+  /* The objects keep their edges: shadows and the screen's frame do not paint here. */
+  .otc__book img,
+  .otc__screen {
+    outline: 1px solid CanvasText;
+  }
+
+  /* The strip keeps its rules in GrayText; today keeps its mark, the strip's rule and the row's dot, in the highlight. */
+  .otc__week li::after {
+    forced-color-adjust: none;
+    background: GrayText;
+  }
+
+  .otc__week li[data-today]::after,
+  .otc__week li[data-today] .otc__week-day::before {
     forced-color-adjust: none;
     background: Highlight;
-    color: HighlightText;
+  }
+
+  .otc__week li[data-today] {
+    color: Highlight;
   }
 
   .otc__dot {

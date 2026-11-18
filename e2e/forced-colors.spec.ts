@@ -37,6 +37,28 @@ test.describe("Forced colours", () => {
     await expect(figure.locator(".ftbreak__range")).toHaveCSS("forced-color-adjust", "none");
   });
 
+  test("Off the clock keeps today's mark and the book's and screen's edges", async ({ page }) => {
+    await page.goto("/fixtures/off-the-clock");
+    const panel = page.locator("[data-fixture='training-saturday']");
+    const highlight = await page.evaluate(() => {
+      const probe = document.body.appendChild(document.createElement("i"));
+      probe.style.cssText = "forced-color-adjust: none; background: Highlight";
+      const colour = getComputedStyle(probe).backgroundColor;
+      probe.remove();
+      return colour;
+    });
+    // Today's mark is the highlight: its rule on a phone, its dot from 960 px. The other days' rules stay drawn in GrayText.
+    const wide = page.viewportSize()!.width >= 960;
+    const mark = await panel.locator(wide ? ".otc__week li[data-today] .otc__week-day" : ".otc__week li[data-today]").evaluate((element, pseudo) => getComputedStyle(element, pseudo).backgroundColor, wide ? "::before" : "::after");
+    expect(mark).toBe(highlight);
+    if (!wide) {
+      const others = await panel.locator(".otc__week li:not([data-today])").evaluateAll((items) => items.map((item) => getComputedStyle(item, "::after").backgroundColor));
+      for (const rule of others) expect(rule).not.toBe(highlight);
+      expect(new Set(others).size).toBe(1);
+    }
+    for (const object of [".otc__book img", ".otc__screen"]) await expect(panel.locator(object)).toHaveCSS("outline-style", "solid");
+  });
+
   test("the GitHub year's levels are not all one colour", async ({ page }) => {
     await page.goto("/");
     const byLevel = await page.locator(".stretch-gh__day[data-level]").evaluateAll((elements) => {

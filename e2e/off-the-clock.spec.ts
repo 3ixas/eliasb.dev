@@ -5,10 +5,11 @@ import { renderedContrast } from "./support/rendered-contrast";
 import { spoken } from "./support/roll";
 
 /*
- * Off the clock (docs/design/DESIGN.md "The homepage, in order" 7, R-19, R-30, R-34): one paper panel in four sections,
- * each under its own heading: Today's workout; the shelf and screen; this week in history; the GitHub year, with what
- * I'm building now under its total. Each state is a whole panel on /fixtures/off-the-clock, with one cell swapped, so every test also shows the
- * panel keeping its shape.
+ * Off the clock (docs/design/DESIGN.md "The homepage, in order" 7, R-19, R-30, R-34; #465): one paper panel composed as
+ * one spread. Today's workout as one strong line over the week; the book and the film as objects on one shelf line;
+ * this week's oddity picture first; the GitHub year, with what I'm building now, as the base. On a phone the sections
+ * stack under rules; from 960 px they are three tiers. Each state is a whole panel on /fixtures/off-the-clock, with one
+ * cell swapped, so every test also shows the panel keeping its shape.
  */
 
 const { days } = offTheClock.training;
@@ -16,6 +17,8 @@ const fixture = (page: Page, name: string) => page.locator(`[data-fixture='${nam
 const cell = (panel: Locator, item: string) => panel.locator(`[data-otc='${item}']`);
 const width = (page: Page) => page.viewportSize()?.width ?? 0;
 const phone = (page: Page) => width(page) < 720;
+/** From 960 px the panel is three tiers: the workout beside the shelf, the oddity across, the year as the base. */
+const tiers = (page: Page) => width(page) >= 960;
 const boxOf = async (locator: Locator) => (await locator.boundingBox())!;
 
 /** The colour the page paints for a token, read the way the browser resolves it. */
@@ -52,11 +55,12 @@ test.describe("Off the clock: on the homepage", () => {
     await expect(cell(panel, "history").getByRole("heading", { level: 3 })).toHaveText(offTheClock.curiosity.label);
   });
 
-  test("a rule separates each section from the one above", async ({ page }) => {
+  test("a rule separates each section: above it when they stack, and between the workout and the shelf when they sit side by side", async ({ page }) => {
     const panel = page.locator("section#off-the-clock .otc");
-    const tops = await panel.evaluate((element) => [...element.children].map((child) => getComputedStyle(child).borderTopWidth));
-    expect(tops[0]).toBe("0px");
-    for (const top of tops.slice(1)) expect(top).toBe("1px");
+    const rules = await panel.evaluate((element) => [...element.children].map((child) => [getComputedStyle(child).borderTopWidth, getComputedStyle(child).borderLeftWidth]));
+    expect(rules[0][0]).toBe("0px");
+    expect(rules[1]).toEqual(tiers(page) ? ["0px", "1px"] : ["1px", "0px"]);
+    for (const [top] of rules.slice(2)) expect(top).toBe("1px");
   });
 
   test("the panel is paper in light and the dark surface in dark", async ({ page }) => {
@@ -129,7 +133,7 @@ test.describe("Off the clock: the book and the film", () => {
       await expect(target.getByRole("heading", { level: 4 })).toHaveText(fallback);
       await expect(target.locator("p").first()).toHaveText(label);
       await expect(target.getByRole("link")).toHaveCount(0);
-      await expect(target.locator("img, .otc__cover")).toHaveCount(0);
+      await expect(target.locator("img, .otc__object")).toHaveCount(0);
     });
   }
 
@@ -149,6 +153,33 @@ test.describe("Off the clock: the book and the film", () => {
     await expect(page.locator(".otc__media").getByText(/^Live from/)).toHaveCount(0);
   });
 
+  test("the book is an object: its cover straight on, its page edges stepping out behind it", async ({ page }) => {
+    const book = cell(fixture(page, "book"), "reading");
+    await expect(book.locator(".otc__book img")).toHaveAttribute("alt", "Cover of Dark Age by Pierce Brown");
+    // The page edges are the cover's stepped shadows, standing out past its right and bottom edges.
+    await expect(book.locator(".otc__book img")).toHaveCSS("box-shadow", / 2px 2px 0px 0px/);
+  });
+
+  test("the film is on a screen in its poster's format, its colours glowing round the frame; the glow is not read", async ({ page }) => {
+    const film = cell(fixture(page, "film"), "film");
+    await expect(film.locator(".otc__screen-poster")).toHaveAttribute("alt", "Poster for The Invite (2026)");
+    await expect(film.locator(".otc__screen-glow")).toHaveAttribute("aria-hidden", "true");
+    await expect(film.locator(".otc__screen-glow")).toHaveAttribute("alt", "");
+    await expect(film.locator(".otc__screen-glow")).toHaveCSS("filter", /blur/);
+    const [screen, poster] = await Promise.all([boxOf(film.locator(".otc__screen")), boxOf(film.locator(".otc__screen-poster"))]);
+    expect(poster.height / poster.width).toBeCloseTo(1.5, 1);
+    expect(screen.width).toBeGreaterThan(poster.width);
+  });
+
+  test("the book and the film stand on one line, and their words start on one line beneath", async ({ page }) => {
+    const panel = fixture(page, "github");
+    const [book, film] = await Promise.all(["reading", "film"].map((item) => boxOf(cell(panel, item).locator(".otc__object"))));
+    expect(Math.abs(book.y + book.height - (film.y + film.height))).toBeLessThan(2);
+    const [bookWords, filmWords] = await Promise.all(["reading", "film"].map((item) => boxOf(cell(panel, item).locator(".otc__media-text"))));
+    expect(Math.abs(bookWords.y - filmWords.y)).toBeLessThan(1);
+    expect(film.x).toBeGreaterThan(book.x + book.width);
+  });
+
   test("a long title wraps inside its column, and the link carries it whole", async ({ page }) => {
     const panel = fixture(page, "long");
     for (const item of ["reading", "film"]) {
@@ -166,7 +197,7 @@ test.describe("Off the clock: this week in history", () => {
     await page.goto("/fixtures/off-the-clock");
   });
 
-  test("full width: the picture, the title, the date and fact, its credit, and an outline pill that counts", async ({ page }) => {
+  test("picture first, across the panel: the picture, the title, the date and fact as its caption, its credit, and an outline pill that counts", async ({ page }) => {
     const history = cell(fixture(page, "history-live"), "history");
     await expect(history.getByRole("heading", { level: 3 })).toHaveText(offTheClock.curiosity.label);
     await expect(history.locator("p[aria-live='polite']")).toHaveText("28 September 1924 The first aerial circumnavigation is completed by a team from the US Army.");
@@ -196,6 +227,7 @@ test.describe("Off the clock: this week in history", () => {
     await expect(step).toHaveAccessibleName(offTheClock.curiosity.count(2, 3));
     await expect(history.locator("p[aria-live='polite']")).toContainText("A cow wanders into a cathedral");
     await expect(history.locator("img")).toHaveCount(0);
+    await expect(history.locator(".otc__history-year")).toHaveText("1781");
     expect(await places()).toEqual(before);
     await step.click();
     await expect(history.locator("p[aria-live='polite']")).toContainText("Born 28 September 1852");
@@ -213,6 +245,12 @@ test.describe("Off the clock: this week in history", () => {
     const history = cell(fixture(page, "history-text-only"), "history");
     await expect(history.locator("img, .otc__history-now .otc__credit")).toHaveCount(0);
     await expect(history.locator("p[aria-live]")).toContainText("A cow wanders into a cathedral");
+    // The frame is never empty: its year stands in for the picture, at the picture's size, and is not read twice.
+    const year = history.locator(".otc__history-year");
+    await expect(year).toHaveText("1781");
+    await expect(year).toHaveAttribute("aria-hidden", "true");
+    const frame = await boxOf(history.locator(".otc__history-image"));
+    expect(frame.width / frame.height).toBeCloseTo(tiers(page) ? 1.5 : 4 / 3, 1);
   });
 
   test("without a live week it is the archive, and says so", async ({ page }) => {
@@ -368,19 +406,34 @@ test.describe("Off the clock: contrast, sizes and layout", () => {
     expect(results.violations).toEqual([]);
   });
 
-  test("the sections stack; the book and the film sit side by side from 720 px, and the week sits under today's session, in a row from 900 px", async ({ page }) => {
+  test("the composition: stacked on a phone; from 960 px the workout beside the shelf, the oddity across, the year beneath", async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
     const panel = fixture(page, "github").locator(".otc");
-    const [training, shelf, history] = await Promise.all(["training", "shelf", "history"].map((item) => boxOf(cell(panel, item))));
-    expect(shelf.y).toBeGreaterThan(training.y + training.height - 1);
-    expect(history.y).toBeGreaterThan(shelf.y + shelf.height - 1);
+    const [training, shelf, history, year] = await Promise.all(["training", "shelf", "history", "github"].map((item) => boxOf(cell(panel, item))));
+    if (tiers(page)) {
+      expect(Math.abs(training.y - shelf.y)).toBeLessThan(1);
+      expect(shelf.x).toBeGreaterThan(training.x + training.width);
+    } else {
+      expect(shelf.y).toBeGreaterThan(training.y + training.height - 1);
+    }
+    expect(history.y).toBeGreaterThan(Math.max(training.y + training.height, shelf.y + shelf.height) - 1);
+    expect(year.y).toBeGreaterThan(history.y + history.height - 1);
+    // The book and the film sit side by side at every width.
     const [book, film] = await Promise.all(["reading", "film"].map((item) => boxOf(cell(panel, item))));
-    if (phone(page)) expect(film.y).toBeGreaterThan(book.y);
-    else expect(Math.round(book.y)).toBe(Math.round(film.y));
-    const [today, week] = await Promise.all([boxOf(cell(panel, "training").locator(".otc__today")), boxOf(cell(panel, "training").locator(".otc__week"))]);
+    expect(Math.round(book.y)).toBe(Math.round(film.y));
+  });
+
+  test("the week: a strip of seven letters on a phone, seven rows of day and session from 960 px; read the same at both", async ({ page }) => {
+    await page.goto("/fixtures/off-the-clock");
+    const training = cell(fixture(page, "training-saturday"), "training");
+    const [today, week] = await Promise.all([boxOf(training.locator(".otc__today")), boxOf(training.locator(".otc__week"))]);
     expect(week.y).toBeGreaterThan(today.y + today.height - 1);
-    const days = await cell(panel, "training").locator(".otc__week li").evaluateAll((items) => new Set(items.map((item) => Math.round(item.getBoundingClientRect().top))).size);
-    expect(days).toBe(width(page) >= 900 ? 1 : 7);
+    const rows = await training.locator(".otc__week li").evaluateAll((items) => new Set(items.map((item) => Math.round(item.getBoundingClientRect().top))).size);
+    expect(rows).toBe(tiers(page) ? 7 : 1);
+    await expect(training.locator(".otc__week-letter").first()).toBeVisible({ visible: !tiers(page) });
+    // On a phone the session is read but clipped to a pixel, as .sr-only is.
+    expect((await boxOf(training.locator(".otc__week-session").first())).width > 2).toBe(tiers(page));
+    await expect(training.getByRole("listitem").nth(5)).toContainText(`${days[5].long}: ${days[5].session}`);
   });
 });
 
