@@ -1252,7 +1252,7 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .argus__value:enabled:hover {
+  .argus__value[aria-expanded="false"]:enabled:hover {
     background: var(--tint);
   }
 }
