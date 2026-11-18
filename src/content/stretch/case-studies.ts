@@ -59,6 +59,7 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
           height: 1748,
           caption: "The district map and the choices that drive the estimate.",
         },
+        working: "threshold-link",
       },
       "where-it-stands": {
         heading: "Used for real.",

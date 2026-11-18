@@ -4,6 +4,7 @@ import { hostLabel } from "../src/components/site/host-label";
 import { projects } from "../src/content/projects";
 import { caseStudies, caseStudySlugs } from "../src/content/stretch/case-studies";
 import { caseStudyCopy, caseStudySectionKeys, caseStudySectionLabels } from "../src/content/stretch/case-study";
+import { firstDistrict, thresholdLink, thresholdLinkCopy, thresholdStart } from "../src/content/stretch/threshold-link";
 import { renderedContrast } from "./support/rendered-contrast";
 import { spoken } from "./support/roll";
 
@@ -130,11 +131,12 @@ for (const slug of caseStudySlugs) {
     });
 
     test("figures take the text side's whole width, with a hairline edge and their captions", async ({ page }) => {
+      // A working figure keeps its screenshot for a visitor without script (checked below), so only the others show one.
       const figures = caseStudySectionKeys.flatMap((key) => {
-        const figure = study.sections[key].figure;
-        return figure ? [{ key, figure }] : [];
+        const { figure, working } = study.sections[key];
+        return figure && !working ? [{ key, figure }] : [];
       });
-      await expect(page.locator("article section .story-fig")).toHaveCount(figures.length);
+      await expect(page.locator("article section .story-fig:visible")).toHaveCount(figures.length);
       for (const { key, figure } of figures) {
         const frame = page.locator(`section#${key} .story-fig`);
         const image = frame.locator(".zoom img");
@@ -222,12 +224,17 @@ for (const slug of caseStudySlugs) {
       // Safari Tabs to links only with Option held, as a visitor with its default settings does.
       const tab = testInfo.project.name.startsWith("webkit") ? "Alt+Tab" : "Tab";
       const scope = "[data-case-study] article, [data-case-study] nav.story-next";
-      const order = await page.locator(`:is(${scope}) :is(a, button):not(dialog *)`).evaluateAll((elements) => elements.map((element) => element.textContent?.trim() ?? ""));
+      // The working figure's choices are in the order too; its screenshot, shown only without script, is not.
+      await page.locator(".tlink").evaluateAll(async (figures) => figures.forEach((figure) => figure.scrollIntoView()));
+      await expect(page.locator(".tlink:not([data-live])")).toHaveCount(0);
+      await page.evaluate(() => scrollTo(0, 0));
+      const order = await page.locator(`:is(${scope}) :is(a, button, select):not(dialog *):visible`).evaluateAll((elements) => elements.map((element) => element.textContent?.trim() ?? ""));
       expect(order.length).toBeGreaterThan(3);
       const reached: string[] = [];
-      await page.locator("body").focus();
-      for (let step = 0; step < 40 && reached.length < order.length; step++) {
-        await page.keyboard.press(tab);
+      // Start on the back link: scrolling the figure into view above may have moved where Tab would start from the body.
+      await page.locator(`:is(${scope}) :is(a, button, select):not(dialog *):visible`).first().focus();
+      for (let step = 0; step < 50 && reached.length < order.length; step++) {
+        if (step > 0) await page.keyboard.press(tab);
         const focused = await page.evaluate((within) => {
           const element = document.activeElement as HTMLElement | null;
           if (!element?.closest(within)) return null;
@@ -284,4 +291,97 @@ test("the homepage's PRD link lands on the card's section", async ({ page }) => 
   await link.click();
   await expect(page).toHaveURL(/\/things-i-make\/threshold#written-down-first$/);
   await expect(page.locator("section#written-down-first figure.prd")).toBeInViewport();
+});
+
+/*
+ * Threshold's link that rewrites itself (#462): under "The link is the save file.", City, District and Place write the
+ * live product's own link, and Copy link copies it. It is drawn by the server at its start and loads as it nears the view.
+ */
+test.describe("Case study: Threshold's working link", () => {
+  const figure = (page: Page) => page.locator("section#how-its-built figure.working-fig");
+  const address = (page: Page) => figure(page).locator("output.tlink__address");
+  const shown = (link: string) => link.replace(/^https:\/\//, "");
+  const live = async (page: Page) => {
+    await figure(page).scrollIntoViewIfNeeded();
+    await expect(figure(page).locator(".tlink[data-live]")).toHaveCount(1);
+  };
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/things-i-make/threshold");
+  });
+
+  test("it takes the screenshot's place on paper under Threshold's colour, with its own caption, and loads only as it nears the view", async ({ page }) => {
+    await expect(figure(page)).toBeVisible();
+    await expect(page.locator("section#how-its-built .working-fig__still")).toBeHidden();
+    await expect(figure(page).locator(".working-fig__frame")).toHaveClass(/\bsurface surface--paper\b/);
+    await expect(figure(page).locator(".working-fig__frame")).toHaveCSS("border-top-color", rgb(projects.find(({ slug }) => slug === "threshold")!.panel!.field));
+    await expect(figure(page).locator("figcaption")).toHaveText(thresholdLinkCopy.caption);
+    // Drawn by the server at its start, the choices held still until the island arrives: once the page has hydrated
+    // (Say hello's Copy shows), a figure more than 600 px below the view is still the drawing.
+    await expect(address(page)).toHaveText(shown(thresholdLink(thresholdStart)));
+    await expect(page.locator("#say-hello .copy-button")).toBeVisible();
+    if (await figure(page).evaluate((element) => element.getBoundingClientRect().top > innerHeight + 700)) {
+      await expect(figure(page).locator(".tlink[data-live]")).toHaveCount(0);
+      await expect(figure(page).getByLabel(thresholdLinkCopy.city, { exact: true })).toBeDisabled();
+    }
+    await live(page);
+    await expect(address(page)).toHaveText(shown(thresholdLink(thresholdStart)));
+  });
+
+  test("each choice rewrites the link in Threshold's own format, and a new city starts on its first district", async ({ page }) => {
+    await live(page);
+    const choose = (name: string, value: string) => figure(page).getByLabel(name, { exact: true }).selectOption(value);
+    await choose(thresholdLinkCopy.place, "2bed");
+    await expect(address(page)).toHaveText(shown(thresholdLink({ ...thresholdStart, place: "2bed" })));
+    await choose(thresholdLinkCopy.district, "lambeth");
+    await expect(address(page)).toHaveText("threshold-beta.vercel.app/london?district=lambeth&type=2bed");
+    await choose(thresholdLinkCopy.city, "zurich");
+    await expect(address(page)).toHaveText(shown(thresholdLink({ city: "zurich", district: firstDistrict("zurich"), place: "2bed" })));
+    await expect(figure(page).getByLabel(thresholdLinkCopy.district, { exact: true })).toHaveValue("kreis-1");
+    // Only the parts that changed arrive afresh: the city and its district.
+    await expect(figure(page).locator(".tlink__part[data-new]")).toHaveText(["zurich", "kreis-1"]);
+  });
+
+  test("its controls are labelled, 44 px, and the link is an output announced politely", async ({ page }) => {
+    await live(page);
+    for (const name of [thresholdLinkCopy.city, thresholdLinkCopy.district, thresholdLinkCopy.place]) {
+      const control = figure(page).getByRole("combobox", { name, exact: true });
+      await expect(control).toBeEnabled();
+      expect((await control.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    }
+    await expect(address(page)).toHaveCount(1);
+    const copy = figure(page).getByRole("button", { name: thresholdLinkCopy.copy });
+    expect((await copy.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  });
+
+  test("Copy link copies the working link for the choices shown", async ({ page, browserName }) => {
+    test.skip(browserName !== "chromium", "Only Chromium can grant clipboard reads");
+    await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+    await live(page);
+    await figure(page).getByLabel(thresholdLinkCopy.city, { exact: true }).selectOption("basel");
+    await figure(page).getByRole("button", { name: thresholdLinkCopy.copy }).click();
+    await expect(figure(page).getByRole("button", { name: thresholdLinkCopy.copied })).toBeVisible();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(thresholdLink({ city: "basel", district: firstDistrict("basel"), place: thresholdStart.place }));
+  });
+
+  test("when the browser refuses the clipboard, Copy link selects the link instead", async ({ page }) => {
+    await live(page);
+    await page.evaluate(() => {
+      Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: () => Promise.reject(new DOMException("Denied", "NotAllowedError")) } });
+    });
+    await figure(page).getByRole("button", { name: thresholdLinkCopy.copy }).click();
+    await expect.poll(() => page.evaluate(() => window.getSelection()?.toString())).toBe(shown(thresholdLink(thresholdStart)));
+  });
+
+  test.describe("without script", () => {
+    test.use({ javaScriptEnabled: false });
+
+    test("it is the screenshot with its caption, as before", async ({ page }) => {
+      const still = caseStudies.threshold.sections["how-its-built"].figure!;
+      await expect(figure(page)).toBeHidden();
+      const shot = page.locator("section#how-its-built .working-fig__still .story-fig");
+      await expect(shot.locator("img").first()).toHaveAttribute("alt", still.alt);
+      await expect(shot.locator("figcaption")).toHaveText(still.caption);
+    });
+  });
 });

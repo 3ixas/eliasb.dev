@@ -303,7 +303,7 @@
   min-width: 0;
 }
 
-.story-section__body > :not(.story-fig) {
+.story-section__body > :not(.story-fig, .working-fig, .working-fig__still) {
   max-width: 760px;
 }
 
@@ -857,5 +857,205 @@
   .lane__request {
     forced-color-adjust: none;
     background: Highlight;
+  }
+}
+
+/*
+ * A working figure (#462; parts/working-figure.tsx): a slice of the product on paper under a rule in the project's
+ * colour, and its caption 24 px below to clear the surface's shadow. With script it is the figure; without, the
+ * screenshot it stands in for, with that screenshot's caption.
+ */
+.working-fig {
+  margin: 36px 0 0;
+}
+
+.working-fig__frame {
+  padding: 28px 32px 32px;
+  border-top: 2px solid var(--accent);
+  border-radius: 16px;
+}
+
+.working-fig figcaption {
+  margin-top: 24px;
+  color: var(--muted);
+  font-size: var(--type-small);
+  line-height: 1.4;
+}
+
+:root:not([data-script]) .working-fig,
+:root[data-script] .working-fig__still {
+  display: none;
+}
+
+/*
+ * Threshold's link (#462; site/threshold-link.tsx): three choices over the address bar they write and Copy link. The
+ * changed part of the link arrives in 200 ms on a wash of Threshold's colour that fades, so the eye finds what moved.
+ */
+.tlink__choices {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.tlink__choice {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: var(--type-label);
+  font-weight: 500;
+}
+
+.tlink__select {
+  position: relative;
+  display: block;
+}
+
+/* The chevron: drawn, so it takes the ink in both themes. */
+.tlink__select::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid var(--ink);
+  border-bottom: 1.5px solid var(--ink);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+.tlink select {
+  appearance: none;
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 40px 0 18px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: 500 var(--type-ui) / 1.2 var(--sans);
+  text-overflow: ellipsis;
+  transition: background-color 0.15s var(--out);
+}
+
+/* Held still while the island loads: drawn as it will work, never greyed. */
+.tlink select:disabled {
+  opacity: 1;
+  color: var(--ink);
+}
+
+.tlink select:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 3px;
+}
+
+.tlink option {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.tlink__bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.tlink__address {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 11px 18px;
+  border-radius: 14px;
+  background: var(--page);
+  color: var(--ink);
+  font-size: var(--type-ui);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.tlink__host {
+  color: var(--muted);
+}
+
+.tlink__part {
+  border-radius: 4px;
+}
+
+.tlink__part[data-new] {
+  animation:
+    tlink-arrive 0.2s var(--out),
+    tlink-wash 1.2s var(--out);
+}
+
+@keyframes tlink-arrive {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes tlink-wash {
+  from {
+    background: color-mix(in srgb, var(--accent) 38%, transparent);
+  }
+}
+
+/* Copy keeps its room before the page has hydrated, so the bar never reflows. */
+.tlink .copy-button[hidden] {
+  display: inline-grid;
+  visibility: hidden;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tlink select:enabled:hover {
+    background: var(--tint);
+  }
+}
+
+@media (max-width: 719.98px) {
+  .working-fig__frame {
+    padding: 22px 20px 24px;
+  }
+
+  .tlink__choices {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .tlink__choice:nth-child(2) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .tlink__bar {
+    flex-wrap: wrap;
+  }
+
+  /* Two lines of room, so a longer district never pushes Copy down a line. */
+  .tlink__address {
+    flex-basis: 100%;
+    min-height: calc(2 * 1.45em + 22px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tlink__part[data-new] {
+    animation: none;
+  }
+
+  .tlink select {
+    transition: none;
+  }
+}
+
+/* Forced colours: the bar keeps an edge and the chevron the text colour. */
+@media (forced-colors: active) {
+  .tlink__address {
+    outline: 1px solid CanvasText;
+  }
+
+  .tlink__select::after {
+    border-color: CanvasText;
   }
 }

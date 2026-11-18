@@ -63,3 +63,36 @@ test.describe("One self-running motion on screen at a time", () => {
     expect([...seen]).toEqual([]);
   });
 });
+
+// Threshold's working link (#462): a choice rewrites the link at once, the changed part arriving in 200 ms on a wash of
+// Threshold's colour; with reduced motion it simply changes.
+test.describe("Threshold's link rewrites itself", () => {
+  const changedPart = (page: Page) => page.locator("section#how-its-built .tlink__part[data-new]");
+  const animations = (page: Page) =>
+    changedPart(page).evaluate((part) =>
+      part
+        .getAnimations()
+        .map((animation) => `${(animation as CSSAnimation).animationName} ${animation.effect?.getComputedTiming().duration}`)
+        .sort(),
+    );
+  const choosePlace = async (page: Page) => {
+    await page.goto("/things-i-make/threshold");
+    const figure = page.locator("section#how-its-built .working-fig");
+    await figure.scrollIntoViewIfNeeded();
+    await expect(figure.locator(".tlink[data-live]")).toHaveCount(1);
+    await figure.getByLabel("Place", { exact: true }).selectOption("studio");
+    await expect(changedPart(page)).toHaveText("studio");
+  };
+
+  test("with motion, the changed part arrives in 200 ms and its wash fades over 1.2 s", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await choosePlace(page);
+    await expect.poll(() => animations(page)).toEqual(["tlink-arrive 200", "tlink-wash 1200"]);
+  });
+
+  test("with reduced motion, the link changes and nothing moves", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await choosePlace(page);
+    expect(await animations(page)).toEqual([]);
+  });
+});
