@@ -1047,19 +1047,21 @@
   white-space: nowrap;
 }
 
-.tlink__part[data-new] {
+/* What a choice or an event just changed, in any working figure: it arrives in 200 ms on a wash of the project's colour. */
+.working-fig [data-new] {
+  border-radius: 4px;
   animation:
-    tlink-arrive 0.2s var(--out),
-    tlink-wash 1.2s var(--out);
+    working-arrive 0.2s var(--out),
+    working-wash 1.2s var(--out);
 }
 
-@keyframes tlink-arrive {
+@keyframes working-arrive {
   from {
     opacity: 0;
   }
 }
 
-@keyframes tlink-wash {
+@keyframes working-wash {
   from {
     background: color-mix(in srgb, var(--project) 38%, transparent);
   }
@@ -1103,7 +1105,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tlink__part[data-new] {
+  .working-fig [data-new] {
     animation: none;
   }
 }
@@ -1116,5 +1118,154 @@
 
   .tlink__select::after {
     border-color: CanvasText;
+  }
+}
+
+/*
+ * Argus Risk's numbers with their history (#463; site/argus-provenance.tsx): each position's P&L a disclosure that opens
+ * on the price tick it came from and that price's age, and New event beneath. Lines are hairlines, as a row's are.
+ */
+.argus__label {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: var(--type-label);
+  font-weight: 500;
+  text-align: right;
+}
+
+.argus__rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.argus__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 16px;
+  border-top: 1px solid var(--hair);
+}
+
+.argus__row:last-child {
+  border-bottom: 1px solid var(--hair);
+}
+
+.argus__symbol {
+  font-size: var(--type-ui);
+  font-weight: 600;
+}
+
+.argus__value {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 4px 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  font: 500 var(--type-lead) / 1 var(--serif);
+  font-variant-numeric: tabular-nums lining-nums;
+  cursor: pointer;
+  transition: background-color 0.15s var(--out);
+}
+
+/* Held still while the island loads: drawn as it will work, never greyed. */
+.argus__value:disabled {
+  color: var(--ink);
+  cursor: default;
+}
+
+.argus__value:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 3px;
+}
+
+/* Points down closed and up open. */
+.argus__chevron {
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.2s var(--out);
+}
+
+.argus__value[aria-expanded="true"] .argus__chevron {
+  transform: translateY(2px) rotate(225deg);
+}
+
+.argus__source {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 24px;
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--page);
+  font-size: var(--type-small);
+}
+
+.argus__source[hidden] {
+  display: none;
+}
+
+.argus__source dt {
+  color: var(--muted);
+  font-size: var(--type-label);
+  font-weight: 500;
+}
+
+.argus__source dd {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 4px 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A new price's wash sits behind its words, not the whole line. */
+.argus__source dd > span {
+  width: fit-content;
+}
+
+.argus__source div:last-child dd {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.argus__stale {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--project);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.argus__foot {
+  margin-top: 20px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .argus__value[aria-expanded="false"]:enabled:hover {
+    background: var(--tint);
+  }
+}
+
+@media (max-width: 479.98px) {
+  .argus__source {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .argus__value,
+  .argus__chevron {
+    transition: none;
   }
 }
