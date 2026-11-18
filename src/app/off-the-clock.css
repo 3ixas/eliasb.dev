@@ -169,6 +169,7 @@
 
 .otc__cell {
   display: grid;
+  min-width: 0;
   grid-row: span 2;
   grid-template-rows: subgrid;
 }
@@ -190,8 +191,10 @@
   width: min(100%, 220px);
 }
 
+/* A long title wraps inside its column: grid items would otherwise keep a long word's width. */
 .otc__media-text {
   grid-row: 2;
+  min-width: 0;
 }
 
 .otc__media-text h4 {
@@ -268,6 +271,8 @@
   object-fit: cover;
   filter: blur(30px) saturate(1.6);
   opacity: 0.95;
+  /* The glow blooms up and out but never below the screen, so it never lies under the film's words. */
+  clip-path: inset(-80px -80px 0 -80px);
 }
 
 /* The glass catches the light across its top-left. */
