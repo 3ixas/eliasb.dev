@@ -71,13 +71,21 @@ test.describe("Off the clock: on the homepage", () => {
     }
   });
 
-  test("without script the panel is whole: the week, the cells, the first oddity and the year", async ({ page }) => {
-    await page.route("**/*.js", (route) => route.abort());
-    await page.reload();
-    const panel = page.locator("#off-the-clock .otc");
+  test("without script the panel is whole: the week's rows with every session, the cells, the first oddity and the year", async ({ browser, page, baseURL }) => {
+    const bare = await browser.newContext({ javaScriptEnabled: false, viewport: page.viewportSize()!, baseURL });
+    const plain = await bare.newPage();
+    await plain.goto("/");
+    const panel = plain.locator("#off-the-clock .otc");
     await expect(cell(panel, "training").getByRole("list", { name: offTheClock.training.week })).toBeVisible();
+    // Today is not known without script, so the week keeps its rows at every width: each day's session is there to read.
+    for (const [index, day] of days.entries()) {
+      const session = cell(panel, "training").locator(".otc__week-session").nth(index);
+      await expect(session).toHaveText(day.session);
+      expect((await boxOf(session)).width).toBeGreaterThan(20);
+    }
     await expect(cell(panel, "history").locator("p[aria-live]")).not.toBeEmpty();
     expect(await bands(panel)).toEqual(sections);
+    await bare.close();
   });
 });
 
@@ -423,7 +431,7 @@ test.describe("Off the clock: contrast, sizes and layout", () => {
     expect(Math.round(book.y)).toBe(Math.round(film.y));
   });
 
-  test("the week: a strip of seven letters on a phone, seven rows of day and session from 960 px; read the same at both", async ({ page }) => {
+  test("the week: with script, a strip of seven letters on a phone and seven rows of day and session from 960 px; read the same at both", async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
     const training = cell(fixture(page, "training-saturday"), "training");
     const [today, week] = await Promise.all([boxOf(training.locator(".otc__today")), boxOf(training.locator(".otc__week"))]);

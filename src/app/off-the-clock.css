@@ -76,37 +76,85 @@
   visibility: hidden;
 }
 
-/* On a phone the week is a quiet strip: a letter a day over a short rule, today's letter and rule in ink. */
+/*
+ * The week is its rows: each day and its session, today in ink with a dot. On a phone, once the page has script (the
+ * boot script marks it before first paint, so nothing changes once seen), the rows become a quiet strip: a letter a day
+ * over a short rule, today's in ink, each day and its session still read (sr-only, training-today.tsx). Without script
+ * a phone keeps the rows, so the week is still there to read while today's line is blank.
+ */
 .otc__week {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  column-gap: 4px;
-  margin-top: 18px;
+  grid-template-columns: minmax(0, 1fr);
+  margin-top: 22px;
   color: var(--muted);
-  font-size: var(--type-label);
-  font-weight: 600;
+  font-size: var(--type-ui);
 }
 
 .otc__week li {
   display: grid;
-  justify-items: center;
-  gap: 6px;
+  grid-template-columns: 7.5em minmax(0, 1fr);
+  padding: 9px 0;
+  border-top: 1px solid var(--hair);
 }
 
-.otc__week li::after {
-  content: "";
-  width: 100%;
-  height: 3px;
-  border-radius: 2px;
-  background: var(--hair);
+.otc__week li:last-child {
+  border-bottom: 1px solid var(--hair);
+}
+
+.otc__week-letter {
+  display: none;
+}
+
+.otc__week-day {
+  font-weight: 600;
 }
 
 .otc__week li[data-today] {
   color: var(--ink);
 }
 
-.otc__week li[data-today]::after {
-  background: var(--ink);
+.otc__week li[data-today] .otc__week-day::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin: 0 8px 1px -15px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+@media (max-width: 959.98px) {
+  :root[data-script] .otc__week {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    column-gap: 4px;
+    margin-top: 18px;
+    font-size: var(--type-label);
+    font-weight: 600;
+  }
+
+  :root[data-script] .otc__week li {
+    grid-template-columns: none;
+    justify-items: center;
+    gap: 6px;
+    padding: 0;
+    border: 0;
+  }
+
+  :root[data-script] .otc__week-letter {
+    display: block;
+  }
+
+  :root[data-script] .otc__week li::after {
+    content: "";
+    width: 100%;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--hair);
+  }
+
+  :root[data-script] .otc__week li[data-today]::after {
+    background: var(--ink);
+  }
 }
 
 /* ---- The book and the film as objects on one shelf line ---- */
@@ -357,43 +405,6 @@
     font-size: 26px;
   }
 
-  .otc__week {
-    grid-template-columns: minmax(0, 1fr);
-    margin-top: 22px;
-    font-size: var(--type-ui);
-    font-weight: 400;
-  }
-
-  .otc__week li {
-    grid-template-columns: 7.5em minmax(0, 1fr);
-    justify-items: start;
-    padding: 9px 0;
-    border-top: 1px solid var(--hair);
-  }
-
-  .otc__week li:last-child {
-    border-bottom: 1px solid var(--hair);
-  }
-
-  .otc__week li::after,
-  .otc__week-letter {
-    display: none;
-  }
-
-  .otc__week-day {
-    font-weight: 600;
-  }
-
-  .otc__week li[data-today] .otc__week-day::before {
-    content: "";
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    margin: 0 8px 1px -15px;
-    border-radius: 50%;
-    background: currentColor;
-  }
-
   .otc__history {
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     column-gap: 56px;
@@ -576,12 +587,12 @@
   }
 
   /* The strip keeps its rules in GrayText; today keeps its mark, the strip's rule and the row's dot, in the highlight. */
-  .otc__week li::after {
+  :root[data-script] .otc__week li::after {
     forced-color-adjust: none;
     background: GrayText;
   }
 
-  .otc__week li[data-today]::after,
+  :root[data-script] .otc__week li[data-today]::after,
   .otc__week li[data-today] .otc__week-day::before {
     forced-color-adjust: none;
     background: Highlight;
