@@ -289,7 +289,8 @@
   display: grid;
   grid-template-columns: 4fr 8fr;
   gap: 24px;
-  padding: 64px 0;
+  /* Half the section space above and below its hairline, so sections sit as far apart as the homepage's. */
+  padding: calc(var(--section-space) / 2) 0;
   border-top: 1px solid var(--hair);
   scroll-margin-top: 24px;
 }
@@ -310,13 +311,13 @@
   text-wrap: balance;
 }
 
-/* The text keeps its 760 px measure; a figure takes the text side's whole width (#461). */
+/* The text keeps prose's measure; a figure takes the text side's whole width (#461). */
 .story-section__body {
   min-width: 0;
 }
 
 .story-section__body > :not(.story-fig, .working-fig, .working-fig__still) {
-  max-width: 760px;
+  max-width: var(--measure);
 }
 
 /*
@@ -793,7 +794,6 @@
   .story-section {
     grid-template-columns: minmax(0, 1fr);
     gap: 20px;
-    padding: 44px 0;
   }
 
   .story-fig__panel {

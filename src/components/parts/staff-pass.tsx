@@ -22,6 +22,9 @@ export function StaffPass({ slug, href, lead = false, drop = 1, priority = false
   return <PassCard id={slug} name={passName(slug)} record={passRecords[slug]} hang={passHang[slug]} role={role} dates={dates} panel={panel} href={href} lead={lead} drop={drop} priority={priority} />;
 }
 
+/** A date range may wrap only after its dash, so a month never parts from its year ("Aug 2024 –" over "Jun 2025"). */
+const unbrokenEnds = (dates: string) => dates.replace(/ (?=\d)/g, "\u00a0").replace(" –", "\u00a0–");
+
 type PassCardProps = {
   /** Names the clip's gradient, so two passes on a page do not share one. */
   id: string;
@@ -76,7 +79,7 @@ export function PassCard({ id, name, record, hang, role, dates, panel, href, lea
         <span className="pass__who">
           <b>Elias Bennett</b>
           <span>{role}</span>
-          <span>{dates}</span>
+          <span>{unbrokenEnds(dates)}</span>
         </span>
         <span className="pass__foot">
           <span className="pass__status">

@@ -45,8 +45,8 @@ test.describe("The 404", () => {
     expect(time.x + time.width).toBeLessThanOrEqual(eclipse.x);
     const linksShown = await page.locator(".site-header__links").evaluate((element) => getComputedStyle(element).opacity === "1");
     if (linksShown) expect(time.x + time.width).toBeLessThanOrEqual(nav.x);
-    // The theme control is the header's last item, at the page's right gutter.
-    expect(Math.abs(eclipse.x + eclipse.width - (header.x + header.width - 32))).toBeLessThanOrEqual(1);
+    // The theme control is the header's last item, at the page's right gutter (48 px from 1024 px, #493).
+    expect(Math.abs(eclipse.x + eclipse.width - (header.x + header.width - 48))).toBeLessThanOrEqual(1);
   });
 
   test("the missing line shows the address asked for, struck through, with Not on file and 404 in cobalt, and is not a link", async ({ page }) => {

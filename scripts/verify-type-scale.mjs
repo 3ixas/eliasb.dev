@@ -29,10 +29,11 @@ if (typeTokens.size < 12) problems.push(`tokens.css defines ${typeTokens.size} -
 
 /**
  * A staff pass is drawn in em of its card's width ÷ 14.5 (pass.css), so it prints the same at any card width. Its em is
- * the card's width ÷ 14.5 (at least 17 px, as the smallest card is 248 px), its sizes are 1 em or more, and its small
- * print is floored at the 13 px floor. Only pass.css may size text this way.
+ * the card's width ÷ 14.5 (at least 14.6 px, as the smallest card is the opening's 212 px), its sizes are 1 em or more,
+ * its small print is floored at the 13 px floor, and the band's name at 24 px, so it stays large text. Only pass.css may
+ * size text this way.
  */
-const passSize = /^(calc\(var\(--card\) \/ 14\.5\)|1(\.\d+)?em|max\(13px, 0\.\d+em\))$/;
+const passSize = /^(calc\(var\(--card\) \/ 14\.5\)|1(\.\d+)?em|max\(13px, 0\.\d+em\)|max\(24px, 1\.\d+em\))$/;
 
 for (const file of readdirSync(dir).filter((name) => name.endsWith(".css"))) {
   readFileSync(new URL(file, dir), "utf8").split("\n").forEach((line, index) => {

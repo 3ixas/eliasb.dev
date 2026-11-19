@@ -2,7 +2,7 @@
  * The homepage's opening (docs/design/DESIGN.md "The homepage, in order" 2, R-11; components/site/opening.tsx): the
  * opening line and its supporting line at the left, the three staff passes hanging from the header's rule at the
  * right. One screen tall, so nothing of Work shows before a scroll. Under 1260 px the text is above the passes, which
- * hang from a hairline; under 900 px the passes scroll sideways, BNP Paribas first.
+ * hang from a hairline; under 900 px the passes scroll sideways when they do not fit, BNP Paribas first.
  */
 
 .opening {
@@ -59,6 +59,15 @@
   clip-path: inset(0 -100vw -320px -100vw);
 }
 
+/* The passes hang at about 85% of their size elsewhere, so the opening keeps its calm (#493). */
+.opening__rail .pass {
+  --card: 212px;
+}
+
+.opening__rail .pass--lead {
+  --card: 224px;
+}
+
 @media (max-width: 1259.98px) {
   .opening {
     grid-template-columns: minmax(0, 1fr);
@@ -85,12 +94,12 @@
   }
 }
 
-/* The rail scrolls sideways inside itself, edge to edge, BNP Paribas first. */
+/* The rail scrolls sideways inside itself, edge to edge, BNP Paribas first, when the passes are wider than the window; when they fit, they stay centred. */
 @media (max-width: 899.98px) {
   .opening__rail {
-    justify-content: flex-start;
-    margin-inline: -32px;
-    padding-inline: 32px;
+    justify-content: safe center;
+    margin-inline: calc(-1 * var(--gutter));
+    padding-inline: var(--gutter);
     overflow-x: auto;
     overscroll-behavior-x: contain;
     scrollbar-width: none;
