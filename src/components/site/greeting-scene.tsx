@@ -1,55 +1,52 @@
 import type { GreetingKey } from "@/content/stretch/greeting";
 
 /**
- * The greeting's small scene, drawn for 30 × 22 px, one object for each line: a terminal prompt for "Hello", a kettle
- * for the morning, a clock a few minutes short of five for the afternoon, a desk lamp for the evening and the moon
- * and stars for late. Each is at rest in the markup, finished; shell.css plays it (steam curls, the minute
- * hand ticks up, the lamp's pool fades in, the cursor blinks, the moon rocks) on load, and on hover or focus.
- * The bulb, the lamp's pool and the clock's pivot are the only amber on the site (--sun); everything else takes
- * the greeting's own colour, and the prompt's cursor is cobalt.
+ * The greeting's small scene, one object for each line, drawn in a 30 × 22 box with one line weight and only as much
+ * detail as reads at that size (#467): a terminal prompt for "Hello", a kettle for the morning, a clock a few minutes
+ * short of five for the afternoon, a table lamp for the evening, and the moon with two stars for late. Each is at rest
+ * in the markup, finished; shell.css plays its one arrival (the cursor blinks, steam rises, the minute hand ticks up,
+ * the lamp's light comes on, the moon rocks as the stars come out) on load, and on hover or focus. The bulb, its
+ * light and the clock's pivot are the only amber on the site (--sun); everything else takes the greeting's own
+ * colour, and the prompt's cursor is cobalt.
  */
 export function GreetingScene({ period }: { period: GreetingKey }) {
   return (
     <svg className="scene" viewBox="0 0 30 22" aria-hidden="true" focusable="false">
       {period === "hello" && (
         <>
-          <path className="scene__ink" d="M5.5 5.8 12 11 5.5 16.2" />
-          <path className="scene__cursor" d="M15 17.2h9.5" />
+          <path className="scene__ink" d="M7 6.5 12 11l-5 4.5" />
+          <path className="scene__cursor" d="M15 16h8" />
         </>
       )}
       {period === "morning" && (
         <>
-          <path className="scene__horizon" d="M0 20.5h30" />
-          <path className="scene__ink" d="M8.5 20.5h10.5v-6.5q0-3.6-5.2-3.6T8.5 14z" />
-          <path className="scene__ink" d="M8.5 15 4.5 12M19 13q4.5 0 4.5 3.6T19 20" />
-          <circle className="scene__dot" cx="13.8" cy="8.6" r="1.1" />
-          <path className="scene__steam" pathLength={1} d="M3.6 9c-1.2-1.2 1.2-2.4 0-4" />
+          <path className="scene__ink" d="M7.5 19.5h15l-2-7.4a3 3 0 0 0-2.9-2.2h-5.2a3 3 0 0 0-2.9 2.2z" />
+          <path className="scene__ink" d="M8.6 15.4 4.2 10" />
+          <path className="scene__ink" d="M11 9.9q4-6.4 8 0" />
+          <path className="scene__steam" pathLength={1} d="M3.4 7.4c-1-1 1-2 0-3.6" />
         </>
       )}
       {period === "afternoon" && (
         <>
-          <circle className="scene__ink" cx="15" cy="11" r="8" />
-          <path className="scene__tick" d="M15 4v1.4M15 16.6V18M8 11h1.4M20.6 11H22" />
-          <path className="scene__ink" d="M15 11l2.3 3.2" />
-          <path className="scene__ink scene__minute" d="M15 11 11.7 5.3" />
-          <circle className="scene__lit" cx="15" cy="11" r="1.1" />
+          <circle className="scene__ink" cx="15" cy="11" r="8.5" />
+          <path className="scene__ink" d="M15 11l2.9 2.4" />
+          <path className="scene__ink scene__minute" d="M15 11 12.7 5.9" />
+          <circle className="scene__lit" cx="15" cy="11" r="1.3" />
         </>
       )}
       {period === "evening" && (
         <>
-          <path className="scene__horizon" d="M0 20.5h30" />
-          <path className="scene__pool" d="M9.2 11 2.5 20.5H17z" />
-          <path className="scene__ink" d="M11 20.5h9M15.5 20.5V13.5L9.6 8.4" />
-          <path className="scene__ink" d="M6.4 4.4 12.4 8.2 9.6 12.2 3.8 8.4z" />
-          <circle className="scene__lit" cx="9.2" cy="9.4" r="1.9" />
+          <path className="scene__pool" d="M8.4 11.2h13.2L24.5 20h-19z" />
+          <path className="scene__ink" d="M11.2 3.5h7.6l2.8 7.7H8.4z" />
+          <path className="scene__ink" d="M15 11.2v7.3M11.5 19h7" />
+          <circle className="scene__lit" cx="15" cy="12.4" r="1.5" />
         </>
       )}
       {period === "late" && (
         <>
-          <path className="scene__moon" d="M17 3.5a7.5 7.5 0 1 0 6.5 11.2A6 6 0 0 1 17 3.5Z" />
-          <circle className="scene__star" cx="4" cy="5" r="1.2" />
-          <circle className="scene__star" cx="27" cy="3" r="1" />
-          <circle className="scene__star" cx="26" cy="17" r="1.1" />
+          <path className="scene__ink scene__moon" d="M16.5 3.2a8 8 0 1 0 7.6 11.6 6.6 6.6 0 0 1-7.6-11.6Z" />
+          <path className="scene__star" d="M5 3.4v4M3 5.4h4" />
+          <path className="scene__star" d="M26 2.5v3M24.5 4h3" />
         </>
       )}
     </svg>

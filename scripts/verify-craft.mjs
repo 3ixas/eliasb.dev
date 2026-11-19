@@ -30,7 +30,6 @@ const motionTransitions = [
   ['.greeting__more', 'the greeting folds open'],
   ['.site-header__links', 'the links step aside for London\'s time'],
   ['.scene__moon', 'the late scene arrives'],
-  ['.scene__star', 'the late scene arrives'],
   ['.eclipse__', 'the Eclipse flips the theme'],
   ['.pass', 'a staff pass leans on hover (DESIGN.md "Motion")'],
   ['.pass__sheen', 'a staff pass catches the light'],
