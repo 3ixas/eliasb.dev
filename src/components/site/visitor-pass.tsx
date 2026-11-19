@@ -18,12 +18,30 @@ function decoded(path: string) {
   }
 }
 
-/** The address shortened in the middle to the pass's text limit, counting code points so an emoji at a cut is never split. */
+/** East Asian wide and full-width characters and emoji take about an em: twice a Latin letter's width. */
+const wide = /[\p{Extended_Pictographic}\u1100-\u115F\u2E80-\uA4CF\uAC00-\uD7A3\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFF60\uFFE0-\uFFE6\u{20000}-\u{3FFFD}]/u;
+const units = (character: string) => (wide.test(character) ? 2 : 1);
+
+/** The characters from one end of `characters` that fit in `budget` units, never splitting a code point. */
+function fit(characters: string[], budget: number) {
+  const kept: string[] = [];
+  for (const character of characters) {
+    budget -= units(character);
+    if (budget < 0) break;
+    kept.push(character);
+  }
+  return kept;
+}
+
+/**
+ * The address shortened in the middle to the pass's text limit, counted in units of a Latin letter's width (a wide
+ * character is two), so both its ends always fit the pass's three lines. Counting code points keeps an emoji whole.
+ */
 export function shortened(address: string) {
   const characters = Array.from(address);
-  if (characters.length <= TEXT_LIMITS.passName) return address;
+  if (characters.reduce((total, character) => total + units(character), 0) <= TEXT_LIMITS.passName) return address;
   const half = Math.floor((TEXT_LIMITS.passName - 1) / 2);
-  return `${characters.slice(0, half).join("")}…${characters.slice(-half).join("")}`;
+  return `${fit(characters, half).join("")}…${fit([...characters].reverse(), half).reverse().join("")}`;
 }
 
 /**

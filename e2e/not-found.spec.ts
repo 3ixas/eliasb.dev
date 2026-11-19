@@ -121,12 +121,25 @@ test.describe("The 404", () => {
     await context.close();
   });
 
-  test("shortening never splits an emoji at the cut", async ({ page }) => {
+  test("shortening never splits an emoji at the cut, and counts it as two letters' width", async ({ page }) => {
     const half = Math.floor((TEXT_LIMITS.passName - 1) / 2);
-    // The character at the cut is an emoji: two UTF-16 units that must stay together.
-    const address = `/${"a".repeat(half - 2)}😀${"b".repeat(60)}`;
+    // Twelve letters and the slash, then an emoji at the cut: two UTF-16 units that must stay together.
+    const address = `/${"a".repeat(half - 3)}😀${"b".repeat(60)}`;
     await page.goto(encodeURI(address));
-    await expect(page.locator(".pass__address")).toHaveText(`/${"a".repeat(half - 2)}😀…${"b".repeat(half)}`);
+    await expect(page.locator(".pass__address")).toHaveText(`/${"a".repeat(half - 3)}😀…${"b".repeat(half)}`);
+  });
+
+  test("a wide-character address keeps both its ends within three lines", async ({ page }) => {
+    const address = `/${"東京の地図".repeat(7)}末`;
+    await page.goto(encodeURI(address));
+    const shown = page.locator(".pass__address");
+    await expect(shown).toHaveText(/^\/東京の地図東京…図東京の地図末$/);
+    const fit = await shown.evaluate((element) => ({
+      lines: Math.round(element.scrollHeight / Number.parseFloat(getComputedStyle(element).lineHeight)),
+      cut: element.scrollHeight > element.clientHeight + 1,
+    }));
+    expect(fit.lines).toBeLessThanOrEqual(3);
+    expect(fit.cut).toBe(false);
   });
 
   test("says what to try: the five homepage sections as rows, in the page's order, with the copy deck's lines", async ({ page }) => {
