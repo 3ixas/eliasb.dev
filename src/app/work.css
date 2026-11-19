@@ -295,6 +295,55 @@
     margin-top: 36px;
   }
 
+  /*
+   * On a phone each panel carries its employer's pass (#493), hanging from the panel's top edge, and the pass prints the
+   * name, role and dates, so the panel's own header stays for assistive technology only.
+   */
+  .work__pass {
+    display: flex;
+    justify-content: center;
+    margin: -26px 0 32px;
+  }
+
+  .work__pass .pass {
+    --drop: 56px;
+  }
+
+  .work .panel__head {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .work .work-bnp {
+    grid-template:
+      "pass" auto
+      "head" auto
+      "figure" auto
+      "comparisons" auto
+      "story" auto
+      / minmax(0, 1fr);
+  }
+
+  .work-bnp > .work__pass {
+    grid-area: pass;
+  }
+
+  .work-bnp__figure,
+  .work-role__figure {
+    padding-top: 0;
+    margin-top: 0;
+  }
+}
+
+/* From 720 px the passes hang in the opening, so the panels carry none. */
+@media (min-width: 720px) {
+  .work__pass {
+    display: none;
+  }
 }
 
 /* Under 440 px of its own the label and value share a line above the bars, which take the full width. */

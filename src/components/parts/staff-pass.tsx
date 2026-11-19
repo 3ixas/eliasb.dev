@@ -12,7 +12,7 @@ const portrait = { src: "/profile/elias-evening-pass.webp", width: 352, height: 
 /**
  * A staff pass (DESIGN.md "The staff pass", R-12): a printed CR80 card hanging from a two-ply lanyard by a metal clip
  * whose legs pass through the slot. Top to bottom it prints the employer's band, the portrait with the name, role and
- * dates, three points and the status with a barcode. The current pass is in colour with a hologram; a returned one is
+ * dates and the status with a barcode: who and when, never results, which Work draws (#493). The current pass is in colour with a hologram; a returned one is
  * greyscale. It keeps its printed colours in both themes. The drawing is hidden from assistive technology; the pass's
  * name is its print. With `href` it is a link (the homepage's, to its employer in Work); without, it is an image (a Role
  * story's own pass, which has nowhere further to go). Sizes inside are in em of the card's width ÷ 14.5 (pass.css).
@@ -39,7 +39,7 @@ type PassCardProps = {
 
 /** The pass from the values it prints, so a fixture can print any values through the same markup. */
 export function PassCard({ id, name, record, hang, role, dates, panel, href, lead = false, drop = 1, priority = false }: PassCardProps) {
-  const { short, points, lanyard } = record;
+  const { short, lanyard } = record;
   const { state, tilt } = hang;
   const slug = id;
   const style = { "--field": panel.field, "--band-ink": panel.ink, "--lanyard": lanyard, "--tilt": `${tilt}deg`, "--drop-by": drop } as CSSProperties;
@@ -77,14 +77,6 @@ export function PassCard({ id, name, record, hang, role, dates, panel, href, lea
           <b>Elias Bennett</b>
           <span>{role}</span>
           <span>{dates}</span>
-        </span>
-        <span className="pass__points">
-          {points.map(({ lead: point, detail }) => (
-            <span key={point}>
-              <b>{point}</b>
-              <span>{detail}</span>
-            </span>
-          ))}
         </span>
         <span className="pass__foot">
           <span className="pass__status">

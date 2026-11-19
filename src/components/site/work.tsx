@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MeasurePair, MeasureSide } from "@/components/parts/measure";
 import { OnView, Count } from "@/components/parts/on-view";
 import { Arrow, Panel, PanelHead } from "@/components/parts/panel";
+import { StaffPass } from "@/components/parts/staff-pass";
 import { roleStories } from "@/content/stretch/role-stories";
 import type { RoleStorySlug } from "@/content/stretch/role-story";
 import { passRecords } from "@/content/stretch/staff-pass";
@@ -11,6 +12,18 @@ import { comparisonRow, displayFigure, workPanels, type Pair, type RolePanel } f
 function Head({ slug }: { slug: RoleStorySlug }) {
   const { role, dates } = roleStories[slug];
   return <PanelHead name={passRecords[slug].short} meta={[role, dates]} />;
+}
+
+/**
+ * The employer's pass, hanging in its panel on a phone only (#493): there the opening is its words, and the pass prints
+ * the panel's name, role and dates. Hidden from assistive technology, since the panel's header says the same.
+ */
+function PanelPass({ slug }: { slug: RoleStorySlug }) {
+  return (
+    <div className="work__pass" aria-hidden="true">
+      <StaffPass slug={slug} lead={slug === "bnp-paribas"} />
+    </div>
+  );
 }
 
 /** "The Optegra story →", a pill on the employer's own panel. */
@@ -33,6 +46,7 @@ function BnpPanel() {
   return (
     <OnView motion="rise">
       <Panel id={slug} colours={story.panel} className="work-bnp">
+        <PanelPass slug={slug} />
         <Head slug={slug} />
         <p className="work-bnp__figure">
           <span className="figure__words">{figure.value}</span>
@@ -84,6 +98,7 @@ function RolePanelView({ panel }: { panel: RolePanel }) {
   return (
     <OnView motion="rise" className="work-role__arrival">
       <Panel id={panel.slug} colours={story.panel} className="work-role">
+        <PanelPass slug={panel.slug} />
         <Head slug={panel.slug} />
         <p className="work-role__figure">
           <span className="figure__value"><Count value={value} from={panel.figure.from} /></span>

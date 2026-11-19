@@ -9,7 +9,7 @@ import type { RoleStorySlug } from "./role-story.ts";
 import { passHang, passRecords, passStatus } from "./staff-pass.ts";
 
 export function passName(slug: RoleStorySlug) {
-  const { short, points } = passRecords[slug];
+  const { short } = passRecords[slug];
   const { role, dates } = roleStories[slug];
-  return [short, `Elias Bennett, ${role}, ${dates}`, ...points.map(({ lead, detail }) => `${lead}, ${detail}`), passStatus(passHang[slug].state)].join(". ") + ".";
+  return [short, `Elias Bennett, ${role}, ${dates}`, passStatus(passHang[slug].state)].join(". ") + ".";
 }

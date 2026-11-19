@@ -8,6 +8,8 @@
 
 .pass {
   --card: 248px;
+  /* Who and when: the band, the portrait with the name, role and dates, and the foot (#493). */
+  --card-height: 14.5em;
   --drop: calc(clamp(140px, 25svh, 232px) * var(--drop-by, 1));
   position: relative;
   display: block;
@@ -112,7 +114,7 @@
 .pass__card {
   position: relative;
   display: block;
-  height: 23em;
+  height: var(--card-height);
   overflow: hidden;
   border-radius: 0.8em;
   color: #141416;
@@ -207,7 +209,6 @@
 }
 
 .pass__who span,
-.pass__points span span,
 .pass__status {
   font-size: max(13px, 0.76em);
 }
@@ -216,39 +217,8 @@
   line-height: 1.22;
 }
 
-.pass__who span:last-child,
-.pass__points span span {
+.pass__who span:last-child {
   color: #5c5b56;
-}
-
-/* Three points, each a serif lead over a sans detail, ruled apart. */
-.pass__points {
-  position: absolute;
-  left: 1.15em;
-  right: 1.15em;
-  top: 11.6em;
-  display: grid;
-  border-top: 1px solid #dddcd6;
-}
-
-.pass__points > span {
-  display: grid;
-  padding: 0.42em 0 0.44em;
-  border-bottom: 1px solid #e7e6e0;
-}
-
-.pass__points b {
-  font-family: var(--serif);
-  font-optical-sizing: auto;
-  font-size: 1em;
-  font-weight: 500;
-  line-height: 1.18;
-  letter-spacing: -0.01em;
-  font-variant-numeric: lining-nums tabular-nums;
-}
-
-.pass__points span span {
-  line-height: 1.25;
 }
 
 .pass__foot {
@@ -386,7 +356,7 @@
   content: "";
   position: absolute;
   inset: auto 0 0;
-  height: 23em;
+  height: var(--card-height);
   border-radius: 0.8em;
   outline: 2px solid var(--cobalt);
   outline-offset: 3px;

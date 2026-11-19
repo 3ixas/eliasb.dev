@@ -94,18 +94,6 @@ function paint(card: HTMLElement, returned: boolean): Print {
     context.stroke();
   }
 
-  // The rules between the points: each element's top and bottom borders.
-  for (const element of card.querySelectorAll<HTMLElement>(".pass__points, .pass__points > span")) {
-    const rect = at(element.getBoundingClientRect());
-    const computed = getComputedStyle(element);
-    for (const [side, y] of [["Top", rect.y], ["Bottom", rect.y + rect.h]] as const) {
-      const width = parseFloat(computed[`border${side}Width`]);
-      if (!width) continue;
-      context.fillStyle = computed[`border${side}Color`];
-      context.fillRect(rect.x, side === "Top" ? y : y - width * s, rect.w, width * s);
-    }
-  }
-
   const holo = card.querySelector<HTMLElement>(".pass__holo");
   if (holo) {
     const { x, y, w } = at(holo.getBoundingClientRect());
