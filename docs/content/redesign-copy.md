@@ -22,7 +22,7 @@ Approved by Elias on 8 October 2026 for [#113](https://github.com/3ixas/eliasb.d
 - Title: Nothing here
 - Heading: This page doesn’t exist.
 - Line: It’s moved, or it never did. Everything else is where you left it.
-- Missing row: the address asked for (shortened in the middle at about 48 characters), struck through. Its line is Not on file and its metadata is 404.
+- Visitor pass ([#470](https://github.com/3ixas/eliasb.dev/issues/470)): its band says Visitor; it prints the address asked for (shortened in the middle at 32 characters), struck through. Its line is Not on file and its metadata is 404.
 - Section title: Try one of these
 - Section note: The homepage, a section at a time.
 

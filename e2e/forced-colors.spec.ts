@@ -56,4 +56,14 @@ test.describe("Forced colours", () => {
     const canvas = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
     expect(band).not.toBe(canvas);
   });
+
+  test("the 404's visitor pass keeps its card stock and print", async ({ page }) => {
+    await page.goto("/nothing-here");
+    const card = page.locator(".pass--visitor .pass__card");
+    await expect(card).toHaveCSS("forced-color-adjust", "none");
+    // The stock stays a drawn gradient, and the print keeps its own inks rather than the system's.
+    expect(await card.evaluate((element) => getComputedStyle(element).backgroundImage)).toContain("gradient");
+    await expect(card.locator(".pass__address")).toHaveCSS("color", "rgb(75, 74, 70)");
+    await expect(card.locator(".pass__silhouette")).toHaveCSS("fill", "rgb(185, 184, 177)");
+  });
 });

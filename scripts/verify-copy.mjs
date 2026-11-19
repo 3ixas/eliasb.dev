@@ -96,10 +96,11 @@ for (const text of built) assert.ok(plain.includes(text), `Built string is not i
 assert.equal(thingsIMake.note, "Products of my own, from a rental calculator to a risk simulator.");
 assert.equal(`${thingsIMake.allThings(projects.length)} →`, "Everything I’ve built (06) →");
 
-// The 404's missing row, section title and note are listed field by field, and each section's line is in the deck's table.
+// The 404's visitor pass, section title and note are listed field by field, and each section's line is in the deck's table.
 for (const line of [
   `- Section title: ${notFound.tryTitle}`,
   `- Section note: ${notFound.tryNote}`,
+  `its band says ${notFound.pass.band};`,
   `Its line is ${notFound.missing.line} and its metadata is ${notFound.missing.meta}.`,
 ]) assert.ok(raw.includes(line), `The 404 copy lacks the line "${line}"`);
 assert.deepEqual(

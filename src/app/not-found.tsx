@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Arrow } from "@/components/parts/panel";
 import { LongForm } from "@/components/site/long-form";
-import { MissingAddress } from "@/components/site/missing-address";
+import { VisitorPass } from "@/components/site/visitor-pass";
 import { pageTitle } from "@/content/site";
 import { notFound as copy, siteCopy } from "@/content/stretch/site-copy";
 
@@ -19,9 +19,9 @@ export const metadata: Metadata = {
 };
 
 /**
- * The 404 (docs/design/DESIGN.md "The 404", R-25): it says what didn't work, then what to try. The title and its line;
- * the address asked for, struck through, with "Not on file" and "404"; then "Try one of these" and the homepage's five
- * sections as rows with the copy deck's lines.
+ * The 404 (docs/design/DESIGN.md "The 404", R-25, #470): it says what didn't work, then what to try. The title and its
+ * line; a small, still visitor pass with the address asked for struck through and "Not on file", and "404" beside it;
+ * then "Try one of these" and the homepage's five sections as rows with the copy deck's lines.
  */
 export default function NotFound() {
   return (
@@ -31,13 +31,10 @@ export default function NotFound() {
           {copy.heading}
         </h1>
         <p className="page-head__note">{copy.line}</p>
-        <p className="missing" data-missing="">
-          <s>
-            <MissingAddress />
-          </s>
-          <span>{copy.missing.line}</span>
+        <div className="not-found__pass" data-missing="">
+          <VisitorPass />
           <b>{copy.missing.meta}</b>
-        </p>
+        </div>
         <section className="not-found__try" aria-labelledby="try-title">
           <h2 id="try-title" className="section__title">
             {copy.tryTitle}

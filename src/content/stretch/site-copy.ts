@@ -54,7 +54,8 @@ export const notFound = {
   title: "Nothing here",
   heading: "This page doesn’t exist.",
   line: "It’s moved, or it never did. Everything else is where you left it.",
-  /** The missing row: the address asked for is its title, struck through; these are its line and its metadata. */
+  /** The visitor pass (#470): its band, then the address asked for, struck through, and its status; "404" is printed beside it. */
+  pass: { band: "Visitor" },
   missing: { line: "Not on file", meta: "404" },
   /** The section title and note above the five homepage sections, and each section's line, by its anchor. */
   tryTitle: "Try one of these",
