@@ -341,6 +341,9 @@ test.describe("Off the clock: contrast, sizes and layout", () => {
       await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
       await page.goto("/fixtures/off-the-clock");
       await page.evaluate(() => document.fonts.ready);
+      // Hydration must finish in every panel before panels are removed: the page hydrates in pieces, and removing a panel
+      // first makes React rebuild the tree when it gets there, so every position measured before that is stale.
+      await page.waitForFunction(() => [...document.querySelectorAll(".otc__week, .otc__history")].every((element) => Object.keys(element).some((key) => key.startsWith("__react"))));
       // Measure the states that carry every kind of text: the cells, history's credit, a stale line and the year.
       await page.evaluate(() => document.querySelectorAll("[data-fixture]").forEach((element) => {
         if (!["history-live", "book-stale", "github", "fallback"].includes((element as HTMLElement).dataset.fixture!)) element.remove();

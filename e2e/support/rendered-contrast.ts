@@ -103,7 +103,14 @@ async function measureOnce(page: Page): Promise<ContrastReading[]> {
       range.selectNodeContents(node);
       // One reading per line: a run that wraps is measured where its words are, not across the box spanning both lines,
       // which takes in whatever sits beside it (a pen stroke under the phrase before it, say).
-      const lines = [...range.getClientRects()].filter((box) => box.width >= 4 && box.height >= 4 && box.bottom + scrollY > 0);
+      // A line an ancestor's overflow cuts away (a clamped description's later lines) is not seen, so it is not measured.
+      const clips = [] as DOMRect[];
+      for (let ancestor = element.parentElement as Element | null; ancestor; ancestor = ancestor.parentElement) {
+        const own = getComputedStyle(ancestor);
+        if (own.overflowX !== "visible" || own.overflowY !== "visible") clips.push(ancestor.getBoundingClientRect());
+      }
+      const seen = (box: DOMRect) => clips.every((clip) => box.top + box.height / 2 >= clip.top && box.top + box.height / 2 <= clip.bottom && box.left + box.width / 2 >= clip.left && box.left + box.width / 2 <= clip.right);
+      const lines = [...range.getClientRects()].filter((box) => box.width >= 4 && box.height >= 4 && box.bottom + scrollY > 0 && seen(box));
       if (lines.length === 0) continue;
       const style = getComputedStyle(element);
       const size = parseFloat(style.fontSize);
