@@ -26,6 +26,8 @@ export async function paintPrint(pass: HTMLElement): Promise<Print> {
   copy.style.animation = "none";
   copy.style.transition = "none";
   copy.style.opacity = "1";
+  // The copy hangs outside its rail, so it keeps the card width the rail gave it (the opening's are smaller, #493).
+  copy.style.setProperty("--card", getComputedStyle(pass).getPropertyValue("--card"));
   copy.removeAttribute("id");
   holder.append(copy);
   document.body.append(holder);
