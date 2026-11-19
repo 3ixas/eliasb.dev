@@ -148,7 +148,7 @@ One template: the page's own words at the top and "ELIAS BENNETT" at the foot, o
 
 ## Tokens
 
-Dark follows the device unless a visitor has chosen. Once script runs, the theme controller decides and a change crossfades.
+Dark follows the device unless a visitor has chosen. Once script runs, the theme controller decides: a press of the theme control pours the change from it, and any other change crossfades.
 
 | Token | Light | Dark | Role |
 |---|---|---|---|
@@ -192,7 +192,7 @@ Every text pair passes WCAG 2.2 AA, measured on the rendered page and on every p
 - **Comparisons** arrive once, in their own unit. A latency's bars fill in their real time, together and at a constant rate: 520 ms takes 520 ms and 230 ms takes 230 ms, so the faster one is felt finishing first. Working days arrive a square at a time (60 ms apart) and minutes a tick at a time from zero (14 ms apart), after following before by 300 ms. Other bars grow from the left, the after bar 300 ms behind the before. Arming is instant; only the arrival moves.
 - **The simulation** arrives once, walk by walk over 1.6 s ([#457](https://github.com/3ixas/eliasb.dev/issues/457)): each endpoint lands as a dot, sliding into its band, and "One price" appears with the first walk and follows the mean of the walks so far, so it wobbles and then settles as they add up; the featured three stand out last. It is drawn when it comes into view, never before first paint. After that it moves only when a control is pressed: each new run arrives the same way, and a control pressed mid-arrival starts the new run from an empty plot.
 - **Screenshots** in a project panel lift 10 px on hover.
-- **Theme changes** crossfade over 0.3 s.
+- **Theme changes** pour from the theme control when it is pressed ([#466](https://github.com/3ixas/eliasb.dev/issues/466)). Dark to light, the light page spreads out of the control over 600 ms, easing out; light to dark, it is drawn back into the control, gathering speed. Either way it reaches the farthest corner from the control's centre, its edge soft and glowing a little ahead of the fill, and the palette's own crossfade stays off. The control rides above the light and glows as it gives it out or takes it in; giving it out, the icon turns over at once, and taking it in, the sun holds until the light has gathered, then turns to the moon. The toolbar colour changes as the pour ends. A press mid-pour finishes the first change at once and pours back from the control. A device setting changing, or a press where the browser has no view transitions, crossfades over 0.3 s.
 - **Reduced motion** shows every end state at once: nothing swings, rises, rolls or draws, and theme changes are instant. Content never waits for motion.
 
 ## Craft bar

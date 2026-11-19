@@ -206,6 +206,8 @@ test.describe("Colour", () => {
   });
 
   test("a theme change crossfades the palette, the GitHub year and the sun with the page", async ({ page }) => {
+    // A press pours where the browser has view transitions (theme.spec); without them it crossfades, as a device change does.
+    await page.addInitScript(() => delete (Document.prototype as { startViewTransition?: unknown }).startViewTransition);
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
     // The homepage has no quiet column to wait on since #416: wait for the theme control itself to hydrate.

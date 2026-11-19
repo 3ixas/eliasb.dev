@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore } from "react";
-import { flipLights, readPreference, systemTheme, watchSystemTheme } from "@/components/site/theme";
+import { type MouseEvent, useEffect, useRef, useSyncExternalStore } from "react";
+import { pourLights, readPreference, systemTheme, watchSystemTheme } from "@/components/site/theme";
 import { siteCopy } from "@/content/stretch/site-copy";
 
 /** The page is dark when the visitor chose dark, or chose nothing and the device is dark. */
@@ -16,7 +16,7 @@ function subscribe(onChange: () => void) {
   return () => observer.disconnect();
 }
 
-/** The icon turns over as it is pressed: it starts turned back and small, and springs upright. */
+/** Where the theme crossfades instead of pouring, the icon turns over as it is pressed: it starts turned back and small, and springs upright. (A pour turns it in shell.css.) */
 const TURN_OVER = [{ transform: "rotate(-120deg) scale(0.6)" }, { transform: "none" }];
 const TURN_OVER_TIMING = { duration: 600, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" };
 
@@ -24,14 +24,15 @@ const TURN_OVER_TIMING = { duration: 600, easing: "cubic-bezier(0.34, 1.56, 0.64
  * The Eclipse, the header's theme control (DESIGN.md "Controls"): a 36 px round
  * icon button, named "Dark theme" and pressed while the dark theme is in force. Which icon shows comes from the theme in CSS, so
  * it is right from the first paint; the pressed state follows once script runs.
- * Pressing it also turns the whole icon over (not with reduced motion).
+ * Pressing it pours the light out of it or draws it back in (theme.ts), and turns the whole icon over (not with
+ * reduced motion).
  */
 export function EclipseToggle() {
   const dark = useSyncExternalStore(subscribe, darkIsOn, () => null);
   const icon = useRef<SVGSVGElement>(null);
 
-  function press() {
-    flipLights();
+  function press(event: MouseEvent<HTMLButtonElement>) {
+    if (pourLights(event.currentTarget)) return;
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) icon.current?.animate(TURN_OVER, TURN_OVER_TIMING);
   }
 

@@ -549,21 +549,35 @@ test.describe("The header greeting", () => {
 });
 
 test.describe("The Eclipse", () => {
-  test("turns the icon over when pressed, and not with reduced motion", async ({ page }) => {
+  test("turns the icon over as it pours the light, and not with reduced motion", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
     // The button's handler exists once it has hydrated, and aria-pressed appears with it.
     await expect(page.locator("[data-eclipse]")).toHaveAttribute("aria-pressed", /^(true|false)$/);
     const turning = () =>
-      page.evaluate(() => {
-        const icon = document.querySelector("[data-eclipse] svg")!;
-        icon.getAnimations().forEach((animation) => animation.cancel());
+      page.evaluate(async () => {
         document.querySelector<HTMLButtonElement>("[data-eclipse]")!.click();
-        return icon.getAnimations().length;
+        const turns = () => document.getAnimations().filter((animation) => /^eclipse-arrive/.test((animation as CSSAnimation).animationName));
+        for (let frame = 0; frame < 30 && turns().length === 0; frame++) await new Promise(requestAnimationFrame);
+        const count = turns().length;
+        for (const animation of document.getAnimations()) if ((animation.effect as KeyframeEffect).pseudoElement?.startsWith("::view-transition")) animation.finish();
+        return count;
       });
     expect(await turning()).toBe(1);
+    await expect(page.locator("html")).not.toHaveAttribute("data-pour");
     await page.emulateMedia({ reducedMotion: "reduce" });
     expect(await turning()).toBe(0);
+  });
+
+  test("without view transitions, turns the icon itself over when pressed", async ({ page }) => {
+    await page.addInitScript(() => delete (Document.prototype as { startViewTransition?: unknown }).startViewTransition);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/");
+    await expect(page.locator("[data-eclipse]")).toHaveAttribute("aria-pressed", /^(true|false)$/);
+    expect(await page.evaluate(() => {
+      document.querySelector<HTMLButtonElement>("[data-eclipse]")!.click();
+      return document.querySelector("[data-eclipse] svg")!.getAnimations().length;
+    })).toBe(1);
   });
 });
 

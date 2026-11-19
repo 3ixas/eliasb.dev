@@ -13,6 +13,11 @@ const token = (page: Page, name: string) =>
 /** The colours of every theme-color meta, which must all be the page background. */
 const toolbar = (page: Page) =>
   page.evaluate(() => [...document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')].map((meta) => meta.content.toLowerCase()));
+/** A browser without view transitions, where a press crossfades the palette as a device change does. */
+const withoutViewTransitions = (page: Page) =>
+  page.addInitScript(() => delete (Document.prototype as { startViewTransition?: unknown }).startViewTransition);
+/** No pour is running. */
+const poured = (page: Page) => expect(page.locator("html")).not.toHaveAttribute("data-pour");
 
 test.describe("Lights and theme", () => {
   test("starts in the device appearance and follows it live", async ({ page }) => {
@@ -121,6 +126,8 @@ test.describe("Lights and theme", () => {
     await page.goto("/");
     const follows = async (label: string, theme: "light" | "dark") => {
       await expect(page.locator("html")).not.toHaveAttribute("data-theme-changing", "");
+      // A pour sets the toolbar as it ends.
+      await poured(page);
       const background = theme === "dark" ? "#0d0d0f" : "#eeede9";
       // WebKit may resolve a registered colour on the next rendering frame
       // after the timer clears. Wait for the palette's actual target as well.
@@ -196,7 +203,8 @@ test.describe("Lights and theme", () => {
     expect(await durations()).toEqual(["0s", "0s", "0s"]);
   });
 
-  test("pressing it again part-way turns the icon back from where it is", async ({ page }) => {
+  test("without view transitions, pressing it again part-way turns the icon back from where it is", async ({ page }) => {
+    await withoutViewTransitions(page);
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "no-preference" });
     await page.goto("/");
     const path = await page.evaluate(() => {
@@ -222,7 +230,8 @@ test.describe("Lights and theme", () => {
     expect(path.reversed).toBeCloseTo(path.middle, 1);
   });
 
-  test("the page fades over 300 ms with a prompt start, and settles afterwards", async ({ page }) => {
+  test("without view transitions, the page fades over 300 ms with a prompt start, and settles afterwards", async ({ page }) => {
+    await withoutViewTransitions(page);
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     await page.emulateMedia({ reducedMotion: "no-preference" });
@@ -259,10 +268,12 @@ test.describe("Lights and theme", () => {
       expect(during.background).toBe(target);
       expect(during.animations).toBe(0);
       await expect(page.locator("html")).not.toHaveAttribute("data-theme-changing", "");
+      await poured(page);
     }
   });
 
-  test("inherited text follows the palette on every frame in both directions", async ({ page }) => {
+  test("without view transitions, inherited text follows the palette on every frame in both directions", async ({ page }) => {
+    await withoutViewTransitions(page);
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     await page.emulateMedia({ reducedMotion: "no-preference" });
@@ -295,7 +306,8 @@ test.describe("Lights and theme", () => {
   });
 
   // tokens.css: the passes and panels palette fades with the room, through the same controller.
-  test("the passes and panels palette crossfades with the rest, in both directions", async ({ page }) => {
+  test("without view transitions, the passes and panels palette crossfades with the rest, in both directions", async ({ page }) => {
+    await withoutViewTransitions(page);
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     await page.emulateMedia({ reducedMotion: "no-preference" });
@@ -328,5 +340,70 @@ test.describe("Lights and theme", () => {
         )
         .toEqual(target);
     }
+  });
+
+  // #466: a press pours the change from the control. The spec pauses and seeks the pour rather than waiting it out.
+  test("a press pours the light out of the control and draws it back in, from the control's centre", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.goto("/");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    for (const [pressed, pour, layer, after] of [["false", "in", "::view-transition-old(root)", "dark"], ["true", "out", "::view-transition-new(root)", "light"]] as const) {
+      await expect(eclipse(page)).toHaveAttribute("aria-pressed", pressed);
+      const middle = await page.evaluate(async () => {
+        const root = document.documentElement;
+        const button = document.querySelector<HTMLButtonElement>("[data-eclipse]")!;
+        const box = button.getBoundingClientRect();
+        button.click();
+        const pouring = () => document.getAnimations().filter((animation) => (animation.effect as KeyframeEffect).pseudoElement?.startsWith("::view-transition"));
+        for (let frame = 0; frame < 30 && pouring().length === 0; frame++) await new Promise(requestAnimationFrame);
+        const animations = pouring();
+        for (const animation of animations) {
+          animation.pause();
+          animation.currentTime = 300;
+        }
+        const style = getComputedStyle(root);
+        const read = {
+          pour: root.dataset.pour,
+          origin: [parseFloat(style.getPropertyValue("--pour-x")) - (box.left + box.width / 2), parseFloat(style.getPropertyValue("--pour-y")) - (box.top + box.height / 2)],
+          layers: animations.map((animation) => [(animation.effect as KeyframeEffect).pseudoElement, (animation as CSSAnimation).animationName]),
+          crossfading: "themeChanging" in root.dataset || root.getAnimations().length > 0,
+        };
+        for (const animation of animations) animation.finish();
+        return read;
+      });
+      expect(middle.pour).toBe(pour);
+      for (const offset of middle.origin) expect(Math.abs(offset)).toBeLessThanOrEqual(1);
+      // The light page is the layer that moves; the control rides above it.
+      expect(middle.layers).toContainEqual([layer, `pour-${pour}`]);
+      expect(middle.layers.map(([pseudo]) => pseudo)).toContain("::view-transition-new(eclipse)");
+      // The layers are the finished themes: the palette's own crossfade stays off.
+      expect(middle.crossfading).toBe(false);
+      await poured(page);
+      await expect.poll(() => scheme(page)).toBe(after);
+      for (const colour of await toolbar(page)) expect(colour).toBe(after === "dark" ? "#0d0d0f" : "#eeede9");
+    }
+  });
+
+  test("a second press mid-pour finishes the first and pours back, leaving nothing stuck", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.goto("/");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await expect(eclipse(page)).toHaveAttribute("aria-pressed", "false");
+    await page.evaluate(async () => {
+      const button = document.querySelector<HTMLButtonElement>("[data-eclipse]")!;
+      const pouring = () => document.getAnimations().filter((animation) => (animation.effect as KeyframeEffect).pseudoElement?.startsWith("::view-transition"));
+      button.click();
+      for (let frame = 0; frame < 30 && pouring().length === 0; frame++) await new Promise(requestAnimationFrame);
+      for (const animation of pouring()) {
+        animation.pause();
+        animation.currentTime = 300;
+      }
+      button.click();
+    });
+    await poured(page);
+    await expect.poll(() => scheme(page)).toBe("light");
+    await expect(eclipse(page)).toHaveAttribute("aria-pressed", "false");
+    expect(await page.evaluate(() => document.getAnimations().filter((animation) => (animation.effect as KeyframeEffect).pseudoElement?.startsWith("::view-transition")).length)).toBe(0);
+    for (const colour of await toolbar(page)) expect(colour).toBe("#eeede9");
   });
 });

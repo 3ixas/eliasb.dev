@@ -5,9 +5,12 @@
  * and sets data-theme and data-lights, so the page never paints in the wrong
  * theme.
  *
- * Changes mark the document as changing (data-theme-changing) before the
- * theme flips, so the stylesheet crossfades even a device setting change.
- * Reduced motion switches instantly. The browser's toolbar colour follows
+ * A press of the theme control pours the change from the control (#466): a
+ * view transition whose light page spreads out of it or is drawn back into it
+ * (shell.css, "Theme change"). Every other change, and a press where the
+ * browser has no view transitions, marks the document as changing
+ * (data-theme-changing) before the theme flips, so the stylesheet crossfades
+ * it. Reduced motion switches instantly. The browser's toolbar colour follows
  * the page.
  *
  * No imports, and nothing runs at load, so the root layout can read the
@@ -98,15 +101,22 @@ function markRoomChanging() {
   );
 }
 
-function setLights(theme: Theme) {
-  markRoomChanging();
+/** How a change is shown: the palette's crossfade, or a pour, whose layers are the finished themes. */
+type Change = "crossfade" | "pour";
+
+function setLights(theme: Theme, change: Change) {
+  // A pour sets the toolbar colour when it ends.
+  if (change === "crossfade") {
+    markRoomChanging();
+    syncToolbarColour(theme);
+  }
   document.documentElement.dataset.lights = theme === "dark" ? "on" : "off";
-  syncToolbarColour(theme);
 }
 
-export function applyPreference(preference: ThemePreference) {
+function applyPreference(preference: ThemePreference, change: Change): Theme {
   const root = document.documentElement;
-  setLights(preference === "system" ? systemTheme() : preference);
+  const theme = preference === "system" ? systemTheme() : preference;
+  setLights(theme, change);
   if (preference === "system") delete root.dataset.theme;
   else root.dataset.theme = preference;
   try {
@@ -115,10 +125,50 @@ export function applyPreference(preference: ThemePreference) {
   } catch {
     // The choice still applies for this visit.
   }
+  return theme;
 }
 
-export function flipLights() {
-  applyPreference(nextPreference(readPreference(), systemTheme()));
+/** The light page's soft edge, as a share of the pour's radius. */
+const POUR_SOFTNESS = 0.22;
+let pouring: ViewTransition | undefined;
+
+/**
+ * The theme control's press. Where the browser has view transitions and motion is on, the light pours out of the
+ * control or is drawn back into it, from its centre to the viewport's farthest corner, and the function returns
+ * true. Otherwise the theme crossfades (instantly with reduced motion) and it returns false.
+ */
+export function pourLights(control: Element): boolean {
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduced || typeof document.startViewTransition !== "function") {
+    applyPreference(nextPreference(readPreference(), systemTheme()), "crossfade");
+    return false;
+  }
+  // A press mid-pour finishes the first change at once; this one starts from the control.
+  pouring?.skipTransition();
+  const root = document.documentElement;
+  const box = control.getBoundingClientRect();
+  const x = box.left + box.width / 2;
+  const y = box.top + box.height / 2;
+  const far = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+  const soft = far * POUR_SOFTNESS;
+  root.style.setProperty("--pour-x", `${x}px`);
+  root.style.setProperty("--pour-y", `${y}px`);
+  root.style.setProperty("--pour-soft", `${soft}px`);
+  root.style.setProperty("--pour-reach", `${far + soft}px`);
+
+  // Read the preference inside the update, after any change still waiting for its own, so two quick presses are two flips.
+  const transition = document.startViewTransition(() => {
+    const theme = applyPreference(nextPreference(readPreference(), systemTheme()), "pour");
+    root.dataset.pour = theme === "light" ? "out" : "in";
+  });
+  pouring = transition;
+  transition.finished.finally(() => {
+    if (pouring !== transition) return;
+    pouring = undefined;
+    delete root.dataset.pour;
+    syncToolbarColour(root.dataset.lights === "on" ? "dark" : "light");
+  });
+  return true;
 }
 
 /** Follows the device appearance while the visitor has made no choice. */
@@ -128,7 +178,7 @@ export function watchSystemTheme() {
   const onChange = () => {
     if (readPreference() !== "system") return;
     const lights = systemTheme() === "dark" ? "on" : "off";
-    if (document.documentElement.dataset.lights !== lights) setLights(systemTheme());
+    if (document.documentElement.dataset.lights !== lights) setLights(systemTheme(), "crossfade");
   };
   media.addEventListener("change", onChange);
   // The device may have changed between the boot script and this listener.

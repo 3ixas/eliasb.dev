@@ -94,7 +94,7 @@ html:has([data-site]) {
   transform: none;
 }
 
-/* ---- Theme change: a crossfade over 0.3 s, instant for reduced motion ---- */
+/* ---- Theme change: a crossfade over 0.3 s, instant for reduced motion (a press pours instead, below) ---- */
 
 :root {
   --room-duration: 0.3s;
@@ -114,6 +114,119 @@ html:has([data-site]) {
   transition-duration: var(--room-duration);
   transition-timing-function: var(--room-ease);
   transition-delay: 0s;
+}
+
+/* ---- Theme change, pressed: the light pours from the theme control (#466) ----
+ * theme.ts starts a view transition from the control's centre (--pour-x, --pour-y) and sets data-pour. Dark to light
+ * ("out"), the new light page spreads out of the control over the dark one, easing out. Light to dark ("in"), the old
+ * light page is drawn back into it, gathering speed, off the dark one beneath. Either way the light page is on top,
+ * masked by a circle whose edge softens over --pour-soft and glows a little ahead of the fill. The pseudo-elements
+ * exist only while motion is on: theme.ts crossfades or switches instantly otherwise. */
+
+@property --pour {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+:root[data-pour="out"]::view-transition-new(root),
+:root[data-pour="in"]::view-transition-old(root) {
+  z-index: 1;
+  mask-image: radial-gradient(
+    circle at var(--pour-x) var(--pour-y),
+    #000 calc(var(--pour) - var(--pour-soft)),
+    rgb(0 0 0 / 0.55) calc(var(--pour) - var(--pour-soft) * 0.35),
+    transparent var(--pour)
+  );
+}
+
+:root[data-pour="out"]::view-transition-new(root) {
+  animation: pour-out 600ms var(--out) both;
+}
+
+:root[data-pour="in"]::view-transition-old(root) {
+  animation: pour-in 600ms cubic-bezier(0.55, 0, 0.85, 0.35) both;
+}
+
+@keyframes pour-out {
+  from { --pour: 0px; }
+  to { --pour: var(--pour-reach); }
+}
+
+@keyframes pour-in {
+  from { --pour: var(--pour-reach); }
+  to { --pour: 0px; }
+}
+
+/* The control is the light's source: it rides above the pour and glows as it gives the light out or takes it in.
+ * Giving it out, it turns over at once. Taking it in, the sun holds until the light has gathered round it, then
+ * turns over to the moon, which would vanish against the light still there. */
+.theme-control {
+  view-transition-name: eclipse;
+}
+
+::view-transition-group(eclipse) {
+  z-index: 2;
+  animation-duration: 600ms;
+}
+
+:root[data-pour="out"]::view-transition-old(eclipse) {
+  animation: eclipse-leave 160ms ease-out both;
+}
+
+:root[data-pour="out"]::view-transition-new(eclipse) {
+  animation: eclipse-arrive 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+:root[data-pour="in"]::view-transition-old(eclipse) {
+  animation: eclipse-leave-late 600ms ease-in both;
+}
+
+:root[data-pour="in"]::view-transition-new(eclipse) {
+  animation: eclipse-arrive-late 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+:root[data-pour="out"]::view-transition-image-pair(eclipse) {
+  animation: eclipse-give 600ms ease-out both;
+}
+
+:root[data-pour="in"]::view-transition-image-pair(eclipse) {
+  animation: eclipse-take 600ms ease-in both;
+}
+
+@keyframes eclipse-leave {
+  to { opacity: 0; transform: rotate(60deg) scale(0.6); }
+}
+
+@keyframes eclipse-arrive {
+  from { opacity: 0; transform: rotate(-120deg) scale(0.6); }
+}
+
+@keyframes eclipse-leave-late {
+  0%, 82% { opacity: 1; transform: none; }
+  to { opacity: 0; transform: rotate(60deg) scale(0.6); }
+}
+
+@keyframes eclipse-arrive-late {
+  0%, 80% { opacity: 0; transform: rotate(-120deg) scale(0.6); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes eclipse-give {
+  from { filter: drop-shadow(0 0 6px rgb(255 247 228)) drop-shadow(0 0 14px rgb(255 247 228 / 0.8)); }
+  to { filter: none; }
+}
+
+@keyframes eclipse-take {
+  from { filter: none; }
+  80% { filter: drop-shadow(0 0 6px rgb(255 247 228)) drop-shadow(0 0 14px rgb(255 247 228 / 0.8)); }
+  to { filter: none; }
 }
 
 /* ---- The header ---- */
