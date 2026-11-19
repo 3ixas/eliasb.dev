@@ -1,0 +1,142 @@
+/* PROTOTYPE (#493), throwaway. Scoped to .proto; deleted once a variant is chosen. */
+
+/* A and B: the pass prints who and when; its three points are gone, so the card is shorter. */
+:is(.proto--a, .proto--b) .pass__points {
+  display: none;
+}
+
+:is(.proto--a, .proto--b) .pass__card {
+  height: 14.5em;
+}
+
+/* B: the opening is words alone, so it needs less than a screen. */
+.proto-b__opening {
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+}
+
+.proto-b__opening .opening__text {
+  max-width: 760px;
+  padding: 120px 0 40px;
+}
+
+.proto-b__panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 56px;
+  align-items: start;
+}
+
+.proto-b__panel#bnp-paribas {
+  --solid: #fff;
+  background: radial-gradient(120% 110% at 10% -10%, #2cbd86 0%, #0fa56d 46%, var(--field) 100%);
+}
+
+.proto-b__figure {
+  display: grid;
+  gap: 4px;
+}
+
+.proto-b__figure .figure__value,
+.proto-b__figure .figure__words {
+  font-family: var(--serif);
+  font-size: var(--type-figure);
+  font-weight: 500;
+  line-height: 1.05;
+}
+
+.proto-b__evidence {
+  max-width: 640px;
+}
+
+.proto-b__evidence .work-bnp__comparisons {
+  margin-top: 32px;
+}
+
+.proto-b__body .work__story {
+  margin-top: 8px;
+}
+
+.proto-b__evidence + .work__story {
+  margin-top: 0;
+}
+
+.proto-b__body .work-bnp__comparisons + .work__story,
+.proto-b__evidence:has(.work-bnp__comparisons) + .work__story {
+  margin-top: 36px;
+}
+
+/* The pass hangs from the panel's top edge: its lanyard runs up out of the panel. */
+.proto-b__hang {
+  margin-top: -44px;
+  margin-right: 24px;
+}
+
+.proto-b__hang .pass {
+  --drop: 64px;
+  transform: none;
+}
+
+@media (max-width: 899.98px) {
+  .proto-b__panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .proto-b__hang {
+    grid-row: 1;
+    margin-top: -26px;
+    justify-self: center;
+  }
+}
+
+/* C: Work is three rows into the stories. */
+.proto-c__rows {
+  border-top: 1px solid var(--hair);
+}
+
+.proto-c__rows li {
+  border-bottom: 1px solid var(--hair);
+}
+
+/* The switcher. */
+.proto-bar {
+  position: fixed;
+  z-index: 50;
+  bottom: 16px;
+  left: 50%;
+  display: grid;
+  gap: 8px;
+  width: min(760px, calc(100vw - 32px));
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: #141416;
+  color: #f0efeb;
+  font: 400 var(--type-small) / 1.4 var(--sans);
+  box-shadow: 0 10px 40px rgb(0 0 0 / 0.3);
+  transform: translateX(-50%);
+}
+
+.proto-bar p {
+  margin: 0;
+  color: #c9c8c2;
+}
+
+.proto-bar div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.proto-bar a {
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: inherit;
+  text-decoration: none;
+  background: rgb(255 255 255 / 0.08);
+}
+
+.proto-bar a[aria-current] {
+  background: #f0efeb;
+  color: #141416;
+  font-weight: 600;
+}
