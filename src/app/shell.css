@@ -682,7 +682,7 @@ html:has([data-site]) {
     right: 0;
     /* Under the header's rule, not over it. */
     top: calc(100% + 1px);
-    padding: 4px var(--menu-gutter, 32px) 8px;
+    padding: 4px var(--gutter) 8px;
     border-bottom: 1px solid var(--ink);
     background-color: var(--page);
   }
@@ -728,13 +728,6 @@ html:has([data-site]) {
 
   :root:not([data-script]) .site-nav a {
     padding-inline: 0 12px;
-  }
-}
-
-/* The Menu list keeps the page's gutter. */
-@media (max-width: 719.98px) {
-  :root[data-script] .site-nav {
-    --menu-gutter: 16px;
   }
 }
 

@@ -6,7 +6,7 @@ import { siteCopy } from "../src/content/stretch/site-copy";
 // Every inner page has one `h1`, the shared header whose links lead to the homepage's sections (DESIGN.md "The header"),
 // and nothing wider than the frame (the Résumé's sheet aside).
 /** The passes and panels frame (DESIGN.md "Layout"). */
-const FRAME = 1344;
+const FRAME = 1216;
 
 const routes = ["/things-i-make", "/resume", "/nothing-here", ...roleStorySlugs.map((slug) => `/work/${slug}`), ...Object.keys(caseStudies).map((slug) => `/things-i-make/${slug}`)];
 

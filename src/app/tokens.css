@@ -71,12 +71,26 @@
   --type-ui: 15px;
   --type-small: 14.5px;
   --type-label: 13px;
+
+  /* Layout (DESIGN.md "Layout", #493): the frame with its gutters, the space between sections, and prose's measure. */
+  --frame: 1216px;
+  --gutter: 32px;
+  --section-space: 128px;
+  --measure: 640px;
 }
 
-/* Lede and prose step down a pixel on a phone. */
+@media (min-width: 1024px) {
+  :root {
+    --gutter: 48px;
+  }
+}
+
+/* Lede and prose step down a pixel on a phone, and the gutters and sections close up. */
 @media (max-width: 719.98px) {
   :root {
     --type-prose: 18px;
+    --gutter: 16px;
+    --section-space: 88px;
   }
 }
 

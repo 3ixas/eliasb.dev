@@ -79,7 +79,7 @@ Newsreader (variable, optical size on) for headings, figures and reading prose; 
 
 #### R-03 Layout and spacing
 
-The page is `max-width: 1344px` with 32 px gutters (16 px under 720 px). Sections are 144 px apart (96 px under 720 px). Panels in one section are 16 px apart. A long-form page's sections are 64 px apart with a hairline between.
+The page is `max-width: 1216px` with 48 px gutters from 1024 px (32 px from 720 px, 16 px under it), and prose keeps a 640 px measure. Sections are 128 px apart (88 px under 720 px), on every page from one token. Panels in one section are 16 px apart. A long-form page's sections are 128 px apart with a hairline halfway (#493).
 
 #### R-04 The panel
 

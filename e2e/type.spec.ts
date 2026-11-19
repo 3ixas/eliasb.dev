@@ -135,9 +135,9 @@ test("dark mode smooths text to greyscale and light mode keeps the default", asy
   expect(smoothing).toBe(/-dark$/.test(testInfo.project.name) ? "antialiased" : "auto");
 });
 
-test("homepage sections sit 144 px apart on a wide screen and 96 px on a phone (R-03)", async ({ page }) => {
+test("homepage sections sit 128 px apart on a wide screen and 88 px on a phone (R-03)", async ({ page }) => {
   await page.goto("/");
   const width = page.viewportSize()!.width;
   const padding = await page.locator("#main-content > section.section").first().evaluate((element) => getComputedStyle(element).paddingTop);
-  expect(padding).toBe(width >= 720 ? "144px" : "96px");
+  expect(padding).toBe(width >= 720 ? "128px" : "88px");
 });

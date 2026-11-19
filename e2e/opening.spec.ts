@@ -103,13 +103,15 @@ test.describe("The first screen", () => {
     }
   });
 
-  test("under 900 px the passes scroll sideways inside their rail, BNP Paribas first, and the page does not", async ({ page }) => {
+  test("under 900 px the passes scroll sideways inside their rail when they do not fit, BNP Paribas first, and the page does not", async ({ page }) => {
     test.skip(width(page) >= 900 || phone(page), "The rail scrolls from 720 to 900 px");
     await page.goto("/");
     await settled(page);
     const rail = page.locator(".opening__rail");
     await expect(rail).toHaveCSS("overflow-x", "auto");
-    expect(await rail.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+    // From about 752 px the opening's smaller passes fit (#493), so the rail scrolls only below that.
+    const [scrolls, rightmost] = await rail.evaluate((element) => [element.scrollWidth > element.clientWidth, Math.max(...[...element.querySelectorAll(".pass")].map((pass) => pass.getBoundingClientRect().right))]);
+    if (!scrolls) expect(rightmost).toBeLessThanOrEqual(width(page));
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
     await expect(passes(page).first()).toHaveAttribute("href", "#bnp-paribas");
     const first = (await passes(page).first().boundingBox())!;
@@ -146,7 +148,8 @@ test.describe("The staff passes", () => {
     expect(await passes(page).evaluateAll((all) => all.map((pass) => pass.getAttribute("href")))).toEqual(slugs.map((slug) => `#${slug}`));
     for (const slug of slugs) await expect(page.locator(`#${slug}`)).toHaveCount(1);
     const widths = await passes(page).evaluateAll((all) => all.map((pass) => (pass as HTMLElement).offsetWidth));
-    expect(widths).toEqual([264, 248, 248]);
+    // The opening hangs them at about 85% (#493).
+    expect(widths).toEqual([224, 212, 212]);
     // BNP Paribas hangs lowest.
     const tops = await page.locator(".opening .pass__card").evaluateAll((cards) => cards.map((card) => card.getBoundingClientRect().top));
     expect(tops[0]).toBeGreaterThan(Math.max(tops[1], tops[2]));

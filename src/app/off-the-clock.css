@@ -169,7 +169,7 @@
 
 .otc__history-text {
   display: grid;
-  max-width: 46em;
+  max-width: var(--measure);
 }
 
 /* Every oddity in one cell: the hidden ones hold the band at the tallest, so stepping moves nothing. */

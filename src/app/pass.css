@@ -141,11 +141,11 @@
     var(--field);
 }
 
-/* 1.41em keeps the name large text (24 px) on the smallest card, so its ink needs 3:1 on the band under the sheen. */
+/* Never under 24 px, so the name stays large text on any card (the opening's are smaller) and its ink needs 3:1 on the band under the sheen. */
 .pass__band span {
   font-family: var(--serif);
   font-optical-sizing: auto;
-  font-size: 1.41em;
+  font-size: max(24px, 1.41em);
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.012em;
