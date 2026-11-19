@@ -207,7 +207,7 @@ test.describe("Homepage shell", () => {
     await page.evaluate(() => document.fonts.ready);
     for (const width of [720, 760, 820, 899, 900, 960, 1024, 1100]) {
       await page.setViewportSize({ width, height: 900 });
-      const gutter = width < 720 ? 16 : 32;
+      const gutter = width < 720 ? 16 : width < 1024 ? 32 : 48;
       await expect.poll(() => page.locator("[data-eclipse]").evaluate((element) => element.getBoundingClientRect().right), String(width)).toBeLessThanOrEqual(width - gutter + 0.5);
       expect((await page.locator("[data-site-header]").boundingBox())!.height, String(width)).toBeCloseTo(64, 0);
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), String(width)).toBeLessThanOrEqual(0);
