@@ -239,7 +239,7 @@ test.describe("Homepage shell", () => {
 test.describe("The header greeting", () => {
   // Tests that measure or hover the greeting need it shown, and it hides under 400 px.
   test.beforeEach(({}, testInfo) => {
-    const shownOnly = /same width|plays on load|ticks up/.test(testInfo.title);
+    const shownOnly = /same width|plays on load|ticks up|cursor blinks/.test(testInfo.title);
     test.skip(shownOnly && (testInfo.project.use.viewport?.width ?? 0) < 400, "The greeting hides under 400 px");
   });
   const greeting = (page: Page) => page.locator("[data-greeting]");
@@ -352,13 +352,13 @@ test.describe("The header greeting", () => {
   });
 
   // The scene for each line: its own object, and none of another's.
-  const parts = ["ink", "cursor", "steam", "minute", "pool", "lit", "horizon", "moon", "star"] as const;
+  const parts = ["ink", "cursor", "steam", "minute", "pool", "lit", "moon", "star"] as const;
   for (const [at, key, drawn] of [
-    ["2026-10-15T08:00:00Z", "morning", { ink: 2, steam: 1, horizon: 1 }],
+    ["2026-10-15T08:00:00Z", "morning", { ink: 3, steam: 1 }],
     ["2026-10-15T14:00:00Z", "afternoon", { ink: 3, minute: 1, lit: 1 }],
     ["2026-10-17T14:00:00Z", "afternoon", { ink: 3, minute: 1, lit: 1 }],
-    ["2026-10-15T19:00:00Z", "evening", { ink: 2, pool: 1, lit: 1, horizon: 1 }],
-    ["2026-10-15T23:00:00Z", "late", { moon: 1, star: 3 }],
+    ["2026-10-15T19:00:00Z", "evening", { ink: 2, pool: 1, lit: 1 }],
+    ["2026-10-15T23:00:00Z", "late", { ink: 1, moon: 1, star: 2 }],
   ] as const) {
     test(`the ${key} scene is drawn for ${at}`, async ({ browser }) => {
       const context = await browser.newContext({ timezoneId: "Etc/GMT" });
@@ -455,13 +455,16 @@ test.describe("The header greeting", () => {
     await context.close();
   });
 
-  test("Hello's cursor blinks, and holds still with reduced motion", async ({ browser }) => {
+  test("Hello's cursor blinks three times on hover, never on its own, and holds still with reduced motion", async ({ browser }) => {
     for (const [reducedMotion, name] of [["no-preference", "scene-cursor"], ["reduce", "none"]] as const) {
       const context = await browser.newContext({ reducedMotion });
       const page = await context.newPage();
       await page.route("**/*.js", (route) => route.abort());
       await page.goto("/");
+      expect(await playing(page, "cursor"), reducedMotion).toBe("none");
+      await greeting(page).hover();
       expect(await playing(page, "cursor"), reducedMotion).toBe(name);
+      if (name !== "none") expect(await page.locator(".scene__cursor").evaluate((element) => getComputedStyle(element).animationIterationCount)).toBe("3");
       await context.close();
     }
   });

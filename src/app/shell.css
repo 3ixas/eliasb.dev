@@ -399,41 +399,27 @@ html:has([data-site]) {
   overflow: visible;
 }
 
-.scene__horizon {
-  fill: none;
-  stroke: var(--hair);
-  stroke-width: 1.5;
-}
-
-/* The heavy line every object is drawn with, and the finer one for the clock's marks. */
+/* One line weight for every object (#467), and a finer one for the steam and the stars. */
 .scene__ink,
 .scene__cursor,
-.scene__tick,
-.scene__steam {
+.scene__steam,
+.scene__star {
   fill: none;
+  stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .scene__ink {
-  stroke: currentColor;
-  stroke-width: 1.9;
+  stroke-width: 1.8;
 }
 
-.scene__tick {
-  stroke: currentColor;
-  stroke-width: 1.2;
-}
-
-.scene__dot,
-.scene__moon,
+.scene__steam,
 .scene__star {
-  fill: currentColor;
+  stroke-width: 1.4;
 }
 
 .scene__steam {
-  stroke: currentColor;
-  stroke-width: 1.3;
   stroke-dasharray: 1;
 }
 
@@ -442,14 +428,14 @@ html:has([data-site]) {
   stroke-width: 2;
 }
 
-/* The amber: the clock's pivot, the lamp's bulb and the pool of light under it. */
+/* The amber: the clock's pivot, the lamp's bulb and the light under its shade. */
 .scene__lit {
   fill: var(--sun);
 }
 
 .scene__pool {
   fill: var(--sun);
-  opacity: 0.24;
+  opacity: 0.22;
 }
 
 .scene__minute,
@@ -457,32 +443,24 @@ html:has([data-site]) {
   transform-origin: 15px 11px;
 }
 
-.scene__star {
-  opacity: 0.35;
-}
-
 /*
- * The scene plays on every load (data-playing, set for a few seconds by the greeting) and on hover or focus. Each
- * object is finished at rest and plays by animating from a lesser state to it, so with reduced motion, where none
- * of this applies, the scene is the whole drawing.
+ * Each scene has one arrival, played once on every load (data-playing, set for a few seconds by the greeting) and
+ * again on hover or focus, finished within 1.2 s; nothing loops. Each object is finished at rest and plays by
+ * animating from a lesser state to it, so with reduced motion, where none of this applies, the scene is the whole drawing.
  */
 @media (prefers-reduced-motion: no-preference) {
   .scene__moon {
     transition: transform 0.8s var(--spring);
   }
 
-  .scene__star {
-    transition: opacity 0.3s;
+  /* Hello: the cursor blinks three times. */
+  [data-greeting="hello"]:is(:hover, :focus-visible, [data-playing]) .scene__cursor {
+    animation: scene-cursor 0.4s steps(1, end) 3;
   }
 
-  /* Hello: the cursor blinks, for as long as it is the line. */
-  [data-greeting="hello"] .scene__cursor {
-    animation: scene-cursor 1.1s steps(1, end) infinite;
-  }
-
-  /* Morning: the steam curls up out of the spout. */
+  /* Morning: the steam rises out of the spout. */
   [data-greeting="morning"]:is(:hover, :focus-visible, [data-playing]) .scene__steam {
-    animation: scene-steam 1.4s var(--out);
+    animation: scene-steam 1.2s var(--out);
   }
 
   /* Afternoon: the minute hand ticks up towards the hour. */
@@ -490,26 +468,22 @@ html:has([data-site]) {
     animation: scene-minute 1.2s steps(4, end);
   }
 
-  /* Evening: the light pool comes on. */
+  /* Evening: the lamp's light comes on. */
   [data-greeting="evening"]:is(:hover, :focus-visible, [data-playing]) .scene__pool {
     animation: scene-pool 1.2s var(--out);
   }
 
-  /* Late: the moon rocks and the stars come out one by one. */
+  /* Late: the moon rocks and the stars come out one after the other; at rest they are lit. */
   [data-greeting="late"]:is(:hover, :focus-visible, [data-playing]) .scene__moon {
     transform: rotate(-18deg);
   }
 
   [data-greeting="late"]:is(:hover, :focus-visible, [data-playing]) .scene__star {
-    opacity: 1;
+    animation: scene-star 0.6s var(--out) backwards;
   }
 
-  [data-greeting="late"]:is(:hover, :focus-visible, [data-playing]) .scene__star:nth-of-type(2) {
-    transition-delay: 0.3s;
-  }
-
-  [data-greeting="late"]:is(:hover, :focus-visible, [data-playing]) .scene__star:nth-of-type(3) {
-    transition-delay: 0.6s;
+  [data-greeting="late"]:is(:hover, :focus-visible, [data-playing]) .scene__star + .scene__star {
+    animation-delay: 0.4s;
   }
 }
 
@@ -527,11 +501,17 @@ html:has([data-site]) {
 
 @keyframes scene-minute {
   from {
-    transform: rotate(-12deg);
+    transform: rotate(-24deg);
   }
 }
 
 @keyframes scene-pool {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes scene-star {
   from {
     opacity: 0;
   }
