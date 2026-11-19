@@ -207,6 +207,7 @@
 /* The words underlined in hair; the arrow sits outside the underline. 10 px above and below make it a 44 px target. */
 .text-link {
   display: inline-block;
+  min-height: 44px;
   padding-block: 10px;
   color: inherit;
   font-family: var(--serif);

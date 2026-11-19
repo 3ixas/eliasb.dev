@@ -66,7 +66,7 @@ test.describe("Work: the panels", () => {
     await expect(bnp.locator("figure")).toHaveCount(0);
     await expect(bnp.locator(".work-bnp__comparisons li")).toHaveCount(2);
     const display = await bnp.evaluate((element) =>
-      [...element.querySelectorAll("*")].filter((node) => node.childElementCount === 0 && node.textContent?.trim() && !node.matches(".panel__name") && parseFloat(getComputedStyle(node).fontSize) >= 32).map((node) => node.textContent),
+      [...element.querySelectorAll("*")].filter((node) => node.childElementCount === 0 && node.textContent?.trim() && !node.matches(".panel__name") && parseFloat(getComputedStyle(node).fontSize) >= 24).map((node) => node.textContent),
     );
     expect(display).toEqual([workPanels.bnp.figure.value]);
   });

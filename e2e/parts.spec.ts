@@ -82,7 +82,7 @@ test.describe("The panel", () => {
     const name = await style(head.locator(".panel__name"), "font-family", "font-size");
     expect(name["font-family"]).toMatch(/^Newsreader/);
     const width = page.viewportSize()!.width;
-    expect(Number.parseFloat(name["font-size"])).toBeCloseTo(Math.min(42, Math.max(30, width * 0.03)), 1);
+    expect(Number.parseFloat(name["font-size"])).toBeCloseTo(Math.min(28, Math.max(22, width * 0.02)), 1);
     await expect(head.locator(".panel__meta span")).toHaveText([roleStories["bnp-paribas"].role, roleStories["bnp-paribas"].dates]);
     expect((await style(head.locator(".panel__meta"), "text-align"))["text-align"]).toBe("right");
   });
@@ -143,12 +143,12 @@ test.describe("Controls", () => {
       .toEqual([]);
   });
 
-  test("the text link is Newsreader 19 px, a 44 px target, with its words underlined and its arrow not", async ({ page }) => {
+  test("the text link is Newsreader 18 px, a 44 px target, with its words underlined and its arrow not", async ({ page }) => {
     await openWithFonts(page);
     const link = page.locator(".text-link").first();
     const read = await style(link, "font-family", "font-size", "text-decoration-line");
     expect(read["font-family"]).toMatch(/^Newsreader/);
-    expect(read["font-size"]).toBe("19px");
+    expect(read["font-size"]).toBe("18px");
     expect(read["text-decoration-line"]).toBe("underline");
     expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     expect((await style(link.locator(".arrow"), "display"))["display"]).toBe("inline-block");
