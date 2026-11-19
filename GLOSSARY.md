@@ -78,11 +78,11 @@ The homepage section for Elias's own projects: **Featured work** above the **Pro
 _Avoid_: Work (that means employment), On my own
 
 **Off the clock**:
-The homepage section for Elias's own time: one paper **Panel** in three bands (DESIGN.md "The homepage, in order" 7, R-19). The first holds his training week with today marked, the book he is reading and the film he last watched; the second this week in history, stepping through three facts; the third his GitHub year with **Now making** beneath its total. Each item is a **Live signal** with a fallback, and stale saved data says where and when it is from.
+The homepage section for Elias's own time: one paper **Panel** in four sections, each under a rule (DESIGN.md "The homepage, in order" 7, R-19): his training week with today marked, the book he is reading and the film he last watched, this week in history stepping through three facts, and his GitHub year with **Now making** beside it. From 960 px each section's heading sits in a margin column with its content to the right. Each item is a **Live signal** with a fallback, and stale saved data says where and when it is from.
 _Avoid_: Library, Personal signals, Board
 
 **Now making**:
-The line under the GitHub year's total in **Off the clock** that follows Elias's latest pushed public GitHub repository (not forks, archives, the profile repository or `personal-portfolio-v1`), refreshed with the page and cached for six hours. A repository that is one of his projects shows the project's name and links to its case study; any other shows its name and GitHub description and links to GitHub. With no year and nothing being made, the band shows the GitHub profile link instead. It replaces the **Making pin**.
+What I'm building now, beside the GitHub year in **Off the clock**, that follows Elias's latest pushed public GitHub repository (not forks, archives, the profile repository or `personal-portfolio-v1`), refreshed with the page and cached for six hours. A repository that is one of his projects shows the project's name and links to its case study; any other shows its name and GitHub description and links to GitHub. With no year and nothing being made, the band shows the GitHub profile link instead. It replaces the **Making pin**.
 _Avoid_: Experiments, Lab
 
 **One-page home**:

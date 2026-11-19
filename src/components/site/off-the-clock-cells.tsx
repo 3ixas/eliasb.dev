@@ -81,7 +81,7 @@ export function BookCell({ reading, now }: { reading: ReadingSignal; now: Date }
     <MediaCell
       item="reading"
       href={reading.href}
-      cover={book.coverUrl ? <Image className="otc__cover" src={book.coverUrl} alt={copy.reading.coverAlt(book.title, book.author)} width={128} height={192} sizes="76px" /> : null}
+      cover={book.coverUrl ? <Image className="otc__cover" src={book.coverUrl} alt={copy.reading.coverAlt(book.title, book.author)} width={128} height={192} sizes="(min-width: 960px) 112px, 88px" /> : null}
       title={book.title}
       line={`${copy.reading.label} · ${book.author}`}
       stale={<Stale source={copy.reading.sourceName} status={status} />}
@@ -100,7 +100,7 @@ export function FilmCell({ signal, now }: { signal: FilmSignal; now: Date }) {
     <MediaCell
       item="film"
       href={film.href}
-      cover={film.posterUrl ? <Image className="otc__cover" src={film.posterUrl} alt={copy.watched.posterAlt(film.title, film.year)} width={128} height={192} sizes="76px" /> : null}
+      cover={film.posterUrl ? <Image className="otc__cover" src={film.posterUrl} alt={copy.watched.posterAlt(film.title, film.year)} width={128} height={192} sizes="(min-width: 960px) 112px, 88px" /> : null}
       title={film.title}
       line={
         watched ? (
