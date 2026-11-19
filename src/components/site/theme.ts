@@ -29,13 +29,17 @@ export const TOOLBAR_COLOUR: Record<Theme, string> = { light: "#eeede9", dark: "
  * layout makes the meta before first paint; this keeps it current.
  */
 export function syncToolbarColour(theme: Theme) {
+  setToolbar(TOOLBAR_COLOUR[theme]);
+}
+
+function setToolbar(colour: string) {
   let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
   if (!meta) {
     meta = document.createElement("meta");
     meta.name = "theme-color";
     document.head.appendChild(meta);
   }
-  meta.content = TOOLBAR_COLOUR[theme];
+  meta.content = colour;
 }
 
 const ROOM_CHANGE_MS = 300;
@@ -130,7 +134,8 @@ function applyPreference(preference: ThemePreference, change: Change): Theme {
 
 /** The light page's soft edge, as a share of the pour's radius. */
 const POUR_SOFTNESS = 0.22;
-let pouring: ViewTransition | undefined;
+let pouring: { transition: ViewTransition; control: Element } | undefined;
+let rerouting = false;
 
 /**
  * The theme control's press. Where the browser has view transitions and motion is on, the light pours out of the
@@ -144,7 +149,8 @@ export function pourLights(control: Element): boolean {
     return false;
   }
   // A press mid-pour finishes the first change at once; this one starts from the control.
-  pouring?.skipTransition();
+  pouring?.transition.skipTransition();
+  rerouteTaps();
   const root = document.documentElement;
   const box = control.getBoundingClientRect();
   const x = box.left + box.width / 2;
@@ -161,14 +167,37 @@ export function pourLights(control: Element): boolean {
     const theme = applyPreference(nextPreference(readPreference(), systemTheme()), "pour");
     root.dataset.pour = theme === "light" ? "out" : "in";
   });
-  pouring = transition;
+  const current = { transition, control };
+  pouring = current;
+  // The browser's toolbar follows the page's background, which shell.css moves with the light.
+  const follow = () => {
+    if (pouring !== current) return;
+    if (root.dataset.pour) setToolbar(getComputedStyle(root).backgroundColor);
+    requestAnimationFrame(follow);
+  };
+  requestAnimationFrame(follow);
   transition.finished.finally(() => {
-    if (pouring !== transition) return;
+    if (pouring !== current) return;
     pouring = undefined;
     delete root.dataset.pour;
     syncToolbarColour(root.dataset.lights === "on" ? "dark" : "light");
   });
   return true;
+}
+
+/**
+ * While a pour runs, the page is a picture the browser draws over everything, and a tap lands on the document rather
+ * than the control. A tap where the control is (with its 4 px reach) still presses it.
+ */
+function rerouteTaps() {
+  if (rerouting) return;
+  rerouting = true;
+  document.addEventListener("click", (event) => {
+    if (!pouring || event.target !== document.documentElement) return;
+    const box = pouring.control.getBoundingClientRect();
+    const inside = event.clientX >= box.left - 4 && event.clientX <= box.right + 4 && event.clientY >= box.top - 4 && event.clientY <= box.bottom + 4;
+    if (inside) pourLights(pouring.control);
+  });
 }
 
 /** Follows the device appearance while the visitor has made no choice. */

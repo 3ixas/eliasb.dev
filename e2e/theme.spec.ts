@@ -354,7 +354,8 @@ test.describe("Lights and theme", () => {
         const button = document.querySelector<HTMLButtonElement>("[data-eclipse]")!;
         const box = button.getBoundingClientRect();
         button.click();
-        const pouring = () => document.getAnimations().filter((animation) => (animation.effect as KeyframeEffect).pseudoElement?.startsWith("::view-transition"));
+        // The pour's layers, and the page's background moving with them.
+        const pouring = () => document.getAnimations().filter((animation) => (animation.effect as KeyframeEffect).pseudoElement?.startsWith("::view-transition") || (animation as CSSAnimation).animationName?.startsWith("toolbar"));
         for (let frame = 0; frame < 30 && pouring().length === 0; frame++) await new Promise(requestAnimationFrame);
         const animations = pouring();
         for (const animation of animations) {
@@ -366,7 +367,9 @@ test.describe("Lights and theme", () => {
           pour: root.dataset.pour,
           origin: [parseFloat(style.getPropertyValue("--pour-x")) - (box.left + box.width / 2), parseFloat(style.getPropertyValue("--pour-y")) - (box.top + box.height / 2)],
           layers: animations.map((animation) => [(animation.effect as KeyframeEffect).pseudoElement, (animation as CSSAnimation).animationName]),
-          crossfading: "themeChanging" in root.dataset || root.getAnimations().length > 0,
+          crossfading: "themeChanging" in root.dataset || root.getAnimations().some((animation) => animation instanceof CSSTransition),
+          // The page's background, which the browser's toolbar follows, is on its way between the two themes.
+          background: getComputedStyle(root).backgroundColor,
         };
         for (const animation of animations) animation.finish();
         return read;
@@ -378,32 +381,37 @@ test.describe("Lights and theme", () => {
       expect(middle.layers.map(([pseudo]) => pseudo)).toContain("::view-transition-new(eclipse)");
       // The layers are the finished themes: the palette's own crossfade stays off.
       expect(middle.crossfading).toBe(false);
+      expect(["rgb(13, 13, 15)", "rgb(238, 237, 233)"]).not.toContain(middle.background);
       await poured(page);
       await expect.poll(() => scheme(page)).toBe(after);
       for (const colour of await toolbar(page)) expect(colour).toBe(after === "dark" ? "#0d0d0f" : "#eeede9");
     }
   });
 
-  test("a second press mid-pour finishes the first and pours back, leaving nothing stuck", async ({ page }) => {
+  test("a second press mid-pour, by mouse, finishes the first and pours back, leaving nothing stuck", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await expect(eclipse(page)).toHaveAttribute("aria-pressed", "false");
+    const box = (await eclipse(page).boundingBox())!;
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    // Hold the pour halfway, so the second press lands while the page is the transition's picture.
     await page.evaluate(async () => {
-      const button = document.querySelector<HTMLButtonElement>("[data-eclipse]")!;
       const pouring = () => document.getAnimations().filter((animation) => (animation.effect as KeyframeEffect).pseudoElement?.startsWith("::view-transition"));
-      button.click();
       for (let frame = 0; frame < 30 && pouring().length === 0; frame++) await new Promise(requestAnimationFrame);
       for (const animation of pouring()) {
         animation.pause();
         animation.currentTime = 300;
       }
-      button.click();
     });
+    await expect(page.locator("html")).toHaveAttribute("data-pour", "in");
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    await expect(page.locator("html")).toHaveAttribute("data-pour", "out");
     await poured(page);
     await expect.poll(() => scheme(page)).toBe("light");
     await expect(eclipse(page)).toHaveAttribute("aria-pressed", "false");
     expect(await page.evaluate(() => document.getAnimations().filter((animation) => (animation.effect as KeyframeEffect).pseudoElement?.startsWith("::view-transition")).length)).toBe(0);
     for (const colour of await toolbar(page)) expect(colour).toBe("#eeede9");
   });
+
 });

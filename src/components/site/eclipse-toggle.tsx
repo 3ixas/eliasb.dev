@@ -39,31 +39,35 @@ export function EclipseToggle() {
   useEffect(() => watchSystemTheme(), []);
 
   return (
-    <button
-      type="button"
-      data-eclipse
-      aria-label={siteCopy.header.darkTheme}
-      aria-pressed={dark ?? undefined}
-      onClick={press}
-      className="theme-control"
-    >
-      <svg ref={icon} viewBox="0 0 24 24" aria-hidden="true">
-        <mask id="eclipse-bite">
-          <rect x="-4" y="-4" width="32" height="32" fill="#fff" />
-          <circle className="eclipse__shadow" cx="12" cy="12" r="6.8" fill="#000" />
-        </mask>
-        <circle className="eclipse__disc" cx="12" cy="12" r="8.2" fill="currentColor" mask="url(#eclipse-bite)" />
-        <g className="eclipse__rays" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-          <line x1="12" y1="1.5" x2="12" y2="3.5" />
-          <line x1="12" y1="20.5" x2="12" y2="22.5" />
-          <line x1="1.5" y1="12" x2="3.5" y2="12" />
-          <line x1="20.5" y1="12" x2="22.5" y2="12" />
-          <line x1="4.6" y1="4.6" x2="6" y2="6" />
-          <line x1="18" y1="18" x2="19.4" y2="19.4" />
-          <line x1="4.6" y1="19.4" x2="6" y2="18" />
-          <line x1="18" y1="6" x2="19.4" y2="4.6" />
-        </g>
-      </svg>
-    </button>
+    <>
+      <button
+        type="button"
+        data-eclipse
+        aria-label={siteCopy.header.darkTheme}
+        aria-pressed={dark ?? undefined}
+        onClick={press}
+        className="theme-control"
+      >
+        <svg ref={icon} viewBox="0 0 24 24" aria-hidden="true">
+          <mask id="eclipse-bite">
+            <rect x="-4" y="-4" width="32" height="32" fill="#fff" />
+            <circle className="eclipse__shadow" cx="12" cy="12" r="6.8" fill="#000" />
+          </mask>
+          <circle className="eclipse__disc" cx="12" cy="12" r="8.2" fill="currentColor" mask="url(#eclipse-bite)" />
+          <g className="eclipse__rays" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+            <line x1="12" y1="1.5" x2="12" y2="3.5" />
+            <line x1="12" y1="20.5" x2="12" y2="22.5" />
+            <line x1="1.5" y1="12" x2="3.5" y2="12" />
+            <line x1="20.5" y1="12" x2="22.5" y2="12" />
+            <line x1="4.6" y1="4.6" x2="6" y2="6" />
+            <line x1="18" y1="18" x2="19.4" y2="19.4" />
+            <line x1="4.6" y1="19.4" x2="6" y2="18" />
+            <line x1="18" y1="6" x2="19.4" y2="4.6" />
+          </g>
+        </svg>
+      </button>
+      {/* The band of light at the pour's edge (shell.css): shown only while a pour runs. */}
+      <span className="pour-light" aria-hidden="true" />
+    </>
   );
 }

@@ -117,16 +117,25 @@ html:has([data-site]) {
 }
 
 /* ---- Theme change, pressed: the light pours from the theme control (#466) ----
- * theme.ts starts a view transition from the control's centre (--pour-x, --pour-y) and sets data-pour. Dark to light
- * ("out"), the new light page spreads out of the control over the dark one, easing out. Light to dark ("in"), the old
- * light page is drawn back into it, gathering speed, off the dark one beneath. Either way the light page is on top,
- * masked by a circle whose edge softens over --pour-soft and glows a little ahead of the fill. The pseudo-elements
- * exist only while motion is on: theme.ts crossfades or switches instantly otherwise. */
+ * The control holds the light bottled up. theme.ts starts a view transition from the control's centre (--pour-x,
+ * --pour-y) and sets data-pour. Dark to light ("out"), the control flares, a bead of light swells at it, and the light
+ * escapes and flows out over the dark page to the farthest corner (1.1 s). Light to dark ("in"), the light is sucked
+ * back into the control, gathering speed, off the dark page beneath, and the control glows as it takes the last of it
+ * in (0.7 s). Either way the light page is the top layer, masked by a circle whose edge softens over --pour-soft, and
+ * a band of light (.pour-light) rides that edge. The page's background, which the browser's toolbar follows, moves
+ * with it. None of this runs with reduced motion or without view transitions: theme.ts crossfades instead. */
 
 @property --pour {
   syntax: "<length>";
   inherits: false;
   initial-value: 0px;
+}
+
+:root {
+  --pour-out: 1100ms;
+  --pour-in: 700ms;
+  /* The pull: slow to start, gathering speed into the control. */
+  --pour-pull: cubic-bezier(0.55, 0, 0.85, 0.35);
 }
 
 ::view-transition-old(root),
@@ -146,17 +155,56 @@ html:has([data-site]) {
   );
 }
 
-:root[data-pour="out"]::view-transition-new(root) {
-  animation: pour-out 600ms var(--out) both;
+/* The band of light at the edge, brightest just inside it. */
+.pour-light {
+  display: none;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: #fff7e2;
+  view-transition-name: pour-light;
 }
 
-:root[data-pour="in"]::view-transition-old(root) {
-  animation: pour-in 600ms cubic-bezier(0.55, 0, 0.85, 0.35) both;
+:root[data-pour] .pour-light {
+  display: block;
+}
+
+::view-transition-group(pour-light) {
+  z-index: 2;
+}
+
+::view-transition-new(pour-light) {
+  mask-image: radial-gradient(
+    circle at var(--pour-x) var(--pour-y),
+    transparent calc(var(--pour) - var(--pour-soft)),
+    rgb(0 0 0 / 0.75) calc(var(--pour) - var(--pour-soft) * 0.3),
+    transparent var(--pour)
+  );
+}
+
+:root[data-pour="out"]::view-transition-new(root),
+:root[data-pour="out"]::view-transition-new(pour-light) {
+  animation: pour-out var(--pour-out) linear both;
+}
+
+:root[data-pour="in"]::view-transition-old(root),
+:root[data-pour="in"]::view-transition-new(pour-light) {
+  animation: pour-in var(--pour-in) var(--pour-pull) both;
 }
 
 @keyframes pour-out {
-  from { --pour: 0px; }
-  to { --pour: var(--pour-reach); }
+  from {
+    --pour: 0px;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+  }
+  /* The bead swells; then the light escapes, fast at first and slowing as it spreads. */
+  16% {
+    --pour: 40px;
+    animation-timing-function: cubic-bezier(0.35, 0, 0.15, 1);
+  }
+  to {
+    --pour: var(--pour-reach);
+  }
 }
 
 @keyframes pour-in {
@@ -164,48 +212,91 @@ html:has([data-site]) {
   to { --pour: 0px; }
 }
 
-/* The control is the light's source: it rides above the pour and glows as it gives the light out or takes it in.
- * Giving it out, it turns over at once. Taking it in, the sun holds until the light has gathered round it, then
+/* The page's background, under the transition's picture, moves with the light for the browser's toolbar. The two
+ * colours are --page's (tokens.css, TOOLBAR_COLOUR in theme.ts): the live palette has already changed. */
+:root[data-pour="out"]:has([data-site]),
+:root[data-pour="out"]:has([data-site]) body {
+  animation: toolbar-out var(--pour-out) linear both;
+}
+
+:root[data-pour="in"]:has([data-site]),
+:root[data-pour="in"]:has([data-site]) body {
+  animation: toolbar-in var(--pour-in) var(--pour-pull) both;
+}
+
+@keyframes toolbar-out {
+  from {
+    background-color: #0d0d0f;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+  }
+  16% {
+    background-color: #0d0d0f;
+    animation-timing-function: cubic-bezier(0.35, 0, 0.15, 1);
+  }
+  to { background-color: #eeede9; }
+}
+
+@keyframes toolbar-in {
+  from { background-color: #eeede9; }
+  to { background-color: #0d0d0f; }
+}
+
+/* The control is the bottle: it rides above the light. Pouring out, it flares as the bead swells and turns over as
+ * the light escapes. Drawing in, the sun holds while the light comes home, glows as it takes the last of it, then
  * turns over to the moon, which would vanish against the light still there. */
 .theme-control {
   view-transition-name: eclipse;
 }
 
 ::view-transition-group(eclipse) {
-  z-index: 2;
-  animation-duration: 600ms;
+  z-index: 3;
+}
+
+:root[data-pour="out"]::view-transition-group(eclipse) {
+  animation-duration: var(--pour-out);
+}
+
+:root[data-pour="in"]::view-transition-group(eclipse) {
+  animation-duration: var(--pour-in);
 }
 
 :root[data-pour="out"]::view-transition-old(eclipse) {
-  animation: eclipse-leave 160ms ease-out both;
+  animation: eclipse-leave var(--pour-out) ease-out both;
 }
 
 :root[data-pour="out"]::view-transition-new(eclipse) {
-  animation: eclipse-arrive 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: eclipse-arrive var(--pour-out) both;
 }
 
 :root[data-pour="in"]::view-transition-old(eclipse) {
-  animation: eclipse-leave-late 600ms ease-in both;
+  animation: eclipse-leave-late var(--pour-in) ease-in both;
 }
 
 :root[data-pour="in"]::view-transition-new(eclipse) {
-  animation: eclipse-arrive-late 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: eclipse-arrive-late var(--pour-in) both;
 }
 
 :root[data-pour="out"]::view-transition-image-pair(eclipse) {
-  animation: eclipse-give 600ms ease-out both;
+  animation: eclipse-give var(--pour-out) both;
 }
 
 :root[data-pour="in"]::view-transition-image-pair(eclipse) {
-  animation: eclipse-take 600ms ease-in both;
+  animation: eclipse-take var(--pour-in) both;
 }
 
 @keyframes eclipse-leave {
+  0%, 12% { opacity: 1; transform: none; }
+  26% { opacity: 0; transform: rotate(60deg) scale(0.6); }
   to { opacity: 0; transform: rotate(60deg) scale(0.6); }
 }
 
 @keyframes eclipse-arrive {
-  from { opacity: 0; transform: rotate(-120deg) scale(0.6); }
+  0%, 14% {
+    opacity: 0;
+    transform: rotate(-120deg) scale(0.6);
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  55%, to { opacity: 1; transform: none; }
 }
 
 @keyframes eclipse-leave-late {
@@ -214,18 +305,25 @@ html:has([data-site]) {
 }
 
 @keyframes eclipse-arrive-late {
-  0%, 80% { opacity: 0; transform: rotate(-120deg) scale(0.6); }
+  0%, 80% {
+    opacity: 0;
+    transform: rotate(-120deg) scale(0.6);
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
   to { opacity: 1; transform: none; }
 }
 
+/* Uncorked: a flare as the bead swells, fading as the light flows away. */
 @keyframes eclipse-give {
-  from { filter: drop-shadow(0 0 6px rgb(255 247 228)) drop-shadow(0 0 14px rgb(255 247 228 / 0.8)); }
-  to { filter: none; }
+  from { filter: none; animation-timing-function: ease-out; }
+  14% { filter: drop-shadow(0 0 8px rgb(255 247 228)) drop-shadow(0 0 22px rgb(255 247 228 / 0.9)); animation-timing-function: ease-in; }
+  60%, to { filter: none; }
 }
 
+/* Taking it in: the glow grows as the light comes home, and settles as the bottle closes. */
 @keyframes eclipse-take {
-  from { filter: none; }
-  80% { filter: drop-shadow(0 0 6px rgb(255 247 228)) drop-shadow(0 0 14px rgb(255 247 228 / 0.8)); }
+  from { filter: none; animation-timing-function: ease-in; }
+  85% { filter: drop-shadow(0 0 8px rgb(255 247 228)) drop-shadow(0 0 22px rgb(255 247 228 / 0.9)); animation-timing-function: ease-out; }
   to { filter: none; }
 }
 
