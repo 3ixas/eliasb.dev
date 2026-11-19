@@ -28,9 +28,11 @@ function useWeekday(fixed?: string) {
 }
 
 /**
- * Off the clock's first section (R-19), "Today's workout": today's session large, and the whole week as seven rows with
- * today marked. Until the day is known (or with no script) the week is all of it, which is still a complete section; the
- * session's line holds the height of the longest session at the current width, so filling it in moves nothing.
+ * Off the clock's first section (R-19, #493), "Today's workout": today's session as one strong line over the week. The
+ * week is one list read the same at every width ("Monday: Upper body gym"); what shows differs (off-the-clock.css): seven
+ * quiet columns from 960 px, a strip of letters on a narrower screen with script, the week's rows without. Until the day
+ * is known (or with no script) nothing is marked, which is still a complete section; the session's line holds the height
+ * of the longest session, so filling it in moves nothing.
  */
 export function TrainingCell({ now }: { now?: string }) {
   const today = useWeekday(now);
@@ -46,9 +48,14 @@ export function TrainingCell({ now }: { now?: string }) {
       <ol className="otc__week" aria-label={week}>
         {days.map((day, index) => (
           <li key={day.short} data-today={today === index ? "" : undefined} aria-current={today === index ? "date" : undefined}>
-            <span aria-hidden="true">{day.short}</span>
-            <span className="sr-only">{day.long}: </span>
-            <span>{day.session}</span>
+            <span className="otc__week-letter" aria-hidden="true">
+              {day.short.charAt(0)}
+            </span>
+            <span className="otc__week-day">
+              <span aria-hidden="true">{day.short}</span>
+              <span className="sr-only">{day.long}: </span>
+            </span>
+            <span className="otc__week-session">{day.session}</span>
           </li>
         ))}
       </ol>

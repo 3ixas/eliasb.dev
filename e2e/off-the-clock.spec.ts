@@ -5,9 +5,9 @@ import { renderedContrast } from "./support/rendered-contrast";
 import { spoken } from "./support/roll";
 
 /*
- * Off the clock (docs/design/DESIGN.md "The homepage, in order" 7, R-19, R-30, R-34): one paper panel in four sections,
- * each under its own heading: Today's workout; the shelf and screen; this week in history; the GitHub year, with what
- * I'm building now under its total. Each state is a whole panel on /fixtures/off-the-clock, with one cell swapped, so every test also shows the
+ * Off the clock (docs/design/DESIGN.md "The homepage, in order" 7, R-19, R-30, R-34, #493): one paper panel in four
+ * sections, each under its own heading, in a margin column from 960 px: Today's workout; the shelf and screen; this week
+ * in history; the GitHub year, with what I'm building now beside it. Each state is a whole panel on /fixtures/off-the-clock, with one cell swapped, so every test also shows the
  * panel keeping its shape.
  */
 
@@ -371,7 +371,7 @@ test.describe("Off the clock: contrast, sizes and layout", () => {
     expect(results.violations).toEqual([]);
   });
 
-  test("the sections stack; the book and the film sit side by side from 720 px, and the week sits under today's session, in a row from 900 px", async ({ page }) => {
+  test("the sections stack; from 960 px each section's heading sits in the margin, its content to the right; the book and the film side by side from 720 px", async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
     const panel = fixture(page, "github").locator(".otc");
     const [training, shelf, history] = await Promise.all(["training", "shelf", "history"].map((item) => boxOf(cell(panel, item))));
@@ -380,10 +380,38 @@ test.describe("Off the clock: contrast, sizes and layout", () => {
     const [book, film] = await Promise.all(["reading", "film"].map((item) => boxOf(cell(panel, item))));
     if (phone(page)) expect(film.y).toBeGreaterThan(book.y);
     else expect(Math.round(book.y)).toBe(Math.round(film.y));
-    const [today, week] = await Promise.all([boxOf(cell(panel, "training").locator(".otc__today")), boxOf(cell(panel, "training").locator(".otc__week"))]);
+    for (const item of ["training", "shelf", "history"]) {
+      const [heading, content] = await Promise.all([boxOf(cell(panel, item).getByRole("heading", { level: 3 })), boxOf(cell(panel, item).locator(":scope > :not(h3)").first())]);
+      if (width(page) >= 960) expect(content.x).toBeGreaterThan(heading.x + heading.width);
+      else expect(content.y).toBeGreaterThan(heading.y + heading.height - 1);
+    }
+  });
+
+  test("the week: with script, seven columns of day and session from 960 px and a strip of seven letters under it; read the same at both", async ({ page }) => {
+    await page.goto("/fixtures/off-the-clock");
+    await hydrated(page);
+    const training = cell(fixture(page, "training-saturday"), "training");
+    const [today, week] = await Promise.all([boxOf(training.locator(".otc__today")), boxOf(training.locator(".otc__week"))]);
     expect(week.y).toBeGreaterThan(today.y + today.height - 1);
-    const days = await cell(panel, "training").locator(".otc__week li").evaluateAll((items) => new Set(items.map((item) => Math.round(item.getBoundingClientRect().top))).size);
-    expect(days).toBe(width(page) >= 900 ? 1 : 7);
+    const rows = await training.locator(".otc__week li").evaluateAll((items) => new Set(items.map((item) => Math.round(item.getBoundingClientRect().top))).size);
+    expect(rows).toBe(1);
+    const wide = width(page) >= 960;
+    await expect(training.locator(".otc__week-letter").first()).toBeVisible({ visible: !wide });
+    // Under 960 px the session is read but clipped to a pixel, as .sr-only is.
+    expect((await boxOf(training.locator(".otc__week-session").first())).width > 2).toBe(wide);
+    await expect(training.getByRole("listitem").nth(5)).toContainText(`${days[5].long}: ${days[5].session}`);
+  });
+
+  test("without script, under 960 px the week is its rows, so every session is there to read", async ({ browser, page, baseURL }) => {
+    test.skip(width(page) >= 960, "Columns from 960 px, with or without script");
+    const bare = await browser.newContext({ javaScriptEnabled: false, viewport: page.viewportSize()!, baseURL });
+    const plain = await bare.newPage();
+    await plain.goto("/fixtures/off-the-clock");
+    const training = cell(fixture(plain, "training-saturday"), "training");
+    const rows = await training.locator(".otc__week li").evaluateAll((items) => new Set(items.map((item) => Math.round(item.getBoundingClientRect().top))).size);
+    expect(rows).toBe(7);
+    await expect(training.locator(".otc__week-session").nth(5)).toBeVisible();
+    await bare.close();
   });
 });
 

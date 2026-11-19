@@ -32,7 +32,7 @@ export function HistoryBand({ events, dates, source }: { events: HistoryEvent[];
     <div className="otc__history otc__section" data-otc="history" data-state={source ? "archive" : "live"}>
       <h3 className="otc__title">{copy.label}</h3>
       <span className="otc__history-image">
-        {image && <Image src={image.src} alt={image.alt} width={image.width} height={image.height} sizes="76px" />}
+        {image && <Image src={image.src} alt={image.alt} width={image.width} height={image.height} sizes="(min-width: 960px) 96px, 76px" />}
       </span>
       <div>
         {/*
