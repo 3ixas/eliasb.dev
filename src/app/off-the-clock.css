@@ -182,10 +182,16 @@
 /* ---- This week in history ---- */
 
 .otc__history {
+  --picture: 220px;
   display: grid;
-  grid-template-columns: 76px minmax(0, 1fr) auto;
-  align-items: center;
+  grid-template-columns: var(--picture) minmax(0, 1fr) auto;
+  align-items: start;
   gap: 16px 24px;
+}
+
+/* With no picture in the week there is no frame. */
+.otc__history:not([data-pictured]) {
+  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .otc__history > .otc__title {
@@ -193,18 +199,36 @@
   margin-bottom: 4px;
 }
 
-/* The picture's slot keeps its height when an oddity has none, so stepping moves nothing. */
+/*
+ * The picture is large enough to look at, framed at 3:2 (#493, Elias: at 76 px "hard to tell what it is"). Every oddity
+ * shares the frame, so stepping moves nothing; one with no picture shows its year there instead.
+ */
 .otc__history-image {
-  display: block;
-  min-height: 76px;
+  display: grid;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
 }
 
 .otc__history-image img {
   display: block;
-  width: 76px;
-  height: 76px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border-radius: 12px;
+}
+
+.otc__history-year {
+  place-self: center;
+  color: var(--muted);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-panel);
+  font-variant-numeric: lining-nums;
+}
+
+.otc__history .otc__step {
+  align-self: center;
 }
 
 .otc__history-text {
@@ -386,8 +410,12 @@
 
   /* History's row: its heading in the margin, then the picture, the date and fact, and the pill. */
   .otc__history {
-    grid-template-columns: var(--otc-margin) 96px minmax(0, 1fr) auto;
-    align-items: start;
+    --picture: 280px;
+    grid-template-columns: var(--otc-margin) var(--picture) minmax(0, 1fr) auto;
+  }
+
+  .otc__history:not([data-pictured]) {
+    grid-template-columns: var(--otc-margin) minmax(0, 1fr) auto;
   }
 
   .otc__history > :not(.otc__title) {
@@ -399,18 +427,6 @@
     grid-row: 1;
   }
 
-  .otc__history-image {
-    min-height: 96px;
-  }
-
-  .otc__history-image img {
-    width: 96px;
-    height: 96px;
-  }
-
-  .otc__step {
-    align-self: center;
-  }
 }
 
 /* ---- Narrower ---- */
@@ -498,13 +514,13 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .otc__history {
-    grid-template-columns: 76px minmax(0, 1fr);
-    align-items: start;
+  /* On a phone the picture takes the full width, over its date and fact. */
+  .otc__history,
+  .otc__history:not([data-pictured]) {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .otc__step {
-    grid-column: 1 / -1;
+  .otc__history .otc__step {
     justify-self: start;
   }
 }
