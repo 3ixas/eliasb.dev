@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { notFound, siteCopy } from "../src/content/stretch/site-copy";
+import { TEXT_LIMITS } from "../src/content/stretch/story";
 import { renderedContrast } from "./support/rendered-contrast";
 
 test.describe("The 404", () => {
@@ -49,17 +50,17 @@ test.describe("The 404", () => {
     expect(Math.abs(eclipse.x + eclipse.width - (header.x + header.width - 48))).toBeLessThanOrEqual(1);
   });
 
-  test("the missing line shows the address asked for, struck through, with Not on file and 404 in cobalt, and is not a link", async ({ page }) => {
+  test("the visitor pass prints Visitor, the address asked for struck through and Not on file, with 404 in cobalt beside it", async ({ page }) => {
     await page.goto("/nothing-here/at-all");
-    const missing = page.locator("[data-missing]");
-    await expect(missing.locator("s")).toHaveText("/nothing-here/at-all");
-    await expect(missing.locator("s")).toHaveCSS("text-decoration-line", "line-through");
-    await expect(missing.locator("> span")).toHaveText(notFound.missing.line);
-    // The address is set as large as a row's name, not as small as its status.
-    await expect(missing.locator(".missing__address")).toHaveCSS("font-size", "18px");
-    const status = missing.locator("b");
+    const pass = page.getByRole("img", { name: `${notFound.pass.band}. /nothing-here/at-all, struck through. ${notFound.missing.line}.` });
+    await expect(pass).toBeVisible();
+    await expect(pass.locator(".pass__band")).toHaveText(notFound.pass.band);
+    const address = pass.locator(".pass__address");
+    await expect(address).toHaveText("/nothing-here/at-all");
+    await expect(address).toHaveCSS("text-decoration-line", "line-through");
+    await expect(pass.locator(".pass__status")).toHaveText(notFound.missing.line);
+    const status = page.locator("[data-missing] > b");
     await expect(status).toHaveText(notFound.missing.meta);
-    await expect(status).toBeVisible();
     const cobalt = await page.evaluate(() => {
       const probe = document.body.appendChild(document.createElement("i"));
       probe.style.color = "var(--cobalt)";
@@ -68,38 +69,77 @@ test.describe("The 404", () => {
       return colour;
     });
     await expect(status).toHaveCSS("color", cobalt);
-    await expect(missing.locator("a")).toHaveCount(0);
+    await expect(page.locator("[data-missing] a")).toHaveCount(0);
+  });
+
+  test("the pass is the page's one object: small, still, with no lanyard, clip, barcode or scene", async ({ page }) => {
+    await page.goto("/nothing-here");
+    const pass = page.locator(".pass--visitor");
+    await expect(pass).toHaveCount(1);
+    await expect(page.locator(".pass")).toHaveCount(1);
+    await expect(page.locator(".pass__lanyard, .pass__clip, .pass__code, .lanyard, canvas")).toHaveCount(0);
+    await expect(pass).toHaveCSS("animation-name", "none");
+    await expect(pass).toHaveCSS("transform", "none");
+    expect((await pass.locator(".pass__card").boundingBox())!.width).toBeLessThanOrEqual(184);
+    await pass.hover();
+    await expect(pass).toHaveCSS("transform", "none");
+  });
+
+  test("the address fills in without moving anything: the pass and the rows sit where they did without it", async ({ page, browser }) => {
+    const where = async (target: typeof page) => {
+      await target.evaluate(() => document.fonts.ready);
+      // Measured from the title: without script a phone's header is taller (its links are not behind Menu).
+      return target.evaluate(() => {
+        const title = document.querySelector("#not-found-title")!.getBoundingClientRect().top;
+        return [".pass__card", ".not-found__try"].map((selector) => document.querySelector(selector)!.getBoundingClientRect()).map(({ top, height }) => ({ top: top - title, height }));
+      });
+    };
+    const context = await browser.newContext({ javaScriptEnabled: false, viewport: page.viewportSize() });
+    const still = await context.newPage();
+    await still.goto("/nothing-here/at-all");
+    const before = await where(still);
+    await context.close();
+    await page.goto("/nothing-here/at-all");
+    await expect(page.locator(".pass__address")).toHaveText("/nothing-here/at-all");
+    expect(await where(page)).toEqual(before);
   });
 
   test("the prerendered HTML never names a wrong address", async ({ request }) => {
     const html = await (await request.get("/nothing-here/at-all")).text();
     // The page is built once for every missing address, so the row fills its address in the browser.
-    expect(html).not.toContain("_not-found</span>");
-    expect(html).toContain("missing__address");
+    expect(html).not.toContain("_not-found</s>");
+    expect(html).toContain("pass__address");
   });
 
-  test("a 100-character address is shortened in the middle and stays readable", async ({ page }) => {
-    const long = `/${"a-very-long-lost-address-".repeat(5)}end`.slice(0, 100);
-    expect(long).toHaveLength(100);
-    await page.goto(long);
-    const address = page.locator(".missing__address");
-    // The first 23 and last 23 characters around one ellipsis.
-    await expect(address).toHaveText(`${long.slice(0, 23)}…${long.slice(-23)}`);
-    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
-    // The whole row stays on screen, so no part of the address is cut off.
-    await expect
-      .poll(async () => {
-        const box = (await address.boundingBox())!;
-        return box.x >= 0 && box.x + box.width <= page.viewportSize()!.width;
-      })
-      .toBe(true);
+  test("without script the pass prints Visitor and Not on file, and no address", async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    const page = await context.newPage();
+    await page.goto("/nothing-here/at-all");
+    const pass = page.getByRole("img", { name: `${notFound.pass.band}. ${notFound.missing.line}.` });
+    await expect(pass).toBeVisible();
+    await expect(pass.locator(".pass__address")).toHaveText("");
+    await context.close();
   });
 
-  test("shortening never splits an emoji at the cut", async ({ page }) => {
-    // The 23rd character is an emoji: two UTF-16 units that must stay together.
-    const address = `/${"a".repeat(21)}😀${"b".repeat(60)}`;
+  test("shortening never splits an emoji at the cut, and counts it as two letters' width", async ({ page }) => {
+    const half = Math.floor((TEXT_LIMITS.passName - 1) / 2);
+    // Twelve letters and the slash, then an emoji at the cut: two UTF-16 units that must stay together.
+    const address = `/${"a".repeat(half - 3)}😀${"b".repeat(60)}`;
     await page.goto(encodeURI(address));
-    await expect(page.locator(".missing__address")).toHaveText(`/${"a".repeat(21)}😀…${"b".repeat(23)}`);
+    await expect(page.locator(".pass__address")).toHaveText(`/${"a".repeat(half - 3)}😀…${"b".repeat(half)}`);
+  });
+
+  test("a wide-character address keeps both its ends within three lines", async ({ page }) => {
+    const address = `/${"東京の地図".repeat(7)}末`;
+    await page.goto(encodeURI(address));
+    const shown = page.locator(".pass__address");
+    await expect(shown).toHaveText(/^\/東京の地図東京…図東京の地図末$/);
+    const fit = await shown.evaluate((element) => ({
+      lines: Math.round(element.scrollHeight / Number.parseFloat(getComputedStyle(element).lineHeight)),
+      cut: element.scrollHeight > element.clientHeight + 1,
+    }));
+    expect(fit.lines).toBeLessThanOrEqual(3);
+    expect(fit.cut).toBe(false);
   });
 
   test("says what to try: the five homepage sections as rows, in the page's order, with the copy deck's lines", async ({ page }) => {
@@ -124,10 +164,12 @@ test.describe("The 404", () => {
       await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
       await page.goto("/nothing-here/at-all");
       await page.evaluate(() => document.fonts.ready);
-      await expect(page.locator(".missing__address")).toHaveText("/nothing-here/at-all");
+      await expect(page.locator(".pass__address")).toHaveText("/nothing-here/at-all");
+      // The pass's print is hidden from assistive technology (its name says it all), but it is read by eye: measure it.
+      await page.locator(".pass--visitor [aria-hidden='true']").evaluateAll((elements) => elements.forEach((element) => element.removeAttribute("aria-hidden")));
       const texts = await page.locator(".not-found").innerText();
       const readings = (await renderedContrast(page)).filter((reading) => texts.includes(reading.text));
-      for (const expected of [notFound.heading, "/nothing-here/at-all", notFound.missing.line, notFound.missing.meta, notFound.tryLines.work]) {
+      for (const expected of [notFound.heading, notFound.pass.band, "/nothing-here/at-all", notFound.missing.line, notFound.missing.meta, notFound.tryLines.work]) {
         expect(readings.some((reading) => reading.text.includes(expected)), expected).toBe(true);
       }
       expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);

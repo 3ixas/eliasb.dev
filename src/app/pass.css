@@ -272,6 +272,43 @@
   }
 }
 
+/* The 404's visitor pass (#470): small and still, with no lanyard. A band of ink on the stock under a hairline, a silhouette
+   in the photo's place, and the address asked for, struck through, over at most three lines. */
+.pass--visitor {
+  --card: 184px;
+  padding-top: 0;
+  transform: none;
+  animation: none;
+  transition: none;
+  will-change: auto;
+}
+
+.pass--visitor .pass__band {
+  color: #141416;
+  background: none;
+  box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.14);
+}
+
+.pass__silhouette {
+  overflow: hidden;
+  fill: #b9b8b1;
+}
+
+.pass__address {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  color: #4b4a46;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: 1.24em;
+  font-weight: 500;
+  line-height: 1.12;
+}
+
 /* Forced colours keep the pass as drawn: it is a picture of a printed object. */
 @media (forced-colors: active) {
   .pass__card {

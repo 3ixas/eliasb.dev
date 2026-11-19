@@ -96,4 +96,24 @@ test.describe("Worst-case data", () => {
     }
     expect(await page.locator("[data-case=figures] .story-figures").count()).toBe(3);
   });
+  test("the 404's pass shortens a 200-character address in the middle to its limit, names it whole, and keeps it on the card", async ({ page }) => {
+    const long = `/${"a-very-long-lost-address-".repeat(9)}end`.slice(0, 200);
+    expect(long).toHaveLength(200);
+    await page.goto(long);
+    const address = page.locator(".pass__address");
+    const half = Math.floor((TEXT_LIMITS.passName - 1) / 2);
+    await expect(address).toHaveText(`${long.slice(0, half)}…${long.slice(-half)}`);
+    await expect(page.locator(".pass--visitor")).toHaveAttribute("aria-label", new RegExp(`${long}, struck through`));
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+    // At most three lines, none of them cut, inside the card.
+    const fit = await address.evaluate((element) => {
+      const card = element.closest(".pass__card")!.getBoundingClientRect();
+      const box = element.getBoundingClientRect();
+      const lines = Math.round(element.scrollHeight / Number.parseFloat(getComputedStyle(element).lineHeight));
+      return { lines, cut: element.scrollHeight > element.clientHeight + 1, inside: box.right <= card.right + 1 && box.bottom <= card.bottom };
+    });
+    expect(fit.lines).toBeLessThanOrEqual(3);
+    expect(fit.cut).toBe(false);
+    expect(fit.inside).toBe(true);
+  });
 });

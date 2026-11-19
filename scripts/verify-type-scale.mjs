@@ -29,7 +29,7 @@ if (typeTokens.size < 12) problems.push(`tokens.css defines ${typeTokens.size} -
 
 /**
  * A staff pass is drawn in em of its card's width ÷ 14.5 (pass.css), so it prints the same at any card width. Its em is
- * the card's width ÷ 14.5 (at least 14.6 px, as the smallest card is the opening's 212 px), its sizes are 1 em or more,
+ * the card's width ÷ 14.5, its sizes are 1 em or more (the 404's 184 px visitor pass, #470, has the smallest em, 12.7 px),
  * its small print is floored at the 13 px floor, and the band's name at 24 px, so it stays large text. Only pass.css may
  * size text this way.
  */

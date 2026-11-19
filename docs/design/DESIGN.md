@@ -136,7 +136,7 @@ The sheet is unchanged: it is what prints and what `public/Elias-Bennett-Resume.
 
 ## The 404
 
-The `h1`, "This page doesn’t exist.", and its line. The address asked for, struck through, with "Not on file" and "404". Then "Try one of these" and the five homepage sections as rows, with the copy deck's lines.
+The `h1`, "This page doesn’t exist.", and its line. Then the visitor pass, the page's one object ([#470](https://github.com/3ixas/eliasb.dev/issues/470), chosen by Elias on 19 November 2026 from three placements): a staff pass's card at 184 px, small and still, with no lanyard, no 3D scene and no drag. It prints "Visitor" in ink on a band of the card stock under a hairline, a grey silhouette where the portrait would be, the address asked for, struck through and shortened in the middle to the pass's text limit (32 characters, three lines at most), and "Not on file". It has no barcode. It is a picture (`role="img"`) named by its print with the whole address; it keeps its printed colours in both themes and in forced colours. "404" sits in cobalt at its foot. Without script the pass prints no address. Then "Try one of these" and the five homepage sections as rows, with the copy deck's lines.
 
 ## Say hello
 
