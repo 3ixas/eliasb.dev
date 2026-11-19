@@ -569,7 +569,7 @@ html:has([data-site]) {
   color: var(--ink);
   font-family: var(--serif);
   font-optical-sizing: auto;
-  font-size: clamp(28px, 5vw, 72px);
+  font-size: clamp(28px, 3.4vw, 48px);
   font-weight: 300;
   line-height: 1.05;
   letter-spacing: -0.035em;

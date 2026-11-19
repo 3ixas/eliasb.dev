@@ -24,7 +24,7 @@
   font-family: var(--serif);
   font-optical-sizing: auto;
   font-weight: 400;
-  font-size: clamp(32px, 3.4vw, 50px);
+  font-size: clamp(26px, 2.4vw, 34px);
   line-height: 1;
   letter-spacing: -0.03em;
   overflow-wrap: anywhere;
@@ -86,7 +86,7 @@
 }
 
 .project--wide .project__name {
-  font-size: clamp(44px, 5.2vw, 76px);
+  font-size: clamp(32px, 3.4vw, 48px);
 }
 
 .project--wide .project__shot {
@@ -177,7 +177,7 @@
 }
 
 .archive__grid .project__name {
-  font-size: clamp(28px, 2.6vw, 38px);
+  font-size: var(--type-panel);
 }
 
 .archive__grid .project__shot {

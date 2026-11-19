@@ -172,7 +172,7 @@ test.describe("Homepage shell", () => {
     await expect(header.locator("img")).toHaveCount(0);
     const name = header.getByRole("link", { name: "Elias Bennett", exact: true });
     await expect(name).toHaveAttribute("href", "/");
-    await expect(name).toHaveCSS("font-size", "20px");
+    await expect(name).toHaveCSS("font-size", "18px");
     await expect(name).toHaveCSS("font-weight", "500");
     expect(await name.evaluate((element) => getComputedStyle(element).fontFamily)).toMatch(/^Newsreader/);
     if (narrow(page, 400)) await expect(header.locator("[data-greeting]")).toBeHidden();
