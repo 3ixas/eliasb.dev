@@ -2,7 +2,8 @@
 # T3 Code's project scripts (t3.json) call this from the checkout's root.
 #   setup: install dependencies, copy .env.local from the main checkout, and give this
 #          checkout its own dev port in .dev-port (gitignored).
-#   dev:   start the dev server on that port; a checkout without .dev-port uses 3000.
+#   dev:   start the dev server on that port (a checkout without .dev-port uses 3000), with
+#          BOARD_FIXTURES=1 so the fixture specs can reuse it (docs/runbooks/local-testing.md).
 # The port is derived from the checkout's path, so it stays the same across runs, and is
 # kept in 3101-3999: 3000 is the main checkout's and 3100 is Playwright's default. The same
 # number works as this checkout's E2E_PORT (docs/runbooks/local-testing.md).
@@ -59,7 +60,7 @@ case "${1:-}" in
     ;;
   dev)
     port=$(cat "$port_file" 2>/dev/null || echo 3000)
-    exec pnpm exec next dev -p "$port" -H 127.0.0.1
+    BOARD_FIXTURES=1 exec pnpm exec next dev -p "$port" -H 127.0.0.1
     ;;
   *)
     echo "Usage: scripts/t3-worktree.sh setup|dev" >&2
