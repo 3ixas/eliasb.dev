@@ -381,19 +381,7 @@ Shared labels: ← Work · Next role · Evidence · section numbers 01–06 ([#1
 
 ## Passes and panels · Staff passes
 
-What each employer's pass prints, as approved in the passes and panels spec (R-12, 11 November 2026). Each point is a lead over a detail; `verify:copy` and `passProblems` check each against its Role story.
-
-| Pass | Lead | Detail |
-|---|---|---|
-| BNP Paribas | Winner | Digitisation competition, 2025 |
-| BNP Paribas | Take Ownership | Award, Q1 2026 |
-| BNP Paribas | AI workflow | Used by several teams |
-| Joveen | −40% | Page load |
-| Joveen | 520 → 230 ms | Key API p95 |
-| Joveen | +30% | Mobile retention |
-| Optegra | 62 → 88% | Core Web Vitals pass rate |
-| Optegra | −30% | p95 page load |
-| Optegra | +15% | Consultation conversion |
+Retired by [#493](https://github.com/3ixas/eliasb.dev/issues/493) (Elias, 19 November 2026): a pass prints who and when (the employer, the name, role and dates, and the status), never results. Its three points (Winner, Take Ownership and AI workflow; −40%, 520 → 230 ms and +30%; 62 → 88%, −30% and +15%) repeated what Work's panels draw, so they are gone from the pass. Each is still told by its Role story.
 
 ## Passes and panels · Work
 

@@ -95,6 +95,10 @@ async function measureOnce(page: Page): Promise<ContrastReading[]> {
         if (own.top < window.top || own.bottom > window.bottom) continue;
       }
       if (!element.checkVisibility({ opacityProperty: true, visibilityProperty: true })) continue;
+      // Visually hidden for assistive technology by clipping (a Work panel's header on a phone, #493): not seen, so not measured.
+      let clipped = false;
+      for (let ancestor: Element | null = element; ancestor && !clipped; ancestor = ancestor.parentElement) clipped = getComputedStyle(ancestor).clipPath === "inset(50%)";
+      if (clipped) continue;
       const range = document.createRange();
       range.selectNodeContents(node);
       // One reading per line: a run that wraps is measured where its words are, not across the box spanning both lines,

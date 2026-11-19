@@ -11,6 +11,7 @@ import { canDrawScene, withScene } from "./support/scene";
  */
 
 test("a software renderer keeps the printed passes", async ({ page, browserName }) => {
+  test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
   test.skip(browserName !== "chromium", "Headless Chromium renders in software");
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
@@ -21,6 +22,7 @@ test("a software renderer keeps the printed passes", async ({ page, browserName 
 });
 
 test("headless WebKit, which draws in software in CI, keeps the printed passes", async ({ page, browserName }, info) => {
+  test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
   test.skip(browserName !== "webkit" || !info.project.name.includes("-1440-light"), "WebKit, once");
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
@@ -63,6 +65,7 @@ test.describe("The 3D staff passes", () => {
   });
 
   test("the homepage's three passes hang in one scene, which spans the rail, and keep their names and links", async ({ page }) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
     await page.goto("/");
     await hung(page);
     await expect(scene(page)).toHaveCount(1);
@@ -104,6 +107,7 @@ test.describe("The 3D staff passes", () => {
   });
 
   test("a drag on a card swings it and goes nowhere; a click follows its pass's link", async ({ page }, info) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
     test.skip(!info.project.name.includes("-1440-"), "A mouse, at the desktop width");
     await page.goto("/");
     await hung(page);
@@ -123,6 +127,7 @@ test.describe("The 3D staff passes", () => {
   });
 
   test("a Ctrl or Cmd click on a card opens its link in a new tab, as on the printed pass", async ({ page, context }, info) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
     test.skip(!info.project.name.includes("-1440-"), "A mouse, at the desktop width");
     await page.goto("/");
     await hung(page);
@@ -136,6 +141,7 @@ test.describe("The 3D staff passes", () => {
   });
 
   test("a middle press let go off the canvas leaves the cards working", async ({ page }, info) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
     test.skip(!info.project.name.includes("-1440-"), "A mouse, at the desktop width");
     await page.goto("/");
     await hung(page);
@@ -151,6 +157,7 @@ test.describe("The 3D staff passes", () => {
   });
 
   test("the canvas narrows with the rail when the window does", async ({ page }, info) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
     test.skip(!info.project.name.includes("-390-"), "From a tablet width down to the phone's");
     await page.setViewportSize({ width: 820, height: 844 });
     await page.goto("/");
@@ -194,6 +201,7 @@ test.describe("The 3D staff passes", () => {
   });
 
   test("reduced motion turned on puts the printed passes back, and turned off hangs them again", async ({ page }, info) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
     test.skip(!info.project.name.includes("-1440-"), "Once, at the desktop width");
     await page.goto("/");
     await hung(page);
@@ -206,6 +214,7 @@ test.describe("The 3D staff passes", () => {
   });
 
   test("the printed passes never show before the scene takes over", async ({ page }) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
     // Every frame from the first paint: the print's opacity, until the scene has drawn.
     await page.addInitScript(() => {
       const seen: string[] = ((window as unknown as { printSeen: string[] }).printSeen = []);
@@ -225,6 +234,7 @@ test.describe("The 3D staff passes", () => {
   });
 
   test("the scene shifts nothing on the page", async ({ page }) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
     await page.goto("/");
     const total = page.evaluate(
       () =>
@@ -244,6 +254,7 @@ test.describe("The 3D staff passes", () => {
 
 test.describe("With reduced motion", () => {
   test("the printed passes stay, with no scene", async ({ page, browserName }) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
     test.skip(browserName !== "chromium", "Chromium");
     await page.goto("/");
     await rail(page).scrollIntoViewIfNeeded();

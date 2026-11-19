@@ -9,13 +9,17 @@ import { withoutScene } from "./support/scene";
 /*
  * The homepage's opening (docs/design/DESIGN.md "The homepage, in order" 2 and "The staff pass", R-11 and R-12): the
  * opening line as the page's one h1, its supporting line, and the three employers' staff passes, BNP Paribas first and
- * largest, each printed with its three points and linking to its employer in Work.
+ * largest, each printing who and when and linking to its employer in Work. On a phone the opening is its words, and each
+ * pass hangs in its own panel in Work instead (#493), so the print checks read whichever passes are shown.
  */
 
 const slugs = ["bnp-paribas", "joveen", "optegra"] as const;
 const heading = (page: Page) => page.getByRole("heading", { level: 1 });
 const passes = (page: Page) => page.locator(".opening .pass");
 const width = (page: Page) => page.viewportSize()?.width ?? 0;
+const phone = (page: Page) => width(page) < 720;
+/** The passes on screen: the opening's from 720 px, Work's panels' on a phone. */
+const shownPasses = (page: Page) => page.locator(phone(page) ? ".work__pass .pass" : ".opening .pass");
 const settled = (page: Page) => page.evaluate(() => document.fonts.ready.then(() => true));
 
 test.describe("The opening line", () => {
@@ -56,8 +60,8 @@ test.describe("The opening line", () => {
     await page.reload();
     await expect(heading(page)).toHaveText(opening.headline);
     await expect(page.locator(".opening__support")).toHaveText(opening.support);
-    await expect(passes(page)).toHaveCount(3);
-    for (const pass of await passes(page).all()) await expect(pass).toBeVisible();
+    await expect(shownPasses(page)).toHaveCount(3);
+    for (const pass of await shownPasses(page).all()) await expect(pass).toBeVisible();
   });
 
   test("the old opening's reacting employer, mini pass, reveal words and hero are gone", async ({ page }) => {
@@ -87,6 +91,7 @@ test.describe("The first screen", () => {
 
   test("the text is beside the passes from 1260 px, above them under it, and the passes hang from the top of the section", async ({ page }) => {
     await page.goto("/");
+    test.skip(phone(page), "On a phone the passes are in Work's panels");
     await settled(page);
     const [text, rail, section] = await Promise.all([page.locator(".opening__text").boundingBox(), page.locator(".opening__rail").boundingBox(), page.locator(".opening").boundingBox()]);
     if (width(page) >= 1260) {
@@ -99,7 +104,7 @@ test.describe("The first screen", () => {
   });
 
   test("under 900 px the passes scroll sideways inside their rail, BNP Paribas first, and the page does not", async ({ page }) => {
-    test.skip(width(page) >= 900, "The rail scrolls under 900 px");
+    test.skip(width(page) >= 900 || phone(page), "The rail scrolls from 720 to 900 px");
     await page.goto("/");
     await settled(page);
     const rail = page.locator(".opening__rail");
@@ -117,7 +122,27 @@ test.describe("The staff passes", () => {
     await page.goto("/");
   });
 
+  test("on a phone the opening is its words, and each Work panel carries its employer's pass, hidden from assistive technology", async ({ page }) => {
+    test.skip(!phone(page), "Phones only");
+    await expect(page.locator(".opening__rail")).toBeHidden();
+    for (const slug of slugs) {
+      const pass = page.locator(`#${slug} .work__pass`);
+      await expect(pass.locator(".pass")).toBeVisible();
+      await expect(pass).toHaveAttribute("aria-hidden", "true");
+      // The pass prints the name, role and dates, so the panel's own header is there for assistive technology alone.
+      await expect(page.locator(`#${slug} .panel__name`)).toHaveText(passRecords[slug].short);
+      expect((await page.locator(`#${slug} .panel__head`).boundingBox())!.width).toBeLessThanOrEqual(1);
+    }
+  });
+
+  test("from 720 px the passes hang in the opening, and the panels carry none", async ({ page }) => {
+    test.skip(phone(page), "From 720 px");
+    await expect(passes(page)).toHaveCount(3);
+    await expect(page.locator(".work__pass").first()).toBeHidden();
+  });
+
   test("three passes, BNP Paribas first and largest, each linking to its employer in Work", async ({ page }) => {
+    test.skip(phone(page), "On a phone the passes are in Work's panels");
     expect(await passes(page).evaluateAll((all) => all.map((pass) => pass.getAttribute("href")))).toEqual(slugs.map((slug) => `#${slug}`));
     for (const slug of slugs) await expect(page.locator(`#${slug}`)).toHaveCount(1);
     const widths = await passes(page).evaluateAll((all) => all.map((pass) => (pass as HTMLElement).offsetWidth));
@@ -127,26 +152,25 @@ test.describe("The staff passes", () => {
     expect(tops[0]).toBeGreaterThan(Math.max(tops[1], tops[2]));
   });
 
-  test("each prints the band, portrait, name, role, dates, three points, status and barcode, and its name is its print", async ({ page }) => {
+  test("each prints the band, portrait, name, role, dates, status and barcode, and no results, and its name is its print", async ({ page }) => {
     for (const [index, slug] of slugs.entries()) {
-      const pass = passes(page).nth(index);
+      const pass = shownPasses(page).nth(index);
       const card = pass.locator(".pass__card");
-      const { short, points } = passRecords[slug];
+      const { short } = passRecords[slug];
       const { role, dates } = roleStories[slug];
       await expect(card.locator(".pass__band")).toHaveText(short);
       await expect(card.locator(".pass__photo")).toHaveAttribute("src", /elias-evening-pass/);
       await expect(card.locator(".pass__who")).toHaveText(`Elias Bennett${role}${dates}`);
-      await expect(card.locator(".pass__points > span")).toHaveText(points.map(({ lead, detail }) => `${lead}${detail}`));
+      await expect(card.locator(".pass__points")).toHaveCount(0);
       await expect(card.locator(".pass__status")).toHaveText(passStatus(passHang[slug].state));
       await expect(card.locator(".pass__code")).toBeVisible();
       await expect(card).toHaveAttribute("aria-hidden", "true");
-      await expect(pass).toHaveAccessibleName(passName(slug));
-      for (const { lead, detail } of points) expect(passName(slug)).toContain(`${lead}, ${detail}`);
+      if (!phone(page)) await expect(pass).toHaveAccessibleName(passName(slug));
     }
   });
 
   test("the current pass is in colour with the hologram and Valid · present; the returned ones are greyscale", async ({ page }) => {
-    const [bnp, joveen, optegra] = await passes(page).all();
+    const [bnp, joveen, optegra] = await shownPasses(page).all();
     await expect(bnp.locator(".pass__holo")).toHaveCount(1);
     await expect(bnp.locator(".pass__status")).toHaveText("Valid · present");
     await expect(bnp.locator(".pass__photo")).toHaveCSS("filter", "none");
@@ -159,7 +183,7 @@ test.describe("The staff passes", () => {
 
   test("the clip's legs enter the slot and end at its lower edge", async ({ page }) => {
     await settled(page);
-    for (const pass of await passes(page).all()) {
+    for (const pass of await shownPasses(page).all()) {
       const [clip, slot] = await Promise.all([
         pass.locator(".pass__clip").evaluate((element) => {
           const box = element.getBoundingClientRect();
@@ -175,18 +199,19 @@ test.describe("The staff passes", () => {
 
   test("every text on a pass is at least 13 px", async ({ page }) => {
     await settled(page);
-    const sizes = await page.locator(".opening .pass__card").evaluateAll((cards) =>
+    const sizes = await shownPasses(page).locator(".pass__card").evaluateAll((cards) =>
       cards.flatMap((card) =>
         [...card.querySelectorAll<HTMLElement>("*")]
           .filter((element) => [...element.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent!.trim()))
           .map((element) => [element.textContent!.trim(), parseFloat(getComputedStyle(element).fontSize)] as const),
       ),
     );
-    expect(sizes.length).toBeGreaterThan(20);
+    expect(sizes.length).toBeGreaterThan(12);
     for (const [text, size] of sizes) expect(size, text).toBeGreaterThanOrEqual(13);
   });
 
-  test("printed passes swing to rest once on arrival, each 80 ms after the last, and rest at once with reduced motion", async ({ browser }) => {
+  test("printed passes swing to rest once on arrival, each 80 ms after the last, and rest at once with reduced motion", async ({ browser }, info) => {
+    test.skip(info.project.name.includes("-390-") || info.project.name.includes("-320-"), "The opening's passes hang from 720 px");
     for (const reducedMotion of ["no-preference", "reduce"] as const) {
       const context = await browser.newContext({ reducedMotion });
       // Where the 3D scene can draw, it takes the printed passes' place and swings them itself (lanyard.spec).
@@ -207,6 +232,7 @@ test.describe("The staff passes", () => {
 
   test("on hover a pass leans the other way and catches the light where the pointer is", async ({ page }) => {
     test.skip(!(await page.evaluate(() => matchMedia("(hover: hover) and (pointer: fine)").matches)), "Hover needs a fine pointer");
+    test.skip(phone(page), "On a phone the passes are pictures in Work's panels");
     // The suite runs with reduced motion; the hover's lean and light are motion, so the page is loaded again without it,
     // and without the 3D scene, which takes the printed passes' place wherever it can draw (lanyard.spec).
     await page.emulateMedia({ reducedMotion: "no-preference" });
@@ -227,6 +253,7 @@ test.describe("The staff passes", () => {
 
   test("a pass is a keyboard stop with the one focus ring, and Enter goes to its employer in Work", async ({ page, browserName }) => {
     test.skip(browserName === "webkit", "Safari does not Tab to links by default");
+    test.skip(phone(page), "On a phone the passes are pictures in Work's panels, not links");
     await page.emulateMedia({ reducedMotion: "reduce" });
     const pass = passes(page).first();
     await pass.focus();
@@ -246,11 +273,13 @@ test.describe("The staff passes", () => {
       await page.reload();
       await settled(page);
       // The passes' print is hidden from assistive technology, which the measure skips, so it is measured with it shown.
-      await page.evaluate(() => document.querySelectorAll(".opening [aria-hidden='true']").forEach((element) => element.removeAttribute("aria-hidden")));
-      const texts = await page.locator(".opening").evaluate((element) => (element as HTMLElement).innerText);
+      const where = phone(page) ? ".opening, .work__pass" : ".opening";
+      await page.evaluate((selector) => document.querySelectorAll(`:is(${selector}) [aria-hidden='true'], .work__pass[aria-hidden='true']`).forEach((element) => element.removeAttribute("aria-hidden")), where);
+      const texts = (await page.locator(where).evaluateAll((elements) => elements.map((element) => (element as HTMLElement).innerText))).join("\n");
       const readings = (await renderedContrast(page)).filter((reading) => texts.includes(reading.text));
-      // Under 900 px only the first pass is on screen; the others are in the rail's scroll.
-      const shown = width(page) < 900 ? [opening.support.slice(0, 20), "Valid · present"] : [opening.support.slice(0, 20), "Valid · present", "Returned", "Key API p95"];
+      // From 720 to 900 px only the first pass is on screen; the others are in the rail's scroll. On a phone each is in its panel.
+      const shown =
+        width(page) < 900 && !phone(page) ? [opening.support.slice(0, 20), "Valid · present"] : [opening.support.slice(0, 20), "Valid · present", "Returned", roleStories.joveen.role];
       for (const expected of shown) {
         expect(readings.some((reading) => reading.text.includes(expected)), expected).toBe(true);
       }
