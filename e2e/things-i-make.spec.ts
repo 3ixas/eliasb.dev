@@ -80,19 +80,17 @@ test.describe("Things I make", () => {
   test("the phone carousel, the 44 px objects and the closer looks are gone", async ({ page }) => {
   });
 
-  test("every panel casts its own colour in light, and in dark each also glows in it", async ({ page }) => {
+  test("every panel casts its own colour in light; in dark it casts black and nothing glows (#493)", async ({ page }) => {
     const shadows = () => panels(page).evaluateAll((all) => all.map((panel) => getComputedStyle(panel).boxShadow));
-    // The glow is the last layer, its colour transparent in light, so it draws nothing there.
-    const unlit = /rgba\([^)]*, 0\) 0px 50px 90px -56px$/;
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
     await page.reload();
     for (const shadow of await shadows()) {
       expect(shadow).toMatch(/0px 6px 14px -6px/);
-      expect(shadow).toMatch(unlit);
+      expect(shadow).not.toContain("90px");
     }
     await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" });
     await page.reload();
-    for (const shadow of await shadows()) expect(shadow).not.toMatch(unlit);
+    for (const shadow of await shadows()) expect(shadow).toMatch(/^rgba\(0, 0, 0, 0\.5\) 0px 1px 2px 0px, rgba\(0, 0, 0, 0\.55\) 0px 6px 14px -6px, rgba\(0, 0, 0, 0\.55\) 0px 28px 56px -28px$/);
     // A bright field (its ink darker than it) takes the stronger rim in dark, as on every panel (parts.css).
     const rims = await panels(page).evaluateAll((all) => all.map((panel) => [panel.classList.contains("surface--bright"), getComputedStyle(panel, "::after").boxShadow] as const));
     expect(rims.filter(([bright]) => bright).length).toBeGreaterThan(0);

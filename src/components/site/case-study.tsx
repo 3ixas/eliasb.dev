@@ -105,7 +105,7 @@ function projectFor(slug: string): Project & Required<Pick<Project, "panel" | "s
 function Opening({ study, project }: { study: CaseStudy; project: ReturnType<typeof projectFor> }) {
   const { links, screenshot } = project;
   return (
-    <Panel as="header" colours={project.panel} glow className="case-open">
+    <Panel as="header" colours={project.panel} className="case-open">
       <StoryBack href="/things-i-make" label={caseStudyCopy.back} />
       <div className="case-open__text">
         <h1 id="case-study-title" className="case-open__title">

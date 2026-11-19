@@ -26,7 +26,7 @@ type ProjectPanelProps = {
 
 /**
  * A project as a panel (DESIGN.md "The panel", R-17 and R-23), the one part the homepage and the archive share. The whole
- * panel is the link: to its case study in its own field and ink, which glows in its own colour in the dark theme; or, for a
+ * panel is the link: to its case study in its own field and ink; or, for a
  * project with no case study, on paper to wherever it lives, marked ↗ and opening in a new tab. A project with no
  * screenshot is a complete panel of text. Styles are in projects.css.
  */
@@ -34,7 +34,7 @@ export function ProjectPanel({ project, line, level = 3, wide = false, meta = fa
   const href = projectHref(project);
   const external = !isInternalHref(href);
   const coloured = Boolean(project.links.caseStudy && project.panel);
-  const surface = panelSurface(coloured ? project.panel : undefined, { glow: coloured });
+  const surface = panelSurface(coloured ? project.panel : undefined);
   const classes = [surface.className, "project", wide ? "project--wide" : null, project.screenshot ? null : "project--text"].filter(Boolean).join(" ");
   const Heading = level === 2 ? "h2" : "h3";
   const { screenshot } = project;
