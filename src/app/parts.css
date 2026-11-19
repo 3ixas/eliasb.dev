@@ -50,10 +50,10 @@
  * and a shade along the bottom, over an exact 1 px edge (in light its own ink; in dark a faint white rim, so a field
  * with dark ink keeps its edge on the dark page); its field is a touch lighter at the top and deeper at the foot; and
  * it sits on the page with a close contact shadow and a soft, wide one tinted by its own field, so a green panel casts
- * green, not grey. In dark the shadows are black and deeper.
+ * green, not grey. In dark the shadows are black and deeper, and nothing glows in its own colour (#493).
  *
  * Whatever wears it tunes the knobs, never the shadows: --rim (the dark rim), --edge (the light one), --cast (the tinted
- * shadow), --lit and --foot (the field at its top and foot), --glow (a project's colour in the dark).
+ * shadow), --lit and --foot (the field at its top and foot).
  */
 .surface {
   --field: var(--paper);
@@ -63,7 +63,6 @@
   --cast: light-dark(color-mix(in srgb, var(--field) 42%, transparent), rgb(0 0 0 / 0.55));
   --lit: light-dark(color-mix(in srgb, var(--field), #fff 5%), color-mix(in srgb, var(--field), #fff 7%));
   --foot: color-mix(in srgb, var(--field), #000 8%);
-  --glow: transparent;
   position: relative;
   isolation: isolate;
   background-color: var(--field);
@@ -72,8 +71,7 @@
   box-shadow:
     0 1px 2px light-dark(rgb(20 20 18 / 0.08), rgb(0 0 0 / 0.5)),
     0 6px 14px -6px var(--cast),
-    0 28px 56px -28px var(--cast),
-    0 50px 90px -56px var(--glow);
+    0 28px 56px -28px var(--cast);
 }
 
 /* The edges sit over whatever fills the surface, so an image to its edge still has them. */
@@ -116,11 +114,6 @@
   --rim: var(--hair);
   --cast: light-dark(rgb(20 20 18 / 0.12), rgb(0 0 0 / 0.55));
   --foot: light-dark(color-mix(in srgb, var(--field), #000 3%), color-mix(in srgb, var(--field), #000 8%));
-}
-
-/* In the dark theme a project's panel glows in its own colour as well. */
-.surface--glow {
-  --glow: light-dark(transparent, color-mix(in srgb, var(--field) 70%, transparent));
 }
 
 .panel__head {

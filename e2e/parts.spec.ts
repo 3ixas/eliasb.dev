@@ -87,16 +87,18 @@ test.describe("The panel", () => {
     expect((await style(head.locator(".panel__meta"), "text-align"))["text-align"]).toBe("right");
   });
 
-  test("a paper panel follows the theme with a hairline, and a project's glows only in the dark", async ({ page }, testInfo) => {
+  test("a paper panel follows the theme with a hairline, and a project's casts its colour in light and nothing glows in dark", async ({ page }, testInfo) => {
     await page.goto(fixture);
     const paper = await style(page.locator('[data-panel="paper"]'), "background-color", "box-shadow");
     const dark = testInfo.project.name.endsWith("-dark");
     expect(paper["background-color"]).toBe(dark ? "rgb(25, 25, 28)" : "rgb(251, 251, 249)");
     const hair = dark ? "rgba(240, 239, 235, 0.16)" : "rgba(20, 20, 22, 0.14)";
     expect(await page.locator('[data-panel="paper"]').evaluate((element) => getComputedStyle(element, "::after").boxShadow)).toContain(`${hair} 0px 0px 0px 1px inset`);
-    const glow = (await style(page.locator('[data-panel="threshold"]'), "box-shadow"))["box-shadow"];
-    // The glow is Threshold's field at 70%, which the browser writes as a color() in sRGB.
-    expect(glow).toMatch(dark ? /color\(srgb 0\.77\d* 0\.56\d* 0\.36\d* \/ 0\.7\) 0px 50px 90px -56px$/ : /rgba\(0, 0, 0, 0\) 0px 50px 90px -56px$/);
+    const cast = (await style(page.locator('[data-panel="threshold"]'), "box-shadow"))["box-shadow"];
+    // In light the wide shadow is Threshold's field at 42%, which the browser writes as a color() in sRGB; in dark it is
+    // black, and no layer glows in the field's colour (#493).
+    expect(cast).toMatch(dark ? /rgba\(0, 0, 0, 0\.55\) 0px 28px 56px -28px$/ : /color\(srgb 0\.77\d* 0\.56\d* 0\.36\d* \/ 0\.42\) 0px 28px 56px -28px$/);
+    expect(cast).not.toContain("90px");
   });
 });
 

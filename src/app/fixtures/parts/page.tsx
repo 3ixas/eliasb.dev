@@ -91,7 +91,7 @@ export default async function PartsFixtures() {
               );
             })}
             {featured.map((project) => (
-              <Panel key={project.slug} as="article" colours={project.panel} glow data-panel={project.slug}>
+              <Panel key={project.slug} as="article" colours={project.panel} data-panel={project.slug}>
                 <PanelHead name={project.name} meta={[project.type, String(project.year)]} />
                 <ul className="chips" aria-label="Stack" style={{ marginTop: 24 }}>
                   {caseStudies[project.slug as keyof typeof caseStudies]?.stack.map((item) => (

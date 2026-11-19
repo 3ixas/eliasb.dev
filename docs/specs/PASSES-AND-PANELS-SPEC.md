@@ -83,7 +83,7 @@ The page is `max-width: 1216px` with 48 px gutters from 1024 px (32 px from 720 
 
 #### R-04 The panel
 
-A panel is a block with a 28 px radius (22 px under 720 px), a field and an ink, and a 1 px lighter top edge. Things inside a panel, and cards, take 16 px; images 12 px; pills are fully round. A panel has no shadow in the light theme. In the dark theme a project panel has a soft glow in its own colour (`0 50px 90px -56px`, the field at 70%).
+A panel is a block with a 28 px radius (22 px under 720 px), a field and an ink, and a 1 px lighter top edge. Things inside a panel, and cards, take 16 px; images 12 px; pills are fully round. A panel has no shadow in the light theme. Nothing glows in its own colour in the dark theme (#493 retired the project panels' glow; DESIGN.md "Depth" holds the surface).
 
 A panel's header is always the name at the left and, where there is one, role and dates at the right. Pass furniture ("Valid · present", "Returned", barcodes) appears only on a pass.
 
