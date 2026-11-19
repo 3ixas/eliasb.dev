@@ -61,7 +61,7 @@
 
 /* An employer's name too long for the display size (Optegra Eye Healthcare & Kensington Medical) is set smaller, so its longest word fits at 320 px. */
 .story-open__title[data-long] {
-  font-size: clamp(36px, 4.6vw, 72px);
+  font-size: clamp(32px, 3.6vw, 52px);
   line-height: 1;
 }
 
@@ -128,7 +128,7 @@
   color: var(--ink);
   font-family: var(--serif);
   font-optical-sizing: auto;
-  font-size: 46px;
+  font-size: var(--type-figure);
   font-weight: 500;
   font-variant-numeric: lining-nums tabular-nums;
   line-height: 1;
@@ -174,7 +174,7 @@
   margin: 0;
   font-family: var(--serif);
   font-optical-sizing: auto;
-  font-size: clamp(52px, 6.6vw, 96px);
+  font-size: var(--type-title);
   font-weight: 400;
   line-height: 0.95;
   letter-spacing: -0.04em;
@@ -241,7 +241,7 @@
   right: calc(100% + 0.06em);
   color: var(--cobalt);
   /* 2.2 times the quote's own clamp(22px, 2.2vw, 30px). */
-  font-size: clamp(48px, 4.84vw, 66px);
+  font-size: clamp(44px, 3.74vw, 53px);
   font-weight: 500;
   line-height: 1;
 }
@@ -303,7 +303,7 @@
   margin: 0;
   font-family: var(--serif);
   font-optical-sizing: auto;
-  font-size: clamp(28px, 2.7vw, 40px);
+  font-size: var(--type-section);
   font-weight: 400;
   line-height: 1.05;
   letter-spacing: -0.025em;
@@ -637,7 +637,7 @@
   gap: 0.25em;
   font-family: var(--serif);
   font-optical-sizing: auto;
-  font-size: clamp(36px, 5vw, 72px);
+  font-size: clamp(28px, 3.4vw, 48px);
   line-height: 1;
   letter-spacing: -0.035em;
   overflow-wrap: anywhere;
@@ -783,7 +783,6 @@
   }
 
   .story-figures b {
-    font-size: 34px;
     white-space: normal;
   }
 
@@ -803,10 +802,6 @@
 
   .case-open {
     padding-top: 18px;
-  }
-
-  .case-open__title {
-    font-size: clamp(44px, 12vw, 52px);
   }
 
   .missing {

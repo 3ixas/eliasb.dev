@@ -46,7 +46,7 @@ test.describe("The opening line", () => {
   test("the supporting line follows it in Newsreader, muted, and is the approved copy", async ({ page }) => {
     const support = page.locator(".opening__support");
     await expect(support).toHaveText(opening.support);
-    expect(parseFloat(await support.evaluate((element) => getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(19);
+    expect(parseFloat(await support.evaluate((element) => getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(18);
     const [h1, line] = await Promise.all([heading(page).boundingBox(), support.boundingBox()]);
     expect(line!.y, "under the opening line").toBeGreaterThanOrEqual(h1!.y + h1!.height);
   });

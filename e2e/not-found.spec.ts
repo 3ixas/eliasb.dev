@@ -56,7 +56,7 @@ test.describe("The 404", () => {
     await expect(missing.locator("s")).toHaveCSS("text-decoration-line", "line-through");
     await expect(missing.locator("> span")).toHaveText(notFound.missing.line);
     // The address is set as large as a row's name, not as small as its status.
-    await expect(missing.locator(".missing__address")).toHaveCSS("font-size", "22px");
+    await expect(missing.locator(".missing__address")).toHaveCSS("font-size", "18px");
     const status = missing.locator("b");
     await expect(status).toHaveText(notFound.missing.meta);
     await expect(status).toBeVisible();

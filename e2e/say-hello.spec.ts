@@ -51,7 +51,7 @@ test.describe("Say hello", () => {
     await expect(email).toHaveCSS("text-decoration-color", cobalt);
     for (const [index, { label }] of sayHello.links.entries()) {
       await expect(links(page).nth(index)).toContainText(label);
-      await expect(links(page).nth(index)).toHaveCSS("font-size", "21px");
+      await expect(links(page).nth(index)).toHaveCSS("font-size", "18px");
     }
   });
 

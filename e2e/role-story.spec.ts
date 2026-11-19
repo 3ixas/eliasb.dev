@@ -99,10 +99,10 @@ for (const slug of roleStorySlugs) {
     test("its paragraphs are Newsreader at 20 px (19 on a phone), and its points a 23 px serif lead over a muted line", async ({ page }) => {
       const paragraph = page.locator("article .prose p").first();
       await expect(paragraph).toHaveCSS("font-family", /Newsreader/);
-      await expect(paragraph).toHaveCSS("font-size", width(page) < 720 ? "19px" : "20px");
+      await expect(paragraph).toHaveCSS("font-size", width(page) < 720 ? "18px" : "19px");
       const point = page.locator("article .points li").first();
       if (await point.count()) {
-        await expect(point.locator("b")).toHaveCSS("font-size", "23px");
+        await expect(point.locator("b")).toHaveCSS("font-size", "20px");
         await expect(point.locator("b")).toHaveCSS("font-family", /Newsreader/);
         await expect(point.locator("span")).toHaveCSS("font-size", "16px");
       }

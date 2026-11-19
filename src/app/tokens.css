@@ -48,25 +48,25 @@
   --serif: var(--font-newsreader), Georgia, serif;
   --sans: var(--font-instrument-sans), system-ui, sans-serif;
 
-  /* The type scale. Display sizes are fluid; nothing a visitor reads is under 13 px. */
-  --type-opening: clamp(36px, 3.7vw, 54px);
-  --type-title: clamp(52px, 7vw, 104px);
-  --type-section: clamp(36px, 3.6vw, 52px);
-  --type-panel: clamp(30px, 3vw, 42px);
+  /* The type scale (#493): display type at about half its first size, so the largest step is 4× body, not 6×. Display sizes are fluid; nothing a visitor reads is under 13 px. */
+  --type-opening: clamp(32px, 3vw, 44px);
+  --type-title: clamp(40px, 4.4vw, 64px);
+  --type-section: clamp(28px, 2.4vw, 36px);
+  --type-panel: clamp(22px, 2vw, 28px);
   /* A Work panel leads with its employer; its figure is the supporting number, a step under it. */
-  --type-employer: clamp(52px, 6vw, 88px);
-  --type-figure: clamp(40px, 3.8vw, 56px);
-  --type-prose: 20px;
+  --type-employer: clamp(36px, 3.6vw, 52px);
+  --type-figure: clamp(28px, 2.6vw, 38px);
+  --type-prose: 19px;
   /* A Role story's lede, and a point's serif lead in a long-form section. */
-  --type-lede: clamp(20px, 1.8vw, 25px);
-  --type-lead: 23px;
+  --type-lede: clamp(19px, 1.5vw, 22px);
+  --type-lead: 20px;
   /* The PRD's quote on its card. */
-  --type-quote: clamp(22px, 2.2vw, 30px);
+  --type-quote: clamp(20px, 1.7vw, 24px);
   /* A row's name, Say hello's links, the header's name, and a text link. */
-  --type-row: 22px;
-  --type-hello: 21px;
-  --type-name: 20px;
-  --type-link: 19px;
+  --type-row: 18px;
+  --type-hello: 18px;
+  --type-name: 18px;
+  --type-link: 18px;
   --type-body: 16px;
   --type-ui: 15px;
   --type-small: 14.5px;
@@ -76,7 +76,7 @@
 /* Lede and prose step down a pixel on a phone. */
 @media (max-width: 719.98px) {
   :root {
-    --type-prose: 19px;
+    --type-prose: 18px;
   }
 }
 
