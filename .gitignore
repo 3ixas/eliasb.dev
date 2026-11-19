@@ -45,3 +45,6 @@ next-env.d.ts
 
 # project design contract
 !docs/design/DESIGN.md
+
+# T3 Code: the dev port scripts/t3-worktree.sh assigns to this checkout
+/.dev-port
