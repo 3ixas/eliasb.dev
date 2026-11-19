@@ -173,6 +173,11 @@ html:has([data-site]) {
   z-index: 2;
 }
 
+/* A press mid-pour captures the band as it was: never show that unmasked field. */
+::view-transition-old(pour-light) {
+  display: none;
+}
+
 ::view-transition-new(pour-light) {
   mask-image: radial-gradient(
     circle at var(--pour-x) var(--pour-y),
