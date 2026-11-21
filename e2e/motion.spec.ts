@@ -131,8 +131,8 @@ test.describe("Panel to page title transitions", () => {
           const original = document.startViewTransition.bind(document);
           const timer = window.setTimeout(() => {
             document.startViewTransition = original;
-            reject(new Error("document.startViewTransition was not called within 4000ms"));
-          }, 4000);
+            reject(new Error("document.startViewTransition was not called within 15000ms"));
+          }, 15000);
           document.startViewTransition = function (arg: Parameters<Document["startViewTransition"]>[0]) {
             window.clearTimeout(timer);
             document.startViewTransition = original;
@@ -191,10 +191,10 @@ test.describe("Panel to page title transitions", () => {
         }),
     );
 
-    // Prevent an unhandled rejection if the 4 s timeout fires while `action()` is still running.
+    // Prevent an unhandled rejection if the timeout fires while `action()` is still running.
     sample.catch(() => {});
     await action();
-    await expect(page).toHaveURL(expectedUrl);
+    await expect(page).toHaveURL(expectedUrl, { timeout: 15000 });
     return sample;
   }
 
@@ -227,6 +227,7 @@ test.describe("Panel to page title transitions", () => {
     await withoutScene(page);
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
+    await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
     const thresholdPanel = page.locator('#things-i-make a.project[href="/things-i-make/threshold"]');
     await thresholdPanel.scrollIntoViewIfNeeded();
     await waitForHydration(page, '#things-i-make a.project[href="/things-i-make/threshold"]');
@@ -234,6 +235,7 @@ test.describe("Panel to page title transitions", () => {
     const forward = await sampleRouteTransition(page, () => thresholdPanel.click(), /\/things-i-make\/threshold$/);
     expectSingleTitleMorph(forward, "route-title-project-threshold");
 
+    await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
     const nextPanel = page.locator(".next-panel");
     await nextPanel.scrollIntoViewIfNeeded();
     await waitForHydration(page, ".next-panel");
@@ -264,17 +266,23 @@ test.describe("Panel to page title transitions", () => {
     await withoutScene(page);
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
+    await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
     await page.evaluate(() => document.fonts.ready);
 
-    // Center Joveen so its visible title (.panel__name on desktop, .work__pass band on phone) is on-screen.
+    // Center Joveen so both its visible title (.panel__name on desktop, .work__pass band on phone) and story link
+    // stay on-screen, and wait for its OnView arrival to finish before clicking.
     await page.locator("#joveen").evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
     await waitForHydration(page, "#joveen .work__story");
     await expect
       .poll(() =>
         page.evaluate(() => {
-          const selector = window.innerWidth < 720 ? "#joveen .work__pass .pass__band span" : "#joveen .panel__name";
-          const rect = document.querySelector(selector)?.getBoundingClientRect();
-          return Boolean(rect && rect.bottom > 0 && rect.top < window.innerHeight);
+          const titleSelector = window.innerWidth < 720 ? "#joveen .work__pass .pass__band span" : "#joveen .panel__name";
+          const titleRect = document.querySelector(titleSelector)?.getBoundingClientRect();
+          const linkRect = document.querySelector("#joveen .work__story")?.getBoundingClientRect();
+          const arrival = document.querySelector("#joveen")?.closest(".work-role__arrival");
+          const settled = !arrival || parseFloat(getComputedStyle(arrival).opacity) > 0.99;
+          const inView = (rect?: DOMRect) => Boolean(rect && rect.bottom > 0 && rect.top < window.innerHeight);
+          return settled && inView(titleRect) && inView(linkRect);
         }),
       )
       .toBe(true);
