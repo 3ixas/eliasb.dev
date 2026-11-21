@@ -21,6 +21,7 @@
 }
 
 .project__name {
+  width: fit-content;
   font-family: var(--serif);
   font-optical-sizing: auto;
   font-weight: 400;

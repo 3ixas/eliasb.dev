@@ -1,5 +1,6 @@
 import { PassLight } from "@/components/parts/pass-light";
 import { StaffPass } from "@/components/parts/staff-pass";
+import { employerPanelTransition, employerTitleStyle, employerTitleTransition, titleLinkTypes, TitleTransition } from "@/components/parts/title-transition";
 import { LongForm } from "@/components/site/long-form";
 import { RoleStoryFigureBlock } from "@/components/site/role-story-figures";
 import { EvidenceFigures, NextPanel, StoryBack, StorySection, StoryText } from "@/components/site/story-parts";
@@ -20,16 +21,19 @@ const sectionKeys = roleStorySectionKeys.filter((key) => key !== "summary");
 export function RoleStoryPage({ story }: { story: RoleStory }) {
   const next = story.next ? roleStories[story.next] : null;
   const meta = [story.role, story.dates, story.setting].filter((part): part is string => !!part);
+  const titleName = employerTitleTransition(story.slug);
 
   return (
     <LongForm attrs={{ "data-role-story": story.slug }}>
       <article className="frame story" aria-labelledby="role-story-title">
         <header className="story-open">
           <div className="story-open__text">
-            <StoryBack href={roleStoryBack.href} label={roleStoryBack.label} />
-            <h1 id="role-story-title" className="story-open__title" data-long={hasLongEmployer(story) ? "" : undefined}>
-              {story.employer}
-            </h1>
+            <StoryBack href={roleStoryBack.href} label={roleStoryBack.label} transitionTypes={titleLinkTypes(titleName)} />
+            <TitleTransition name={titleName} share={employerTitleStyle(story.slug)}>
+              <h1 id="role-story-title" className="story-open__title" data-long={hasLongEmployer(story) ? "" : undefined}>
+                {story.employer}
+              </h1>
+            </TitleTransition>
             <p className="story-open__meta">
               {meta.map((part) => (
                 <span key={part} className="story-open__part">
@@ -52,10 +56,10 @@ export function RoleStoryPage({ story }: { story: RoleStory }) {
         ))}
       </article>
       {next ? (
-        <NextPanel label={roleStoryCopy.nextRole} href={`/work/${next.slug}`} name={passRecords[next.slug].short} line={`${next.role} · ${next.dates}`} colours={next.panel} />
+        <NextPanel label={roleStoryCopy.nextRole} href={`/work/${next.slug}`} name={passRecords[next.slug].short} line={`${next.role} · ${next.dates}`} colours={next.panel} transition={employerPanelTransition(next.slug)} />
       ) : (
         <nav className="frame story-next" aria-label="Back to Work">
-          <StoryBack href={roleStoryBack.href} label={roleStoryBack.label} />
+          <StoryBack href={roleStoryBack.href} label={roleStoryBack.label} transitionTypes={titleLinkTypes(titleName)} />
         </nav>
       )}
     </LongForm>

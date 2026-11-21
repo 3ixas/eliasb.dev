@@ -2,6 +2,7 @@ import Image from "next/image";
 import { hostLabel } from "@/components/site/host-label";
 import { isInternalHref, SiteLink } from "@/components/site/site-link";
 import { OUT, panelSurface } from "@/components/parts/panel";
+import { projectPanelTransition, titleLinkTypes, TitleTransition } from "@/components/parts/title-transition";
 import type { Project } from "@/content/projects";
 
 /** A project opens at its case study, else its live site, else its code. */
@@ -22,6 +23,8 @@ type ProjectPanelProps = {
   meta?: boolean;
   /** On the first screen, so the screenshot loads at once. */
   eager?: boolean;
+  /** Opts this panel's title into the shared route view transition to its case study h1 (#472). */
+  titleTransition?: boolean;
 };
 
 /**
@@ -30,7 +33,7 @@ type ProjectPanelProps = {
  * project with no case study, on paper to wherever it lives, marked ↗ and opening in a new tab. A project with no
  * screenshot is a complete panel of text. Styles are in projects.css.
  */
-export function ProjectPanel({ project, line, level = 3, wide = false, meta = false, eager = false }: ProjectPanelProps) {
+export function ProjectPanel({ project, line, level = 3, wide = false, meta = false, eager = false, titleTransition = false }: ProjectPanelProps) {
   const href = projectHref(project);
   const external = !isInternalHref(href);
   const coloured = Boolean(project.links.caseStudy && project.panel);
@@ -38,10 +41,13 @@ export function ProjectPanel({ project, line, level = 3, wide = false, meta = fa
   const classes = [surface.className, "project", wide ? "project--wide" : null, project.screenshot ? null : "project--text"].filter(Boolean).join(" ");
   const Heading = level === 2 ? "h2" : "h3";
   const { screenshot } = project;
+  const transition = titleTransition && project.links.caseStudy ? projectPanelTransition(project.slug) : undefined;
   return (
-    <SiteLink href={href} className={classes} style={surface.style}>
+    <SiteLink href={href} className={classes} style={surface.style} transitionTypes={transition ? titleLinkTypes(transition.name) : undefined}>
       <span className="project__text">
-        <Heading className="project__name">{project.name}</Heading>
+        <TitleTransition name={transition?.name} share={transition?.share}>
+          <Heading className="project__name">{project.name}</Heading>
+        </TitleTransition>
         <span className="project__line">{line}</span>
         {(meta || external) && (
           <span className="project__meta">

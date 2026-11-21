@@ -28,7 +28,7 @@ export function WorkArchivePage({ catalogue }: { catalogue: readonly Project[] }
             panel: (
               <li>
                 <OnView motion="rise" className="archive__arrival">
-                  <ProjectPanel project={project} line={project.outcome} level={2} meta eager={index < FIRST_SCREEN} />
+                  <ProjectPanel project={project} line={project.outcome} level={2} meta eager={index < FIRST_SCREEN} titleTransition />
                 </OnView>
               </li>
             ),

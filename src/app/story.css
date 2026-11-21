@@ -49,6 +49,7 @@
 }
 
 .story-open__title {
+  width: fit-content;
   margin: 20px 0 0;
   font-family: var(--serif);
   font-optical-sizing: auto;
@@ -171,6 +172,7 @@
 }
 
 .case-open__title {
+  width: fit-content;
   margin: 0;
   font-family: var(--serif);
   font-optical-sizing: auto;

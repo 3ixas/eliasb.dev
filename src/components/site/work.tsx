@@ -3,6 +3,8 @@ import { MeasurePair, MeasureSide } from "@/components/parts/measure";
 import { OnView, Count } from "@/components/parts/on-view";
 import { Arrow, Panel, PanelHead } from "@/components/parts/panel";
 import { StaffPass } from "@/components/parts/staff-pass";
+import { employerPanelTransition, employerTitleTransition, titleLinkTypes } from "@/components/parts/title-transition";
+import { WorkTitleTransition } from "@/components/parts/work-title-transition";
 import { roleStories } from "@/content/stretch/role-stories";
 import type { RoleStorySlug } from "@/content/stretch/role-story";
 import { passRecords } from "@/content/stretch/staff-pass";
@@ -11,7 +13,18 @@ import { comparisonRow, displayFigure, workPanels, type Pair, type RolePanel } f
 /** The panel's header: the employer's short name (as on its pass), with its role and dates at the right. */
 function Head({ slug }: { slug: RoleStorySlug }) {
   const { role, dates } = roleStories[slug];
-  return <PanelHead name={passRecords[slug].short} meta={[role, dates]} />;
+  const { name, share } = employerPanelTransition(slug);
+  return (
+    <PanelHead
+      name={passRecords[slug].short}
+      meta={[role, dates]}
+      renderName={(heading) => (
+        <WorkTitleTransition name={name} share={share} when="desktop">
+          {heading}
+        </WorkTitleTransition>
+      )}
+    />
+  );
 }
 
 /**
@@ -19,9 +32,18 @@ function Head({ slug }: { slug: RoleStorySlug }) {
  * the panel's name, role and dates. Hidden from assistive technology, since the panel's header says the same.
  */
 function PanelPass({ slug }: { slug: RoleStorySlug }) {
+  const { name, share } = employerPanelTransition(slug);
   return (
     <div className="work__pass" aria-hidden="true">
-      <StaffPass slug={slug} lead={slug === "bnp-paribas"} />
+      <StaffPass
+        slug={slug}
+        lead={slug === "bnp-paribas"}
+        renderBandName={(label) => (
+          <WorkTitleTransition name={name} share={share} when="phone">
+            {label}
+          </WorkTitleTransition>
+        )}
+      />
     </div>
   );
 }
@@ -29,7 +51,7 @@ function PanelPass({ slug }: { slug: RoleStorySlug }) {
 /** "The Optegra story →", a pill on the employer's own panel. */
 function StoryLink({ slug, outline = false }: { slug: RoleStorySlug; outline?: boolean }) {
   return (
-    <Link className={outline ? "pill pill--outline work__story" : "pill work__story"} href={`/work/${slug}`}>
+    <Link className={outline ? "pill pill--outline work__story" : "pill work__story"} href={`/work/${slug}`} transitionTypes={titleLinkTypes(employerTitleTransition(slug))}>
       {`The ${passRecords[slug].short} story`}
       <Arrow />
     </Link>
