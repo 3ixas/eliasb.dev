@@ -43,6 +43,7 @@ const motionTransitions = [
   ['.sim__plot[data-armed] .sim__bin i[data-landed]', "the simulation's endpoints land as dots"],
   ['.sim__plot[data-armed] .sim__price[data-pricing]', "the simulation's price follows the mean so far and settles"],
   ['.ftbreak .measure--minutes i', "Flowtime's minutes follow its slider"],
+  ['::view-transition-group(zoom-shot)', 'a screenshot grows from where it sits and returns there (DESIGN.md "Motion")'],
   [':root[data-theme-changing]', 'the theme changes'],
 ];
 
@@ -122,9 +123,11 @@ export function craftProblems(files) {
   const springs = allRules.filter(({ declarations }) => declarations['--spring'] !== undefined);
   if (springs.length === 0) problems.push('No rule sets --spring.');
 
-  // Feedback transitions are 100 to 250 ms.
+  // Feedback transitions are 100 to 250 ms; view-transition groups outside that window must also be named.
+  const durationProps = (selector) =>
+    selector.includes('::view-transition-group') ? ['transition', 'transition-duration', 'animation-duration'] : ['transition', 'transition-duration'];
   for (const { path, selector, declarations } of allRules) {
-    for (const name of ['transition', 'transition-duration']) {
+    for (const name of durationProps(selector)) {
       const value = declarations[name];
       if (value === undefined || value === 'none') continue;
       if (value.includes('!important')) continue;
@@ -136,7 +139,8 @@ export function craftProblems(files) {
   }
   // A named motion that no longer exists is a stale exception.
   for (const [part] of motionTransitions) {
-    if (!allRules.some(({ selector, declarations }) => selector.includes(part) && ('transition' in declarations || 'transition-duration' in declarations))) problems.push(`The motion exception \`${part}\` matches no transition; remove it from verify-craft.mjs.`);
+    if (!allRules.some(({ selector, declarations }) => selector.includes(part) && durationProps(selector).some((prop) => prop in declarations)))
+      problems.push(`The motion exception \`${part}\` matches no transition; remove it from verify-craft.mjs.`);
   }
 
   return problems;
@@ -158,5 +162,6 @@ mustFail('controls ring offset', broken('src/app/parts.css', '  outline: 2px sol
 mustFail('panel ring colour', broken('src/app/parts.css', 'outline-color: var(--panel-ink);', 'outline-color: var(--cobalt);'), /var\(--panel-ink\)/);
 mustFail('spring', broken('src/app/tokens.css', '--spring: cubic-bezier(.3, 1.5, .4, 1);', '--spring: cubic-bezier(.3, 1.4, .64, 1);'), /--spring/);
 mustFail('feedback timing', broken('src/app/parts.css', 'transition: background-color 150ms var(--out);', 'transition: background-color 400ms var(--out);'), /400 ms/);
+mustFail('view-transition naming', broken('src/app/zoom.css', '::view-transition-group(zoom-shot)', '::view-transition-group(unnamed-shot)'), /280 ms/);
 
 console.log('Craft checks passed: one focus ring, the site curves and feedback within 100 to 250 ms.');

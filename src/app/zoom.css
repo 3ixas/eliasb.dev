@@ -21,39 +21,94 @@
   outline: none;
 }
 
+/* Hidden while the large view is open, so the thumbnail never ghosts behind the scrim and reappears cleanly as the return target. */
+.zoom img[data-zoom-hidden] {
+  visibility: hidden;
+}
+
+/* Drop the inline shadow during snapshot capture so its ink overflow never skews the morph box. */
+:root[data-zoom-transition] .zoom img[data-zooming],
+:root[data-zoom-transition] .zoom__img[data-zooming] {
+  box-shadow: none;
+}
+
 .zoom__dialog {
-  /* The site's reset zeroes margins; a modal dialog is centred by its auto margins. */
-  margin: auto;
-  width: fit-content;
-  max-width: 96vw;
-  max-height: 96dvh;
+  position: fixed;
+  inset: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
   padding: 0;
   border: 0;
-  border-radius: 14px;
-  background: var(--paper);
+  background: transparent;
   overflow: hidden;
-  cursor: zoom-out;
 }
 
 .zoom__dialog::backdrop {
   background: rgb(0 0 0 / 0.72);
 }
 
-/* As wide as the window allows (up to 1400 px and the image's own width), and no taller than the window; --w and --ar are the image's declared width and aspect ratio. */
-.zoom__dialog img {
-  display: block;
-  width: min(96vw, 1400px, calc(96dvh * var(--ar)), calc(var(--w) * 1px));
-  height: auto;
+/*
+ * The scrollable, pinch-zoomable stage: flex + margin: auto centres the fitted image and lets every edge of a zoomed
+ * image stay reachable when it overflows, while overscroll-behavior keeps scroll inside the dialog.
+ */
+.zoom__stage {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding: 2dvh 2vw;
+  overflow: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y pinch-zoom;
+  cursor: zoom-out;
 }
 
-.zoom__dialog form {
+/* As wide as the window allows (up to 1400 px and the image's own width), and no taller than the window; --w and --ar are the image's declared width and aspect ratio. */
+.zoom__img {
+  display: block;
+  flex: none;
+  margin: auto;
+  --fit-w: min(96vw, 1400px, calc(96dvh * var(--ar)), calc(var(--w) * 1px));
+  width: var(--fit-w);
+  height: auto;
+  border-radius: 14px;
+  background: var(--paper);
+  touch-action: pan-x pan-y pinch-zoom;
+}
+
+.zoom__stage[data-zoomed] {
+  padding: 0;
+}
+
+/* Double tap enlarges the screenshot inside the scrollable stage (2× to 2.5× fitted width, following the image's declared width). */
+.zoom__stage[data-zoomed] .zoom__img {
+  width: clamp(calc(var(--fit-w) * 2), calc(var(--w) * 1px), calc(var(--fit-w) * 2.5));
+  max-width: none;
+  border-radius: 0;
+}
+
+@media (max-width: 719.98px) {
+  .zoom__stage {
+    padding: 0;
+  }
+
+  .zoom__img {
+    --fit-w: min(100vw, calc(100dvh * var(--ar)), calc(var(--w) * 1px));
+    border-radius: 0;
+  }
+}
+
+.zoom__bar {
   margin: 0;
 }
 
 .zoom__close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
+  position: fixed;
+  top: max(10px, env(safe-area-inset-top));
+  right: max(10px, env(safe-area-inset-right));
   min-width: 44px;
   min-height: 44px;
   padding: 0 14px;
@@ -73,27 +128,64 @@
 /* The page behind a modal does not scroll. */
 body:has(.zoom__dialog[open]) {
   overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* ---------- view-transition morph (#471): thumbnail grows into the large view and returns there ---------- */
+
+/* Let input pass through the transition layer so nothing locks up mid-move. */
+::view-transition {
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .zoom__dialog[open] {
-    animation: zoom-in 0.2s var(--out);
+  :root[data-zoom-transition="open"]::view-transition-group(zoom-shot) {
+    animation-duration: 280ms;
+    animation-timing-function: var(--out);
   }
 
-  .zoom__dialog[open]::backdrop {
-    animation: zoom-fade 0.2s var(--out);
+  :root[data-zoom-transition="close"]::view-transition-group(zoom-shot) {
+    animation-duration: 220ms;
+    animation-timing-function: var(--out);
+  }
+
+  :root[data-zoom-transition]::view-transition-group(zoom-shot) {
+    overflow: clip;
+    border-radius: 14px;
+  }
+
+  @media (max-width: 719.98px) {
+    :root[data-zoom-transition]::view-transition-group(zoom-shot) {
+      border-radius: 0;
+    }
+  }
+
+  :root[data-zoom-transition]::view-transition-old(zoom-shot),
+  :root[data-zoom-transition]::view-transition-new(zoom-shot) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation-duration: 220ms;
+    animation-timing-function: var(--out);
+  }
+
+  :root[data-zoom-transition="open"]::view-transition-old(root),
+  :root[data-zoom-transition="open"]::view-transition-new(root) {
+    animation-duration: 220ms;
+    animation-timing-function: var(--out);
+  }
+
+  :root[data-zoom-transition="close"]::view-transition-old(root),
+  :root[data-zoom-transition="close"]::view-transition-new(root) {
+    animation-duration: 180ms;
+    animation-timing-function: var(--out);
   }
 }
 
-@keyframes zoom-in {
-  from {
-    opacity: 0;
-    transform: scale(0.97);
-  }
-}
-
-@keyframes zoom-fade {
-  from {
-    opacity: 0;
+@media (prefers-reduced-motion: reduce) {
+  :root[data-zoom-transition]::view-transition-group(*),
+  :root[data-zoom-transition]::view-transition-old(*),
+  :root[data-zoom-transition]::view-transition-new(*) {
+    animation: none;
   }
 }
