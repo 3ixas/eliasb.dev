@@ -35,11 +35,12 @@ export function Panel({ colours, as: Tag = "div", className, children, ...rest }
  * A panel's header: the name at the left and, where there are any, role and dates at the right, one to a line.
  * `level` keeps the heading order of the page it sits on.
  */
-export function PanelHead({ name, meta = [], level = 3 }: { name: string; meta?: readonly string[]; level?: 2 | 3 }) {
+export function PanelHead({ name, meta = [], level = 3, renderName }: { name: string; meta?: readonly string[]; level?: 2 | 3; renderName?: (heading: ReactNode) => ReactNode }) {
   const Heading = level === 2 ? "h2" : "h3";
+  const heading = <Heading className="panel__name">{name}</Heading>;
   return (
     <div className="panel__head">
-      <Heading className="panel__name">{name}</Heading>
+      {renderName ? renderName(heading) : heading}
       {meta.length > 0 && (
         <p className="panel__meta">
           {meta.map((line) => (

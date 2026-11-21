@@ -1,4 +1,5 @@
 import { Arrow, Panel } from "@/components/parts/panel";
+import { projectPanelTransition, projectTitleTransition, titleLinkTypes, TitleTransition } from "@/components/parts/title-transition";
 import { WorkingFigure } from "@/components/parts/working-figure";
 import { hostLabel } from "@/components/site/host-label";
 import { LongForm } from "@/components/site/long-form";
@@ -46,7 +47,7 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
           );
         })}
       </article>
-      <NextPanel label={caseStudyCopy.nextProject} href={`/things-i-make/${next.slug}`} name={next.name} line={next.outcome} colours={next.panel!} />
+      <NextPanel label={caseStudyCopy.nextProject} href={`/things-i-make/${next.slug}`} name={next.name} line={next.outcome} colours={next.panel!} transition={projectPanelTransition(next.slug)} />
     </LongForm>
   );
 }
@@ -104,13 +105,16 @@ function projectFor(slug: string): Project & Required<Pick<Project, "panel" | "s
 /** The opening panel: the text at the left, the screenshot at the right (beneath under 960 px). */
 function Opening({ study, project }: { study: CaseStudy; project: ReturnType<typeof projectFor> }) {
   const { links, screenshot } = project;
+  const titleName = projectTitleTransition(study.slug);
   return (
     <Panel as="header" colours={project.panel} className="case-open">
-      <StoryBack href="/things-i-make" label={caseStudyCopy.back} />
+      <StoryBack href="/things-i-make" label={caseStudyCopy.back} transitionTypes={titleLinkTypes(titleName)} />
       <div className="case-open__text">
-        <h1 id="case-study-title" className="case-open__title">
-          {project.name}
-        </h1>
+        <TitleTransition name={titleName}>
+          <h1 id="case-study-title" className="case-open__title">
+            {project.name}
+          </h1>
+        </TitleTransition>
         <p className="case-open__lede">{study.description}</p>
         <ul className="chips case-open__stack" aria-label="Stack">
           {study.stack.map((item) => (

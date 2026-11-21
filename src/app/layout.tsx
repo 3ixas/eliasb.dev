@@ -4,6 +4,7 @@ import { Instrument_Sans, Newsreader } from "next/font/google";
 import "./base.css";
 import "./tokens.css";
 import "./zoom.css";
+import "./transitions.css";
 import "./shell.css";
 import "./parts.css";
 import "./pass.css";

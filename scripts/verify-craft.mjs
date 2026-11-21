@@ -44,6 +44,8 @@ const motionTransitions = [
   ['.sim__plot[data-armed] .sim__price[data-pricing]', "the simulation's price follows the mean so far and settles"],
   ['.ftbreak .measure--minutes i', "Flowtime's minutes follow its slider"],
   ['::view-transition-group(zoom-shot)', 'a screenshot grows from where it sits and returns there (DESIGN.md "Motion")'],
+  ['::view-transition-group(.route-title)', 'a panel title carries across to its page (DESIGN.md "Motion")'],
+  ['::view-transition-group(.route-title-swap)', 'a short panel name crossfades into a longer page title (DESIGN.md "Motion")'],
   [':root[data-theme-changing]', 'the theme changes'],
 ];
 

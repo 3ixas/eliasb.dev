@@ -1,0 +1,72 @@
+/*
+ * Route view transitions (#472, re-scoped by #493): only the title carries across between a panel and its page,
+ * in under 300 ms on --out, and instantly with reduced motion. The page root never fades (#364 holds for every
+ * other part of the page). Scoped with :not([data-zoom-transition]) so #471's screenshot zoom rules never collide.
+ */
+
+.vt-title {
+  display: inline-block;
+}
+
+/* Everything except the shared title changes at once: the page itself never fades. */
+:root:not([data-zoom-transition])::view-transition-group(root),
+:root:not([data-zoom-transition])::view-transition-new(root) {
+  animation: none;
+}
+
+:root:not([data-zoom-transition])::view-transition-old(root) {
+  display: none;
+}
+
+/* Never leave an unpaired exit or entry title fading on its own (e.g. an off-screen next panel on browser Back). */
+::view-transition-old(.route-title):only-child,
+::view-transition-old(.route-title-swap):only-child {
+  display: none;
+}
+
+::view-transition-new(.route-title):only-child,
+::view-transition-new(.route-title-swap):only-child {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Same text on both sides: scales cleanly on its tight box without distortion. */
+  ::view-transition-group(.route-title) {
+    animation-duration: 240ms;
+    animation-timing-function: var(--out);
+  }
+
+  ::view-transition-old(.route-title),
+  ::view-transition-new(.route-title) {
+    animation-duration: 240ms;
+    animation-timing-function: var(--out);
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Short panel name to longer full h1 (Optegra): crossfades unstretched while its box moves. */
+  ::view-transition-group(.route-title-swap) {
+    animation-duration: 240ms;
+    animation-timing-function: var(--out);
+    overflow: clip;
+  }
+
+  ::view-transition-old(.route-title-swap),
+  ::view-transition-new(.route-title-swap) {
+    animation-duration: 240ms;
+    animation-timing-function: var(--out);
+    width: auto;
+    height: auto;
+    max-width: none;
+    object-fit: none;
+    object-position: left top;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-zoom-transition])::view-transition-group(*),
+  :root:not([data-zoom-transition])::view-transition-old(*),
+  :root:not([data-zoom-transition])::view-transition-new(*) {
+    animation: none;
+  }
+}

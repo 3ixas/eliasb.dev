@@ -8,10 +8,22 @@ export const isInternalHref = (href: string) => href.startsWith("/");
  * A link that opens the way its address implies: a page of this site in place, an email as it is,
  * and anywhere else in a new tab with noreferrer.
  */
-export function SiteLink({ href, className, style, children }: { href: string; className?: string; style?: CSSProperties; children: ReactNode }) {
+export function SiteLink({
+  href,
+  className,
+  style,
+  transitionTypes,
+  children,
+}: {
+  href: string;
+  className?: string;
+  style?: CSSProperties;
+  transitionTypes?: string[];
+  children: ReactNode;
+}) {
   if (isInternalHref(href)) {
     return (
-      <Link className={className} style={style} href={href}>
+      <Link className={className} style={style} href={href} transitionTypes={transitionTypes}>
         {children}
       </Link>
     );

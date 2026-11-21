@@ -38,6 +38,7 @@
 }
 
 .work .panel__name {
+  width: fit-content;
   font-size: var(--type-employer);
   line-height: 0.95;
   letter-spacing: -0.035em;

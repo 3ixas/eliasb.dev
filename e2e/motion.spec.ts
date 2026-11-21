@@ -96,3 +96,273 @@ test.describe("Threshold's link rewrites itself", () => {
     expect(await animations(page)).toEqual([]);
   });
 });
+
+// Panel to page (#472, quietened in #493): only the clicked employer or project title carries across,
+// in 240 ms (< 300 ms) on --out; the root never fades, screenshots do not travel, and reduced motion
+// or browsers without View Transitions change at once.
+test.describe("Panel to page title transitions", () => {
+  type GroupFrame = { x: number; y: number; w: number; h: number };
+  type RouteTransitionSample = {
+    groups: { pseudo: string; duration: number; easing: string; newObjectFit: string }[];
+    animatedPseudos: string[];
+    rootAnimated: boolean;
+    start: GroupFrame | null;
+    mid: GroupFrame | null;
+    end: GroupFrame | null;
+  };
+
+  /** Waits until React has attached its event handlers to an interactive element before triggering a transition. */
+  async function waitForHydration(page: Page, selector: string) {
+    await expect
+      .poll(() =>
+        page.locator(selector).first().evaluate((element) => Object.keys(element).some((key) => key.startsWith("__reactProps$"))),
+      )
+      .toBe(true);
+  }
+
+  /**
+   * Intercepts the next `document.startViewTransition` call, pauses the shared title group once ready,
+   * seeks to 0%, 25% and 100%, and skips the transition so the spec proves the morph without waiting it out.
+   */
+  async function sampleRouteTransition(page: Page, action: () => Promise<unknown>, expectedUrl: RegExp): Promise<RouteTransitionSample> {
+    const sample = page.evaluate(
+      () =>
+        new Promise<RouteTransitionSample>((resolve, reject) => {
+          const original = document.startViewTransition.bind(document);
+          const timer = window.setTimeout(() => {
+            document.startViewTransition = original;
+            reject(new Error("document.startViewTransition was not called within 4000ms"));
+          }, 4000);
+          document.startViewTransition = function (arg: Parameters<Document["startViewTransition"]>[0]) {
+            window.clearTimeout(timer);
+            document.startViewTransition = original;
+            const vt = original(arg);
+            vt.ready
+              .then(() => {
+                const vtAnims = document.getAnimations().filter((animation) => {
+                  const pe = (animation.effect as KeyframeEffect | null)?.pseudoElement;
+                  return Boolean(pe && pe.startsWith("::view-transition"));
+                });
+                const animatedPseudos = vtAnims
+                  .filter((animation) => (Number(animation.effect!.getComputedTiming().duration) || 0) > 0)
+                  .map((animation) => (animation.effect as KeyframeEffect).pseudoElement!);
+                const rootAnimated = animatedPseudos.some((pe) => pe.includes("(root)"));
+                const groupAnims = vtAnims.filter((animation) => {
+                  const pe = (animation.effect as KeyframeEffect).pseudoElement!;
+                  return pe.startsWith("::view-transition-group(") && pe !== "::view-transition-group(root)";
+                });
+                const groups = groupAnims.map((animation) => {
+                  const pseudo = (animation.effect as KeyframeEffect).pseudoElement!;
+                  const newPseudo = pseudo.replace("::view-transition-group(", "::view-transition-new(");
+                  const duration = Number(animation.effect!.getComputedTiming().duration) || 0;
+                  const easing = getComputedStyle(document.documentElement, pseudo).animationTimingFunction;
+                  const newObjectFit = getComputedStyle(document.documentElement, newPseudo).objectFit;
+                  return { pseudo, duration, easing, newObjectFit };
+                });
+
+                let start: GroupFrame | null = null;
+                let mid: GroupFrame | null = null;
+                let end: GroupFrame | null = null;
+                if (groupAnims.length === 1 && groups[0].duration > 0) {
+                  const group = groupAnims[0];
+                  const { pseudo, duration } = groups[0];
+                  const readAt = (time: number): GroupFrame => {
+                    group.pause();
+                    group.currentTime = time;
+                    const style = getComputedStyle(document.documentElement, pseudo);
+                    const matrix = new DOMMatrix(style.transform);
+                    return { x: matrix.m41, y: matrix.m42, w: parseFloat(style.width), h: parseFloat(style.height) };
+                  };
+                  start = readAt(0);
+                  mid = readAt(duration * 0.25);
+                  end = readAt(duration);
+                  group.finish();
+                }
+
+                vt.skipTransition();
+                resolve({ groups, animatedPseudos, rootAnimated, start, mid, end });
+              })
+              .catch((error) => {
+                vt.skipTransition();
+                reject(error);
+              });
+            return vt;
+          };
+        }),
+    );
+
+    await action();
+    await expect(page).toHaveURL(expectedUrl);
+    return sample;
+  }
+
+  function expectSingleTitleMorph(sample: RouteTransitionSample, expectedName: string, expectedObjectFit: "fill" | "none" = "fill") {
+    expect(sample.rootAnimated).toBe(false);
+    expect(sample.groups).toHaveLength(1);
+    expect(sample.groups[0].pseudo).toBe(`::view-transition-group(${expectedName})`);
+    expect(sample.groups[0].duration).toBe(240);
+    expect(sample.groups[0].easing).toBe("cubic-bezier(0.22, 1, 0.36, 1)");
+    expect(sample.groups[0].newObjectFit).toBe(expectedObjectFit);
+    expect(sample.start).not.toBeNull();
+    expect(sample.mid).not.toBeNull();
+    expect(sample.end).not.toBeNull();
+    const distStartEnd = Math.hypot(
+      sample.end!.x - sample.start!.x,
+      sample.end!.y - sample.start!.y,
+      sample.end!.w - sample.start!.w,
+    );
+    const distStartMid = Math.hypot(
+      sample.mid!.x - sample.start!.x,
+      sample.mid!.y - sample.start!.y,
+      sample.mid!.w - sample.start!.w,
+    );
+    expect(distStartEnd).toBeGreaterThan(4);
+    expect(distStartMid).toBeGreaterThan(0);
+    expect(distStartMid).toBeLessThan(distStartEnd);
+  }
+
+  test("project panel on the homepage and next-project panel morph only the clicked title", async ({ page }) => {
+    await withoutScene(page);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/");
+    const thresholdPanel = page.locator('#things-i-make a.project[href="/things-i-make/threshold"]');
+    await thresholdPanel.scrollIntoViewIfNeeded();
+    await waitForHydration(page, '#things-i-make a.project[href="/things-i-make/threshold"]');
+
+    const forward = await sampleRouteTransition(page, () => thresholdPanel.click(), /\/things-i-make\/threshold$/);
+    expectSingleTitleMorph(forward, "route-title-project-threshold");
+
+    const nextPanel = page.locator(".next-panel");
+    await nextPanel.scrollIntoViewIfNeeded();
+    await waitForHydration(page, ".next-panel");
+    const toNext = await sampleRouteTransition(page, () => nextPanel.click(), /\/things-i-make\/argus-risk$/);
+    expectSingleTitleMorph(toNext, "route-title-project-argus-risk");
+  });
+
+  test("archive project panel to case study and back link carry only the project title with no next-panel ghost", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/things-i-make");
+    const flowtimePanel = page.locator('a.project[href="/things-i-make/flowtime"]');
+    await flowtimePanel.scrollIntoViewIfNeeded();
+    await waitForHydration(page, 'a.project[href="/things-i-make/flowtime"]');
+
+    const forward = await sampleRouteTransition(page, () => flowtimePanel.click(), /\/things-i-make\/flowtime$/);
+    expectSingleTitleMorph(forward, "route-title-project-flowtime");
+
+    // Threshold sits first on /things-i-make, so its title is in view at every width on the back link.
+    await page.goto("/things-i-make/threshold");
+    const backLink = page.locator(".story-back").first();
+    await expect(backLink).toBeVisible();
+    await waitForHydration(page, ".story-back");
+    const back = await sampleRouteTransition(page, () => backLink.click(), /\/things-i-make$/);
+    expectSingleTitleMorph(back, "route-title-project-threshold");
+  });
+
+  test("Work panel, next-role panel (including Optegra) and back link carry only the employer title", async ({ page }) => {
+    await withoutScene(page);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/");
+
+    // Center Joveen so its visible title (.panel__name on desktop, .work__pass band on phone) is on-screen.
+    await page.locator("#joveen").evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+    await waitForHydration(page, "#joveen .work__story");
+
+    const toJoveen = await sampleRouteTransition(page, () => page.locator("#joveen .work__story").click(), /\/work\/joveen$/);
+    expectSingleTitleMorph(toJoveen, "route-title-employer-joveen");
+
+    const nextOptegra = page.locator(".next-panel");
+    await nextOptegra.scrollIntoViewIfNeeded();
+    await waitForHydration(page, ".next-panel");
+    const toOptegra = await sampleRouteTransition(page, () => nextOptegra.click(), /\/work\/optegra$/);
+    expectSingleTitleMorph(toOptegra, "route-title-employer-optegra", "none");
+
+    // Navigate from BNP Paribas back to /#work: BNP is the first Work panel, so its title is in view at every width.
+    await page.goto("/work/bnp-paribas");
+    await waitForHydration(page, ".story-back");
+    const backToWork = await sampleRouteTransition(page, () => page.locator(".story-back").first().click(), /\/#work$/);
+    expectSingleTitleMorph(backToWork, "route-title-employer-bnp-paribas");
+  });
+
+  test("browser Back preserves scroll restoration and keyboard navigation with transitions active", async ({ page }, testInfo) => {
+    await withoutScene(page);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/");
+
+    const thresholdPanel = page.locator('#things-i-make a.project[href="/things-i-make/threshold"]');
+    await thresholdPanel.scrollIntoViewIfNeeded();
+    await waitForHydration(page, '#things-i-make a.project[href="/things-i-make/threshold"]');
+    const scrollBefore = await page.evaluate(() => window.scrollY);
+    expect(scrollBefore).toBeGreaterThan(200);
+
+    // Navigate from the keyboard with real transitions playing and verify focus stays usable on the destination.
+    await thresholdPanel.focus();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/\/things-i-make\/threshold$/);
+    await expect(page.getByRole("heading", { level: 1, name: "Threshold" })).toBeVisible();
+    await page.keyboard.press(testInfo.project.name.startsWith("webkit") ? "Alt+Tab" : "Tab");
+    const focusedOnDestination = await page.evaluate(() => {
+      const el = document.activeElement;
+      return Boolean(el && el !== document.body && el !== document.documentElement);
+    });
+    expect(focusedOnDestination).toBe(true);
+
+    // In production builds (CI), popstate runs a pure TransitionLane and triggers the reverse title morph;
+    // in `next dev`, Next's dev rendering indicator adds a SyncLane that skips startViewTransition on popstate.
+    if (process.env.CI) {
+      const backHome = await sampleRouteTransition(page, () => page.goBack(), /\/$/);
+      expectSingleTitleMorph(backHome, "route-title-project-threshold");
+    } else {
+      await page.goBack();
+      await expect(page).toHaveURL(/\/$/);
+    }
+    await expect.poll(() => page.evaluate((before) => Math.abs(window.scrollY - before), scrollBefore)).toBeLessThan(120);
+
+    // Also verify browser Back after a NextPanel hop (Joveen -> Optegra -> Back to Joveen).
+    await page.goto("/work/joveen");
+    const nextOptegra = page.locator(".next-panel");
+    await nextOptegra.scrollIntoViewIfNeeded();
+    await waitForHydration(page, ".next-panel");
+    await nextOptegra.click();
+    await expect(page).toHaveURL(/\/work\/optegra$/);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+
+    if (process.env.CI) {
+      const backToJoveen = await sampleRouteTransition(page, () => page.goBack(), /\/work\/joveen$/);
+      expectSingleTitleMorph(backToJoveen, "route-title-employer-optegra", "none");
+    } else {
+      await page.goBack();
+      await expect(page).toHaveURL(/\/work\/joveen$/);
+    }
+    await expect(page.getByRole("heading", { level: 1, name: "Joveen" })).toBeVisible();
+  });
+
+  test("with reduced motion, no view-transition animation plays", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/things-i-make");
+    const flowtimePanel = page.locator('a.project[href="/things-i-make/flowtime"]');
+    await flowtimePanel.scrollIntoViewIfNeeded();
+    await waitForHydration(page, 'a.project[href="/things-i-make/flowtime"]');
+
+    const sample = await sampleRouteTransition(page, () => flowtimePanel.click(), /\/things-i-make\/flowtime$/);
+    expect(sample.animatedPseudos).toEqual([]);
+    await expect(page.getByRole("heading", { level: 1, name: "Flowtime" })).toBeVisible();
+  });
+
+  test("without startViewTransition support, forward, back link and browser Back still navigate cleanly", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.addInitScript(() => {
+      Object.defineProperty(Document.prototype, "startViewTransition", { value: undefined, configurable: true, writable: true });
+    });
+
+    await page.goto("/things-i-make");
+    await page.locator('a.project[href="/things-i-make/threshold"]').click();
+    await expect(page).toHaveURL(/\/things-i-make\/threshold$/);
+    await expect(page.getByRole("heading", { level: 1, name: "Threshold" })).toBeVisible();
+
+    await page.goBack();
+    await expect(page).toHaveURL(/\/things-i-make$/);
+    await expect(page.getByRole("heading", { level: 1, name: "Things I make" })).toBeVisible();
+    expect(errors).toEqual([]);
+  });
+});

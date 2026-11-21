@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Count } from "@/components/parts/on-view";
 import { Arrow, panelSurface } from "@/components/parts/panel";
+import { titleLinkTypes, TitleTransition, type PanelTitleTransition } from "@/components/parts/title-transition";
 import { Arrowed } from "@/components/site/long-form";
 import { ZoomableImage } from "@/components/site/zoomable-image";
 import type { EvidenceItem, PanelColours, StorySectionBody } from "@/content/stretch/story";
@@ -15,9 +16,9 @@ import type { EvidenceItem, PanelColours, StorySectionBody } from "@/content/str
  */
 
 /** "← Work" or "← Things I make": the first thing on the page. */
-export function StoryBack({ href, label }: { href: string; label: string }) {
+export function StoryBack({ href, label, transitionTypes }: { href: string; label: string; transitionTypes?: string[] }) {
   return (
-    <Link className="story-back" href={href}>
+    <Link className="story-back" href={href} transitionTypes={transitionTypes}>
       <Arrowed label={label} />
     </Link>
   );
@@ -94,16 +95,36 @@ export function StoryImage({ id, src, alt, width, height, caption }: { id?: stri
 }
 
 /** The page's end before Say hello: the next page as a panel in its own colour, its label and line at the left and its name large at the right. */
-export function NextPanel({ label, href, name, line, colours }: { label: string; href: string; name: string; line: string; colours: PanelColours }) {
+export function NextPanel({
+  label,
+  href,
+  name,
+  line,
+  colours,
+  transition,
+}: {
+  label: string;
+  href: string;
+  name: string;
+  line: string;
+  colours: PanelColours;
+  transition?: PanelTitleTransition;
+}) {
   const surface = panelSurface(colours);
   return (
     <nav className="frame story-next" aria-label={label}>
-      <Link className={`${surface.className} next-panel`} href={href} style={surface.style}>
+      <Link className={`${surface.className} next-panel`} href={href} style={surface.style} transitionTypes={transition ? titleLinkTypes(transition.name) : undefined}>
         <span className="next-panel__line">
           <span>{label}</span> <span>{line}</span>
         </span>
         <span className="next-panel__name">
-          {name}
+          {transition ? (
+            <TitleTransition name={transition.name} share={transition.share}>
+              <span className="vt-title">{name}</span>
+            </TitleTransition>
+          ) : (
+            name
+          )}
           <Arrow />
         </span>
       </Link>
