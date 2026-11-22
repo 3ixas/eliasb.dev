@@ -31,7 +31,7 @@ import {
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { HangingPass } from "./hanging";
 import { STEP, type Vec3 } from "./physics";
-import { strapMaterial } from "./strap";
+import { loadWebbing, strapMaterial } from "./strap";
 
 /** The camera's vertical field of view: long, so the cards are not distorted near the edges of the view. */
 const FOV = 20;
@@ -106,8 +106,9 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
   const rivet = new MeshPhysicalMaterial({ color: 0x55565c, metalness: 1, roughness: 0.4, envMap: environment, envMapIntensity: 1 });
   const fabrics = new Map<string, MeshPhysicalMaterial>();
   const anisotropy = renderer.capabilities.getMaxAnisotropy();
+  const webbing = await loadWebbing(anisotropy);
   const fabric = (colour: string) => {
-    if (!fabrics.has(colour)) fabrics.set(colour, strapMaterial(colour, anisotropy));
+    if (!fabrics.has(colour)) fabrics.set(colour, strapMaterial(colour, webbing, anisotropy));
     return fabrics.get(colour)!;
   };
   const hanging = await Promise.all(passes.map((pass) => HangingPass.paint(pass, { back, edge, metal, rivet, environment, anisotropy, fabric })));
@@ -357,7 +358,8 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     hanging.forEach((pass) => pass.dispose());
     backdrop.geometry.dispose();
     [back, edge, metal, rivet, shadow, ...fabrics.values()].forEach((material) => material.dispose());
-    [...fabrics.values()].forEach((material) => [material.map, material.normalMap].forEach((texture) => texture?.dispose()));
+    [...fabrics.values()].forEach((material) => material.map?.dispose());
+    webbing.normalMap.dispose();
     environment.dispose();
     renderer.dispose();
   };
