@@ -132,7 +132,7 @@ Four across (two under 1260 px, one under 720 px), upright, on paper with a hair
 
 ## The Résumé
 
-The sheet is unchanged: it is what prints and what `public/Elias-Bennett-Resume.pdf` holds, so `verify:resume` and the committed PDF stay valid. The page around it takes the header, the page colour and Say hello. Download PDF is the Button and sits on the sheet's edge.
+An A4 sheet lying on the desk (`resume.css`, [#468](https://github.com/3ixas/eliasb.dev/issues/468)), set in the site's own faces: Newsreader for the name, the summary line and the quiet left-margin section titles; Instrument Sans with tabular figures for everything else, with hairline rules between sections and 12 mm / 13 mm A4 margins. It stays light paper in both themes, prints exactly what it shows, aims for one A4 page (never more than two), and regenerates `public/Elias-Bennett-Resume.pdf` with embedded fonts and live links (`pnpm resume:pdf`, held by `verify:resume`). The page around it takes the header, the page colour and Say hello. Download PDF is the Button and sits on the sheet's edge.
 
 ## The 404
 
@@ -176,7 +176,7 @@ Every text pair passes WCAG 2.2 AA, measured on the rendered page and on every p
 
 ## Type
 
-- **Newsreader** (variable, optical size on) for the opening line, titles, figures, ledes, prose and the email. **Instrument Sans** for interface text, labels, captions and the stories on the habit cards. Both self-hosted through `next/font`, with fallback faces scaled to their measured widths. Only the Résumé sheet keeps JetBrains Mono.
+- **Newsreader** (variable, optical size on) for the opening line, titles, figures, ledes, prose, the email, and the Résumé sheet's name, summary line and section titles. **Instrument Sans** for interface text, labels, captions, the stories on the habit cards, and the rest of the Résumé sheet (with tabular figures for dates and links). Both self-hosted through `next/font`, with fallback faces scaled to their measured widths. No other face loads anywhere on the site ([#468](https://github.com/3ixas/eliasb.dev/issues/468)).
 - **Scale** ([#493](https://github.com/3ixas/eliasb.dev/issues/493)): display type stays Newsreader at about half its first size, so the largest step is 4× body, not 6×. Page titles `clamp(40px, 4.4vw, 64px)`; employer `clamp(36px, 3.6vw, 52px)`; opening line `clamp(32px, 3vw, 44px)` at line height 1.05 and −0.028 em; figures `clamp(28px, 2.6vw, 38px)`; section titles `clamp(28px, 2.4vw, 36px)`; panel titles `clamp(22px, 2vw, 28px)`; quote `clamp(20px, 1.7vw, 24px)`; lede `clamp(19px, 1.5vw, 22px)`; prose 19 px (18 px under 720 px); a point's lead 20 px; rows, links, names and Say hello's links one 18 px step; interface 15 to 16 px; small text 13 to 14.5 px.
 - **One floor.** Nothing a visitor reads is smaller than 13 px, on the page or printed on a pass.
 - **Figures** are lining and tabular wherever they are compared or roll.
@@ -249,7 +249,7 @@ From the quiet index, with its code, tokens, specs and baselines, each in the ti
 - enamel Pass pins and their glyphs
 - the phone carousel of featured projects
 - the removal rule, the two-width rule and the four-screen length budget
-- Bricolage Grotesque, DM Mono and the Fine cut
+- Bricolage Grotesque, JetBrains Mono, DM Mono and the Fine cut
 
 ## Decided in review
 

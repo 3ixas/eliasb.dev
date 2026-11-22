@@ -15,13 +15,13 @@ import "./projects.css";
 import "./off-the-clock.css";
 import "./story.css";
 import "./simulation.css";
-import "./stretch-resume.css";
+import "./resume.css";
 
 // Self-hosted at build time by next/font, so no request goes to Google when a visitor loads a page.
 // Passes and panels (docs/design/DESIGN.md "Type"): Newsreader for headings, figures and prose, with its
 // optical-size axis; Instrument Sans for interface text. Both variable in weight, Latin only, and given
 // next/font's fallback faces, which it sizes from each font's own metrics so a late font moves nothing.
-// tokens.css reads them as --serif and --sans. The Résumé sheet's own faces are loaded by its layout.
+// tokens.css reads them as --serif and --sans; every route, including the Résumé sheet, uses only these two faces.
 const newsreader = Newsreader({
   subsets: ["latin"],
   axes: ["opsz"],

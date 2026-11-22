@@ -1,8 +1,8 @@
 // Fails when something retired is written anywhere in the source, the stylesheets, the scripts or the specs: the old
-// Subpage header and its classes, the Fastener and its tape token, and the quiet index's parts (R-32: the row, closer
-// looks, the margin, reveal words, the pen, the 44 px objects, Pass pins, the Stretch shell and tokens, and Bricolage
-// Grotesque and DM Mono outside the Résumé sheet). Documents are exempt: the glossary and the design history keep the
-// words as history.
+// Subpage header and its classes, the Fastener and its tape token, the quiet index's parts (R-32: the row, closer
+// looks, the margin, reveal words, the pen, the 44 px objects, Pass pins, the Stretch shell and tokens), and the
+// retired faces (Bricolage Grotesque, JetBrains Mono and DM Mono). Documents are exempt: the glossary and the design
+// history keep the words as history.
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
@@ -15,14 +15,13 @@ const retired = [
   [/\bqi-[a-z]/, "a quiet index class (qi-*)"],
   [/components\/quiet\//, "the quiet index's components"],
   [/quiet-(index|long-form|opening|forced-colors)\.css/, "a quiet index stylesheet"],
-  [/stretch-(shell|tokens|type)\b|--stretch-|data-stretch-shell/, "the Stretch shell, its tokens or its hook"],
+  [/stretch-(shell|tokens|type|resume)\b|--stretch-|data-stretch-shell/, "the Stretch shell, its tokens, its hook or the old Résumé stylesheet"],
   [/CloserLook|closer-look|RevealWord|reveal-word|data-look-(tap|slot)|MarginPlacement|ScrollHold/, "a closer look, the margin or a reveal word"],
   [/\bPen\b|habit-number|HabitNumber|TodayTile|CalendarTile|ProjectObject|MiniPass|FullPass|PassPins|finished-pass/, "the pen, a 44 px object or the old pass and its pins"],
   [/DM_Mono|--font-dm-mono/, "DM Mono"],
+  [/Bricolage_Grotesque|--font-bricolage|Bricolage Fallback/, "Bricolage Grotesque"],
+  [/JetBrains_Mono|--font-jetbrains-mono/, "JetBrains Mono"],
 ];
-
-// Bricolage Grotesque is the Résumé sheet's face alone (its PDF was drawn in it): only these files may name it.
-const bricolageAllowed = new Set(["src/app/resume/layout.tsx", "src/app/stretch-resume.css"]);
 
 const files = execFileSync("git", ["ls-files", "src", "scripts", "e2e", "playwright.config.ts"], { encoding: "utf8" })
   .split("\n")
@@ -34,7 +33,7 @@ for (const file of files) {
     .split("\n")
     .forEach((line, index) => {
       for (const [pattern, what] of retired) if (pattern.test(line)) problems.push(`${file}:${index + 1} mentions ${what}`);
-      if (/[Bb]ricolage/.test(line) && !bricolageAllowed.has(file) && !file.startsWith("e2e/")) problems.push(`${file}:${index + 1} names Bricolage Grotesque outside the Résumé sheet`);
+      if (/[Bb]ricolage|JetBrains/i.test(line) && !file.startsWith("e2e/")) problems.push(`${file}:${index + 1} names a retired face (Bricolage Grotesque or JetBrains Mono)`);
     });
 }
 

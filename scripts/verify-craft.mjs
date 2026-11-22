@@ -19,7 +19,7 @@ const RING = { colour: 'var(--cobalt)', offset: '3px', page: ':where([data-site]
 const ringExceptions = [
   { selector: '.panel :focus-visible', colour: 'var(--panel-ink)', why: 'cobalt would not hold 3:1 on every panel field' },
   { selector: '.zoom__close:focus-visible', colour: '#fff', why: 'the Close button sits on a dark scrim' },
-  { selector: '.stretch-resume__sheet :focus-visible', colour: 'var(--sheet-focus)', why: 'the Résumé sheet is paper with its own ink' },
+  { selector: '.resume__sheet :focus-visible', colour: 'var(--sheet-focus)', why: 'the Résumé sheet is paper with its own ink' },
 ];
 
 /**

@@ -36,7 +36,7 @@ html:has([data-site]) body,
 }
 
 /* No single word alone on a last line, where the browser can manage it. Headings keep their own balance, and the Résumé sheet keeps the PDF's line breaks. */
-[data-site] :is(p, li, figcaption, blockquote):not(.stretch-resume__sheet *) {
+[data-site] :is(p, li, figcaption, blockquote):not(.resume__sheet *) {
   text-wrap: pretty;
 }
 

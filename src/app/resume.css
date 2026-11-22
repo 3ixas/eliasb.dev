@@ -1,0 +1,418 @@
+/*
+ * The Résumé (GLOSSARY.md, src/components/site/resume.tsx): an A4 sheet lying on the desk, and the
+ * same sheet when printed. Set in the site's own faces — Newsreader for the name, the summary line
+ * and the quiet section titles; Instrument Sans with tabular figures for everything else. The sheet
+ * stays light paper in either theme, so it sets its own light ink, muted, hairline and focus tokens
+ * rather than reading the page's. Its padding on screen matches the print page margin so lines break
+ * in the same places in both.
+ */
+
+/* The desk: the sheet centred on the page, with Download PDF on its top edge at the right (R-24). */
+.resume__desk {
+  display: grid;
+  /* One column the desk's width, so the sheet's 210 mm gives way to a phone (it has max-width: 100%). */
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: end;
+  gap: 16px;
+  width: min(210mm, 100%);
+  margin-inline: auto;
+  padding: 48px 0 64px;
+}
+
+.resume__sheet {
+  --sheet-paper: #ffffff;
+  --sheet-ink: #141416;
+  --sheet-muted: #5f5e5a;
+  /* Light ink at 14% over white, written solid so PDF hairlines print crisply without alpha quirks. */
+  --sheet-rule: #dfdeda;
+  /* The light theme's cobalt: the sheet is paper in both themes, so the dark theme's lighter cobalt would not hold on it. */
+  --sheet-focus: #2443d6;
+  box-sizing: border-box;
+  width: 210mm;
+  max-width: 100%;
+  min-height: 297mm;
+  padding: 12mm 13mm;
+  background-color: var(--sheet-paper);
+  color: var(--sheet-ink);
+  box-shadow:
+    0 1px 2px rgb(20 20 18 / 0.08),
+    0 12px 32px rgb(20 20 18 / 0.12);
+  font-family: var(--sans);
+  font-size: var(--type-label);
+  line-height: 1.38;
+  color-scheme: light;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+.resume__sheet :focus-visible {
+  outline-color: var(--sheet-focus);
+}
+
+:where(.resume__sheet) a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--sheet-rule);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 150ms var(--out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :where(.resume__sheet) a:hover {
+    text-decoration-color: var(--sheet-ink);
+  }
+}
+
+:where(.resume__sheet) :is(ul, dl, p, h1, h2, h3) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---- Header ---- */
+
+.resume__head {
+  display: grid;
+  gap: 5px;
+}
+
+.resume__identity {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px 16px;
+}
+
+/* Display type: Newsreader 400 in mixed case, matching the site's headings. */
+.resume__name {
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+.resume__role {
+  display: flex;
+  gap: 10px;
+  font-size: var(--type-small);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.resume__role span + span {
+  color: var(--sheet-muted);
+  font-weight: 400;
+}
+
+.resume__contacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 18px;
+  color: var(--sheet-muted);
+  font-size: var(--type-label);
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1.4;
+}
+
+.resume__summary {
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid var(--sheet-rule);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-body);
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+/* ---- Sections: quiet Newsreader title in the left margin, content at a comfortable measure on the right ---- */
+
+.resume__section {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 8px 14px;
+  align-items: start;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid var(--sheet-rule);
+}
+
+.resume__heading {
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-small);
+  font-weight: 400;
+  line-height: 1.32;
+  letter-spacing: -0.01em;
+  color: var(--sheet-muted);
+}
+
+.resume__body {
+  min-width: 0;
+}
+
+/* ---- Experience ---- */
+
+.resume__entry + .resume__entry {
+  margin-top: 8px;
+}
+
+/* Role and employer on the left, dates on the right. */
+.resume__line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  font-size: var(--type-small);
+  font-weight: 400;
+  line-height: 1.32;
+}
+
+.resume__who {
+  text-wrap: balance;
+}
+
+.resume__who strong,
+.resume__who [data-resume="employer"] {
+  font-weight: 600;
+}
+
+.resume__sep {
+  color: var(--sheet-muted);
+  font-weight: 400;
+}
+
+.resume__dates {
+  flex: none;
+  color: var(--sheet-muted);
+  font-size: var(--type-label);
+  font-variant-numeric: lining-nums tabular-nums;
+  white-space: nowrap;
+}
+
+.resume__link {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  margin-top: 2px;
+  color: var(--sheet-muted);
+  font-size: var(--type-label);
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1.38;
+}
+
+/*
+ * A native marker, not a positioned ::before: Chromium paints positioned boxes after the rest of the
+ * page, so the PDF's text would list every result last, out of order.
+ */
+.resume__results {
+  margin-top: 4px;
+  padding-left: 14px;
+  list-style: "– ";
+}
+
+.resume__results li + li {
+  margin-top: 2px;
+}
+
+/* ---- Selected projects ---- */
+
+.resume__projects li + li {
+  margin-top: 6px;
+}
+
+.resume__project-head {
+  font-size: var(--type-small);
+  line-height: 1.32;
+}
+
+.resume__project-head strong {
+  font-weight: 600;
+}
+
+.resume__project-outcome {
+  font-size: var(--type-label);
+  font-weight: 400;
+}
+
+.resume__meta {
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* ---- Awards ---- */
+
+.resume__awards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+}
+
+.resume__awards strong {
+  font-weight: 600;
+}
+
+.resume__award-detail {
+  color: var(--sheet-muted);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* ---- Skills ---- */
+
+.resume__skills {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px 20px;
+}
+
+.resume__skills dt {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.resume__skills dd {
+  margin: 0;
+  color: var(--sheet-ink);
+  line-height: 1.36;
+}
+
+/* ---- Education ---- */
+
+.resume__education {
+  display: grid;
+  gap: 5px;
+}
+
+.resume__education .resume__line {
+  gap: 8px;
+}
+
+.resume__education strong {
+  font-weight: 600;
+}
+
+.resume__course {
+  font-size: var(--type-label);
+}
+
+/* ---- Phone ---- */
+
+/* A phone shows the sheet full width, with no paper edge. */
+@media (max-width: 760px) {
+  .resume__desk {
+    padding-top: 24px;
+  }
+
+  .resume__download {
+    margin-right: 16px;
+  }
+
+  .resume__sheet {
+    min-height: 0;
+    padding: 24px 16px;
+    box-shadow: none;
+  }
+
+  .resume__section {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+}
+
+@media (max-width: 560px) {
+  .resume__identity {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .resume__line {
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .resume__skills {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Shadows are dropped in forced colours, so the sheet keeps its edge as a 1 px outline. */
+@media (forced-colors: active) {
+  .resume__sheet {
+    outline: 1px solid CanvasText;
+    outline-offset: -1px;
+  }
+}
+
+/*
+ * Cmd-P gives the sheet: the desk, the header and the button stay behind. The A4 page is a
+ * named page that only the sheet uses (`page: resume` below), so no other route's print is touched.
+ */
+@page resume {
+  size: A4;
+  margin: 12mm 13mm;
+}
+
+@media print {
+  html:has([data-resume]),
+  html:has([data-resume]) body,
+  [data-resume] {
+    background: #ffffff;
+  }
+
+  [data-resume] .resume__download {
+    display: none;
+  }
+
+  /* ↗ marks a link that leaves the site on screen; on paper there is nowhere to leave to, and the PDF holds only the sheet's text. */
+  .resume__away {
+    display: none;
+  }
+
+  .resume__desk {
+    display: block;
+    padding: 0;
+  }
+
+  .resume__sheet {
+    width: auto;
+    min-height: 0;
+    padding: 0;
+    box-shadow: none;
+    page: resume;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* The print window can be narrower than the sheet's own layout would suggest; keep the wide arrangement. */
+  .resume__identity {
+    flex-direction: row;
+    gap: 4px 16px;
+  }
+
+  .resume__section {
+    grid-template-columns: 112px minmax(0, 1fr);
+    gap: 8px 14px;
+  }
+
+  .resume__line {
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .resume__skills {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .resume__entry,
+  .resume__projects li {
+    break-inside: avoid;
+  }
+
+  .resume__heading {
+    break-after: avoid;
+  }
+}

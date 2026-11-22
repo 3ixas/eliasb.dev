@@ -31,10 +31,6 @@
   /* 1 in the dark theme and 0 in the light one, for what cannot take a colour (the Eclipse icon). Not registered, so it flips at once. */
   --dark: 0;
   color-scheme: light;
-  /* The Résumé sheet's own text steps, which its PDF was drawn at (the sheet alone reads them). */
-  --text-label: 13px;
-  --text-small: 15px;
-  --text-body: 17px;
   /* A staff pass is printed: its card stock and its shadow on the page (DESIGN.md "The staff pass"). */
   --stock: #ffffff;
   --stock-end: #f5f4f0;
