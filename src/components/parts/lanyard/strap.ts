@@ -1,9 +1,9 @@
 /*
- * The lanyard's strap (#448, round two): two plies of woven webbing in the employer's colour (DESIGN.md "The staff pass").
- * Each ply is a thin flat tube of real thickness through its particles, so an edge-on ply still shows its edge. Its twist is
- * held at both ends: where it leaves the view it faces the viewer (it goes on round a neck), and at the crimp it turns with
- * the clip; the difference is spread along the ply and followed from frame to frame, so turns of the card wind the strap up
- * and unwind it again rather than snapping back.
+ * The lanyard's strap (#448, #486): two plies of woven polyester twill webbing in the employer's colour (DESIGN.md
+ * "The staff pass"). Each ply is a thin flat tube of real thickness through its particles, so an edge-on ply still shows
+ * its edge. Its twist is held at both ends: where it leaves the view it faces the viewer (it goes on round a neck), and
+ * at the crimp it turns with the clip; the difference is spread along the ply and followed from frame to frame, so turns
+ * of the card wind the strap up and unwind it again rather than snapping back.
  */
 import { BufferAttribute, BufferGeometry, CanvasTexture, CatmullRomCurve3, ClampToEdgeWrapping, Color, DoubleSide, Mesh, MeshPhysicalMaterial, RepeatWrapping, SRGBColorSpace, Vector2, Vector3 } from "three";
 import { cross, dot, normalise, scale, sub, type Vec3 } from "./physics";
@@ -16,21 +16,49 @@ const SAMPLES = 48;
 const FACES = 4;
 /** Where a ply leaves the view, its width runs along the world's x, so its face is to the viewer. */
 const LEVEL: Vec3 = { x: 1, y: 0, z: 0 };
+/** Relief strength of the Scharr normal map derived from the webbing's luminance. */
+const RELIEF = 3.2;
 
-export function strapMaterial(colour: string, anisotropy: number) {
-  const map = weave(colour);
-  const normalMap = weaveRelief();
-  for (const texture of [map, normalMap]) {
-    texture.wrapS = ClampToEdgeWrapping;
-    texture.wrapT = RepeatWrapping;
-    texture.anisotropy = anisotropy;
+/** The decoded greyscale webbing tile and the single normal map derived from it, shared by every employer's strap. */
+export type Webbing = {
+  size: number;
+  luma: Float32Array;
+  mean: number;
+  normalMap: CanvasTexture;
+};
+
+/** Decodes the seamless webbing tile and derives its tangent-space normal map once for the scene. */
+export function createWebbing(image: HTMLImageElement, anisotropy: number): Webbing {
+  const size = image.naturalWidth;
+  if (!size || size !== image.naturalHeight) throw new Error(`Webbing tile must be square (${image.naturalWidth}×${image.naturalHeight})`);
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("No 2D canvas");
+  context.drawImage(image, 0, 0);
+  const data = context.getImageData(0, 0, size, size).data;
+  const luma = new Float32Array(size * size);
+  let sum = 0;
+  for (let i = 0; i < luma.length; i++) {
+    const p = i * 4;
+    const value = (0.2126 * data[p] + 0.7152 * data[p + 1] + 0.0722 * data[p + 2]) / 255;
+    luma[i] = value;
+    sum += value;
   }
-  // Fabric: matte, with the soft sheen of woven polyester at a grazing angle, a touch lighter than the dye.
+  const mean = sum / luma.length;
+  const normalMap = weaveRelief(luma, size, anisotropy);
+  return { size, luma, mean, normalMap };
+}
+
+export function strapMaterial(colour: string, webbing: Webbing, anisotropy: number) {
+  const map = weave(colour, webbing, anisotropy);
+  // Fabric: matte dyed polyester, with the soft sheen of woven yarn at a grazing angle, a touch lighter than the dye.
   return new MeshPhysicalMaterial({
     map,
-    normalMap,
-    normalScale: new Vector2(0.8, 0.8),
-    roughness: 0.8,
+    normalMap: webbing.normalMap,
+    normalScale: new Vector2(0.95, 0.95),
+    roughness: 0.78,
     sheen: 0.7,
     sheenRoughness: 0.45,
     sheenColor: new Color(colour).lerp(new Color(0xffffff), 0.35),
@@ -137,34 +165,28 @@ export class Strap {
 
 const vertex = (sample: number, face: number, side: 0 | 1) => (sample * FACES + face) * 2 + side;
 
-/** The tile: one strap width square, repeated along the strap. */
-const TILE = 64;
-/** A twill's diagonal ridges per tile, and the woven edge's width in texels. */
-const RIDGES = 9;
-const SELVEDGE = 5;
-
-/** The webbing's height at a texel: diagonal twill ridges over fine lengthwise yarns, with a raised woven edge each side. */
-function height(x: number, y: number) {
-  const twill = 0.5 + 0.5 * Math.sin((2 * Math.PI * (x + y) * RIDGES) / TILE);
-  const yarn = 0.5 + 0.5 * Math.cos((2 * Math.PI * x * 16) / TILE);
-  const edge = x < SELVEDGE || x >= TILE - SELVEDGE ? 0.6 + 0.4 * Math.sin((2 * Math.PI * y * 16) / TILE) : 0;
-  return edge || 0.75 * twill + 0.25 * yarn;
-}
-
-/** A normal map from the webbing's height. */
-function weaveRelief() {
+/** A tangent-space normal map derived from the webbing tile's luminance via a periodic 3×3 Scharr filter. */
+function weaveRelief(luma: Float32Array, size: number, anisotropy: number) {
   const canvas = document.createElement("canvas");
-  canvas.width = TILE;
-  canvas.height = TILE;
+  canvas.width = size;
+  canvas.height = size;
   const context = canvas.getContext("2d")!;
-  const image = context.createImageData(TILE, TILE);
-  const at = (x: number, y: number) => height(Math.min(TILE - 1, Math.max(0, x)), (y + TILE) % TILE);
-  for (let y = 0; y < TILE; y++) {
-    for (let x = 0; x < TILE; x++) {
-      const dx = (at(x + 1, y) - at(x - 1, y)) * 1.6;
-      const dy = (at(x, y + 1) - at(x, y - 1)) * 1.6;
+  const image = context.createImageData(size, size);
+  const at = (x: number, y: number) => luma[((y + size) % size) * size + ((x + size) % size)];
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const gx =
+        3 * (at(x + 1, y - 1) - at(x - 1, y - 1)) +
+        10 * (at(x + 1, y) - at(x - 1, y)) +
+        3 * (at(x + 1, y + 1) - at(x - 1, y + 1));
+      const gy =
+        3 * (at(x - 1, y + 1) - at(x - 1, y - 1)) +
+        10 * (at(x, y + 1) - at(x, y - 1)) +
+        3 * (at(x + 1, y + 1) - at(x + 1, y - 1));
+      const dx = (gx / 32) * RELIEF;
+      const dy = (gy / 32) * RELIEF;
       const length = Math.hypot(dx, dy, 1);
-      const i = (y * TILE + x) * 4;
+      const i = (y * size + x) * 4;
       image.data[i] = ((-dx / length) * 0.5 + 0.5) * 255;
       image.data[i + 1] = ((dy / length) * 0.5 + 0.5) * 255;
       image.data[i + 2] = ((1 / length) * 0.5 + 0.5) * 255;
@@ -172,34 +194,48 @@ function weaveRelief() {
     }
   }
   context.putImageData(image, 0, 0);
-  return new CanvasTexture(canvas);
+  const texture = new CanvasTexture(canvas);
+  texture.wrapS = ClampToEdgeWrapping;
+  texture.wrapT = RepeatWrapping;
+  texture.anisotropy = anisotropy;
+  return texture;
 }
 
-/** The dye, a shade lighter on the ridges and darker in the hollows, and darker still where the edges roll away. */
-function weave(colour: string) {
+/** Tints the neutral grey webbing tile into an employer's dye, keeping yarn-crown sheen and softly rolled selvedge edges. */
+function weave(colour: string, { size, luma, mean }: Webbing, anisotropy: number) {
   const canvas = document.createElement("canvas");
-  canvas.width = TILE;
-  canvas.height = TILE;
+  canvas.width = size;
+  canvas.height = size;
   const context = canvas.getContext("2d")!;
   context.fillStyle = colour;
-  context.fillRect(0, 0, TILE, TILE);
-  const image = context.getImageData(0, 0, TILE, TILE);
-  for (let y = 0; y < TILE; y++) {
-    for (let x = 0; x < TILE; x++) {
-      const shade = 0.88 + 0.2 * height(x, y);
-      const i = (y * TILE + x) * 4;
-      for (let k = 0; k < 3; k++) image.data[i + k] = Math.min(255, image.data[i + k] * shade);
-    }
+  context.fillRect(0, 0, size, size);
+  const image = context.getImageData(0, 0, size, size);
+  const data = image.data;
+  const br = data[0];
+  const bg = data[1];
+  const bb = data[2];
+  for (let i = 0; i < luma.length; i++) {
+    const delta = luma[i] - mean;
+    const shade = 1 + delta * 1.45;
+    // A faint satin lift on yarn crowns keeps dark dyes (Joveen's charcoal) legible as woven polyester.
+    const sheen = Math.max(0, delta - 0.04) * 58;
+    const p = i * 4;
+    data[p] = Math.max(0, Math.min(255, br * shade + sheen));
+    data[p + 1] = Math.max(0, Math.min(255, bg * shade + sheen));
+    data[p + 2] = Math.max(0, Math.min(255, bb * shade + sheen));
   }
   context.putImageData(image, 0, 0);
-  const edges = context.createLinearGradient(0, 0, TILE, 0);
-  edges.addColorStop(0, "rgb(0 0 0 / 0.18)");
-  edges.addColorStop(0.14, "rgb(0 0 0 / 0)");
-  edges.addColorStop(0.86, "rgb(0 0 0 / 0)");
-  edges.addColorStop(1, "rgb(0 0 0 / 0.18)");
+  const edges = context.createLinearGradient(0, 0, size, 0);
+  edges.addColorStop(0, "rgb(0 0 0 / 0.16)");
+  edges.addColorStop(0.12, "rgb(0 0 0 / 0)");
+  edges.addColorStop(0.88, "rgb(0 0 0 / 0)");
+  edges.addColorStop(1, "rgb(0 0 0 / 0.16)");
   context.fillStyle = edges;
-  context.fillRect(0, 0, TILE, TILE);
+  context.fillRect(0, 0, size, size);
   const texture = new CanvasTexture(canvas);
   texture.colorSpace = SRGBColorSpace;
+  texture.wrapS = ClampToEdgeWrapping;
+  texture.wrapT = RepeatWrapping;
+  texture.anisotropy = anisotropy;
   return texture;
 }

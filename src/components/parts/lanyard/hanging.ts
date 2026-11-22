@@ -19,6 +19,8 @@ export type Shared = {
   rivet: Material;
   environment: Texture;
   anisotropy: number;
+  /** The generated hologram foil texture when any pass in the stage carries a hologram (#486). */
+  foil: HTMLImageElement | null;
   /** The strap's fabric in a colour, shared by every pass on that colour. */
   fabric: (colour: string) => MeshPhysicalMaterial;
 };
@@ -35,10 +37,11 @@ export class HangingPass {
   private size = 1;
   private readonly aspect: number;
   private readonly face: MeshPhysicalMaterial;
+  private readonly foil: HTMLImageElement | null;
   private readonly textures: [CanvasTexture, CanvasTexture, CanvasTexture];
 
   static async paint(pass: HTMLElement, shared: Shared) {
-    return new HangingPass(pass, await paintPrint(pass), shared);
+    return new HangingPass(pass, await paintPrint(pass, shared.foil), shared);
   }
 
   private constructor(private readonly pass: HTMLElement, print: Print, shared: Shared) {
@@ -47,6 +50,7 @@ export class HangingPass {
     this.printed = printed;
     this.link = pass instanceof HTMLAnchorElement ? pass : null;
     this.aspect = print.aspect;
+    this.foil = shared.foil;
 
     const colour = new CanvasTexture(print.canvas);
     colour.colorSpace = SRGBColorSpace;
@@ -122,7 +126,7 @@ export class HangingPass {
 
   /** Paints the card again, for a change of theme (its stock is a step darker in dark). */
   async reprint() {
-    const print = await paintPrint(this.pass);
+    const print = await paintPrint(this.pass, this.foil);
     [print.canvas, print.surface, print.foil].forEach((image, i) => {
       this.textures[i].image = image;
       this.textures[i].needsUpdate = true;
