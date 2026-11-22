@@ -37,6 +37,31 @@ test.describe("Forced colours", () => {
     await expect(figure.locator(".ftbreak__range")).toHaveCSS("forced-color-adjust", "none");
   });
 
+  test("Where I'm headed keeps its split test, ticks and live mark distinct", async ({ page }) => {
+    await page.goto("/");
+    const section = page.locator("section[aria-labelledby='headed-heading']");
+    const canvas = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    const colours = await section.evaluate((root) => {
+      const other = root.querySelector('[data-proof="split"] [data-variant="other"] rect')!;
+      const chosen = root.querySelector('[data-proof="split"] .headed__split-box')!;
+      const bnpTick = root.querySelector('[data-proof="count"] .drawn__ticks i')!;
+      const thresholdTick = root.querySelector('[data-proof="count-to-live"] .drawn__ticks i')!;
+      const live = root.querySelector('[data-proof="count-to-live"] .headed__live')!;
+      return {
+        other: getComputedStyle(other).stroke,
+        chosen: getComputedStyle(chosen).stroke,
+        bnpTick: getComputedStyle(bnpTick).backgroundColor,
+        thresholdTick: getComputedStyle(thresholdTick).backgroundColor,
+        live: getComputedStyle(live).backgroundColor,
+      };
+    });
+    expect(colours.chosen).not.toBe(colours.other);
+    for (const colour of Object.values(colours)) expect(colour).not.toBe(canvas);
+    expect(colours.bnpTick).toBe(colours.chosen);
+    expect(colours.thresholdTick).toBe(colours.chosen);
+    expect(colours.live).toBe(colours.chosen);
+  });
+
   test("the GitHub year's levels are not all one colour", async ({ page }) => {
     await page.goto("/");
     const byLevel = await page.locator(".stretch-gh__day[data-level]").evaluateAll((elements) => {

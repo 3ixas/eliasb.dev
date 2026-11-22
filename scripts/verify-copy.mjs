@@ -26,7 +26,7 @@ import { greetingKey, greetingLine } from "../src/content/stretch/greeting.ts";
 import { offTheClock } from "../src/content/stretch/off-the-clock.ts";
 import { opening } from "../src/content/stretch/opening.ts";
 import { notFound, sayHello, siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy.ts";
-import { headedProblems, shownSource, work } from "../src/content/stretch/work.ts";
+import { headedProblems, PAPER_SURFACE, shownSource, work } from "../src/content/stretch/work.ts";
 import { comparisonRow, workPanelProblems, workPanels } from "../src/content/stretch/work-panels.ts";
 import { simulationCopy } from "../src/content/stretch/simulation-copy.ts";
 import { thresholdLinkCopy } from "../src/content/stretch/threshold-link.ts";
@@ -230,6 +230,30 @@ assert.deepEqual(headedProblems(headed.bars), []);
 assert.match(headedProblems([{ ...headed.bars[0], soFar: { ...headed.bars[0].soFar, restates: ["decided what the engineers built next"] } }])[0], /Judgement bar.*decided what the engineers built next/);
 assert.match(headedProblems([{ ...headed.bars[2], soFar: { ...headed.bars[2].soFar, restates: ["58 user stories"] } }])[0], /Range bar.*58 user stories/);
 assert.match(headedProblems([{ ...headed.bars[2], soFar: { ...headed.bars[2].soFar, text: "Threshold, a live site." } }])[0], /Range bar.*no longer shows "57 user stories"/);
+// Each part's drawn proof is held to its "So far" line (#459), and its colour falls back to cobalt when its thread falls under 3:1.
+assert.match(headedProblems([{ ...headed.bars[1], drawn: { kind: "count", value: 71 } }])[0], /Depth bar draws 71/);
+assert.match(headedProblems([{ ...headed.bars[1], drawn: { kind: "count", value: 0 } }])[0], /Depth bar draws 0.*positive whole number/);
+assert.match(headedProblems([{ ...headed.bars[2], drawn: { kind: "count-to-live", value: 58 } }])[0], /Range bar draws 58/);
+assert.match(headedProblems([{ ...headed.bars[2], soFar: { ...headed.bars[2].soFar, text: "Threshold, 57 user stories." } }])[0], /Range bar draws a live mark/);
+assert.match(headedProblems([{ ...headed.bars[0], soFar: { ...headed.bars[0].soFar, text: "At Optegra, dashboards guided what the engineers built next." } }])[0], /Judgement bar draws a split test/);
+assert.equal(shownSource(headed.bars[0].source).drawn, "light-dark(var(--cobalt), var(--cobalt))", "Optegra's thread falls under 3:1 on paper, so its drawing takes cobalt");
+assert.match(shownSource(headed.bars[1].source).drawn, /^light-dark\(#[0-9a-f]{6}, #[0-9a-f]{6}\)$/, "BNP Paribas's thread holds 3:1 on paper in both themes");
+assert.match(shownSource(headed.bars[2].source).drawn, /^light-dark\(#[0-9a-f]{6}, #[0-9a-f]{6}\)$/, "Threshold's thread holds 3:1 on paper in both themes");
+// PAPER_SURFACE stays pinned to tokens.css (--paper) and parts.css (.surface--paper light foot 3% black, dark lit top 7% white).
+{
+  const tokensCss = readFileSync(new URL("../src/app/tokens.css", import.meta.url), "utf8");
+  const partsCss = readFileSync(new URL("../src/app/parts.css", import.meta.url), "utf8");
+  const papers = [...tokensCss.matchAll(/--paper:\s*(#[0-9a-f]{6});/g)].map((m) => m[1]);
+  const lightPaper = papers[0];
+  const darkPaper = papers[1];
+  const footBlack = Number(partsCss.match(/\.surface--paper[\s\S]*?--foot:\s*light-dark\(color-mix\(in srgb, var\(--field\), #000 (\d+)%\)/)?.[1]);
+  const litWhite = Number(partsCss.match(/--lit:\s*light-dark\(.*?,\s*color-mix\(in srgb, var\(--field\), #fff (\d+)%\)\)/)?.[1]);
+  assert.ok(lightPaper && darkPaper && footBlack > 0 && litWhite > 0, "tokens.css and parts.css define the paper surface tones");
+  const mix = (hex, target, weight) =>
+    "#" + [1, 3, 5].map((at) => Math.round(Number.parseInt(hex.slice(at, at + 2), 16) * (1 - weight) + target * weight).toString(16).padStart(2, "0")).join("");
+  assert.equal(PAPER_SURFACE.light, mix(lightPaper, 0, footBlack / 100), "PAPER_SURFACE.light matches light --paper deepened by .surface--paper's --foot");
+  assert.equal(PAPER_SURFACE.dark, mix(darkPaper, 255, litWhite / 100), "PAPER_SURFACE.dark matches dark --paper lifted by .surface's --lit");
+}
 // Work has a row for every Role story exactly once, the current job first.
 assert.deepEqual([...work.employers.map((employer) => employer.slug)].sort(), [...roleStorySlugs].sort(), "Work has a row for every Role story exactly once");
 assert.equal(work.employers[0].slug, roleStorySlugs[0], "Work starts with the newest Role story");

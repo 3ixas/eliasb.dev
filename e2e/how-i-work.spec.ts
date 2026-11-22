@@ -2,13 +2,15 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { caseStudies } from "../src/content/stretch/case-studies";
 import { howIWork } from "../src/content/stretch/how-i-work";
+import { contrastRatio } from "../src/content/stretch/story";
 import { shownSource, work } from "../src/content/stretch/work";
 import { renderedContrast } from "./support/rendered-contrast";
 
 /*
- * Where I'm headed and How I work (docs/design/DESIGN.md "The homepage, in order" 4 and 6, "How I work's cards"; R-16 and
- * R-18): one paper panel with three parts, each from a chip naming its source; then four upright cards, each the habit
- * above a cobalt rule, the story with its proof phrase highlighted, and the proof drawn in the foot; then the PRD link.
+ * Where I'm headed and How I work (docs/design/DESIGN.md "The homepage, in order" 4 and 6, "How I work's cards"; R-16,
+ * R-18 and #459): one paper panel with three parts, each from a chip naming its source and its proof drawn beneath its
+ * line; then four upright cards, each the habit above a cobalt rule, the story with its proof phrase highlighted, and
+ * the proof drawn in the foot; then the PRD link.
  */
 
 const headed = (page: Page) => page.locator("section[aria-labelledby='headed-heading']");
@@ -50,6 +52,81 @@ test.describe("Where I'm headed", () => {
     if (width(page) >= 1260) expect(parts.x).toBeGreaterThan(lead.x + lead.width);
     else expect(parts.y).toBeGreaterThanOrEqual(lead.y + lead.height);
   });
+
+  test("each part draws its proof, hidden from assistive technology and matching its line", async ({ page }) => {
+    const parts = headed(page).locator(".headed__parts > li");
+    const [optegra, bnp, threshold] = [0, 1, 2].map((index) => parts.nth(index).locator(".headed__proof"));
+    for (const proof of [optegra, bnp, threshold]) {
+      await expect(proof).toBeVisible();
+      await expect(proof).toHaveAttribute("aria-hidden", "true");
+    }
+    // Optegra: a split test with two variants side by side, one marked as the one that went on.
+    const [other, chosen] = await Promise.all([
+      boxOf(optegra.locator('[data-variant="other"]')),
+      boxOf(optegra.locator('[data-variant="chosen"] .headed__split-box')),
+    ]);
+    expect(chosen.x).toBeGreaterThan(other.x + other.width);
+    await expect(optegra.locator('[data-variant="other"] rect').first()).toHaveAttribute("stroke-dasharray", /\d/);
+    await expect(optegra.locator(".headed__split-arrow")).toBeVisible();
+    // BNP Paribas: 70 ticks, reusing How I work's tick drawing.
+    await expect(bnp.locator(".drawn__ticks i")).toHaveCount(70);
+    // Threshold: 57 ticks leading to one filled live mark.
+    await expect(threshold.locator(".drawn__ticks i")).toHaveCount(57);
+    await expect(threshold.locator(".headed__live")).toBeVisible();
+    const [lastTick, liveMark] = await Promise.all([boxOf(threshold.locator(".drawn__ticks i").last()), boxOf(threshold.locator(".headed__live"))]);
+    expect(liveMark.x).toBeGreaterThan(lastTick.x);
+  });
+
+  for (const scheme of ["light", "dark"] as const) {
+    test(`each drawn proof holds 3:1 against paper and uses cobalt where its source thread falls short (${scheme})`, async ({ page, browserName }) => {
+      test.skip(browserName !== "chromium", "Measured in Chromium");
+      await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
+      await page.reload();
+      await settled(page);
+      const measured = await headed(page).evaluate((section) => {
+        const ctx = document.createElement("canvas").getContext("2d", { willReadFrequently: true })!;
+        const resolveHex = (cssColour: string) => {
+          ctx.clearRect(0, 0, 1, 1);
+          ctx.fillStyle = cssColour;
+          ctx.fillRect(0, 0, 1, 1);
+          const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+          return `#${[r, g, b].map((channel) => channel.toString(16).padStart(2, "0")).join("")}`;
+        };
+        const panel = section.querySelector(".headed")!;
+        const tokenHex = (token: string) => {
+          const probe = document.createElement("span");
+          probe.style.color = `var(${token})`;
+          panel.append(probe);
+          const hex = resolveHex(getComputedStyle(probe).color);
+          probe.remove();
+          return hex;
+        };
+        const optegra = section.querySelector('[data-proof="split"] .headed__split-box')!;
+        const bnp = section.querySelector('[data-proof="count"] .drawn__ticks i')!;
+        const threshold = section.querySelector('[data-proof="count-to-live"] .drawn__ticks i')!;
+        const live = section.querySelector('[data-proof="count-to-live"] .headed__live')!;
+        return {
+          surfaceStops: [tokenHex("--lit"), tokenHex("--field"), tokenHex("--foot")],
+          cobalt: tokenHex("--cobalt"),
+          optegra: resolveHex(getComputedStyle(optegra).stroke),
+          bnp: resolveHex(getComputedStyle(bnp).backgroundColor),
+          threshold: resolveHex(getComputedStyle(threshold).backgroundColor),
+          live: resolveHex(getComputedStyle(live).backgroundColor),
+        };
+      });
+      const stops = [...new Set(measured.surfaceStops)];
+      expect(stops.length).toBeGreaterThanOrEqual(2);
+      expect(measured.optegra).toBe(measured.cobalt);
+      expect(measured.bnp).not.toBe(measured.cobalt);
+      expect(measured.threshold).not.toBe(measured.cobalt);
+      expect(measured.live).toBe(measured.threshold);
+      for (const colour of [measured.optegra, measured.bnp, measured.threshold, measured.live]) {
+        for (const surface of stops) {
+          expect(contrastRatio(colour, surface), `${colour} on ${surface}`).toBeGreaterThanOrEqual(3);
+        }
+      }
+    });
+  }
 });
 
 test.describe("How I work", () => {
@@ -124,6 +201,7 @@ test.describe("How I work", () => {
     await page.route("**/*.js", (route) => route.abort());
     await page.reload();
     await expect(headed(page).locator(".headed__parts > li")).toHaveCount(3);
+    await expect(headed(page).locator(".headed__proof")).toHaveCount(3);
     await expect(cards(page)).toHaveCount(4);
     for (const card of await cards(page).all()) await expect(card).toBeVisible();
   });
