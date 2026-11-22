@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "assets": {
+    "pass-bnp-paribas.png": {
+      "width": 650,
+      "height": 1178,
+      "shadowPadX": 56,
+      "fingerprint": "c18e6856e266ff480c941192f32d63888cadd0cfe98df66bc29d3ed65331d326"
+    },
+    "pass-joveen.png": {
+      "width": 654,
+      "height": 1180,
+      "shadowPadX": 56,
+      "fingerprint": "aca42745565aeb5d958496b12d434c6a37f957ec0d6cb3b7384bbe330951d638"
+    },
+    "pass-optegra.png": {
+      "width": 652,
+      "height": 1178,
+      "shadowPadX": 56,
+      "fingerprint": "a3ec102c0b9950ab8bf04c864728d2a22973653fdfc13100c0b76db0c78c651a"
+    },
+    "shot-threshold.png": {
+      "width": 1080,
+      "height": 775,
+      "fingerprint": "a958687ff7db5ff9b5ff5235612f760290dbda507cf6d1190005d28c6f57eed6"
+    },
+    "shot-argus-risk.png": {
+      "width": 1080,
+      "height": 608,
+      "fingerprint": "c0438b7d4cc195d5b3550bae645fe4d5bd43cd3abc5362a888a93ba5ba47af3e"
+    },
+    "shot-flowtime.png": {
+      "width": 1080,
+      "height": 727,
+      "fingerprint": "dccd226f1cb4fcda4c5010e1a446af39a503311edc4530c27572c6e5354282f1"
+    }
+  }
+}

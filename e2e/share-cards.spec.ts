@@ -6,9 +6,10 @@ import { roleStories, roleStorySlugs } from "../src/content/stretch/role-stories
 import { sayHello } from "../src/content/stretch/site-copy";
 
 /*
- * Share cards (docs/design/DESIGN.md, "Share cards", R-26): one template in Newsreader, so every card is a 1200 × 630 PNG on
- * its page's field, and the
- * pages that take the homepage's card say so in their metadata. The Copy button's fallback is held here too.
+ * Share cards and favicon (docs/design/DESIGN.md, "Share cards", R-26, #469): one template in Newsreader carrying each
+ * page's object on 1200 × 630 PNG (three passes on the homepage, the employer's pass on a Role story, the screenshot on
+ * a case study), the Newsreader "E" favicon in site cobalt with dark-scheme SVG + PNG + Apple touch icon fallbacks, and
+ * the Copy button's fallback.
  */
 
 const pngSize = (bytes: Buffer) => ({ width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) });
@@ -23,28 +24,52 @@ test.describe("Share cards", () => {
     });
   }
 
-  // R-26: the homepage's card is on the page colour; a Role story's and a case study's take their panel's field.
+  // R-26 & #469: every card is drawn on its field (corner check) and carries its object on the right side (not empty field).
   const fields: [string, string][] = [
     ["/opengraph-image", sharePage.field],
     ...roleStorySlugs.map((slug): [string, string] => [`/work/${slug}/opengraph-image`, roleStories[slug].panel.field]),
     ...caseStudySlugs.map((slug): [string, string] => [`/things-i-make/${slug}/opengraph-image`, projects.find((project) => project.slug === slug)!.panel!.field]),
   ];
   for (const [path, field] of fields) {
-    test(`${path} is drawn on ${field}`, async ({ page }) => {
+    test(`${path} is drawn on ${field}, carries its object and clips nothing at the edges`, async ({ page }) => {
       await page.goto(path);
-      const corner = await page.locator("img").evaluate(async (image: HTMLImageElement) => {
+      const expectedRgb = [1, 3, 5].map((at) => parseInt(field.slice(at, at + 2), 16));
+      const { corner, nonFieldInObjectArea, clippedEdgePixels } = await page.locator("img").evaluate(async (image: HTMLImageElement, rgb: number[]) => {
         await image.decode();
         const canvas = document.createElement("canvas");
         [canvas.width, canvas.height] = [image.naturalWidth, image.naturalHeight];
         const context = canvas.getContext("2d")!;
         context.drawImage(image, 0, 0);
-        return [...context.getImageData(8, 8, 1, 1).data].slice(0, 3);
-      });
-      expect(corner).toEqual([1, 3, 5].map((at) => parseInt(field.slice(at, at + 2), 16)));
+        const differs = (x: number, y: number, tol = 12) => {
+          const [r, g, b] = context.getImageData(x, y, 1, 1).data;
+          return Math.abs(r - rgb[0]) > tol || Math.abs(g - rgb[1]) > tol || Math.abs(b - rgb[2]) > tol;
+        };
+        const corner = [...context.getImageData(8, 8, 1, 1).data].slice(0, 3);
+        // Sample the right-side object region (x: 680..1120, y: 120..520) on a 16 px grid.
+        let nonFieldInObjectArea = 0;
+        for (let x = 680; x <= 1120; x += 16) {
+          for (let y = 120; y <= 520; y += 16) {
+            if (differs(x, y)) nonFieldInObjectArea += 1;
+          }
+        }
+        // Sample the outer left, right and bottom margin bands (20 px inside each edge) to confirm nothing clips off the card.
+        let clippedEdgePixels = 0;
+        for (let y = 8; y < 622; y += 16) {
+          if (differs(12, y, 18)) clippedEdgePixels += 1;
+          if (differs(1188, y, 18)) clippedEdgePixels += 1;
+        }
+        for (let x = 8; x < 1192; x += 16) {
+          if (differs(x, 618, 18)) clippedEdgePixels += 1;
+        }
+        return { corner, nonFieldInObjectArea, clippedEdgePixels };
+      }, expectedRgb);
+      expect(corner).toEqual(expectedRgb);
+      expect(nonFieldInObjectArea).toBeGreaterThan(80);
+      expect(clippedEdgePixels).toBe(0);
     });
   }
 
-  // Each page names a card from this template, never a screenshot: the headline card, or its own.
+  // Each page names a card from this template, never a raw screenshot: the headline card, or its own.
   const cards = [
     ["/", "/opengraph-image"],
     ["/things-i-make", "/opengraph-image"],
@@ -60,6 +85,35 @@ test.describe("Share cards", () => {
       await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
     });
   }
+});
+
+test.describe("Favicon", () => {
+  test("serves the Newsreader E SVG (with dark variant), 32 px PNG fallback and 180 px Apple touch icon", async ({ page, request }) => {
+    await page.goto("/");
+
+    const svgHref = await page.locator('link[rel="icon"][type="image/svg+xml"]').first().getAttribute("href");
+    expect(svgHref).toMatch(/^\/icon\.svg/);
+    const svgResponse = await request.get(svgHref!);
+    expect(svgResponse.status()).toBe(200);
+    const svg = await svgResponse.text();
+    expect(svg).toContain("prefers-color-scheme: dark");
+    expect(svg).toContain("#2443d6");
+    expect(svg).toContain("#8c9eff");
+
+    const pngHref = await page.locator('link[rel="icon"][type="image/png"]').first().getAttribute("href");
+    expect(pngHref).toBeTruthy();
+    const pngResponse = await request.get(pngHref!);
+    expect(pngResponse.status()).toBe(200);
+    expect(pngResponse.headers()["content-type"]).toBe("image/png");
+    expect(pngSize(await pngResponse.body())).toEqual({ width: 32, height: 32 });
+
+    const appleHref = await page.locator('link[rel="apple-touch-icon"]').first().getAttribute("href");
+    expect(appleHref).toBeTruthy();
+    const appleResponse = await request.get(appleHref!);
+    expect(appleResponse.status()).toBe(200);
+    expect(appleResponse.headers()["content-type"]).toBe("image/png");
+    expect(pngSize(await appleResponse.body())).toEqual({ width: 180, height: 180 });
+  });
 });
 
 test.describe("Copy, when the clipboard refuses", () => {

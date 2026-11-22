@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <style>
-    .tile { fill: #fbfbf8; }
-    .mark { fill: #2340ff; }
+    .tile { fill: #fbfbf9; stroke: rgba(20, 20, 22, 0.14); stroke-width: 1; }
+    .mark { fill: #2443d6; }
     @media (prefers-color-scheme: dark) {
-      .tile { fill: #0d0d12; }
-      .mark { fill: #8b9cff; }
+      .tile { fill: #0d0d0f; stroke: rgba(240, 239, 235, 0.16); }
+      .mark { fill: #8c9eff; }
     }
   </style>
-  <rect class="tile" width="32" height="32" rx="7"/>
-  <path class="mark" d="M10.69 28V4H16.33V28ZM14.69 28V23.42H21.31V28ZM14.69 17.89V13.71H20.36V17.89ZM14.69 8.58V4H21.31V8.58Z"/>
+  <rect class="tile" x="0.5" y="0.5" width="31" height="31" rx="7"/>
+  <path class="mark" d="M20.14 11.52L20.14 15.45L20.14 19.37L18.8 19.37L18.47 16.28L11.31 16.28L11.31 14.61L18.47 14.61L18.8 11.52ZM24.15 11.67L23.34 11.85L20.36 7.02L21.46 7.59L11.31 7.59L11.31 5.9L20.86 5.9L22.64 5L23.03 5ZM20.8 24.87L24 19.78L24.71 19.97L23.51 27L23.1 27L21.19 25.98L11.31 25.98L11.31 24.29L21.63 24.29ZM7.29 25.98L7.29 25.35L9.53 24.51L9.53 7.37L7.29 6.53L7.29 5.9L13.39 5.9L13.39 25.98Z"/>
 </svg>
