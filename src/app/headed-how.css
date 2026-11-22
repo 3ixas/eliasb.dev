@@ -117,6 +117,35 @@
   stroke: var(--drawn, var(--cobalt));
 }
 
+/* Six months from zero to production code: hollow dashed zero, six counted month segments, arrow into a solid tinted code block. */
+.headed__months {
+  display: block;
+  flex: none;
+  height: 20px;
+  width: auto;
+}
+
+.headed__zero {
+  stroke: color-mix(in srgb, var(--ink) 34%, transparent);
+}
+
+.headed__month {
+  fill: var(--drawn, var(--cobalt));
+}
+
+.headed__months-arrow {
+  stroke: var(--drawn, var(--cobalt));
+}
+
+.headed__prod-box {
+  fill: color-mix(in srgb, var(--drawn, var(--cobalt)) 12%, transparent);
+  stroke: var(--drawn, var(--cobalt));
+}
+
+.headed__prod-code {
+  stroke: var(--drawn, var(--cobalt));
+}
+
 /* Count leading to one filled live mark (57 user stories → live site). */
 .headed__live-trail {
   display: inline-flex;
@@ -139,7 +168,7 @@
   border-radius: 50%;
   background: var(--drawn, var(--cobalt));
   box-shadow:
-    0 0 0 2px var(--paper),
+    0 0 0 2px var(--field),
     0 0 0 3.5px color-mix(in srgb, var(--drawn, var(--cobalt)) 36%, transparent);
 }
 
@@ -338,12 +367,14 @@
   }
 
   .headed__split,
+  .headed__months,
   .headed__live-arrow,
   .headed__live {
     forced-color-adjust: none;
   }
 
-  .headed__split-off {
+  .headed__split-off,
+  .headed__zero {
     stroke: GrayText;
   }
 
@@ -355,16 +386,20 @@
     stroke: GrayText;
   }
 
-  .headed__split-on .headed__split-box {
+  .headed__split-on .headed__split-box,
+  .headed__prod-box {
     fill: none;
     stroke: Highlight;
   }
 
-  .headed__split-on .headed__split-bar {
+  .headed__split-on .headed__split-bar,
+  .headed__month {
     fill: Highlight;
   }
 
   .headed__split-arrow,
+  .headed__months-arrow,
+  .headed__prod-code,
   .headed__live-arrow {
     stroke: Highlight;
   }

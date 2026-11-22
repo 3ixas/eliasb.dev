@@ -231,23 +231,28 @@ assert.match(headedProblems([{ ...headed.bars[0], soFar: { ...headed.bars[0].soF
 assert.match(headedProblems([{ ...headed.bars[2], soFar: { ...headed.bars[2].soFar, restates: ["58 user stories"] } }])[0], /Range bar.*58 user stories/);
 assert.match(headedProblems([{ ...headed.bars[2], soFar: { ...headed.bars[2].soFar, text: "Threshold, a live site." } }])[0], /Range bar.*no longer shows "57 user stories"/);
 // Each part's drawn proof is held to its "So far" line (#459), and its colour falls back to cobalt when its thread falls under 3:1.
-assert.match(headedProblems([{ ...headed.bars[1], drawn: { kind: "count", value: 71 } }])[0], /Depth bar draws 71/);
-assert.match(headedProblems([{ ...headed.bars[1], drawn: { kind: "count", value: 0 } }])[0], /Depth bar draws 0.*positive whole number/);
+assert.match(headedProblems([{ ...headed.bars[1], drawn: { kind: "months-to-prod", months: 7 } }])[0], /Depth bar draws 7 months/);
+assert.match(headedProblems([{ ...headed.bars[1], drawn: { kind: "months-to-prod", months: 0 } }])[0], /Depth bar draws 0 months.*positive whole number/);
+assert.match(headedProblems([{ ...headed.bars[1], soFar: { ...headed.bars[1].soFar, text: "Six months to production code, in a pricing engine of around 70 projects." } }])[0], /Depth bar draws a start from zero/);
+assert.match(headedProblems([{ ...headed.bars[1], soFar: { ...headed.bars[1].soFar, text: "Six months from zero C# to live code, in a pricing engine of around 70 projects." } }])[0], /Depth bar draws production code/);
 assert.match(headedProblems([{ ...headed.bars[2], drawn: { kind: "count-to-live", value: 58 } }])[0], /Range bar draws 58/);
 assert.match(headedProblems([{ ...headed.bars[2], soFar: { ...headed.bars[2].soFar, text: "Threshold, 57 user stories." } }])[0], /Range bar draws a live mark/);
 assert.match(headedProblems([{ ...headed.bars[0], soFar: { ...headed.bars[0].soFar, text: "At Optegra, dashboards guided what the engineers built next." } }])[0], /Judgement bar draws a split test/);
 assert.equal(shownSource(headed.bars[0].source).drawn, "light-dark(var(--cobalt), var(--cobalt))", "Optegra's thread falls under 3:1 on paper, so its drawing takes cobalt");
 assert.match(shownSource(headed.bars[1].source).drawn, /^light-dark\(#[0-9a-f]{6}, #[0-9a-f]{6}\)$/, "BNP Paribas's thread holds 3:1 on paper in both themes");
 assert.match(shownSource(headed.bars[2].source).drawn, /^light-dark\(#[0-9a-f]{6}, #[0-9a-f]{6}\)$/, "Threshold's thread holds 3:1 on paper in both themes");
-// PAPER_SURFACE stays pinned to tokens.css (--paper) and parts.css (.surface--paper light foot 3% black, dark lit top 7% white).
+// PAPER_SURFACE stays pinned to tokens.css (--paper) and parts.css (.surface--paper light foot 3% black, .surface dark lit top 7% white).
 {
   const tokensCss = readFileSync(new URL("../src/app/tokens.css", import.meta.url), "utf8");
   const partsCss = readFileSync(new URL("../src/app/parts.css", import.meta.url), "utf8");
   const papers = [...tokensCss.matchAll(/--paper:\s*(#[0-9a-f]{6});/g)].map((m) => m[1]);
   const lightPaper = papers[0];
   const darkPaper = papers[1];
-  const footBlack = Number(partsCss.match(/\.surface--paper[\s\S]*?--foot:\s*light-dark\(color-mix\(in srgb, var\(--field\), #000 (\d+)%\)/)?.[1]);
-  const litWhite = Number(partsCss.match(/--lit:\s*light-dark\(.*?,\s*color-mix\(in srgb, var\(--field\), #fff (\d+)%\)\)/)?.[1]);
+  const footBlack = Number(partsCss.match(/\.surface--paper\s*\{[^}]*--foot:\s*light-dark\(color-mix\(in srgb, var\(--field\), #000 (\d+)%\)/)?.[1]);
+  const surfaceBlock = partsCss.match(/\.surface\s*\{([^}]*)\}/)?.[1] ?? "";
+  const paperBlock = partsCss.match(/\.surface--paper\s*\{([^}]*)\}/)?.[1] ?? "";
+  const litSource = paperBlock.includes("--lit:") ? paperBlock : surfaceBlock;
+  const litWhite = Number(litSource.match(/--lit:\s*light-dark\(.*?,\s*color-mix\(in srgb, var\(--field\), #fff (\d+)%\)\)/)?.[1]);
   assert.ok(lightPaper && darkPaper && footBlack > 0 && litWhite > 0, "tokens.css and parts.css define the paper surface tones");
   const mix = (hex, target, weight) =>
     "#" + [1, 3, 5].map((at) => Math.round(Number.parseInt(hex.slice(at, at + 2), 16) * (1 - weight) + target * weight).toString(16).padStart(2, "0")).join("");

@@ -23,13 +23,13 @@ export type HeadedSource = { story: RoleStorySlug } | { project: CaseStudySlug }
 
 /**
  * What a part of Where I'm headed draws from its "So far" line (#459), in the same language as How I work's proof
- * feet: a split test (two variants side by side, one marked as the one that went on), a count as that many ticks,
- * or a count of ticks leading to one filled mark for the live site. Every drawn count and claim is held to its
- * "So far" line by `headedProblems` (`verify:copy`).
+ * feet: a split test (two variants side by side, one marked as the one that went on), a run of months from zero to
+ * production code, or a count of ticks leading to one filled mark for the live site. Every drawn count and claim is
+ * held to its "So far" line by `headedProblems` (`verify:copy`).
  */
 export type HeadedProof =
   | { kind: "split" }
-  | { kind: "count"; value: number }
+  | { kind: "months-to-prod"; months: number }
   | { kind: "count-to-live"; value: number };
 
 /**
@@ -96,6 +96,9 @@ export function shownSource(source: HeadedSource): ShownSource {
 /** The words that carry a phrase: figures and words of four letters or more. */
 const keyWords = (text: string) => text.toLowerCase().match(/\d+|[a-z]{4,}/g) ?? [];
 
+/** Small number words a "So far" line may spell out instead of digits (matching `role-story.ts`). */
+const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"] as const;
+
 /**
  * Bars whose "So far" does not restate a fact in its source, or whose drawn proof does not match its line, as
  * messages naming the bar; empty when valid. Each phrase must be in the source, the shown line must keep a key word
@@ -105,6 +108,7 @@ export function headedProblems(bars: readonly HeadedBar[]): string[] {
   return bars.flatMap((bar) => {
     const source = shownSource(bar.source).text.toLowerCase();
     const shown = new Set(keyWords(bar.soFar.text));
+    const allWords = new Set(bar.soFar.text.toLowerCase().match(/\d+|[a-z]+/g) ?? []);
     const problems = bar.soFar.restates.flatMap((phrase) => {
       if (!source.includes(phrase.toLowerCase())) return [`Where I’m headed: the ${bar.label} bar’s "So far" restates "${phrase}", which its source does not say.`];
       if (!keyWords(phrase).some((word) => shown.has(word))) return [`Where I’m headed: the ${bar.label} bar’s "So far" no longer shows "${phrase}", which is what checks it.`];
@@ -112,13 +116,23 @@ export function headedProblems(bars: readonly HeadedBar[]): string[] {
     });
     if (bar.drawn.kind === "split") {
       if (!shown.has("split")) problems.push(`Where I’m headed: the ${bar.label} bar draws a split test, which its "So far" line does not mention.`);
+    } else if (bar.drawn.kind === "months-to-prod") {
+      const { months } = bar.drawn;
+      const word = NUMBER_WORDS[months];
+      if (!Number.isInteger(months) || months <= 0) {
+        problems.push(`Where I’m headed: the ${bar.label} bar draws ${months} months, which must be a positive whole number.`);
+      } else if (!allWords.has(String(months)) && (!word || !allWords.has(word))) {
+        problems.push(`Where I’m headed: the ${bar.label} bar draws ${months} months, which its "So far" line does not state.`);
+      }
+      if (!allWords.has("zero")) problems.push(`Where I’m headed: the ${bar.label} bar draws a start from zero, which its "So far" line does not mention.`);
+      if (!allWords.has("production")) problems.push(`Where I’m headed: the ${bar.label} bar draws production code, which its "So far" line does not mention.`);
     } else {
       if (!Number.isInteger(bar.drawn.value) || bar.drawn.value <= 0) {
         problems.push(`Where I’m headed: the ${bar.label} bar draws ${bar.drawn.value}, which must be a positive whole number.`);
       } else if (!shown.has(String(bar.drawn.value))) {
         problems.push(`Where I’m headed: the ${bar.label} bar draws ${bar.drawn.value}, which its "So far" line does not state.`);
       }
-      if (bar.drawn.kind === "count-to-live" && !shown.has("live")) {
+      if (!shown.has("live")) {
         problems.push(`Where I’m headed: the ${bar.label} bar draws a live mark, which its "So far" line does not mention.`);
       }
     }
@@ -202,7 +216,7 @@ export const work = {
           restates: ["from zero C# to production code", "around 70 projects"],
         },
         source: { story: "bnp-paribas" },
-        drawn: { kind: "count", value: 70 },
+        drawn: { kind: "months-to-prod", months: 6 },
       },
       {
         label: "Range",

@@ -29,8 +29,40 @@ function Drawn({ proof, colour }: { proof: HeadedProof; colour: string }) {
             <path className="headed__split-arrow" d="M66 10h12m-4-4 4 4-4 4" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </g>
         </svg>
-      ) : proof.kind === "count" ? (
-        <DrawnTicks count={proof.value} />
+      ) : proof.kind === "months-to-prod" ? (
+        (() => {
+          const segW = 10;
+          const segGap = 4;
+          const segStart = 16;
+          const segSpan = proof.months * segW + (proof.months - 1) * segGap;
+          const arrowStart = segStart + segSpan + 5;
+          const boxX = arrowStart + 17;
+          const totalW = boxX + 26;
+          return (
+            <svg className="headed__months" viewBox={`0 0 ${totalW} 20`} width={totalW} height="20" focusable="false">
+              {/* Zero start: hollow dashed ring, starting from nothing. */}
+              <circle className="headed__zero" data-stage="zero" cx="6" cy="10" r="4.5" fill="none" strokeWidth="1.25" strokeDasharray="2 1.8" />
+              {/* Six counted month segments spanning the climb. */}
+              {Array.from({ length: proof.months }, (_, index) => (
+                <rect key={index} className="headed__month" data-month={index + 1} x={segStart + index * (segW + segGap)} y="8.75" width={segW} height="2.5" rx="1.25" />
+              ))}
+              {/* Arrow into production code. */}
+              <path className="headed__months-arrow" d={`M${arrowStart} 10h12m-4-4 4 4-4 4`} fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              {/* Production code: solid tinted frame with code chevrons, matching the split test's chosen card. */}
+              <g className="headed__prod" data-stage="prod">
+                <rect className="headed__prod-box" x={boxX} y="2" width="24" height="16" rx="3" strokeWidth="1.5" />
+                <path
+                  className="headed__prod-code"
+                  d={`M${boxX + 8.25} 7.25L${boxX + 5.25} 10l3 2.75M${boxX + 13.1} 6.75l-2.2 6.5M${boxX + 15.75} 7.25l3 2.75-3 2.75`}
+                  fill="none"
+                  strokeWidth="1.35"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </g>
+            </svg>
+          );
+        })()
       ) : (
         <>
           <DrawnTicks count={proof.value} />

@@ -68,10 +68,22 @@ test.describe("Where I'm headed", () => {
     expect(chosen.x).toBeGreaterThan(other.x + other.width);
     await expect(optegra.locator('[data-variant="other"] rect').first()).toHaveAttribute("stroke-dasharray", /\d/);
     await expect(optegra.locator(".headed__split-arrow")).toBeVisible();
-    // BNP Paribas: 70 ticks, reusing How I work's tick drawing.
-    await expect(bnp.locator(".drawn__ticks i")).toHaveCount(70);
-    // Threshold: 57 ticks leading to one filled live mark.
+    // BNP Paribas: six months from hollow zero to production code.
+    await expect(bnp.locator(".headed__zero")).toHaveAttribute("stroke-dasharray", /\d/);
+    await expect(bnp.locator(".headed__month")).toHaveCount(6);
+    const [zero, firstMonth, lastMonth, prod] = await Promise.all([
+      boxOf(bnp.locator(".headed__zero")),
+      boxOf(bnp.locator(".headed__month").first()),
+      boxOf(bnp.locator(".headed__month").last()),
+      boxOf(bnp.locator(".headed__prod-box")),
+    ]);
+    expect(firstMonth.x).toBeGreaterThan(zero.x + zero.width);
+    expect(lastMonth.x).toBeGreaterThan(firstMonth.x);
+    expect(prod.x).toBeGreaterThan(lastMonth.x + lastMonth.width);
+    // Threshold: 57 ticks on one row leading to one filled live mark.
     await expect(threshold.locator(".drawn__ticks i")).toHaveCount(57);
+    const tickRows = await threshold.locator(".drawn__ticks i").evaluateAll((ticks) => new Set(ticks.map((tick) => Math.round(tick.getBoundingClientRect().top))).size);
+    expect(tickRows).toBe(1);
     await expect(threshold.locator(".headed__live")).toBeVisible();
     const [lastTick, liveMark] = await Promise.all([boxOf(threshold.locator(".drawn__ticks i").last()), boxOf(threshold.locator(".headed__live"))]);
     expect(liveMark.x).toBeGreaterThan(lastTick.x);
@@ -102,14 +114,16 @@ test.describe("Where I'm headed", () => {
           return hex;
         };
         const optegra = section.querySelector('[data-proof="split"] .headed__split-box')!;
-        const bnp = section.querySelector('[data-proof="count"] .drawn__ticks i')!;
+        const bnp = section.querySelector('[data-proof="months-to-prod"] .headed__month')!;
+        const bnpProd = section.querySelector('[data-proof="months-to-prod"] .headed__prod-box')!;
         const threshold = section.querySelector('[data-proof="count-to-live"] .drawn__ticks i')!;
         const live = section.querySelector('[data-proof="count-to-live"] .headed__live')!;
         return {
           surfaceStops: [tokenHex("--lit"), tokenHex("--field"), tokenHex("--foot")],
           cobalt: tokenHex("--cobalt"),
           optegra: resolveHex(getComputedStyle(optegra).stroke),
-          bnp: resolveHex(getComputedStyle(bnp).backgroundColor),
+          bnp: resolveHex(getComputedStyle(bnp).fill),
+          bnpProd: resolveHex(getComputedStyle(bnpProd).stroke),
           threshold: resolveHex(getComputedStyle(threshold).backgroundColor),
           live: resolveHex(getComputedStyle(live).backgroundColor),
         };
@@ -118,9 +132,10 @@ test.describe("Where I'm headed", () => {
       expect(stops.length).toBeGreaterThanOrEqual(2);
       expect(measured.optegra).toBe(measured.cobalt);
       expect(measured.bnp).not.toBe(measured.cobalt);
+      expect(measured.bnpProd).toBe(measured.bnp);
       expect(measured.threshold).not.toBe(measured.cobalt);
       expect(measured.live).toBe(measured.threshold);
-      for (const colour of [measured.optegra, measured.bnp, measured.threshold, measured.live]) {
+      for (const colour of [measured.optegra, measured.bnp, measured.bnpProd, measured.threshold, measured.live]) {
         for (const surface of stops) {
           expect(contrastRatio(colour, surface), `${colour} on ${surface}`).toBeGreaterThanOrEqual(3);
         }
