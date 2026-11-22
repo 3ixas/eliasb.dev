@@ -6,7 +6,7 @@ import { work } from "../src/content/stretch/work";
 
 // The Résumé is an A4 sheet on the desk (GLOSSARY.md). The page is hydrated and laid out after load,
 // so every reading polls rather than trusting the first one.
-const sheet = (page: import("@playwright/test").Page) => page.locator(".stretch-resume__sheet");
+const sheet = (page: import("@playwright/test").Page) => page.locator(".resume__sheet");
 
 test.describe("The Résumé", () => {
   test.beforeEach(async ({ page }) => {
@@ -51,17 +51,17 @@ test.describe("The Résumé", () => {
   });
 
   test("prints on one A4 page, with room to spare", async ({ page }) => {
-    // The page is 210 mm with 8 mm top and bottom and 14 mm at the sides, so the sheet prints 182 mm wide and may be 281 mm tall.
+    // The page is 210 mm with 12 mm top and bottom and 13 mm at the sides, so the sheet prints 184 mm wide and may be 273 mm tall.
     const mm = (n: number) => (n / 25.4) * 96;
-    await page.setViewportSize({ width: Math.round(mm(182)), height: 1123 });
+    await page.setViewportSize({ width: Math.round(mm(184)), height: 1123 });
     await page.emulateMedia({ media: "print" });
     // 20 px (about one line) of headroom, so rewording a line does not tip the sheet onto a second page.
-    await expect.poll(() => sheet(page).evaluate((el) => el.getBoundingClientRect().height)).toBeLessThanOrEqual(mm(281) - 20);
+    await expect.poll(() => sheet(page).evaluate((el) => el.getBoundingClientRect().height)).toBeLessThanOrEqual(mm(273) - 20);
   });
 
   test("gives each role the Role story's own Résumé lines", async ({ page }) => {
     for (const [index, slug] of roleStorySlugs.entries()) {
-      await expect(page.locator("[data-resume-entry]").nth(index).locator(".stretch-resume__results li")).toHaveText([...roleStories[slug].resume]);
+      await expect(page.locator("[data-resume-entry]").nth(index).locator(".resume__results li")).toHaveText([...roleStories[slug].resume]);
     }
   });
 
@@ -69,7 +69,7 @@ test.describe("The Résumé", () => {
     await expect(sheet(page)).toBeVisible();
     await expect
       .poll(() => sheet(page).evaluate((el) => ({ paper: getComputedStyle(el).backgroundColor, ink: getComputedStyle(el).color })))
-      .toEqual({ paper: "rgb(255, 255, 255)", ink: "rgb(17, 17, 20)" });
+      .toEqual({ paper: "rgb(255, 255, 255)", ink: "rgb(20, 20, 22)" });
   });
 
   test("fits the screen: no sideways scroll, and nothing clipped", async ({ page }) => {
@@ -77,8 +77,8 @@ test.describe("The Résumé", () => {
     await expect
       .poll(() =>
         page.evaluate(() => {
-          const clipped = [...document.querySelectorAll(".stretch-resume__sheet *")].filter((element) => element.scrollWidth > element.clientWidth + 1 && getComputedStyle(element).display !== "inline");
-          const sheetBox = document.querySelector(".stretch-resume__sheet")!.getBoundingClientRect();
+          const clipped = [...document.querySelectorAll(".resume__sheet *")].filter((element) => element.scrollWidth > element.clientWidth + 1 && getComputedStyle(element).display !== "inline");
+          const sheetBox = document.querySelector(".resume__sheet")!.getBoundingClientRect();
           return {
             pageOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
             clipped: clipped.map((element) => element.className || element.tagName),
@@ -146,7 +146,7 @@ test.describe("The Résumé", () => {
     await expect(sheet(page)).toBeVisible();
     await expect
       .poll(() => sheet(page).evaluate((el) => ({ paper: getComputedStyle(el).backgroundColor, ink: getComputedStyle(el).color })))
-      .toEqual({ paper: "rgb(255, 255, 255)", ink: "rgb(17, 17, 20)" });
+      .toEqual({ paper: "rgb(255, 255, 255)", ink: "rgb(20, 20, 22)" });
   });
 });
 

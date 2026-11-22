@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 // The passes and panels faces (layout.tsx, tokens.css; docs/design/DESIGN.md "Type"), on /fixtures/tokens and the pages.
-// Bricolage Grotesque, DM Mono and the Fine cut retired in #420; only the Résumé sheet keeps its own faces.
+// Bricolage Grotesque, DM Mono, JetBrains Mono and the Fine cut are all retired (#420, #468).
 
 const serifSteps = ["opening", "title", "section", "panel", "figure", "prose"];
 const sansSteps = ["body", "ui", "small", "label"];
@@ -108,17 +108,35 @@ test.describe("Faces on the pages", () => {
     });
   }
 
-  test("only the Résumé loads its sheet's faces, and the sheet sets metadata in JetBrains Mono", async ({ page }) => {
-    await page.goto("/");
-    await page.evaluate(() => document.fonts.ready);
-    // The sheet's local fallback face is declared everywhere, but nothing outside the Résumé loads a sheet face.
-    expect(await page.evaluate(() => [...document.fonts].some((face) => /JetBrains Mono|Bricolage/.test(face.family) && face.status !== "unloaded"))).toBe(false);
+  test("/resume sets its name, summary and section titles in Newsreader, everything else in Instrument Sans with tabular figures, and loads no retired face", async ({ page }) => {
     await page.goto("/resume");
     await page.evaluate(() => document.fonts.ready);
-    const sheetMono = await page.locator(".stretch-resume__sheet .stretch-mono").first().evaluate((element) => getComputedStyle(element).fontFamily);
-    expect(sheetMono.replaceAll('"', "")).toMatch(/^JetBrains Mono/);
-    const sheet = await page.locator(".stretch-resume__sheet").evaluate((element) => getComputedStyle(element).fontFamily);
-    expect(sheet.replaceAll('"', "")).toMatch(/^Bricolage Grotesque/);
+    const reading = await page.evaluate(() => ({
+      loaded: [...document.fonts].filter((face) => face.status === "loaded").map((face) => face.family.replaceAll('"', "")),
+      external: performance.getEntriesByType("resource").filter((entry) => !entry.name.startsWith(location.origin) && /\.(woff2?|ttf|otf)(\?|$)|fonts\./.test(entry.name)).length,
+      name: getComputedStyle(document.querySelector(".resume__name")!).fontFamily.replaceAll('"', ""),
+      summary: getComputedStyle(document.querySelector(".resume__summary")!).fontFamily.replaceAll('"', ""),
+      heading: getComputedStyle(document.querySelector(".resume__heading")!).fontFamily.replaceAll('"', ""),
+      sheet: getComputedStyle(document.querySelector(".resume__sheet")!).fontFamily.replaceAll('"', ""),
+      dates: {
+        family: getComputedStyle(document.querySelector('[data-resume="dates"]')!).fontFamily.replaceAll('"', ""),
+        numeric: getComputedStyle(document.querySelector('[data-resume="dates"]')!).fontVariantNumeric,
+      },
+      link: {
+        family: getComputedStyle(document.querySelector(".resume__link")!).fontFamily.replaceAll('"', ""),
+        numeric: getComputedStyle(document.querySelector(".resume__link")!).fontVariantNumeric,
+      },
+    }));
+    expect(reading.loaded.filter((family) => /bricolage|dm mono|hanken|jetbrains/i.test(family))).toEqual([]);
+    expect(reading.external, "font requests to another host").toBe(0);
+    expect(reading.name).toMatch(/^Newsreader/);
+    expect(reading.summary).toMatch(/^Newsreader/);
+    expect(reading.heading).toMatch(/^Newsreader/);
+    expect(reading.sheet).toMatch(/^Instrument Sans/);
+    expect(reading.dates.family).toMatch(/^Instrument Sans/);
+    expect(reading.dates.numeric).toContain("tabular-nums");
+    expect(reading.link.family).toMatch(/^Instrument Sans/);
+    expect(reading.link.numeric).toContain("tabular-nums");
   });
 });
 
