@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
+import { DrawnTicks } from "@/components/parts/drawn-ticks";
 import { MeasurePair } from "@/components/parts/measure";
 import { OnView } from "@/components/parts/on-view";
 import { Arrow } from "@/components/parts/panel";
@@ -36,11 +37,7 @@ function Drawn({ proof }: { proof: BeatProof }) {
       return (
         <>
           <b>{proof.value}</b>
-          <span className="drawn__ticks" aria-hidden="true">
-            {Array.from({ length: proof.value }, (_, index) => (
-              <i key={index} />
-            ))}
-          </span>
+          <DrawnTicks count={proof.value} />
         </>
       );
     case "switch":

@@ -71,6 +71,107 @@
   font-size: var(--type-ui);
 }
 
+/* Each part's drawn proof (#459): quiet, in the same language as How I work's feet, in the source's colour where it holds 3:1 else cobalt. */
+.headed__proof {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.headed__proof .drawn__ticks {
+  flex: 0 1 auto;
+}
+
+/* Split test: two variants side by side (left dashed and muted, right solid and tinted in --drawn with an arrow showing it went on). */
+.headed__split {
+  display: block;
+  flex: none;
+  width: 82px;
+  height: 20px;
+}
+
+.headed__split-off {
+  stroke: color-mix(in srgb, var(--ink) 32%, transparent);
+}
+
+.headed__split-off .headed__split-bar {
+  fill: color-mix(in srgb, var(--ink) 26%, transparent);
+  stroke: none;
+}
+
+.headed__split-rule {
+  stroke: var(--hair);
+}
+
+.headed__split-on .headed__split-box {
+  fill: color-mix(in srgb, var(--drawn, var(--cobalt)) 12%, transparent);
+  stroke: var(--drawn, var(--cobalt));
+}
+
+.headed__split-on .headed__split-bar {
+  fill: var(--drawn, var(--cobalt));
+}
+
+.headed__split-arrow {
+  stroke: var(--drawn, var(--cobalt));
+}
+
+/* Six months from zero to production code: hollow dashed zero, six counted month segments, arrow into a solid tinted code block. */
+.headed__months {
+  display: block;
+  flex: none;
+  height: 20px;
+  width: auto;
+}
+
+.headed__zero {
+  stroke: color-mix(in srgb, var(--ink) 34%, transparent);
+}
+
+.headed__month {
+  fill: var(--drawn, var(--cobalt));
+}
+
+.headed__months-arrow {
+  stroke: var(--drawn, var(--cobalt));
+}
+
+.headed__prod-box {
+  fill: color-mix(in srgb, var(--drawn, var(--cobalt)) 12%, transparent);
+  stroke: var(--drawn, var(--cobalt));
+}
+
+.headed__prod-code {
+  stroke: var(--drawn, var(--cobalt));
+}
+
+/* Count leading to one filled live mark (57 user stories → live site). */
+.headed__live-trail {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+.headed__live-arrow {
+  display: block;
+  width: 14px;
+  height: 10px;
+  stroke: var(--drawn, var(--cobalt));
+}
+
+.headed__live {
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--drawn, var(--cobalt));
+  box-shadow:
+    0 0 0 2px var(--field),
+    0 0 0 3.5px color-mix(in srgb, var(--drawn, var(--cobalt)) 36%, transparent);
+}
+
 /* ---- How I work: four upright cards ---- */
 
 .cards {
@@ -172,7 +273,7 @@
   width: 2px;
   height: 11px;
   border-radius: 1px;
-  background: var(--cobalt);
+  background: var(--drawn, var(--cobalt));
 }
 
 /* A switch that is off: an outline with its knob at the left. */
@@ -246,7 +347,13 @@
   }
 }
 
-/* Forced colours keep the drawings: ticks in the highlight, the switch in the text colour (the bars are parts.css's). */
+@media (max-width: 359.98px) {
+  .headed__proof .drawn__ticks {
+    column-gap: 1px;
+  }
+}
+
+/* Forced colours keep the drawings: ticks and chosen marks in the highlight, unselected variants and dividers in grey, the switch in the text colour (the bars are parts.css's). */
 @media (forced-colors: active) {
   .drawn__switch::after {
     forced-color-adjust: none;
@@ -257,5 +364,50 @@
   .drawn__dot::before {
     forced-color-adjust: none;
     background: Highlight;
+  }
+
+  .headed__split,
+  .headed__months,
+  .headed__live-arrow,
+  .headed__live {
+    forced-color-adjust: none;
+  }
+
+  .headed__split-off,
+  .headed__zero {
+    stroke: GrayText;
+  }
+
+  .headed__split-off .headed__split-bar {
+    fill: GrayText;
+  }
+
+  .headed__split-rule {
+    stroke: GrayText;
+  }
+
+  .headed__split-on .headed__split-box,
+  .headed__prod-box {
+    fill: none;
+    stroke: Highlight;
+  }
+
+  .headed__split-on .headed__split-bar,
+  .headed__month {
+    fill: Highlight;
+  }
+
+  .headed__split-arrow,
+  .headed__months-arrow,
+  .headed__prod-code,
+  .headed__live-arrow {
+    stroke: Highlight;
+  }
+
+  .headed__live {
+    background: Highlight;
+    box-shadow:
+      0 0 0 2px Canvas,
+      0 0 0 3.5px CanvasText;
   }
 }
