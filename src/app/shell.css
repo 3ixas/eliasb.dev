@@ -35,8 +35,8 @@ html:has([data-site]) body,
   outline: none;
 }
 
-/* No single word alone on a last line, where the browser can manage it. Headings keep their own balance, and the Résumé sheet keeps the PDF's line breaks. */
-[data-site] :is(p, li, figcaption, blockquote):not(.resume__sheet *) {
+/* No single word alone on a last line, where the browser can manage it; the Résumé's PDF is printed from the sheet, so it gets the same breaks. Headings keep their own balance. */
+[data-site] :is(p, li, figcaption, blockquote) {
   text-wrap: pretty;
 }
 
