@@ -16,10 +16,6 @@ const SAMPLES = 48;
 const FACES = 4;
 /** Where a ply leaves the view, its width runs along the world's x, so its face is to the viewer. */
 const LEVEL: Vec3 = { x: 1, y: 0, z: 0 };
-/** Seamless greyscale polyester twill tile, loaded only when the 3D scene mounts (#486). */
-export const WEBBING_URL = "/lanyard/webbing.webp";
-/** How long the scene waits for the webbing tile before failing back to the printed pass (ms). */
-const WEBBING_WAIT = 4000;
 /** Relief strength of the Scharr normal map derived from the webbing's luminance. */
 const RELIEF = 3.2;
 
@@ -31,9 +27,8 @@ export type Webbing = {
   normalMap: CanvasTexture;
 };
 
-/** Loads the seamless webbing tile and derives its tangent-space normal map once for the scene. */
-export async function loadWebbing(anisotropy: number): Promise<Webbing> {
-  const image = await loadImage(WEBBING_URL, WEBBING_WAIT);
+/** Decodes the seamless webbing tile and derives its tangent-space normal map once for the scene. */
+export function createWebbing(image: HTMLImageElement, anisotropy: number): Webbing {
   const size = image.naturalWidth;
   if (!size || size !== image.naturalHeight) throw new Error(`Webbing tile must be square (${image.naturalWidth}×${image.naturalHeight})`);
   const canvas = document.createElement("canvas");
@@ -169,28 +164,6 @@ export class Strap {
 }
 
 const vertex = (sample: number, face: number, side: 0 | 1) => (sample * FACES + face) * 2 + side;
-
-/** Loads an image texture with a hard timeout so a broken or hung asset falls back cleanly to the printed pass. */
-function loadImage(url: string, timeoutMs: number): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.decoding = "async";
-    const timer = window.setTimeout(() => reject(new Error(`Timed out loading ${url}`)), timeoutMs);
-    const done = (callback: () => void) => {
-      clearTimeout(timer);
-      image.onload = null;
-      image.onerror = null;
-      callback();
-    };
-    image.onload = () =>
-      done(() => {
-        if (typeof image.decode === "function") image.decode().then(() => resolve(image), () => resolve(image));
-        else resolve(image);
-      });
-    image.onerror = () => done(() => reject(new Error(`Could not load ${url}`)));
-    image.src = url;
-  });
-}
 
 /** A tangent-space normal map derived from the webbing tile's luminance via a periodic 3×3 Scharr filter. */
 function weaveRelief(luma: Float32Array, size: number, anisotropy: number) {

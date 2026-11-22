@@ -10,13 +10,14 @@ const FACE_WIDTH = 1024;
 const PHOTO_WAIT = 4000;
 
 /**
- * `canvas` is the colour; `surface` and `foil` are data maps over the same layout, at a quarter of the size. `surface`: green
- * is roughness and blue metalness (three.js reads them from those channels). `foil`: red is where the hologram's film is, and
- * green the film's thickness, which sets the colour it shows at each angle.
+ * `canvas` is the colour; `surface` and `foil` are data maps over the same layout, at half the width so the hologram's
+ * engraved guilloche reads cleanly under the light. `surface`: green is roughness and blue metalness (three.js reads them
+ * from those channels). `foil`: red is where the hologram's film is, and green the film's thickness derived from the
+ * generated foil texture, which sets the colour each wave shows as the card turns (#486).
  */
 export type Print = { canvas: HTMLCanvasElement; surface: HTMLCanvasElement; foil: HTMLCanvasElement; aspect: number };
 
-export async function paintPrint(pass: HTMLElement): Promise<Print> {
+export async function paintPrint(pass: HTMLElement, foilImage: HTMLImageElement | null): Promise<Print> {
   const holder = document.createElement("div");
   holder.setAttribute("aria-hidden", "true");
   holder.inert = true;
@@ -43,13 +44,13 @@ export async function paintPrint(pass: HTMLElement): Promise<Print> {
         return Promise.race([image.decode().catch(() => undefined), new Promise((done) => setTimeout(done, PHOTO_WAIT))]);
       }),
     );
-    return paint(card, copy.dataset.state === "returned");
+    return paint(card, copy.dataset.state === "returned", foilImage);
   } finally {
     holder.remove();
   }
 }
 
-function paint(card: HTMLElement, returned: boolean): Print {
+function paint(card: HTMLElement, returned: boolean, foilImage: HTMLImageElement | null): Print {
   const box = card.getBoundingClientRect();
   const s = FACE_WIDTH / box.width;
   const height = Math.round(box.height * s);
@@ -98,18 +99,24 @@ function paint(card: HTMLElement, returned: boolean): Print {
 
   const holo = card.querySelector<HTMLElement>(".pass__holo");
   if (holo) {
+    if (!foilImage?.naturalWidth) throw new Error("Hologram foil texture not loaded");
     const { x, y, w } = at(holo.getBoundingClientRect());
     const r = w / 2;
-    const turn = context.createConicGradient((20 * Math.PI) / 180, x + r, y + r);
-    ["#9fe8ff", "#dcb8ff", "#ffe39a", "#a9f5c4", "#9fe8ff"].forEach((colour, i) => turn.addColorStop(i / 4, colour));
-    context.fillStyle = turn;
+    context.save();
     context.beginPath();
     context.arc(x + r, y + r, r, 0, Math.PI * 2);
-    context.fill();
-    context.strokeStyle = "rgb(255 255 255 / 0.75)";
+    context.clip();
+    context.drawImage(foilImage, x, y, w, w);
+    context.restore();
+    context.strokeStyle = "rgb(255 255 255 / 0.72)";
     context.lineWidth = s;
     context.beginPath();
     context.arc(x + r, y + r, r - s / 2, 0, Math.PI * 2);
+    context.stroke();
+    context.strokeStyle = "rgb(0 0 0 / 0.22)";
+    context.lineWidth = 0.5 * s;
+    context.beginPath();
+    context.arc(x + r, y + r, r - 0.25 * s, 0, Math.PI * 2);
     context.stroke();
   }
 
@@ -131,13 +138,13 @@ function paint(card: HTMLElement, returned: boolean): Print {
   }
 
   paintWords(context, card, box, s);
-  const finish = paintFinish(card, box, height);
+  const finish = paintFinish(box, height, holo && foilImage ? { holo, foilImage } : null);
   return { canvas, ...finish, aspect: box.height / box.width };
 }
 
-/** The laminate's satin, and the hologram's metal foil and film. */
-function paintFinish(card: HTMLElement, box: DOMRect, faceHeight: number) {
-  const k = 1 / 4;
+/** The laminate's satin, and the hologram's metal foil and thin film derived from the generated guilloche texture (#486). */
+function paintFinish(box: DOMRect, faceHeight: number, hologram: { holo: HTMLElement; foilImage: HTMLImageElement } | null) {
+  const k = 1 / 2;
   const width = FACE_WIDTH * k;
   const height = Math.round(faceHeight * k);
   const surface = document.createElement("canvas");
@@ -154,37 +161,58 @@ function paintFinish(card: HTMLElement, box: DOMRect, faceHeight: number) {
   film.fillStyle = "#000";
   film.fillRect(0, 0, width, height);
 
-  const holo = card.querySelector<HTMLElement>(".pass__holo");
-  if (holo) {
+  if (hologram) {
+    const { holo, foilImage } = hologram;
     const rect = holo.getBoundingClientRect();
     const s = width / box.width;
     const r = (rect.width / 2) * s;
     const cx = (rect.left - box.left) * s + r;
     const cy = (rect.top - box.top) * s + r;
-    // Half metal: bright enough to keep its pastel print, metal enough to catch the room.
-    paint.fillStyle = "rgb(0 70 140)";
-    paint.beginPath();
-    paint.arc(cx, cy, r, 0, Math.PI * 2);
-    paint.fill();
-    // The film: rings and spokes of changing thickness, so each part of the disc turns a different colour as the card moves.
     const x0 = Math.floor(cx - r);
     const y0 = Math.floor(cy - r);
     const size = Math.ceil(r * 2) + 1;
-    const image = film.createImageData(size, size);
+
+    // Sample the generated foil at the disc's exact pixel resolution so its engraved guilloche drives roughness, metalness
+    // and thin-film thickness under the scene's light.
+    const sample = document.createElement("canvas");
+    sample.width = size;
+    sample.height = size;
+    const sampleContext = sample.getContext("2d")!;
+    sampleContext.drawImage(foilImage, 0, 0, size, size);
+    const src = sampleContext.getImageData(0, 0, size, size).data;
+
+    const surfacePatch = paint.getImageData(x0, y0, size, size);
+    const filmPatch = film.createImageData(size, size);
     for (let y = 0; y < size; y++) {
       for (let x = 0; x < size; x++) {
         const dx = x0 + x + 0.5 - cx;
         const dy = y0 + y + 0.5 - cy;
-        const out = Math.hypot(dx, dy) / r;
-        if (out > 1) continue;
-        const phase = (3 * Math.atan2(dy, dx)) / (2 * Math.PI) + 1.4 * out;
+        const dist = Math.hypot(dx, dy);
+        // Smooth 1 px edge coverage around the circular foil stamp.
+        const mask = Math.max(0, Math.min(1, r - dist + 0.5));
+        if (mask <= 0) continue;
         const i = (y * size + x) * 4;
-        image.data[i] = 255;
-        image.data[i + 1] = 255 * (0.5 - 0.5 * Math.cos(2 * Math.PI * phase));
-        image.data[i + 3] = 255;
+        const luma = pixelLuma(src, i) / 255;
+        // Raised guilloche waves stay glossier and slightly more metallic than the recessed diamond mesh.
+        const roughness = 58 + (1 - luma) * 38;
+        const metalness = 118 + luma * 44;
+        surfacePatch.data[i] = 0;
+        surfacePatch.data[i + 1] = Math.round(surfacePatch.data[i + 1] * (1 - mask) + roughness * mask);
+        surfacePatch.data[i + 2] = Math.round(surfacePatch.data[i + 2] * (1 - mask) + metalness * mask);
+        surfacePatch.data[i + 3] = 255;
+
+        // Smooth optical thickness across the disc, shifted subtly by the guilloche relief so the silver pattern stays crisp
+        // face-on and a clean diffraction band sweeps across the waves as the card turns.
+        const sweep = 0.5 + (dx * 0.55 + dy * 0.35) / (2.2 * r);
+        const thickness = Math.max(0, Math.min(1, sweep + (luma - 0.72) * 0.45));
+        const strength = (145 + luma * 75) * mask;
+        filmPatch.data[i] = Math.round(strength);
+        filmPatch.data[i + 1] = Math.round(255 * thickness);
+        filmPatch.data[i + 3] = 255;
       }
     }
-    film.putImageData(image, x0, y0);
+    paint.putImageData(surfacePatch, x0, y0);
+    film.putImageData(filmPatch, x0, y0);
   }
   return { surface, foil };
 }
@@ -250,13 +278,14 @@ function greyscale(image: HTMLImageElement): HTMLCanvasElement {
   const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
   const data = pixels.data;
   for (let i = 0; i < data.length; i += 4) {
-    const luma = 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
-    const value = Math.max(0, Math.min(255, (luma - 128) * 1.05 + 128));
+    const value = Math.max(0, Math.min(255, (pixelLuma(data, i) - 128) * 1.05 + 128));
     data[i] = data[i + 1] = data[i + 2] = value;
   }
   context.putImageData(pixels, 0, 0);
   return canvas;
 }
+
+const pixelLuma = (data: Uint8ClampedArray, i: number) => 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
 
 function roundRect(context: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   context.beginPath();

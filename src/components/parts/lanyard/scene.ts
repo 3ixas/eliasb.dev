@@ -31,7 +31,13 @@ import {
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { HangingPass } from "./hanging";
 import { STEP, type Vec3 } from "./physics";
-import { loadWebbing, strapMaterial } from "./strap";
+import { createWebbing, strapMaterial } from "./strap";
+
+/** Seamless material textures loaded only when the 3D scene mounts (#486). */
+const WEBBING_URL = "/lanyard/webbing.webp";
+const FOIL_URL = "/lanyard/foil.webp";
+/** How long the scene waits for a material texture before falling back to the printed pass (ms). */
+const TEXTURE_WAIT = 4000;
 
 /** The camera's vertical field of view: long, so the cards are not distorted near the edges of the view. */
 const FOV = 20;
@@ -58,6 +64,13 @@ const ARRIVALS = [
 export type Mount = { stage: HTMLElement; passes: HTMLElement[]; onReady: () => void };
 
 export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<() => void> {
+  // Load material textures before allocating WebGL/PMREM resources so a network failure or timeout never leaks GPU state.
+  const needsFoil = passes.some((pass) => Boolean(pass.querySelector(".pass__holo")));
+  const [webbingImage, foilImage] = await Promise.all([
+    loadImage(WEBBING_URL, TEXTURE_WAIT),
+    needsFoil ? loadImage(FOIL_URL, TEXTURE_WAIT) : Promise.resolve(null),
+  ]);
+
   // The canvas reaches the window's sides, and multisampling resolves all of it every frame: at twice the pixels it cost
   // six times the frame (37 ms against 6). On a 2x screen the pixels themselves smooth the card's edges, so it is kept
   // for 1x screens, where the canvas has a quarter of the pixels.
@@ -106,12 +119,38 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
   const rivet = new MeshPhysicalMaterial({ color: 0x55565c, metalness: 1, roughness: 0.4, envMap: environment, envMapIntensity: 1 });
   const fabrics = new Map<string, MeshPhysicalMaterial>();
   const anisotropy = renderer.capabilities.getMaxAnisotropy();
-  const webbing = await loadWebbing(anisotropy);
-  const fabric = (colour: string) => {
-    if (!fabrics.has(colour)) fabrics.set(colour, strapMaterial(colour, webbing, anisotropy));
-    return fabrics.get(colour)!;
+  let webbing: ReturnType<typeof createWebbing> | null = null;
+  let hanging: HangingPass[] = [];
+
+  const cleanupInit = () => {
+    canvas.remove();
+    pad.remove();
+    hanging.forEach((pass) => pass.dispose());
+    backdrop.geometry.dispose();
+    [back, edge, metal, rivet, shadow, ...fabrics.values()].forEach((material) => material.dispose());
+    [...fabrics.values()].forEach((material) => material.map?.dispose());
+    webbing?.normalMap.dispose();
+    environment.dispose();
+    renderer.dispose();
   };
-  const hanging = await Promise.all(passes.map((pass) => HangingPass.paint(pass, { back, edge, metal, rivet, environment, anisotropy, fabric })));
+
+  try {
+    webbing = createWebbing(webbingImage, anisotropy);
+    const loadedWebbing = webbing;
+    const fabric = (colour: string) => {
+      if (!fabrics.has(colour)) fabrics.set(colour, strapMaterial(colour, loadedWebbing, anisotropy));
+      return fabrics.get(colour)!;
+    };
+    const painted = await Promise.allSettled(
+      passes.map((pass) => HangingPass.paint(pass, { back, edge, metal, rivet, environment, anisotropy, foil: foilImage, fabric })),
+    );
+    hanging = painted.filter((result): result is PromiseFulfilledResult<HangingPass> => result.status === "fulfilled").map((result) => result.value);
+    const failed = painted.find((result): result is PromiseRejectedResult => result.status === "rejected");
+    if (failed) throw failed.reason;
+  } catch (error) {
+    cleanupInit();
+    throw error;
+  }
   hanging.forEach((pass) => scene.add(...pass.meshes));
 
   // Laying out: the stage's pixels map to world units at the cards' plane, where the widest card's width is 1. Where the
@@ -353,15 +392,7 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     window.removeEventListener("resize", relayout);
     themed.disconnect();
     scheme.removeEventListener("change", schemeChanged);
-    canvas.remove();
-    pad.remove();
-    hanging.forEach((pass) => pass.dispose());
-    backdrop.geometry.dispose();
-    [back, edge, metal, rivet, shadow, ...fabrics.values()].forEach((material) => material.dispose());
-    [...fabrics.values()].forEach((material) => material.map?.dispose());
-    webbing.normalMap.dispose();
-    environment.dispose();
-    renderer.dispose();
+    cleanupInit();
   };
 
   shade();
@@ -385,6 +416,25 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
   onReady();
   run();
   return dispose;
+}
+
+/** Loads an image texture with a hard timeout so a broken or hung asset falls back cleanly to the printed pass. */
+async function loadImage(url: string, timeoutMs: number): Promise<HTMLImageElement> {
+  const image = new Image();
+  image.decoding = "async";
+  image.src = url;
+  let timer = 0;
+  try {
+    await Promise.race([
+      image.decode().catch(() => Promise.reject(new Error(`Could not load ${url}`))),
+      new Promise<never>((_, reject) => {
+        timer = window.setTimeout(() => reject(new Error(`Timed out loading ${url}`)), timeoutMs);
+      }),
+    ]);
+    return image;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 /** The element's layout position within the stage, ignoring transforms (the CSS pass is turned by its tilt). */

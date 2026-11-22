@@ -10,15 +10,38 @@ import { canDrawScene, withScene } from "./support/scene";
  * Headless Chromium renders in software, where the scene would keep the printed passes, so these specs report a GPU.
  */
 
+const slugs = ["bnp-paribas", "joveen", "optegra"] as const;
+const rail = (page: Page) => page.locator(".opening__rail");
+const scene = (page: Page) => page.locator("canvas.lanyard__scene");
+
+/** Records every `/lanyard/` texture request (and optionally only successful responses) made by `page`. */
+function trackTextures(page: Page, kind: "request" | "response" = "request") {
+  const paths: string[] = [];
+  if (kind === "request") {
+    page.on("request", (request) => {
+      const path = new URL(request.url()).pathname;
+      if (path.startsWith("/lanyard/")) paths.push(path);
+    });
+  } else {
+    page.on("response", (response) => {
+      const path = new URL(response.url()).pathname;
+      if (path.startsWith("/lanyard/") && response.ok()) paths.push(path);
+    });
+  }
+  return paths;
+}
+
 test("a software renderer keeps the printed passes", async ({ page, browserName }) => {
   test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
   test.skip(browserName !== "chromium", "Headless Chromium renders in software");
+  const textures = trackTextures(page);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   await rail(page).scrollIntoViewIfNeeded();
   await expect(rail(page)).toHaveAttribute("data-lanyard", "failed");
   await expect(rail(page)).toHaveAttribute("data-lanyard-error", /^(Software renderer|No hardware WebGL 2)/);
   await expect(scene(page)).toHaveCount(0);
+  expect(textures).toEqual([]);
 });
 
 test("headless WebKit, which draws in software in CI, keeps the printed passes", async ({ page, browserName }, info) => {
@@ -39,10 +62,6 @@ test("headless WebKit, which draws in software in CI, keeps the printed passes",
   // In CI, where WebKit draws in software, the printed passes stay; on a Mac it has the GPU and may draw.
   if (process.env.CI) expect(state).toMatch(/^failed /);
 });
-
-const slugs = ["bnp-paribas", "joveen", "optegra"] as const;
-const rail = (page: Page) => page.locator(".opening__rail");
-const scene = (page: Page) => page.locator("canvas.lanyard__scene");
 
 /** Waits for the scene to take the passes' place: it loads once the rail is near the view. */
 const hung = async (page: Page, stage = rail(page)) => {
@@ -189,15 +208,37 @@ test.describe("The 3D staff passes", () => {
 
   test("a Role story's pass hangs in its own scene, and a click on it goes nowhere", async ({ page }, info) => {
     test.skip(!info.project.name.includes("-1440-"), "A mouse, at the desktop width");
+    const textures = trackTextures(page);
     await page.goto("/work/joveen");
     const stage = page.locator(".story-open__rail");
     await hung(page, stage);
     await expect(stage.locator("canvas.lanyard__scene")).toHaveCount(1);
     await expect(stage.locator(".pass")).toHaveAttribute("role", "img");
+    // A returned pass has no hologram, so only the webbing tile loads.
+    expect(textures).toEqual(["/lanyard/webbing.webp"]);
     const box = (await stage.locator(".pass__card").boundingBox())!;
     await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
     await page.waitForTimeout(300);
     expect(page.url()).toMatch(/\/work\/joveen$/);
+  });
+
+  test("the material textures load only with the scene, and a failed texture load falls back to the printed passes", async ({ page }, info) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
+    test.skip(!info.project.name.includes("-1440-"), "Once, at the desktop width");
+    const loaded = trackTextures(page, "response");
+    await page.goto("/");
+    await hung(page);
+    expect([...new Set(loaded)].sort()).toEqual(["/lanyard/foil.webp", "/lanyard/webbing.webp"]);
+
+    // If either material texture cannot load, the scene fails cleanly without leaving a canvas and shows the printed passes.
+    for (const url of ["**/lanyard/webbing.webp", "**/lanyard/foil.webp"]) {
+      await page.route(url, (route) => route.abort());
+      await page.reload();
+      await expect(rail(page)).toHaveAttribute("data-lanyard", "failed", { timeout: 15_000 });
+      await expect(scene(page)).toHaveCount(0);
+      await expect(rail(page).locator(".pass__card").first()).toHaveCSS("opacity", "1");
+      await page.unroute(url);
+    }
   });
 
   test("reduced motion turned on puts the printed passes back, and turned off hangs them again", async ({ page }, info) => {
@@ -256,11 +297,13 @@ test.describe("With reduced motion", () => {
   test("the printed passes stay, with no scene", async ({ page, browserName }) => {
     test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
     test.skip(browserName !== "chromium", "Chromium");
+    const textures = trackTextures(page);
     await page.goto("/");
     await rail(page).scrollIntoViewIfNeeded();
     await page.waitForTimeout(1000);
     await expect(scene(page)).toHaveCount(0);
     await expect(rail(page)).not.toHaveAttribute("data-lanyard", "3d");
     await expect(rail(page).locator(".pass__card").first()).toHaveCSS("opacity", "1");
+    expect(textures).toEqual([]);
   });
 });
