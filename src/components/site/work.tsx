@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MeasurePair, MeasureSide } from "@/components/parts/measure";
 import { OnView, Count } from "@/components/parts/on-view";
 import { Arrow, Panel, PanelHead } from "@/components/parts/panel";
+import { PassLight } from "@/components/parts/pass-light";
 import { StaffPass } from "@/components/parts/staff-pass";
 import { employerPanelTransition, employerTitleTransition, titleLinkTypes } from "@/components/parts/title-transition";
 import { WorkTitleTransition } from "@/components/parts/work-title-transition";
@@ -34,7 +35,7 @@ function Head({ slug }: { slug: RoleStorySlug }) {
 function PanelPass({ slug }: { slug: RoleStorySlug }) {
   const { name, share } = employerPanelTransition(slug);
   return (
-    <div className="work__pass" aria-hidden="true">
+    <PassLight className="work__pass" aria-hidden>
       <StaffPass
         slug={slug}
         lead={slug === "bnp-paribas"}
@@ -44,7 +45,7 @@ function PanelPass({ slug }: { slug: RoleStorySlug }) {
           </WorkTitleTransition>
         )}
       />
-    </div>
+    </PassLight>
   );
 }
 

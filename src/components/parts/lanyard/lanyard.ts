@@ -23,16 +23,34 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
     // The stage says how far the scene got (`data-lanyard`: waiting, loading, 3d, or failed with `data-lanyard-error`, or
     // slow; the scene adds what a frame cost, `data-lanyard-frame`). Waiting, loading and 3d keep the printed passes
     // unseen (pass.css), so the print never shows and is then swapped; failed and slow show it. /fixtures/lanyard prints
-    // the state, so a phone with no console can still say what happened. One scene at a time: none starts while one is
-    // up or loading.
+    // the state, so a phone with no console can still say what happened. One scene per stage at a time: none starts while
+    // one is up or loading.
     const cannot = cannotDraw();
     const fail = (reason: string) => {
       element.dataset.lanyard = "failed";
       element.dataset.lanyardError = reason;
     };
+    const clear = () => {
+      dispose?.();
+      dispose = undefined;
+      delete element.dataset.lanyardFrame;
+    };
     let slow = 0;
+    // The print waits unseen from here, unless the scene cannot draw at all.
+    const wait = () => {
+      if (cannot) fail(cannot);
+      else if (!dispose && !loading) element.setAttribute("data-lanyard", "waiting");
+    };
+    const rearm = () => {
+      clear();
+      if (!wanted()) return;
+      wait();
+      near.observe(element);
+    };
     const start = () => {
       if (!wanted() || dispose || loading) return;
+      // A stage hidden by a media query (`.opening__rail` on a phone, `.work__pass` from 720 px) stays unmounted until visible.
+      if (!element.offsetWidth || !element.offsetHeight) return;
       if (cannot) return fail(cannot);
       near.disconnect();
       element.dataset.lanyard = "loading";
@@ -40,18 +58,30 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
       // A scene that takes this long to arrive shows the print meanwhile; it still takes over when it draws.
       slow = window.setTimeout(() => element.dataset.lanyard === "loading" && (element.dataset.lanyard = "slow"), SLOW_MS);
       import("./scene")
-        .then(({ mountLanyard }) => mountLanyard({ stage: element, passes, onReady: () => wanted() && (element.dataset.lanyard = "3d") }))
-        .then((stop) => (wanted() ? (dispose = stop) : stop()))
-        .catch((error: unknown) => fail(error instanceof Error ? error.message : String(error)))
-        .finally(() => {
+        .then(({ mountLanyard }) =>
+          mountLanyard({
+            stage: element,
+            passes,
+            onReady: () => wanted() && (element.dataset.lanyard = "3d"),
+            onHide: rearm,
+            onContextLost: () => {
+              clear();
+              if (wanted()) fail("WebGL context lost");
+            },
+          }),
+        )
+        .then((stop) => {
           loading = false;
           clearTimeout(slow);
+          if (!stop) return rearm();
+          if (wanted()) dispose = stop;
+          else stop();
+        })
+        .catch((error: unknown) => {
+          loading = false;
+          clearTimeout(slow);
+          if (wanted()) fail(error instanceof Error ? error.message : String(error));
         });
-    };
-    // The print waits unseen from here, unless the scene cannot draw at all.
-    const wait = () => {
-      if (cannot) fail(cannot);
-      else if (!dispose && !loading) element.setAttribute("data-lanyard", "waiting");
     };
     const near = new IntersectionObserver(([entry]) => entry.isIntersecting && start(), { rootMargin: "200px" });
     if (wanted()) wait();
@@ -64,11 +94,9 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
         near.observe(element);
         return;
       }
-      dispose?.();
-      dispose = undefined;
+      clear();
       delete element.dataset.lanyard;
       delete element.dataset.lanyardError;
-      delete element.dataset.lanyardFrame;
     };
     still.addEventListener("change", changed);
 
@@ -77,10 +105,9 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
       clearTimeout(slow);
       near.disconnect();
       still.removeEventListener("change", changed);
-      dispose?.();
+      clear();
       delete element.dataset.lanyard;
       delete element.dataset.lanyardError;
-      delete element.dataset.lanyardFrame;
     };
   }, [stage]);
 }
