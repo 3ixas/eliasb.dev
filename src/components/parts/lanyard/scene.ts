@@ -61,9 +61,15 @@ const ARRIVALS = [
   { velocity: { x: 0.16, y: 0, z: -0.45 }, spin: 1.3 },
 ];
 
-export type Mount = { stage: HTMLElement; passes: HTMLElement[]; onReady: () => void };
+export type Mount = {
+  stage: HTMLElement;
+  passes: HTMLElement[];
+  onReady: () => void;
+  onHide: () => void;
+  onContextLost: () => void;
+};
 
-export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<() => void> {
+export async function mountLanyard({ stage, passes, onReady, onHide, onContextLost }: Mount): Promise<(() => void) | undefined> {
   // Load material textures before allocating WebGL/PMREM resources so a network failure or timeout never leaks GPU state.
   const needsFoil = passes.some((pass) => Boolean(pass.querySelector(".pass__holo")));
   const [webbingImage, foilImage] = await Promise.all([
@@ -121,8 +127,10 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
   const anisotropy = renderer.capabilities.getMaxAnisotropy();
   let webbing: ReturnType<typeof createWebbing> | null = null;
   let hanging: HangingPass[] = [];
+  const lost = () => onContextLost();
 
   const cleanupInit = () => {
+    canvas.removeEventListener("webglcontextlost", lost);
     canvas.remove();
     pad.remove();
     hanging.forEach((pass) => pass.dispose());
@@ -132,6 +140,7 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     webbing?.normalMap.dispose();
     environment.dispose();
     renderer.dispose();
+    renderer.getContext().getExtension("WEBGL_lose_context")?.loseContext();
   };
 
   try {
@@ -166,13 +175,21 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     [canvas.style.width, pad.style.width] = was;
     return width;
   };
-  // How far the canvas draws past the stage: to the window's sides, wherever a card is swung, but never past them, which
-  // would scroll the page sideways; BLEED below; and not at all where the stage scrolls sideways itself.
+  // Nearest horizontally clipping ancestor (e.g. a phone Work `.panel`), or the window's sides when nothing clips.
+  const clipBounds = () => {
+    for (let at = stage.parentElement; at && at !== document.documentElement; at = at.parentElement) {
+      if (getComputedStyle(at).overflowX !== "visible") return at.getBoundingClientRect();
+    }
+    return { left: 0, right: document.documentElement.clientWidth };
+  };
+  // How far the canvas draws past the stage: to its clipping bounds (the window's sides or enclosing panel), never past
+  // them, BLEED below, and not at all where the stage scrolls sideways itself.
   const bleed = () => {
     if (getComputedStyle(stage).overflowX !== "visible") return { left: 0, right: 0, bottom: 0 };
     const { left, right } = stage.getBoundingClientRect();
+    const bounds = clipBounds();
     const side = (room: number) => Math.max(0, Math.floor(room));
-    return { left: side(left), right: side(document.documentElement.clientWidth - right), bottom: BLEED };
+    return { left: side(left - bounds.left), right: side(bounds.right - right), bottom: BLEED };
   };
   // A point in the stage, in world units: the camera looks at the middle of the canvas, which reaches past the stage.
   const toWorld = (x: number, y: number): Vec3 => {
@@ -351,12 +368,17 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
   });
   seen.observe(stage);
   // The stage resizing, or the window around it (which moves the stage and so how far the canvas reaches past it), lays
-  // the passes out again; observing reports the stage's size once at the start, so only a real change does.
+  // the passes out again; if a media query hides the stage (`0×0`), dispose it and let `useLanyard` re-arm for when it
+  // returns. Observing reports the stage's size once at the start, so only a real change re-lays out.
   let resizing = 0;
   const relayout = () => {
     cancelAnimationFrame(resizing);
     resizing = requestAnimationFrame(() => {
       const next = measure();
+      if (!next.width || !next.height || !next.unit) {
+        onHide();
+        return;
+      }
       if ((["width", "height", "unit", "left", "right", "bottom"] as const).every((key) => next[key] === view[key])) return;
       layout(false);
     });
@@ -395,6 +417,13 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
     cleanupInit();
   };
 
+  // If a resize/rotation hid the stage while textures or cards were loading, abandon the mount without dividing by zero.
+  const initial = measure();
+  if (!initial.width || !initial.height || !initial.unit) {
+    dispose();
+    return undefined;
+  }
+
   shade();
   stage.append(canvas, pad);
   layout(true);
@@ -407,10 +436,15 @@ export async function mountLanyard({ stage, passes, onReady }: Mount): Promise<(
   gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
   const cost = performance.now() - started;
   stage.dataset.lanyardFrame = `${Math.round(cost)} ms`;
+  if (gl.isContextLost()) {
+    dispose();
+    throw new Error("WebGL context lost");
+  }
   if (cost > SLOW) {
     dispose();
     throw new Error(`Too slow to draw (${Math.round(cost)} ms a frame)`);
   }
+  canvas.addEventListener("webglcontextlost", lost);
   resized.observe(stage);
   window.addEventListener("resize", relayout);
   onReady();

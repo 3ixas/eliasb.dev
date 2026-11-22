@@ -12,6 +12,7 @@ import { canDrawScene, withScene } from "./support/scene";
 
 const slugs = ["bnp-paribas", "joveen", "optegra"] as const;
 const rail = (page: Page) => page.locator(".opening__rail");
+const workPass = (page: Page, slug: (typeof slugs)[number]) => page.locator(`#${slug} .work__pass`);
 const scene = (page: Page) => page.locator("canvas.lanyard__scene");
 
 /** Records every `/lanyard/` texture request (and optionally only successful responses) made by `page`. */
@@ -32,14 +33,15 @@ function trackTextures(page: Page, kind: "request" | "response" = "request") {
 }
 
 test("a software renderer keeps the printed passes", async ({ page, browserName }) => {
-  test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
   test.skip(browserName !== "chromium", "Headless Chromium renders in software");
+  const phone = (page.viewportSize()?.width ?? 0) < 720;
   const textures = trackTextures(page);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
-  await rail(page).scrollIntoViewIfNeeded();
-  await expect(rail(page)).toHaveAttribute("data-lanyard", "failed");
-  await expect(rail(page)).toHaveAttribute("data-lanyard-error", /^(Software renderer|No hardware WebGL 2)/);
+  const stage = phone ? workPass(page, "bnp-paribas") : rail(page);
+  await stage.scrollIntoViewIfNeeded();
+  await expect(stage).toHaveAttribute("data-lanyard", "failed");
+  await expect(stage).toHaveAttribute("data-lanyard-error", /^(Software renderer|No hardware WebGL 2)/);
   await expect(scene(page)).toHaveCount(0);
   expect(textures).toEqual([]);
 });
@@ -123,6 +125,75 @@ test.describe("The 3D staff passes", () => {
       await expect(passes.nth(index)).toHaveAccessibleName(passName(slug));
       await expect(passes.nth(index)).toHaveAttribute("href", `#${slug}`);
     }
+    // Hidden phone Work-panel stages stay unmounted (`waiting`, 0 canvases) at desktop widths even after scrolling into view.
+    await page.locator("#bnp-paribas").scrollIntoViewIfNeeded();
+    await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+    await expect(workPass(page, "bnp-paribas")).toHaveAttribute("data-lanyard", "waiting");
+    await expect(page.locator(".work__pass canvas.lanyard__scene")).toHaveCount(0);
+  });
+
+  test("on a phone each Work panel hangs its employer's pass in 3D with the generated textures, and the story link stays live", async ({ page }) => {
+    test.skip((page.viewportSize()?.width ?? 0) >= 720, "Phones only: under 720 px each Work panel carries its pass");
+    const loaded = trackTextures(page, "response");
+    await page.goto("/");
+    for (const slug of slugs) {
+      const stage = workPass(page, slug);
+      await stage.scrollIntoViewIfNeeded();
+      await hung(page, stage);
+      await expect(stage.locator("canvas.lanyard__scene")).toHaveCount(1);
+      await expect(stage).toHaveAttribute("aria-hidden", "true");
+    }
+    // The hidden opening rail stays unmounted (`waiting`, 0 canvases) on a phone.
+    await expect(rail(page)).toHaveAttribute("data-lanyard", "waiting");
+    await expect(rail(page).locator("canvas.lanyard__scene")).toHaveCount(0);
+    expect([...new Set(loaded)].sort()).toEqual(["/lanyard/foil.webp", "/lanyard/webbing.webp"]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    // The canvas takes no pointer, so the panel's story link underneath remains clickable.
+    const story = page.locator("#bnp-paribas .work__story");
+    await story.scrollIntoViewIfNeeded();
+    await story.click();
+    await expect(page).toHaveURL(/\/work\/bnp-paribas$/);
+  });
+
+  test("resizing across 720 px disposes hidden stages and mounts the visible ones cleanly", async ({ page }) => {
+    test.skip((page.viewportSize()?.width ?? 0) >= 720, "Starts on a phone width and crosses 720 px");
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto("/");
+    const bnp = workPass(page, "bnp-paribas");
+    await bnp.scrollIntoViewIfNeeded();
+    await hung(page, bnp);
+    await expect(rail(page).locator("canvas.lanyard__scene")).toHaveCount(0);
+
+    // Rotate/widen past 720 px: Work-panel scenes dispose and return to waiting; the opening rail mounts.
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await expect(page.locator(".work__pass canvas.lanyard__scene")).toHaveCount(0);
+    await expect(bnp).toHaveAttribute("data-lanyard", "waiting");
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await hung(page, rail(page));
+    await expect(rail(page).locator("canvas.lanyard__scene")).toHaveCount(1);
+
+    // Narrow back to phone width: the opening rail disposes; Work-panel scenes mount again.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(rail(page).locator("canvas.lanyard__scene")).toHaveCount(0);
+    await expect(rail(page)).toHaveAttribute("data-lanyard", "waiting");
+    await bnp.scrollIntoViewIfNeeded();
+    await hung(page, bnp);
+    await expect(bnp.locator("canvas.lanyard__scene")).toHaveCount(1);
+    expect(errors).toEqual([]);
+  });
+
+  test("losing the WebGL context disposes the scene and restores the printed pass", async ({ page }) => {
+    const phone = (page.viewportSize()?.width ?? 0) < 720;
+    await page.goto("/");
+    const stage = phone ? workPass(page, "bnp-paribas") : rail(page);
+    await stage.scrollIntoViewIfNeeded();
+    await hung(page, stage);
+    await stage.locator("canvas.lanyard__scene").dispatchEvent("webglcontextlost");
+    await expect(stage).toHaveAttribute("data-lanyard", "failed");
+    await expect(stage).toHaveAttribute("data-lanyard-error", "WebGL context lost");
+    await expect(stage.locator("canvas.lanyard__scene")).toHaveCount(0);
+    await expect(stage.locator(".pass__card").first()).toHaveCSS("opacity", "1");
   });
 
   test("a drag on a card swings it and goes nowhere; a click follows its pass's link", async ({ page }, info) => {
@@ -295,15 +366,16 @@ test.describe("The 3D staff passes", () => {
 
 test.describe("With reduced motion", () => {
   test("the printed passes stay, with no scene", async ({ page, browserName }) => {
-    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
     test.skip(browserName !== "chromium", "Chromium");
+    const phone = (page.viewportSize()?.width ?? 0) < 720;
     const textures = trackTextures(page);
     await page.goto("/");
-    await rail(page).scrollIntoViewIfNeeded();
+    const stage = phone ? workPass(page, "bnp-paribas") : rail(page);
+    await stage.scrollIntoViewIfNeeded();
     await page.waitForTimeout(1000);
     await expect(scene(page)).toHaveCount(0);
-    await expect(rail(page)).not.toHaveAttribute("data-lanyard", "3d");
-    await expect(rail(page).locator(".pass__card").first()).toHaveCSS("opacity", "1");
+    await expect(stage).not.toHaveAttribute("data-lanyard", "3d");
+    await expect(stage.locator(".pass__card").first()).toHaveCSS("opacity", "1");
     expect(textures).toEqual([]);
   });
 });

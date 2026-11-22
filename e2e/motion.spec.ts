@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { withoutScene } from "./support/scene";
+import { canDrawScene, withoutScene, withScene } from "./support/scene";
 
 // Motion on the finished page: hover that only moves things where there is a hover. (How I work's pen, which drew with the scroll, retired in #414.)
 test.describe("Hover that needs a hover", () => {
@@ -280,7 +280,8 @@ test.describe("Panel to page title transitions", () => {
           const titleRect = document.querySelector(titleSelector)?.getBoundingClientRect();
           const linkRect = document.querySelector("#joveen .work__story")?.getBoundingClientRect();
           const arrival = document.querySelector("#joveen")?.closest(".work-role__arrival");
-          const settled = !arrival || parseFloat(getComputedStyle(arrival).opacity) > 0.99;
+          const arrivalStyle = arrival ? getComputedStyle(arrival) : null;
+          const settled = !arrivalStyle || (parseFloat(arrivalStyle.opacity) > 0.99 && arrivalStyle.transform === "none");
           const inView = (rect?: DOMRect) => Boolean(rect && rect.bottom > 0 && rect.top < window.innerHeight);
           return settled && inView(titleRect) && inView(linkRect);
         }),
@@ -301,6 +302,36 @@ test.describe("Panel to page title transitions", () => {
     await waitForHydration(page, ".story-back");
     const backToWork = await sampleRouteTransition(page, () => page.locator(".story-back").first().click(), /\/#work$/);
     expectSingleTitleMorph(backToWork, "route-title-employer-bnp-paribas");
+  });
+
+  test("phone Work panel with live 3D pass still carries only the employer title to its Role story", async ({ page, browserName }, info) => {
+    test.skip(browserName !== "chromium" || !info.project.name.includes("-390-"), "Phone 3D scene in Chromium");
+    await withScene(page);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/");
+    test.skip(!(await canDrawScene(page)), "No WebGL 2 in this browser");
+    await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
+    await page.evaluate(() => document.fonts.ready);
+
+    await page.locator("#joveen").evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+    await waitForHydration(page, "#joveen .work__story");
+    await expect(page.locator("#joveen .work__pass")).toHaveAttribute("data-lanyard", "3d", { timeout: 15_000 });
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const titleRect = document.querySelector("#joveen .work__pass .pass__band span")?.getBoundingClientRect();
+          const linkRect = document.querySelector("#joveen .work__story")?.getBoundingClientRect();
+          const arrival = document.querySelector("#joveen")?.closest(".work-role__arrival");
+          const arrivalStyle = arrival ? getComputedStyle(arrival) : null;
+          const settled = !arrivalStyle || (parseFloat(arrivalStyle.opacity) > 0.99 && arrivalStyle.transform === "none");
+          const inView = (rect?: DOMRect) => Boolean(rect && rect.bottom > 0 && rect.top < window.innerHeight);
+          return settled && inView(titleRect) && inView(linkRect);
+        }),
+      )
+      .toBe(true);
+
+    const toJoveen = await sampleRouteTransition(page, () => page.locator("#joveen .work__story").click(), /\/work\/joveen$/);
+    expectSingleTitleMorph(toJoveen, "route-title-employer-joveen");
   });
 
   test("browser Back preserves scroll restoration and keyboard navigation with transitions active", async ({ page }, testInfo) => {
