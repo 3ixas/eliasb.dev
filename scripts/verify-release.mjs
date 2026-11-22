@@ -368,10 +368,34 @@ async function verifyHomeSocialMetadata(baseUrl, document) {
   }
   check(metaContent(document, "twitter:image", "name")?.includes("/opengraph-image"), "Homepage Twitter image should be the headline card");
 
-  const icon = tags(document, "link").find((tag) => attribute(tag, "rel") === "icon");
-  check(attribute(icon ?? "", "href")?.startsWith("/icon.svg"), "The favicon should be the E SVG");
+  const iconLinks = tags(document, "link").filter((tag) => attribute(tag, "rel") === "icon");
+  const svgIcon = iconLinks.find((tag) => attribute(tag, "href")?.startsWith("/icon.svg"));
+  check(Boolean(svgIcon), "The favicon should expose the Newsreader E SVG (/icon.svg)");
   const iconSvg = await fetchAsset(baseUrl, "/icon.svg");
   check(iconSvg.includes("prefers-color-scheme: dark"), "The favicon should carry a dark-tab variant");
+  check(iconSvg.includes("#2443d6") && iconSvg.includes("#8c9eff"), "The favicon should use today's light and dark cobalt tokens");
+
+  const pngIcon = iconLinks.find((tag) => attribute(tag, "type") === "image/png");
+  const pngIconHref = attribute(pngIcon ?? "", "href");
+  check(Boolean(pngIconHref), "The favicon should provide a PNG fallback for Safari");
+  if (pngIconHref) {
+    const pngResponse = await fetch(new URL(pngIconHref, baseUrl), { redirect: "manual" });
+    equal(pngResponse.status, 200, "The PNG fallback favicon should return 200");
+    equal(pngResponse.headers.get("content-type"), "image/png", "The PNG fallback favicon content type");
+    const pngBytes = Buffer.from(await pngResponse.arrayBuffer());
+    check(pngBytes.length >= 24 && pngBytes.readUInt32BE(16) === 32 && pngBytes.readUInt32BE(20) === 32, "The PNG fallback favicon should be 32 × 32");
+  }
+
+  const appleIcon = tags(document, "link").find((tag) => attribute(tag, "rel") === "apple-touch-icon");
+  const appleIconHref = attribute(appleIcon ?? "", "href");
+  check(Boolean(appleIconHref), "The page should expose an Apple touch icon");
+  if (appleIconHref) {
+    const appleResponse = await fetch(new URL(appleIconHref, baseUrl), { redirect: "manual" });
+    equal(appleResponse.status, 200, "The Apple touch icon should return 200");
+    equal(appleResponse.headers.get("content-type"), "image/png", "The Apple touch icon content type");
+    const appleBytes = Buffer.from(await appleResponse.arrayBuffer());
+    check(appleBytes.length >= 24 && appleBytes.readUInt32BE(16) === 180 && appleBytes.readUInt32BE(20) === 180, "The Apple touch icon should be 180 × 180");
+  }
 }
 
 async function verifyNotFound(baseUrl) {

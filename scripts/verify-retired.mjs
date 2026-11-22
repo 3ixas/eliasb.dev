@@ -21,11 +21,12 @@ const retired = [
   [/DM_Mono|--font-dm-mono/, "DM Mono"],
   [/Bricolage_Grotesque|--font-bricolage|Bricolage Fallback/, "Bricolage Grotesque"],
   [/JetBrains_Mono|--font-jetbrains-mono/, "JetBrains Mono"],
+  [/#2340ff/i, "the retired Stretch cobalt (#2340ff; today's cobalt is #2443d6)"],
 ];
 
 const files = execFileSync("git", ["ls-files", "src", "scripts", "e2e", "playwright.config.ts"], { encoding: "utf8" })
   .split("\n")
-  .filter((file) => /\.(tsx?|mjs|css|json)$/.test(file) && file !== self);
+  .filter((file) => /\.(tsx?|mjs|css|json|svg)$/.test(file) && file !== self);
 
 const problems = [];
 for (const file of files) {

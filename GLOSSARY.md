@@ -30,7 +30,7 @@ Retired ([#302](https://github.com/3ixas/eliasb.dev/issues/302)). It was the lin
 _Avoid_: Scroll trigger
 
 **Cobalt accent**:
-The site's one accent colour (`#2340ff` in light, `#8b9cff` in dark). It may be used large, and marks Elias's name, today and now, and the way to say hello. It coloured the award pins on a **Staff pass** until [#285](https://github.com/3ixas/eliasb.dev/issues/285); **Pass pins** now take their own enamel colours. It never colours a project.
+The site's one accent colour (`#2443d6` in light, `#8c9eff` in dark; updated from `#2340ff` / `#8b9cff` in passes and panels). It may be used large, and marks Elias's name, today and now, and the way to say hello. It coloured the award pins on a **Staff pass** until [#285](https://github.com/3ixas/eliasb.dev/issues/285); **Pass pins** now take their own enamel colours. It never colours a project.
 _Avoid_: Using it for project tiles or as decoration
 
 **Eclipse**:

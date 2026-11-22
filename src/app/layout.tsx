@@ -47,8 +47,8 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
-  // The favicon is app/icon.svg and the social image app/opengraph-image.tsx;
-  // Next.js links both from their file names.
+  // The SVG favicon (app/icon.svg), Safari PNG fallback (app/icon1.png), Apple touch icon (app/apple-icon.png)
+  // and social image (app/opengraph-image.tsx) are all linked by Next.js from their file names.
   openGraph: {
     type: "website",
     siteName,
