@@ -50,6 +50,8 @@ test.describe("The panel", () => {
         color: rgb(ink),
       });
     }
+    // Joveen's panel lifts to #1a1a1f so it clearly separates from the #0d0d0f dark page (R-41).
+    await expect(page.locator('[data-panel="joveen"]')).toHaveCSS("background-color", "rgb(26, 26, 31)");
   });
 
   // Depth (#458, #476): every panel is lit from above, with a rim, and casts a shadow tinted by its own field.

@@ -382,9 +382,40 @@ test.describe("Case study: Threshold's working link", () => {
     await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
     await live(page);
     await figure(page).getByLabel(thresholdLinkCopy.city, { exact: true }).selectOption("basel");
-    await figure(page).getByRole("button", { name: thresholdLinkCopy.copy }).click();
+    const copy = figure(page).locator(".copy-button");
+    const quietWidth = (await copy.boundingBox())!.width;
+    await copy.click();
     await expect(figure(page).getByRole("button", { name: thresholdLinkCopy.copied })).toBeVisible();
+    await expect(copy.locator(".copy-button__word")).toContainText("✓");
+    expect((await copy.boundingBox())!.width).toBe(quietWidth);
+    await expect(figure(page).locator('[role="status"]')).toHaveText(thresholdLinkCopy.copied);
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(thresholdLink({ city: "basel", district: firstDistrict("basel"), place: thresholdStart.place }));
+  });
+
+  test("Copy link morphs synchronously to ✓ Copied with zero width shift before the clipboard resolves", async ({ page }) => {
+    await live(page);
+    const copy = figure(page).locator(".copy-button");
+    const quietWidth = (await copy.boundingBox())!.width;
+    await page.evaluate(() => {
+      let resolveWrite!: () => void;
+      (window as unknown as { finishWrite: () => void }).finishWrite = () => resolveWrite();
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: {
+          writeText: () =>
+            new Promise<void>((resolve) => {
+              resolveWrite = resolve;
+            }),
+        },
+      });
+    });
+    await copy.click();
+    await expect(copy).toHaveAttribute("data-copied", "");
+    await expect(copy.locator(".copy-button__word")).toContainText("✓");
+    await expect(copy.locator(".copy-button__word")).toContainText(thresholdLinkCopy.copied);
+    expect((await copy.boundingBox())!.width).toBe(quietWidth);
+    await page.evaluate(() => (window as unknown as { finishWrite: () => void }).finishWrite());
+    await expect(figure(page).locator('[role="status"]')).toHaveText(thresholdLinkCopy.copied);
   });
 
   test("when the browser refuses the clipboard, Copy link selects the link instead", async ({ page }) => {

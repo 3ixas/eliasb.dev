@@ -21,9 +21,12 @@ export async function OffTheClock() {
   ]);
   return (
     <section id="off-the-clock" className="frame section" aria-labelledby="off-the-clock-heading">
-      <h2 id="off-the-clock-heading" className="section__title">
-        {offTheClock.heading}
-      </h2>
+      <div className="section__head">
+        <h2 id="off-the-clock-heading" className="section__title">
+          {offTheClock.heading}
+        </h2>
+        <p className="section__note">{offTheClock.note}</p>
+      </div>
       <OffTheClockPanel
         training={<TrainingCell />}
         book={<BookCell reading={reading} now={now} />}

@@ -33,11 +33,10 @@ test.describe("Homepage shell", () => {
     await expect(page.getByRole("heading", { level: 2 })).toHaveText([headings[0], work.headed.heading, ...headings.slice(1)]);
   });
 
-  // Work opens with a section title and, alone among the sections, a subheading (DESIGN.md "Layout"; #413).
-  test("Work has its section title and its subheading", async ({ page }) => {
+  // Every section with a subheading (Work, Things I make, How I work, Off the clock) stacks it directly under its h2 (DESIGN.md "Layout", R-43).
+  test("each section opens with its title and stacked subheading", async ({ page }) => {
     await page.goto("/");
-    const section = page.locator("section#work");
-    const title = section.getByRole("heading", { level: 2, name: work.heading, exact: true });
+    await page.evaluate(() => document.fonts.ready);
     const size = await page.evaluate(() => {
       const probe = document.createElement("i");
       probe.style.fontSize = "var(--type-section)";
@@ -46,27 +45,60 @@ test.describe("Homepage shell", () => {
       probe.remove();
       return value;
     });
-    await expect(title).toHaveCSS("font-size", size);
-    await expect(title).toHaveCSS("font-family", /^Newsreader/);
-    await expect(section.locator(".work__subheading")).toHaveText(work.note);
+    for (const { id, heading, note } of sections) {
+      if (!note) continue;
+      const section = page.locator(`section#${id}`);
+      const title = section.getByRole("heading", { level: 2, name: heading, exact: true });
+      await expect(title).toHaveClass(/section__title/);
+      await expect(title).toHaveCSS("font-size", size);
+      await expect(title).toHaveCSS("font-family", /^Newsreader/);
+      const subheading = section.locator(".section__note");
+      await expect(subheading).toHaveText(note);
+      await expect
+        .poll(
+          async () => {
+            const [titleBox, noteBox] = await Promise.all([title.boundingBox(), subheading.boundingBox()]);
+            if (!titleBox || !noteBox) return null;
+            return {
+              under: noteBox.y >= titleBox.y + titleBox.height - 0.5,
+              aligned: Math.abs(noteBox.x - titleBox.x) <= 1,
+              measure: noteBox.width <= 640.5,
+            };
+          },
+          { message: `${id} subheading geometry` },
+        )
+        .toEqual({ under: true, aligned: true, measure: true });
+    }
   });
 
-  test("Off the clock has its section title and no note", async ({ page }) => {
-    await page.goto("/");
-    const section = page.locator("section#off-the-clock");
-    await expect(section.getByRole("heading", { level: 2, name: offTheClock.heading, exact: true })).toHaveClass(/section__title/);
-  });
-
-  test("Things I make has its section title and no note", async ({ page }) => {
-    await page.goto("/");
-    const section = page.locator("section#things-i-make");
-    await expect(section.getByRole("heading", { level: 2, name: thingsIMake.heading, exact: true })).toHaveClass(/section__title/);
-  });
-
-  test("How I work has its section title and no note", async ({ page }) => {
-    await page.goto("/");
-    const section = page.locator("section#how-i-work");
-    await expect(section.getByRole("heading", { level: 2, name: howIWork.heading, exact: true })).toHaveClass(/section__title/);
+  test("at 1440, 1024, 390 and 320 px, every section subheading stacks under its heading, left-aligned, within 640 px", async ({ browser }, testInfo) => {
+    test.skip(!/-1440-light$/.test(testInfo.project.name), "Sweeps its own widths: once per engine");
+    const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
+    const page = await context.newPage();
+    const checks = [
+      { path: "/", pairs: sections.filter((s) => s.note).map(({ id }) => [`section#${id} h2.section__title`, `section#${id} .section__note`] as const) },
+      { path: "/things-i-make", pairs: [["h1.archive__title", ".archive__note"] as const] },
+    ];
+    for (const { path, pairs } of checks) {
+      await page.goto(path);
+      await page.evaluate(() => document.fonts.ready);
+      for (const width of [1440, 1024, 390, 320]) {
+        await page.setViewportSize({ width, height: 900 });
+        for (const [headingSel, noteSel] of pairs) {
+          await expect
+            .poll(
+              async () => {
+                const [h, n] = await Promise.all([page.locator(headingSel).boundingBox(), page.locator(noteSel).boundingBox()]);
+                if (!h || !n) return null;
+                return { under: n.y >= h.y + h.height - 0.5, aligned: Math.abs(n.x - h.x) <= 1, measure: n.width <= 640.5 };
+              },
+              { message: `${path} ${noteSel} at ${width}px` },
+            )
+            .toEqual({ under: true, aligned: true, measure: true });
+        }
+      }
+    }
+    await context.close();
   });
 
   test("the header links jump to each section and mark the one in view", async ({ page }) => {
@@ -166,7 +198,7 @@ test.describe("Homepage shell", () => {
     }
   });
 
-  test("the header is the name, the greeting, the links and the theme control over an ink rule, 64 px tall, with no portrait and nothing sideways", async ({ page }) => {
+  test("the header is the name, the greeting, the links and the theme control over a hairline, 64 px tall, with no portrait and nothing sideways", async ({ page }) => {
     await page.goto("/");
     const header = page.locator("[data-site-header]");
     await expect(header.locator("img")).toHaveCount(0);
@@ -179,8 +211,15 @@ test.describe("Homepage shell", () => {
     else await expect(header.locator("[data-greeting]")).toBeVisible();
     await expect(header.locator("[data-eclipse]")).toBeVisible();
     expect((await header.boundingBox())!.height).toBeCloseTo(64, 0);
-    const ink = await page.evaluate(() => getComputedStyle(document.body).color);
-    await expect(header).toHaveCSS("border-bottom", `1px solid ${ink}`);
+    const hair = await page.evaluate(() => {
+      const probe = document.createElement("i");
+      probe.style.color = "var(--hair)";
+      document.body.append(probe);
+      const colour = getComputedStyle(probe).color;
+      probe.remove();
+      return colour;
+    });
+    await expect(header).toHaveCSS("border-bottom", `1px solid ${hair}`);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
     // The theme control and Menu are 36 px to the eye.
     await expect(header.locator("[data-eclipse]")).toHaveCSS("width", "36px");

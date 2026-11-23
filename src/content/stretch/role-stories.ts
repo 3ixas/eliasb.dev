@@ -234,7 +234,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
       light: { field: "#0a0a0a", ink: "#f2f2f2", swatch: "#737373" },
       dark: { field: "#ececec", ink: "#0a0a0a", swatch: "#7a7a7a" },
     },
-    panel: { field: "#0b0b0c", ink: "#f4f4f2" },
+    panel: { field: "#1a1a1f", ink: "#f4f4f2" },
     next: "optegra",
   },
   optegra: {

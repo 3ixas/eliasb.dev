@@ -174,12 +174,24 @@ test.describe("Lights and theme", () => {
       return [[r.left - 3.5, r.top + r.height / 2], [r.right + 3.5, r.top + r.height / 2], [r.left + r.width / 2, r.top - 3.5], [r.left + r.width / 2, r.bottom + 3.5]].every(([x, y]) => element.contains(document.elementFromPoint(x, y)));
     })).toBe(true);
     await expect(eclipse(page)).toHaveCSS("border-top-width", "0px");
+    await expect(eclipse(page)).toHaveCSS("box-shadow", "none");
     await expect(eclipse(page)).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
     await eclipse(page).hover();
     await expect(eclipse(page)).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
     await page.keyboard.press("Tab");
     await eclipse(page).focus();
+    const cobalt = await page.evaluate(() => {
+      const probe = document.createElement("i");
+      probe.style.color = "var(--cobalt)";
+      document.body.append(probe);
+      const colour = getComputedStyle(probe).color;
+      probe.remove();
+      return colour;
+    });
     await expect(eclipse(page)).toHaveCSS("outline-style", "solid");
+    await expect(eclipse(page)).toHaveCSS("outline-width", "2px");
+    await expect(eclipse(page)).toHaveCSS("outline-offset", "3px");
+    await expect(eclipse(page)).toHaveCSS("outline-color", cobalt);
   });
 
   test("the icon settles in 420 ms, and in 0 ms with reduced motion", async ({ page }) => {
@@ -299,7 +311,10 @@ test.describe("Lights and theme", () => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     await page.emulateMedia({ reducedMotion: "no-preference" });
-    for (const [pressed, target] of [["false", { page: "rgb(13, 13, 15)", ink: "rgb(240, 239, 235)" }], ["true", { page: "rgb(238, 237, 233)", ink: "rgb(20, 20, 22)" }]] as const) {
+    for (const [pressed, target] of [
+      ["false", { page: "rgb(13, 13, 15)", band: "rgb(20, 21, 26)", ink: "rgb(240, 239, 235)" }],
+      ["true", { page: "rgb(238, 237, 233)", band: "rgb(228, 225, 218)", ink: "rgb(20, 20, 22)" }],
+    ] as const) {
       // aria-pressed appears only once the Eclipse has hydrated, so the click below reaches its handler.
       await expect(eclipse(page)).toHaveAttribute("aria-pressed", pressed);
       const frames = await page.evaluate(async () => {
@@ -310,12 +325,17 @@ test.describe("Lights and theme", () => {
         for (const time of [0, 150, 300]) {
           for (const animation of animations) animation.currentTime = time;
           const style = getComputedStyle(document.documentElement);
-          frames.push({ page: style.getPropertyValue("--page").trim(), ink: style.getPropertyValue("--ink").trim() });
+          frames.push({
+            page: style.getPropertyValue("--page").trim(),
+            band: style.getPropertyValue("--band").trim(),
+            ink: style.getPropertyValue("--ink").trim(),
+          });
         }
         for (const animation of animations) animation.play();
         return frames;
       });
       expect(new Set(frames.map((frame) => frame.page)).size, "--page passes through a middle value").toBe(3);
+      expect(new Set(frames.map((frame) => frame.band)).size, "--band passes through a middle value").toBe(3);
       expect(new Set(frames.map((frame) => frame.ink)).size, "--ink passes through a middle value").toBe(3);
       await expect(page.locator("html")).not.toHaveAttribute("data-theme-changing", "");
       // The fade can still be finishing its last frames, so wait for it to land.
@@ -323,7 +343,11 @@ test.describe("Lights and theme", () => {
         .poll(() =>
           page.evaluate(() => {
             const style = getComputedStyle(document.documentElement);
-            return { page: style.getPropertyValue("--page").trim(), ink: style.getPropertyValue("--ink").trim() };
+            return {
+              page: style.getPropertyValue("--page").trim(),
+              band: style.getPropertyValue("--band").trim(),
+              ink: style.getPropertyValue("--ink").trim(),
+            };
           }),
         )
         .toEqual(target);

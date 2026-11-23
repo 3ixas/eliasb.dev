@@ -7,11 +7,11 @@ import { opening } from "@/content/stretch/opening";
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 /** tokens.css's colours, in the order DESIGN.md's table gives them. */
-const colours = ["page", "paper", "ink", "muted", "hair", "tint", "cobalt", "green"] as const;
+const colours = ["page", "band", "paper", "ink", "muted", "hair", "tint", "cobalt", "green"] as const;
 const yearLevels = ["year-0", "year-1", "year-2", "year-3", "year-4"] as const;
 
 /** Every text colour on each surface that follows the theme. Hair and tint are never text, and green on the page is only an underline. */
-const pairs = (["page", "paper"] as const).flatMap((surface) =>
+const pairs = (["page", "band", "paper"] as const).flatMap((surface) =>
   (["ink", "muted", "cobalt"] as const).map((colour) => ({ name: `${colour}-on-${surface}`, surface, colour })),
 );
 
@@ -66,7 +66,7 @@ export default async function TokenFixtures() {
 
         <section style={section} aria-label="Text on each surface">
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: 16 }}>
-            {(["page", "paper"] as const).map((surface) => (
+            {(["page", "band", "paper"] as const).map((surface) => (
               <div key={surface} style={{ display: "grid", gap: 4, padding: 24, borderRadius: 28, background: `var(--${surface})`, boxShadow: "inset 0 0 0 1px var(--hair)" }}>
                 {pairs
                   .filter((pair) => pair.surface === surface)

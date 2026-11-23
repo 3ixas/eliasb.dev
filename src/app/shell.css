@@ -110,7 +110,7 @@ html:has([data-site]) {
 /* Animate the palette once, on the root. Descendant colour transitions would chase their parent's inherited colour
  * and make text lag behind the surface. The theme controller (theme.ts) registers each of these as a <color>. */
 :root[data-theme-changing] {
-  transition-property: --sun, --page, --paper, --ink, --muted, --hair, --tint, --cobalt, --green, --year-0, --year-1, --year-2, --year-3, --year-4, --stock, --stock-end, --shadow;
+  transition-property: --sun, --page, --band, --paper, --ink, --muted, --hair, --tint, --cobalt, --green, --year-0, --year-1, --year-2, --year-3, --year-4, --stock, --stock-end, --shadow;
   transition-duration: var(--room-duration);
   transition-timing-function: var(--room-ease);
   transition-delay: 0s;
@@ -118,7 +118,7 @@ html:has([data-site]) {
 
 /* ---- The header ---- */
 
-/* 64 px tall over a 1 px ink rule, as wide as the page. Not sticky. */
+/* 64 px tall over a 1 px hairline, as wide as the page. Not sticky. */
 .site-header {
   position: relative;
   z-index: 20;
@@ -126,7 +126,7 @@ html:has([data-site]) {
   align-items: center;
   gap: 24px;
   min-height: 64px;
-  border-bottom: 1px solid var(--ink);
+  border-bottom: 1px solid var(--hair);
   color: var(--ink);
   font-family: var(--sans);
   font-size: var(--type-small);
@@ -519,19 +519,20 @@ html:has([data-site]) {
 
 /* ---- Say hello ---- */
 
+/* Full-bleed closing band under a 1 px hairline (DESIGN.md "Say hello", R-51). */
 .say-hello {
-  padding-bottom: 112px;
+  margin-top: var(--section-space);
+  padding-block: 64px 96px;
+  border-top: 1px solid var(--hair);
+  background-color: var(--band);
 }
 
 .say-hello:focus-visible {
   outline: none;
 }
 
-/* The title sits under a 1 px ink rule. */
 .say-hello__title {
   margin-top: 0;
-  padding-top: 24px;
-  border-top: 1px solid var(--ink);
 }
 
 .say-hello__email {
@@ -620,6 +621,11 @@ html:has([data-site]) {
 
 .copy-button > span {
   grid-area: 1 / 1;
+  white-space: nowrap;
+}
+
+.copy-button__check {
+  font-variant-emoji: text;
 }
 
 .copy-button__room {
@@ -639,7 +645,7 @@ html:has([data-site]) {
   }
 
   .say-hello {
-    padding-bottom: 72px;
+    padding-block: 48px 72px;
   }
 
   .say-hello__links {
@@ -663,7 +669,7 @@ html:has([data-site]) {
     /* Under the header's rule, not over it. */
     top: calc(100% + 1px);
     padding: 4px var(--gutter) 8px;
-    border-bottom: 1px solid var(--ink);
+    border-bottom: 1px solid var(--hair);
     background-color: var(--page);
   }
 
