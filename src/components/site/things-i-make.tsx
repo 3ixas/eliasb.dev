@@ -46,9 +46,12 @@ export function ThingsIMake() {
   const others = projectIndex(projects, featuredSlugs).slice(0, HOMEPAGE_INDEX_ROWS);
   return (
     <section id="things-i-make" className="frame section things" aria-labelledby="things-i-make-heading">
-      <h2 id="things-i-make-heading" className="section__title">
-        {thingsIMake.heading}
-      </h2>
+      <div className="section__head">
+        <h2 id="things-i-make-heading" className="section__title">
+          {thingsIMake.heading}
+        </h2>
+        <p className="section__note">{thingsIMake.note}</p>
+      </div>
       <div className="panels">
         {wide && (
           <OnView motion="rise">

@@ -11,6 +11,7 @@ type Scheme = "light" | "dark";
 const colours: Record<Scheme, Record<string, string>> = {
   light: {
     page: "rgb(238, 237, 233)",
+    band: "rgb(228, 225, 218)",
     paper: "rgb(251, 251, 249)",
     ink: "rgb(20, 20, 22)",
     muted: "rgb(95, 94, 90)",
@@ -26,6 +27,7 @@ const colours: Record<Scheme, Record<string, string>> = {
   },
   dark: {
     page: "rgb(13, 13, 15)",
+    band: "rgb(20, 21, 26)",
     paper: "rgb(25, 25, 28)",
     ink: "rgb(240, 239, 235)",
     muted: "rgb(163, 162, 156)",

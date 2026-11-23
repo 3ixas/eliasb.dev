@@ -72,7 +72,7 @@ let paletteRegistered = false;
 function registerPalette() {
   if (paletteRegistered || typeof CSS.registerProperty !== "function") return;
   // tokens.css: the palette, and the greeting's sun.
-  const palette = ["page", "paper", "ink", "muted", "hair", "tint", "cobalt", "green", "year-0", "year-1", "year-2", "year-3", "year-4", "stock", "stock-end", "shadow"].map((name) => `--${name}`);
+  const palette = ["page", "band", "paper", "ink", "muted", "hair", "tint", "cobalt", "green", "year-0", "year-1", "year-2", "year-3", "year-4", "stock", "stock-end", "shadow"].map((name) => `--${name}`);
   for (const name of ["--sun", ...palette]) {
     CSS.registerProperty({ name, syntax: "<color>", inherits: true, initialValue: "transparent" });
   }

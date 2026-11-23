@@ -148,10 +148,12 @@ function RolePanelView({ panel }: { panel: RolePanel }) {
 export function Work() {
   return (
     <section id="work" className="frame section work" aria-labelledby="work-heading">
-      <h2 id="work-heading" className="section__title">
-        {workPanels.heading}
-      </h2>
-      <p className="work__subheading">{workPanels.subheading}</p>
+      <div className="section__head">
+        <h2 id="work-heading" className="section__title">
+          {workPanels.heading}
+        </h2>
+        <p className="section__note work__subheading">{workPanels.subheading}</p>
+      </div>
       <div className="panels">
         <BnpPanel />
         <div className="panels panels--two panels--aligned">

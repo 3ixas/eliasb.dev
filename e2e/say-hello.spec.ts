@@ -21,12 +21,40 @@ test.describe("Say hello", () => {
     await page.goto("/");
   });
 
-  test("is the title under an ink rule, then the email and Copy, then Résumé, GitHub and LinkedIn", async ({ page }) => {
+  test("is a full-bleed band under a hairline, with the title, email and Copy, then Résumé, GitHub and LinkedIn", async ({ page }) => {
     const heading = section(page).getByRole("heading", { level: 2, name: "Say hello", exact: true });
     await expect(heading).toHaveCount(1);
     await expect(section(page)).toHaveAttribute("aria-labelledby", (await heading.getAttribute("id"))!);
-    const ink = await page.evaluate(() => getComputedStyle(document.body).color);
-    await expect(heading).toHaveCSS("border-top", `1px solid ${ink}`);
+    const { hair, band } = await page.evaluate(() => {
+      const read = (token: string) => {
+        const probe = document.createElement("i");
+        probe.style.color = `var(${token})`;
+        document.body.append(probe);
+        const colour = getComputedStyle(probe).color;
+        probe.remove();
+        return colour;
+      };
+      return { hair: read("--hair"), band: read("--band") };
+    });
+    await expect(section(page)).toHaveCSS("border-top", `1px solid ${hair}`);
+    await expect(section(page)).toHaveCSS("background-color", band);
+    await expect(heading).toHaveCSS("border-top-width", "0px");
+    await expect
+      .poll(async () => {
+        const box = await section(page).boundingBox();
+        if (!box) return null;
+        const { pageWidth, overflow } = await page.evaluate(() => ({
+          pageWidth: document.body.getBoundingClientRect().width,
+          overflow: document.documentElement.scrollWidth > innerWidth,
+        }));
+        return {
+          flushLeft: Math.abs(box.x) <= 0.5,
+          matchesBody: Math.abs(box.width - pageWidth) <= 0.5,
+          fullBleed: box.width >= page.viewportSize()!.width - 20,
+          overflow,
+        };
+      })
+      .toEqual({ flushLeft: true, matchesBody: true, fullBleed: true, overflow: false });
     // Nothing is written under the heading: the email and its button are the line.
     await expect(section(page).locator("p:visible")).toHaveCount(0);
     expect(await section(page).locator("a[href]").evaluateAll((all) => all.map((link) => link.getAttribute("href")))).toEqual([
@@ -55,7 +83,7 @@ test.describe("Say hello", () => {
     }
   });
 
-  test("Copy puts the address on the clipboard and says Copied in the same width, then goes back", async ({ page, browserName }) => {
+  test("Copy morphs synchronously to ✓ Copied at the same width before the clipboard resolves, then goes back", async ({ page, browserName }) => {
     test.skip(browserName !== "chromium", "Only Chromium can grant clipboard reads");
     await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
     const copy = copyButton(page);
@@ -67,6 +95,8 @@ test.describe("Say hello", () => {
     // Away from the button, so the fill is Copied's own and not hover's.
     await page.mouse.move(0, 0);
     await expect(copy).toHaveAccessibleName(sayHello.copied);
+    await expect(copy.locator(".copy-button__word")).toContainText("✓");
+    await expect(copy.locator(".copy-button__word")).toContainText(sayHello.copied);
     expect((await copy.boundingBox())!.width).toBe(quietWidth);
     await expect(section(page).getByRole("status")).toHaveText(sayHello.copied);
     // It fills with ink while it says so.
@@ -75,6 +105,32 @@ test.describe("Say hello", () => {
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(address);
     await expect(copy).toHaveAccessibleName(sayHello.copy, { timeout: 5000 });
     await expect.poll(() => copy.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe(quiet);
+  });
+
+  test("Copy morphs to ✓ Copied with zero width shift before a pending clipboard promise resolves", async ({ page }) => {
+    await hydrated(page);
+    const copy = copyButton(page);
+    const quietWidth = (await copy.boundingBox())!.width;
+    await page.evaluate(() => {
+      let resolveWrite!: () => void;
+      (window as unknown as { finishWrite: () => void }).finishWrite = () => resolveWrite();
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: {
+          writeText: () =>
+            new Promise<void>((resolve) => {
+              resolveWrite = resolve;
+            }),
+        },
+      });
+    });
+    await copy.click();
+    await expect(copy).toHaveAttribute("data-copied", "");
+    await expect(copy.locator(".copy-button__word")).toContainText("✓");
+    await expect(copy.locator(".copy-button__word")).toContainText(sayHello.copied);
+    expect((await copy.boundingBox())!.width).toBe(quietWidth);
+    await page.evaluate(() => (window as unknown as { finishWrite: () => void }).finishWrite());
+    await expect(section(page).getByRole("status")).toHaveText(sayHello.copied);
   });
 
   test("when the browser refuses the clipboard, Copy selects the address instead", async ({ page }) => {

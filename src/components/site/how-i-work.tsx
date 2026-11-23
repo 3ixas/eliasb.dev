@@ -85,9 +85,12 @@ export function HowIWork() {
   if (!date) throw new Error("The Threshold PRD has no date for How I work's link to show");
   return (
     <section id="how-i-work" className="frame section how" aria-labelledby="how-i-work-heading">
-      <h2 id="how-i-work-heading" className="section__title">
-        {howIWork.heading}
-      </h2>
+      <div className="section__head">
+        <h2 id="how-i-work-heading" className="section__title">
+          {howIWork.heading}
+        </h2>
+        <p className="section__note">{howIWork.note}</p>
+      </div>
       <ol className="cards">
         {howIWork.beats.map((beat) => (
           <Card key={beat.habit} beat={beat} />

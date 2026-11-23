@@ -7,17 +7,6 @@
  * ink elsewhere, and a pair's weights are lighter.
  */
 
-.work__subheading {
-  max-width: 28em;
-  margin: -26px 0 40px;
-  color: var(--muted);
-  font-family: var(--serif);
-  font-optical-sizing: auto;
-  font-size: var(--type-prose);
-  line-height: 1.35;
-  text-wrap: balance;
-}
-
 /*
  * Every Work panel (#458): one structure in three. The name leads, with its role over its dates directly under it;
  * then the figure a clear step down and its quiet label; then the evidence under a hairline; then the story link.
@@ -275,10 +264,6 @@
 /* ---- Narrower ---- */
 
 @media (max-width: 719.98px) {
-  .work__subheading {
-    margin: -16px 0 28px;
-  }
-
   .work-bnp__figure {
     padding-top: 36px;
   }

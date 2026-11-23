@@ -19,6 +19,12 @@
   padding-top: var(--section-space);
 }
 
+.section__head {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
 .section__title {
   margin-bottom: 32px;
   font-family: var(--serif);
@@ -27,6 +33,22 @@
   font-size: var(--type-section);
   line-height: 1;
   letter-spacing: -0.03em;
+}
+
+.section__head .section__title {
+  margin-bottom: 0;
+}
+
+/* Section subheading: stacked directly underneath its h2, left-aligned, within 640 px (DESIGN.md "Layout", R-43). */
+.section__note {
+  max-width: var(--measure);
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-prose);
+  line-height: 1.35;
+  text-wrap: pretty;
 }
 
 /* Panels in one section: 16 px apart, two side by side stacking on a phone. */
@@ -59,7 +81,7 @@
   --field: var(--paper);
   --panel-ink: var(--ink);
   --rim: rgb(255 255 255 / 0.16);
-  --edge: color-mix(in srgb, var(--panel-ink) 9%, transparent);
+  --edge: color-mix(in srgb, var(--panel-ink) 14%, transparent);
   --cast: light-dark(color-mix(in srgb, var(--field) 42%, transparent), rgb(0 0 0 / 0.55));
   --lit: light-dark(color-mix(in srgb, var(--field), #fff 5%), color-mix(in srgb, var(--field), #fff 7%));
   --foot: color-mix(in srgb, var(--field), #000 8%);
@@ -624,6 +646,7 @@
 }
 
 @media (max-width: 719.98px) {
+  .section__head,
   .section__title {
     margin-bottom: 28px;
   }

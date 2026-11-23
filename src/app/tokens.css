@@ -11,6 +11,7 @@
  */
 :root {
   --page: #eeede9;
+  --band: #e4e1da;
   --paper: #fbfbf9;
   --ink: #141416;
   --muted: #5f5e5a;
@@ -93,6 +94,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-lights]):not([data-theme]) {
     --page: #0d0d0f;
+    --band: #14151a;
     --paper: #19191c;
     --ink: #f0efeb;
     --muted: #a3a29c;
@@ -116,6 +118,7 @@
 
 :root[data-lights="on"]:not([data-theme="light"]) {
   --page: #0d0d0f;
+  --band: #14151a;
   --paper: #19191c;
   --ink: #f0efeb;
   --muted: #a3a29c;
@@ -138,6 +141,7 @@
 
 :root[data-theme="dark"] {
   --page: #0d0d0f;
+  --band: #14151a;
   --paper: #19191c;
   --ink: #f0efeb;
   --muted: #a3a29c;
