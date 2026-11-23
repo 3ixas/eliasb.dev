@@ -39,16 +39,7 @@ The ruleset can require only a check that `main` already reports. Merge the work
 
 ## The redesign's integration branch
 
-The passes and panels redesign ([#409](https://github.com/3ixas/eliasb.dev/issues/409)) is built on `integration/passes-and-panels`. `main` keeps the quiet index, and production, until the last ticket.
-
-1. **Target.** A redesign ticket's branch is cut from `integration/passes-and-panels` and its pull request targets it: `gh pr create --base integration/passes-and-panels`. A pull request for one of those tickets never targets `main`.
-2. **Checks.** `quality` and the eight e2e shards run on every push to any branch, and `codex-review` on every pull request, so the same checks run as for `main`. The branch has its own ruleset, "integration/passes-and-panels: CI and Codex review must pass" (id 27150536), set up in [#410](https://github.com/3ixas/eliasb.dev/issues/410) with Elias's approval. It is the earlier `integration/quiet-index` one (those checks required, every review thread resolved, no bypass), and it also blocks force-pushes and deleting the branch.
-3. **Review.** Everything above about Codex applies: `@codex review` after every push, reply before resolving, never write the mention in a thread.
-4. **Merging.** Squash, pinned: `gh pr merge <number> --squash --auto --match-head-commit <full sha>`. A ticket's merge here does not deploy production, so it does not wait for Elias's pick, with two exceptions: a ticket whose criteria say findings are posted for him to pick ([#421](https://github.com/3ixas/eliasb.dev/issues/421), [#426](https://github.com/3ixas/eliasb.dev/issues/426)), and anything that changes approved copy. Post the preview link on the ticket either way.
-5. **Previews.** Vercel builds every branch. The integration branch's own preview is `https://eliasb-dev-git-integration-passes-and-panels-elias-projects-6b28dac4.vercel.app`; a ticket's is in the Vercel bot's comment on its pull request.
-6. **Keeping it current.** When `main` gains a commit, merge `main` into the integration branch with a merge commit, in its own pull request. Never rebase or force-push the integration branch: open pull requests are based on it.
-7. **One ticket at a time on the laptop.** Tickets that are unblocked together may be built in any order, but not in parallel locally (`docs/runbooks/local-testing.md`).
-8. **The end.** [#422](https://github.com/3ixas/eliasb.dev/issues/422) merges the integration branch into `main` by the rules below, as one pull request, after Elias approves its head commit. That merge is the deploy.
+The passes and panels redesign ([#409](https://github.com/3ixas/eliasb.dev/issues/409)) was built on `integration/passes-and-panels` and merged into `main` by [#422](https://github.com/3ixas/eliasb.dev/issues/422). Every ticket now branches from `main` and its pull request targets `main`. Build one ticket at a time on the laptop (`docs/runbooks/local-testing.md`).
 
 ## Before merging
 

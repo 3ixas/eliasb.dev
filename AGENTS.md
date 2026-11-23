@@ -12,7 +12,7 @@ Before pushing to, re-running checks on, or merging a pull request, read `docs/r
 
 Before running Playwright, a verify script or a build locally, read `docs/runbooks/local-testing.md`.
 
-Before changing the design, read `docs/design/DESIGN.md` (the contract) and `GLOSSARY.md`; `docs/specs/PASSES-AND-PANELS-SPEC.md` holds its requirements. Until `integration/passes-and-panels` is merged into `main` ([#422](https://github.com/3ixas/eliasb.dev/issues/422)), a pull request for an issue under #409 targets that branch.
+Before changing the design, read `docs/design/DESIGN.md` (the contract) and `GLOSSARY.md`; `docs/specs/PASSES-AND-PANELS-SPEC.md` and `docs/specs/PASSES-AND-PANELS-REFINEMENT-SPEC.md` hold its requirements. Pull requests target `main`.
 
 ## Code Review Rules
 
