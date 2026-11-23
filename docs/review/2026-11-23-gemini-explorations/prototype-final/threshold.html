@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Threshold · Elias Bennett</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="frame site-header__inner">
+      <a class="brand" href="./index.html">
+        <span class="brand__name">Elias Bennett</span>
+        <span class="brand__greet-wrap">
+          <svg class="scene" id="greeting-scene" viewBox="0 0 30 22" aria-hidden="true" focusable="false">
+            <path class="scene__ink" d="M7 6.5 12 11l-5 4.5" />
+            <path class="scene__cursor" d="M15 16h8" />
+          </svg>
+          <span class="brand__greeting" id="greeting">Hello</span>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="Site">
+        <a href="./index.html#work">Work</a>
+        <a href="./things.html" aria-current="page">Things I make</a>
+        <a href="./index.html#how-i-work">How I work</a>
+        <a href="./index.html#say-hello">Say hello</a>
+      </nav>
+      <button type="button" class="theme-control" id="theme-toggle" aria-label="Dark theme" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <mask id="eclipse-bite">
+            <rect x="-4" y="-4" width="32" height="32" fill="#fff" />
+            <circle class="eclipse__shadow" cx="12" cy="12" r="6.8" fill="#000" />
+          </mask>
+          <circle class="eclipse__disc" cx="12" cy="12" r="8.2" fill="currentColor" mask="url(#eclipse-bite)" />
+          <g class="eclipse__rays" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <line x1="12" y1="1.5" x2="12" y2="3.5" />
+            <line x1="12" y1="20.5" x2="12" y2="22.5" />
+            <line x1="1.5" y1="12" x2="3.5" y2="12" />
+            <line x1="20.5" y1="12" x2="22.5" y2="12" />
+            <line x1="4.6" y1="4.6" x2="6" y2="6" />
+            <line x1="18" y1="18" x2="19.4" y2="19.4" />
+            <line x1="4.6" y1="19.4" x2="6" y2="18" />
+            <line x1="18" y1="6" x2="19.4" y2="4.6" />
+          </g>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="main" class="frame">
+    <section class="case-header">
+      <a class="story-back" href="./things.html">← Things I make</a>
+      <h1>Threshold</h1>
+      <p class="case-header__outcome">A clearer view of what moving could cost.</p>
+      <div class="case-header__meta">
+        <span>Product · Data visualisation · 2026</span>
+        <span>React 19, TypeScript, MapLibre</span>
+      </div>
+      <div class="case-header__actions">
+        <a class="btn btn--primary" href="https://threshold-beta.vercel.app" target="_blank" rel="noreferrer">Live site ↗</a>
+        <a class="btn btn--quiet" href="https://github.com/3ixas/threshold" target="_blank" rel="noreferrer">Code ↗</a>
+      </div>
+      <div class="evidence-strip">
+        <div class="evidence-item"><strong>57</strong><span>user stories</span></div>
+        <div class="evidence-item"><strong>13 slices</strong><span>built in a day</span></div>
+        <div class="evidence-item"><strong>182</strong><span>tests</span></div>
+        <div class="evidence-item"><strong>3 cities</strong><span>London, Basel, Zurich</span></div>
+      </div>
+    </section>
+
+    <section class="case-stage" aria-label="Threshold interface">
+      <button type="button" class="zoom-trigger"
+        data-zoom-src="../../../../public/work/threshold/answer.webp"
+        data-zoom-alt="Threshold’s answer for a room in Hackney: on £2,400 a month with £2,500 saved, three months until you can move in, £2,992 still needed upfront and a £1,496 monthly surplus">
+        <div class="bezel">
+          <img src="../../../../public/work/threshold/answer.webp" alt="Threshold’s answer for a room in Hackney" width="1472" height="1056">
+        </div>
+        <span class="zoom-trigger__hint">
+          <span>Hackney room · £2,400/mo · £2,500 saved</span>
+          <span>Inspect full screen ↗</span>
+        </span>
+      </button>
+    </section>
+
+    <div class="longform">
+      <aside class="chapter-rail" aria-label="On this page">
+        <a href="#where-it-started" aria-current="location">Where it started</a>
+        <a href="#on-paper">On paper</a>
+        <a href="#decisions">Decisions</a>
+        <a href="#how-its-built">How it’s built</a>
+        <a href="#where-it-stands">Where it stands</a>
+        <a href="#whats-next">What’s next</a>
+      </aside>
+
+      <div class="prose-stream">
+        <section class="chapter" id="where-it-started">
+          <h2>The rent is the easy part.</h2>
+          <p>My friends had no clear idea what renting would cost by area, and one of them was about to move to Switzerland. Most rent calculators stop at the monthly figure. Before you get the keys you might need five weeks’ deposit in London, or three months’ in Switzerland, plus the first month’s rent, moving costs and furniture. Can I afford to move, and if not, how long until I can?</p>
+        </section>
+
+        <section class="chapter" id="on-paper">
+          <h2>The problem, on paper.</h2>
+          <blockquote class="prd-quote">
+            “People in their 20s and 30s make the decision to move out … without a clear, honest view of what it will actually cost.”
+            <cite>From the PRD · Threshold’s PRD, 16 April 2026</cite>
+          </blockquote>
+        </section>
+
+        <section class="chapter" id="decisions">
+          <h2>Two totals and a straight answer.</h2>
+          <ul class="decision-list">
+            <li><strong>Upfront and monthly stay separate.</strong> You can often afford the monthly costs long before you’ve saved the upfront ones.</li>
+            <li><strong>The answer is one of three.</strong> Move now; not yet, and how many months of saving; or your income doesn’t cover the monthly costs.</li>
+            <li><strong>Each city keeps its own rules.</strong> Different deposits, local charges and transport passes, and every default can be changed.</li>
+            <li><strong>Suggestions show what would help.</strong> A cheaper district, a smaller place, or a flatmate, and how much each would save.</li>
+          </ul>
+          <figure style="margin: 22px 0 0;">
+            <div class="bezel" style="background: var(--band); border-color: var(--hair);">
+              <img src="../../../../public/work/threshold/costs.webp" alt="Threshold upfront and monthly cost breakdown" width="1472" height="1056">
+            </div>
+          </figure>
+        </section>
+
+        <section class="chapter" id="how-its-built">
+          <h2>The link is the save file.</h2>
+          <p>Everything you choose lives in the URL: no account, no backend. The calculations are plain functions with no state of their own. The maps use real boundaries: 33 London boroughs, Zurich’s 12 Kreise and Basel in seven areas.</p>
+          <div class="working-fig" id="threshold-working-figure">
+            <div class="wf-keys" role="group" aria-label="City">
+              <button type="button" class="wf-key" data-wf-city="london" aria-pressed="true">London</button>
+              <button type="button" class="wf-key" data-wf-city="basel" aria-pressed="false">Basel</button>
+              <button type="button" class="wf-key" data-wf-city="zurich" aria-pressed="false">Zurich</button>
+            </div>
+            <div class="wf-keys" id="wf-districts" role="group" aria-label="District"></div>
+            <div class="wf-keys" role="group" aria-label="Place">
+              <button type="button" class="wf-key" data-wf-place="room" aria-pressed="true">Room</button>
+              <button type="button" class="wf-key" data-wf-place="studio" aria-pressed="false">Studio</button>
+              <button type="button" class="wf-key" data-wf-place="1-bed" aria-pressed="false">1-bed</button>
+              <button type="button" class="wf-key" data-wf-place="2-bed" aria-pressed="false">2-bed</button>
+              <button type="button" class="wf-key" data-wf-place="3-bed" aria-pressed="false">3-bed</button>
+            </div>
+            <div class="wf-urlbar">
+              <code class="wf-url" id="wf-url">https://threshold-beta.vercel.app/?city=london&amp;district=hackney&amp;place=room</code>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <button type="button" class="copy-btn" id="wf-copy" data-copy-text="https://threshold-beta.vercel.app/?city=london&district=hackney&place=room"><span data-copy-label>Copy link</span></button>
+                <a class="btn btn--quiet" id="wf-open" href="https://threshold-beta.vercel.app/?city=london&amp;district=hackney&amp;place=room" target="_blank" rel="noreferrer">Open this scenario ↗</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="chapter" id="where-it-stands">
+          <h2>Used for real.</h2>
+          <p>I used it during my own flat hunt, and friends have used it too.</p>
+        </section>
+
+        <section class="chapter" id="whats-next">
+          <h2>What’s next</h2>
+          <ul class="decision-list">
+            <li><strong>Keep the data fresh.</strong> Move the April 2026 snapshot to a scheduled refresh where the sources allow it.</li>
+            <li><strong>Show the sources in the app.</strong> Link every default to its source.</li>
+            <li><strong>Finer areas in Basel.</strong> Use its 19 Wohnviertel rather than seven areas.</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="frame site-footer__inner">
+      <span>Made by Elias</span>
+      <span><a href="./index.html">Homepage</a> · <a href="./bnp.html">BNP Paribas</a> · <a href="./things.html">Archive</a></span>
+    </div>
+  </footer>
+
+  <dialog class="lightbox" id="zoom-dialog" aria-label="Full-size screenshot">
+    <div class="lightbox__bar">
+      <span class="lightbox__cap" style="font-size: 14px; color: var(--muted);"></span>
+      <button type="button" class="btn btn--quiet" data-close-zoom>Close</button>
+    </div>
+    <div class="lightbox__slot"></div>
+  </dialog>
+
+  <div class="sr-only" id="live-status" aria-live="polite"></div>
+  <script src="./app.js"></script>
+</body>
+</html>

@@ -144,10 +144,10 @@ Update `src/components/site/role-story.tsx`, `src/components/site/story-parts.ts
 #### R-53 Monte Carlo simulation legibility & live spread readout
 Enhance `src/components/site/simulation-plot.tsx` and `src/components/site/simulation.tsx` on the BNP Paribas Role story:
 - Raise at-rest stroke contrast/legibility of background simulated paths and axes on `#00965e` so the distribution reads crisply at rest without waiting for interaction.
-- Add a live tabular **`10th–90th spread`** readout beside the `10 / 100 / 1,000` path selector and `Run again` control, updating on every run and included in the polite screen-reader announcement.
+- Add a live tabular **`10th–90th spread`** readout beside the `10 / 100 / 1,000` path selector and `Run again` control: the gap between the run's 10th and 90th percentile endpoints, recomputed on every run and included in the polite screen-reader announcement. More paths steady the estimate between runs; they do not narrow the spread, which the model's fixed volatility sets, so the readout never fakes a narrowing.
 
 **Affected files:** `src/components/site/simulation-plot.tsx`, `src/components/site/simulation-model.ts`, `src/components/site/simulation.tsx`, `src/app/story.css`.  
-**Acceptance:** switching `10` → `100` → `1,000` visibly narrows the `10th–90th spread` figure; simulation remains exclusively on the BNP Paribas Role story; reduced motion shows the finished plot at once.
+**Acceptance:** the `10th–90th spread` equals the sampled endpoints' percentile gap on every run, and at `1,000` paths it varies less between runs than at `10`; simulation remains exclusively on the BNP Paribas Role story; reduced motion shows the finished plot at once.
 
 #### R-54 Case studies: lifted open-ground header, exhibition stage & Threshold `Open this scenario ↗`
 Update `src/components/site/case-study.tsx`, `src/components/site/threshold-link.tsx`, and `src/app/story.css`:

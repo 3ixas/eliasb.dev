@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Software engineer at BNP Paribas · Elias Bennett</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="frame site-header__inner">
+      <a class="brand" href="./index.html">
+        <span class="brand__name">Elias Bennett</span>
+        <span class="brand__greet-wrap">
+          <svg class="scene" id="greeting-scene" viewBox="0 0 30 22" aria-hidden="true" focusable="false">
+            <path class="scene__ink" d="M7 6.5 12 11l-5 4.5" />
+            <path class="scene__cursor" d="M15 16h8" />
+          </svg>
+          <span class="brand__greeting" id="greeting">Hello</span>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="Site">
+        <a href="./index.html#work" aria-current="page">Work</a>
+        <a href="./things.html">Things I make</a>
+        <a href="./index.html#how-i-work">How I work</a>
+        <a href="./index.html#say-hello">Say hello</a>
+      </nav>
+      <button type="button" class="theme-control" id="theme-toggle" aria-label="Dark theme" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <mask id="eclipse-bite">
+            <rect x="-4" y="-4" width="32" height="32" fill="#fff" />
+            <circle class="eclipse__shadow" cx="12" cy="12" r="6.8" fill="#000" />
+          </mask>
+          <circle class="eclipse__disc" cx="12" cy="12" r="8.2" fill="currentColor" mask="url(#eclipse-bite)" />
+          <g class="eclipse__rays" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <line x1="12" y1="1.5" x2="12" y2="3.5" />
+            <line x1="12" y1="20.5" x2="12" y2="22.5" />
+            <line x1="1.5" y1="12" x2="3.5" y2="12" />
+            <line x1="20.5" y1="12" x2="22.5" y2="12" />
+            <line x1="4.6" y1="4.6" x2="6" y2="6" />
+            <line x1="18" y1="18" x2="19.4" y2="19.4" />
+            <line x1="4.6" y1="19.4" x2="6" y2="18" />
+            <line x1="18" y1="6" x2="19.4" y2="4.6" />
+          </g>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="main" class="frame">
+    <section class="role-open" aria-labelledby="role-title">
+      <div>
+        <a class="story-back" href="./index.html#work">← Work</a>
+        <h1 id="role-title">BNP Paribas</h1>
+        <p class="role-open__meta">Software engineer · Risk division · London · Jul 2025 – now</p>
+      </div>
+      <div class="embedded-pass">
+        <img src="../../../../public/profile/elias-evening-pass.webp" alt="Elias Bennett" width="352" height="426">
+        <div>
+          <div class="embedded-pass__org">BNP Paribas</div>
+          <div class="embedded-pass__name">Elias Bennett</div>
+          <div class="embedded-pass__sub">Software engineer<br>Jul 2025 – now · Current</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="longform">
+      <aside class="chapter-rail" aria-label="On this page">
+        <a href="#summary" aria-current="location">Summary</a>
+        <a href="#the-role">The role</a>
+        <a href="#the-problems">The problems</a>
+        <a href="#decisions">Decisions</a>
+        <a href="#what-changed">What changed</a>
+        <a href="#what-i-took">What I took with me</a>
+      </aside>
+
+      <div class="prose-stream">
+        <section class="chapter" id="summary">
+          <h2>Summary</h2>
+          <p>I’m a software engineer in BNP Paribas’s risk division in London. I work in C# on the engines that price and risk-manage trades on CPU and GPU, and I’m the team’s only C# engineer.</p>
+        </section>
+
+        <section class="chapter" id="the-role">
+          <h2>The role</h2>
+          <p>The engines run large simulation-based calculations across several asset classes. It’s a big codebase, around 70 projects, and some of the C# is translated to run on the GPU. I joined in July 2025 having never written C#. Today I own implementation and delivery on the C# side, from planning through review.</p>
+
+          <figure class="sim-card" aria-label="How the pricing engines work">
+            <div class="sim-head">
+              <h3>How the pricing engines work</h3>
+              <div class="sim-readout">
+                <strong id="sim-price">One price: 100.3</strong>
+                <span id="sim-spread">10th–90th spread: 18.0 pts</span>
+              </div>
+            </div>
+            <div class="sim-canvas-wrap">
+              <canvas id="bnp-sim-canvas" aria-label="Illustrative simulated paths from today to the horizon, a histogram of where they end on the right edge, and a dashed line at their average, labelled one price."></canvas>
+            </div>
+            <div class="sim-controls">
+              <div class="sim-steps" role="group" aria-label="Paths">
+                <span class="sim-steps__label">Paths</span>
+                <button type="button" class="sim-btn" data-sim-paths="10" aria-pressed="false">10</button>
+                <button type="button" class="sim-btn" data-sim-paths="100" aria-pressed="true">100</button>
+                <button type="button" class="sim-btn" data-sim-paths="1000" aria-pressed="false">1,000</button>
+              </div>
+              <button type="button" class="sim-btn sim-btn--run" id="sim-run">Run again</button>
+            </div>
+            <figcaption style="font-size: 14px;">The engines run large simulation-based calculations across several asset classes. Thousands of possible market paths go in; a price and its risk come out.</figcaption>
+            <span class="sr-only" id="sim-live" aria-live="polite"></span>
+          </figure>
+        </section>
+
+        <section class="chapter" id="the-problems">
+          <h2>The problems</h2>
+          <ul class="decision-list">
+            <li><strong>Market data.</strong> Loaders written in Java had to be ported to C#, pulling data from several sources into one place and checking it on the way.</li>
+            <li><strong>A stale dependency.</strong> The live pricing pipeline relied on a data file that was no longer reliably available in production.</li>
+            <li><strong>Quant code.</strong> Pricing code written by quantitative developers had to be integrated into the engine.</li>
+            <li><strong>Two execution paths.</strong> The same tests had to run on both CPU and GPU.</li>
+          </ul>
+        </section>
+
+        <section class="chapter" id="decisions">
+          <h2>Decisions</h2>
+          <ul class="decision-list">
+            <li><strong>Ship the risky change behind a flag, switched off.</strong> Removing the dependency touched live pricing, so I put the new path behind a feature flag that defaults to off, added caching and wrote an end-to-end test nobody had asked for. The architect’s view was that the thing to protect was the blast radius, not only correctness.</li>
+            <li><strong>Validate the data before trusting it.</strong> The commodity loader had ten file types, correlation groups, unit conversions and records linked to each other. Checking links catches orphaned records on load rather than showing up as a strange number in a simulation.</li>
+            <li><strong>Give AI work phases.</strong> Each stage has its own scoped agent: grill the problem, plan, build test-first, self-review, then a health review.</li>
+          </ul>
+
+          <div class="working-fig">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px;">
+              <div>
+                <strong style="display: block;">Protect the blast radius</strong>
+                <span class="flag-status" id="story-flag-status" aria-live="polite">Live pricing on today’s path · new path off by default</span>
+              </div>
+              <button type="button" class="flag-btn" role="switch" aria-checked="false" data-flag-switch data-flag-status="story-flag-status">
+                <span class="flag-btn__track" aria-hidden="true"><span class="flag-btn__knob"></span></span>
+                <span data-flag-label>Off</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="chapter" id="what-changed">
+          <h2>What changed</h2>
+          <p>I used that workflow to integrate a pricer into the calculation engine in a couple of days — a job that takes an experienced engineer about two weeks. In the bank’s digitisation competition, I led a team of four to co-build a dashboard that cut a 30–40 minute data load to under 5, winning out of five groups and presenting it to the Head of Risk Systems.</p>
+          <div class="evidence-strip" style="margin-top: 20px; grid-template-columns: repeat(2, minmax(0, 1fr));">
+            <div class="evidence-item"><strong>Nov 2025</strong><span>won the bank’s digitisation competition</span></div>
+            <div class="evidence-item"><strong>Six months</strong><span>from zero C# to production code</span></div>
+          </div>
+        </section>
+
+        <section class="chapter" id="what-i-took">
+          <h2>What I took with me</h2>
+          <p>I was nominated as an AI Champion in the risk division, and the workflow is now used by several teams across the department. I also won a Take Ownership award. The habit underneath all of it: write down what you’re doing before you build it, and ship it so it’s safe to undo.</p>
+
+          <figure class="archival-mat">
+            <div class="archival-mat__inner">
+              <img src="../../../../public/work/bnp-paribas/take-ownership.png" alt="_nology’s Q1 2026 Take Ownership award certificate for Elias Bennett" width="1600" height="1131">
+            </div>
+            <figcaption>Take Ownership · _nology · Q1 2026 · awarded May 2026</figcaption>
+          </figure>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="frame site-footer__inner">
+      <span>Made by Elias</span>
+      <span><a href="./index.html">Homepage</a> · <a href="./threshold.html">Threshold</a> · <a href="./things.html">Archive</a></span>
+    </div>
+  </footer>
+  <script src="./app.js"></script>
+</body>
+</html>
