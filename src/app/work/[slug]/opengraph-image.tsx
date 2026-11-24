@@ -3,7 +3,7 @@ import { roleStoryFor, roleStorySlugs } from "@/content/stretch/role-stories";
 import { hasLongEmployer } from "@/content/stretch/role-story";
 import { notFound } from "next/navigation";
 
-export const alt = "Elias Bennett: a role story, in the employer’s colour";
+export const alt = "Role story · Elias Bennett";
 export const size = shareSize;
 export const contentType = "image/png";
 

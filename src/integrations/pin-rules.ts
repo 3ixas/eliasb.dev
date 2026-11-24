@@ -60,8 +60,8 @@ export function pinStatus(key: PinKey, source: PinSource, now: Date): PinStatus 
   return { kind: "stale", asOf: asOfDate(updated) };
 }
 
-const shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"] as const;
-const longMonths = [
+export const SHORT_MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
+export const MONTH_NAMES = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",
 ] as const;
@@ -69,10 +69,10 @@ const longMonths = [
 // Numeric parts only, so the result is the same in every locale.
 const londonDay = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", day: "numeric", month: "numeric" });
 
-/** The day in London, written "12 Sept" (and "12 September" for screen readers). */
+/** The day in London, written "12 Sep" (and "12 September" for screen readers). */
 export function asOfDate(date: Date): AsOfDate {
   const parts = londonDay.formatToParts(date);
   const day = Number(parts.find(({ type }) => type === "day")?.value);
   const month = Number(parts.find(({ type }) => type === "month")?.value) - 1;
-  return { iso: date.toISOString(), short: `${day} ${shortMonths[month]}`, long: `${day} ${longMonths[month]}` };
+  return { iso: date.toISOString(), short: `${day} ${SHORT_MONTH_NAMES[month]}`, long: `${day} ${MONTH_NAMES[month]}` };
 }

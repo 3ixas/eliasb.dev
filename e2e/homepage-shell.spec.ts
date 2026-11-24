@@ -587,7 +587,7 @@ test.describe("The header greeting", () => {
     await expect(page.locator(".greeting__more")).toBeHidden();
     await greeting(page).tap();
     await expect(greeting(page)).toHaveAttribute("aria-expanded", "true");
-    await expect(page.locator(".greeting__more")).toHaveText(/^it’s \d\d:\d\d here in London$/);
+    await expect(page.locator(".greeting__more")).toHaveText(/^It’s \d\d:\d\d here in London$/);
     const [words, more] = await Promise.all([page.locator(".greeting__words").boundingBox(), page.locator(".greeting__more").boundingBox()]);
     expect(more!.y).toBeGreaterThanOrEqual(words!.y + words!.height - 1);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);

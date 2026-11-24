@@ -249,7 +249,7 @@ test.describe("Off the clock: the book and the film", () => {
     await expect(film.getByRole("link")).toHaveAttribute("href", /letterboxd\.com/);
     await expect(film.getByRole("link")).toHaveAttribute("target", "_blank");
     await expect(film.getByRole("heading", { level: 4 })).toHaveText("The Invite");
-    await expect(film.locator("p").first()).toContainText("Last watched 14 Sept");
+    await expect(film.locator("p").first()).toContainText("Last watched 14 Sep");
     await expect(film.locator("p").first()).toContainText("★★★★½");
     await expect(film).toContainText("rated 4.5 out of 5");
   });
@@ -309,7 +309,7 @@ test.describe("Off the clock: this week in history", () => {
     await expect(history.locator(".otc__history-image img")).toHaveAttribute("alt", "Douglas World Cruisers on a beach");
     const step = history.locator(".otc__step");
     await expect(step).toHaveClass(/pill--outline/);
-    await expect(step).toHaveAccessibleName(offTheClock.curiosity.count(1, 3));
+    await expect(step).toHaveAccessibleName(`${offTheClock.curiosity.count(1, 3)}, ${offTheClock.curiosity.nextFact}`);
     const [band, panel] = await Promise.all([boxOf(history), boxOf(fixture(page, "history-live").locator(".otc"))]);
     expect(band.width).toBeGreaterThan(panel.width - 100);
   });
@@ -328,7 +328,7 @@ test.describe("Off the clock: this week in history", () => {
     const places = () => Promise.all([place(step), place(cell(panel, "github"))]);
     const before = await places();
     await step.click();
-    await expect(step).toHaveAccessibleName(offTheClock.curiosity.count(2, 3));
+    await expect(step).toHaveAccessibleName(`${offTheClock.curiosity.count(2, 3)}, ${offTheClock.curiosity.nextFact}`);
     await expect(history.locator("p[aria-live='polite']")).toContainText("A cow wanders into a cathedral");
     await expect(history.locator(".otc__history-image img")).toHaveCount(0);
     expect(await places()).toEqual(before);
@@ -336,7 +336,7 @@ test.describe("Off the clock: this week in history", () => {
     await expect(history.locator("p[aria-live='polite']")).toContainText("Born 28 September 1852");
     expect(await places()).toEqual(before);
     await step.click();
-    await expect(step).toHaveAccessibleName(offTheClock.curiosity.count(1, 3));
+    await expect(step).toHaveAccessibleName(`${offTheClock.curiosity.count(1, 3)}, ${offTheClock.curiosity.nextFact}`);
     await expect(history.locator("p[aria-live='polite']")).toContainText("1924");
   });
 
@@ -433,7 +433,7 @@ test.describe("Off the clock: the GitHub year", () => {
     const cobalt = await token(page, "--cobalt");
     await expect(today).toHaveCount(1);
     await expect(today).toHaveAttribute("aria-current", "date");
-    await expect(today).toHaveAttribute("aria-label", /2 Oct$/);
+    await expect(today).toHaveAttribute("aria-label", /2 October$/);
     await expect(today).toHaveCSS("background-color", await token(page, `--year-${await today.getAttribute("data-level")}`));
     await expect(today).toHaveCSS("box-shadow", new RegExp(cobalt.replace(/[()]/g, "\\$&")));
   });
@@ -448,7 +448,7 @@ test.describe("Off the clock: the GitHub year", () => {
   });
 
   test("a stale year says when its data is from; a missing year still keeps the row", async ({ page }) => {
-    await expect(cell(fixture(page, "github-stale"), "github").locator(".otc__source")).toContainText(offTheClock.fromAsOf("GitHub", "28 Sept"));
+    await expect(cell(fixture(page, "github-stale"), "github").locator(".otc__source")).toContainText(offTheClock.fromAsOf("GitHub", "28 Sep"));
     await expect(cell(fixture(page, "github"), "github").locator(".otc__source")).toHaveCount(0);
     const missing = cell(fixture(page, "github-unavailable"), "github");
     await expect(missing.locator("[data-github-days]")).toHaveCount(0);

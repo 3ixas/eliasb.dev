@@ -32,7 +32,7 @@ export type DisplayFigure = { evidence: number; from: number };
 
 export type BnpPanel = {
   slug: "bnp-paribas";
-  /** "Six months" over "from zero C# to production code": the evidence item "Six · months from zero C# …", split after its first word. */
+  /** "6 months" over "from zero C# to production code": matches BNP Paribas's evidence item. */
   figure: { value: string; label: string };
   /** `title` names what the chart shows, above it (#457), so a reader knows before the caption. */
 
@@ -46,7 +46,7 @@ export const workPanels = {
   subheading: "History, then marketing, then code. Each move was towards the work I liked most.",
   bnp: {
     slug: "bnp-paribas",
-    figure: { value: "Six months", label: "from zero C# to production code" },
+    figure: { value: "6 months", label: "from zero C# to production code" },
     comparisons: [
       { row: 0, before: { name: "An experienced engineer", value: "about two weeks" }, after: { name: "Me, new to it", value: "a couple of days" } },
       { row: 1, before: { name: "Before", value: "30–40 min" }, after: { name: "After", value: "under 5 min" } },
@@ -67,7 +67,7 @@ export const workPanels = {
       slug: "optegra",
       figure: { evidence: 0, from: 62 },
       pairs: [
-        { what: "Pass rate", value: "62% → 88%", unit: "rate", before: { amount: 62 }, after: { amount: 88 } },
+        { what: "Core Web Vitals", value: "62% → 88%", unit: "rate", before: { amount: 62 }, after: { amount: 88 } },
         { what: "p95 page load", value: "−30%", unit: "change", before: { amount: 100 }, after: { amount: 70 } },
         { what: "Consultation conversion", value: "+15%", unit: "change", before: { amount: 100 }, after: { amount: 115 } },
       ],

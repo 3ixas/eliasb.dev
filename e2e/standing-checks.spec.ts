@@ -101,7 +101,7 @@ test("every page has one h1, a skip link to its content, and its content without
     await test.step(`${route} without script`, async () => {
       await plain.goto(route);
       await soft(plain.getByRole("heading", { level: 1 }), `${route}: the h1 without script`).toBeVisible();
-      await soft(plain.locator('nav[aria-label="On this page"] a').first(), `${route}: the header's links without script`).toBeVisible();
+      await soft(plain.locator(`nav[aria-label="${route === "/" ? "On this page" : "Site"}"] a`).first(), `${route}: the header's links without script`).toBeVisible();
       await soft.poll(() => plain.locator("#main-content").evaluate((main) => (main as HTMLElement).innerText.trim().length), { message: `${route}: content without script` }).toBeGreaterThan(200);
     });
   }

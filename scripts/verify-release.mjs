@@ -25,8 +25,8 @@ const canonicalPages = [
 const expectedSitemapUrls = new Set(canonicalPages.map((route) => route === "/" ? "https://www.eliasb.dev" : `https://www.eliasb.dev${route}`));
 // Every page shares with the one card template (docs/design/DESIGN.md, "Share cards"): the archive and the Résumé take the
 // homepage's card, and each case study has its own, so each address carries Next's cache hash.
-const headlineAlt = "ELIAS BENNETT. I build pricing and risk engines at BNP Paribas, and products of my own.";
-const caseStudyAlt = "Elias Bennett: a case study, in the project’s colour";
+const headlineAlt = "Elias Bennett: I build pricing and risk engines at BNP Paribas, and products of my own.";
+const caseStudyAlt = "Case study · Elias Bennett";
 const expectedWorkSocialCards = new Map([
   ["/things-i-make", { title: "Things I make · Elias Bennett", image: "/opengraph-image", alt: headlineAlt }],
   ["/things-i-make/threshold", { title: "Threshold · Elias Bennett", image: "/things-i-make/threshold/opengraph-image", alt: caseStudyAlt }],
@@ -356,7 +356,7 @@ async function verifyHomeSocialMetadata(baseUrl, document) {
   equal(metaContent(document, "description", "name"), description, "Homepage description");
   equal(metaContent(document, "og:title"), title, "Homepage Open Graph title");
   equal(metaContent(document, "og:site_name"), "Elias Bennett", "Open Graph site name");
-  equal(metaContent(document, "og:image:alt"), "ELIAS BENNETT. I build pricing and risk engines at BNP Paribas, and products of my own.", "Homepage social image alternative text");
+  equal(metaContent(document, "og:image:alt"), headlineAlt, "Homepage social image alternative text");
   equal(metaContent(document, "twitter:title", "name"), title, "Homepage Twitter title");
 
   const ogImage = metaContent(document, "og:image");

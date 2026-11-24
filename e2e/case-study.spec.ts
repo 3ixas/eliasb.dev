@@ -242,7 +242,7 @@ for (const slug of caseStudySlugs) {
       await page.route("**/*.js", (route) => route.abort());
       await page.reload();
       await expect(page.locator("article section[id]")).toHaveCount(caseStudySectionKeys.length);
-      await expect(page.locator('nav[aria-label="On this page"] a')).toHaveCount(5);
+      await expect(page.locator('nav[aria-label="Site"] a')).toHaveCount(5);
       await expect(page.locator("nav.chapter-rail a")).toHaveCount(caseStudySectionKeys.length);
       await expect(page.locator("nav.chapter-rail a[aria-current]")).toHaveCount(0);
       await expect(page.getByRole("list", { name: "Evidence" }).getByRole("listitem")).toHaveCount(study.evidence.length);

@@ -1,10 +1,8 @@
 import { hangingPassAside, shareCard, sharePage, shareSize } from "@/app/share-card";
+import { headlineCardAlt } from "@/content/share";
 import { opening } from "@/content/stretch/opening";
-import { siteCopy } from "@/content/stretch/site-copy";
 
-const { name, lead, emphasis } = siteCopy.socialImage;
-
-export const alt = `${name}. ${lead} ${emphasis}`;
+export const alt = headlineCardAlt;
 export const size = shareSize;
 export const contentType = "image/png";
 

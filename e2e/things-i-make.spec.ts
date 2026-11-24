@@ -171,7 +171,7 @@ test.describe("Things I make", () => {
   test("the archive link has the true count", async ({ page }) => {
     const all = section(page).getByRole("link", { name: thingsIMake.allThings(projects.length) });
     await expect(all).toHaveAttribute("href", "/things-i-make");
-    await expect(all).toContainText("(06)");
+    await expect(all).toContainText("(6)");
   });
 
   test("every panel casts its own colour in light; in dark it casts black and nothing glows (#493)", async ({ page }) => {

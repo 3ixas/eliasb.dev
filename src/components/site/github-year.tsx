@@ -3,6 +3,7 @@
 import { useId, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 import { Count } from "@/components/parts/on-view";
 import {
+  contributionAccessibleTag,
   contributionLevel,
   contributionTag,
   createContributionCalendar,
@@ -104,7 +105,7 @@ export function GitHubYear({ activity, total, mark }: { activity: ActivityDay[];
                 data-level={contributionLevel(day.count)}
                 data-today={index === today ? "" : undefined}
                 data-selected={selected === index || undefined}
-                aria-label={contributionTag(day)}
+                aria-label={contributionAccessibleTag(day)}
                 aria-current={index === today ? "date" : undefined}
                 tabIndex={index === tabStop ? 0 : -1}
                 onPointerEnter={(event) => event.pointerType === "mouse" && setSelected(index)}

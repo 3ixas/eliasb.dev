@@ -40,7 +40,7 @@ export type HowIWork = {
 
 export const howIWork: HowIWork = {
   heading: "How I work",
-  note: "Four habits, and where I picked them up.",
+  note: "Four habits, and the proof for each.",
   beats: [
     {
       habit: "Start from a real problem.",
@@ -66,7 +66,7 @@ export const howIWork: HowIWork = {
     {
       habit: "Measure whether it works.",
       proof:
-        "I learned this in marketing. At Optegra, split tests and analytics dashboards showed which changes brought in consultations and guided what the engineers built next; consultation conversion rose by 15%.",
+        "I learned this in marketing. At Optegra, split tests and analytics dashboards showed which changes brought in consultations, and conversion rose by 15%.",
       highlight: "rose by 15%",
       drawn: { kind: "change", value: "+15%", percent: 15, before: "Before", after: "After" },
     },

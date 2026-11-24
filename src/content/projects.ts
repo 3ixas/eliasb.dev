@@ -71,7 +71,7 @@ const entries = [
     },
     screenshot: {
       src: "/work/threshold/answer.webp",
-      alt: "Threshold's answer for a room in Hackney: on £2,400 a month with £2,500 saved, three months until you can move in, £2,992 still needed upfront and a £1,496 monthly surplus",
+      alt: "Threshold’s answer for a room in Hackney: on £2,400 a month with £2,500 saved, three months until you can move in, £2,992 still needed upfront and a £1,496 monthly surplus",
       width: 1472,
       height: 1056,
     },
@@ -148,7 +148,7 @@ const entries = [
     links: { code: "https://github.com/3ixas/risk-event-tracker" },
     screenshot: {
       src: "/work/risk-event-tracker/request.webp",
-      alt: "A request to the Risk Event Tracker API logging a high-severity credit event, and its 201 response with the new event's ID and the time it was logged",
+      alt: "A request to the Risk Event Tracker API logging a high-severity credit event, and its 201 response with the new event’s ID and the time it was logged",
       width: 1732,
       height: 1060,
     },

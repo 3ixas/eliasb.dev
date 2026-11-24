@@ -1,6 +1,7 @@
 # Full-site copy review (#528)
 
 Date: 24 November 2026  
+Sign-off: Elias approved all proposed changes on 24 November 2026 except `M2` (kept `"in C# and Java"` in the homepage meta description, as he works in both).  
 Reviewed against: `main` at `8afb065` (live local render and source side by side), Elias’s `voice-profile.md` and `writing-preferences.md`, `docs/design/DESIGN.md`, `docs/specs/PASSES-AND-PANELS-REFINEMENT-SPEC.md` (R-41 to R-55), and `docs/content/redesign-copy.md`.
 
 ## Overall judgement
@@ -250,7 +251,7 @@ The real problems are almost all **drift left behind by the refinement**, **loca
 | C25 | 03 Decisions & Working figure (`case-studies.ts:185–201`, `flowtime-break.ts:10–21`) | `Count from a fixed point, and ask instead of guessing.` + 4 cards · Slider `How long you focused`, `Flowtime` / `A Pomodoro`, `Focus` / `Break`, `aria-valuetext`, caption | Keep | — | Crisp, witty caption (`however the work is going`). |
 | C26 | 04 How it’s built (`case-studies.ts:204–207`) | `Everything stays in your browser.` + paragraph | Keep | — | Concrete and clear. |
 | C27 | 05 Where it stands (`case-studies.ts:210–213`) | Heading: `Used for my own focus.` · Body: `I use it for my own focused work.` | Heading: `Used for real.` (or `Live in the browser.`) · Body: `I use it for my own focused work.` | Repetition across surfaces / length | The heading and the one-sentence body repeat the exact same six words back to back. Changing the heading removes the tautology without inventing any new claim (`Used for real.` also mirrors Threshold). |
-| C28 | 06 What’s next · card 1 (`case-studies.ts:217`) | `Move between devices.` `Keep local storage as the default.` | `Move between devices.` `Sync or transfer sessions between devices while keeping local storage as the default.` | Clarity | Current text jumps straight to the constraint (`Keep local storage as the default`) without stating what is being added. Clarifies the intention using existing concepts (`CASE-STUDY-SOURCES.md:22`). |
+| C28 | 06 What’s next · card 1 (`case-studies.ts:217`) | `Move between devices.` `Keep local storage as the default.` | `Move between devices.` `Sync or transfer sessions between devices while keeping local storage as the default.` | Clarity | Current text jumps straight to the constraint (`Keep local storage as the default`) without stating what the future work would add. `CASE-STUDY-SOURCES.md:22` confirms Flowtime currently stores data locally in the browser with no sync today, which is why moving sessions between devices sits under `06 What’s next` as future work. |
 | C29 | 06 What’s next · card 2 (`case-studies.ts:218`) | `See when you focus best.` `Show the time of day you tend to focus longest.` | Keep | — | Clear. |
 
 ---

@@ -1,5 +1,20 @@
-/** Where an external link goes, as a person would say it: "GitHub", else the host without "www.". */
+import { projects } from "../../content/projects.ts";
+
+const KNOWN_HOSTS: Readonly<Record<string, string>> = {
+  "github.com": "GitHub",
+  "linkedin.com": "LinkedIn",
+  "goodreads.com": "Goodreads",
+  "letterboxd.com": "Letterboxd",
+  "web.archive.org": "the Wayback Machine",
+  ...Object.fromEntries(
+    projects.flatMap((project) =>
+      project.links.live ? [[new URL(project.links.live).hostname.replace(/^www\./, ""), project.name]] : [],
+    ),
+  ),
+};
+
+/** Where an external link goes, as a person would say it: a known name, else the host without "www.". */
 export const hostLabel = (href: string) => {
-  const { hostname } = new URL(href);
-  return hostname === "github.com" ? "GitHub" : hostname.replace(/^www\./, "");
+  const host = new URL(href).hostname.replace(/^www\./, "");
+  return KNOWN_HOSTS[host] ?? host;
 };

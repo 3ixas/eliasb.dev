@@ -143,19 +143,34 @@ export function roleStoryColours({ light, dark }: RoleStory["colours"]): StoryCo
   return { field: pick("field"), ink: pick("ink"), swatch: pick("swatch") };
 }
 
+const SMALL_NUMBERS: Record<string, string> = {
+  one: "1",
+  two: "2",
+  three: "3",
+  four: "4",
+  five: "5",
+  six: "6",
+  seven: "7",
+  eight: "8",
+  nine: "9",
+  ten: "10",
+};
+const DIGIT_TO_WORD = Object.fromEntries(Object.entries(SMALL_NUMBERS).map(([word, digit]) => [digit, word]));
+
 /**
  * The figures a Résumé line claims (digits, and the number words a line uses), which its own Role story
  * must also state: the lines are written separately, so this is what stops one keeping a number the story
- * has since changed.
+ * has since changed. Small number words ("six") and their digits ("6") match each other.
  */
 const figures = (line: string) => line.toLowerCase().match(/\d+|\b(?:one|two|three|four|five|six|seven|eight|nine|ten)\b/g) ?? [];
 
 /** Résumé lines whose figures their Role story does not state, as messages; empty when valid. */
 export function resumeLineProblems(story: RoleStory): string[] {
   const said = new Set(storyText(story).toLowerCase().match(/\d+|[a-z]+/g));
+  const stated = (figure: string) => said.has(figure) || Boolean(SMALL_NUMBERS[figure] && said.has(SMALL_NUMBERS[figure])) || Boolean(DIGIT_TO_WORD[figure] && said.has(DIGIT_TO_WORD[figure]));
   return story.resume.flatMap((line) =>
     figures(line)
-      .filter((figure) => !said.has(figure))
+      .filter((figure) => !stated(figure))
       .map((figure) => `Role story "${story.slug}" has a Résumé line with "${figure}", which its story does not say: "${line}"`),
   );
 }

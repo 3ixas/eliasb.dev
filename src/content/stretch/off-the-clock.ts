@@ -53,11 +53,8 @@ export const offTheClock = {
   curiosity: {
     /** The history row's title. */
     label: "Odd but true, from this week in history",
-    /** The row's line for a week with several oddities. */
-    rowLine: (n: number) => `${n} things that happened this week, some stranger than others.`,
-    /** Stamped on the clipping, which restamps as the row cycles. */
-    stamp: "This week in history",
     count: (position: number, total: number) => `${position} of ${total}`,
+    nextFact: "next fact",
     sourceName: "Wikipedia",
     fallback: "From the archive",
     imageCredit: "Image:",

@@ -16,6 +16,7 @@ import { filmLine } from "../src/content/stretch/film-line.ts";
 import { nowMakingEntry } from "../src/content/stretch/off-the-clock.ts";
 import { getHistorySignal, historyWeekStart, HISTORY_FALLBACK_EVENTS, selectHistoryEvents } from "../src/integrations/history.ts";
 import {
+  contributionAccessibleTag,
   contributionLevel,
   contributionTag,
   createContributionCalendar,
@@ -369,10 +370,10 @@ assert.deepEqual(Object.keys(integrationConfig).sort(), ["github", "goodreads", 
 const originalDateTimeFormat = Intl.DateTimeFormat;
 try {
   Intl.DateTimeFormat = function () { throw new Error("Runtime locale formatting must not enter the calendar render"); };
-  assert.equal(formatContributionDate("2025-09-28", { month: "short" }), "28 Sept 2025");
-  assert.equal(formatContributionDate("2025-09-28", { month: "short", weekday: "short" }), "Sun, 28 Sept 2025");
+  assert.equal(formatContributionDate("2025-09-28", { month: "short" }), "28 Sep 2025");
+  assert.equal(formatContributionDate("2025-09-28", { month: "short", weekday: "short" }), "Sun, 28 Sep 2025");
   assert.equal(formatContributionDate("2025-09-28", { weekday: "long" }), "Sunday, 28 September 2025");
-  assert.equal(createContributionCalendar([{ date: "2025-09-28", count: 0 }]).monthLabels[0].label, "Sept");
+  assert.equal(createContributionCalendar([{ date: "2025-09-28", count: 0 }]).monthLabels[0].label, "Sep");
 } finally {
   Intl.DateTimeFormat = originalDateTimeFormat;
 }
@@ -439,8 +440,11 @@ const quietYear = datesForWindow(GITHUB_ACTIVITY_DAYS, new Date("2026-10-02T12:0
 assert.equal(contributionTag({ date: "2026-01-15", count: 12 }), "12 contributions on Thu 15 Jan");
 assert.equal(contributionTag({ date: "2026-01-15", count: 1 }), "1 contribution on Thu 15 Jan");
 assert.equal(contributionTag({ date: "2026-01-15", count: 0 }), "0 contributions on Thu 15 Jan");
+assert.equal(contributionAccessibleTag({ date: "2026-01-15", count: 12 }), "12 contributions on Thursday 15 January");
+assert.equal(contributionAccessibleTag({ date: "2026-01-15", count: 1 }), "1 contribution on Thursday 15 January");
+assert.equal(contributionAccessibleTag({ date: "2026-01-15", count: 0 }), "0 contributions on Thursday 15 January");
 assert.deepEqual([0, 1, 2, 3, 4, 40].map(contributionLevel), [0, 1, 2, 3, 4, 4]);
-assert.deepEqual(createContributionCalendar(quietYear).monthLabels.map(({ label }) => label).filter((label) => /June|July/.test(label)), ["June", "July"]);
+assert.deepEqual(createContributionCalendar(quietYear).monthLabels.map(({ label }) => label).filter((label) => /^(Jun|Jul)$/.test(label)), ["Jun", "Jul"]);
 
 // Making: my latest public repository, or nothing.
 const repositories = [
@@ -489,7 +493,7 @@ assert.deepEqual(pinStatus("reading", { state: "unavailable", updatedAt: null },
 assert.deepEqual(pinStatus("github", { state: "live", updatedAt: daysAgo(3) }, pinNow), { kind: "current" });
 assert.deepEqual(pinStatus("github", { state: "live", updatedAt: daysAgo(10) }, pinNow), {
   kind: "stale",
-  asOf: { iso: daysAgo(10), short: "22 Sept", long: "22 September" },
+  asOf: { iso: daysAgo(10), short: "22 Sep", long: "22 September" },
 });
 assert.equal(pinStatus("github", { state: "live", updatedAt: daysAgo(4) }, pinNow).kind, "stale");
 assert.equal(pinStatus("github", { state: "live", updatedAt: daysAgo(2) }, pinNow).kind, "current");
@@ -505,7 +509,7 @@ assert.equal(pinStatus("github", { state: "live", updatedAt: null }, pinNow).kin
 assert.equal(pinStatus("github", { state: "live", updatedAt: "not a date" }, pinNow).kind, "current");
 // "As of" dates are London days, the same in every locale.
 assert.deepEqual(asOfDate(new Date("2026-03-01T00:30:00.000Z")), { iso: "2026-03-01T00:30:00.000Z", short: "1 Mar", long: "1 March" });
-assert.equal(asOfDate(new Date("2026-06-30T23:30:00.000Z")).short, "1 July");
-assert.equal(asOfDate(new Date("2026-09-12T09:00:00.000Z")).short, "12 Sept");
+assert.equal(asOfDate(new Date("2026-06-30T23:30:00.000Z")).short, "1 Jul");
+assert.equal(asOfDate(new Date("2026-09-12T09:00:00.000Z")).short, "12 Sep");
 
 console.log("Signal contract checks passed.");
