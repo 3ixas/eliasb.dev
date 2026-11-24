@@ -37,6 +37,7 @@ export function HistoryBand({ events, dates, source }: { events: HistoryEvent[];
         {pictured && (
           <div className="otc__history-image">
             {image ? (
+              /* Keying by image.src remounts ZoomableImage when stepping between oddities so any open zoom/preload state resets cleanly. */
               <ZoomableImage
                 key={image.src}
                 src={image.src}

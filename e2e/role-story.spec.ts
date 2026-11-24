@@ -103,7 +103,7 @@ for (const slug of roleStorySlugs) {
       await expect(section).toHaveCSS("border-top-width", "1px");
     });
 
-    test("scrolling updates the chapter rail's active lifted paper pill without layout shift", async ({ page }) => {
+    test("scrolling updates the chapter rail's active lifted paper pill without layout shift, and Enter on a rail link focuses its section", async ({ page }) => {
       const rail = page.locator("nav.chapter-rail");
       await expect(rail.locator('a[aria-current="location"]')).toHaveCount(1);
       await page.evaluate(() => document.fonts.ready);
@@ -114,6 +114,12 @@ for (const slug of roleStorySlugs) {
       const active = rail.locator('a[href="#what-changed"]');
       await expect(active).toHaveAttribute("aria-current", "location");
       await expect.poll(measure).toEqual(before);
+
+      const decisionsLink = rail.locator('a[href="#decisions"]');
+      await decisionsLink.focus();
+      await page.keyboard.press("Enter");
+      await expect(page.locator("section#decisions")).toBeFocused();
+      await expect(decisionsLink).toHaveAttribute("aria-current", "location");
     });
 
     test("its paragraphs are Newsreader at 19 px (18 on a phone), and its Problem and Decision entries are bordered paper cards", async ({ page }) => {

@@ -138,7 +138,7 @@ for (const slug of caseStudySlugs) {
       await expect(card.locator("b")).toHaveCSS("font-family", /Newsreader/);
     });
 
-    test("scrolling updates the chapter rail's active lifted paper pill without layout shift", async ({ page }) => {
+    test("scrolling updates the chapter rail's active lifted paper pill without layout shift, and Enter on a rail link focuses its section", async ({ page }) => {
       const rail = page.locator("nav.chapter-rail");
       await expect(rail.locator('a[aria-current="location"]')).toHaveCount(1);
       await page.evaluate(() => document.fonts.ready);
@@ -149,6 +149,12 @@ for (const slug of caseStudySlugs) {
       const active = rail.locator('a[href="#how-its-built"]');
       await expect(active).toHaveAttribute("aria-current", "location");
       await expect.poll(measure).toEqual(before);
+
+      const decisionsLink = rail.locator('a[href="#decisions"]');
+      await decisionsLink.focus();
+      await page.keyboard.press("Enter");
+      await expect(page.locator("section#decisions")).toBeFocused();
+      await expect(decisionsLink).toHaveAttribute("aria-current", "location");
     });
 
     test("a section's address opens on that section and focuses it", async ({ page }) => {

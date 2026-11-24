@@ -243,6 +243,7 @@ test.describe("How I work", () => {
     await expect(sw).toHaveAttribute("aria-checked", "false");
     await expect(sw).toHaveAccessibleDescription("defaults to off");
     await expect(sw.locator(".flag-switch__label")).toHaveText("Off");
+    await expect(sw.locator(".flag-switch__label")).toHaveAttribute("aria-hidden", "true");
     await expect(todayChip).toHaveText("Today’s path");
     await expect(newChip).toHaveText("New cached path");
     await expect(todayChip).toHaveAttribute("data-live", "true");
@@ -334,6 +335,7 @@ test.describe("How I work", () => {
     const card3 = cards(page).nth(2);
     await expect(card3.getByRole("switch")).toHaveCount(0);
     await expect(card3.locator(".flag-switch__label")).toHaveText("Off");
+    await expect(card3.locator(".flag-switch__label")).not.toHaveAttribute("aria-hidden", "true");
     await expect(card3.locator('.route-chip[data-live="true"]')).toHaveText("Today’s path");
     await context.close();
   });

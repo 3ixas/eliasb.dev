@@ -8,18 +8,6 @@ import { expect, test, type Page } from "@playwright/test";
 const width = (page: Page) => page.viewportSize()?.width ?? 0;
 const wide = (page: Page) => width(page) >= 1180;
 
-/**
- * Hydrated, with the opening's passes at rest: their arrival swing is finished at once, as a motion spec seeks rather
- * than waits, so a slow engine is not painting it while the fold under test runs.
- */
-const hydrated = async (page: Page) => {
-  await page.waitForFunction(() => {
-    const columns = [...document.querySelectorAll("[data-quiet-column]")];
-    return columns.length > 0 && columns.every((column) => Object.keys(column).some((key) => key.startsWith("__reactProps$")));
-  });
-  await page.evaluate(() => document.querySelectorAll(".pass").forEach((pass) => pass.getAnimations().forEach((animation) => animation.finish())));
-};
-
 // Interrupting a closer look retired with the closer looks in #420; a panel's interrupted arrival is parts.spec's.
 
 test.describe("Nothing is blank", () => {

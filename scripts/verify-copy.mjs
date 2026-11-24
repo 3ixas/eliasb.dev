@@ -41,8 +41,8 @@ const plain = raw.replace(/\*/g, "").replace(/[{}]/g, "");
 // ---- Every string in the typed modules is in the approved copy ----------------------------
 
 const leaves = (value, path = "") => {
-  // Links, image paths, a figure's kind, a comparison's unit and its screens' devices, dates, anchors, category keys and Role story slugs are addresses and data, not words, so the approved copy does not list them.
-  if (typeof value === "string") return /(href|src|writtenOn|\.id|\.glyph|\.slug|\.figures\.[\w-]+\.kind|\.rows\[\d+\]\.unit|\.pairs\[\d+\]\.unit|\.figures\.[\w-]+\.images\[\d+\]\.device|\.category|\.story|\.project|\.restates\[\d+\]|\.drawn\.kind|\.drawn\.projects\[\d+\])$/.test(path) ? [] : [[path, value]];
+  // Links, image paths, a figure's kind, a comparison's unit and its screens' devices, anchors, category keys, Role story slugs and drawn-proof metadata are addresses and data, not words, so the approved copy does not list them.
+  if (typeof value === "string") return /(href|src|\.id|\.slug|\.figures\.[\w-]+\.kind|\.rows\[\d+\]\.unit|\.figures\.[\w-]+\.images\[\d+\]\.device|\.category|\.story|\.project|\.restates\[\d+\]|\.drawn\.kind|\.drawn\.projects\[\d+\])$/.test(path) ? [] : [[path, value]];
   if (Array.isArray(value)) return value.flatMap((item, index) => leaves(item, `${path}[${index}]`));
   if (value && typeof value === "object") return Object.entries(value).flatMap(([key, item]) => leaves(item, `${path}.${key}`));
   return [];

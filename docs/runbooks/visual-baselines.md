@@ -1,6 +1,6 @@
 # Visual baselines runbook
 
-`e2e/materials.spec.ts` compares pictures of the shared parts' materials (each panel field with its pills, its lighter top edge and the dark glow; the controls on the page; rows on paper) with baselines in `e2e/materials.spec.ts-snapshots/`. It reads `/fixtures/parts`, which exists only with `BOARD_FIXTURES=1`, runs on one Chromium project (`chromium-1440-light`) and takes 6 pictures: three groups, each in light and dark, at 2×.
+`e2e/materials.spec.ts` compares pictures of the shared parts' materials (each panel field with its pills, its lighter top edge and its `1 px` hairline edge; the controls on the page; rows on paper) with baselines in `e2e/materials.spec.ts-snapshots/`. It reads `/fixtures/parts`, which exists only with `BOARD_FIXTURES=1`, runs on one Chromium project (`chromium-1440-light`) and takes 6 pictures: three groups, each in light and dark, at 2×.
 
 Baselines must come from the Playwright image CI runs in, because font smoothing differs between macOS and Linux. A `-darwin` picture is never committed.
 
@@ -18,4 +18,4 @@ Then run the spec once more in CI, or locally against a production build in the 
 
 ## What this gate does not cover
 
-The look of a whole page, which changes with live data and copy, and anything that takes a human eye: how the passes read on their lanyards, a panel's glow in dark, dark smoothing. Those belong to the sign-off walk.
+The look of a whole page, which changes with live data and copy, and anything that takes a human eye: how the pass reads on its lanyard, panel separation in dark, dark smoothing. Those belong to the sign-off walk.

@@ -34,7 +34,7 @@ function Highlighted({ story, phrase, markId }: { story: string; phrase: string;
  * 3. Live accessible Off / On switch moving the active highlight between Today's path and New cached path.
  * 4. Bold +15% figure over proportional Before and After bars.
  */
-function ProofTray({ proof, describedBy }: { proof: BeatProof; describedBy?: string }) {
+function ProofTray({ proof }: { proof: BeatProof }) {
   switch (proof.kind) {
     case "projects":
       return (
@@ -90,7 +90,7 @@ function ProofTray({ proof, describedBy }: { proof: BeatProof; describedBy?: str
           on={proof.on}
           currentPath={proof.currentPath}
           newPath={proof.newPath}
-          describedBy={describedBy ?? SWITCH_DESCRIPTION_ID}
+          describedBy={SWITCH_DESCRIPTION_ID}
         />
       );
     case "change": {
@@ -129,7 +129,7 @@ function Card({ beat }: { beat: Beat }) {
           <Highlighted story={beat.proof} phrase={beat.highlight} markId={markId} />
         </p>
         <div className="card__proof" data-proof={beat.drawn.kind}>
-          <ProofTray proof={beat.drawn} describedBy={markId} />
+          <ProofTray proof={beat.drawn} />
         </div>
       </OnView>
     </li>

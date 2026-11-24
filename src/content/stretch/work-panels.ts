@@ -1,9 +1,9 @@
 /*
- * Work's panels (docs/design/DESIGN.md "The homepage, in order" 3, R-13 to R-15): BNP Paribas full width with its
- * figure and two comparisons (its simulation is on its Role story: simulation-copy.ts), then Joveen and Optegra with a display figure and three before and
- * after pairs each, every one drawn in its own unit (`measure.ts`). The words are the passes and panels spec's, listed in docs/content/redesign-copy.md
- * ("Passes and panels · Work") and checked there by verify:copy. Every figure and every bar's amount is a fact its
- * Role story already tells, and `workPanelProblems` fails when one drifts.
+ * Work's panels (docs/design/DESIGN.md "The homepage, in order" 3, R-13 to R-15, R-45): BNP Paribas full width with its
+ * figure and two comparisons (its simulation is on its Role story: simulation-copy.ts), then Joveen and Optegra with a
+ * display figure and a compact 3-metric tray each (their before/after values stay checked against `measure.ts` and each
+ * story's facts). The words are listed in docs/content/redesign-copy.md ("Work") and checked there by verify:copy.
+ * Every figure and metric is a fact its Role story already tells, and `workPanelProblems` fails when one drifts.
  *
  * Its runtime imports carry a .ts extension, so Node can load it directly as well as Next.
  */
@@ -22,8 +22,8 @@ export type Side = { name: string; value: string };
 export type Comparison = { row: number; before: Side; after: Side };
 
 /**
- * A before and after pair on Joveen's or Optegra's panel: what moved, its value as the story states it, and the two
- * amounts in the pair's unit. A change stated as a percentage is drawn from 100 (`+30%` is 100 against 130).
+ * A metric in Joveen's or Optegra's compact 3-metric tray: what moved, its value as the story states it, and the two
+ * unit-checked amounts kept for `workPanelProblems` and `/fixtures/parts`. A percentage change is checked from 100 (`+30%` is 100 against 130).
  */
 export type Pair = Measure & { what: string; value: string };
 

@@ -67,6 +67,7 @@ export function ZoomableImage({ src, alt, width, height, sizes, preload }: { src
   const owner = useRef({});
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const large = useRef<HTMLImageElement>(null);
   const [wanted, setWanted] = useState(false);
@@ -165,9 +166,15 @@ export function ZoomableImage({ src, alt, width, height, sizes, preload }: { src
     const inlineImg = inlineImage();
     const largeImg = large.current;
 
-    if (!canUseViewTransition() || !inlineImg || !largeImg) {
+    // Keep initial dialog focus on Close rather than letting a scrollable .zoom__stage steal it.
+    const showModal = () => {
       flushSync(resetZoomState);
       dialogEl.showModal();
+      closeButton.current?.focus({ preventScroll: true });
+    };
+
+    if (!canUseViewTransition() || !inlineImg || !largeImg) {
+      showModal();
       return;
     }
 
@@ -183,8 +190,7 @@ export function ZoomableImage({ src, alt, width, height, sizes, preload }: { src
         inlineImg.style.viewTransitionName = "";
         delete inlineImg.dataset.zooming;
         inlineImg.dataset.zoomHidden = "";
-        flushSync(resetZoomState);
-        dialogEl.showModal();
+        showModal();
         largeImg.style.viewTransitionName = "zoom-shot";
       },
       () => {
@@ -426,6 +432,7 @@ export function ZoomableImage({ src, alt, width, height, sizes, preload }: { src
           }}
         >
           <button
+            ref={closeButton}
             className="zoom__close"
             onClick={(event) => {
               if (event.detail === 0) lastInput.current = "keyboard";

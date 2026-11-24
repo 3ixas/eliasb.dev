@@ -98,23 +98,69 @@ test.describe("Forced colours", () => {
     await expect(card.locator(".pass__silhouette")).toHaveCSS("fill", "rgb(185, 184, 177)");
   });
 
-  test("Threshold's city switcher keeps its selected button distinct and project bezels keep their border", async ({ page }) => {
+  test("Threshold's city switcher keeps its selected button distinct and project bezels keep their borders and image outlines", async ({ page }) => {
     await page.goto("/");
     const active = page.locator('#things-i-make .project-city__btn[aria-pressed="true"]');
     const inactive = page.locator('#things-i-make .project-city__btn[aria-pressed="false"]').first();
     await expect(active).toHaveCSS("forced-color-adjust", "none");
-    const [activeBg, inactiveBg, bezelBorder] = await Promise.all([
+    const [activeBg, inactiveBg, bezelBorder, imgOutline] = await Promise.all([
       active.evaluate((el) => getComputedStyle(el).backgroundColor),
       inactive.evaluate((el) => getComputedStyle(el).backgroundColor),
       page.locator("#things-i-make .project__shot").first().evaluate((el) => getComputedStyle(el).borderTopColor),
+      page.locator("#things-i-make .project__shot > img").first().evaluate((el) => ({
+        style: getComputedStyle(el).outlineStyle,
+        width: getComputedStyle(el).outlineWidth,
+        color: getComputedStyle(el).outlineColor,
+      })),
     ]);
     const canvas = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
     expect(activeBg).not.toBe(inactiveBg);
     expect(activeBg).not.toBe(canvas);
     expect(bezelBorder).not.toBe(canvas);
+    expect(imgOutline.style).toBe("solid");
+    expect(imgOutline.width).toBe("1px");
+    expect(imgOutline.color).not.toBe(canvas);
+
+    await page.goto("/things-i-make");
+    const [archiveBezel, archiveImg] = await Promise.all([
+      page.locator(".archive__grid .project__shot").first().evaluate((el) => getComputedStyle(el).borderTopColor),
+      page.locator(".archive__grid .project__shot > img").first().evaluate((el) => getComputedStyle(el).outlineColor),
+    ]);
+    expect(archiveBezel).not.toBe(canvas);
+    expect(archiveImg).not.toBe(canvas);
   });
 
-  test("How I work keeps its feature-flag switch, active route chip, 13-slice bar and Before/After bars distinct", async ({ page }) => {
+  test("the --band surfaces and header keep visible rules, and Say hello's copied state stays distinct", async ({ page }) => {
+    await page.goto("/");
+    const canvas = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    const rules = await page.evaluate(() => {
+      const header = getComputedStyle(document.querySelector("[data-site-header]")!);
+      const band = getComputedStyle(document.querySelector(".headed-how-band")!);
+      const hello = getComputedStyle(document.querySelector("#say-hello")!);
+      return {
+        headerBottom: [header.borderBottomWidth, header.borderBottomColor],
+        bandTop: [band.borderTopWidth, band.borderTopColor],
+        bandBottom: [band.borderBottomWidth, band.borderBottomColor],
+        helloTop: [hello.borderTopWidth, hello.borderTopColor],
+      };
+    });
+    for (const [edgeWidth, edgeColor] of Object.values(rules)) {
+      expect(edgeWidth).toBe("1px");
+      expect(edgeColor).not.toBe(canvas);
+    }
+
+    const copy = page.locator("#say-hello .copy-button");
+    await expect(copy).toBeVisible();
+    await page.evaluate(() => {
+      Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: () => Promise.resolve() } });
+    });
+    await copy.click();
+    await expect(copy).toHaveAttribute("data-copied", "");
+    await expect(copy).toHaveCSS("forced-color-adjust", "none");
+    await expect(copy).not.toHaveCSS("background-color", canvas);
+  });
+
+  test("How I work keeps its trays, project pills, switch, active route chip, 13-slice bar and Before/After bars distinct", async ({ page }) => {
     await page.goto("/");
     const how = page.locator("section#how-i-work");
     const canvas = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
@@ -126,6 +172,9 @@ test.describe("Forced colours", () => {
 
     const readColours = () =>
       how.evaluate((root) => {
+        const tray = root.querySelector(".card__proof")!;
+        const pill = root.querySelector(".how-project-pill")!;
+        const swatch = root.querySelector(".how-project-pill__swatch")!;
         const slice = root.querySelector(".how-slices__bars i")!;
         const track = root.querySelector(".flag-switch__track")!;
         const knob = root.querySelector(".flag-switch__knob")!;
@@ -134,6 +183,9 @@ test.describe("Forced colours", () => {
         const before = root.querySelector('.drawn__bars .bar:not(.bar--after)')!;
         const after = root.querySelector(".drawn__bars .bar--after")!;
         return {
+          trayBorder: getComputedStyle(tray).borderTopColor,
+          pillBorder: getComputedStyle(pill).borderTopColor,
+          swatch: getComputedStyle(swatch).backgroundColor,
           slice: getComputedStyle(slice).backgroundColor,
           track: getComputedStyle(track).backgroundColor,
           knob: getComputedStyle(knob).backgroundColor,
@@ -145,6 +197,9 @@ test.describe("Forced colours", () => {
       });
 
     const off = await readColours();
+    expect(off.trayBorder).not.toBe(canvas);
+    expect(off.pillBorder).not.toBe(canvas);
+    expect(off.swatch).not.toBe(canvas);
     expect(off.slice).not.toBe(canvas);
     expect(off.knob).not.toBe(off.track);
     expect(off.liveBg).not.toBe(off.idleBg);

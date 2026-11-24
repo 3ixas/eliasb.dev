@@ -582,8 +582,9 @@ button.flag-switch:active {
   }
 }
 
-/* Forced colours keep the drawings and active states distinct (R-29, R-48, R-49). */
+/* Forced colours keep the band edges, drawings and active states distinct (R-29, R-48, R-49). */
 @media (forced-colors: active) {
+  .headed-how-band,
   .card__proof,
   .how-project-pill,
   .how-project-pill__thumb,
