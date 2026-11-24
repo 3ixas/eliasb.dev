@@ -1,21 +1,21 @@
 /*
- * The homepage's opening (docs/design/DESIGN.md "The homepage, in order" 2, R-11; components/site/opening.tsx): the
- * opening line and its supporting line at the left, the three staff passes hanging from the header's rule at the
- * right. One screen tall, so nothing of Work shows before a scroll. Under 1260 px the text is above the passes, which
- * hang from a hairline; under 900 px the passes scroll sideways when they do not fit, BNP Paribas first.
+ * The homepage's opening (docs/design/DESIGN.md "The homepage, in order" 2, R-11 and R-44; components/site/opening.tsx):
+ * the opening line, its supporting line and primary actions at the left, and one current BNP Paribas Staff pass hanging
+ * from the header's hairline at the right. One screen tall on desktop, so nothing of Work shows before a scroll. Under
+ * 960 px the text and actions stack above a quiet rail hairline from which the single pass hangs cleanly.
  */
 
 .opening {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 24px;
+  grid-template-columns: minmax(0, 7.2fr) minmax(0, 4.8fr);
+  gap: clamp(32px, 4.5vw, 72px);
   /* The header is 64 px, its rule included. */
   min-height: min(calc(100svh - 64px), 900px);
 }
 
 .opening__text {
   align-self: center;
-  padding-bottom: 7vh;
+  padding-bottom: 6vh;
 }
 
 .opening__line {
@@ -40,7 +40,7 @@
 
 .opening__support {
   max-width: 24em;
-  margin: 26px 0 0;
+  margin: 24px 0 0;
   color: var(--muted);
   font-family: var(--serif);
   font-optical-sizing: auto;
@@ -49,75 +49,60 @@
   text-wrap: pretty;
 }
 
-/* The passes hang from the top of the section, which is the header's rule; their lanyards run up out of view. */
+.opening__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+/* The pass hangs from the top of the section (the header's hairline on desktop); its lanyard and 3D canvas clip cleanly at 0 above. */
 .opening__rail {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: flex-start;
-  gap: 20px;
   padding-bottom: 48px;
   clip-path: inset(0 -100vw -320px -100vw);
 }
 
-/* The passes hang at about 85% of their size elsewhere, so the opening keeps its calm (#493). */
-.opening__rail .pass {
-  --card: 212px;
-}
-
-.opening__rail .pass--lead {
-  --card: 224px;
-}
-
-@media (max-width: 1259.98px) {
+@media (max-width: 959.98px) {
   .opening {
     grid-template-columns: minmax(0, 1fr);
+    gap: 0;
     min-height: 0;
   }
 
   .opening__text {
-    padding: 64px 0 56px;
+    padding: 48px 0 36px;
   }
 
   .opening__support {
     max-width: 30em;
   }
 
-  /* Under the text the passes hang from a hairline. */
+  /* Under the words and actions, the single pass hangs from a quiet rail hairline without overlapping them. */
   .opening__rail {
-    justify-content: center;
     padding-bottom: 24px;
     border-top: 1px solid var(--hair);
   }
 
   .opening__rail .pass {
-    --drop: calc(132px * var(--drop-by, 1));
-  }
-}
-
-/* The rail scrolls sideways inside itself, edge to edge, BNP Paribas first, when the passes are wider than the window; when they fit, they stay centred. */
-@media (max-width: 899.98px) {
-  .opening__rail {
-    justify-content: safe center;
-    margin-inline: calc(-1 * var(--gutter));
-    padding-inline: var(--gutter);
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-    clip-path: none;
-  }
-
-  .opening__rail::-webkit-scrollbar {
-    display: none;
+    --drop: 112px;
   }
 }
 
 @media (max-width: 719.98px) {
   .opening__text {
-    padding: 40px 0;
+    padding: 32px 0 28px;
   }
 
-  /* On a phone the opening is its words; each pass hangs in its own panel in Work instead (#493). */
-  .opening__rail {
-    display: none;
+  .opening__actions {
+    margin-top: 24px;
+  }
+
+  .opening__rail .pass {
+    --card: 256px;
+    --drop: 84px;
   }
 }

@@ -66,7 +66,7 @@ test.describe("Work: the panels", () => {
     await expect(bnp.locator("figure")).toHaveCount(0);
     await expect(bnp.locator(".work-bnp__comparisons li")).toHaveCount(2);
     const display = await bnp.evaluate((element) =>
-      [...element.querySelectorAll("*")].filter((node) => node.childElementCount === 0 && node.textContent?.trim() && !node.matches(".panel__name") && !node.closest(".work__pass") && parseFloat(getComputedStyle(node).fontSize) >= 24).map((node) => node.textContent),
+      [...element.querySelectorAll("*")].filter((node) => node.childElementCount === 0 && node.textContent?.trim() && !node.matches(".panel__name") && parseFloat(getComputedStyle(node).fontSize) >= 24).map((node) => node.textContent),
     );
     expect(display).toEqual([workPanels.bnp.figure.value]);
   });
@@ -120,13 +120,10 @@ test.describe("Work: the panels", () => {
     for (const { pairs } of workPanels.roles) for (const pair of pairs) await expect(section(page)).toContainText(pair.value);
   });
 
-  test("each staff pass in the opening lands on its employer's panel", async ({ page }) => {
-    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the passes hang in the panels themselves");
-    for (const slug of slugs) {
-      await page.locator(`.opening a.pass[href="#${slug}"]`).click();
-      await expect(page).toHaveURL(new RegExp(`#${slug}$`));
-      await expect(panel(page, slug)).toBeInViewport();
-    }
+  test("the BNP Paribas staff pass in the opening lands on its employer's panel", async ({ page }) => {
+    await page.locator('.opening a.pass[href="#bnp-paribas"]').click();
+    await expect(page).toHaveURL(/#bnp-paribas$/);
+    await expect(panel(page, "bnp-paribas")).toBeInViewport();
   });
 
   test("a Role story's ← Work lands on this section, its heading on screen", async ({ page }) => {
@@ -299,7 +296,6 @@ test.describe("Work: the panels' composition", () => {
   });
 
   test("each panel's role and dates sit directly under its name, left-aligned, role over dates", async ({ page }) => {
-    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the pass prints them, and the header is for assistive technology");
     for (const slug of slugs) {
       const [name, meta, lines] = await panel(page, slug).evaluate((element) => {
         const box = (selector: string) => element.querySelector(selector)!.getBoundingClientRect();

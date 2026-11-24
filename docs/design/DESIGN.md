@@ -230,7 +230,7 @@ What holds the finish in place. Each rule is checked by a gate, or by hand where
 - **Forced colours** keep the data and the drawings: bars, day squares and minute ticks take the text colour (before) and the highlight (after), and their scales grey; Where I'm headed's and How I work's ticks, chosen split-test variant, six month segments, production code mark and live mark take the highlight while unselected variants, zero start and dividers take grey; the GitHub year keeps its five levels with a hairline on each cell, and passes keep the colours they were drawn in.
 - **Reduced motion**: see Motion.
 - **The standing checks** hold: the skip link, content in the server HTML and complete without script, axe, AA contrast, 3:1 focus rings, external links marked `↗` that open in a new tab, the theme rules, and each page's title, description and social image.
-- **Overflow**: nothing scrolls sideways from 320 to 1440 px except the pass rail and the GitHub year on a phone, which scroll inside themselves. No state widens the page. 200% zoom holds.
+- **Overflow**: nothing scrolls sideways from 320 to 1440 px except the GitHub year on a phone, which scrolls inside itself. No state widens the page. 200% zoom holds.
 
 ## What this design avoids
 

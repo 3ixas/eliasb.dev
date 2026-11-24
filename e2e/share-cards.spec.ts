@@ -6,10 +6,10 @@ import { roleStories, roleStorySlugs } from "../src/content/stretch/role-stories
 import { sayHello } from "../src/content/stretch/site-copy";
 
 /*
- * Share cards and favicon (docs/design/DESIGN.md, "Share cards", R-26, #469): one template in Newsreader carrying each
- * page's object on 1200 × 630 PNG (three passes on the homepage, the employer's pass on a Role story, the screenshot on
- * a case study), the Newsreader "E" favicon in site cobalt with dark-scheme SVG + PNG + Apple touch icon fallbacks, and
- * the Copy button's fallback.
+ * Share cards and favicon (docs/design/DESIGN.md, "Share cards", R-26, #469, R-44): one template in Newsreader carrying
+ * each page's object on 1200 × 630 PNG (the current BNP Paribas pass on the homepage, the employer's pass on a Role
+ * story, the screenshot on a case study), the Newsreader "E" favicon in site cobalt with dark-scheme SVG + PNG + Apple
+ * touch icon fallbacks, and the Copy button's fallback.
  */
 
 const pngSize = (bytes: Buffer) => ({ width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) });
@@ -68,6 +68,56 @@ test.describe("Share cards", () => {
       expect(clippedEdgePixels).toBe(0);
     });
   }
+
+  test("/opengraph-image hangs only the single current BNP Paribas pass from the top edge (R-44)", async ({ page }) => {
+    await page.goto("/opengraph-image");
+    const fieldRgb = [1, 3, 5].map((at) => parseInt(sharePage.field.slice(at, at + 2), 16));
+    const { lanyards, bnpGreenPixels } = await page.locator("img").evaluate(async (image: HTMLImageElement, rgb: number[]) => {
+      await image.decode();
+      const canvas = document.createElement("canvas");
+      [canvas.width, canvas.height] = [image.naturalWidth, image.naturalHeight];
+      const context = canvas.getContext("2d")!;
+      context.drawImage(image, 0, 0);
+      const pixel = (x: number, y: number) => [...context.getImageData(x, y, 1, 1).data].slice(0, 3);
+      const differs = (x: number, y: number) => {
+        const [r, g, b] = pixel(x, y);
+        return Math.abs(r - rgb[0]) > 14 || Math.abs(g - rgb[1]) > 14 || Math.abs(b - rgb[2]) > 14;
+      };
+      // Group top-edge lanyard plies (y = 8, within 40 px for one two-ply V-strap): 1 lanyard for a single pass, 3 for the retired cluster.
+      const lanyards: [number, number][] = [];
+      let start: number | null = null;
+      for (let x = 0; x < canvas.width; x += 2) {
+        if (differs(x, 8)) {
+          if (start === null) start = x;
+        } else if (start !== null) {
+          if (x - start >= 10) {
+            const last = lanyards[lanyards.length - 1];
+            if (last && start - last[1] <= 40) last[1] = x;
+            else lanyards.push([start, x]);
+          }
+          start = null;
+        }
+      }
+      if (start !== null && canvas.width - start >= 10) {
+        const last = lanyards[lanyards.length - 1];
+        if (last && start - last[1] <= 40) last[1] = canvas.width;
+        else lanyards.push([start, canvas.width]);
+      }
+      // Confirm the pass header band on the right carries BNP Paribas emerald green (#00965e family).
+      let bnpGreenPixels = 0;
+      for (let x = 840; x <= 1120; x += 8) {
+        for (let y = 240; y <= 360; y += 8) {
+          const [r, g, b] = pixel(x, y);
+          if (g > 110 && g > r + 60 && g > b + 20) bnpGreenPixels += 1;
+        }
+      }
+      return { lanyards, bnpGreenPixels };
+    }, fieldRgb);
+    expect(lanyards).toHaveLength(1);
+    expect(lanyards[0][0]).toBeGreaterThan(800);
+    expect(lanyards[0][1] - lanyards[0][0]).toBeLessThanOrEqual(80);
+    expect(bnpGreenPixels).toBeGreaterThan(40);
+  });
 
   // Each page names a card from this template, never a raw screenshot: the headline card, or its own.
   const cards = [

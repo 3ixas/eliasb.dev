@@ -2,16 +2,13 @@ import Link from "next/link";
 import { MeasurePair, MeasureSide } from "@/components/parts/measure";
 import { OnView, Count } from "@/components/parts/on-view";
 import { Arrow, Panel, PanelHead } from "@/components/parts/panel";
-import { PassLight } from "@/components/parts/pass-light";
-import { StaffPass } from "@/components/parts/staff-pass";
-import { employerPanelTransition, employerTitleTransition, titleLinkTypes } from "@/components/parts/title-transition";
-import { WorkTitleTransition } from "@/components/parts/work-title-transition";
+import { TitleTransition, employerPanelTransition, employerTitleTransition, titleLinkTypes } from "@/components/parts/title-transition";
 import { roleStories } from "@/content/stretch/role-stories";
 import type { RoleStorySlug } from "@/content/stretch/role-story";
 import { passRecords } from "@/content/stretch/staff-pass";
 import { comparisonRow, displayFigure, workPanels, type Pair, type RolePanel } from "@/content/stretch/work-panels";
 
-/** The panel's header: the employer's short name (as on its pass), with its role and dates at the right. */
+/** The panel's header: the employer's short name (as on its pass), with its role and dates directly under it. */
 function Head({ slug }: { slug: RoleStorySlug }) {
   const { role, dates } = roleStories[slug];
   const { name, share } = employerPanelTransition(slug);
@@ -20,32 +17,11 @@ function Head({ slug }: { slug: RoleStorySlug }) {
       name={passRecords[slug].short}
       meta={[role, dates]}
       renderName={(heading) => (
-        <WorkTitleTransition name={name} share={share} when="desktop">
+        <TitleTransition name={name} share={share}>
           {heading}
-        </WorkTitleTransition>
+        </TitleTransition>
       )}
     />
-  );
-}
-
-/**
- * The employer's pass, hanging in its panel on a phone only (#493): there the opening is its words, and the pass prints
- * the panel's name, role and dates. Hidden from assistive technology, since the panel's header says the same.
- */
-function PanelPass({ slug }: { slug: RoleStorySlug }) {
-  const { name, share } = employerPanelTransition(slug);
-  return (
-    <PassLight className="work__pass" aria-hidden>
-      <StaffPass
-        slug={slug}
-        lead={slug === "bnp-paribas"}
-        renderBandName={(label) => (
-          <WorkTitleTransition name={name} share={share} when="phone">
-            {label}
-          </WorkTitleTransition>
-        )}
-      />
-    </PassLight>
   );
 }
 
@@ -69,7 +45,6 @@ function BnpPanel() {
   return (
     <OnView motion="rise">
       <Panel id={slug} colours={story.panel} className="work-bnp">
-        <PanelPass slug={slug} />
         <Head slug={slug} />
         <p className="work-bnp__figure">
           <span className="figure__words">{figure.value}</span>
@@ -121,7 +96,6 @@ function RolePanelView({ panel }: { panel: RolePanel }) {
   return (
     <OnView motion="rise" className="work-role__arrival">
       <Panel id={panel.slug} colours={story.panel} className="work-role">
-        <PanelPass slug={panel.slug} />
         <Head slug={panel.slug} />
         <p className="work-role__figure">
           <span className="figure__value"><Count value={value} from={panel.figure.from} /></span>

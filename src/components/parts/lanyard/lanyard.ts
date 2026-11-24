@@ -49,7 +49,7 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
     };
     const start = () => {
       if (!wanted() || dispose || loading) return;
-      // A stage hidden by a media query (`.opening__rail` on a phone, `.work__pass` from 720 px) stays unmounted until visible.
+      // A stage hidden by CSS stays unmounted until it has non-zero layout dimensions.
       if (!element.offsetWidth || !element.offsetHeight) return;
       if (cannot) return fail(cannot);
       near.disconnect();

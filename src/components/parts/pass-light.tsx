@@ -9,7 +9,7 @@ import { useLanyard } from "@/components/parts/lanyard/lanyard";
  * pointer and the hologram turns. Hover adds feedback only, so nothing here is needed to read a pass, and with reduced
  * motion or a touch screen nothing moves.
  */
-export function PassLight({ className, "aria-hidden": ariaHidden, children }: { className: string; "aria-hidden"?: boolean; children: ReactNode }) {
+export function PassLight({ className, children }: { className: string; children: ReactNode }) {
   const rail = useRef<HTMLDivElement>(null);
   useLanyard(rail);
 
@@ -35,7 +35,7 @@ export function PassLight({ className, "aria-hidden": ariaHidden, children }: { 
   }, []);
 
   return (
-    <div ref={rail} className={`lanyard ${className}`} aria-hidden={ariaHidden || undefined}>
+    <div ref={rail} className={`lanyard ${className}`}>
       {children}
     </div>
   );

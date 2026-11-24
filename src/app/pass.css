@@ -2,15 +2,15 @@
  * The staff pass (docs/design/DESIGN.md "The staff pass", R-12; components/parts/staff-pass.tsx): a printed card on a
  * lanyard. It is an object, so it keeps its printed colours in both themes; only its card stock is a step darker in
  * dark (--stock). Every size inside is in em of the card's width ÷ 14.5, so the card is drawn once at any width;
- * small print is floored at 13 px. The pass sets --field and --band-ink (its Role story's panel) and --lanyard from its content, --tilt for how it
- * rests, and --drop-by for how far below the rail it hangs.
+ * small print is floored at 13 px. The pass sets --field and --band-ink (its Role story's panel) and --lanyard from its content, and --tilt for how it
+ * rests.
  */
 
 .pass {
   --card: 248px;
   /* Who and when: the band, the portrait with the name, role and dates, and the foot (#493). */
   --card-height: 14.5em;
-  --drop: calc(clamp(140px, 25svh, 232px) * var(--drop-by, 1));
+  --drop: clamp(140px, 25svh, 232px);
   position: relative;
   display: block;
   flex: none;
