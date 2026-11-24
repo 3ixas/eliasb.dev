@@ -108,12 +108,12 @@
   text-wrap: pretty;
 }
 
-/* The evidence figures: each value large in Newsreader over its muted words (full-strength ink on a panel). */
+/* The evidence figures: bordered 4-up cards shared by Role story hero banners (R-52) and Case study open headers (R-54). */
 .story-figures {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px 36px;
-  margin: 40px 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 148px), 1fr));
+  gap: 12px;
+  margin: 22px 0 0;
   padding: 0;
   list-style: none;
   color: var(--muted);
@@ -122,9 +122,11 @@
 }
 
 .story-figures li {
-  /* The words wrap at 12em, but never narrower than the value above them ("2-minute" is wider). */
-  min-width: min-content;
-  max-width: 12em;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--hair);
+  border-radius: 14px;
+  background: var(--paper);
 }
 
 .story-figures b {
@@ -138,27 +140,6 @@
   font-variant-numeric: lining-nums tabular-nums;
   line-height: 1;
   letter-spacing: -0.03em;
-  white-space: nowrap;
-}
-
-/* Bordered 4-up evidence cards shared by Role story hero banners (R-52) and Case study open headers (R-54). */
-:is(.story-open, .case-header) .story-figures {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 148px), 1fr));
-  gap: 12px;
-}
-
-:is(.story-open, .case-header) .story-figures li {
-  min-width: 0;
-  max-width: none;
-  padding: 14px 16px;
-  border: 1px solid var(--hair);
-  border-radius: 14px;
-  background: var(--paper);
-}
-
-:is(.story-open, .case-header) .story-figures b {
-  white-space: normal;
 }
 
 /* Inside a Role story's coloured hero banner, the evidence strip takes the panel's translucent well and full-strength ink. */
@@ -304,10 +285,6 @@
   margin: 0;
   color: var(--muted);
   font-size: var(--type-small);
-}
-
-.case-header .story-figures {
-  margin-top: 22px;
 }
 
 /* Full-width project-colour panel framing the whole uncropped screenshot in the shared concentric optical bezel (parts.css). */
@@ -916,29 +893,16 @@
 
 @media (max-width: 719.98px) {
   .story-figures {
-    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 22px 20px;
+    gap: 10px;
   }
 
   .story-figures li {
-    max-width: none;
-  }
-
-  .story-figures b {
-    white-space: normal;
-  }
-
-  :is(.story-open, .case-header) .story-figures {
-    gap: 10px;
+    padding: 12px 14px;
   }
 
   .case-header {
     padding-top: 16px;
-  }
-
-  .case-header .story-figures li {
-    padding: 12px 14px;
   }
 
   .case-stage {
@@ -997,7 +961,7 @@
 @media (forced-colors: active) {
   .embedded-pass,
   .embedded-pass__photo,
-  :is(.story-open, .case-header) .story-figures li {
+  .story-figures li {
     border-color: CanvasText;
   }
 
