@@ -190,7 +190,9 @@
   background: var(--bezel-bg);
 }
 
-.optical-bezel img {
+/* The inline screenshot only (`> img` on ProjectPanel, `> .zoom img` on CaseStage): never match the lightbox `<dialog>` image. */
+.optical-bezel > img,
+.optical-bezel > .zoom img {
   display: block;
   width: 100%;
   height: auto;
