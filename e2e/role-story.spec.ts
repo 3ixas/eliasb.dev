@@ -471,3 +471,51 @@ for (const slug of roleStorySlugs) {
     });
   });
 }
+
+test.describe("Role story: Joveen latency fill", () => {
+  test.use({ reducedMotion: "no-preference" });
+
+  test("Joveen's key API p95 fills in its own time: 520 ms against 230 ms, together and at a constant rate", async ({ page }) => {
+    await page.goto("/work/joveen");
+    const changed = page.locator("section#what-changed");
+    await expect(changed.locator("[data-grow]")).toHaveAttribute("data-armed", "");
+    // Catch the fills the moment the bars are let go and pause them, so none can finish before it is read, however slow the
+    // runner. A mutation observer's callback runs before the next frame; CI's WebKit does not reliably fire transitionrun.
+    await changed.evaluate((element) => {
+      const caught: Animation[] = [];
+      (window as unknown as { fills: Animation[] }).fills = caught;
+      const grow = element.querySelector("[data-grow]")!;
+      const watcher = new MutationObserver(() => {
+        if (grow.hasAttribute("data-armed")) return;
+        watcher.disconnect();
+        for (const bar of element.querySelectorAll(".measure--ms .bar")) {
+          const fill = bar.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "transform");
+          fill?.pause();
+          if (fill) caught.push(fill);
+        }
+      });
+      watcher.observe(grow, { attributes: true, attributeFilter: ["data-armed"] });
+    });
+    await changed.locator(".measure--ms").first().evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+    await expect.poll(() => page.evaluate(() => (window as unknown as { fills: Animation[] }).fills.filter(Boolean).length)).toBe(2);
+    // Seek both fills to where the faster one ends, rather than wait them out.
+    const fills = await changed.evaluate((element) =>
+      (window as unknown as { fills: Animation[] }).fills.map((fill, index) => {
+        const { duration, delay } = fill.effect!.getComputedTiming();
+        fill.currentTime = Number(delay) + 230;
+        const bar = element.querySelectorAll(".measure--ms .bar")[index];
+        const scale = new DOMMatrix(getComputedStyle(bar).transform).a;
+        fill.finish();
+        return { duration: Number(duration), delay: Number(delay), scale };
+      }),
+    );
+    const [before, after] = fills;
+    // Each fill lasts its value, within 20 ms.
+    expect(Math.abs(before.duration - 520)).toBeLessThanOrEqual(20);
+    expect(Math.abs(after.duration - 230)).toBeLessThanOrEqual(20);
+    expect(after.delay).toBe(before.delay);
+    // At 230 ms the after bar is full and the before bar, filling at the same rate, is 230 / 520 of the way.
+    expect(after.scale).toBeCloseTo(1, 2);
+    expect(before.scale).toBeCloseTo(230 / 520, 2);
+  });
+});

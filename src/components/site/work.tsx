@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { MeasurePair, MeasureSide } from "@/components/parts/measure";
+import { MeasureSide } from "@/components/parts/measure";
 import { OnView, Count } from "@/components/parts/on-view";
 import { Arrow, Panel, PanelHead } from "@/components/parts/panel";
 import { TitleTransition, employerPanelTransition, employerTitleTransition, titleLinkTypes } from "@/components/parts/title-transition";
 import { roleStories } from "@/content/stretch/role-stories";
 import type { RoleStorySlug } from "@/content/stretch/role-story";
 import { passRecords } from "@/content/stretch/staff-pass";
-import { comparisonRow, displayFigure, workPanels, type Pair, type RolePanel } from "@/content/stretch/work-panels";
+import { comparisonRow, displayFigure, workPanels, type RolePanel } from "@/content/stretch/work-panels";
 
 /** The panel's header: the employer's short name (as on its pass), with its role and dates directly under it. */
 function Head({ slug }: { slug: RoleStorySlug }) {
@@ -78,18 +78,7 @@ function BnpPanel() {
   );
 }
 
-/** One before and after pair: what moved, the pair drawn in its unit, and the value written out at the right. */
-function PairRow({ pair }: { pair: Pair }) {
-  return (
-    <li className="pair">
-      <span className="pair__what">{pair.what}</span>
-      <MeasurePair measure={pair} />
-      <b className="pair__value">{pair.value}</b>
-    </li>
-  );
-}
-
-/** Joveen or Optegra: a display figure that rolls to its value once, three pairs in their units and the link to the story. */
+/** Joveen or Optegra: a display figure that rolls to its value once, a compact three-metric tray and the link to the story. */
 function RolePanelView({ panel }: { panel: RolePanel }) {
   const story = roleStories[panel.slug];
   const { value, label } = displayFigure(story, panel.figure)!;
@@ -101,13 +90,16 @@ function RolePanelView({ panel }: { panel: RolePanel }) {
           <span className="figure__value"><Count value={value} from={panel.figure.from} /></span>
           <span className="figure__label">{label}</span>
         </p>
-        <OnView motion="grow">
-          <ul className="pairs">
+        <div className="work-metrics__wrap">
+          <ul className="work-metrics">
             {panel.pairs.map((pair) => (
-              <PairRow key={pair.what} pair={pair} />
+              <li key={pair.what} className="work-metric">
+                <strong className="work-metric__value">{pair.value}</strong>
+                <span className="work-metric__label">{pair.what}</span>
+              </li>
             ))}
           </ul>
-        </OnView>
+        </div>
         <StoryLink slug={panel.slug} outline />
       </Panel>
     </OnView>
@@ -115,9 +107,10 @@ function RolePanelView({ panel }: { panel: RolePanel }) {
 }
 
 /**
- * Work (DESIGN.md "The homepage, in order" 3, R-13 to R-15): the title and its subheading, BNP Paribas full width,
- * then Joveen and Optegra side by side. Each panel carries its employer's slug as its id, which the opening's passes
- * link to. Joveen's and Optegra's panels share their rows, so their rules and links stay level (#458).
+ * Work (DESIGN.md "The homepage, in order" 3, R-13 to R-15, R-45): the title and its subheading, BNP Paribas full width
+ * with its translucent stat well and two drawn unit comparisons, then Joveen and Optegra side by side with compact
+ * three-metric trays. Each panel carries its employer's slug as its id, which the opening's pass links to. Joveen's and
+ * Optegra's panels share their rows, so their trays and links stay level (#458, #515).
  */
 export function Work() {
   return (

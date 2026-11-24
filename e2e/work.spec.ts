@@ -8,9 +8,9 @@ import { shown } from "./support/roll";
 import { renderedContrast } from "./support/rendered-contrast";
 
 /*
- * Work (docs/design/DESIGN.md "The homepage, in order" 3 and "Figures", R-13 to R-15): the title and subheading,
- * BNP Paribas's panel with its figure and two comparisons (its simulation is simulation.spec.ts), then Joveen and Optegra side by side with a
- * display figure and three pairs each.
+ * Work (docs/design/DESIGN.md "The homepage, in order" 3 and "Figures", R-13 to R-15, R-45): the title and subheading,
+ * BNP Paribas's panel with its translucent stat well and two drawn unit comparisons (its simulation is simulation.spec.ts),
+ * then Joveen and Optegra side by side with a display figure and a compact three-metric tray each.
  */
 
 const section = (page: Page) => page.locator("section#work");
@@ -58,10 +58,14 @@ test.describe("Work: the panels", () => {
     }
   });
 
-  test("BNP Paribas's panel holds one display figure and two comparisons, and nothing else at display size but the employer's name", async ({ page }) => {
+  test("BNP Paribas's panel holds its translucent stat well and two comparisons, and nothing else at display size but the employer's name", async ({ page }) => {
     const bnp = panel(page, "bnp-paribas");
-    await expect(bnp.locator(".figure__words")).toHaveText(workPanels.bnp.figure.value);
-    await expect(bnp.locator(".figure__label")).toHaveText(workPanels.bnp.figure.label);
+    const well = bnp.locator(".work-bnp__figure");
+    await expect(well.locator(".figure__words")).toHaveText(workPanels.bnp.figure.value);
+    await expect(well.locator(".figure__label")).toHaveText(workPanels.bnp.figure.label);
+    await expect(well).toHaveCSS("background-color", "rgba(255, 255, 255, 0.22)");
+    await expect(well).toHaveCSS("border-top-width", "1px");
+    await expect(well).toHaveCSS("border-top-left-radius", "16px");
     // Its simulation is on its Role story (#457).
     await expect(bnp.locator("figure")).toHaveCount(0);
     await expect(bnp.locator(".work-bnp__comparisons li")).toHaveCount(2);
@@ -92,21 +96,39 @@ test.describe("Work: the panels", () => {
     ]);
   });
 
-  test("Joveen and Optegra each show a display figure and its label, three pairs drawn in their units with their values, and the link to the story", async ({ page }) => {
+  test("Joveen and Optegra each show a display figure and its label, a compact three-metric tray from content, and the link to the story", async ({ page }) => {
+    await settled(page);
     for (const { slug, figure, pairs } of workPanels.roles) {
+      const card = panel(page, slug);
       const evidence = roleStories[slug].evidence[figure.evidence];
-      await expect.poll(() => shown(panel(page, slug).locator(".figure__value"))).toBe(evidence.value);
-      await expect(panel(page, slug).locator(".figure__label")).toHaveText(evidence.label);
-      const rows = panel(page, slug).locator(".pair");
-      await expect(rows).toHaveCount(3);
-      const drawings = await drawn(panel(page, slug), ".pair");
+      await expect.poll(() => shown(card.locator(".figure__value"))).toBe(evidence.value);
+      await expect(card.locator(".figure__label")).toHaveText(evidence.label);
+      const tray = card.locator(".work-metrics");
+      await expect(tray).toHaveCSS("background-color", "rgba(0, 0, 0, 0.22)");
+      await expect(tray).toHaveCSS("border-top-width", "1px");
+      await expect(tray).toHaveCSS("border-top-left-radius", "16px");
+      await expect(card.locator(".measure-pair")).toHaveCount(0);
+      const items = tray.locator(".work-metric");
+      await expect(items).toHaveCount(3);
       for (const [index, pair] of pairs.entries()) {
-        await expect(rows.nth(index).locator(".pair__what")).toHaveText(pair.what);
-        await expect(rows.nth(index).locator(".pair__value")).toHaveText(pair.value);
-        // A drawing too narrow to read is a collapsed track: side by side at 720 to 1000 px the panels are at their narrowest.
-        const room = await rows.nth(index).locator(".measure-pair").evaluate((element) => element.getBoundingClientRect().width);
-        expect(room, `${slug}: ${pair.what} has room for its drawing`).toBeGreaterThan(120);
-        expectDrawn(drawings[index], pair, `${slug}: ${pair.what}`);
+        await expect(items.nth(index).locator(".work-metric__value")).toHaveText(pair.value);
+        await expect(items.nth(index).locator(".work-metric__label")).toHaveText(pair.what);
+      }
+      const trayBox = await boxOf(tray);
+      const boxes = await Promise.all([0, 1, 2].map((index) => boxOf(items.nth(index))));
+      for (const box of boxes) {
+        expect(box.x, `${slug}: metric stays inside tray left`).toBeGreaterThanOrEqual(trayBox.x - 1);
+        expect(box.x + box.width, `${slug}: metric stays inside tray right`).toBeLessThanOrEqual(trayBox.x + trayBox.width + 1);
+      }
+      if (trayBox.width >= 360) {
+        for (let index = 1; index < boxes.length; index++) {
+          expect(Math.abs(boxes[index].y - boxes[0].y), `${slug}: metrics sit in one three-column row`).toBeLessThan(1);
+          expect(boxes[index].x, `${slug}: metrics flow left to right`).toBeGreaterThan(boxes[index - 1].x);
+        }
+      } else {
+        for (let index = 1; index < boxes.length; index++) {
+          expect(boxes[index].y, `${slug}: narrow tray stacks metrics into clean rows`).toBeGreaterThanOrEqual(boxes[index - 1].y + boxes[index - 1].height - 1);
+        }
       }
     }
   });
@@ -140,6 +162,7 @@ test.describe("Work: the panels", () => {
   });
 
   test("the mini passes, enamel pins and employer rows are gone from Work", async ({ page }) => {
+    await expect(section(page).locator(".pass")).toHaveCount(0);
   });
 
   test("it fits the screen, nothing is under 13 px, and the links are 44 px targets", async ({ page }) => {
@@ -202,14 +225,16 @@ test.describe("Work: arriving", () => {
   });
 
   test("below the fold the figures wait at their start, the bars are armed, and each arrives once in view", async ({ page }) => {
+    const bnp = panel(page, "bnp-paribas");
     const joveen = panel(page, "joveen");
+    await expect(bnp.locator("[data-grow]")).toHaveAttribute("data-armed", "");
     await expect.poll(() => shown(joveen.locator(".figure__value"))).toBe("−0%");
     await expect.poll(() => shown(panel(page, "optegra").locator(".figure__value"))).toBe("62%");
     // A screen reader is read the value, never the start.
     await expect(joveen.locator(".figure__value .sr-only")).toHaveText("−40%");
-    await expect(joveen.locator("[data-grow]")).toHaveAttribute("data-armed", "");
+    await bnp.locator("[data-grow]").scrollIntoViewIfNeeded();
+    await expect(bnp.locator("[data-grow]")).not.toHaveAttribute("data-armed", "");
     await joveen.scrollIntoViewIfNeeded();
-    await expect(joveen.locator("[data-grow]")).not.toHaveAttribute("data-armed", "");
     await expect(joveen.locator(".roll")).not.toHaveAttribute("data-armed", "");
     await joveen.locator(".figure__value").evaluate((element) => element.getAnimations({ subtree: true }).forEach((animation) => animation.finish()));
     await expect.poll(() => shown(joveen.locator(".figure__value"))).toBe("−40%");
@@ -219,49 +244,6 @@ test.describe("Work: arriving", () => {
     await expect(optegra.locator(".roll")).not.toHaveAttribute("data-armed", "");
     await optegra.evaluate((element) => element.getAnimations({ subtree: true }).forEach((animation) => animation.finish()));
     await expect.poll(() => shown(optegra)).toBe("88%");
-  });
-
-  test("Joveen's key API p95 fills in its own time: 520 ms against 230 ms, together and at a constant rate", async ({ page }) => {
-    const joveen = panel(page, "joveen");
-    await expect(joveen.locator("[data-grow]")).toHaveAttribute("data-armed", "");
-    // Catch the fills the moment the bars are let go and pause them, so none can finish before it is read, however slow the
-    // runner. A mutation observer's callback runs before the next frame; CI's WebKit does not reliably fire transitionrun.
-    await joveen.evaluate((element) => {
-      const caught: Animation[] = [];
-      (window as unknown as { fills: Animation[] }).fills = caught;
-      const grow = element.querySelector("[data-grow]")!;
-      const watcher = new MutationObserver(() => {
-        if (grow.hasAttribute("data-armed")) return;
-        watcher.disconnect();
-        for (const bar of element.querySelectorAll(".measure--ms .bar")) {
-          const fill = bar.getAnimations().find((animation) => (animation as CSSTransition).transitionProperty === "transform");
-          fill?.pause();
-          if (fill) caught.push(fill);
-        }
-      });
-      watcher.observe(grow, { attributes: true, attributeFilter: ["data-armed"] });
-    });
-    await joveen.locator(".measure--ms").first().evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
-    await expect.poll(() => page.evaluate(() => (window as unknown as { fills: Animation[] }).fills.filter(Boolean).length)).toBe(2);
-    // Seek both fills to where the faster one ends, rather than wait them out.
-    const fills = await joveen.evaluate((element) =>
-      (window as unknown as { fills: Animation[] }).fills.map((fill, index) => {
-        const { duration, delay } = fill.effect!.getComputedTiming();
-        fill.currentTime = Number(delay) + 230;
-        const bar = element.querySelectorAll(".measure--ms .bar")[index];
-        const scale = new DOMMatrix(getComputedStyle(bar).transform).a;
-        fill.finish();
-        return { duration: Number(duration), delay: Number(delay), scale };
-      }),
-    );
-    const [before, after] = fills;
-    // Each fill lasts its value, within 20 ms.
-    expect(Math.abs(before.duration - 520)).toBeLessThanOrEqual(20);
-    expect(Math.abs(after.duration - 230)).toBeLessThanOrEqual(20);
-    expect(after.delay).toBe(before.delay);
-    // At 230 ms the after bar is full and the before bar, filling at the same rate, is 230 / 520 of the way.
-    expect(after.scale).toBeCloseTo(1, 2);
-    expect(before.scale).toBeCloseTo(230 / 520, 2);
   });
 
   test("BNP Paribas's working days arrive a square at a time, before then after", async ({ page }) => {
@@ -321,12 +303,17 @@ test.describe("Work: the panels' composition", () => {
     expect(Math.abs(comparisons.y - name.y)).toBeLessThan(24);
   });
 
-  test("side by side, Joveen's and Optegra's rules and links are level", async ({ page }) => {
+  test("side by side, Joveen's and Optegra's metric trays and links are level", async ({ page }) => {
     test.skip(width(page) < 720, "Stacked below 720 px");
-    const tops = (selector: string) => page.locator(`.work-role ${selector}`).evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().top));
-    const [rules, links] = await Promise.all([tops(".pairs"), tops(".work__story")]);
-    expect(Math.abs(rules[0] - rules[1])).toBeLessThan(1);
-    expect(Math.abs(links[0] - links[1])).toBeLessThan(1);
+    const rects = (selector: string) =>
+      page.locator(`.work-role ${selector}`).evaluateAll((elements) => elements.map((element) => {
+        const box = element.getBoundingClientRect();
+        return { top: box.top, bottom: box.bottom };
+      }));
+    const [trays, links] = await Promise.all([rects(".work-metrics"), rects(".work__story")]);
+    expect(Math.abs(trays[0].top - trays[1].top)).toBeLessThan(1);
+    expect(Math.abs(trays[0].bottom - trays[1].bottom)).toBeLessThan(1);
+    expect(Math.abs(links[0].top - links[1].top)).toBeLessThan(1);
   });
 });
 

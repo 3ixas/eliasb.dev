@@ -1,10 +1,10 @@
 /*
- * Work (docs/design/DESIGN.md "The homepage, in order" 3 and "Figures"; R-13 to R-15): the subheading, BNP Paribas's
- * panel with its figure and two comparisons (its simulation is on its Role story, simulation.css), and Joveen's and Optegra's panels with a display figure
- * and three pairs. The panel, the pill and the arrivals are parts.css's; this file lays out what is on the panels.
+ * Work (docs/design/DESIGN.md "The homepage, in order" 3 and "Figures"; R-13 to R-15, R-45): the subheading,
+ * BNP Paribas's panel with its translucent stat well and two drawn comparisons (its simulation is on its Role story,
+ * simulation.css), and Joveen's and Optegra's panels with a display figure and a compact three-metric tray. The panel,
+ * the pill and the arrivals are parts.css's; this file lays out what is on the panels.
  *
- * Comparisons (`.measure`, `.cmp`) are parts.css's: here the after side is white on BNP Paribas's green and the panel's
- * ink elsewhere, and a pair's weights are lighter.
+ * Comparisons (`.measure`, `.cmp`) are parts.css's: here the after side is white on BNP Paribas's green.
  */
 
 /*
@@ -99,15 +99,24 @@
   grid-area: head;
 }
 
+/* Light translucent stat well: lightens the bright green beneath dark ink so full-strength ink stays well above AA (R-45). */
 .work-bnp__figure {
   grid-area: figure;
-  padding-top: 56px;
+  margin-top: 32px;
+  padding: 18px 22px;
+  border: 1px solid var(--edge);
+  border-radius: 16px;
+  background: rgb(255 255 255 / 0.22);
 }
 
-/* As Joveen's and Optegra's pairs sit under their figures: the rule 32 px below the figure's words. */
+.work-bnp__figure .figure__label {
+  margin-top: 6px;
+}
+
+/* Comparisons under the stat well on narrower viewports. */
 .work-bnp__comparisons {
   grid-area: comparisons;
-  margin-top: 32px;
+  margin-top: 28px;
 }
 
 .work-bnp__comparisons ul {
@@ -148,7 +157,8 @@
   }
 
   .work-bnp__figure {
-    padding-block: 64px 48px;
+    align-self: center;
+    margin-block: 28px;
   }
 
   .work-bnp__comparisons {
@@ -192,12 +202,12 @@
 }
 
 .work-role__figure {
-  margin-top: 56px;
+  margin-top: 40px;
 }
 
 /*
  * Side by side, Joveen and Optegra share their rows (subgrid), so a label that runs to two lines on one panel moves the
- * other's rule with it: the rules, the evidence and the links stay level across the pair.
+ * other's tray with it: the metric trays and the story links stay level across the pair (#458, #515).
  */
 @media (min-width: 720px) {
   .panels--aligned {
@@ -218,43 +228,45 @@
   }
 }
 
-/* The pairs lay out by their own width, not the window's: side by side at 720 to 1000 px a panel is too narrow for the label, bars and value in one row. */
-.pairs {
-  --thin: 5px;
-  --thick: 9px;
+/*
+ * Compact 3-metric tray (R-45): dark-tinted translucent well with subtle 1 px hairline border. Sized by its own inline
+ * width so 1024–1440 px desktop shows three columns while narrower side-by-side panels and phones use clean rows.
+ */
+.work-metrics__wrap {
   container-type: inline-size;
   display: grid;
-  align-content: start;
-  gap: 14px;
-  margin-block: 32px;
-  padding-top: 24px;
-  border-top: 1px solid var(--line);
+  margin-block: 28px;
 }
 
-.pair {
+.work-metrics {
   display: grid;
-  grid-template-columns: 10em minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 3px 16px;
-  font-size: var(--type-small);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 16px;
+  align-content: start;
+  padding: 16px 18px;
+  border: 1px solid var(--edge);
+  border-radius: 16px;
+  background: rgb(0 0 0 / 0.22);
 }
 
-.pair__what {
-  grid-row: 1 / span 2;
+.work-metric {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-width: 0;
 }
 
-.pair .measure-pair {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-}
-
-.pair__value {
-  grid-column: 3;
-  grid-row: 1 / span 2;
-  min-width: 8.5em;
+.work-metric__value {
+  font-size: var(--type-ui);
   font-weight: 600;
+  line-height: 1.25;
   font-variant-numeric: lining-nums tabular-nums;
-  text-align: right;
+}
+
+.work-metric__label {
+  color: color-mix(in srgb, var(--panel-ink) 86%, transparent);
+  font-size: var(--type-label);
+  line-height: 1.3;
 }
 
 .work-role > .work__story {
@@ -265,7 +277,8 @@
 
 @media (max-width: 719.98px) {
   .work-bnp__figure {
-    padding-top: 36px;
+    margin-top: 24px;
+    padding: 16px 18px;
   }
 
   .work-bnp__comparisons ul {
@@ -278,28 +291,42 @@
   }
 
   .work-role__figure {
-    margin-top: 36px;
+    margin-top: 28px;
+  }
+
+  .work-metrics__wrap {
+    margin-block: 22px 24px;
   }
 }
 
-/* Under 440 px of its own the label and value share a line above the bars, which take the full width. */
-@container (max-width: 439.98px) {
-  .pair {
-    grid-template-columns: minmax(0, 1fr) auto;
+/* Under 360 px of its own (side-by-side at 720–960 px and phones), each metric becomes one horizontal row so values never wrap awkwardly. */
+@container (max-width: 359.98px) {
+  .work-metrics {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: 6px 16px;
   }
 
-  .pair__what {
-    grid-row: 1;
+  .work-metric {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 12px;
+    padding-block: 10px;
+    border-top: 1px solid var(--edge);
   }
 
-  .pair__value {
-    grid-column: 2;
-    grid-row: 1;
-    min-width: 0;
+  .work-metric:first-child {
+    border-top: 0;
   }
 
-  .pair .measure-pair {
-    grid-column: 1 / -1;
-    grid-row: 2;
+  .work-metric__value {
+    order: 2;
+    text-align: right;
+  }
+
+  .work-metric__label {
+    order: 1;
   }
 }
