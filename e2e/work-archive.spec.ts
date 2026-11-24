@@ -4,6 +4,7 @@ import { projectIndex, projects } from "../src/content/projects";
 import { caseStudies } from "../src/content/stretch/case-studies";
 import { roleStorySlugs } from "../src/content/stretch/role-stories";
 import { siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy";
+import { expectOpticalBezel, readOpticalBezel } from "./support/bezel";
 import { renderedContrast } from "./support/rendered-contrast";
 
 /*
@@ -101,6 +102,14 @@ test.describe("Work archive: the catalogue", () => {
   test("the first screen's screenshots load at once", async ({ page }) => {
     const images = panels(page).locator(".project__shot img");
     for (const image of (await images.all()).slice(0, 3)) await expect(image).toHaveAttribute("loading", "eager");
+  });
+
+  test("featured and archive screenshots sit whole and uncropped inside concentric optical bezels", async ({ page }) => {
+    const phone = width(page) < 720;
+    const all = await panels(page).all();
+    for (const [index, panel] of all.entries()) {
+      expectOpticalBezel(await readOpticalBezel(panel), `archive panel ${index}`, phone);
+    }
   });
 
   test("has no sideways scroll, nothing under 13 px, and passes axe", async ({ page }) => {

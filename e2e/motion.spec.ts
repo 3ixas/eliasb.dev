@@ -228,9 +228,9 @@ test.describe("Panel to page title transitions", () => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
     await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
-    const thresholdPanel = page.locator('#things-i-make a.project[href="/things-i-make/threshold"]');
+    const thresholdPanel = page.locator('#things-i-make .project a[href="/things-i-make/threshold"]');
     await thresholdPanel.scrollIntoViewIfNeeded();
-    await waitForHydration(page, '#things-i-make a.project[href="/things-i-make/threshold"]');
+    await waitForHydration(page, '#things-i-make .project a[href="/things-i-make/threshold"]');
 
     const forward = await sampleRouteTransition(page, () => thresholdPanel.click(), /\/things-i-make\/threshold$/);
     expectSingleTitleMorph(forward, "route-title-project-threshold");
@@ -308,9 +308,9 @@ test.describe("Panel to page title transitions", () => {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/");
 
-    const thresholdPanel = page.locator('#things-i-make a.project[href="/things-i-make/threshold"]');
+    const thresholdPanel = page.locator('#things-i-make .project a[href="/things-i-make/threshold"]');
     await thresholdPanel.scrollIntoViewIfNeeded();
-    await waitForHydration(page, '#things-i-make a.project[href="/things-i-make/threshold"]');
+    await waitForHydration(page, '#things-i-make .project a[href="/things-i-make/threshold"]');
     const scrollBefore = await page.evaluate(() => window.scrollY);
     expect(scrollBefore).toBeGreaterThan(200);
 

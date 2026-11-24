@@ -1,22 +1,37 @@
+import Image from "next/image";
 import Link from "next/link";
 import { OnView } from "@/components/parts/on-view";
 import { Arrow, OUT } from "@/components/parts/panel";
 import { ProjectPanel, projectHref } from "@/components/parts/project-panel";
 import { hostLabel } from "@/components/site/host-label";
 import { isInternalHref, SiteLink } from "@/components/site/site-link";
+import { ThresholdCitySwitcher, type ThresholdCityPreview } from "@/components/site/threshold-city-switcher";
 import { featuredProjects, featuredSlugs, HOMEPAGE_INDEX_ROWS, projectIndex, projects, type Project } from "@/content/projects";
 import { thingsIMake } from "@/content/stretch/site-copy";
+import { thresholdCities, thresholdCityChoice, thresholdDisplayLink, thresholdLinkCopy, thresholdStart } from "@/content/stretch/threshold-link";
 
 /** A row's line: the shorter one the homepage gives a project, else its own outcome. */
 const rowLine = (project: Project) => thingsIMake.rowOutcomes[project.slug] ?? project.outcome;
 
-/** One of the other projects: its name, line and year, the whole row a link, marked ↗ when it leaves the site. */
+/** Canonical Threshold URLs for each city, serialized once on the server so the client switcher stays tiny. */
+const thresholdCityPreviews = thresholdCities.map(({ id, name }) => ({
+  id,
+  name,
+  displayUrl: thresholdDisplayLink(thresholdCityChoice(id)),
+})) as [ThresholdCityPreview, ...ThresholdCityPreview[]];
+
+/** One of the other projects: bordered paper strip with a visible 60 × 40 px thumbnail, name, line and year, marked ↗ when it leaves the site. */
 function ProjectRow({ project }: { project: Project }) {
   const href = projectHref(project);
   const external = !isInternalHref(href);
   return (
     <li>
       <SiteLink href={href} className="row">
+        {project.screenshot && (
+          <span className="row__thumb" aria-hidden="true">
+            <Image src={project.screenshot.src} alt="" width={120} height={80} sizes="60px" />
+          </span>
+        )}
         <span className="row__name">{project.name}</span>
         <span className="row__line">{rowLine(project)}</span>
         <span className="row__meta">
@@ -37,9 +52,9 @@ function ProjectRow({ project }: { project: Project }) {
 }
 
 /**
- * Things I make (DESIGN.md "The homepage, in order" 5, R-17): the first featured project as a wide panel, like the other
- * two a name, a line and its screenshot, with the other two side by side, then the rest as rows newest first (at most ten), then the archive link with the
- * true count.
+ * Things I make (DESIGN.md "The homepage, in order" 4, R-17, R-46, R-47): Threshold wide with its inline city URL
+ * switcher and concentric optical bezel, Argus Risk and Flowtime side by side, then the secondary projects as bordered
+ * paper strips with visible 60 × 40 px thumbnails newest first (at most ten), then the archive link with the true count.
  */
 export function ThingsIMake() {
   const [wide, ...pair] = featuredProjects(projects, featuredSlugs);
@@ -55,7 +70,13 @@ export function ThingsIMake() {
       <div className="panels">
         {wide && (
           <OnView motion="rise">
-            <ProjectPanel project={wide} line={rowLine(wide)} wide titleTransition />
+            <ProjectPanel
+              project={wide}
+              line={rowLine(wide)}
+              wide
+              titleTransition
+              controls={<ThresholdCitySwitcher cities={thresholdCityPreviews} initialCity={thresholdStart.city} label={thresholdLinkCopy.city} />}
+            />
           </OnView>
         )}
         {pair.length > 0 && (

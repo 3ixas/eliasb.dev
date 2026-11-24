@@ -28,7 +28,7 @@ async function overflows(page: Page) {
       const name = `${(element.getAttribute("class") ?? element.tagName).slice(0, 30)} "${(element.textContent ?? "").trim().slice(0, 24)}"`;
       if (box.right > edge + 1) out.push(`${name} ends at ${Math.round(box.right)}, past the page's ${edge}`);
       const panel = element.closest<HTMLElement>(".panel, .pass__card");
-      if (panel && panel !== element && !element.closest(".project__shot")) {
+      if (panel && panel !== element) {
         const inside = panel.getBoundingClientRect();
         if (box.right > inside.right + 1 && getComputedStyle(element).position !== "absolute") out.push(`${name} ends at ${Math.round(box.right)}, past its panel's ${Math.round(inside.right)}`);
       }

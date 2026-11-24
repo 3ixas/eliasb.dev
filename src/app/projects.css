@@ -1,23 +1,42 @@
 /*
- * Things I make and the Work archive (docs/design/DESIGN.md "The homepage, in order" 5 and "The Work archive"; R-17 and
- * R-23). A project is a panel (components/parts/project-panel.tsx): its own field and ink when it has a case study, else
- * paper. The panel, the rows, the pills and the arrivals are parts.css's.
+ * Things I make and the Work archive (docs/design/DESIGN.md "The homepage, in order" 4 and "The Work archive"; R-17,
+ * R-23, R-46 and R-47). A project is a panel (components/parts/project-panel.tsx): its own field and ink when it has a
+ * case study, else paper, staging its complete uncropped screenshot inside a concentric optical bezel tuned per field.
+ * The panel, the rows, the pills and the arrivals are parts.css's.
  */
 
 /* ---- A project panel ---- */
 
 .project {
+  /* Default bezel tuning for dark coloured fields (e.g. Flowtime #2a211b): lifted translucent mat + panel --line hairline. */
+  --bezel-bg: rgb(255 255 255 / 0.09);
+  --bezel-border: var(--line);
+  --bezel-img-shadow: 0 12px 28px -12px rgb(0 0 0 / 0.48), 0 0 0 1px var(--edge);
   display: grid;
   grid-template-rows: auto 1fr;
-  min-height: 500px;
-  padding: 0;
+  gap: 24px;
+  padding: 36px;
   color: var(--panel-ink);
   text-decoration: none;
 }
 
+/* Bright coloured fields (Threshold #c58f5e, Argus Risk #4f86f7): dark-tinted mat keeps dark product UIs crisp in both themes. */
+.project.surface--bright {
+  --bezel-bg: color-mix(in srgb, var(--panel-ink) 16%, transparent);
+  --bezel-border: var(--line);
+  --bezel-img-shadow: 0 12px 28px -12px rgb(0 0 0 / 0.32), 0 0 0 1px var(--edge);
+}
+
+/* Paper panels on the archive: quiet linen mat in light, lifted translucent mat in dark so dark UIs stay distinct from --paper. */
+.project.surface--paper {
+  --bezel-bg: light-dark(var(--band), rgb(255 255 255 / 0.07));
+  --bezel-border: var(--hair);
+  --bezel-img-shadow: 0 8px 20px -10px light-dark(rgb(20 20 18 / 0.18), rgb(0 0 0 / 0.45)), 0 0 0 1px var(--hair);
+}
+
 .project__text {
   display: block;
-  padding: 36px 40px 28px;
+  min-width: 0;
 }
 
 .project__name {
@@ -33,7 +52,7 @@
 
 .project__line {
   display: block;
-  max-width: 22em;
+  max-width: 24em;
   margin-top: 10px;
   font-family: var(--serif);
   font-optical-sizing: auto;
@@ -44,16 +63,19 @@
 
 .project__meta {
   display: block;
-  margin-top: 14px;
+  margin-top: 12px;
   font-size: var(--type-label);
   font-weight: 500;
 }
 
-/* The screenshot bleeds off the panel's lower edge and lifts 10 px under a hovering fine pointer. */
+/* Concentric optical bezel (28 px panel -> 16 px bezel -> 10 px uncropped image), lifting 10 px under a hovering fine pointer. */
 .project__shot {
   display: block;
   align-self: end;
-  margin: 0 40px -28px;
+  padding: 10px;
+  border: 1px solid var(--bezel-border);
+  border-radius: 16px;
+  background: var(--bezel-bg);
   transition: transform 700ms var(--out);
 }
 
@@ -61,29 +83,27 @@
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 16 / 9.4;
-  object-fit: cover;
-  object-position: top left;
-  border-radius: 12px 12px 0 0;
-  box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(0 0 0 / 0.12);
+  border-radius: 10px;
+  box-shadow: var(--bezel-img-shadow);
 }
 
 /* With no screenshot the panel is its text, at its own height. */
 .project--text {
-  min-height: 0;
   grid-template-rows: auto;
 }
 
-/* The wide panel: text and figures at the left, the screenshot bleeding off the right. */
+/* The wide panel: text, inline controls and CTA on the left, uncropped optical bezel on the right. */
 .project--wide {
-  grid-template: 1fr / 5fr 7fr;
-  min-height: 540px;
+  grid-template: 1fr / minmax(0, 5fr) minmax(0, 7fr);
+  align-items: center;
+  gap: 32px 40px;
+  padding: 40px 44px;
 }
 
 .project--wide .project__text {
-  display: grid;
-  grid-template-rows: auto auto 1fr;
-  padding: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .project--wide .project__name {
@@ -91,28 +111,87 @@
 }
 
 .project--wide .project__shot {
-  margin: 56px 0 0;
-  overflow: hidden;
+  align-self: center;
 }
 
-.project--wide .project__shot img {
-  width: auto;
-  max-width: none;
-  height: 100%;
-  min-height: 420px;
-  aspect-ratio: auto;
-  border-radius: 14px 0 0;
+/* ---- Threshold inline city URL switcher (R-46) ---- */
+
+.project-city {
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px 14px;
+  border: 1px solid var(--edge);
+  border-radius: 16px;
+  background: rgb(255 255 255 / 0.24);
+  display: grid;
+  gap: 10px;
 }
 
-/* The panel is itself the control, so its ring is outside it on the page: the page's cobalt, not the panel's ink. */
-.project:focus-visible {
+.project-city__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.project-city__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.3);
+  color: var(--panel-ink);
+  font-family: var(--sans);
+  font-size: var(--type-small);
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 150ms var(--out), background-color 150ms var(--out), color 150ms var(--out), border-color 150ms var(--out);
+}
+
+.project-city__btn:active {
+  transform: scale(0.97);
+}
+
+.project-city__btn[aria-pressed="true"] {
+  border-color: var(--panel-ink);
+  background: var(--panel-ink);
+  color: var(--field);
+}
+
+.project-city__url {
+  display: block;
+  color: var(--panel-ink);
+  font-family: var(--sans);
+  font-size: var(--type-label);
+  font-weight: 500;
+  line-height: 1.4;
+  font-variant-numeric: lining-nums tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.project__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* The linked panel is itself the control, so its ring is outside it on the page: the page's cobalt, not the panel's ink. */
+a.project:focus-visible {
   outline: 2px solid var(--cobalt);
   outline-offset: 3px;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .project:hover .project__shot {
+  a.project:hover .project__shot {
     transform: translateY(-10px);
+  }
+
+  .project-city__btn:not([aria-pressed="true"]):hover {
+    background: rgb(255 255 255 / 0.46);
   }
 }
 
@@ -123,12 +202,59 @@
   height: 100%;
 }
 
+/* Secondary project rows: calm bordered paper strips with visible-at-rest 60 × 40 px micro-thumbnails (R-47). */
 .things__rows {
-  margin-top: 32px;
+  display: grid;
+  gap: 10px;
+  margin-top: 24px;
+  border-top: 0;
+}
+
+.things__rows > li {
+  border-bottom: 0;
+}
+
+.things__rows .row {
+  grid-template-columns: 60px minmax(0, 3.6fr) minmax(0, 7fr) 5em;
+  gap: 4px 20px;
+  align-items: center;
+  margin-inline: 0;
+  padding: 12px 18px;
+  border: 1px solid var(--hair);
+  border-radius: 16px;
+  background-color: var(--paper);
+}
+
+.things__rows .row__thumb {
+  display: block;
+  width: 60px;
+  height: 40px;
+  overflow: hidden;
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+  background: var(--band);
+}
+
+.things__rows .row__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+}
+
+.things__rows .row__meta {
+  min-width: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .things__rows .row:hover {
+    background-color: light-dark(color-mix(in srgb, var(--paper), var(--ink) 5%), color-mix(in srgb, var(--paper), var(--ink) 7%));
+  }
 }
 
 .things__all {
-  margin-top: 32px;
+  margin-top: 28px;
 }
 
 /* ---- The archive ---- */
@@ -174,7 +300,8 @@
 }
 
 .archive__grid .project {
-  min-height: 0;
+  padding: 28px;
+  gap: 24px;
 }
 
 .archive__grid .project__name {
@@ -182,48 +309,57 @@
 }
 
 .archive__grid .project__shot {
-  margin-top: 36px;
-}
-
-.archive__grid .project__shot img {
-  aspect-ratio: 16 / 11;
+  padding: 8px;
 }
 
 /* ---- Narrower ---- */
 
 @media (max-width: 1259.98px) {
   .project--wide {
-    grid-template: auto 1fr / minmax(0, 1fr);
-  }
-
-  .project--wide .project__shot {
-    margin: 0 0 -24px 44px;
-  }
-
-  .project--wide .project__shot img {
-    width: 100%;
-    height: auto;
-    min-height: 0;
-    aspect-ratio: 16 / 10;
+    grid-template: auto auto / minmax(0, 1fr);
+    gap: 28px;
+    padding: 36px;
   }
 }
 
 @media (max-width: 719.98px) {
-  .project {
-    min-height: 0;
-  }
-
-  .project__text,
-  .project--wide .project__text {
-    padding: 26px 22px 22px;
+  .project,
+  .project--wide,
+  .archive__grid .project {
+    padding: 24px 20px;
+    gap: 20px;
   }
 
   .project__shot {
-    margin-inline: 22px;
+    padding: 8px;
   }
 
-  .project--wide .project__shot {
-    margin: 0 0 -24px 22px;
+  .things__rows .row {
+    grid-template-columns: 60px minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 4px 12px;
+    padding: 12px 14px;
+  }
+
+  .things__rows .row__thumb {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: center;
+  }
+
+  .things__rows .row__name {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .things__rows .row__meta {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .things__rows .row__line {
+    grid-column: 2 / -1;
+    grid-row: 2;
   }
 
   .archive {
@@ -234,5 +370,29 @@
 @media (prefers-reduced-motion: reduce) {
   .project__shot {
     transition: none;
+  }
+
+  .project-city__btn:active {
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .project__shot,
+  .project-city,
+  .things__rows .row,
+  .things__rows .row__thumb {
+    border-color: CanvasText;
+  }
+
+  .project-city__btn {
+    border-color: ButtonText;
+  }
+
+  .project-city__btn[aria-pressed="true"] {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background: Highlight;
+    color: HighlightText;
   }
 }
