@@ -7,19 +7,23 @@ import { caseStudyCopy, caseStudySectionKeys, caseStudySectionLabels } from "../
 import { firstDistrict, thresholdLink, thresholdLinkCopy, thresholdStart } from "../src/content/stretch/threshold-link";
 import { argusPositions, argusProvenanceCopy, formatUsd, pricedAt, priceSteps, unrealisedUsd } from "../src/content/stretch/argus-provenance";
 import { breakMinutes, flowtimeBreakCopy, focusRange, pomodoro } from "../src/content/stretch/flowtime-break";
+import { expectOpticalBezel, readOpticalBezel } from "./support/bezel";
 import { renderedContrast } from "./support/rendered-contrast";
 import { spoken } from "./support/roll";
 
 /*
- * Case studies (docs/design/DESIGN.md "Long-form pages", R-22): a panel in the project's colour holding the back link,
- * the name, the description, the stack, Live site and Code, the evidence figures and the landing screenshot; the
- * sections in the Role story's layout; the PRD as a paper card, its opening quote mark hanging in cobalt; then the next project as a panel.
+ * Case studies (docs/design/DESIGN.md "Long-form pages", R-22, R-54): a lifted open-ground header holding the back
+ * link, the name, the outcome lede, the stack, Live site and Code, and four bordered paper evidence cards; directly
+ * below, a full-width project-colour exhibition stage holding the whole uncropped screenshot in a concentric optical
+ * bezel; then the shared sticky chapter rail beside the six sections, structured Decision cards, working figures and
+ * paper PRD card; then the next project panel and Say hello.
  */
 
 const schemes = ["light", "dark"] as const;
 const rgb = (hex: string) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
 const width = (page: Page) => page.viewportSize()?.width ?? 0;
-const opening = (page: Page) => page.locator("header.case-open");
+const opening = (page: Page) => page.locator("header.case-header");
+const stage = (page: Page) => page.locator(".case-stage");
 
 for (const slug of caseStudySlugs) {
   const study = caseStudies[slug];
@@ -31,14 +35,14 @@ for (const slug of caseStudySlugs) {
       await page.goto(`/things-i-make/${slug}`);
     });
 
-    test("the opening is a panel in the project's colour: the back link, the name as the one h1, the description and the stack", async ({ page }) => {
-      await expect(opening(page)).toHaveCSS("background-color", rgb(project.panel!.field));
-      await expect(opening(page)).toHaveCSS("color", rgb(project.panel!.ink));
+    test("the header sits open on the page ground: back link, one h1, outcome lede, stack chips and four bordered evidence cards", async ({ page }) => {
+      await expect(opening(page)).not.toHaveClass(/\bpanel\b/);
+      await expect(opening(page)).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
       const back = opening(page).getByRole("link", { name: "Things I make", exact: true });
       await expect(back).toHaveAttribute("href", "/things-i-make");
       await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(project.name);
-      await expect(opening(page).locator(".case-open__lede")).toHaveText(study.description);
+      await expect(opening(page).locator(".case-header__lede")).toHaveText(study.description);
       await expect(opening(page).getByRole("list", { name: "Stack" }).getByRole("listitem")).toHaveText([...study.stack]);
       if (study.note) await expect(opening(page)).toContainText(study.note);
     });
@@ -60,39 +64,91 @@ for (const slug of caseStudySlugs) {
       }
     });
 
-    test("the evidence figures are in the opening, and four of them wrap without overflow", async ({ page }) => {
+    test("the four bordered evidence cards sit in the header and wrap without overflow", async ({ page }) => {
       const list = opening(page).getByRole("list", { name: "Evidence" });
       expect(await spoken(list.getByRole("listitem"))).toEqual(study.evidence.map(({ value, label }) => `${value} ${label}`));
+      await expect(list.getByRole("listitem").first()).toHaveCSS("border-top-width", "1px");
+      await expect(list.locator("b").first()).toHaveCSS("font-family", /Newsreader/);
       expect(await list.evaluate((element) => element.scrollWidth <= element.clientWidth + 0.5)).toBe(true);
       for (const item of await list.getByRole("listitem").all()) expect(await item.evaluate((element) => element.scrollWidth <= element.clientWidth + 0.5)).toBe(true);
     });
 
-    test("the screenshot sits in the panel, at the right of the text from 960 px and beneath it under that", async ({ page }) => {
-      const shot = opening(page).locator(".case-open__shot");
-      await expect(shot.locator(".zoom img")).toHaveAttribute("alt", project.screenshot!.alt);
-      await expect(shot.locator("img").first()).toHaveCSS("border-radius", "16px");
-      const text = opening(page).locator(".case-open__text");
+    test("the project-colour exhibition stage sits directly below the header, enters the first fold, and frames the whole uncropped screenshot in an optical bezel", async ({ page }) => {
+      await expect(stage(page)).toHaveClass(/\bpanel surface\b/);
+      await expect(stage(page)).toHaveCSS("background-color", rgb(project.panel!.field));
+      await expect(stage(page)).toHaveCSS("color", rgb(project.panel!.ink));
+      await expect(stage(page).locator(".zoom")).toHaveAttribute("aria-haspopup", "dialog");
+      await expect(stage(page).locator(".zoom img")).toHaveAttribute("alt", project.screenshot!.alt);
+      await page.evaluate(() => document.fonts.ready);
+      const viewportHeight = page.viewportSize()!.height;
+      const stageImg = stage(page).locator(".zoom img");
       await expect
         .poll(async () => {
-          const [t, s] = [(await text.boundingBox())!, (await shot.boundingBox())!];
-          return width(page) >= 960 ? s.x >= t.x + t.width - 1 : s.y >= t.y + t.height - 1;
+          const [headerBox, stageBox, imgBox] = [(await opening(page).boundingBox())!, (await stage(page).boundingBox())!, (await stageImg.boundingBox())!];
+          return {
+            belowHeader: stageBox.y >= headerBox.y + headerBox.height - 1,
+            // Not merely 1 px of panel padding: the framed screenshot itself is meaningfully visible in the first fold.
+            screenshotInFirstFold: imgBox.y < viewportHeight - 80,
+          };
         })
-        .toBe(true);
+        .toEqual({ belowHeader: true, screenshotInFirstFold: true });
+      const reading = await readOpticalBezel(stage(page), ".case-stage__bezel");
+      expectOpticalBezel(reading, `${project.name} stage`, width(page) < 720);
     });
 
-    test("the header is the shared one, and the six sections are in order, each under its own heading in the Role story's layout", async ({ page }) => {
+    test("the header is the shared one, and the six sections sit beside the shared sticky chapter rail with bordered Decision cards", async ({ page }) => {
       await expect(page.locator("[data-site-header]")).toHaveCount(1);
       const ids = await page.locator("article section[id]").evaluateAll((sections) => sections.map((section) => section.id));
       expect(ids).toEqual([...caseStudySectionKeys]);
       await expect(page.locator("article h2")).toHaveText(caseStudySectionKeys.map((key) => study.sections[key].heading ?? caseStudySectionLabels[key]));
       for (const text of await page.locator("article h2").allTextContents()) expect(text).not.toMatch(/^\d/);
-      const [heading, body] = [page.locator("section#decisions h2"), page.locator("section#decisions .story-section__body")];
+      const rail = page.locator("nav.chapter-rail");
+      await expect(rail).toHaveAttribute("aria-label", "Case study sections");
+      const links = rail.locator("a");
+      await expect(links).toHaveText(caseStudySectionKeys.map((key) => caseStudySectionLabels[key]));
+      for (const text of await links.allTextContents()) expect(text).not.toMatch(/\d/);
+      const stream = page.locator(".story-stream");
       await expect
         .poll(async () => {
-          const [h, b] = [(await heading.boundingBox())!, (await body.boundingBox())!];
-          return width(page) >= 720 ? b.x >= h.x + h.width - 1 : b.y >= h.y + h.height - 1;
+          const [r, s] = [(await rail.boundingBox())!, (await stream.boundingBox())!];
+          return width(page) >= 960 ? s.x >= r.x + r.width - 1 : s.y >= r.y + r.height - 1;
         })
         .toBe(true);
+      if (width(page) >= 960) {
+        await expect(rail).toHaveCSS("position", "sticky");
+        const railBox = (await rail.boundingBox())!;
+        for (const figure of await stream.locator(".story-fig:visible, .working-fig:visible").all()) {
+          const figBox = (await figure.boundingBox())!;
+          expect(figBox.x).toBeGreaterThanOrEqual(railBox.x + railBox.width - 1);
+        }
+      }
+      // Prose and Decision cards stay within the 640 px measure; figures stay within 760 px.
+      for (const key of caseStudySectionKeys) {
+        const body = page.locator(`section#${key} .story-section__body`);
+        for (const text of await body.locator(":scope > :not(.story-fig, .working-fig, .working-fig__still)").all()) {
+          expect((await text.boundingBox())!.width).toBeLessThanOrEqual(640.5);
+        }
+        for (const fig of await body.locator(":scope > .story-fig:visible, :scope > .working-fig:visible").all()) {
+          expect((await fig.boundingBox())!.width).toBeLessThanOrEqual(760.5);
+        }
+      }
+      const card = page.locator("section#decisions .story-cards li.story-card").first();
+      await expect(card).toHaveClass(/\bsurface surface--paper\b/);
+      await expect(card).toHaveCSS("border-radius", "16px");
+      await expect(card.locator("b")).toHaveCSS("font-family", /Newsreader/);
+    });
+
+    test("scrolling updates the chapter rail's active lifted paper pill without layout shift", async ({ page }) => {
+      const rail = page.locator("nav.chapter-rail");
+      await expect(rail.locator('a[aria-current="location"]')).toHaveCount(1);
+      await page.evaluate(() => document.fonts.ready);
+      const measure = () => rail.locator("a").evaluateAll((els) => els.map((el) => ({ w: el.getBoundingClientRect().width, h: el.getBoundingClientRect().height })));
+      const before = await measure();
+      const target = page.locator("section#how-its-built");
+      await target.evaluate((el) => window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 60));
+      const active = rail.locator('a[href="#how-its-built"]');
+      await expect(active).toHaveAttribute("aria-current", "location");
+      await expect.poll(measure).toEqual(before);
     });
 
     test("a section's address opens on that section and focuses it", async ({ page }) => {
@@ -182,13 +238,15 @@ for (const slug of caseStudySlugs) {
       await expect(page.locator("main")).toHaveCSS("opacity", "1");
     });
 
-    test("it is in the server-rendered page", async ({ page }) => {
+    test("it is in the server-rendered page, and the chapter rail is plain jump links without script", async ({ page }) => {
       await page.route("**/*.js", (route) => route.abort());
       await page.reload();
       await expect(page.locator("article section[id]")).toHaveCount(caseStudySectionKeys.length);
       await expect(page.locator('nav[aria-label="On this page"] a')).toHaveCount(5);
+      await expect(page.locator("nav.chapter-rail a")).toHaveCount(caseStudySectionKeys.length);
+      await expect(page.locator("nav.chapter-rail a[aria-current]")).toHaveCount(0);
       await expect(page.getByRole("list", { name: "Evidence" }).getByRole("listitem")).toHaveCount(study.evidence.length);
-      await expect(page.locator(".case-open__shot img")).not.toHaveCount(0);
+      await expect(page.locator(".case-stage__bezel img")).not.toHaveCount(0);
     });
 
     for (const scheme of schemes) {
@@ -310,6 +368,7 @@ test.describe("Case study: Threshold's working link", () => {
   const figure = (page: Page) => page.locator("section#how-its-built figure.working-fig");
   const address = (page: Page) => figure(page).locator("output.tlink__address");
   const shown = (link: string) => link.replace(/^https:\/\//, "");
+  const openScenario = (page: Page) => figure(page).getByRole("link", { name: /^Open this scenario opens/ });
   const live = async (page: Page) => {
     await figure(page).scrollIntoViewIfNeeded();
     await expect(figure(page).locator(".tlink[data-live]")).toHaveCount(1);
@@ -351,15 +410,25 @@ test.describe("Case study: Threshold's working link", () => {
     await expect(address(page)).toHaveText(shown(thresholdLink(thresholdStart)));
   });
 
-  test("each choice rewrites the link in Threshold's own format, and a new city starts on its first district", async ({ page }) => {
+  test("each choice rewrites the link in Threshold's own format, updates Open this scenario, and a new city starts on its first district", async ({ page }) => {
     await live(page);
+    await expect(openScenario(page)).toHaveAttribute("href", thresholdLink(thresholdStart));
+    await expect(openScenario(page)).toHaveAttribute("target", "_blank");
+    await expect(openScenario(page)).toHaveAttribute("rel", "noopener noreferrer");
+    await expect(openScenario(page).locator(".arrow")).toHaveText("\u2197\uFE0E");
     const choose = (name: string, value: string) => figure(page).getByLabel(name, { exact: true }).selectOption(value);
+    const placeUrl = thresholdLink({ ...thresholdStart, place: "2bed" });
     await choose(thresholdLinkCopy.place, "2bed");
-    await expect(address(page)).toHaveText(shown(thresholdLink({ ...thresholdStart, place: "2bed" })));
+    await expect(address(page)).toHaveText(shown(placeUrl));
+    await expect(openScenario(page)).toHaveAttribute("href", placeUrl);
+    const districtUrl = thresholdLink({ city: "london", district: "lambeth", place: "2bed" });
     await choose(thresholdLinkCopy.district, "lambeth");
     await expect(address(page)).toHaveText("threshold-beta.vercel.app/london?district=lambeth&type=2bed");
+    await expect(openScenario(page)).toHaveAttribute("href", districtUrl);
+    const zurichUrl = thresholdLink({ city: "zurich", district: firstDistrict("zurich"), place: "2bed" });
     await choose(thresholdLinkCopy.city, "zurich");
-    await expect(address(page)).toHaveText(shown(thresholdLink({ city: "zurich", district: firstDistrict("zurich"), place: "2bed" })));
+    await expect(address(page)).toHaveText(shown(zurichUrl));
+    await expect(openScenario(page)).toHaveAttribute("href", zurichUrl);
     await expect(figure(page).getByLabel(thresholdLinkCopy.district, { exact: true })).toHaveValue("kreis-1");
     // Only the parts that changed arrive afresh: the city and its district.
     await expect(figure(page).locator(".tlink__part[data-new]")).toHaveText(["zurich", "kreis-1"]);
@@ -375,6 +444,7 @@ test.describe("Case study: Threshold's working link", () => {
     await expect(address(page)).toHaveCount(1);
     const copy = figure(page).getByRole("button", { name: thresholdLinkCopy.copy });
     expect((await copy.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    expect((await openScenario(page).boundingBox())!.height).toBeGreaterThanOrEqual(44);
   });
 
   test("Copy link copies the working link for the choices shown", async ({ page, browserName }) => {
@@ -427,11 +497,12 @@ test.describe("Case study: Threshold's working link", () => {
     await expect.poll(() => page.evaluate(() => window.getSelection()?.toString())).toBe(shown(thresholdLink(thresholdStart)));
   });
 
-  test("a value never breaks across lines, and the link's room holds for the longest, so Copy link never moves", async ({ page }) => {
+  test("a value never breaks across lines, and the link's room holds for the longest, so Copy link and Open this scenario never move", async ({ page }) => {
     await live(page);
-    // On a phone Copy link sits under the address, which keeps room for the longest link; wider, it sits beside it, level with its first line.
     const copy = figure(page).getByRole("button", { name: thresholdLinkCopy.copy });
-    const tops = new Set<number>();
+    const open = openScenario(page);
+    const copyTops = new Set<number>();
+    const openTops = new Set<number>();
     for (const [city, district, place] of [
       ["zurich", "kreis-1", "room"],
       ["london", "kensington-chelsea", "studio"],
@@ -443,9 +514,12 @@ test.describe("Case study: Threshold's working link", () => {
       await figure(page).getByLabel(thresholdLinkCopy.place, { exact: true }).selectOption(place);
       await expect(address(page)).toContainText(`district=${district}&type=${place}`);
       for (const part of await figure(page).locator(".tlink__part").all()) expect(await part.evaluate((element) => element.getClientRects().length)).toBe(1);
-      tops.add(Math.round((await copy.boundingBox())!.y + (await page.evaluate(() => scrollY))));
+      const y = await page.evaluate(() => scrollY);
+      copyTops.add(Math.round((await copy.boundingBox())!.y + y));
+      openTops.add(Math.round((await open.boundingBox())!.y + y));
     }
-    expect([...tops]).toHaveLength(1);
+    expect([...copyTops]).toHaveLength(1);
+    expect([...openTops]).toHaveLength(1);
   });
 
   test.describe("without script", () => {

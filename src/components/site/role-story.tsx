@@ -49,7 +49,7 @@ export function RoleStoryPage({ story }: { story: RoleStory }) {
         <StoryChapters items={chapters} label="Story sections">
           {sectionKeys.map((key) => (
             <StorySection key={key} id={key} title={roleStorySectionLabels[key]}>
-              <StoryText body={story.sections[key]} cards />
+              <StoryText body={story.sections[key]} />
               {story.figures?.[key] && <RoleStoryFigureBlock figure={story.figures[key]} panel={story.panel} />}
             </StorySection>
           ))}

@@ -13,6 +13,7 @@ export const thresholdLinkCopy = {
   place: "Place",
   copy: "Copy link",
   copied: "Copied",
+  open: "Open this scenario ↗",
   caption: "Change a choice and the link changes with it. Copy it to open Threshold as you left it.",
 } as const;
 
