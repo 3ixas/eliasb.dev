@@ -21,7 +21,7 @@ import {
   roleStorySectionLabels,
 } from "../src/content/stretch/role-story.ts";
 import { currentPassStatus, passLinkLabel, passProblems, passRecords } from "../src/content/stretch/staff-pass.ts";
-import { howIWork } from "../src/content/stretch/how-i-work.ts";
+import { howIWork, shortPrdDate } from "../src/content/stretch/how-i-work.ts";
 import { greetingKey, greetingLine } from "../src/content/stretch/greeting.ts";
 import { offTheClock } from "../src/content/stretch/off-the-clock.ts";
 import { opening } from "../src/content/stretch/opening.ts";
@@ -171,16 +171,22 @@ assert.equal(`${howIWork.prd.title}, ${prdDate}`, raw.match(/^- PRD card caption
   const table = deck.split("\n").filter((line) => line.startsWith("|") && !line.startsWith("|---")).map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()));
   const drawnAs = ({ drawn }) =>
     drawn.kind === "projects" ? drawn.projects.map((slug) => projects.find((project) => project.slug === slug)?.name).join(" · ")
-    : drawn.kind === "count" ? `${drawn.value}, as ${drawn.value} ticks`
-    : drawn.kind === "switch" ? `A switch, ${drawn.label}`
-    : `${drawn.value}, its bar ${drawn.percent}% longer`;
+    : drawn.kind === "count" ? `${drawn.value}, ${drawn.slices} slices`
+    : drawn.kind === "switch" ? `A switch, ${drawn.off} / ${drawn.on} · ${drawn.currentPath} · ${drawn.newPath}`
+    : `${drawn.value}, ${drawn.before} · ${drawn.after}, its bar ${drawn.percent}% longer`;
   assert.deepEqual(howIWork.beats.map((beat) => [beat.habit, beat.highlight, drawnAs(beat)]), table.filter((row) => howIWork.beats.some((beat) => beat.habit === row[0])), "How I work: the highlights and drawn proofs");
-  assert.equal(`${howIWork.prd.title}, ${prdDate} →`, line("PRD link"), "How I work: the link to the PRD");
-  // A drawing never says more than its story: a count or a change is a number the story states.
+  assert.equal(`${howIWork.prd.title}, ${shortPrdDate(prdDate)} →`, line("PRD link"), "How I work: the link to the PRD");
+  // A drawing never says more than its story or Threshold's evidence: every drawn number is stated.
   for (const beat of howIWork.beats) {
     const { drawn } = beat;
     const number = drawn.kind === "count" ? String(drawn.value) : drawn.kind === "change" ? String(drawn.percent) : null;
     if (number) assert.ok(beat.highlight.includes(number), `How I work: "${beat.habit}" draws ${number}, which its highlighted phrase does not state`);
+    if (drawn.kind === "count") {
+      assert.ok(
+        caseStudies.threshold.evidence.some((item) => item.value === String(drawn.slices) && item.label.includes("slices")),
+        `How I work: "${beat.habit}" draws ${drawn.slices} slices, which Threshold's evidence does not state`,
+      );
+    }
     if (drawn.kind === "change") assert.equal(drawn.value, `+${drawn.percent}%`, `How I work: "${beat.habit}" writes ${drawn.value} for a ${drawn.percent}% change`);
     if (drawn.kind === "projects") for (const slug of drawn.projects) assert.ok(beat.proof.includes(projects.find((project) => project.slug === slug)?.name ?? slug), `How I work: "${beat.habit}" draws ${slug}, which its story does not name`);
   }

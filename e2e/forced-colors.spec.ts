@@ -113,4 +113,53 @@ test.describe("Forced colours", () => {
     expect(activeBg).not.toBe(canvas);
     expect(bezelBorder).not.toBe(canvas);
   });
+
+  test("How I work keeps its feature-flag switch, active route chip, 13-slice bar and Before/After bars distinct", async ({ page }) => {
+    await page.goto("/");
+    const how = page.locator("section#how-i-work");
+    const canvas = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    const sw = how.getByRole("switch");
+    const activeChip = how.locator('.route-chip[data-live="true"]');
+    const inactiveChip = how.locator('.route-chip[data-live="false"]');
+    await expect(activeChip).toHaveCSS("forced-color-adjust", "none");
+    await expect(sw.locator(".flag-switch__track")).toHaveCSS("forced-color-adjust", "none");
+
+    const readColours = () =>
+      how.evaluate((root) => {
+        const slice = root.querySelector(".how-slices__bars i")!;
+        const track = root.querySelector(".flag-switch__track")!;
+        const knob = root.querySelector(".flag-switch__knob")!;
+        const live = root.querySelector('.route-chip[data-live="true"]')!;
+        const idle = root.querySelector('.route-chip[data-live="false"]')!;
+        const before = root.querySelector('.drawn__bars .bar:not(.bar--after)')!;
+        const after = root.querySelector(".drawn__bars .bar--after")!;
+        return {
+          slice: getComputedStyle(slice).backgroundColor,
+          track: getComputedStyle(track).backgroundColor,
+          knob: getComputedStyle(knob).backgroundColor,
+          liveBg: getComputedStyle(live).backgroundColor,
+          idleBg: getComputedStyle(idle).backgroundColor,
+          before: getComputedStyle(before).backgroundColor,
+          after: getComputedStyle(after).backgroundColor,
+        };
+      });
+
+    const off = await readColours();
+    expect(off.slice).not.toBe(canvas);
+    expect(off.knob).not.toBe(off.track);
+    expect(off.liveBg).not.toBe(off.idleBg);
+    expect(off.liveBg).not.toBe(canvas);
+    expect(off.after).not.toBe(off.before);
+    expect(off.before).not.toBe(canvas);
+    expect(off.after).not.toBe(canvas);
+
+    await expect.poll(() => sw.evaluate((el) => Object.keys(el).some((key) => key.startsWith("__reactProps$")))).toBe(true);
+    await sw.click();
+    await expect(sw).toHaveAttribute("aria-checked", "true");
+    await expect(inactiveChip).toBeVisible();
+    const on = await readColours();
+    expect(on.track).not.toBe(off.track);
+    expect(on.knob).not.toBe(on.track);
+    expect(on.liveBg).not.toBe(on.idleBg);
+  });
 });

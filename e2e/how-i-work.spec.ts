@@ -1,35 +1,68 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { caseStudies } from "../src/content/stretch/case-studies";
-import { howIWork } from "../src/content/stretch/how-i-work";
+import { howIWork, shortPrdDate } from "../src/content/stretch/how-i-work";
 import { contrastRatio } from "../src/content/stretch/story";
 import { shownSource, work } from "../src/content/stretch/work";
 import { renderedContrast } from "./support/rendered-contrast";
 
 /*
- * Where I'm headed and How I work (docs/design/DESIGN.md "The homepage, in order" 4 and 6, "How I work's cards"; R-16,
- * R-18 and #459): one paper panel with three parts, each from a chip naming its source and its proof drawn beneath its
- * line; then four upright cards, each the habit above a cobalt rule, the story with its proof phrase highlighted, and
- * the proof drawn in the foot; then the PRD link.
+ * Where I'm headed and How I work (docs/design/DESIGN.md "The homepage, in order" 5, "How I work's cards"; R-16, R-18,
+ * R-48, R-49 and #459): both share one full-bleed `--band` section with hairline top and bottom edges. Where I'm headed
+ * sits on an asymmetric 4 / 7 bordered paper panel keeping its source chips and three drawn proofs; How I work is a
+ * 2 × 2 grid of bordered paper cards (stacking under 720 px) with four distinct inset proof trays.
  */
 
-const headed = (page: Page) => page.locator("section[aria-labelledby='headed-heading']");
-const how = (page: Page) => page.locator("section#how-i-work");
+const band = (page: Page) => page.locator("#main-content > section.headed-how-band");
+const headed = (page: Page) => band(page).locator("section[aria-labelledby='headed-heading']");
+const how = (page: Page) => band(page).locator("section#how-i-work");
 const cards = (page: Page) => how(page).locator(".card");
 const width = (page: Page) => page.viewportSize()?.width ?? 0;
 const boxOf = async (locator: Locator) => (await locator.boundingBox())!;
 const settled = (page: Page) => page.evaluate(() => document.fonts.ready.then(() => true));
-const date = caseStudies.threshold.prd.date!;
+const shortDate = shortPrdDate(caseStudies.threshold.prd.date!);
 
-test.describe("Where I'm headed", () => {
+test.describe("Where I'm headed and the shared band", () => {
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
   });
 
-  test("is its own section after Work: one paper panel with the title, the lead and three parts", async ({ page }) => {
-    const order = await page.locator("#main-content > section").evaluateAll((all) => all.map((section) => section.id || section.getAttribute("aria-labelledby")));
-    expect(order.indexOf("headed-heading")).toBe(order.indexOf("work") + 1);
+  test("shares one full-bleed --band section with hairline top and bottom edges after Things I make", async ({ page }) => {
+    await settled(page);
+    const order = await page.locator("#main-content > section").evaluateAll((all) => all.map((section) => section.id || section.className));
+    expect(order.indexOf("headed-how-band")).toBe(order.indexOf("things-i-make") + 1);
+    const { hair, bandToken } = await page.evaluate(() => {
+      const read = (token: string) => {
+        const probe = document.createElement("i");
+        probe.style.color = `var(${token})`;
+        document.body.append(probe);
+        const colour = getComputedStyle(probe).color;
+        probe.remove();
+        return colour;
+      };
+      return { hair: read("--hair"), bandToken: read("--band") };
+    });
+    await expect(band(page)).toHaveCSS("background-color", bandToken);
+    await expect(band(page)).toHaveCSS("border-top", `1px solid ${hair}`);
+    await expect(band(page)).toHaveCSS("border-bottom", `1px solid ${hair}`);
+    await expect
+      .poll(async () => {
+        const box = await band(page).boundingBox();
+        if (!box) return null;
+        const { pageWidth, overflow } = await page.evaluate(() => ({
+          pageWidth: document.body.getBoundingClientRect().width,
+          overflow: document.documentElement.scrollWidth > innerWidth,
+        }));
+        return {
+          flushLeft: Math.abs(box.x) <= 0.5,
+          matchesBody: Math.abs(box.width - pageWidth) <= 0.5,
+          fullBleed: box.width >= page.viewportSize()!.width - 20,
+          overflow,
+        };
+      })
+      .toEqual({ flushLeft: true, matchesBody: true, fullBleed: true, overflow: false });
+
     await expect(headed(page).getByRole("heading", { level: 2 })).toHaveText(work.headed.heading);
     await expect(headed(page).locator(".surface--paper")).toHaveCount(1);
     await expect(headed(page).locator(".headed__lead p")).toHaveText(work.headed.line);
@@ -47,10 +80,14 @@ test.describe("Where I'm headed", () => {
     for (const retired of ["product engineer", "So far", "Judgement", "Depth", "Range"]) expect(text).not.toContain(retired);
   });
 
-  test("the lead sits beside the parts from 1260 px and above them under it", async ({ page }) => {
+  test("the lead sits beside the parts in an asymmetric 4 / 7 layout from 1260 px and above them under it", async ({ page }) => {
     const [lead, parts] = await Promise.all([boxOf(headed(page).locator(".headed__lead")), boxOf(headed(page).locator(".headed__parts"))]);
-    if (width(page) >= 1260) expect(parts.x).toBeGreaterThan(lead.x + lead.width);
-    else expect(parts.y).toBeGreaterThanOrEqual(lead.y + lead.height);
+    if (width(page) >= 1260) {
+      expect(parts.x).toBeGreaterThan(lead.x + lead.width);
+      expect(parts.width / lead.width).toBeCloseTo(7 / 4, 1);
+    } else {
+      expect(parts.y).toBeGreaterThanOrEqual(lead.y + lead.height);
+    }
   });
 
   test("each part draws its proof, hidden from assistive technology and matching its line", async ({ page }) => {
@@ -80,7 +117,8 @@ test.describe("Where I'm headed", () => {
     expect(firstMonth.x).toBeGreaterThan(zero.x + zero.width);
     expect(lastMonth.x).toBeGreaterThan(firstMonth.x);
     expect(prod.x).toBeGreaterThan(lastMonth.x + lastMonth.width);
-    // Threshold: 57 ticks on one row leading to one filled live mark.
+    // Threshold: 57 ticks on one row leading to one filled live mark — and the 57-tick motif appears only once on the page.
+    await expect(page.locator(".drawn__ticks")).toHaveCount(1);
     await expect(threshold.locator(".drawn__ticks i")).toHaveCount(57);
     const tickRows = await threshold.locator(".drawn__ticks i").evaluateAll((ticks) => new Set(ticks.map((tick) => Math.round(tick.getBoundingClientRect().top))).size);
     expect(tickRows).toBe(1);
@@ -150,19 +188,22 @@ test.describe("How I work", () => {
     await page.goto("/");
   });
 
-  test("four cards, each the habit, its story verbatim with the proof phrase highlighted, and a drawn proof", async ({ page }) => {
+  test("four bordered paper cards, each with habit, verbatim highlighted story, and its own distinct inset proof tray", async ({ page }) => {
     await expect(how(page).getByRole("heading", { level: 2 })).toHaveText(howIWork.heading);
     await expect(cards(page)).toHaveCount(4);
+    const kinds: string[] = [];
     for (const [index, beat] of howIWork.beats.entries()) {
       const card = cards(page).nth(index);
       await expect(card.getByRole("heading", { level: 3 })).toHaveText(beat.habit);
       await expect(card.locator("p")).toHaveText(beat.proof);
       await expect(card.locator("mark")).toHaveText(beat.highlight);
-      await expect(card.locator(".card__proof")).toBeVisible();
-      // A paper surface (#476): lit from above, its edge the hairline, over a neutral shadow.
+      const tray = card.locator(".card__proof");
+      await expect(tray).toBeVisible();
+      kinds.push((await tray.getAttribute("data-proof"))!);
       await expect(card).toHaveClass(/\bsurface surface--paper\b/);
       await expect(card).toHaveCSS("box-shadow", /0px 6px 14px -6px/);
     }
+    expect(new Set(kinds).size).toBe(4);
   });
 
   test("the highlight is a tint behind the words, never an underline", async ({ page }) => {
@@ -173,55 +214,131 @@ test.describe("How I work", () => {
     }
   });
 
-  test("the proofs are drawn from the content: the two projects, 57 ticks, a switch that is off, a bar 15% longer", async ({ page }) => {
+  test("four distinct proof trays: project pills, 57 + 13-slice bar + PRD link, live Off/On switch, and +15% Before/After bars", async ({ page }) => {
     const [start, write, ship, measure] = [0, 1, 2, 3].map((index) => cards(page).nth(index).locator(".card__proof"));
-    await expect(start.locator(".drawn__dot")).toHaveText(["Threshold", "Flowtime"]);
+
+    // Tray 1: Threshold and Flowtime pills linking straight to their case studies, >= 44 px tall.
+    const pills = start.locator("a.how-project-pill");
+    await expect(pills).toHaveText(["Threshold", "Flowtime"]);
+    await expect(pills.nth(0)).toHaveAttribute("href", "/things-i-make/threshold");
+    await expect(pills.nth(1)).toHaveAttribute("href", "/things-i-make/flowtime");
+    for (const pill of await pills.all()) {
+      await expect(pill.locator("img")).toBeVisible();
+      expect((await boxOf(pill)).height).toBeGreaterThanOrEqual(44);
+    }
+
+    // Tray 2: 57 numeral, 13-slice stepped bar, and direct PRD link inside the tray (no separate PRD link, no 57 ticks).
     await expect(write.locator("b")).toHaveText("57");
-    await expect(write.locator(".drawn__ticks i")).toHaveCount(57);
-    await expect(ship).toHaveText("Off");
-    await expect(ship.locator(".drawn__switch")).toHaveCount(1);
+    await expect(write.locator(".how-slices__bars i")).toHaveCount(13);
+    await expect(write.locator(".drawn__ticks")).toHaveCount(0);
+    await expect(how(page).locator("a.how__prd")).toHaveCount(1);
+    const prdLink = write.getByRole("link", { name: `${howIWork.prd.title}, ${shortDate}` });
+    await expect(prdLink).toHaveAttribute("href", "/things-i-make/threshold#written-down-first");
+    expect((await boxOf(prdLink)).height).toBeGreaterThanOrEqual(44);
+
+    // Tray 3: Off / On role="switch" named by New cached path, described by defaults to off, moving the live highlight.
+    const sw = ship.getByRole("switch", { name: "New cached path" });
+    const todayChip = ship.locator(".route-chip").nth(0);
+    const newChip = ship.locator(".route-chip").nth(1);
+    await expect(sw).toHaveAttribute("aria-checked", "false");
+    await expect(sw).toHaveAccessibleDescription("defaults to off");
+    await expect(sw.locator(".flag-switch__label")).toHaveText("Off");
+    await expect(todayChip).toHaveText("Today’s path");
+    await expect(newChip).toHaveText("New cached path");
+    await expect(todayChip).toHaveAttribute("data-live", "true");
+    await expect(newChip).toHaveAttribute("data-live", "false");
+    const swBox = await boxOf(sw);
+    expect(swBox.height).toBeGreaterThanOrEqual(44);
+    expect(swBox.width).toBeGreaterThanOrEqual(44);
+
+    // Tray 4: +15% over proportional Before and After bars.
     await expect(measure.locator("b")).toHaveText("+15%");
-    const [before, after] = await measure.locator(".bar").evaluateAll((bars) => bars.map((bar) => bar.getBoundingClientRect().width));
-    expect(after / before).toBeCloseTo(1.15, 2);
+    await expect(measure.locator(".how-lift__label")).toHaveText(["Before", "After"]);
+    await expect
+      .poll(async () => {
+        const [before, after] = await measure.locator(".bar").evaluateAll((bars) => bars.map((bar) => bar.getBoundingClientRect().width));
+        return before > 0 ? after / before : 0;
+      })
+      .toBeCloseTo(1.15, 2);
   });
 
-  test("every card's rule sits at one height, and the cards are four across, two under 1260 px and one under 720 px", async ({ page }) => {
+  test("the feature-flag switch toggles with click, Space and Enter, keeps its accessible name, updates aria-checked and moves the active route highlight", async ({ page }) => {
+    const ship = cards(page).nth(2).locator(".card__proof");
+    const sw = ship.getByRole("switch", { name: "New cached path" });
+    const todayChip = ship.locator(".route-chip").nth(0);
+    const newChip = ship.locator(".route-chip").nth(1);
+
+    await expect(sw).toHaveAttribute("aria-checked", "false");
+
+    // Click: Off -> On
+    await sw.click();
+    await expect(sw).toHaveAttribute("aria-checked", "true");
+    await expect(sw).toHaveAccessibleName("New cached path");
+    await expect(sw.locator(".flag-switch__label")).toHaveText("On");
+    await expect(todayChip).toHaveAttribute("data-live", "false");
+    await expect(newChip).toHaveAttribute("data-live", "true");
+
+    // Space: On -> Off
+    await sw.focus();
+    await page.keyboard.press("Space");
+    await expect(sw).toHaveAttribute("aria-checked", "false");
+    await expect(sw).toHaveAccessibleName("New cached path");
+    await expect(sw.locator(".flag-switch__label")).toHaveText("Off");
+    await expect(todayChip).toHaveAttribute("data-live", "true");
+    await expect(newChip).toHaveAttribute("data-live", "false");
+
+    // Enter: Off -> On
+    await page.keyboard.press("Enter");
+    await expect(sw).toHaveAttribute("aria-checked", "true");
+    await expect(sw).toHaveAccessibleName("New cached path");
+    await expect(sw.locator(".flag-switch__label")).toHaveText("On");
+    await expect(todayChip).toHaveAttribute("data-live", "false");
+    await expect(newChip).toHaveAttribute("data-live", "true");
+  });
+
+  test("cards sit in a 2 × 2 grid from 720 px and stack to 1 column under 720 px, with level cobalt rules per row", async ({ page }) => {
     await settled(page);
     const rules = await cards(page).locator("h3").evaluateAll((headings) => headings.map((heading) => Math.round(heading.getBoundingClientRect().bottom)));
     const tops = await cards(page).evaluateAll((all) => all.map((card) => Math.round(card.getBoundingClientRect().top)));
-    const across = width(page) >= 1260 ? 4 : width(page) >= 720 ? 2 : 1;
+    const across = width(page) >= 720 ? 2 : 1;
     for (let row = 0; row < 4; row += across) {
       const inRow = rules.slice(row, row + across);
       if (across > 1) expect(new Set(inRow).size, `rules in row ${row / across + 1}`).toBe(1);
       expect(new Set(tops.slice(row, row + across)).size).toBe(1);
     }
+    if (across === 2) expect(tops[2]).toBeGreaterThan(tops[0]);
     await expect(cards(page).first().locator("h3")).toHaveCSS("border-bottom-width", "2px");
   });
 
-  test("the PRD link names its date and lands on the PRD on Threshold's case study", async ({ page }) => {
-    const link = how(page).getByRole("link", { name: `${howIWork.prd.title}, ${date}` });
+  test("the PRD link inside card 2 lands on the PRD on Threshold's case study", async ({ page }) => {
+    const link = cards(page).nth(1).getByRole("link", { name: `${howIWork.prd.title}, ${shortDate}` });
     await expect(link).toHaveAttribute("href", "/things-i-make/threshold#written-down-first");
-    expect((await boxOf(link)).height).toBeGreaterThanOrEqual(44);
     await link.click();
     await expect(page).toHaveURL(/\/things-i-make\/threshold#written-down-first$/);
     await expect(page.locator("#written-down-first")).toBeInViewport();
   });
 
-  test("#how-i-work still lands on the section", async ({ page }) => {
+  test("#how-i-work lands on the section", async ({ page }) => {
     await page.goto("/#how-i-work");
     await expect(how(page).getByRole("heading", { level: 2 })).toBeInViewport();
   });
 
-  test("both sections are complete without script", async ({ page }) => {
-    await page.route("**/*.js", (route) => route.abort());
-    await page.reload();
+  test("both sections are complete without script, and the switch renders as a still Off figure", async ({ browser }, testInfo) => {
+    const context = await browser.newContext({ javaScriptEnabled: false, viewport: testInfo.project.use.viewport, reducedMotion: "reduce" });
+    const page = await context.newPage();
+    await page.goto("/");
     await expect(headed(page).locator(".headed__parts > li")).toHaveCount(3);
     await expect(headed(page).locator(".headed__proof")).toHaveCount(3);
     await expect(cards(page)).toHaveCount(4);
     for (const card of await cards(page).all()) await expect(card).toBeVisible();
+    const card3 = cards(page).nth(2);
+    await expect(card3.getByRole("switch")).toHaveCount(0);
+    await expect(card3.locator(".flag-switch__label")).toHaveText("Off");
+    await expect(card3.locator('.route-chip[data-live="true"]')).toHaveText("Today’s path");
+    await context.close();
   });
 
-  test("nothing scrolls sideways, and nothing in either section is under 13 px", async ({ page }) => {
+  test("nothing scrolls sideways across 320 to 1440 px, and nothing in the band is under 13 px", async ({ page }) => {
     await settled(page);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     for (const scope of [headed(page), how(page)]) {
@@ -232,25 +349,57 @@ test.describe("How I work", () => {
     }
   });
 
+  test("interactive tray controls show the 2 px cobalt focus ring at 3 px offset", async ({ page, browserName }) => {
+    test.skip(browserName === "webkit", "WebKit does not apply :focus-visible on programmatic keyboard focus consistently for links");
+    const cobalt = await page.evaluate(() => {
+      const probe = document.createElement("i");
+      probe.style.color = "var(--cobalt)";
+      document.body.append(probe);
+      const colour = getComputedStyle(probe).color;
+      probe.remove();
+      return colour;
+    });
+    const controls = [
+      cards(page).nth(0).locator("a.how-project-pill").first(),
+      cards(page).nth(1).locator("a.how__prd"),
+      cards(page).nth(2).getByRole("switch", { name: "New cached path" }),
+    ];
+    for (const control of controls) {
+      await control.focus();
+      await page.keyboard.press("Shift+Tab");
+      await page.keyboard.press("Tab");
+      await expect(control).toBeFocused();
+      await expect(control).toHaveCSS("outline-width", "2px");
+      await expect(control).toHaveCSS("outline-style", "solid");
+      await expect(control).toHaveCSS("outline-color", cobalt);
+      await expect(control).toHaveCSS("outline-offset", "3px");
+    }
+  });
+
   for (const scheme of ["light", "dark"] as const) {
-    test(`every text in both sections passes AA, measured on the rendered page (${scheme})`, async ({ page, browserName }) => {
+    test(`every text in the band passes AA, measured on the rendered page (${scheme})`, async ({ page, browserName }) => {
       test.skip(browserName !== "chromium", "Measured in Chromium");
       await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
       await page.reload();
       await settled(page);
       const texts = (await headed(page).innerText()) + "\n" + (await how(page).innerText());
       const readings = (await renderedContrast(page)).filter((reading) => texts.includes(reading.text));
-      for (const expected of ["Optegra", work.headed.bars[0].soFar.text.slice(0, 20), "no clear idea", "Before I build", "Off", "+15%", "Threshold’s PRD"]) {
+      for (const expected of ["Optegra", work.headed.bars[0].soFar.text.slice(0, 20), "no clear idea", "Before I build", "Today’s path", "New cached path", "+15%", "Before", "After", "Threshold’s PRD"]) {
         expect(readings.some((reading) => reading.text.includes(expected)), expected).toBe(true);
       }
       expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);
     });
 
-    test(`has no axe violations (${scheme})`, async ({ page }) => {
+    test(`has no axe violations in either switch state (${scheme})`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
       await page.reload();
-      const results = await new AxeBuilder({ page }).include("section[aria-labelledby='headed-heading']").include("#how-i-work").analyze();
-      expect(results.violations).toEqual([]);
+      const offResults = await new AxeBuilder({ page }).include("#main-content > section.headed-how-band").analyze();
+      expect(offResults.violations).toEqual([]);
+      const sw = cards(page).nth(2).getByRole("switch", { name: "New cached path" });
+      await sw.click();
+      await expect(sw).toHaveAttribute("aria-checked", "true");
+      const onResults = await new AxeBuilder({ page }).include("#main-content > section.headed-how-band").analyze();
+      expect(onResults.violations).toEqual([]);
     });
   }
 });

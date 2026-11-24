@@ -47,6 +47,9 @@ test.describe("Contrast, measured from the rendered page", () => {
       "Zurich",
       "threshold-beta.vercel.app",
       "Home Secretary",
+      "Today’s path",
+      "New cached path",
+      "Threshold’s PRD, 16 Apr 2026",
     ];
     for (const text of targets) expect(measured, `"${text}" is measured`).toContain(normal(text));
     const ofTargets = readings.filter((reading) => targets.some((text) => normal(reading.text).includes(normal(text)) || normal(text).includes(normal(reading.text))));

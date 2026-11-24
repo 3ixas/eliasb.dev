@@ -8,9 +8,9 @@ import { ThingsIMake } from "@/components/site/things-i-make";
 import { Work } from "@/components/site/work";
 
 /**
- * The Stretch homepage shell: the header, the opening line and five anchored sections
- * (Work first) with their headings, notes and true counts. The page ends on Say hello: no footer. The
- * page is complete from its first frame: nothing is held, faded or played in.
+ * The homepage shell (DESIGN.md "The homepage, in order"): header, opening, Work, Things I make, the full-bleed
+ * `--band` section holding Where I'm headed and How I work, Off the clock, and Say hello. No footer; complete from its
+ * first frame.
  */
 export function Homepage() {
   return (
@@ -20,11 +20,15 @@ export function Homepage() {
         <Opening />
 
         <Work />
-        <WhereImHeaded />
 
         <ThingsIMake />
 
-        <HowIWork />
+        <section className="headed-how-band">
+          <div className="frame">
+            <WhereImHeaded />
+            <HowIWork />
+          </div>
+        </section>
 
         <OffTheClock />
 
