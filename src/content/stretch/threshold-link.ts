@@ -107,3 +107,10 @@ export const thresholdLink = ({ city, district, place }: ThresholdChoice) =>
 
 /** A city's first district is Threshold's own default, so a new city starts there. */
 export const firstDistrict = (city: ThresholdCity) => thresholdCities.find(({ id }) => id === city)!.districts[0][0];
+
+/** Canonical preview choice for a city on the homepage switcher: London keeps `thresholdStart` (Hackney, room); other cities open on their first district. */
+export const thresholdCityChoice = (city: ThresholdCity): ThresholdChoice =>
+  city === thresholdStart.city ? thresholdStart : { city, district: firstDistrict(city), place: thresholdStart.place };
+
+/** The canonical Threshold URL without its scheme, as shown in URL previews. */
+export const thresholdDisplayLink = (choice: ThresholdChoice) => thresholdLink(choice).replace(/^https?:\/\//, "");

@@ -97,4 +97,20 @@ test.describe("Forced colours", () => {
     await expect(card.locator(".pass__address")).toHaveCSS("color", "rgb(75, 74, 70)");
     await expect(card.locator(".pass__silhouette")).toHaveCSS("fill", "rgb(185, 184, 177)");
   });
+
+  test("Threshold's city switcher keeps its selected button distinct and project bezels keep their border", async ({ page }) => {
+    await page.goto("/");
+    const active = page.locator('#things-i-make .project-city__btn[aria-pressed="true"]');
+    const inactive = page.locator('#things-i-make .project-city__btn[aria-pressed="false"]').first();
+    await expect(active).toHaveCSS("forced-color-adjust", "none");
+    const [activeBg, inactiveBg, bezelBorder] = await Promise.all([
+      active.evaluate((el) => getComputedStyle(el).backgroundColor),
+      inactive.evaluate((el) => getComputedStyle(el).backgroundColor),
+      page.locator("#things-i-make .project__shot").first().evaluate((el) => getComputedStyle(el).borderTopColor),
+    ]);
+    const canvas = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    expect(activeBg).not.toBe(inactiveBg);
+    expect(activeBg).not.toBe(canvas);
+    expect(bezelBorder).not.toBe(canvas);
+  });
 });

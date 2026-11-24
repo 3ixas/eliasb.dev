@@ -90,7 +90,7 @@ The canonical scrollable homepage where the primary navigation moves between six
 _Avoid_: Making Library, Lab, or About separate primary destinations.
 
 **Featured work**:
-The three projects with a **Case study** (Threshold, Argus Risk and Flowtime), chosen by hand and shown first in **Things I make** as panels in their **Project colour**: Threshold wide, a name, a line and its screenshot (its figures are on its case study), then the other two side by side (R-17). A featured project needs a case study, a screenshot and its panel colours. The rest follow as plain rows.
+The three projects with a **Case study** (Threshold, Argus Risk and Flowtime), chosen by hand and shown first in **Things I make** as panels in their **Project colour**, each framing its uncropped screenshot in an optical bezel: Threshold wide with its inline city URL switcher, then Argus Risk and Flowtime side by side (R-17, R-46). A featured project needs a case study, a screenshot and its panel colours. The rest follow as bordered paper strips with visible thumbnails (R-47).
 _Avoid_: Treating the homepage as a complete project archive.
 
 **Work archive**:
