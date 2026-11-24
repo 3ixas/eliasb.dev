@@ -32,7 +32,7 @@ for (const route of routes) {
 test("an inner page's header links lead to the homepage's five sections", async ({ page }) => {
   for (const route of routes) {
     await page.goto(route);
-    const nav = page.locator("[data-site-header]").getByRole("navigation", { name: siteCopy.header.linksLabel, includeHidden: true });
+    const nav = page.locator("[data-site-header]").getByRole("navigation", { name: siteCopy.header.siteLinksLabel, includeHidden: true });
     expect(await nav.locator("a").evaluateAll((anchors) => anchors.map((anchor) => [anchor.textContent, anchor.getAttribute("href")])), route).toEqual(
       siteCopy.menu.map(({ id, label }) => [label, `/#${id}`]),
     );

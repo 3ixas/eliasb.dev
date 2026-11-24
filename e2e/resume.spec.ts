@@ -92,7 +92,7 @@ test.describe("The Résumé", () => {
   test("takes the shared header and ends with Say hello, and Download PDF sits above the sheet", async ({ page }) => {
     await expect(page.locator("[data-site-header]")).toBeVisible();
     await expect(page.locator("[data-site-header]").getByRole("link", { name: "Elias Bennett", exact: true })).toHaveAttribute("href", "/");
-    await expect(page.getByRole("navigation", { name: siteCopy.header.linksLabel, includeHidden: true })).toHaveCount(1);
+    await expect(page.getByRole("navigation", { name: siteCopy.header.siteLinksLabel, includeHidden: true })).toHaveCount(1);
     await expect(page.locator("section#say-hello")).toHaveCount(1);
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     await expect(sheet(page)).toBeVisible();
