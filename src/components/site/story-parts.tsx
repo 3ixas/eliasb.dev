@@ -3,17 +3,40 @@ import type { ReactNode } from "react";
 import { Count } from "@/components/parts/on-view";
 import { Arrow, panelSurface } from "@/components/parts/panel";
 import { titleLinkTypes, TitleTransition, type PanelTitleTransition } from "@/components/parts/title-transition";
+import { ChapterRail, type StoryChapter } from "@/components/site/chapter-rail";
 import { Arrowed } from "@/components/site/long-form";
 import { ZoomableImage } from "@/components/site/zoomable-image";
 import type { EvidenceItem, PanelColours, StorySectionBody } from "@/content/stretch/story";
 
 /*
- * The passes and panels long-form parts (docs/design/DESIGN.md "Long-form pages", R-21 and R-22): what a Role story and
- * a case study share once they are on the new design. The back link, a section with its heading at the left and its
- * text at the right, the text itself (paragraphs and points), the evidence figures, a screenshot with its caption, and
- * the panel that leads to the next page. Styles are in
- * story.css. Server-rendered, so a page reads the same with no script.
+ * The passes and panels long-form parts (docs/design/DESIGN.md "Long-form pages", R-21, R-22, R-52, R-54): what a Role
+ * story and a case study share. The back link, the sticky chapter rail and reading stream, a section with its heading
+ * and body, structured Problem/Decision cards, the evidence figures, a screenshot or archival-matted artefact with its
+ * caption, and the panel that leads to the next page. Styles are in story.css.
  */
+
+/** Shared two-column long-form container: sticky left chapter rail from 960 px beside the right reading column. */
+export function StoryChapters({ items, label, children }: { items: readonly StoryChapter[]; label: string; children: ReactNode }) {
+  return (
+    <div className="story-layout">
+      <ChapterRail items={items} label={label} />
+      <div className="story-stream">{children}</div>
+    </div>
+  );
+}
+
+function StoryPoints({ points, cards }: { points: NonNullable<StorySectionBody["points"]>; cards: boolean }) {
+  if (points.length === 0) return null;
+  return (
+    <ul className={cards ? "points story-cards" : "points"}>
+      {points.map(({ lead, text }) => (
+        <li key={lead} className={cards ? "story-card surface surface--paper" : undefined}>
+          <b>{lead}</b> <span>{text}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 /** "← Work" or "← Things I make": the first thing on the page. */
 export function StoryBack({ href, label, transitionTypes }: { href: string; label: string; transitionTypes?: string[] }) {
@@ -24,7 +47,7 @@ export function StoryBack({ href, label, transitionTypes }: { href: string; labe
   );
 }
 
-/** A section: the heading at the left, the text and its figures at the right. Its id is a focus target for an address that names it. */
+/** A section: its id is a focus target for an address that names it. */
 export function StorySection({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   const titleId = `${id}-title`;
   return (
@@ -37,8 +60,8 @@ export function StorySection({ id, title, children }: { id: string; title: strin
   );
 }
 
-/** A section's words: its paragraphs in Newsreader, then its points, each a serif lead over a muted line. */
-export function StoryText({ body }: { body: StorySectionBody }) {
+/** A section's words: its paragraphs in Newsreader, then its points (optionally as bordered paper cards). */
+export function StoryText({ body, cards = false }: { body: StorySectionBody; cards?: boolean }) {
   const { paragraphs, points } = body;
   return (
     <>
@@ -49,20 +72,12 @@ export function StoryText({ body }: { body: StorySectionBody }) {
           ))}
         </div>
       )}
-      {points && points.length > 0 && (
-        <ul className="points">
-          {points.map(({ lead, text }) => (
-            <li key={lead}>
-              <b>{lead}</b> <span>{text}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+      {points && points.length > 0 && <StoryPoints points={points} cards={cards} />}
     </>
   );
 }
 
-/** The evidence figures: each value large in Newsreader over its words, wrapping two by two on a phone; a number rolls to its value once. */
+/** The evidence figures: each value large in Newsreader over its words, wrapping cleanly at every width; a number rolls to its value once. */
 export function EvidenceFigures({ evidence }: { evidence: readonly EvidenceItem[] }) {
   if (evidence.length === 0) return null;
   return (
@@ -82,13 +97,16 @@ export function EvidenceFigures({ evidence }: { evidence: readonly EvidenceItem[
 /** Desktop column widths for an image in the text column: at most 760 px, 8 of 12 columns, or the page on a phone. */
 export const columnImageSizes = "(min-width: 1260px) 840px, (min-width: 720px) 64vw, 100vw";
 
-/** A screenshot or a certificate in the text column, as it is: 16 px corners, a hairline edge, opening large in a dialog, and its caption beneath. */
-export function StoryImage({ id, src, alt, width, height, caption }: { id?: string; src: string; alt: string; width: number; height: number; caption: ReactNode }) {
+/** A screenshot or printed artefact in the text column; with `mat`, framed on a neutral archival paper mat so printed documents separate cleanly in both themes (R-52). */
+export function StoryImage({ id, src, alt, width, height, caption, mat = false }: { id?: string; src: string; alt: string; width: number; height: number; caption: ReactNode; mat?: boolean }) {
+  const shot = (
+    <div className="story-fig__shot">
+      <ZoomableImage src={src} alt={alt} width={width} height={height} sizes={columnImageSizes} />
+    </div>
+  );
   return (
-    <figure id={id} className="story-fig">
-      <div className="story-fig__shot">
-        <ZoomableImage src={src} alt={alt} width={width} height={height} sizes={columnImageSizes} />
-      </div>
+    <figure id={id} className={mat ? "story-fig story-fig--mat" : "story-fig"}>
+      {mat ? <div className="story-fig__mat surface surface--paper">{shot}</div> : shot}
       <figcaption>{caption}</figcaption>
     </figure>
   );

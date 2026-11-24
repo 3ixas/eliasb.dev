@@ -22,11 +22,15 @@ test.describe("The simulation", () => {
     await page.goto(page_);
   });
 
-  test("it sits under The role, on a panel in BNP Paribas's colour, with its heading", async ({ page }) => {
+  test("it sits under The role, on a panel in BNP Paribas's colour, with its heading, and appears nowhere else", async ({ page }) => {
     const sim = page.locator("section#the-role .story-fig__panel .sim");
     await expect(sim).toHaveCount(1);
     await expect(sim.getByRole("heading", { level: 3 })).toHaveText(simulationCopy.title);
     await expect(sim).toHaveAccessibleName(simulationCopy.title);
+    for (const other of ["/", "/work/joveen", "/work/optegra"]) {
+      await page.goto(other);
+      await expect(page.locator(".sim")).toHaveCount(0);
+    }
   });
 
   test("the simulation: its bins sum to the number of paths, the price line sits at the mean of the endpoints, and it says it is illustrative", async ({ page }) => {
@@ -142,9 +146,12 @@ test.describe("The simulation's controls", () => {
     await settled(page, SIM.paths);
   });
 
-  test("Paths sets 10, 100 or 1,000 walks, reports which is pressed, and tells a screen reader the run's paths and price", async ({ page }) => {
+  test("Paths sets 10, 100 or 1,000 walks, updates the live tabular 10th–90th spread readout to the sampled percentile gap, and tells a screen reader paths, price and spread", async ({ page }) => {
     await expect(page.getByRole("group", { name: simulationCopy.paths }).getByRole("button")).toHaveText(["10", "100", "1,000"]);
     await expect(step(page, "100")).toHaveAttribute("aria-pressed", "true");
+    const spreadEl = page.locator(".sim__spread");
+    await expect(spreadEl.locator(".sim__spread-label")).toHaveText(simulationCopy.spread);
+    await expect(spreadEl).toHaveCSS("font-variant-numeric", /tabular-nums/);
     for (const [label, count] of [["10", 10], ["1,000", 1000], ["100", 100]] as const) {
       await step(page, label).click();
       await settled(page, count);
@@ -157,11 +164,12 @@ test.describe("The simulation's controls", () => {
       const per = count >= 1000 ? 10 : 1;
       const dots = await page.locator(".sim__bin").evaluateAll((elements) => elements.map((element) => element.querySelectorAll("i").length));
       expect(dots).toEqual(run.bins.map((walks) => Math.ceil(walks / per)));
-      await expect(page.locator(".sim [aria-live='polite']")).toHaveText(simulationCopy.settled(new Intl.NumberFormat("en-GB").format(count), run.change));
+      await expect(spreadEl.locator(".sim__spread-value")).toHaveText(simulationCopy.formatSpread(run.spread));
+      await expect(page.locator(".sim [aria-live='polite']")).toHaveText(simulationCopy.settled(new Intl.NumberFormat("en-GB").format(count), run.change, run.spread));
     }
   });
 
-  test("Run again draws a new set from a new seed, with the same number of walks, and moves the price to its mean", async ({ page }) => {
+  test("Run again draws a new set from a new seed, with the same number of walks, moves the price to its mean and recomputes the spread", async ({ page }) => {
     const before = await plot(page).getAttribute("data-seed");
     await again(page).click();
     await expect(plot(page)).not.toHaveAttribute("data-seed", before!);
@@ -172,6 +180,7 @@ test.describe("The simulation's controls", () => {
       return Math.abs(element.querySelector(".sim__price")!.getBoundingClientRect().top - (box.top + at * box.height));
     }, run.mean);
     expect(offset).toBeLessThan(1.5);
+    await expect(page.locator(".sim__spread-value")).toHaveText(simulationCopy.formatSpread(run.spread));
   });
 
   test("the controls are buttons of at least 44 px, in reading order after the plot", async ({ page }, testInfo) => {

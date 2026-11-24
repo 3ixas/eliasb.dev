@@ -113,6 +113,8 @@
 
 .panel {
   --line: color-mix(in srgb, var(--panel-ink) 30%, transparent);
+  --well: rgb(0 0 0 / 0.22);
+  --well-border: color-mix(in srgb, var(--panel-ink) 18%, transparent);
   overflow: hidden;
   padding: 44px;
   border-radius: 28px;
@@ -127,6 +129,7 @@
 .surface--bright {
   --foot: var(--field);
   --rim: rgb(255 255 255 / 0.42);
+  --well: rgb(255 255 255 / 0.22);
 }
 
 /* A surface that follows the theme: paper, its edge the page's hairline in both themes and its shadow neutral, not paper-white. */

@@ -27,11 +27,12 @@
   --hist: 120px;
   /* Past the dots, room for the price's label at the end of its line, so it never covers an endpoint. */
   --label: 96px;
+  --axis: color-mix(in srgb, var(--panel-ink) 55%, transparent);
   position: relative;
   min-height: 340px;
   margin-right: calc(var(--hist) + 12px + var(--label));
-  border-left: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  border-left: 1.5px solid var(--axis);
+  border-bottom: 1.5px solid var(--axis);
 }
 
 .sim__paths {
@@ -166,6 +167,26 @@
   color: var(--field);
 }
 
+/* Live tabular 10th–90th spread readout beside the controls (R-53), sitting on the panel's translucent well. */
+.sim__spread {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-left: auto;
+  padding: 10px 16px;
+  border: 1px solid var(--well-border);
+  border-radius: 999px;
+  background: var(--well);
+  color: var(--panel-ink);
+  font-size: var(--type-small);
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1.2;
+}
+
+.sim__spread-value {
+  font-weight: 600;
+}
+
 .sim figcaption {
   max-width: 36em;
   font-size: var(--type-ui);
@@ -228,10 +249,19 @@
     right: calc(var(--hist) + 18px);
     transform: translateY(calc(-100% - 6px));
   }
+
+  .sim__spread {
+    margin-left: 0;
+  }
 }
 
 /* Forced colours keep the data: the walks and the endpoints in the text colour, the mean and the price line in the highlight (R-29). */
 @media (forced-colors: active) {
+  .sim__plot,
+  .sim__spread {
+    border-color: CanvasText;
+  }
+
   .sim__bin i,
   .sim__price {
     forced-color-adjust: none;

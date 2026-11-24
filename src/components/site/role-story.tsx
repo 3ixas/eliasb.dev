@@ -1,9 +1,9 @@
-import { PassLight } from "@/components/parts/pass-light";
-import { StaffPass } from "@/components/parts/staff-pass";
+import { EmbeddedPass } from "@/components/parts/embedded-pass";
+import { Panel } from "@/components/parts/panel";
 import { employerPanelTransition, employerTitleStyle, employerTitleTransition, titleLinkTypes, TitleTransition } from "@/components/parts/title-transition";
 import { LongForm } from "@/components/site/long-form";
 import { RoleStoryFigureBlock } from "@/components/site/role-story-figures";
-import { EvidenceFigures, NextPanel, StoryBack, StorySection, StoryText } from "@/components/site/story-parts";
+import { EvidenceFigures, NextPanel, StoryBack, StoryChapters, StorySection, StoryText } from "@/components/site/story-parts";
 import { roleStories } from "@/content/stretch/role-stories";
 import { hasLongEmployer, roleStoryBack, roleStoryCopy, roleStorySectionKeys, roleStorySectionLabels, type RoleStory } from "@/content/stretch/role-story";
 import { passRecords } from "@/content/stretch/staff-pass";
@@ -12,21 +12,21 @@ import { passRecords } from "@/content/stretch/staff-pass";
 const sectionKeys = roleStorySectionKeys.filter((key) => key !== "summary");
 
 /**
- * A Role story (GLOSSARY.md; DESIGN.md "Long-form pages", R-21): "← Work"; the employer as the title with its role,
- * dates and setting on one line, the summary as the lede and the story's evidence figures, beside that employer's staff
- * pass; then its sections, each heading at the left and its text at the right with the figure it argues from; then the
- * next role as a panel in that employer's colour, and Say hello. The last story ends on "← Work" instead. The server
- * renders all of it.
+ * A Role story (GLOSSARY.md; DESIGN.md "Long-form pages", R-21, R-52, R-53): a coloured employer hero banner holding
+ * "← Work", the employer title, role/dates/setting, summary lede, bordered evidence strip, and compact embedded Staff
+ * pass; then a sticky left chapter rail (from 960 px) beside the reading column of sections, structured Problem and
+ * Decision cards, and figures; then the next role panel and Say hello. The last story ends on "← Work" instead.
  */
 export function RoleStoryPage({ story }: { story: RoleStory }) {
   const next = story.next ? roleStories[story.next] : null;
   const meta = [story.role, story.dates, story.setting].filter((part): part is string => !!part);
   const titleName = employerTitleTransition(story.slug);
+  const chapters = sectionKeys.map((key) => ({ id: key, title: roleStorySectionLabels[key] }));
 
   return (
     <LongForm attrs={{ "data-role-story": story.slug }}>
       <article className="frame story" aria-labelledby="role-story-title">
-        <header className="story-open">
+        <Panel as="header" colours={story.panel} className="story-open">
           <div className="story-open__text">
             <StoryBack href={roleStoryBack.href} label={roleStoryBack.label} transitionTypes={titleLinkTypes(titleName)} />
             <TitleTransition name={titleName} share={employerTitleStyle(story.slug)}>
@@ -42,18 +42,18 @@ export function RoleStoryPage({ story }: { story: RoleStory }) {
               ))}
             </p>
             <p className="story-open__lede">{story.sections.summary.paragraphs[0]}</p>
-            <EvidenceFigures evidence={story.evidence} />
           </div>
-          <PassLight className="story-open__rail">
-            <StaffPass slug={story.slug} lead priority />
-          </PassLight>
-        </header>
-        {sectionKeys.map((key) => (
-          <StorySection key={key} id={key} title={roleStorySectionLabels[key]}>
-            <StoryText body={story.sections[key]} />
-            {story.figures?.[key] && <RoleStoryFigureBlock figure={story.figures[key]} panel={story.panel} />}
-          </StorySection>
-        ))}
+          <EvidenceFigures evidence={story.evidence} />
+          <EmbeddedPass slug={story.slug} priority />
+        </Panel>
+        <StoryChapters items={chapters} label="Story sections">
+          {sectionKeys.map((key) => (
+            <StorySection key={key} id={key} title={roleStorySectionLabels[key]}>
+              <StoryText body={story.sections[key]} cards />
+              {story.figures?.[key] && <RoleStoryFigureBlock figure={story.figures[key]} panel={story.panel} />}
+            </StorySection>
+          ))}
+        </StoryChapters>
       </article>
       {next ? (
         <NextPanel label={roleStoryCopy.nextRole} href={`/work/${next.slug}`} name={passRecords[next.slug].short} line={`${next.role} · ${next.dates}`} colours={next.panel} transition={employerPanelTransition(next.slug)} />
