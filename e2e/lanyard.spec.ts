@@ -234,14 +234,20 @@ test.describe("The 3D staff pass", () => {
     await expect.poll(reach).toEqual([true, true, true]);
   });
 
-  test("Role stories use the compact embedded pass without mounting a 3D lanyard scene", async ({ page }, info) => {
+  test("a Role story's pass hangs in its own scene, and a click on it goes nowhere", async ({ page }, info) => {
     test.skip(!info.project.name.includes("-1440-"), "Once, at the desktop width");
     const textures = trackTextures(page);
     await page.goto("/work/joveen");
-    await expect(page.locator(".story-open .embedded-pass")).toHaveCount(1);
-    await expect(page.locator(".story-open .embedded-pass")).toHaveAttribute("role", "img");
-    await expect(page.locator("canvas.lanyard__scene, .lanyard")).toHaveCount(0);
-    expect(textures).toEqual([]);
+    const stage = page.locator(".story-open__rail");
+    await hung(page, stage);
+    await expect(stage.locator("canvas.lanyard__scene")).toHaveCount(1);
+    await expect(stage.locator(".pass")).toHaveAttribute("role", "img");
+    // A returned pass has no hologram, so only the webbing tile loads.
+    expect(textures).toEqual(["/lanyard/webbing.webp"]);
+    const box = (await stage.locator(".pass__card").boundingBox())!;
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    await page.waitForTimeout(300);
+    expect(page.url()).toMatch(/\/work\/joveen$/);
   });
 
   test("a failed texture load falls back to the printed pass without leaving a canvas", async ({ page }, info) => {

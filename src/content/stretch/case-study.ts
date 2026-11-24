@@ -43,6 +43,7 @@ export const caseStudyCopy = {
   live: "Live site ↗",
   code: "Code ↗",
   nextProject: "Next project",
+  allProjects: "All projects",
   fromPrd: "From the PRD",
 } as const;
 
@@ -80,8 +81,8 @@ export type CaseStudy = {
   prd: PrdCard;
   /** At most four. */
   evidence: readonly EvidenceItem[];
-  /** The slug of the case study that follows this one. */
-  next: CaseStudySlug;
+  /** The slug of the case study that follows this one, or null on the last study (which links to /things-i-make). */
+  next: CaseStudySlug | null;
   /** The page's meta description. */
   description: string;
 };
@@ -127,8 +128,8 @@ export function caseStudyProblems(studies: readonly CaseStudy[], catalogue: read
       problems.push(`Case study "${study.slug}" has more than ${MAX_EVIDENCE} evidence items.`);
     }
     problems.push(...evidenceFigureProblems(`Case study "${study.slug}"`, study.evidence));
-    if (!slugs.includes(study.next) || study.next === study.slug) {
-      problems.push(`Case study "${study.slug}" must end with a different case study, not "${study.next}".`);
+    if (study.next !== null && (!slugs.includes(study.next) || study.next === study.slug)) {
+      problems.push(`Case study "${study.slug}" must end with a different case study or none, not "${study.next}".`);
     }
     for (const key of caseStudySectionKeys) {
       const section = study.sections[key];

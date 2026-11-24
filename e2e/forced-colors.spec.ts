@@ -236,24 +236,25 @@ test.describe("Forced colours", () => {
     expect(rowBorder).not.toBe(canvas);
   });
 
-  test("Role stories keep the embedded pass, active chapter pill, Problem/Decision cards, archival mat and simulation spread distinct", async ({ page }) => {
+  test("Role stories keep the hanging pass, evidence strip, active chapter pill, Problem/Decision cards, archival mat and simulation spread distinct", async ({ page }) => {
     await page.goto("/work/bnp-paribas");
     const canvas = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
     const activePill = page.locator('.chapter-rail a[aria-current="location"]');
     await expect(activePill).toHaveCount(1);
     await expect(activePill).toHaveCSS("forced-color-adjust", "none");
+    await expect(page.locator(".story-open__rail .pass__card")).toHaveCSS("forced-color-adjust", "none");
     const inactivePill = page.locator('.chapter-rail a:not([aria-current])').first();
-    const [activeBg, inactiveBg, passBorder, cardOutline, matOutline, spreadBorder] = await Promise.all([
+    const [activeBg, inactiveBg, evidenceBorder, cardOutline, matOutline, spreadBorder] = await Promise.all([
       activePill.evaluate((el) => getComputedStyle(el).backgroundColor),
       inactivePill.evaluate((el) => getComputedStyle(el).backgroundColor),
-      page.locator(".embedded-pass").evaluate((el) => getComputedStyle(el).borderTopColor),
+      page.locator(".story-open__card .story-figures li").first().evaluate((el) => getComputedStyle(el).borderTopColor),
       page.locator(".story-card").first().evaluate((el) => getComputedStyle(el).outlineColor),
       page.locator(".story-fig__mat").evaluate((el) => getComputedStyle(el).outlineColor),
       page.locator(".sim__spread").evaluate((el) => getComputedStyle(el).borderTopColor),
     ]);
     expect(activeBg).not.toBe(inactiveBg);
     expect(activeBg).not.toBe(canvas);
-    for (const edge of [passBorder, cardOutline, matOutline, spreadBorder]) expect(edge).not.toBe(canvas);
+    for (const edge of [evidenceBorder, cardOutline, matOutline, spreadBorder]) expect(edge).not.toBe(canvas);
   });
 
   test("Case studies keep the evidence cards, exhibition bezel, active chapter pill, Decision cards and Open this scenario distinct", async ({ page }) => {

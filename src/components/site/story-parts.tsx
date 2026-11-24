@@ -112,7 +112,7 @@ export function StoryImage({ id, src, alt, width, height, caption, mat = false }
   );
 }
 
-/** The page's end before Say hello: the next page as a panel in its own colour, its label and line at the left and its name large at the right. */
+/** The page's end before Say hello: the next page as a panel (in its own colour, or paper when omitted), its label and line at the left and its name large at the right. */
 export function NextPanel({
   label,
   href,
@@ -125,7 +125,7 @@ export function NextPanel({
   href: string;
   name: string;
   line: string;
-  colours: PanelColours;
+  colours?: PanelColours;
   transition?: PanelTitleTransition;
 }) {
   const surface = panelSurface(colours);

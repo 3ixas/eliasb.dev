@@ -5,17 +5,16 @@ import { passName } from "../src/content/stretch/pass-name";
 import { roleStories, roleStorySlugs } from "../src/content/stretch/role-stories";
 import { roleStoryBack, roleStoryCopy, roleStoryDescription, roleStoryName, roleStorySectionKeys, roleStorySectionLabels } from "../src/content/stretch/role-story";
 import { passRecords } from "../src/content/stretch/staff-pass";
-import { luminance } from "../src/content/stretch/story";
 import { drawn, expectDrawn } from "./support/measure";
 import { spoken } from "./support/roll";
 import { renderedContrast } from "./support/rendered-contrast";
 
 /*
  * Role stories (docs/design/DESIGN.md "Long-form pages", R-21, R-52, R-53): a coloured employer hero banner holding
- * "← Work", the employer as h1, role, dates and setting on one line, the summary as the lede, the bordered evidence
- * strip and the employer's compact embedded Staff pass; then a sticky left chapter rail (from 960 px) beside the
- * reading column of sections, structured Problem and Decision cards, figures in the employer's colour and the neutral
- * archival mat for the certificate; then the next role as a panel, and Say hello.
+ * "← Work", the employer as h1, role, dates and setting on one line, the summary as the lede and the bordered evidence
+ * strip, beside the employer's hanging Staff pass (stacked below under 960 px); then a sticky left chapter rail (from
+ * 960 px) beside the reading column of sections, structured Problem and Decision cards, figures in the employer's
+ * colour and the neutral archival mat for the certificate; then the next role as a panel, and Say hello.
  */
 
 const schemes = ["light", "dark"] as const;
@@ -23,7 +22,8 @@ const schemes = ["light", "dark"] as const;
 const sectionKeys = roleStorySectionKeys.filter((key) => key !== "summary");
 const width = (page: Page) => page.viewportSize()?.width ?? 0;
 const opening = (page: Page) => page.locator(".story-open");
-const pass = (page: Page) => opening(page).locator(".embedded-pass");
+const heroCard = (page: Page) => opening(page).locator(".story-open__card");
+const pass = (page: Page) => opening(page).locator(".story-open__rail .pass");
 /** An rgb() string for a hex colour, as getComputedStyle reports it. */
 const rgb = (hex: string) => `rgb(${[1, 3, 5].map((at) => parseInt(hex.slice(at, at + 2), 16)).join(", ")})`;
 
@@ -37,9 +37,9 @@ for (const slug of roleStorySlugs) {
     });
 
     test("the opening is a coloured employer hero banner holding the back link, h1, role, dates and setting, and the summary as the lede", async ({ page }) => {
-      await expect(opening(page)).toHaveClass(/\bpanel surface\b/);
-      await expect(opening(page)).toHaveCSS("background-color", rgb(story.panel.field));
-      await expect(opening(page)).toHaveCSS("color", rgb(story.panel.ink));
+      await expect(heroCard(page)).toHaveClass(/\bpanel surface\b/);
+      await expect(heroCard(page)).toHaveCSS("background-color", rgb(story.panel.field));
+      await expect(heroCard(page)).toHaveCSS("color", rgb(story.panel.ink));
       await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(story.employer);
       const back = opening(page).getByRole("link", { name: "Work", exact: true });
@@ -136,30 +136,27 @@ for (const slug of roleStorySlugs) {
       }
     });
 
-    test("the employer's compact embedded pass sits in the opening as an image named by its print, not a link, on a light translucent well on bright fields", async ({ page }) => {
+    test("the employer's Staff pass hangs in the opening as an image named by its print, not a link", async ({ page }) => {
       await expect(pass(page)).toHaveCount(1);
       await expect(pass(page)).toHaveAttribute("role", "img");
       await expect(pass(page)).toHaveAccessibleName(passName(slug));
-      await expect(pass(page).locator(".embedded-pass__org")).toHaveText(passRecords[slug].short);
-      await expect(opening(page).locator(".embedded-pass a, a.embedded-pass, .pass")).toHaveCount(0);
-      await expect(pass(page)).toHaveCSS("border-top-width", "1px");
-      const bright = luminance(story.panel.ink) < luminance(story.panel.field);
-      await expect(pass(page)).toHaveCSS("background-color", bright ? "rgba(255, 255, 255, 0.22)" : "rgba(0, 0, 0, 0.22)");
+      await expect(pass(page).locator(".pass__band span")).toHaveText(passRecords[slug].short);
+      await expect(opening(page).locator(".story-open__rail a, a.pass")).toHaveCount(0);
     });
 
-    test("on a laptop-sized window (1024 px) the embedded pass sits beside the text with no sideways scroll", async ({ page }) => {
+    test("on a laptop-sized window (1024 px) the Staff pass hangs beside the hero banner with no sideways scroll", async ({ page }) => {
       await page.setViewportSize({ width: 1024, height: 768 });
-      const text = page.locator(".story-open__text");
-      await expect.poll(async () => (await pass(page).boundingBox())!.x >= (await text.boundingBox())!.x + (await text.boundingBox())!.width - 1).toBe(true);
+      const card = heroCard(page);
+      await expect.poll(async () => (await pass(page).locator(".pass__card").boundingBox())!.x >= (await card.boundingBox())!.x + (await card.boundingBox())!.width - 1).toBe(true);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     });
 
-    test("the embedded pass sits at the right of the text from 960 px, and stacks below it under that", async ({ page }) => {
-      const text = opening(page).locator(".story-open__text");
+    test("the Staff pass sits at the right of the hero banner from 960 px, and hangs below it under that", async ({ page }) => {
+      const card = heroCard(page);
       await expect
         .poll(async () => {
-          const [t, p] = [(await text.boundingBox())!, (await pass(page).boundingBox())!];
-          return width(page) >= 960 ? p.x >= t.x + t.width - 1 : p.y >= t.y + t.height - 1;
+          const [c, p] = [(await card.boundingBox())!, (await pass(page).locator(".pass__card").boundingBox())!];
+          return width(page) >= 960 ? p.x >= c.x + c.width - 1 : p.y >= c.y + c.height - 1;
         })
         .toBe(true);
     });
@@ -364,10 +361,10 @@ for (const slug of roleStorySlugs) {
           return widest <= element.clientWidth + 0.5;
         };
         await expect.poll(() => page.getByRole("heading", { level: 1 }).evaluate(widestWordFits)).toBe(true);
-        const card = (await pass(page).boundingBox())!;
+        const card = (await pass(page).locator(".pass__card").boundingBox())!;
         expect(card.x).toBeGreaterThanOrEqual(0);
         expect(card.x + card.width).toBeLessThanOrEqual(at);
-        await expect.poll(() => pass(page).locator(".embedded-pass__org").evaluate((org) => org.scrollWidth <= org.clientWidth + 0.5)).toBe(true);
+        await expect.poll(() => pass(page).locator(".pass__band span").evaluate((org) => org.scrollWidth <= org.clientWidth + 0.5)).toBe(true);
         // A part of the role, dates and setting that starts a line starts at the line's edge, which clips the dot before it.
         const strays = await opening(page).locator(".story-open__meta").evaluate((meta) => {
           const left = meta.getBoundingClientRect().left;
@@ -432,14 +429,14 @@ for (const slug of roleStorySlugs) {
     });
 
     for (const scheme of schemes) {
-      test(`every text pair passes AA on the rendered page, including the pass well, and nothing is under 13 px (${scheme})`, async ({ page, browserName }) => {
+      test(`every text pair passes AA on the rendered page, and nothing is under 13 px (${scheme})`, async ({ page, browserName }) => {
         test.skip(browserName !== "chromium", "Measured in Chromium");
         await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
         await page.reload();
         await page.evaluate(() => document.fonts.ready);
         const texts = await page.evaluate(() => [...document.querySelectorAll("[data-role-story] article, nav.story-next")].map((part) => (part as HTMLElement).innerText).join("\n"));
         const readings = (await renderedContrast(page)).filter((reading) => texts.includes(reading.text));
-        for (const expected of [story.employer, story.role, "Elias Bennett", story.evidence[0].label, roleStorySectionLabels["the-role"], ...(next ? [roleStoryCopy.nextRole] : [])]) {
+        for (const expected of [story.employer, story.role, story.evidence[0].label, roleStorySectionLabels["the-role"], ...(next ? [roleStoryCopy.nextRole] : [])]) {
           expect(readings.some((reading) => reading.text.includes(expected)), expected).toBe(true);
         }
         expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);

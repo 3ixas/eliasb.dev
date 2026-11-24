@@ -57,15 +57,7 @@
   margin-top: 28px;
 }
 
-/* The pass hangs from the top of the section (the header's hairline on desktop); its lanyard and 3D canvas clip cleanly at 0 above. */
-.opening__rail {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-bottom: 48px;
-  clip-path: inset(0 -100vw -320px -100vw);
-}
-
+/* The shared .pass-rail in parts.css handles the hanging pass's alignment, hairline clip and phone drop. */
 @media (max-width: 959.98px) {
   .opening {
     grid-template-columns: minmax(0, 1fr);
@@ -80,16 +72,6 @@
   .opening__support {
     max-width: 30em;
   }
-
-  /* Under the words and actions, the single pass hangs from a quiet rail hairline without overlapping them. */
-  .opening__rail {
-    padding-bottom: 24px;
-    border-top: 1px solid var(--hair);
-  }
-
-  .opening__rail .pass {
-    --drop: 112px;
-  }
 }
 
 @media (max-width: 719.98px) {
@@ -99,10 +81,5 @@
 
   .opening__actions {
     margin-top: 24px;
-  }
-
-  .opening__rail .pass {
-    --card: 256px;
-    --drop: 84px;
   }
 }

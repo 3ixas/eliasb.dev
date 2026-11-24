@@ -131,9 +131,9 @@ Set `Say hello` (`src/components/site/say-hello.tsx`, `src/components/site/copy-
 
 ### Long-Form Stories
 
-#### R-52 Role stories: coloured hero banner with embedded pass, sticky chapter rail & structured cards
+#### R-52 Role stories: coloured hero banner with hanging Staff pass, sticky chapter rail & structured cards
 Update `src/components/site/role-story.tsx`, `src/components/site/story-parts.tsx`, `src/components/site/long-form.tsx`, and `src/app/story.css`:
-- **Hero banner:** full-width bordered panel in the employer's colour holding `← Work`, employer `h1`, role/dates/setting, lede, bordered evidence strip, and the employer's compact **embedded Staff pass** (on a light translucent well `rgba(255,255,255,0.22)` on bright fields such as BNP Paribas so full-strength ink stays AA; stacked below text under `960 px`).
+- **Hero banner & Staff pass:** bordered panel in the employer's colour holding `← Work`, employer `h1`, role/dates/setting, lede, and bordered evidence strip, paired with that employer's real hanging **Staff pass** (`PassLight` + `StaffPass`, hanging from the header hairline at the right from `960 px`, and from a quiet rail hairline beneath the coloured hero banner under `960 px` — replacing the flat embedded pass card per Elias's 24 Nov 2026 sign-off review).
 - **Sticky chapter rail:** from `960 px`, sticky left navigation rail listing the story's plain section titles (zero numbers); active section highlighted via IntersectionObserver on a lifted bordered paper pill with a cobalt dot (progressive enhancement: plain jump links without JS).
 - **Structured Problem & Decision cards:** render key narrative decisions/problems in tonal bordered paper cards (`--paper`, `1 px solid var(--hair)`) inside the right reading column (`≤ 640 px` prose measure, figures up to `760 px`).
 - **Archival mat:** frame BNP Paribas's `_nology` Take Ownership certificate on a neutral archival mat with a subtle `1 px` border so the printed document separates cleanly in both themes.
@@ -155,6 +155,7 @@ Update `src/components/site/case-study.tsx`, `src/components/site/threshold-link
 - **Project-colour exhibition stage:** immediately below the header, place a full-width bordered panel in the project's signature colour (`#c58f5e` Threshold, `#4f86f7` Argus Risk, `#2a211b` Flowtime) holding the complete uncropped screenshot in a concentric optical bezel, clickable/tappable into `ZoomableImage`.
 - **Sticky chapter rail & structured Decision cards:** share the exact same sticky left chapter rail (no numbers) and bordered tonal Decision cards as Role stories (`R-52`), while keeping all three working figures (`ThresholdLink`, `ArgusProvenance`, `FlowtimeBreak`) and the paper PRD card intact.
 - **Threshold working figure action:** add an **`Open this scenario ↗`** external link beside `Copy link` that opens Threshold directly at the currently built URL.
+- **Final case study ending:** the final case study (`Flowtime`) ends on a bordered paper **`All projects`** panel (`Things I make →`) linking to `/things-i-make` instead of looping back to `Threshold` (per Elias's 24 Nov 2026 sign-off review).
 
 **Affected files:** `src/components/site/case-study.tsx`, `src/components/site/threshold-link.tsx`, `src/components/site/threshold-link-live.tsx`, `src/app/story.css`.  
 **Acceptance:** applies cleanly to Threshold, Argus Risk, and Flowtime; first fold reaches the product exhibition stage immediately; `Open this scenario ↗` href tracks every `City / District / Place` selection and opens in a new tab with `rel="noopener noreferrer"`.

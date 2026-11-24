@@ -4,6 +4,7 @@ import { hostLabel } from "../src/components/site/host-label";
 import { projects } from "../src/content/projects";
 import { caseStudies, caseStudySlugs } from "../src/content/stretch/case-studies";
 import { caseStudyCopy, caseStudySectionKeys, caseStudySectionLabels } from "../src/content/stretch/case-study";
+import { workArchive } from "../src/content/stretch/site-copy";
 import { firstDistrict, thresholdLink, thresholdLinkCopy, thresholdStart } from "../src/content/stretch/threshold-link";
 import { argusPositions, argusProvenanceCopy, formatUsd, pricedAt, priceSteps, unrealisedUsd } from "../src/content/stretch/argus-provenance";
 import { breakMinutes, flowtimeBreakCopy, focusRange, pomodoro } from "../src/content/stretch/flowtime-break";
@@ -28,7 +29,7 @@ const stage = (page: Page) => page.locator(".case-stage");
 for (const slug of caseStudySlugs) {
   const study = caseStudies[slug];
   const project = projects.find((entry) => entry.slug === slug)!;
-  const next = projects.find((entry) => entry.slug === study.next)!;
+  const next = study.next ? projects.find((entry) => entry.slug === study.next)! : null;
 
   test.describe(`Case study: ${project.name}`, () => {
     test.beforeEach(async ({ page }) => {
@@ -220,17 +221,34 @@ for (const slug of caseStudySlugs) {
     });
 
     test("it ends on the next project as a panel in its colour, then Say hello; following it opens that case study", async ({ page }) => {
+      test.skip(!next, "Final case study links to All projects instead");
       const panel = page.getByRole("navigation", { name: caseStudyCopy.nextProject }).getByRole("link");
       await expect(panel).toHaveCount(1);
       await expect(panel).toHaveAttribute("href", `/things-i-make/${study.next}`);
       await expect(panel).toContainText(caseStudyCopy.nextProject);
-      await expect(panel).toContainText(next.name);
-      await expect(panel).toContainText(next.outcome);
-      await expect(panel).toHaveCSS("background-color", rgb(next.panel!.field));
+      await expect(panel).toContainText(next!.name);
+      await expect(panel).toContainText(next!.outcome);
+      await expect(panel).toHaveCSS("background-color", rgb(next!.panel!.field));
       expect((await panel.boundingBox())!.y).toBeLessThan((await page.locator("#say-hello").boundingBox())!.y);
       await panel.click();
       await expect(page).toHaveURL(new RegExp(`/things-i-make/${study.next}$`));
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText(next.name);
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(next!.name);
+    });
+
+    test("the final case study ends on a paper panel to All projects, then Say hello; following it opens /things-i-make", async ({ page }) => {
+      test.skip(!!next, "Only the final case study links to All projects");
+      await expect(page.getByRole("navigation", { name: caseStudyCopy.nextProject })).toHaveCount(0);
+      const panel = page.getByRole("navigation", { name: caseStudyCopy.allProjects }).getByRole("link");
+      await expect(panel).toHaveCount(1);
+      await expect(panel).toHaveAttribute("href", "/things-i-make");
+      await expect(panel).toContainText(caseStudyCopy.allProjects);
+      await expect(panel).toContainText(workArchive.heading);
+      await expect(panel).toContainText(workArchive.note);
+      await expect(panel).toHaveClass(/\bsurface--paper\b/);
+      expect((await panel.boundingBox())!.y).toBeLessThan((await page.locator("#say-hello").boundingBox())!.y);
+      await panel.click();
+      await expect(page).toHaveURL(/\/things-i-make$/);
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(workArchive.heading);
     });
 
     test("there is no footer", async ({ page }) => {
@@ -263,7 +281,7 @@ for (const slug of caseStudySlugs) {
         await page.evaluate(() => document.fonts.ready);
         const texts = await page.evaluate(() => [...document.querySelectorAll("[data-case-study] article, nav.story-next")].map((part) => (part as HTMLElement).innerText).join("\n"));
         const readings = (await renderedContrast(page)).filter((reading) => texts.includes(reading.text));
-        for (const expected of [project.name, study.stack[0], study.evidence[0].label, caseStudyCopy.fromPrd, caseStudyCopy.nextProject]) {
+        for (const expected of [project.name, study.stack[0], study.evidence[0].label, caseStudyCopy.fromPrd, next ? caseStudyCopy.nextProject : caseStudyCopy.allProjects]) {
           expect(readings.some((reading) => reading.text.includes(expected)), expected).toBe(true);
         }
         expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);

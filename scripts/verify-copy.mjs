@@ -331,12 +331,12 @@ for (const story of roles) {
 
 assert.deepEqual(caseStudyProblems(studies, projects), []);
 for (const slug of featuredSlugs) assert.ok(caseStudies[slug], `${slug} is featured and has a case study`);
-assert.deepEqual(studies.map((study) => study.next), ["argus-risk", "flowtime", "threshold"], "Next project follows the featured order");
+assert.deepEqual(studies.map((study) => study.next), ["argus-risk", "flowtime", null], "Next project follows the featured order, and Flowtime ends on All projects");
 
 // The problems are reported by name.
 const [threshold] = studies;
 assert.match(caseStudyProblems([{ ...threshold, evidence: [...threshold.evidence, threshold.evidence[0]] }, studies[1], studies[2]], projects)[0], /more than 4 evidence/);
-assert.match(caseStudyProblems([{ ...threshold, next: "threshold" }], projects)[0], /different case study/);
+assert.match(caseStudyProblems([{ ...threshold, next: "threshold" }], projects)[0], /different case study or none/);
 assert.match(caseStudyProblems([{ ...threshold, slug: "ghost" }, threshold], projects)[0], /"ghost" has no project/);
 assert.match(
   caseStudyProblems([{ ...threshold, sections: { ...threshold.sections, decisions: {} } }, studies[1]], projects)[0],
