@@ -218,8 +218,8 @@ test.describe("The 3D staff pass", () => {
   test("the canvas reaches the window's sides, so a swung card is not cut, and follows the window without scrolling the page", async ({ page }, info) => {
     test.skip(!info.project.name.includes("-1440-"), "A wide window");
     await page.setViewportSize({ width: 1920, height: 1000 });
-    await page.goto("/work/bnp-paribas");
-    const stage = page.locator(".story-open__rail");
+    await page.goto("/");
+    const stage = rail(page);
     await hung(page, stage);
     const reach = () =>
       stage.evaluate((element) => {
@@ -234,20 +234,14 @@ test.describe("The 3D staff pass", () => {
     await expect.poll(reach).toEqual([true, true, true]);
   });
 
-  test("a Role story's pass hangs in its own scene, and a click on it goes nowhere", async ({ page }, info) => {
-    test.skip(!info.project.name.includes("-1440-"), "A mouse, at the desktop width");
+  test("Role stories use the compact embedded pass without mounting a 3D lanyard scene", async ({ page }, info) => {
+    test.skip(!info.project.name.includes("-1440-"), "Once, at the desktop width");
     const textures = trackTextures(page);
     await page.goto("/work/joveen");
-    const stage = page.locator(".story-open__rail");
-    await hung(page, stage);
-    await expect(stage.locator("canvas.lanyard__scene")).toHaveCount(1);
-    await expect(stage.locator(".pass")).toHaveAttribute("role", "img");
-    // A returned pass has no hologram, so only the webbing tile loads.
-    expect(textures).toEqual(["/lanyard/webbing.webp"]);
-    const box = (await stage.locator(".pass__card").boundingBox())!;
-    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-    await page.waitForTimeout(300);
-    expect(page.url()).toMatch(/\/work\/joveen$/);
+    await expect(page.locator(".story-open .embedded-pass")).toHaveCount(1);
+    await expect(page.locator(".story-open .embedded-pass")).toHaveAttribute("role", "img");
+    await expect(page.locator("canvas.lanyard__scene, .lanyard")).toHaveCount(0);
+    expect(textures).toEqual([]);
   });
 
   test("a failed texture load falls back to the printed pass without leaving a canvas", async ({ page }, info) => {

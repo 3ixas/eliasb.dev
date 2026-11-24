@@ -34,7 +34,20 @@ function paint(canvas: HTMLCanvasElement, run: Simulation, to: number, from = 0)
   const context = canvas.getContext("2d");
   if (!context) return;
   context.setTransform(ratio, 0, 0, ratio, 0, 0);
-  if (from === 0) context.clearRect(0, 0, width, height);
+  if (from === 0) {
+    context.clearRect(0, 0, width, height);
+    // Today's starting level: a crisp dashed baseline across the plot so drift reads at rest (R-53).
+    context.save();
+    context.strokeStyle = getComputedStyle(canvas).color;
+    context.globalAlpha = 0.28;
+    context.lineWidth = 1;
+    context.setLineDash([4, 4]);
+    context.beginPath();
+    context.moveTo(0, height / 2);
+    context.lineTo(width, height / 2);
+    context.stroke();
+    context.restore();
+  }
   context.strokeStyle = getComputedStyle(canvas).color;
   context.lineJoin = "round";
   const trace = (walk: readonly number[]) => {
@@ -44,13 +57,13 @@ function paint(canvas: HTMLCanvasElement, run: Simulation, to: number, from = 0)
   };
   const done = to >= run.walks.length;
   const featured = new Set(done ? run.featured : []);
-  // The more walks, the fainter each, so a thousand read as a cloud rather than a block.
-  context.globalAlpha = Math.min(0.3, 2 / Math.sqrt(run.walks.length));
-  context.lineWidth = 1;
+  // Keep background walks legible at rest on #00965e while scaling opacity down so 1,000 walks read as an airy cloud (R-53).
+  context.globalAlpha = Math.min(0.56, Math.max(0.1, 3.2 / Math.sqrt(run.walks.length)));
+  context.lineWidth = run.walks.length <= 10 ? 1.35 : run.walks.length <= 100 ? 1.1 : 1;
   for (let index = from; index < to; index += 1) if (!featured.has(index)) trace(run.walks[index]);
   if (!done) return;
   context.globalAlpha = 1;
-  context.lineWidth = 1.75;
+  context.lineWidth = 2.2;
   for (const index of run.featured) trace(run.walks[index]);
 }
 
@@ -108,7 +121,7 @@ export function SimulationPlot() {
       price?.style.setProperty("--at", String(run.mean));
       element.removeAttribute("data-armed");
       element.setAttribute("data-arrived", String(arrived.current));
-      if (asked.current) setSaid(copy.settled(grouped.format(run.walks.length), run.change));
+      if (asked.current) setSaid(copy.settled(grouped.format(run.walks.length), run.change, run.spread));
       return;
     }
     element.setAttribute("data-armed", "");
@@ -201,6 +214,10 @@ export function SimulationPlot() {
               {grouped.format(count)}
             </button>
           ))}
+        </div>
+        <div className="sim__spread">
+          <span className="sim__spread-label">{copy.spread}</span>
+          <span className="sim__spread-value">{copy.formatSpread(run.spread)}</span>
         </div>
       </div>
       <p className="sr-only" aria-live="polite">

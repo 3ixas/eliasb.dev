@@ -64,6 +64,12 @@ export const passHang: Record<RoleStorySlug, { state: PassState; tilt: number }>
   optegra: { state: "returned", tilt: -1.2 },
 };
 
+/** The white-tux portrait, cropped as both the hanging and embedded passes print it (DESIGN.md "The staff pass"). */
+export const passPortrait = { src: "/profile/elias-evening-pass.webp", width: 352, height: 426 } as const;
+
+/** A date range may wrap only after its dash, so a month never parts from its year ("Aug 2024 –" over "Jun 2025"). */
+export const unbrokenEnds = (dates: string) => dates.replace(/ (?=\d)/g, "\u00a0").replace(" –", "\u00a0–");
+
 /** What a pass says its status is: "Valid · present" while the job is current, otherwise "Returned". */
 export const passStatus = (state: PassState) => (state === "current" ? currentPassStatus : "Returned");
 

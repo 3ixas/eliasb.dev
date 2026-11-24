@@ -1,8 +1,9 @@
 // Renders the committed PNG assets for share cards under public/share/:
-// 1. Each employer's StaffPass captured from its live Role story page (transparent background, punched slot
-//    kept transparent behind the metal clip so the pass sits cleanly on both the page colour and its employer field).
+// 1. Each employer's StaffPass captured from the dev/fixture route `/fixtures/share-passes` (transparent background,
+//    punched slot kept transparent behind the metal clip so the pass sits cleanly on both the page colour and its
+//    employer field). Requires a running server started with `BOARD_FIXTURES=1` (e.g. `sh scripts/t3-worktree.sh dev`).
 // 2. Crisp PNG copies of each featured case study's WebP screenshot (Satori/resvg drops image/webp silently).
-// Run against a running site: `SHARE_BASE_URL=http://127.0.0.1:3115 pnpm share:assets`.
+// Run against a running fixture-enabled site: `SHARE_BASE_URL=http://127.0.0.1:3115 pnpm share:assets`.
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { chromium } from "@playwright/test";
 import {
@@ -36,15 +37,18 @@ try {
   });
   const page = await context.newPage();
 
-  for (const [name, spec] of Object.entries(expected)) {
-    if (spec.kind !== "pass") continue;
-    await page.goto(`${base}/work/${spec.slug}`, { waitUntil: "networkidle" });
+  const passEntries = Object.entries(expected).filter(([, spec]) => spec.kind === "pass");
+  if (passEntries.length > 0) {
+    await page.goto(`${base}/fixtures/share-passes`, { waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
+  }
 
+  for (const [name, spec] of passEntries) {
     // Isolate the printed StaffPass at a uniform crisp size with generous lanyard drop above the card.
-    const metrics = await page.evaluate(async () => {
-      const pass = document.querySelector(".pass");
-      if (!pass) throw new Error("No .pass element found on page.");
+    const metrics = await page.evaluate(async (slug) => {
+      document.querySelector("#share-pass-stage")?.remove();
+      const pass = document.querySelector(`[data-share-pass="${slug}"] .pass`);
+      if (!pass) throw new Error(`No .pass element found for "${slug}". Ensure the server runs with BOARD_FIXTURES=1.`);
 
       const photo = pass.querySelector(".pass__photo");
       if (photo instanceof HTMLImageElement) {
@@ -110,7 +114,7 @@ try {
           tiltRad: (tiltDeg * Math.PI) / 180,
         },
       };
-    });
+    }, spec.slug);
 
     // 1. Capture card + lanyard without the metal clip, so we can punch the slot hole cleanly to transparent.
     await page.evaluate(() => {

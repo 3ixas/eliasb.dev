@@ -5,16 +5,17 @@ import { passName } from "../src/content/stretch/pass-name";
 import { roleStories, roleStorySlugs } from "../src/content/stretch/role-stories";
 import { roleStoryBack, roleStoryCopy, roleStoryDescription, roleStoryName, roleStorySectionKeys, roleStorySectionLabels } from "../src/content/stretch/role-story";
 import { passRecords } from "../src/content/stretch/staff-pass";
+import { luminance } from "../src/content/stretch/story";
 import { drawn, expectDrawn } from "./support/measure";
 import { spoken } from "./support/roll";
 import { renderedContrast } from "./support/rendered-contrast";
-import { withoutScene } from "./support/scene";
 
 /*
- * Role stories (docs/design/DESIGN.md "Long-form pages", R-21): the employer as the title, role, dates and setting on one
- * line, the summary as the lede, the evidence figures and the employer's staff pass; then each section with its heading
- * at the left and its text at the right, its figures in the employer's colour; then the next role as a panel, and Say
- * hello.
+ * Role stories (docs/design/DESIGN.md "Long-form pages", R-21, R-52, R-53): a coloured employer hero banner holding
+ * "← Work", the employer as h1, role, dates and setting on one line, the summary as the lede, the bordered evidence
+ * strip and the employer's compact embedded Staff pass; then a sticky left chapter rail (from 960 px) beside the
+ * reading column of sections, structured Problem and Decision cards, figures in the employer's colour and the neutral
+ * archival mat for the certificate; then the next role as a panel, and Say hello.
  */
 
 const schemes = ["light", "dark"] as const;
@@ -22,7 +23,7 @@ const schemes = ["light", "dark"] as const;
 const sectionKeys = roleStorySectionKeys.filter((key) => key !== "summary");
 const width = (page: Page) => page.viewportSize()?.width ?? 0;
 const opening = (page: Page) => page.locator(".story-open");
-const pass = (page: Page) => opening(page).locator(".pass");
+const pass = (page: Page) => opening(page).locator(".embedded-pass");
 /** An rgb() string for a hex colour, as getComputedStyle reports it. */
 const rgb = (hex: string) => `rgb(${[1, 3, 5].map((at) => parseInt(hex.slice(at, at + 2), 16)).join(", ")})`;
 
@@ -35,7 +36,10 @@ for (const slug of roleStorySlugs) {
       await page.goto(`/work/${slug}`);
     });
 
-    test("the opening has the back link to Work, the employer as the one h1, role, dates and setting on one line, and the summary as the lede", async ({ page }) => {
+    test("the opening is a coloured employer hero banner holding the back link, h1, role, dates and setting, and the summary as the lede", async ({ page }) => {
+      await expect(opening(page)).toHaveClass(/\bpanel surface\b/);
+      await expect(opening(page)).toHaveCSS("background-color", rgb(story.panel.field));
+      await expect(opening(page)).toHaveCSS("color", rgb(story.panel.ink));
       await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(story.employer);
       const back = opening(page).getByRole("link", { name: "Work", exact: true });
@@ -47,10 +51,11 @@ for (const slug of roleStorySlugs) {
       await expect(opening(page).locator(".story-open__lede")).toHaveText(story.sections.summary.paragraphs[0]);
     });
 
-    test("the opening shows the story's evidence figures, each value over its words", async ({ page }) => {
+    test("the opening shows the story's bordered evidence strip, each value over its words", async ({ page }) => {
       const list = opening(page).getByRole("list", { name: "Evidence" });
       expect(await spoken(list.getByRole("listitem"))).toEqual(story.evidence.map(({ value, label }) => `${value} ${label}`));
       await expect(list.locator("b").first()).toHaveCSS("font-family", /Newsreader/);
+      await expect(list.getByRole("listitem").first()).toHaveCSS("border-top-width", "1px");
     });
 
     test("the header is the shared one, and the sections are in order with their headings: no Summary heading and no numbers", async ({ page }) => {
@@ -62,18 +67,35 @@ for (const slug of roleStorySlugs) {
       for (const text of await page.locator("article h2").allTextContents()) expect(text).not.toMatch(/\d/);
     });
 
-    test("each section has its heading at the left and its text at the right from 720 px, and the heading above the text on a phone", async ({ page }) => {
+    test("the sticky chapter rail lists plain section titles with no numbers, sits left of the reading column from 960 px, and never overlaps a figure", async ({ page }) => {
+      const rail = page.locator("nav.chapter-rail");
+      const links = rail.locator("a");
+      await expect(links).toHaveText(sectionKeys.map((key) => roleStorySectionLabels[key]));
+      for (const text of await links.allTextContents()) expect(text).not.toMatch(/\d/);
+      const stream = page.locator(".story-stream");
+      await expect
+        .poll(async () => {
+          const [r, s] = [(await rail.boundingBox())!, (await stream.boundingBox())!];
+          return width(page) >= 960 ? s.x >= r.x + r.width - 1 : s.y >= r.y + r.height - 1;
+        })
+        .toBe(true);
+      if (width(page) >= 960) {
+        await expect(rail).toHaveCSS("position", "sticky");
+        const railBox = (await rail.boundingBox())!;
+        for (const figure of await stream.locator(".story-fig").all()) {
+          const figBox = (await figure.boundingBox())!;
+          expect(figBox.x).toBeGreaterThanOrEqual(railBox.x + railBox.width - 1);
+        }
+      }
+      // Prose and cards stay within the 640 px measure; figures stay within 760 px.
       for (const key of sectionKeys) {
-        const heading = page.locator(`section#${key} h2`);
         const body = page.locator(`section#${key} .story-section__body`);
-        await expect
-          .poll(async () => {
-            const [h, b] = [(await heading.boundingBox())!, (await body.boundingBox())!];
-            return width(page) >= 720 ? b.x >= h.x + h.width - 1 && Math.abs(b.y - h.y) < 24 : b.y >= h.y + h.height - 1;
-          })
-          .toBe(true);
-        // The text keeps its 760 px measure; a figure may take the text side's whole width (#461).
-        for (const text of await body.locator(":scope > :not(.story-fig)").all()) expect((await text.boundingBox())!.width).toBeLessThanOrEqual(760.5);
+        for (const text of await body.locator(":scope > :not(.story-fig)").all()) {
+          expect((await text.boundingBox())!.width).toBeLessThanOrEqual(640.5);
+        }
+        for (const fig of await body.locator(":scope > .story-fig").all()) {
+          expect((await fig.boundingBox())!.width).toBeLessThanOrEqual(760.5);
+        }
       }
       // A hairline and 64 px between sections (44 px on a phone).
       const section = page.locator(`section#${sectionKeys[1]}`);
@@ -81,68 +103,59 @@ for (const slug of roleStorySlugs) {
       await expect(section).toHaveCSS("border-top-width", "1px");
     });
 
-    test("from 720 px a section's heading stays in view beside its text as the section scrolls, and lets go at its end", async ({ page }) => {
-      test.skip(width(page) < 720, "A phone sets the heading above its text.");
-      // The tallest section is the one a heading has furthest to travel beside.
-      const tallest = await page.locator("section.story-section").evaluateAll((sections) => sections.sort((a, b) => b.clientHeight - a.clientHeight)[0].id);
-      const section = page.locator(`section#${tallest}`);
-      const heading = section.locator("h2");
-      await expect(heading).toHaveCSS("position", "sticky");
-      // Scrolled to the section's middle, the heading is held 32 px from the top, inside its section.
-      await section.evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY + element.clientHeight / 2 - 200));
-      await expect.poll(async () => Math.round((await heading.boundingBox())!.y)).toBe(32);
-      // Scrolled past it, the heading has left with its section rather than covering the next one.
-      await section.evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().bottom + window.scrollY));
-      await expect.poll(async () => (await heading.boundingBox())!.y + (await heading.boundingBox())!.height).toBeLessThanOrEqual(1);
+    test("scrolling updates the chapter rail's active lifted paper pill without layout shift", async ({ page }) => {
+      const rail = page.locator("nav.chapter-rail");
+      await expect(rail.locator('a[aria-current="location"]')).toHaveCount(1);
+      await page.evaluate(() => document.fonts.ready);
+      const measure = () => rail.locator("a").evaluateAll((els) => els.map((el) => ({ w: el.getBoundingClientRect().width, h: el.getBoundingClientRect().height })));
+      const before = await measure();
+      const target = page.locator("section#what-changed");
+      await target.evaluate((el) => window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 60));
+      const active = rail.locator('a[href="#what-changed"]');
+      await expect(active).toHaveAttribute("aria-current", "location");
+      await expect.poll(measure).toEqual(before);
     });
 
-    test("its paragraphs are Newsreader at 20 px (19 on a phone), and its points a 23 px serif lead over a muted line", async ({ page }) => {
+    test("its paragraphs are Newsreader at 19 px (18 on a phone), and its Problem and Decision entries are bordered paper cards", async ({ page }) => {
       const paragraph = page.locator("article .prose p").first();
       await expect(paragraph).toHaveCSS("font-family", /Newsreader/);
       await expect(paragraph).toHaveCSS("font-size", width(page) < 720 ? "18px" : "19px");
-      const point = page.locator("article .points li").first();
+      const point = page.locator("article .story-cards li.story-card").first();
       if (await point.count()) {
+        await expect(point).toHaveClass(/\bsurface surface--paper\b/);
+        await expect(point).toHaveCSS("border-radius", "16px");
         await expect(point.locator("b")).toHaveCSS("font-size", "20px");
         await expect(point.locator("b")).toHaveCSS("font-family", /Newsreader/);
         await expect(point.locator("span")).toHaveCSS("font-size", "16px");
       }
     });
 
-    test("the employer's staff pass hangs in the opening as an image named by its print, not a link", async ({ page }) => {
+    test("the employer's compact embedded pass sits in the opening as an image named by its print, not a link, on a light translucent well on bright fields", async ({ page }) => {
       await expect(pass(page)).toHaveCount(1);
       await expect(pass(page)).toHaveAttribute("role", "img");
       await expect(pass(page)).toHaveAccessibleName(passName(slug));
-      await expect(pass(page).locator(".pass__band")).toHaveText(passRecords[slug].short);
-      await expect(opening(page).locator(".pass a, a.pass")).toHaveCount(0);
+      await expect(pass(page).locator(".embedded-pass__org")).toHaveText(passRecords[slug].short);
+      await expect(opening(page).locator(".embedded-pass a, a.embedded-pass, .pass")).toHaveCount(0);
+      await expect(pass(page)).toHaveCSS("border-top-width", "1px");
+      const bright = luminance(story.panel.ink) < luminance(story.panel.field);
+      await expect(pass(page)).toHaveCSS("background-color", bright ? "rgba(255, 255, 255, 0.22)" : "rgba(0, 0, 0, 0.22)");
     });
 
-    test("on a laptop-sized window (1024 px) the pass still hangs beside the text, so the opening's right is never empty", async ({ page }) => {
+    test("on a laptop-sized window (1024 px) the embedded pass sits beside the text with no sideways scroll", async ({ page }) => {
       await page.setViewportSize({ width: 1024, height: 768 });
       const text = page.locator(".story-open__text");
       await expect.poll(async () => (await pass(page).boundingBox())!.x >= (await text.boundingBox())!.x + (await text.boundingBox())!.width - 1).toBe(true);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     });
 
-    test("the pass hangs at the right of the text from 960 px, and below it under that", async ({ page }) => {
+    test("the embedded pass sits at the right of the text from 960 px, and stacks below it under that", async ({ page }) => {
       const text = opening(page).locator(".story-open__text");
       await expect
         .poll(async () => {
-          const [t, p] = [(await text.boundingBox())!, (await pass(page).locator(".pass__card").boundingBox())!];
+          const [t, p] = [(await text.boundingBox())!, (await pass(page).boundingBox())!];
           return width(page) >= 960 ? p.x >= t.x + t.width - 1 : p.y >= t.y + t.height - 1;
         })
         .toBe(true);
-    });
-
-    test("the printed pass swings once on arrival, and not at all with reduced motion", async ({ page }) => {
-      // Where the 3D scene can draw, it takes the printed pass's place and swings it itself (lanyard.spec).
-      await withoutScene(page);
-      await page.emulateMedia({ reducedMotion: "no-preference" });
-      await page.goto(`/work/${slug}`);
-      const animations = () => pass(page).evaluate((element) => element.getAnimations().map((a) => `${(a as CSSAnimation).animationName}:${a.effect?.getComputedTiming().iterations}`));
-      await expect.poll(animations).toContain("pass-swing:1");
-      await page.emulateMedia({ reducedMotion: "reduce" });
-      await page.reload();
-      await expect.poll(animations).toEqual([]);
     });
 
     test("a section's address opens on that section and focuses it", async ({ page }) => {
@@ -233,14 +246,17 @@ for (const slug of roleStorySlugs) {
         for (const [index, row] of scale.rows.entries()) expectDrawn(drawings[index], row, row.what);
       });
 
-      test("the certificate sits under What I took with me with a hairline edge, its caption and its own address", async ({ page }) => {
+      test("the certificate sits on a neutral archival mat under What I took with me with its caption and its own address", async ({ page }) => {
         const figure = page.locator("section#what-i-took-with-me figure#take-ownership-certificate");
         const certificate = story.figures!["what-i-took-with-me"]!;
         if (certificate.kind !== "certificate") throw new Error("BNP Paribas's last figure is the certificate");
+        const mat = figure.locator(".story-fig__mat");
+        await expect(mat).toHaveClass(/\bsurface surface--paper\b/);
+        await expect(mat).toHaveCSS("border-radius", "20px");
         await expect(figure.locator("figcaption")).toHaveText(certificate.caption);
         const image = figure.locator(".zoom img");
         await expect(image).toHaveAttribute("alt", certificate.alt);
-        await expect(image).toHaveCSS("border-radius", "16px");
+        await expect(image).toHaveCSS("border-radius", "12px");
         await expect(image).toHaveCSS("box-shadow", /1px/);
       });
     }
@@ -342,10 +358,10 @@ for (const slug of roleStorySlugs) {
           return widest <= element.clientWidth + 0.5;
         };
         await expect.poll(() => page.getByRole("heading", { level: 1 }).evaluate(widestWordFits)).toBe(true);
-        const card = (await pass(page).locator(".pass__card").boundingBox())!;
+        const card = (await pass(page).boundingBox())!;
         expect(card.x).toBeGreaterThanOrEqual(0);
         expect(card.x + card.width).toBeLessThanOrEqual(at);
-        await expect.poll(() => pass(page).locator(".pass__band span").evaluate((band) => band.scrollWidth <= band.clientWidth + 0.5)).toBe(true);
+        await expect.poll(() => pass(page).locator(".embedded-pass__org").evaluate((org) => org.scrollWidth <= org.clientWidth + 0.5)).toBe(true);
         // A part of the role, dates and setting that starts a line starts at the line's edge, which clips the dot before it.
         const strays = await opening(page).locator(".story-open__meta").evaluate((meta) => {
           const left = meta.getBoundingClientRect().left;
@@ -398,24 +414,26 @@ for (const slug of roleStorySlugs) {
       await expect(page.locator("main")).toHaveCSS("opacity", "1");
     });
 
-    test("it is in the server-rendered page", async ({ page }) => {
+    test("it is in the server-rendered page, and the chapter rail is plain jump links without script", async ({ page }) => {
       await page.route("**/*.js", (route) => route.abort());
       await page.reload();
       await expect(page.locator("article section[id]")).toHaveCount(sectionKeys.length);
       await expect(page.locator('nav[aria-label="On this page"] a')).toHaveCount(5);
+      await expect(page.locator("nav.chapter-rail a")).toHaveCount(sectionKeys.length);
+      await expect(page.locator('nav.chapter-rail a[aria-current]')).toHaveCount(0);
       await expect(pass(page)).toHaveCount(1);
       await expect(opening(page).getByRole("list", { name: "Evidence" }).getByRole("listitem")).toHaveCount(story.evidence.length);
     });
 
     for (const scheme of schemes) {
-      test(`every text pair passes AA on the rendered page, and nothing is under 13 px (${scheme})`, async ({ page, browserName }) => {
+      test(`every text pair passes AA on the rendered page, including the pass well, and nothing is under 13 px (${scheme})`, async ({ page, browserName }) => {
         test.skip(browserName !== "chromium", "Measured in Chromium");
         await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" });
         await page.reload();
         await page.evaluate(() => document.fonts.ready);
         const texts = await page.evaluate(() => [...document.querySelectorAll("[data-role-story] article, nav.story-next")].map((part) => (part as HTMLElement).innerText).join("\n"));
         const readings = (await renderedContrast(page)).filter((reading) => texts.includes(reading.text));
-        for (const expected of [story.employer, story.role, story.evidence[0].label, roleStorySectionLabels["the-role"], ...(next ? [roleStoryCopy.nextRole] : [])]) {
+        for (const expected of [story.employer, story.role, "Elias Bennett", story.evidence[0].label, roleStorySectionLabels["the-role"], ...(next ? [roleStoryCopy.nextRole] : [])]) {
           expect(readings.some((reading) => reading.text.includes(expected)), expected).toBe(true);
         }
         expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);

@@ -41,6 +41,7 @@ export function expectedShareAssets({
     String(RENDER_VERSION),
     read("public/profile/elias-evening-pass.webp"),
     read("src/components/parts/staff-pass.tsx"),
+    read("src/app/fixtures/share-passes/page.tsx"),
     read("src/app/pass.css"),
     read("src/app/tokens.css"),
   ];

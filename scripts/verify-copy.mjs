@@ -424,9 +424,9 @@ for (const [what, ids] of [["menu", siteCopy.menu.map(({ id }) => id)], ["Say he
   assert.equal(workPanels.subheading, work.note, "Work's subheading is its approved note");
   assert.equal(`${bnp.figure.value} · ${bnp.figure.label}`, bullet(deck, "BNP Paribas figure"), "Work: BNP Paribas's figure");
   assert.equal(simulationCopy.title, bullet(deck, "Simulation heading"), "Work: the simulation's heading");
-  assert.equal(`${simulationCopy.again} · ${simulationCopy.paths} · 10 · 100 · 1,000`, bullet(deck, "Simulation controls"), "Work: the simulation's controls");
-  assert.equal(simulationCopy.settled("1,000", 0.012), "1,000 paths: one price, 1.2% above today.", "Work: a settled run is read with its price");
-  assert.equal(simulationCopy.settled("10", -0.0004), "10 paths: one price, level with today.", "Work: a price that rounds to nothing is level");
+  assert.equal(`${simulationCopy.again} · ${simulationCopy.paths} · 10 · 100 · 1,000 · ${simulationCopy.spread}`, bullet(deck, "Simulation controls"), "Work: the simulation's controls");
+  assert.equal(simulationCopy.settled("1,000", 0.012, 0.871), "1,000 paths: one price, 1.2% above today; 10th–90th spread 87.1%.", "Work: a settled run is read with its price and spread");
+  assert.equal(simulationCopy.settled("10", -0.0004, 0.871), "10 paths: one price, level with today; 10th–90th spread 87.1%.", "Work: a price that rounds to nothing is level");
   assert.equal(`${simulationCopy.start} · ${simulationCopy.end} · ${simulationCopy.price}`, bullet(deck, "Simulation"), "Work: the simulation's labels");
   assert.equal(simulationCopy.caption, bullet(deck, "Simulation caption"), "Work: the simulation's caption");
   assert.equal(simulationCopy.description, bullet(deck, "Simulation description"), "Work: the simulation's accessible description");

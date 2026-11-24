@@ -1,13 +1,11 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
+import { siteName } from "@/content/site";
 import { roleStories } from "@/content/stretch/role-stories";
 import type { RoleStorySlug } from "@/content/stretch/role-story";
 import { passName } from "@/content/stretch/pass-name";
-import { passHang, passRecords, passStatus, type PassRecord } from "@/content/stretch/staff-pass";
+import { passHang, passPortrait, passRecords, passStatus, unbrokenEnds, type PassRecord } from "@/content/stretch/staff-pass";
 import type { PanelColours } from "@/content/stretch/story";
-
-/** The white-tux portrait, cropped as the pass prints it (DESIGN.md "The staff pass"). */
-const portrait = { src: "/profile/elias-evening-pass.webp", width: 352, height: 426 } as const;
 
 /**
  * A staff pass (DESIGN.md "The staff pass", R-12): a printed CR80 card hanging from a two-ply lanyard by a metal clip
@@ -21,9 +19,6 @@ export function StaffPass({ slug, href, lead = false, priority = false }: { slug
   const { role, dates, panel } = roleStories[slug];
   return <PassCard id={slug} name={passName(slug)} record={passRecords[slug]} hang={passHang[slug]} role={role} dates={dates} panel={panel} href={href} lead={lead} priority={priority} />;
 }
-
-/** A date range may wrap only after its dash, so a month never parts from its year ("Aug 2024 –" over "Jun 2025"). */
-const unbrokenEnds = (dates: string) => dates.replace(/ (?=\d)/g, "\u00a0").replace(" –", "\u00a0–");
 
 type PassCardProps = {
   /** Names the clip's gradient, so two passes on a page do not share one. */
@@ -74,9 +69,9 @@ export function PassCard({ id, name, record, hang, role, dates, panel, href, lea
           <span>{short}</span>
         </span>
         <i className="pass__slot" />
-        <Image className="pass__photo" src={portrait.src} width={portrait.width} height={portrait.height} alt="" sizes="80px" preload={priority} />
+        <Image className="pass__photo" src={passPortrait.src} width={passPortrait.width} height={passPortrait.height} alt="" sizes="80px" preload={priority} />
         <span className="pass__who">
-          <b>Elias Bennett</b>
+          <b>{siteName}</b>
           <span>{role}</span>
           <span>{unbrokenEnds(dates)}</span>
         </span>

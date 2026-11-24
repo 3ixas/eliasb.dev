@@ -79,9 +79,9 @@ function ScaleFigure({ figure, panel }: { figure: Extract<RoleStoryFigure, { kin
   );
 }
 
-/** The award's certificate, at column width; its id lets an address name it. */
+/** The award's certificate on a neutral archival mat, at column width; its id lets an address name it (R-52). */
 function CertificateFigure({ figure }: { figure: Extract<RoleStoryFigure, { kind: "certificate" }> }) {
-  return <StoryImage id={figure.id} src={figure.src} alt={figure.alt} width={figure.width} height={figure.height} caption={figure.caption} />;
+  return <StoryImage id={figure.id} src={figure.src} alt={figure.alt} width={figure.width} height={figure.height} caption={figure.caption} mat />;
 }
 
 /** Screenshots of a public page, never edited: the link beneath says what and when they are, and goes to where they were taken. */

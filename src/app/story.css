@@ -32,25 +32,28 @@
   outline-offset: 3px;
 }
 
-/* ---- A Role story's opening ---- */
+/* ---- A Role story's opening: coloured employer hero banner with embedded Staff pass (R-52) ---- */
 
-/* The text at the left; the pass hangs from the header's rule at the right, its lanyard running up out of view. */
+/* Text at the left, compact embedded Staff pass at the right, bordered evidence strip across the foot; stacks under 960 px. */
 .story-open {
   display: grid;
-  grid-template-columns: 7fr 5fr;
-  gap: 24px;
-  min-height: 640px;
+  grid-template:
+    "text pass" auto
+    "figures figures" auto
+    / minmax(0, 1fr) minmax(264px, 340px);
+  gap: 28px 40px;
+  align-items: center;
+  margin-top: 24px;
 }
 
 .story-open__text {
-  align-self: center;
+  grid-area: text;
   min-width: 0;
-  padding: 40px 0 72px;
 }
 
 .story-open__title {
   width: fit-content;
-  margin: 20px 0 0;
+  margin: 14px 0 0;
   font-family: var(--serif);
   font-optical-sizing: auto;
   font-size: var(--type-title);
@@ -67,16 +70,16 @@
 }
 
 /*
- * Role, dates and setting on one muted line, wrapping between parts and never inside one. Each dot sits in the gap before
+ * Role, dates and setting on one line, wrapping between parts and never inside one. Each dot sits in the gap before
  * its part, so a part that starts a new line takes its dot past the line's left edge, where the line clips it.
  */
 .story-open__meta {
   display: flex;
   flex-wrap: wrap;
   column-gap: 1em;
-  margin: 18px 0 0;
+  margin: 16px 0 0;
   overflow: clip;
-  color: var(--muted);
+  color: var(--panel-ink);
   font-size: var(--type-ui);
   line-height: 1.5;
 }
@@ -95,8 +98,9 @@
 }
 
 .story-open__lede {
-  max-width: 25em;
-  margin: 28px 0 0;
+  max-width: 28em;
+  margin: 22px 0 0;
+  color: var(--panel-ink);
   font-family: var(--serif);
   font-optical-sizing: auto;
   font-size: var(--type-lede);
@@ -104,7 +108,7 @@
   text-wrap: pretty;
 }
 
-/* The evidence figures: each value large in Newsreader over its muted words (the panel's ink on a panel). Four wrap two by two where they do not fit in a row. */
+/* The evidence figures: each value large in Newsreader over its muted words (full-strength ink on a panel). */
 .story-figures {
   display: flex;
   flex-wrap: wrap;
@@ -137,12 +141,108 @@
   white-space: nowrap;
 }
 
-.story-open__rail {
+/* Bordered evidence strip inside a Role story's coloured hero banner (R-52). */
+.story-open .story-figures {
+  grid-area: figures;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 148px), 1fr));
+  gap: 12px;
+  margin: 0;
+  color: var(--panel-ink);
+}
+
+.story-open .story-figures li {
+  min-width: 0;
+  max-width: none;
+  padding: 14px 16px;
+  border: 1px solid var(--well-border);
+  border-radius: 14px;
+  background: var(--well);
+}
+
+.story-open .story-figures b {
+  color: inherit;
+  white-space: normal;
+}
+
+/* Compact embedded employer Staff pass inside the hero banner (R-52). */
+.embedded-pass {
+  grid-area: pass;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-bottom: 48px;
-  clip-path: inset(0 -100vw -320px -100vw);
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--well-border);
+  border-radius: 16px;
+  background: var(--well);
+  color: var(--panel-ink);
+}
+
+.embedded-pass__photo {
+  flex: none;
+  width: 64px;
+  height: 78px;
+  border: 1px solid var(--well-border);
+  border-radius: 8px;
+  background: var(--band);
+  object-fit: cover;
+}
+
+.embedded-pass[data-state="returned"] .embedded-pass__photo {
+  filter: grayscale(1) contrast(1.05);
+}
+
+.embedded-pass__body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.embedded-pass__org {
+  font-size: var(--type-label);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.embedded-pass__name {
+  margin: 2px 0;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-lead);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+
+.embedded-pass__role {
+  font-size: var(--type-small);
+  line-height: 1.3;
+}
+
+.embedded-pass__dates {
+  font-size: var(--type-label);
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1.3;
+}
+
+.embedded-pass__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: var(--type-label);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.embedded-pass__holo {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: conic-gradient(from 20deg, #9fe8ff, #dcb8ff, #ffe39a, #a9f5c4, #9fe8ff);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.75), 0 0 0 0.5px rgb(0 0 0 / 0.35);
 }
 
 /* ---- A case study's opening: a panel in the project's colour ---- */
@@ -285,6 +385,114 @@
   margin-top: 32px;
 }
 
+/* ---- Shared long-form chapter rail and reading stream (R-52, R-54) ---- */
+
+.story-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
+  margin-top: 44px;
+}
+
+.chapter-rail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--hair);
+}
+
+.chapter-rail a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: var(--muted);
+  font-size: var(--type-small);
+  font-weight: 500;
+  line-height: 1.25;
+  text-decoration: none;
+  transition: background-color 150ms var(--out), border-color 150ms var(--out), color 150ms var(--out);
+}
+
+.chapter-rail a::before {
+  content: "";
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: transparent;
+  transition: background-color 150ms var(--out);
+}
+
+.chapter-rail a[aria-current="location"] {
+  border-color: var(--hair);
+  background-color: var(--paper);
+  color: var(--ink);
+  box-shadow:
+    0 1px 2px light-dark(rgb(20 20 18 / 0.08), rgb(0 0 0 / 0.45)),
+    0 4px 12px -6px light-dark(rgb(20 20 18 / 0.14), rgb(0 0 0 / 0.55));
+}
+
+.chapter-rail a[aria-current="location"]::before {
+  background: var(--cobalt);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .chapter-rail a:hover {
+    background-color: var(--tint);
+    color: var(--ink);
+  }
+
+  .chapter-rail a[aria-current="location"]:hover {
+    background-color: var(--paper);
+  }
+}
+
+.story-stream {
+  min-width: 0;
+  max-width: 760px;
+}
+
+.story-stream .story-section {
+  display: block;
+}
+
+.story-stream .story-section:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.story-stream .story-section__title {
+  position: static;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 960px) {
+  .story-layout {
+    grid-template-columns: 224px minmax(0, 1fr);
+    gap: clamp(32px, 5vw, 68px);
+    align-items: start;
+    margin-top: 64px;
+  }
+
+  .chapter-rail {
+    position: sticky;
+    top: 28px;
+    display: grid;
+    gap: 4px;
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .chapter-rail a {
+    display: flex;
+  }
+}
+
 /* ---- Sections ---- */
 
 .story-section {
@@ -384,6 +592,18 @@
   color: var(--muted);
   font-size: var(--type-body);
   line-height: 1.55;
+}
+
+/* Structured Problem & Decision cards: tonal bordered paper surfaces in the reading column (R-52, R-54). */
+.story-cards {
+  display: grid;
+  gap: 12px;
+}
+
+.story-cards li.story-card {
+  padding: 20px 24px;
+  border-top: 0;
+  border-radius: 16px;
 }
 
 /* ---- Figures ---- */
@@ -603,6 +823,21 @@
   box-shadow: 0 0 0 1px var(--hair), 0 30px 50px -36px var(--shadow);
 }
 
+/* Neutral archival mat around printed artefacts such as BNP Paribas's certificate (R-52); keeps overflow visible so focus rings never clip. */
+.story-fig__mat {
+  padding: clamp(18px, 3vw, 28px);
+  border-radius: 20px;
+}
+
+.story-fig--mat .story-fig__shot .zoom img {
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--hair);
+}
+
+.story-fig__mat + figcaption {
+  margin-top: 24px;
+}
+
 /* On its own line, so the link is a 44 px target. */
 .story-fig__source {
   display: inline-flex;
@@ -719,21 +954,12 @@
  */
 @media (max-width: 959.98px) {
   .story-open {
-    grid-template-columns: minmax(0, 1fr);
-    min-height: 0;
-  }
-
-  .story-open__text {
-    padding-bottom: 48px;
-  }
-
-  .story-open__rail {
-    padding-bottom: 24px;
-    border-top: 1px solid var(--hair);
-  }
-
-  .story-open__rail .pass {
-    --drop: 132px;
+    grid-template:
+      "text" auto
+      "figures" auto
+      "pass" auto
+      / minmax(0, 1fr);
+    gap: 24px;
   }
 
   .case-open {
@@ -753,10 +979,6 @@
 /* ---- Phone ---- */
 
 @media (max-width: 719.98px) {
-  .story-open__text {
-    padding-top: 24px;
-  }
-
   .story-figures {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -771,8 +993,22 @@
     white-space: normal;
   }
 
-  .story-open__rail .pass {
-    --drop: 88px;
+  .story-open .story-figures {
+    gap: 10px;
+  }
+
+  .embedded-pass {
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .embedded-pass__photo {
+    width: 56px;
+    height: 68px;
+  }
+
+  .story-cards li.story-card {
+    padding: 18px 20px;
   }
 
   .story-section {
@@ -810,13 +1046,32 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .next-panel__name .arrow {
+  .next-panel__name .arrow,
+  .chapter-rail a,
+  .chapter-rail a::before {
     transition: none;
   }
 }
 
-/* Forced colours keep the flag: the lines and the switch in the text colour (R-29). */
+/* Forced colours keep the flag, embedded pass, evidence tiles and active chapter pill distinct (R-29, R-52). */
 @media (forced-colors: active) {
+  .embedded-pass,
+  .embedded-pass__photo,
+  .story-open .story-figures li {
+    border-color: CanvasText;
+  }
+
+  .chapter-rail a[aria-current="location"] {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  .chapter-rail a[aria-current="location"]::before {
+    background: HighlightText;
+  }
+
   .lane i,
   .lane__switch {
     border-color: CanvasText;
