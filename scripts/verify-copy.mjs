@@ -193,6 +193,19 @@ assert.equal(`${howIWork.prd.title}, ${prdDate}`, raw.match(/^- PRD card caption
   assert.equal(line("Where I’m headed lead"), work.headed.line, "Where I’m headed: the lead (spec Decisions 2)");
 }
 
+// Off the clock: the compact 7-day cue labels (R-50, R-55) match the deck table and come from each day's session.
+{
+  const cueRows = rows(raw, "## Passes and panels · Off the clock");
+  assert.deepEqual(
+    offTheClock.training.days.map(({ short, cue, session }) => [short, cue, session]),
+    cueRows,
+    "Off the clock: the 7-day workout cue table",
+  );
+  for (const day of offTheClock.training.days) {
+    assert.ok(day.session.toLowerCase().includes(day.cue.toLowerCase()), `Off the clock: ${day.short} cue "${day.cue}" is not sourced from "${day.session}"`);
+  }
+}
+
 // The approved copy under a `### name` heading, for the sections that follow.
 const copyFor = (name) => {
   const start = raw.indexOf(`### ${name}`);

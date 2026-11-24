@@ -424,3 +424,17 @@ As approved in the passes and panels spec (R-16, R-18) and refined on 23 Novembe
 | Write it down first. | 57 user stories | 57, 13 slices |
 | Ship it so it’s safe to undo. | defaults to off | A switch, Off / On · Today’s path · New cached path |
 | Measure whether it works. | rose by 15% | +15%, Before · After, its bar 15% longer |
+
+## Passes and panels · Off the clock
+
+As refined on 23 November 2026 (R-50, R-55): Off the clock sets its four sections as nested stone rows with margin headings (`Today’s workout`, `On my shelf and screen`, `Odd but true, from this week in history`, `GitHub, the past year`). Today’s workout pairs today’s full session with a static 7-day schedule of compact cues sourced from the training plan above, beside the Central London running photo.
+
+| Day | Cue | Session |
+|---|---|---|
+| Mon | Upper | Upper body gym |
+| Tue | Lower | Lower body gym |
+| Wed | Zone 2 | Zone 2, assault bike |
+| Thu | Upper | Upper body gym |
+| Fri | Lower | Lower body gym |
+| Sat | Rope | Skipping rope intervals |
+| Sun | Bike | Assault bike intervals |

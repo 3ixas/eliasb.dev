@@ -162,4 +162,22 @@ test.describe("Forced colours", () => {
     expect(on.knob).not.toBe(on.track);
     expect(on.liveBg).not.toBe(on.idleBg);
   });
+
+  test("Off the clock keeps its nested row edges and today's workout tile distinct", async ({ page }) => {
+    await page.goto("/");
+    const section = page.locator("section#off-the-clock");
+    const today = section.locator(".otc__day[data-today]");
+    await expect(today).toHaveCount(1);
+    const other = section.locator(".otc__day:not([data-today])").first();
+    await expect(today).toHaveCSS("forced-color-adjust", "none");
+    const [todayBg, otherBg, rowBorder, canvas] = await Promise.all([
+      today.evaluate((el) => getComputedStyle(el).backgroundColor),
+      other.evaluate((el) => getComputedStyle(el).backgroundColor),
+      section.locator(".otc__section").first().evaluate((el) => getComputedStyle(el).borderTopColor),
+      page.evaluate(() => getComputedStyle(document.body).backgroundColor),
+    ]);
+    expect(todayBg).not.toBe(otherBg);
+    expect(todayBg).not.toBe(canvas);
+    expect(rowBorder).not.toBe(canvas);
+  });
 });

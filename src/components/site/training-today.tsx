@@ -1,10 +1,11 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { ZoomableImage } from "@/components/site/zoomable-image";
 import { offTheClock } from "@/content/stretch/off-the-clock";
 import { londonWeekday } from "@/integrations/signal-mappers";
 
-const { days, week, title } = offTheClock.training;
+const { days, week, title, photo, photoCaption } = offTheClock.training;
 
 /** The longest session, which an invisible copy holds the line's height to: wrapped at a phone's width it is the tallest. */
 const longest = days.reduce((a, b) => (b.session.length > a.length ? b.session : a), "");
@@ -28,37 +29,50 @@ function useWeekday(fixed?: string) {
 }
 
 /**
- * Off the clock's first section (R-19, #493), "Today's workout": today's session as one strong line over the week. The
- * week is one list read the same at every width ("Monday: Upper body gym"); what shows differs (off-the-clock.css): seven
- * quiet columns from 960 px, a strip of letters on a narrower screen with script, the week's rows without. Until the day
- * is known (or with no script) nothing is marked, which is still a complete section; the session's line holds the height
- * of the longest session, so filling it in moves nothing.
+ * Off the clock's first nested stone row (DESIGN.md "The homepage, in order" 6, R-50): "Today's workout", showing today's
+ * full session over a calm, static 7-day schedule of compact cues (`Mon · Upper` … `Sun · Bike`) with today marked, beside
+ * the Central London running photo wired to the shared `ZoomableImage` lightbox. Until the day is known (or with no script)
+ * nothing is marked as today while the full 7-day week stays visible; the invisible sizer holds today's line height so
+ * filling it in moves nothing.
  */
 export function TrainingCell({ now }: { now?: string }) {
   const today = useWeekday(now);
   return (
     <div className="otc__section otc__training" data-otc="training">
       <h3 className="otc__title">{title}</h3>
-      <p className="otc__today">
-        <span className="otc__today-sizer" aria-hidden="true">
-          {longest}
-        </span>
-        <span>{today === null ? "" : days[today].session}</span>
-      </p>
-      <ol className="otc__week" aria-label={week}>
-        {days.map((day, index) => (
-          <li key={day.short} data-today={today === index ? "" : undefined} aria-current={today === index ? "date" : undefined}>
-            <span className="otc__week-letter" aria-hidden="true">
-              {day.short.charAt(0)}
+      <div className="otc__training-body">
+        <div className="otc__training-main">
+          <p className="otc__today">
+            <span className="otc__today-sizer" aria-hidden="true">
+              {longest}
             </span>
-            <span className="otc__week-day">
-              <span aria-hidden="true">{day.short}</span>
-              <span className="sr-only">{day.long}: </span>
-            </span>
-            <span className="otc__week-session">{day.session}</span>
-          </li>
-        ))}
-      </ol>
+            <span>{today === null ? "" : days[today].session}</span>
+          </p>
+          <ol className="otc__week" aria-label={week}>
+            {days.map((day, index) => (
+              <li key={day.short} className="otc__day" data-today={today === index ? "" : undefined} aria-current={today === index ? "date" : undefined}>
+                <span className="otc__week-day" aria-hidden="true">
+                  {day.short}
+                </span>
+                <span className="otc__week-cue" aria-hidden="true">
+                  {day.cue}
+                </span>
+                <span className="sr-only">{`${day.long}: ${day.session}`}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <figure className="otc__run-photo">
+          <ZoomableImage
+            src={photo.src}
+            alt={photo.alt}
+            width={photo.width}
+            height={photo.height}
+            sizes="(min-width: 720px) 156px, calc(100vw - 112px)"
+          />
+          <figcaption className="otc__run-caption">{photoCaption}</figcaption>
+        </figure>
+      </div>
     </div>
   );
 }
