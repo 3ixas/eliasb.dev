@@ -22,15 +22,22 @@ const sections = [
 ];
 
 test.describe("Homepage shell", () => {
-  test("seven sections in order: the opening, then the five anchored ones with Where I'm headed after Work", async ({ page }) => {
+  test("six top-level sections in order: opening, Work, Things I make, the shared Where I'm headed and How I work band, Off the clock, Say hello", async ({ page }) => {
     await page.goto("/");
     const main = page.locator("#main-content");
-    await expect(main.locator("> section")).toHaveCount(7);
-    const ids = sections.map((section) => section.id);
-    expect(await main.locator("> section").evaluateAll((all) => all.map((section) => section.id))).toEqual(["", ids[0], "", ...ids.slice(1)]);
+    await expect(main.locator("> section")).toHaveCount(6);
+    expect(await main.locator("> section").evaluateAll((all) => all.map((section) => section.id))).toEqual(["", "work", "things-i-make", "", "off-the-clock", "say-hello"]);
+    await expect(main.locator("> section.headed-how-band section[aria-labelledby='headed-heading']")).toHaveCount(1);
+    await expect(main.locator("> section.headed-how-band section#how-i-work")).toHaveCount(1);
     await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName(opening.headline);
-    const headings = sections.map((section) => (section.id === "say-hello" ? "Say hello" : section.heading));
-    await expect(page.getByRole("heading", { level: 2 })).toHaveText([headings[0], work.headed.heading, ...headings.slice(1)]);
+    await expect(page.getByRole("heading", { level: 2 })).toHaveText([
+      work.heading,
+      thingsIMake.heading,
+      work.headed.heading,
+      howIWork.heading,
+      offTheClock.heading,
+      "Say hello",
+    ]);
   });
 
   // Every section with a subheading (Work, Things I make, How I work, Off the clock) stacks it directly under its h2 (DESIGN.md "Layout", R-43).

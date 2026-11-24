@@ -79,14 +79,15 @@ function Drawn({ proof, colour }: { proof: HeadedProof; colour: string }) {
 }
 
 /**
- * Where I'm headed (DESIGN.md "The homepage, in order" 4, R-16, #459): its own section, one paper panel with the title
- * and lead at the left and three parts at the right. Each part starts from a chip naming where its evidence comes from,
- * in that source's colour, then its heading, its one line, and its drawn proof. No destination label and no job title.
+ * Where I'm headed (DESIGN.md "The homepage, in order" 5, R-16, R-48, #459): sits inside the shared full-bleed `--band`
+ * section as an asymmetric 4 / 7 bordered paper panel with the title and lead at the left and three parts at the right.
+ * Each part starts from a chip naming where its evidence comes from, in that source's colour, then its heading, its one
+ * line, and its drawn proof. No destination label and no job title.
  */
 export function WhereImHeaded() {
   const { heading, line, bars } = work.headed;
   return (
-    <section className="frame section" aria-labelledby="headed-heading">
+    <section className="headed-section" aria-labelledby="headed-heading">
       <OnView motion="rise">
         <Panel className="headed">
           <div className="headed__lead">

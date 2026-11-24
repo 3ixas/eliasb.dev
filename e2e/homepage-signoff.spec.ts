@@ -9,7 +9,7 @@ test.describe("Homepage sign-off", () => {
     const width = page.viewportSize()!.width;
     test.skip(!(width in heightBudget), "The budget is set at 1440 × 900 and 390 × 844");
     await page.goto("/");
-    await expect(page.locator("#main-content > section")).toHaveCount(7);
+    await expect(page.locator("#main-content > section")).toHaveCount(6);
     const budget = heightBudget[width as keyof typeof heightBudget];
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight)).toBeLessThanOrEqual(budget);
   });
