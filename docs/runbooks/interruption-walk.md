@@ -4,12 +4,12 @@ The human half of the craft bar: feel can't be measured on a shared runner, so i
 
 **Pass condition, throughout:** nothing jumps, restarts from zero or is left stuck.
 
-1. **Phone:** load the homepage and scroll while the three passes are still swinging to rest. They finish their swing; nothing restarts.
+1. **Phone:** load the homepage and scroll while the BNP Paribas pass is still swinging to rest on its rail. It finishes its swing cleanly without poking above the opening actions; nothing restarts.
 2. **Phone:** open Menu and close it again before it has finished opening, then tap a link in it.
 3. **Phone:** scroll quickly past Work and back while the panels rise and the bars grow. Each arrives once and ends where the server drew it, and nothing armed is left blank.
 4. **Phone:** start a press on a pill or a row, then scroll instead. The press clears and nothing follows.
 5. **Phone:** step this week in history ("1 of 3") three times fast. Each tap moves one fact, and nothing in the panel shifts.
-6. **Desktop:** sweep the pointer across the three passes and off them mid-lean. Each lean and catch of the light settles back without a jump.
+6. **Desktop:** sweep the pointer across the BNP Paribas pass and off it mid-lean (or drag and release the 3D pass). It settles back smoothly without a jump.
 7. **Desktop:** scroll the simulation into view and away again while its paths are drawing. It finishes or holds, and never redraws from zero.
 8. **Desktop:** hover a project panel and leave mid-lift, then hover the next. Each screenshot settles on its own.
 9. **Either:** press the Eclipse, then press it again halfway through the crossfade.

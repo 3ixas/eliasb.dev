@@ -87,7 +87,7 @@ function Drawn({ proof, colour }: { proof: HeadedProof; colour: string }) {
 export function WhereImHeaded() {
   const { heading, line, bars } = work.headed;
   return (
-    <section className="headed-section" aria-labelledby="headed-heading">
+    <section aria-labelledby="headed-heading">
       <OnView motion="rise">
         <Panel className="headed">
           <div className="headed__lead">

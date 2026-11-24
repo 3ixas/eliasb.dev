@@ -172,7 +172,8 @@ test.describe("Off the clock: tap-to-enlarge imagery", () => {
 
     await page.keyboard.press("Enter");
     await expect(dialog).toBeVisible();
-    await dialog.getByRole("button", { name: "Close" }).click();
+    await expect(dialog.getByRole("button", { name: "Close" })).toBeFocused();
+    await page.keyboard.press("Enter");
     await expect(dialog).toBeHidden();
     await expect(button).toBeFocused();
   });
@@ -208,7 +209,8 @@ test.describe("Off the clock: tap-to-enlarge imagery", () => {
 
     await page.keyboard.press("Enter");
     await expect(firstDialog).toBeVisible();
-    await firstDialog.getByRole("button", { name: "Close" }).click();
+    await expect(firstDialog.getByRole("button", { name: "Close" })).toBeFocused();
+    await page.keyboard.press("Enter");
     await expect(firstDialog).toBeHidden();
     await expect(button).toBeFocused();
 

@@ -41,8 +41,8 @@ const plain = raw.replace(/\*/g, "").replace(/[{}]/g, "");
 // ---- Every string in the typed modules is in the approved copy ----------------------------
 
 const leaves = (value, path = "") => {
-  // Links, image paths, a figure's kind, a comparison's unit and its screens' devices, dates, anchors, category keys and Role story slugs are addresses and data, not words, so the approved copy does not list them.
-  if (typeof value === "string") return /(href|src|writtenOn|\.id|\.glyph|\.slug|\.figures\.[\w-]+\.kind|\.rows\[\d+\]\.unit|\.pairs\[\d+\]\.unit|\.figures\.[\w-]+\.images\[\d+\]\.device|\.category|\.story|\.project|\.restates\[\d+\]|\.drawn\.kind|\.drawn\.projects\[\d+\])$/.test(path) ? [] : [[path, value]];
+  // Links, image paths, a figure's kind, a comparison's unit and its screens' devices, anchors, category keys, Role story slugs and drawn-proof metadata are addresses and data, not words, so the approved copy does not list them.
+  if (typeof value === "string") return /(href|src|\.id|\.slug|\.figures\.[\w-]+\.kind|\.rows\[\d+\]\.unit|\.figures\.[\w-]+\.images\[\d+\]\.device|\.category|\.story|\.project|\.restates\[\d+\]|\.drawn\.kind|\.drawn\.projects\[\d+\])$/.test(path) ? [] : [[path, value]];
   if (Array.isArray(value)) return value.flatMap((item, index) => leaves(item, `${path}[${index}]`));
   if (value && typeof value === "object") return Object.entries(value).flatMap(([key, item]) => leaves(item, `${path}.${key}`));
   return [];
@@ -331,12 +331,12 @@ for (const story of roles) {
 
 assert.deepEqual(caseStudyProblems(studies, projects), []);
 for (const slug of featuredSlugs) assert.ok(caseStudies[slug], `${slug} is featured and has a case study`);
-assert.deepEqual(studies.map((study) => study.next), ["argus-risk", "flowtime", "threshold"], "Next project follows the featured order");
+assert.deepEqual(studies.map((study) => study.next), ["argus-risk", "flowtime", null], "Next project follows the featured order, and Flowtime ends on All projects");
 
 // The problems are reported by name.
 const [threshold] = studies;
 assert.match(caseStudyProblems([{ ...threshold, evidence: [...threshold.evidence, threshold.evidence[0]] }, studies[1], studies[2]], projects)[0], /more than 4 evidence/);
-assert.match(caseStudyProblems([{ ...threshold, next: "threshold" }], projects)[0], /different case study/);
+assert.match(caseStudyProblems([{ ...threshold, next: "threshold" }], projects)[0], /different case study or none/);
 assert.match(caseStudyProblems([{ ...threshold, slug: "ghost" }, threshold], projects)[0], /"ghost" has no project/);
 assert.match(
   caseStudyProblems([{ ...threshold, sections: { ...threshold.sections, decisions: {} } }, studies[1]], projects)[0],

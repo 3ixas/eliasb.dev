@@ -38,7 +38,7 @@ for (const file of readdirSync(dir).filter((name) => name.endsWith(".css"))) {
     if (!size) return;
     const at = `${file}:${index + 1} font-size: ${size}`;
     if (file === "pass.css" && passSize.test(size)) return;
-    const token = size.match(/^var\((--(?:text|type)-[\w-]+)\)$/)?.[1];
+    const token = size.match(/^var\((--type-[\w-]+)\)$/)?.[1];
     if (token) {
       if (!typeTokens.has(token)) problems.push(`${at} uses ${token}, which is not a type token`);
       return;

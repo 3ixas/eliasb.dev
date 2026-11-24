@@ -35,7 +35,7 @@ export function PassLight({ className, children }: { className: string; children
   }, []);
 
   return (
-    <div ref={rail} className={`lanyard ${className}`}>
+    <div ref={rail} className={`lanyard pass-rail ${className}`}>
       {children}
     </div>
   );

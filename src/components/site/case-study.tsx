@@ -13,6 +13,7 @@ import { ThresholdLinkIsland } from "@/components/site/threshold-link-island";
 import { ZoomableImage } from "@/components/site/zoomable-image";
 import { projects, type Project } from "@/content/projects";
 import { caseStudyCopy, caseStudySectionKeys, caseStudySectionLabels, type CaseStudy, type CaseStudySection } from "@/content/stretch/case-study";
+import { workArchive } from "@/content/stretch/site-copy";
 import type { PanelColours } from "@/content/stretch/story";
 import { argusPositions, argusProvenanceCopy } from "@/content/stretch/argus-provenance";
 import { flowtimeBreakCopy, focusRange } from "@/content/stretch/flowtime-break";
@@ -27,7 +28,7 @@ import { thresholdLinkCopy, thresholdStart } from "@/content/stretch/threshold-l
  */
 export function CaseStudyPage({ study }: { study: CaseStudy }) {
   const project = projectFor(study.slug);
-  const next = projectFor(study.next);
+  const next = study.next ? projectFor(study.next) : null;
   const chapters = caseStudySectionKeys.map((key) => ({ id: key, title: caseStudySectionLabels[key] }));
 
   return (
@@ -48,7 +49,11 @@ export function CaseStudyPage({ study }: { study: CaseStudy }) {
           })}
         </StoryChapters>
       </article>
-      <NextPanel label={caseStudyCopy.nextProject} href={`/things-i-make/${next.slug}`} name={next.name} line={next.outcome} colours={next.panel!} transition={projectPanelTransition(next.slug)} />
+      {next ? (
+        <NextPanel label={caseStudyCopy.nextProject} href={`/things-i-make/${next.slug}`} name={next.name} line={next.outcome} colours={next.panel!} transition={projectPanelTransition(next.slug)} />
+      ) : (
+        <NextPanel label={caseStudyCopy.allProjects} href="/things-i-make" name={workArchive.heading} line={workArchive.note} />
+      )}
     </LongForm>
   );
 }

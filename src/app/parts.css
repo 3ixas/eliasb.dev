@@ -713,6 +713,37 @@
   }
 }
 
+/*
+ * Shared hanging Staff pass rail (PassLight: homepage opening and Role stories). Clips the strap and 3D canvas cleanly
+ * at its top hairline while letting the 3D scene bleed 320 px below (matching scene.ts BLEED). Under 960 px it hangs
+ * beneath the opening text or Role hero from a quiet 1 px hairline.
+ */
+.pass-rail {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-bottom: 48px;
+  clip-path: inset(0 -100vw -320px -100vw);
+}
+
+@media (max-width: 959.98px) {
+  .pass-rail {
+    padding-bottom: 24px;
+    border-top: 1px solid var(--hair);
+  }
+
+  .pass-rail .pass {
+    --drop: 112px;
+  }
+}
+
+@media (max-width: 719.98px) {
+  .pass-rail .pass {
+    --card: 256px;
+    --drop: 84px;
+  }
+}
+
 /* Forced colours keep the data: before in the text colour, after in the highlight, the scales in grey (R-29). Shadows are dropped there, so a surface keeps its edge as an outline. */
 @media (forced-colors: active) {
   .surface {
@@ -720,8 +751,15 @@
     outline-offset: -1px;
   }
 
+  .pass-rail,
   .optical-bezel {
     border-color: CanvasText;
+  }
+
+  .optical-bezel > img,
+  .optical-bezel > .zoom img {
+    outline: 1px solid GrayText;
+    outline-offset: -1px;
   }
 
   .bar,

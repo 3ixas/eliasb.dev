@@ -170,7 +170,7 @@ Where I’m headed and How I work share one full-bleed `--band` section (R-48, R
 
 Voice rule: frame everything positively. Say what exists, what I did, and what’s next; never write what’s missing, unfinished or unmeasured.
 
-Shared labels: ← Things I make · Live site ↗ · Code ↗ · Next project · From the PRD. Chapter rail landmark name (not on screen): Case study sections. The header lede uses the case study’s `Meta description` (`study.description`) so visitors get concrete product context rather than repeating the homepage panel’s short outcome.
+Shared labels: ← Things I make · Live site ↗ · Code ↗ · Next project · All projects · From the PRD. Chapter rail landmark name (not on screen): Case study sections. The header lede uses the case study’s `Meta description` (`study.description`) so visitors get concrete product context rather than repeating the homepage panel’s short outcome.
 
 ### Threshold
 

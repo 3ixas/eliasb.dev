@@ -32,7 +32,7 @@ export function HowFlagSwitch({
       <span className="flag-switch__track" aria-hidden="true">
         <span className="flag-switch__knob" />
       </span>
-      <span className="flag-switch__label" aria-hidden="true">
+      <span className="flag-switch__label" aria-hidden={ready || undefined}>
         {enabled ? on : off}
       </span>
     </>

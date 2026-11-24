@@ -230,7 +230,7 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
       { value: "⅕", label: "default break" },
       { value: "2-minute", label: "first cycle (the target)" },
     ],
-    next: "threshold",
+    next: null,
     description:
       "A focus timer that counts up, sets breaks in proportion to your focus and keeps your history on your device.",
   },
