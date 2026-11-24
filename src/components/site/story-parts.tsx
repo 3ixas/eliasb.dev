@@ -25,12 +25,12 @@ export function StoryChapters({ items, label, children }: { items: readonly Stor
   );
 }
 
-function StoryPoints({ points, cards }: { points: NonNullable<StorySectionBody["points"]>; cards: boolean }) {
+function StoryPoints({ points }: { points: NonNullable<StorySectionBody["points"]> }) {
   if (points.length === 0) return null;
   return (
-    <ul className={cards ? "points story-cards" : "points"}>
+    <ul className="story-cards">
       {points.map(({ lead, text }) => (
-        <li key={lead} className={cards ? "story-card surface surface--paper" : undefined}>
+        <li key={lead} className="story-card surface surface--paper">
           <b>{lead}</b> <span>{text}</span>
         </li>
       ))}
@@ -60,8 +60,8 @@ export function StorySection({ id, title, children }: { id: string; title: strin
   );
 }
 
-/** A section's words: its paragraphs in Newsreader, then its points (optionally as bordered paper cards). */
-export function StoryText({ body, cards = false }: { body: StorySectionBody; cards?: boolean }) {
+/** A section's words: its paragraphs in Newsreader, then its structured points as bordered paper cards. */
+export function StoryText({ body }: { body: StorySectionBody }) {
   const { paragraphs, points } = body;
   return (
     <>
@@ -72,7 +72,7 @@ export function StoryText({ body, cards = false }: { body: StorySectionBody; car
           ))}
         </div>
       )}
-      {points && points.length > 0 && <StoryPoints points={points} cards={cards} />}
+      {points && points.length > 0 && <StoryPoints points={points} />}
     </>
   );
 }

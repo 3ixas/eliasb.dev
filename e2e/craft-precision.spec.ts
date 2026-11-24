@@ -32,7 +32,7 @@ test.describe("Nothing is blank", () => {
 
   test("an expanded screenshot has started loading before it opens, and opens on the picture", async ({ page }) => {
     await page.goto("/things-i-make/threshold");
-    const button = page.locator(".case-open .zoom").first();
+    const button = page.locator(".case-stage .zoom").first();
     await expect.poll(() => button.evaluate((element) => Object.keys(element).some((key) => key.startsWith("__reactProps$")))).toBe(true);
     const dialog = page.locator(".zoom__dialog").first();
     await expect(dialog.locator("img")).toHaveCount(0);
@@ -49,7 +49,7 @@ test.describe("Nothing is blank", () => {
 
   test("opening waits for the image to decode, even for a click with nothing before it", async ({ page }) => {
     await page.goto("/things-i-make/threshold");
-    const button = page.locator(".case-open .zoom").first();
+    const button = page.locator(".case-stage .zoom").first();
     await expect.poll(() => button.evaluate((element) => Object.keys(element).some((key) => key.startsWith("__reactProps$")))).toBe(true);
     // A click from assistive technology: no pointer or focus first, so nothing has asked for the large image yet.
     await button.evaluate((element) => {

@@ -1,9 +1,9 @@
 /*
- * Long-form pages on the passes and panels design (docs/design/DESIGN.md "Long-form pages", R-21 and R-22;
- * components/site/role-story.tsx, case-study.tsx and story-parts.tsx): a Role story's opening with its pass, a case
- * study's opening panel and its PRD card, sections with the heading
- * at the left (4 of 12 columns) and the text at the right (at most 760 px), figures in the text column, and the next
- * page as a panel. The panel, the bars and the arrivals are parts.css's.
+ * Long-form pages on the passes and panels design (docs/design/DESIGN.md "Long-form pages", R-21, R-22, R-52, R-54;
+ * components/site/role-story.tsx, case-study.tsx and story-parts.tsx): a Role story's coloured hero banner with its
+ * embedded pass, a case study's lifted open-ground header and project-colour exhibition stage, the shared sticky
+ * chapter rail beside the reading stream of sections and bordered Problem/Decision cards, working figures and the PRD
+ * card, and the next page as a panel. The panel, bezels, bars and arrivals are parts.css's.
  */
 
 /* ---- The back link ---- */
@@ -141,28 +141,40 @@
   white-space: nowrap;
 }
 
-/* Bordered evidence strip inside a Role story's coloured hero banner (R-52). */
-.story-open .story-figures {
-  grid-area: figures;
+/* Bordered 4-up evidence cards shared by Role story hero banners (R-52) and Case study open headers (R-54). */
+:is(.story-open, .case-header) .story-figures {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 148px), 1fr));
   gap: 12px;
+}
+
+:is(.story-open, .case-header) .story-figures li {
+  min-width: 0;
+  max-width: none;
+  padding: 14px 16px;
+  border: 1px solid var(--hair);
+  border-radius: 14px;
+  background: var(--paper);
+}
+
+:is(.story-open, .case-header) .story-figures b {
+  white-space: normal;
+}
+
+/* Inside a Role story's coloured hero banner, the evidence strip takes the panel's translucent well and full-strength ink. */
+.story-open .story-figures {
+  grid-area: figures;
   margin: 0;
   color: var(--panel-ink);
 }
 
 .story-open .story-figures li {
-  min-width: 0;
-  max-width: none;
-  padding: 14px 16px;
-  border: 1px solid var(--well-border);
-  border-radius: 14px;
+  border-color: var(--well-border);
   background: var(--well);
 }
 
 .story-open .story-figures b {
   color: inherit;
-  white-space: normal;
 }
 
 /* Compact embedded employer Staff pass inside the hero banner (R-52). */
@@ -245,35 +257,15 @@
   box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.75), 0 0 0 0.5px rgb(0 0 0 / 0.35);
 }
 
-/* ---- A case study's opening: a panel in the project's colour ---- */
+/* ---- A case study's lifted open-ground header and project-colour exhibition stage (R-54) ---- */
 
-/* The text at the left, the screenshot at the right; under 960 px the screenshot follows the text. */
-.case-open {
-  display: grid;
-  grid-template:
-    "back back" auto
-    "text shot" 1fr
-    / 5fr 7fr;
-  gap: 0 40px;
-  min-height: 640px;
-  margin: 16px 0 64px;
-  padding-top: 28px;
+.case-header {
+  padding-top: 24px;
 }
 
-.case-open > .story-back {
-  grid-area: back;
-  justify-self: start;
-}
-
-.case-open__text {
-  grid-area: text;
-  min-width: 0;
-  padding: 28px 0 8px;
-}
-
-.case-open__title {
+.case-header__title {
   width: fit-content;
-  margin: 0;
+  margin: 10px 0 0;
   font-family: var(--serif);
   font-optical-sizing: auto;
   font-size: var(--type-title);
@@ -283,9 +275,10 @@
   overflow-wrap: break-word;
 }
 
-.case-open__lede {
-  max-width: 20em;
-  margin: 18px 0 0;
+.case-header__lede {
+  max-width: 34em;
+  margin: 14px 0 0;
+  color: var(--muted);
   font-family: var(--serif);
   font-optical-sizing: auto;
   font-size: var(--type-lede);
@@ -293,38 +286,38 @@
   text-wrap: pretty;
 }
 
-.case-open__stack {
-  margin: 24px 0 0;
+.case-header__stack {
+  margin: 18px 0 0;
   padding: 0;
   list-style: none;
 }
 
-.case-open__links {
+.case-header__links {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  margin-top: 28px;
+  margin-top: 18px;
 }
 
-.case-open__note {
+.case-header__note {
   margin: 0;
+  color: var(--muted);
   font-size: var(--type-small);
 }
 
-/* On a panel the figures take its ink, as everything on it does. */
-.case-open .story-figures {
-  color: inherit;
+.case-header .story-figures {
+  margin-top: 22px;
 }
 
-.case-open .story-figures b {
-  color: inherit;
+/* Full-width project-colour panel framing the whole uncropped screenshot in the shared concentric optical bezel (parts.css). */
+.case-stage {
+  margin-top: 24px;
+  padding: clamp(20px, 3vw, 36px);
 }
 
-.case-open__shot {
-  grid-area: shot;
-  align-self: end;
-  min-width: 0;
+.case-stage__bezel .zoom {
+  border-radius: 10px;
 }
 
 /* ---- The PRD: a paper card with the cobalt rule on top ---- */
@@ -381,7 +374,7 @@
 }
 
 .prose + .prd,
-.points + .prd {
+.story-cards + .prd {
   margin-top: 32px;
 }
 
@@ -457,20 +450,6 @@
   max-width: 760px;
 }
 
-.story-stream .story-section {
-  display: block;
-}
-
-.story-stream .story-section:first-child {
-  padding-top: 0;
-  border-top: 0;
-}
-
-.story-stream .story-section__title {
-  position: static;
-  margin-bottom: 20px;
-}
-
 @media (min-width: 960px) {
   .story-layout {
     grid-template-columns: 224px minmax(0, 1fr);
@@ -496,13 +475,15 @@
 /* ---- Sections ---- */
 
 .story-section {
-  display: grid;
-  grid-template-columns: 4fr 8fr;
-  gap: 24px;
   /* Half the section space above and below its hairline, so sections sit as far apart as the homepage's. */
   padding: calc(var(--section-space) / 2) 0;
   border-top: 1px solid var(--hair);
   scroll-margin-top: 24px;
+}
+
+.story-section:first-child {
+  padding-top: 0;
+  border-top: 0;
 }
 
 /* Focused by an address that names it; the heading is what shows it. */
@@ -511,7 +492,7 @@
 }
 
 .story-section__title {
-  margin: 0;
+  margin: 0 0 20px;
   font-family: var(--serif);
   font-optical-sizing: auto;
   font-size: var(--type-section);
@@ -530,19 +511,6 @@
   max-width: var(--measure);
 }
 
-/*
- * From 720 px the heading stays in view beside its section while the section scrolls, and lets go at its end, so the
- * left of the page is never empty beside a long section. No figure spans under it: one that did would pass beneath the
- * heading held beside it.
- */
-@media (min-width: 720px) {
-  .story-section__title {
-    position: sticky;
-    top: 32px;
-    align-self: start;
-  }
-}
-
 .prose p {
   margin: 0;
   font-family: var(--serif);
@@ -556,27 +524,25 @@
   margin-top: 1em;
 }
 
-.prose + .points {
+.prose + .story-cards {
   margin-top: 32px;
 }
 
-.points {
+/* Structured Problem & Decision cards: tonal bordered paper surfaces in the reading column (R-52, R-54). */
+.story-cards {
+  display: grid;
+  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.points li {
-  padding: 20px 0;
-  border-top: 1px solid var(--hair);
+.story-cards li.story-card {
+  padding: 20px 24px;
+  border-radius: 16px;
 }
 
-.points li:first-child {
-  padding-top: 0;
-  border-top: 0;
-}
-
-.points b {
+.story-cards b {
   display: block;
   margin-bottom: 6px;
   font-family: var(--serif);
@@ -587,23 +553,11 @@
   letter-spacing: -0.015em;
 }
 
-.points span {
+.story-cards span {
   display: block;
   color: var(--muted);
   font-size: var(--type-body);
   line-height: 1.55;
-}
-
-/* Structured Problem & Decision cards: tonal bordered paper surfaces in the reading column (R-52, R-54). */
-.story-cards {
-  display: grid;
-  gap: 12px;
-}
-
-.story-cards li.story-card {
-  padding: 20px 24px;
-  border-top: 0;
-  border-radius: 16px;
 }
 
 /* ---- Figures ---- */
@@ -946,12 +900,7 @@
   line-height: 1.35;
 }
 
-/* ---- Under 1260 px: the pass hangs below the text, from a hairline ---- */
-
-/*
- * Under 960 px the opening stacks: the pass (or a case study's screenshot) follows the text. From 960 px there is room
- * for both side by side, so a laptop-sized window keeps the right of the opening filled (#461).
- */
+/* Under 960 px the Role story hero banner stacks its embedded pass beneath the text and evidence (#461, R-52). */
 @media (max-width: 959.98px) {
   .story-open {
     grid-template:
@@ -960,19 +909,6 @@
       "pass" auto
       / minmax(0, 1fr);
     gap: 24px;
-  }
-
-  .case-open {
-    grid-template:
-      "back" auto
-      "text" auto
-      "shot" auto
-      / minmax(0, 1fr);
-    min-height: 0;
-  }
-
-  .case-open__text {
-    padding-bottom: 36px;
   }
 }
 
@@ -993,8 +929,21 @@
     white-space: normal;
   }
 
-  .story-open .story-figures {
+  :is(.story-open, .case-header) .story-figures {
     gap: 10px;
+  }
+
+  .case-header {
+    padding-top: 16px;
+  }
+
+  .case-header .story-figures li {
+    padding: 12px 14px;
+  }
+
+  .case-stage {
+    margin-top: 20px;
+    padding: 18px;
   }
 
   .embedded-pass {
@@ -1011,17 +960,8 @@
     padding: 18px 20px;
   }
 
-  .story-section {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 20px;
-  }
-
   .story-fig__panel {
     padding: 24px 22px 26px;
-  }
-
-  .case-open {
-    padding-top: 18px;
   }
 
   .not-found__try {
@@ -1053,11 +993,11 @@
   }
 }
 
-/* Forced colours keep the flag, embedded pass, evidence tiles and active chapter pill distinct (R-29, R-52). */
+/* Forced colours keep the flag, embedded pass, evidence cards and active chapter pill distinct (R-29, R-52, R-54). */
 @media (forced-colors: active) {
   .embedded-pass,
   .embedded-pass__photo,
-  .story-open .story-figures li {
+  :is(.story-open, .case-header) .story-figures li {
     border-color: CanvasText;
   }
 
@@ -1244,16 +1184,21 @@
   color: var(--ink);
 }
 
-/* Copy link sits level with the address's first line, so it stays put as a longer link takes more lines. */
+/* Full-width address bar above the Copy link + Open this scenario action row; reserved line room keeps actions still as choices change (R-54). */
 .tlink__bar {
-  display: flex;
-  align-items: flex-start;
+  display: grid;
   gap: 12px;
   margin-top: 24px;
 }
 
+.tlink__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
 .tlink__address {
-  flex: 1;
   min-width: 0;
   min-height: 44px;
   padding: 11px 18px;
@@ -1295,10 +1240,17 @@
   }
 }
 
-/* Copy keeps its room before the page has hydrated, so the bar never reflows. */
+/* Copy keeps its room before the page has hydrated, so the action row never reflows. */
 .tlink .copy-button[hidden] {
   display: inline-grid;
   visibility: hidden;
+}
+
+/* Where the sticky chapter rail narrows the reading stream, keep two lines reserved so long districts never shift the actions. */
+@media (max-width: 1139.98px) and (min-width: 720px) {
+  .tlink__address {
+    min-height: calc(2 * 1.45em + 22px);
+  }
 }
 
 @media (max-width: 719.98px) {
@@ -1315,13 +1267,8 @@
     grid-row: 2;
   }
 
-  .tlink__bar {
-    flex-wrap: wrap;
-  }
-
-  /* Room for the longest link, so a longer district never pushes Copy down: three lines at 390 px, four at 320. */
+  /* Room for the longest link, so a longer district never pushes Copy link or Open this scenario down: three lines at 390 px, four at 320. */
   .tlink__address {
-    flex-basis: 100%;
     min-height: calc(3 * 1.45em + 22px);
   }
 }
@@ -1338,10 +1285,14 @@
   }
 }
 
-/* Forced colours: the bar keeps an edge and the chevron the text colour. */
+/* Forced colours: the bar keeps an edge, the open action keeps its outline, and the chevron the text colour. */
 @media (forced-colors: active) {
   .tlink__address {
     outline: 1px solid CanvasText;
+  }
+
+  .tlink__open {
+    border: 1px solid LinkText;
   }
 
   .tlink__select::after {

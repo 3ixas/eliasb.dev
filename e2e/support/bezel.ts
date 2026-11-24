@@ -17,14 +17,14 @@ export type BezelReading = {
  * Waits for a project panel's screenshot to finish loading and measures its concentric optical bezel geometry and
  * composited luminance separation against the panel field (DESIGN.md "The panel", R-46, R-47).
  */
-export async function readOpticalBezel(panel: Locator): Promise<BezelReading> {
-  const img = panel.locator(".project__shot img");
+export async function readOpticalBezel(panel: Locator, bezelSelector = ".project__shot"): Promise<BezelReading> {
+  const img = panel.locator(`${bezelSelector} img`);
   await img.scrollIntoViewIfNeeded();
   await expect.poll(() => img.evaluate((el) => (el as HTMLImageElement).complete && (el as HTMLImageElement).naturalWidth > 0)).toBe(true);
 
-  return panel.evaluate((el) => {
+  return panel.evaluate((el, selector) => {
     const panelBox = el.getBoundingClientRect();
-    const bezelEl = el.querySelector<HTMLElement>(".project__shot")!;
+    const bezelEl = el.querySelector<HTMLElement>(selector)!;
     const imgEl = bezelEl.querySelector<HTMLImageElement>("img")!;
     const bezelBox = bezelEl.getBoundingClientRect();
     const imgBox = imgEl.getBoundingClientRect();
@@ -67,7 +67,7 @@ export async function readOpticalBezel(panel: Locator): Promise<BezelReading> {
       matLuminance: compositeLuminance(field, mat),
       borderLuminance: compositeLuminance(field, mat, border),
     };
-  });
+  }, bezelSelector);
 }
 
 /** Asserts whole uncropped framing, concentric radii (`28/22 -> 16 -> 10`), and measurable optical separation from the field. */

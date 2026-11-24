@@ -91,7 +91,7 @@ export function ProjectPanel({
         )}
       </TextTag>
       {screenshot && (
-        <ShotTag className="project__shot">
+        <ShotTag className="optical-bezel project__shot">
           <Image src={screenshot.src} alt={screenshot.alt} width={screenshot.width} height={screenshot.height} sizes={sizes} loading={eager ? "eager" : "lazy"} />
         </ShotTag>
       )}

@@ -1,5 +1,6 @@
 import type { ChangeEvent } from "react";
 import { CopyButton } from "@/components/site/copy-button";
+import { OutLink } from "@/components/site/site-link";
 import {
   THRESHOLD_ORIGIN,
   thresholdCities,
@@ -15,15 +16,16 @@ export type LinkPart = keyof ThresholdChoice;
 const ID = "threshold-link";
 
 /**
- * Threshold's link that rewrites itself (#462, the case study's How it's built): City, District and Place, Threshold's
- * own options, beside the address bar they write, and Copy link. The server draws it at its start (`thresholdStart`)
- * with the choices held still; the island (threshold-link-live.tsx) draws the same markup with `choose`, so the
- * working figure takes the drawing's place without a pixel moving. A changed part of the link is keyed by its value,
- * so it arrives afresh each time (story.css). The link is an `output`, announced politely as it changes. Copy needs
- * script and works from the start: it copies the link shown, or selects it if the clipboard is refused.
+ * Threshold's link that rewrites itself (#462, R-54, the case study's How it's built): City, District and Place,
+ * Threshold's own options, over the address bar they write, Copy link and Open this scenario. The server draws it at
+ * its start (`thresholdStart`) with the choices held still; the island (threshold-link-live.tsx) draws the same markup
+ * with `choose`, so the working figure takes the drawing's place without a pixel moving. A changed part of the link is
+ * keyed by its value, so it arrives afresh each time (story.css). The link is an `output`, announced politely as it
+ * changes. Both Copy link and Open this scenario read `thresholdLink(choice)` directly.
  */
 export function ThresholdLinkView({ choice, changed = [], choose }: { choice: ThresholdChoice; changed?: readonly LinkPart[]; choose?: (part: LinkPart, value: string) => void }) {
   const city = thresholdCities.find(({ id }) => id === choice.city)!;
+  const href = thresholdLink(choice);
   const on = (part: LinkPart) => (choose ? (event: ChangeEvent<HTMLSelectElement>) => choose(part, event.target.value) : undefined);
   const part = (name: LinkPart) => (
     <span key={`${name}-${choice[name]}`} className="tlink__part" data-new={changed.includes(name) ? "" : undefined}>
@@ -42,7 +44,10 @@ export function ThresholdLinkView({ choice, changed = [], choose }: { choice: Th
         <output id={`${ID}-address`} className="tlink__address" htmlFor={`${ID}-city ${ID}-district ${ID}-place`}>
           <span className="tlink__host">{new URL(THRESHOLD_ORIGIN).host}</span>/{part("city")}?district={part("district")}&amp;type={part("place")}
         </output>
-        <CopyButton text={thresholdLink(choice)} textId={`${ID}-address`} label={copy.copy} done={copy.copied} className="working-fig__control" />
+        <div className="tlink__actions">
+          <CopyButton text={href} textId={`${ID}-address`} label={copy.copy} done={copy.copied} className="working-fig__control" />
+          <OutLink href={href} label={copy.open} className="button tlink__open" />
+        </div>
       </div>
     </div>
   );

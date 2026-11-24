@@ -5,8 +5,8 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 // the stills behind working figures, #462 and #463), and a Role story's (and its certificate).
 const pages = [
   { route: "/", trigger: "#off-the-clock [data-otc='training'] .zoom" },
-  { route: "/things-i-make/threshold", trigger: ".case-open .zoom" },
-  { route: "/things-i-make/argus-risk", trigger: ".case-open .zoom" },
+  { route: "/things-i-make/threshold", trigger: ".case-stage .zoom" },
+  { route: "/things-i-make/argus-risk", trigger: ".case-stage .zoom" },
   { route: "/work/joveen", trigger: ".story-fig .zoom" },
   { route: "/work/optegra", trigger: ".story-fig .zoom" },
   { route: "/work/bnp-paribas", trigger: "#take-ownership-certificate .zoom" },
@@ -165,7 +165,7 @@ test.describe("Screenshot view-transition morph (pause and seek)", () => {
 
   test("open grows from the thumbnail and close returns to it", async ({ page }) => {
     await page.goto("/things-i-make/threshold");
-    const button = page.locator(".case-open .zoom").first();
+    const button = page.locator(".case-stage .zoom").first();
     await expect(button).toBeVisible();
     await button.scrollIntoViewIfNeeded();
     await waitForHydration(button);
@@ -198,7 +198,7 @@ test.describe("Screenshot view-transition morph (pause and seek)", () => {
 
   test("closing after the page scrolled while the dialog was open returns to the thumbnail's new position", async ({ page }) => {
     await page.goto("/things-i-make/threshold");
-    const button = page.locator(".case-open .zoom").first();
+    const button = page.locator(".case-stage .zoom").first();
     await expect(button).toBeVisible();
     await button.scrollIntoViewIfNeeded();
     await waitForHydration(button);
@@ -212,7 +212,7 @@ test.describe("Screenshot view-transition morph (pause and seek)", () => {
     const shifted = await page.evaluate(() => {
       document.body.style.overflow = "auto";
       window.scrollBy({ top: 120, behavior: "instant" });
-      const rect = document.querySelector(".case-open .zoom img")!.getBoundingClientRect();
+      const rect = document.querySelector(".case-stage .zoom img")!.getBoundingClientRect();
       document.body.style.overflow = "";
       return { x: rect.left, y: rect.top, width: rect.width, scrollY: window.scrollY };
     });
@@ -227,7 +227,7 @@ test.describe("Screenshot view-transition morph (pause and seek)", () => {
 
   test("closing after the thumbnail moved off screen brings it back into view before returning to it", async ({ page }) => {
     await page.goto("/things-i-make/threshold");
-    const button = page.locator(".case-open .zoom").first();
+    const button = page.locator(".case-stage .zoom").first();
     await expect(button).toBeVisible();
     await button.scrollIntoViewIfNeeded();
     await waitForHydration(button);
@@ -240,7 +240,7 @@ test.describe("Screenshot view-transition morph (pause and seek)", () => {
     const offscreen = await page.evaluate(() => {
       document.body.style.overflow = "auto";
       window.scrollBy({ top: 1600, behavior: "instant" });
-      const rect = document.querySelector(".case-open .zoom img")!.getBoundingClientRect();
+      const rect = document.querySelector(".case-stage .zoom img")!.getBoundingClientRect();
       document.body.style.overflow = "";
       return { bottom: rect.bottom };
     });
@@ -260,7 +260,7 @@ test.describe("Screenshot view-transition morph (pause and seek)", () => {
   test("with reduced motion, open and close happen at once with no view-transition animation", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/things-i-make/threshold");
-    const button = page.locator(".case-open .zoom").first();
+    const button = page.locator(".case-stage .zoom").first();
     await expect(button).toBeVisible();
     await waitForHydration(button);
     await button.evaluate(() => {
@@ -287,7 +287,7 @@ test.describe("Screenshot view-transition morph (pause and seek)", () => {
       Object.defineProperty(document, "startViewTransition", { value: undefined, configurable: true });
     });
     await page.goto("/things-i-make/threshold");
-    const button = page.locator(".case-open .zoom").first();
+    const button = page.locator(".case-stage .zoom").first();
     await expect(button).toBeVisible();
     await waitForHydration(button);
     await button.click();
@@ -307,7 +307,7 @@ test.describe("Touch pinch, pan and double tap on a phone", () => {
 
   test("touch open morphs, single tap stays open, double tap zooms to the tapped point and pans without scrolling the page behind", async ({ page }) => {
     await page.goto("/things-i-make/threshold");
-    const button = page.locator(".case-open .zoom").first();
+    const button = page.locator(".case-stage .zoom").first();
     await expect(button).toBeVisible();
     await button.scrollIntoViewIfNeeded();
     await waitForHydration(button);
@@ -393,7 +393,7 @@ test.describe("Touch pinch, pan and double tap on a phone", () => {
 // the screenshot until the next tap); a key that closes it still gets the ring, even after a previous pointer close.
 test.describe("Closing the dialog returns focus without a ring for a pointer", () => {
   const route = "/things-i-make/threshold";
-  const trigger = ".case-open .zoom";
+  const trigger = ".case-stage .zoom";
 
   test("a click on the dialog closes it, the button is focused and shows no outline, then Esc still shows the ring", async ({ page }) => {
     await page.goto(route);

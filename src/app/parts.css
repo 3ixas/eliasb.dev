@@ -115,6 +115,10 @@
   --line: color-mix(in srgb, var(--panel-ink) 30%, transparent);
   --well: rgb(0 0 0 / 0.22);
   --well-border: color-mix(in srgb, var(--panel-ink) 18%, transparent);
+  /* Default concentric optical bezel tuning for dark coloured fields (Flowtime #2a211b, etc.). */
+  --bezel-bg: rgb(255 255 255 / 0.09);
+  --bezel-border: var(--line);
+  --bezel-img-shadow: 0 12px 28px -12px rgb(0 0 0 / 0.48), 0 0 0 1px var(--edge);
   overflow: hidden;
   padding: 44px;
   border-radius: 28px;
@@ -130,6 +134,8 @@
   --foot: var(--field);
   --rim: rgb(255 255 255 / 0.42);
   --well: rgb(255 255 255 / 0.22);
+  --bezel-bg: color-mix(in srgb, var(--panel-ink) 16%, transparent);
+  --bezel-img-shadow: 0 12px 28px -12px rgb(0 0 0 / 0.32), 0 0 0 1px var(--edge);
 }
 
 /* A surface that follows the theme: paper, its edge the page's hairline in both themes and its shadow neutral, not paper-white. */
@@ -137,6 +143,9 @@
   --line: var(--hair);
   --edge: var(--hair);
   --rim: var(--hair);
+  --bezel-bg: light-dark(var(--band), rgb(255 255 255 / 0.07));
+  --bezel-border: var(--hair);
+  --bezel-img-shadow: 0 8px 20px -10px light-dark(rgb(20 20 18 / 0.18), rgb(0 0 0 / 0.45)), 0 0 0 1px var(--hair);
   --cast: light-dark(rgb(20 20 18 / 0.12), rgb(0 0 0 / 0.55));
   --foot: light-dark(color-mix(in srgb, var(--field), #000 3%), color-mix(in srgb, var(--field), #000 8%));
 }
@@ -170,6 +179,23 @@
 
 .panel__meta span {
   display: block;
+}
+
+/* Concentric optical bezel (28/22 px panel -> 16 px bezel -> 10 px uncropped image; R-46, R-47, R-54). */
+.optical-bezel {
+  display: block;
+  padding: 10px;
+  border: 1px solid var(--bezel-border);
+  border-radius: 16px;
+  background: var(--bezel-bg);
+}
+
+.optical-bezel img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: var(--bezel-img-shadow);
 }
 
 /* ---- Controls (R-05) ---- */
@@ -664,6 +690,10 @@
     border-radius: 22px;
   }
 
+  .optical-bezel {
+    padding: 8px;
+  }
+
   .row {
     grid-template-columns: minmax(0, 1fr) auto;
   }
@@ -686,6 +716,10 @@
   .surface {
     outline: 1px solid CanvasText;
     outline-offset: -1px;
+  }
+
+  .optical-bezel {
+    border-color: CanvasText;
   }
 
   .bar,
