@@ -5,7 +5,7 @@ import { caseStudyOpening } from "@/content/stretch/case-study";
 import { luminance } from "@/content/stretch/story";
 import { notFound } from "next/navigation";
 
-export const alt = "Elias Bennett: a case study, in the project’s colour";
+export const alt = "Case study · Elias Bennett";
 export const size = shareSize;
 export const contentType = "image/png";
 

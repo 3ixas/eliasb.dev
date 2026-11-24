@@ -17,7 +17,10 @@ test.describe("The Markdown version", () => {
     const text = await response.text();
     expect(text).toMatch(/^# Elias Bennett\n/);
     expect(text).toContain(`> ${opening.headline}`);
-    for (const heading of ["## Work", "### Where I’m headed", "## Things I make", "## How I work", "## Off the clock", "## Say hello"]) expect(text, heading).toContain(heading);
+    const headings = ["## Work", "## Things I make", "## Where I’m headed", "## How I work", "## Off the clock", "## Say hello"];
+    for (const heading of headings) expect(text, heading).toContain(heading);
+    const positions = headings.map((heading) => text.indexOf(heading));
+    expect(positions).toEqual([...positions].sort((a, b) => a - b));
     for (const { employer, dates } of Object.values(roleStories)) {
       expect(text).toContain(employer);
       expect(text).toContain(dates);

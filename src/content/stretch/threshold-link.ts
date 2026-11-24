@@ -14,7 +14,7 @@ export const thresholdLinkCopy = {
   copy: "Copy link",
   copied: "Copied",
   open: "Open this scenario ↗",
-  caption: "Change a choice and the link changes with it. Copy it to open Threshold as you left it.",
+  caption: "Change a choice and the link changes with it. Copy it, or open the scenario straight in Threshold.",
 } as const;
 
 export const THRESHOLD_ORIGIN = "https://threshold-beta.vercel.app";

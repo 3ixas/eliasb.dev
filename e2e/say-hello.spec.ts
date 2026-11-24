@@ -83,12 +83,14 @@ test.describe("Say hello", () => {
     }
   });
 
+  const copyIdleName = `${sayHello.copy} ${sayHello.copySrSuffix}`;
+
   test("Copy morphs synchronously to ✓ Copied at the same width before the clipboard resolves, then goes back", async ({ page, browserName }) => {
     test.skip(browserName !== "chromium", "Only Chromium can grant clipboard reads");
     await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
     const copy = copyButton(page);
     await hydrated(page);
-    await expect(copy).toHaveAccessibleName(sayHello.copy);
+    await expect(copy).toHaveAccessibleName(copyIdleName);
     const quiet = await copy.evaluate((element) => getComputedStyle(element).backgroundColor);
     const quietWidth = (await copy.boundingBox())!.width;
     await copy.click();
@@ -103,7 +105,7 @@ test.describe("Say hello", () => {
     const ink = await page.evaluate(() => getComputedStyle(document.body).color);
     await expect.poll(() => copy.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe(ink);
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(address);
-    await expect(copy).toHaveAccessibleName(sayHello.copy, { timeout: 5000 });
+    await expect(copy).toHaveAccessibleName(copyIdleName, { timeout: 5000 });
     await expect.poll(() => copy.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe(quiet);
   });
 
@@ -140,7 +142,7 @@ test.describe("Say hello", () => {
     });
     await copyButton(page).click();
     await expect.poll(() => page.evaluate(() => window.getSelection()?.toString())).toBe(address);
-    await expect(copyButton(page)).toHaveAccessibleName(sayHello.copy);
+    await expect(copyButton(page)).toHaveAccessibleName(copyIdleName);
   });
 
   test("without script the email is still a working link and there is no dead button", async ({ page }) => {

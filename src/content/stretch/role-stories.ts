@@ -80,7 +80,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
         live: "Live pricing · today’s path",
         toggled: "New path · no stale file · cached",
         state: "off by default",
-        caption: "Protect the blast radius",
+        caption: "Protect the blast radius.",
       },
       // Each row in its own unit: working days (two weeks taken as ten), and minutes, 30–40 as a range and under 5 as a bound.
       "what-changed": {
@@ -119,7 +119,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
     ],
     evidence: [
       { value: "Nov 2025", label: "won the bank’s digitisation competition" },
-      { value: "Six", label: "months from zero C# to production code" },
+      { value: "6 months", label: "from zero C# to production code" },
     ],
     // BNP's green, as a hue only (no logo). The light field takes near-black ink (5.0:1);
     // the dark field is the same hue deepened and takes light ink (11.4:1).

@@ -17,7 +17,7 @@ type CopyStatus = "idle" | "copying" | "copied";
  * seconds. If the browser refuses the clipboard, it reverts and selects the text as shown (`textId`) instead, with no
  * new words.
  */
-export function CopyButton({ text, textId, label, done, className }: { text: string; textId: string; label: string; done: string; className?: string }) {
+export function CopyButton({ text, textId, label, srSuffix, done, className }: { text: string; textId: string; label: string; srSuffix?: string; done: string; className?: string }) {
   const ready = useHydrated();
   const [status, setStatus] = useState<CopyStatus>("idle");
   const timer = useRef(0);
@@ -90,7 +90,10 @@ export function CopyButton({ text, textId, label, done, className }: { text: str
               {done}
             </>
           ) : (
-            label
+            <>
+              {label}
+              {srSuffix && <span className="sr-only">{` ${srSuffix}`}</span>}
+            </>
           )}
         </span>
         <span className="copy-button__room" aria-hidden="true">

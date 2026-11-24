@@ -9,8 +9,6 @@
 
 import type { ProjectCategory } from "../projects";
 
-const pad = (n: number) => String(n).padStart(2, "0");
-
 export const siteCopy = {
   titleHome: "Elias Bennett, software engineer at BNP Paribas",
   /** Other pages: "{Page} · Elias Bennett". */
@@ -34,9 +32,10 @@ export const siteCopy = {
     darkTheme: "Dark theme",
     backToWork: "← Work",
     /** Said beside the greeting on a wide screen while it is hovered or focused: London's time, as {HH:MM}. */
-    londonTime: (time: string) => `it’s ${time} here in London`,
-    /** The header's links, named for the page they belong to. */
+    londonTime: (time: string) => `It’s ${time} here in London`,
+    /** The header's links, named for the homepage when on it, and for the site on inner routes. */
     linksLabel: "On this page",
+    siteLinksLabel: "Site",
     /** The button that opens the links under 720 px. */
     menuButton: "Menu",
   },
@@ -79,12 +78,13 @@ export const thingsIMake = {
     "home-secretary": "A household coordination prototype, built for coursework.",
   } as Readonly<Record<string, string>>,
   /** The link to the archive, with the true count; its arrow is drawn beside it. */
-  allThings: (built: number) => `Everything I’ve built (${pad(built)})`,
+  allThings: (built: number) => `Everything I’ve built (${built})`,
 } as const;
 
 export const sayHello = {
   /** The email's button, and what it says for two seconds once the address is on the clipboard. */
   copy: "Copy",
+  copySrSuffix: "email address",
   copied: "Copied",
   /** In the order shown. `id` names the profile link (src/content/site.ts) each one opens. */
   links: [

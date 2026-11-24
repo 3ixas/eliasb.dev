@@ -28,7 +28,7 @@ export function SayHello() {
           <a id={addressId} className="say-hello__address" href={profile.links.email}>
             {address}
           </a>
-          <CopyButton text={address} textId={addressId} label={sayHello.copy} done={sayHello.copied} />
+          <CopyButton text={address} textId={addressId} label={sayHello.copy} srSuffix={sayHello.copySrSuffix} done={sayHello.copied} />
         </div>
         <ul className="say-hello__links">
           {sayHello.links.map(({ id, label }) =>

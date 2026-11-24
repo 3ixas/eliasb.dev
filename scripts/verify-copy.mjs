@@ -32,6 +32,7 @@ import { simulationCopy } from "../src/content/stretch/simulation-copy.ts";
 import { thresholdLinkCopy } from "../src/content/stretch/threshold-link.ts";
 import { argusProvenanceCopy } from "../src/content/stretch/argus-provenance.ts";
 import { flowtimeBreakCopy } from "../src/content/stretch/flowtime-break.ts";
+import { hostLabel } from "../src/components/site/host-label.ts";
 
 const raw = readFileSync(new URL("../docs/content/redesign-copy.md", import.meta.url), "utf8");
 // Emphasis stars and the {braces} around live values are markup, not words.
@@ -82,11 +83,11 @@ for (const [name, module] of Object.entries(modules)) {
 // Strings built from live values, filled with the copy's own placeholders.
 const built = [
   siteCopy.title("Page"),
+  siteCopy.header.londonTime("14:28"),
   thingsIMake.allThings(6),
-  offTheClock.curiosity.rowLine(3),
   offTheClock.curiosity.count(1, 3),
   offTheClock.github.contributions("1,221"),
-  ...["Goodreads", "Letterboxd", "GitHub", "Wikipedia"].map(offTheClock.live),
+  ...["GitHub", "Wikipedia"].map(offTheClock.live),
   offTheClock.fromAsOf("Goodreads", "date"),
   argusProvenanceCopy.announce("symbol", "value"),
   flowtimeBreakCopy.minutes("n"),
@@ -94,7 +95,7 @@ const built = [
 ];
 for (const text of built) assert.ok(plain.includes(text), `Built string is not in the approved copy: "${text}"`);
 assert.equal(thingsIMake.note, "Products of my own, from a rental calculator to a risk simulator.");
-assert.equal(`${thingsIMake.allThings(projects.length)} →`, "Everything I’ve built (06) →");
+assert.equal(`${thingsIMake.allThings(projects.length)} →`, "Everything I’ve built (6) →");
 
 // The 404's visitor pass, section title and note are listed field by field, and each section's line is in the deck's table.
 for (const line of [
@@ -143,39 +144,31 @@ assert.equal([opening.headline, opening.support].join(" ").match(/BNP/g)?.length
 assert.ok(opening.headline.includes("BNP"), "The opening's one BNP is in the h1");
 
 // The opening's lines are the copy deck's, and the runs the page draws put them back together exactly.
-const openingRows = Object.fromEntries(rows(raw, "### Quiet index · Opening").map(([where, copy]) => [where, copy.replaceAll("*", "")]));
+const openingRows = Object.fromEntries(rows(raw, "## Opening").map(([where, copy]) => [where, copy.replaceAll("*", "")]));
 assert.equal(opening.headline, openingRows["Opening line (`h1`)"], "The opening line");
 assert.equal(opening.support, openingRows["Supporting line"], "The supporting line");
 assert.equal(opening.headlineRuns.map((run) => run.text).join(""), opening.headline, "The opening's headline runs read as the headline");
 
-// How I work: four habits. The first two are as in the original three-beat table; the last two are in the quiet index table.
-const keptBeats = rows(raw, "## How I work");
-const quietHow = Object.fromEntries(rows(raw, "### Quiet index · How I work"));
-assert.equal(howIWork.beats.length, 4, "How I work has four habits");
-assert.equal(howIWork.note, quietHow.Note, "How I work: note");
-// Each card highlights a phrase of its story, so the phrase must be in the story word for word.
-for (const beat of howIWork.beats) assert.ok(beat.proof.includes(beat.highlight), `How I work: "${beat.habit}" has no "${beat.highlight}" in its story to highlight`);
-assert.deepEqual(
-  howIWork.beats.slice(0, 2).map((beat) => [`**${beat.habit}**`, beat.proof]),
-  keptBeats.slice(0, 2),
-);
-for (const beat of howIWork.beats.slice(2)) assert.equal(`${beat.proof} Underline: “${beat.highlight}”`, quietHow[beat.habit], `How I work: "${beat.habit}"`);
-// The PRD row and the closer look's caption are the case study's own date, so the two cannot drift apart.
-const prdDate = caseStudies.threshold.prd.date;
-assert.equal(`${howIWork.prd.title} · ${prdDate}`, quietHow["PRD row"], "How I work: the PRD row");
-assert.equal(`${howIWork.prd.title}, ${prdDate}`, raw.match(/^- PRD card caption: (.+)$/m)?.[1], "How I work: the PRD closer look's caption");
+// How I work: four habits, their highlights, drawn proofs and PRD link.
 {
-  // The cards' drawn proofs (R-18) and the link to the PRD, as the deck's "Passes and panels" section gives them.
-  const deck = raw.slice(raw.indexOf("## Passes and panels · Where I’m headed and How I work"));
-  const line = (label) => deck.match(new RegExp(`^- ${label}: (.+)$`, "m"))?.[1];
-  const table = deck.split("\n").filter((line) => line.startsWith("|") && !line.startsWith("|---")).map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()));
+  const howSection = copyFor("How I work");
+  const howRows = rows(howSection, "### ");
+  assert.equal(howIWork.beats.length, 4, "How I work has four habits");
+  assert.equal(howIWork.note, bullet(howSection, "Note"), "How I work: note");
+  // Each card highlights a phrase of its story, so the phrase must be in the story word for word.
+  for (const beat of howIWork.beats) assert.ok(beat.proof.includes(beat.highlight), `How I work: "${beat.habit}" has no "${beat.highlight}" in its story to highlight`);
   const drawnAs = ({ drawn }) =>
     drawn.kind === "projects" ? drawn.projects.map((slug) => projects.find((project) => project.slug === slug)?.name).join(" · ")
     : drawn.kind === "count" ? `${drawn.value}, ${drawn.slices} slices`
     : drawn.kind === "switch" ? `A switch, ${drawn.off} / ${drawn.on} · ${drawn.currentPath} · ${drawn.newPath}`
     : `${drawn.value}, ${drawn.before} · ${drawn.after}, its bar ${drawn.percent}% longer`;
-  assert.deepEqual(howIWork.beats.map((beat) => [beat.habit, beat.highlight, drawnAs(beat)]), table.filter((row) => howIWork.beats.some((beat) => beat.habit === row[0])), "How I work: the highlights and drawn proofs");
-  assert.equal(`${howIWork.prd.title}, ${shortPrdDate(prdDate)} →`, line("PRD link"), "How I work: the link to the PRD");
+  assert.deepEqual(
+    howIWork.beats.map((beat) => [beat.habit, beat.proof, beat.highlight, drawnAs(beat)]),
+    howRows,
+    "How I work: habits, proofs, highlights and drawn proofs",
+  );
+  const prdDate = caseStudies.threshold.prd.date;
+  assert.equal(`${howIWork.prd.title}, ${shortPrdDate(prdDate)} →`, bullet(howSection, "PRD link"), "How I work: the link to the PRD");
   // A drawing never says more than its story or Threshold's evidence: every drawn number is stated.
   for (const beat of howIWork.beats) {
     const { drawn } = beat;
@@ -190,14 +183,16 @@ assert.equal(`${howIWork.prd.title}, ${prdDate}`, raw.match(/^- PRD card caption
     if (drawn.kind === "change") assert.equal(drawn.value, `+${drawn.percent}%`, `How I work: "${beat.habit}" writes ${drawn.value} for a ${drawn.percent}% change`);
     if (drawn.kind === "projects") for (const slug of drawn.projects) assert.ok(beat.proof.includes(projects.find((project) => project.slug === slug)?.name ?? slug), `How I work: "${beat.habit}" draws ${slug}, which its story does not name`);
   }
-  assert.equal(line("Where I’m headed lead"), work.headed.line, "Where I’m headed: the lead (spec Decisions 2)");
 }
 
 // Off the clock: the compact 7-day cue labels (R-50, R-55) match the deck table and come from each day's session.
 {
-  const cueRows = rows(raw, "## Passes and panels · Off the clock");
+  const otcFrom = raw.indexOf("## Off the clock");
+  const otcNext = raw.indexOf("\n## ", otcFrom + 1);
+  const otcSection = raw.slice(otcFrom, otcNext === -1 ? undefined : otcNext);
+  const cueRows = rows(otcSection, "### Training week");
   assert.deepEqual(
-    offTheClock.training.days.map(({ short, cue, session }) => [short, cue, session]),
+    offTheClock.training.days.map(({ short, long, cue, session }) => [short, long, cue, session]),
     cueRows,
     "Off the clock: the 7-day workout cue table",
   );
@@ -207,28 +202,21 @@ assert.equal(`${howIWork.prd.title}, ${prdDate}`, raw.match(/^- PRD card caption
 }
 
 // The approved copy under a `### name` heading, for the sections that follow.
-const copyFor = (name) => {
+function copyFor(name) {
   const start = raw.indexOf(`### ${name}`);
   const end = raw.slice(start + 1).search(/\n##+ /);
   return raw.slice(start, end === -1 ? undefined : start + 1 + end);
-};
-
-// Work: the employers' closer looks and Where I'm headed, word for word.
-const bullet = (text, label) => text.match(new RegExp(`^- ${label}: (.+)$`, "m"))?.[1];
-const { headed } = work;
-
-const workCopy = copyFor("Quiet index · Work");
-const workRows = Object.fromEntries(rows(workCopy, "### ").map(([where, copy]) => [where, copy]));
-const nowProofs = work.employers[0].proofs;
-assert.ok(workRows["BNP Paribas closer look"].includes(nowProofs.join(" · ")), "BNP Paribas: the closer look's proofs");
-for (const { slug, pins } of work.employers) {
-  const story = roleStories[slug];
-  assert.equal(`${story.role} · ${story.dates}`, workRows[`${passRecords[slug].short} row`], `${slug}: the row's line is its Role story's role and dates`);
-  assert.equal(pins.length, 3, `${slug}: three Pass pins`);
 }
+
+// Work and Where I'm headed, word for word.
+function bullet(text, label) {
+  return text.match(new RegExp(`^- ${label}: (.+)$`, "m"))?.[1];
+}
+const { headed } = work;
 
 const headedCopy = copyFor("Where I’m headed");
 assert.equal(headed.heading, bullet(headedCopy, "Heading"), "Where I’m headed: heading");
+assert.equal(headed.line, bullet(headedCopy, "Lead"), "Where I’m headed: lead");
 assert.equal(headed.soFar, bullet(headedCopy, "Tag"), "Where I’m headed: tag");
 assert.deepEqual(
   headed.bars.map((bar) => [bar.label, bar.title, bar.soFar.text, shownSource(bar.source).link.label]),
@@ -236,9 +224,9 @@ assert.deepEqual(
   "Where I’m headed: bars",
 );
 
-const gotHereCopy = copyFor("How I got here");
-assert.equal(work.note, bullet(gotHereCopy, "Note"), "Work: note");
-assert.equal(work.heading, bullet(raw.slice(raw.indexOf("## Work\n")), "Heading"), "Work: heading");
+const workSection = raw.slice(raw.indexOf("## Work\n"));
+assert.equal(work.heading, bullet(workSection, "Heading"), "Work: heading");
+assert.equal(work.note, bullet(workSection, "Subheading"), "Work: subheading");
 
 // Every link goes to a Role story or Case study that exists, and every "So far" restates a fact its source tells.
 for (const { source } of headed.bars) {
@@ -295,7 +283,7 @@ for (const study of studies) {
     table.Opening,
     `${study.slug}: opening`,
   );
-  assert.equal(study.description, table["Meta description"], `${study.slug}: meta description`);
+  assert.equal(study.description, table["Meta description (and header lede)"], `${study.slug}: meta description`);
 
   const lead = (section) => (section.heading ? `**${section.heading}** ` : "");
   const points = (section) => section.points?.map((point) => `*${point.lead}* ${point.text}`).join(" ") ?? "";
@@ -413,9 +401,9 @@ for (const [what, ids] of [["menu", siteCopy.menu.map(({ id }) => id)], ["Say he
   assert.equal(new Set(ids).size, ids.length, `the ${what} lists each id once`);
 }
 
-// Work's panels (R-13 to R-15): every string as the deck gives it, and every figure and bar its Role story's fact.
+// Work's panels (R-13 to R-15, R-45): every string as the deck gives it, and every figure and bar its Role story's fact.
 {
-  const from = raw.indexOf("## Passes and panels · Work");
+  const from = raw.indexOf("## Work\n");
   const next = raw.indexOf("\n## ", from + 1);
   const deck = raw.slice(from, next === -1 ? undefined : next);
   const tables = deck.split("\n").filter((line) => line.startsWith("|") && !line.startsWith("|---")).map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()));
@@ -459,7 +447,21 @@ for (const [what, ids] of [["menu", siteCopy.menu.map(({ id }) => id)], ["Say he
   const comparison = (replacement) => workPanelProblems({ ...workPanels, bnp: { ...bnp, comparisons: [{ ...bnp.comparisons[0], ...replacement }, bnp.comparisons[1]] } });
   assert.match(comparison({ after: { name: "Me, new to it", value: "an afternoon" } })[0], /writes "an afternoon"/, "A comparison's value is its scale row's");
   assert.match(comparison({ row: 4 })[0], /scale row 4/);
-  assert.match(workPanelProblems({ ...workPanels, bnp: { ...bnp, figure: { value: "Six months", label: "from zero Rust to production code" } } })[0], /figure .* is not one of its Role story's evidence items/);
+  assert.match(workPanelProblems({ ...workPanels, bnp: { ...bnp, figure: { value: "6 months", label: "from zero Rust to production code" } } })[0], /figure .* is not one of its Role story's evidence items/);
+}
+
+// External host labels read as human names for known sites, and strip www. otherwise (#528).
+for (const [href, expected] of [
+  ["https://github.com/3ixas", "GitHub"],
+  ["https://www.linkedin.com/in/elias-t-bennett/", "LinkedIn"],
+  ["https://www.goodreads.com/user/show/1", "Goodreads"],
+  ["https://letterboxd.com/3lxas/", "Letterboxd"],
+  ["https://threshold-beta.vercel.app/london", "Threshold"],
+  ["https://flowtime-focus-timer.vercel.app", "Flowtime"],
+  ["https://web.archive.org/web/20240605112227/https://www.optegra.com/", "the Wayback Machine"],
+  ["https://www.joveen.com/", "joveen.com"],
+]) {
+  assert.equal(hostLabel(href), expected, `hostLabel(${href})`);
 }
 
 console.log("Redesign copy checks passed.");

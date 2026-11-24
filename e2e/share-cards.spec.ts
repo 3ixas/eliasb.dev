@@ -178,7 +178,7 @@ test.describe("Copy, when the clipboard refuses", () => {
       return !!button && Object.keys(button).some((key) => key.startsWith("__reactProps$"));
     });
     const copy = page.locator(".copy-button");
-    const label = sayHello.copy;
+    const label = `${sayHello.copy} ${sayHello.copySrSuffix}`;
     const address = (await page.locator("#say-hello-email").textContent())!.trim();
     await copy.click();
     await expect.poll(() => page.evaluate(() => window.getSelection()?.toString().trim())).toBe(address);

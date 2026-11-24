@@ -11,7 +11,7 @@ export const simulationCopy = {
   end: "Horizon",
   price: "One price",
   caption:
-    "The engines run large simulation-based calculations across several asset classes. Thousands of possible market paths go in; a price and its risk come out.",
+    "Thousands of possible market paths go in; a price and its risk come out.",
   description:
     "Illustrative simulated paths from today to the horizon, a histogram of where they end on the right edge, and a dashed line at their average, labelled one price.",
   again: "Run again",

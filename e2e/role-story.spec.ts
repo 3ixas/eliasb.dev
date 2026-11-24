@@ -171,7 +171,7 @@ for (const slug of roleStorySlugs) {
         await expect(flag.locator(".panel")).toHaveCSS("background-color", rgb(story.panel.field));
         await expect(flag.locator(".lane")).toHaveText(["Live pricing · today’s path", "New path · no stale file · cachedoff by default"]);
         await expect(flag.locator(".lane__switch")).toHaveCount(1);
-        await expect(flag.locator("figcaption")).toHaveText("Protect the blast radius");
+        await expect(flag.locator("figcaption")).toHaveText("Protect the blast radius.");
         const scale = page.locator("section#what-changed figure");
         await expect(scale.locator(".panel")).toHaveCSS("background-color", rgb(story.panel.field));
         await expect(scale.locator("figcaption")).toHaveText("Bars to scale. Two weeks is taken as ten working days.");
@@ -418,7 +418,7 @@ for (const slug of roleStorySlugs) {
       await page.route("**/*.js", (route) => route.abort());
       await page.reload();
       await expect(page.locator("article section[id]")).toHaveCount(sectionKeys.length);
-      await expect(page.locator('nav[aria-label="On this page"] a')).toHaveCount(5);
+      await expect(page.locator('nav[aria-label="Site"] a')).toHaveCount(5);
       await expect(page.locator("nav.chapter-rail a")).toHaveCount(sectionKeys.length);
       await expect(page.locator('nav.chapter-rail a[aria-current]')).toHaveCount(0);
       await expect(pass(page)).toHaveCount(1);

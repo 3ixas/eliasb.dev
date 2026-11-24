@@ -1,10 +1,9 @@
 import type { ActivityDay } from "@/integrations/types";
+import { MONTH_NAMES, SHORT_MONTH_NAMES } from "../../integrations/pin-rules.ts";
 
 export const CONTRIBUTION_WINDOW_DAYS = 365;
 // Explicit English names keep server and browser output identical during hydration.
 // Their Intl locale data can disagree, for example "Sept" versus "Sep".
-const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] as const;
-const SHORT_MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"] as const;
 export const CONTRIBUTION_WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] as const;
 
 export type ContributionCalendarModel = {
@@ -104,12 +103,23 @@ export function formatContributionDate(value: string, options: ContributionDateO
   return `${options.weekday === "short" ? weekday.slice(0, 3) : weekday}, ${day}`;
 }
 
-/** A day's pencilled tag: "12 contributions on Thu 15 Jan", or "0 contributions on Thu 15 Jan". */
-export function contributionTag({ date, count }: ActivityDay) {
+function formatContributionTag({ date, count }: ActivityDay, format: "short" | "long") {
   const day = dateFromIsoDay(date);
-  const when = `${CONTRIBUTION_WEEKDAYS[day.getUTCDay()].slice(0, 3)} ${day.getUTCDate()} ${SHORT_MONTH_NAMES[day.getUTCMonth()]}`;
-  if (count === 0) return `0 contributions on ${when}`;
+  const weekday = CONTRIBUTION_WEEKDAYS[day.getUTCDay()];
+  const when = format === "short"
+    ? `${weekday.slice(0, 3)} ${day.getUTCDate()} ${SHORT_MONTH_NAMES[day.getUTCMonth()]}`
+    : `${weekday} ${day.getUTCDate()} ${MONTH_NAMES[day.getUTCMonth()]}`;
   return `${count} ${count === 1 ? "contribution" : "contributions"} on ${when}`;
+}
+
+/** A day's pencilled tag: "12 contributions on Thu 15 Jan", or "0 contributions on Thu 15 Jan". */
+export function contributionTag(day: ActivityDay) {
+  return formatContributionTag(day, "short");
+}
+
+/** A day's spoken label for assistive technology: "12 contributions on Thursday 15 January". */
+export function contributionAccessibleTag(day: ActivityDay) {
+  return formatContributionTag(day, "long");
 }
 
 /** GitHub's five levels, from no contributions to busy. */

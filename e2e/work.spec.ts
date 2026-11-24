@@ -201,7 +201,7 @@ test.describe("Work: the panels", () => {
       await page.evaluate(() => document.querySelectorAll("#work .panel [aria-hidden='true']").forEach((element) => element.removeAttribute("aria-hidden")));
       const texts = await section(page).evaluate((element) => [...element.querySelectorAll(".work__subheading, .panel")].map((part) => (part as HTMLElement).innerText).join("\n"));
       const readings = (await renderedContrast(page)).filter((reading) => texts.includes(reading.text));
-      for (const expected of [workPanels.subheading.slice(0, 20), "Six months", "Key API p95", "Consultation", "The Optegra story"]) {
+      for (const expected of [workPanels.subheading.slice(0, 20), "6 months", "Key API p95", "Consultation", "The Optegra story"]) {
         expect(readings.some((reading) => reading.text.includes(expected)), expected).toBe(true);
       }
       expect(readings.filter((reading) => reading.median < reading.needs || reading.worst < reading.needs)).toEqual([]);

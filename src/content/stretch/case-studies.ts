@@ -100,7 +100,7 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
       "where-it-started": {
         heading: "A total doesn’t say how old it is.",
         paragraphs: [
-          "I built this one on purpose. I work on pricing and risk systems, and I wanted to build a small version of that world end to end, with a front end that makes it easy to see. Most risk dashboards show a portfolio’s value, but not how old it is, which feed it came from, or whether the system is keeping up. Argus is a simulator: its prices, FX rates and trades are generated, and it runs on your machine.",
+          "I work on pricing and risk systems, and I wanted to build a small version of that world end to end, with a front end that makes it easy to see. Most risk dashboards show a portfolio’s value, but not how old it is, which feed it came from, or whether the system is keeping up. Argus is a simulator: its prices, FX rates and trades are generated, and it runs on your machine.",
         ],
       },
       "written-down-first": { heading: "Two users, on paper." },
@@ -207,14 +207,14 @@ export const caseStudies: Record<CaseStudySlug, CaseStudy> = {
         ],
       },
       "where-it-stands": {
-        heading: "Used for my own focus.",
+        heading: "Used for real.",
         paragraphs: [
           "I use it for my own focused work.",
         ],
       },
       "whats-next": {
         points: [
-          { lead: "Move between devices.", text: "Keep local storage as the default." },
+          { lead: "Move between devices.", text: "Sync or transfer sessions between devices while keeping local storage as the default." },
           { lead: "See when you focus best.", text: "Show the time of day you tend to focus longest." },
         ],
       },

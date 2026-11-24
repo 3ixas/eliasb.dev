@@ -140,18 +140,9 @@ export function headedProblems(bars: readonly HeadedBar[]): string[] {
   });
 }
 
-/** One of an employer's three results for the Markdown mirror: what it is for in bold, and the cause or date beside it. */
-export type WorkPin = { label: string; detail: string };
-
-/**
- * An employer's row (GLOSSARY.md, Row): the Role story it leads to, then what its closer look shows under
- * its pass: three Pass pins, each a result and its cause (a Résumé line from the Role story), and `proofs`,
- * extra lines the copy deck gives the closer look.
- */
+/** An employer listed in Work and the Markdown mirror, newest first. */
 export type Employer = {
   slug: RoleStorySlug;
-  pins: readonly WorkPin[];
-  proofs: readonly string[];
 };
 
 export const work = {
@@ -160,42 +151,14 @@ export const work = {
   note: "History, then marketing, then code. Each move was towards the work I liked most.",
   /** Newest first. verify:copy checks it covers every Role story once. */
   employers: [
-    {
-      slug: "bnp-paribas",
-      pins: [
-        { label: "Winner", detail: "Digitisation · 2025" },
-        { label: "Take Ownership", detail: "Q1 2026" },
-        { label: "AI Champion", detail: "2026" },
-      ],
-      /** What the pass says beyond its headline number ("Only · C# engineer on the team", from staff-pass.ts). */
-      proofs: [
-        "I was nominated as an AI Champion, and the workflow I built is now used by several teams across the department.",
-        "With that workflow I integrated a pricer in a couple of days, a job that takes an experienced engineer about two weeks.",
-      ],
-    },
-    {
-      slug: "joveen",
-      pins: [
-        { label: "Page load, cut by 40%", detail: "Cut page load by 40% by refactoring React components and lazy-loading assets." },
-        { label: "Key API p95, 520 ms → 230 ms", detail: "Added indexes and rewrote slow queries, starting with the API that mattered most." },
-        { label: "Mobile retention, up 30%", detail: "Fixed mobile layout and browser bugs found by a cross-browser testing pipeline." },
-      ],
-      proofs: [],
-    },
-    {
-      slug: "optegra",
-      pins: [
-        { label: "Core Web Vitals pass rate, 62% → 88%", detail: "Scoped performance fixes with the engineers and ticketed them." },
-        { label: "p95 page load, cut by 30%", detail: "The same scoped, ticketed fixes." },
-        { label: "Where the switch started", detail: "The best part of the job was working with the engineers who built our website." },
-      ],
-      proofs: [],
-    },
+    { slug: "bnp-paribas" },
+    { slug: "joveen" },
+    { slug: "optegra" },
   ] satisfies readonly Employer[],
   headed: {
     heading: "Where I’m headed",
     /** The lead (the passes and panels spec, Decisions 2): it names a level and a character, not a job title. */
-    line: "I’m working towards the judgement, depth and range to be trusted with what to build, building it well and getting it used. Here’s how far I’ve got on each.",
+    line: "I’m working towards the judgement, depth and range to be trusted to decide what to build, build it well and get it used. Here’s how far I’ve got on each.",
     soFar: "So far",
     bars: [
       {

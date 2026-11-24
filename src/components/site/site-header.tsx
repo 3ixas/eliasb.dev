@@ -21,7 +21,12 @@ export function SiteHeader({ home = false }: { home?: boolean }) {
         Elias Bennett
       </Link>
       <SiteGreeting />
-      <SectionLinks home={home} label={siteCopy.header.linksLabel} menuLabel={siteCopy.header.menuButton} sections={sectionLinks} />
+      <SectionLinks
+        home={home}
+        label={home ? siteCopy.header.linksLabel : siteCopy.header.siteLinksLabel}
+        menuLabel={siteCopy.header.menuButton}
+        sections={sectionLinks}
+      />
       <EclipseToggle />
     </header>
   );

@@ -68,7 +68,12 @@ export function HistoryBand({ events, dates, source }: { events: HistoryEvent[];
           </div>
           {source && <p className="otc__source">{source}</p>}
           {events.length > 1 && (
-            <button type="button" className="pill pill--outline otc__step" onClick={() => setPosition((at) => (at + 1) % events.length)}>
+            <button
+              type="button"
+              className="pill pill--outline otc__step"
+              aria-label={`${copy.count(position + 1, events.length)}, ${copy.nextFact}`}
+              onClick={() => setPosition((at) => (at + 1) % events.length)}
+            >
               {copy.count(position + 1, events.length)}
               <span className="arrow" aria-hidden="true">
                 →

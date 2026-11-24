@@ -82,7 +82,7 @@ test.describe("Work archive: the catalogue", () => {
   });
 
   test("the header has the way home and the links to the homepage's sections", async ({ page }) => {
-    const nav = page.getByRole("navigation", { name: siteCopy.header.linksLabel, includeHidden: true });
+    const nav = page.getByRole("navigation", { name: siteCopy.header.siteLinksLabel, includeHidden: true });
     await expect(nav.locator("a").first()).toHaveAttribute("href", "/#work");
   });
 
