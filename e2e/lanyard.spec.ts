@@ -3,16 +3,14 @@ import { passName } from "../src/content/stretch/pass-name";
 import { canDrawScene, withScene } from "./support/scene";
 
 /*
- * The 3D staff passes (#448, parts/lanyard; DESIGN.md "The staff pass"): where the browser can draw them and motion is on,
- * one scene hangs the homepage's three passes, and another a Role story's pass, over the printed passes, which stay in the
- * page for their names, links and the keyboard. A click on a homepage card follows its link and a drag does not.
- * Drawn in Chromium at the phone and desktop widths; a browser without WebGL 2 keeps the printed passes (opening.spec).
- * Headless Chromium renders in software, where the scene would keep the printed passes, so these specs report a GPU.
+ * The 3D staff pass (#448, #486, #514, parts/lanyard; DESIGN.md "The staff pass"): where the browser can draw it and
+ * motion is on, one scene hangs the single current BNP Paribas pass in the homepage opening (on desktop and phone),
+ * and another hangs a Role story's pass, over the printed pass, which stays in the page for its name, link and keyboard
+ * focus ring. A click on the homepage card follows its link to `#bnp-paribas` and a drag does not.
+ * Headless Chromium renders in software, where the scene keeps the printed pass, so the scene tests report a GPU.
  */
 
-const slugs = ["bnp-paribas", "joveen", "optegra"] as const;
 const rail = (page: Page) => page.locator(".opening__rail");
-const workPass = (page: Page, slug: (typeof slugs)[number]) => page.locator(`#${slug} .work__pass`);
 const scene = (page: Page) => page.locator("canvas.lanyard__scene");
 
 /** Records every `/lanyard/` texture request (and optionally only successful responses) made by `page`. */
@@ -32,23 +30,20 @@ function trackTextures(page: Page, kind: "request" | "response" = "request") {
   return paths;
 }
 
-test("a software renderer keeps the printed passes", async ({ page, browserName }) => {
+test("a software renderer keeps the printed pass", async ({ page, browserName }) => {
   test.skip(browserName !== "chromium", "Headless Chromium renders in software");
-  const phone = (page.viewportSize()?.width ?? 0) < 720;
   const textures = trackTextures(page);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
-  const stage = phone ? workPass(page, "bnp-paribas") : rail(page);
-  await stage.scrollIntoViewIfNeeded();
-  await expect(stage).toHaveAttribute("data-lanyard", "failed");
-  await expect(stage).toHaveAttribute("data-lanyard-error", /^(Software renderer|No hardware WebGL 2)/);
+  await rail(page).scrollIntoViewIfNeeded();
+  await expect(rail(page)).toHaveAttribute("data-lanyard", "failed");
+  await expect(rail(page)).toHaveAttribute("data-lanyard-error", /^(Software renderer|No hardware WebGL 2)/);
   await expect(scene(page)).toHaveCount(0);
   expect(textures).toEqual([]);
 });
 
-test("headless WebKit, which draws in software in CI, keeps the printed passes", async ({ page, browserName }, info) => {
-  test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
-  test.skip(browserName !== "webkit" || !info.project.name.includes("-1440-light"), "WebKit, once");
+test("headless WebKit, which draws in software in CI, keeps the printed pass", async ({ page, browserName }, info) => {
+  test.skip(browserName !== "webkit" || !/-(390|1440)-light$/.test(info.project.name), "WebKit at phone and desktop widths");
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   await rail(page).scrollIntoViewIfNeeded();
@@ -61,23 +56,23 @@ test("headless WebKit, which draws in software in CI, keeps the printed passes",
   });
   info.annotations.push({ type: "renderer", description: state });
   console.log(`WebKit scene: ${state}`);
-  // In CI, where WebKit draws in software, the printed passes stay; on a Mac it has the GPU and may draw.
+  // In CI, where WebKit draws in software, the printed pass stays; on a Mac it has the GPU and may draw.
   if (process.env.CI) expect(state).toMatch(/^failed /);
 });
 
-/** Waits for the scene to take the passes' place: it loads once the rail is near the view. */
+/** Waits for the scene to take the pass's place: it loads once the rail is near the view. */
 const hung = async (page: Page, stage = rail(page)) => {
   test.skip(!(await canDrawScene(page)), "No WebGL 2 in this browser");
   await expect(stage).toHaveAttribute("data-lanyard", "3d", { timeout: 15_000 });
 };
 
-/** The centre of a printed card, where its 3D card hangs at rest. */
-const centreOf = async (page: Page, index: number) => {
-  const box = (await rail(page).locator(".pass__card").nth(index).boundingBox())!;
+/** The centre of the printed opening card, where its 3D card hangs at rest. */
+const centreOf = async (page: Page) => {
+  const box = (await rail(page).locator(".pass__card").first().boundingBox())!;
   return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
 };
 
-test.describe("The 3D staff passes", () => {
+test.describe("The 3D staff pass", () => {
   test.use({ reducedMotion: "no-preference" });
 
   test.beforeEach(async ({ page, browserName }, info) => {
@@ -85,22 +80,21 @@ test.describe("The 3D staff passes", () => {
     await withScene(page);
   });
 
-  test("the homepage's three passes hang in one scene, which spans the rail, and keep their names and links", async ({ page }) => {
-    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
+  test("the homepage's single BNP Paribas pass hangs in one 3D scene with real textures, unclipped at its top anchor, with no Work-panel passes", async ({ page }) => {
+    const loaded = trackTextures(page, "response");
     await page.goto("/");
     await hung(page);
     await expect(scene(page)).toHaveCount(1);
     await expect(scene(page)).toHaveAttribute("aria-hidden", "true");
-    // The pad a pointer takes hold through spans all the rail scrolls through, so it scrolls with the passes on a phone.
-    // The canvas draws past it, so a card swung to the side is not cut at the rail's edge (#448): never past the window's
-    // sides, and not at all where the rail scrolls sideways. Both read together: the scene lays itself out again when the
-    // fonts or the window change the rail.
+    await expect(page.locator("#work .pass, .work__pass")).toHaveCount(0);
+    expect([...new Set(loaded)].sort()).toEqual(["/lanyard/foil.webp", "/lanyard/webbing.webp"]);
+
+    // The pad matches the rail; the canvas reaches the window's sides without overflowing sideways, and aligns with the rail's top hairline.
     await expect
       .poll(() =>
         rail(page).evaluate((element) => {
           const pad = element.querySelector<HTMLElement>(".lanyard__pad")!;
           const canvas = element.querySelector<HTMLCanvasElement>("canvas.lanyard__scene")!;
-          // Measured as the scene measures: without the canvas, which reaches past the rail.
           const was = canvas.style.width;
           canvas.style.width = "0";
           const width = element.scrollWidth;
@@ -109,99 +103,76 @@ test.describe("The 3D staff passes", () => {
         }),
       )
       .toEqual([0, 0]);
-    const reach = await rail(page).evaluate((element) => {
+
+    const geometry = await rail(page).evaluate((element) => {
       const canvas = element.querySelector<HTMLCanvasElement>("canvas.lanyard__scene")!.getBoundingClientRect();
       const stage = element.getBoundingClientRect();
-      return { left: Math.round(stage.left - canvas.left), right: Math.round(canvas.right - stage.right), within: canvas.right <= document.documentElement.clientWidth + 0.5, scrolls: getComputedStyle(element).overflowX !== "visible" };
+      const card = element.querySelector<HTMLElement>(".pass__card")!.getBoundingClientRect();
+      const clip = element.querySelector<HTMLElement>(".pass__clip")!.getBoundingClientRect();
+      const borderTop = parseFloat(getComputedStyle(element).borderTopWidth) || 0;
+      return {
+        leftGap: Math.abs(canvas.left),
+        rightGap: Math.abs(document.documentElement.clientWidth - canvas.right),
+        topOffsetFromHairline: Math.abs(canvas.top - (stage.top + borderTop)),
+        clipBelowCanvasTop: clip.top - canvas.top,
+        cardBelowCanvasTop: card.top - canvas.top,
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      };
     });
-    // Where the rail scrolls (a phone) the canvas spans what it scrolls through and no more; elsewhere it reaches past the
-    // rail's left and stays inside the window.
-    if (reach.scrolls) expect(reach.left).toBe(0);
-    else expect([reach.left > 0, reach.within]).toEqual([true, true]);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    expect(geometry.leftGap).toBeLessThanOrEqual(1);
+    expect(geometry.rightGap).toBeLessThanOrEqual(1);
+    expect(geometry.topOffsetFromHairline).toBeLessThanOrEqual(1);
+    expect(geometry.clipBelowCanvasTop, "strap and clip sit cleanly below the top anchor").toBeGreaterThan(12);
+    expect(geometry.cardBelowCanvasTop).toBeGreaterThan(geometry.clipBelowCanvasTop);
+    expect(geometry.overflow).toBeLessThanOrEqual(0);
+
     const passes = rail(page).locator(".pass");
-    await expect(passes).toHaveCount(3);
-    for (const [index, slug] of slugs.entries()) {
-      await expect(passes.nth(index)).toHaveAccessibleName(passName(slug));
-      await expect(passes.nth(index)).toHaveAttribute("href", `#${slug}`);
-    }
-    // Hidden phone Work-panel stages stay unmounted (`waiting`, 0 canvases) at desktop widths even after scrolling into view.
-    await page.locator("#bnp-paribas").scrollIntoViewIfNeeded();
-    await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
-    await expect(workPass(page, "bnp-paribas")).toHaveAttribute("data-lanyard", "waiting");
-    await expect(page.locator(".work__pass canvas.lanyard__scene")).toHaveCount(0);
+    await expect(passes).toHaveCount(1);
+    await expect(passes.first()).toHaveAccessibleName(passName("bnp-paribas"));
+    await expect(passes.first()).toHaveAttribute("href", "#bnp-paribas");
   });
 
-  test("on a phone each Work panel hangs its employer's pass in 3D with the generated textures, and the story link stays live", async ({ page }) => {
-    test.skip((page.viewportSize()?.width ?? 0) >= 720, "Phones only: under 720 px each Work panel carries its pass");
-    const loaded = trackTextures(page, "response");
-    await page.goto("/");
-    for (const slug of slugs) {
-      const stage = workPass(page, slug);
-      await stage.scrollIntoViewIfNeeded();
-      await hung(page, stage);
-      await expect(stage.locator("canvas.lanyard__scene")).toHaveCount(1);
-      await expect(stage).toHaveAttribute("aria-hidden", "true");
-    }
-    // The hidden opening rail stays unmounted (`waiting`, 0 canvases) on a phone.
-    await expect(rail(page)).toHaveAttribute("data-lanyard", "waiting");
-    await expect(rail(page).locator("canvas.lanyard__scene")).toHaveCount(0);
-    expect([...new Set(loaded)].sort()).toEqual(["/lanyard/foil.webp", "/lanyard/webbing.webp"]);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
-    // The canvas takes no pointer, so the panel's story link underneath remains clickable.
-    const story = page.locator("#bnp-paribas .work__story");
-    await story.scrollIntoViewIfNeeded();
-    await story.click();
-    await expect(page).toHaveURL(/\/work\/bnp-paribas$/);
-  });
-
-  test("resizing across 720 px disposes hidden stages and mounts the visible ones cleanly", async ({ page }) => {
-    test.skip((page.viewportSize()?.width ?? 0) >= 720, "Starts on a phone width and crosses 720 px");
+  test("resizing between phone and desktop keeps the single opening scene mounted and cleanly aligned", async ({ page }, info) => {
+    test.skip(!info.project.name.includes("-390-"), "Starts at phone width and resizes to desktop and back");
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
     await page.goto("/");
-    const bnp = workPass(page, "bnp-paribas");
-    await bnp.scrollIntoViewIfNeeded();
-    await hung(page, bnp);
-    await expect(rail(page).locator("canvas.lanyard__scene")).toHaveCount(0);
+    await hung(page);
 
-    // Rotate/widen past 720 px: Work-panel scenes dispose and return to waiting; the opening rail mounts.
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await expect(page.locator(".work__pass canvas.lanyard__scene")).toHaveCount(0);
-    await expect(bnp).toHaveAttribute("data-lanyard", "waiting");
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await hung(page, rail(page));
-    await expect(rail(page).locator("canvas.lanyard__scene")).toHaveCount(1);
-
-    // Narrow back to phone width: the opening rail disposes; Work-panel scenes mount again.
-    await page.setViewportSize({ width: 390, height: 844 });
-    await expect(rail(page).locator("canvas.lanyard__scene")).toHaveCount(0);
-    await expect(rail(page)).toHaveAttribute("data-lanyard", "waiting");
-    await bnp.scrollIntoViewIfNeeded();
-    await hung(page, bnp);
-    await expect(bnp.locator("canvas.lanyard__scene")).toHaveCount(1);
+    for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }] as const) {
+      await page.setViewportSize(viewport);
+      await expect(rail(page)).toHaveAttribute("data-lanyard", "3d");
+      await expect(scene(page)).toHaveCount(1);
+      await expect
+        .poll(() =>
+          rail(page).evaluate((element) => {
+            const canvas = element.querySelector<HTMLCanvasElement>("canvas.lanyard__scene")!.getBoundingClientRect();
+            return [
+              Math.abs(canvas.left) <= 1,
+              Math.abs(document.documentElement.clientWidth - canvas.right) <= 1,
+              document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+            ];
+          }),
+        )
+        .toEqual([true, true, true]);
+    }
     expect(errors).toEqual([]);
   });
 
   test("losing the WebGL context disposes the scene and restores the printed pass", async ({ page }) => {
-    const phone = (page.viewportSize()?.width ?? 0) < 720;
-    await page.goto("/");
-    const stage = phone ? workPass(page, "bnp-paribas") : rail(page);
-    await stage.scrollIntoViewIfNeeded();
-    await hung(page, stage);
-    await stage.locator("canvas.lanyard__scene").dispatchEvent("webglcontextlost");
-    await expect(stage).toHaveAttribute("data-lanyard", "failed");
-    await expect(stage).toHaveAttribute("data-lanyard-error", "WebGL context lost");
-    await expect(stage.locator("canvas.lanyard__scene")).toHaveCount(0);
-    await expect(stage.locator(".pass__card").first()).toHaveCSS("opacity", "1");
-  });
-
-  test("a drag on a card swings it and goes nowhere; a click follows its pass's link", async ({ page }, info) => {
-    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
-    test.skip(!info.project.name.includes("-1440-"), "A mouse, at the desktop width");
     await page.goto("/");
     await hung(page);
-    const { x, y } = await centreOf(page, 0);
+    await rail(page).locator("canvas.lanyard__scene").dispatchEvent("webglcontextlost");
+    await expect(rail(page)).toHaveAttribute("data-lanyard", "failed");
+    await expect(rail(page)).toHaveAttribute("data-lanyard-error", "WebGL context lost");
+    await expect(rail(page).locator("canvas.lanyard__scene")).toHaveCount(0);
+    await expect(rail(page).locator(".pass__card").first()).toHaveCSS("opacity", "1");
+  });
+
+  test("a drag on the card swings it and goes nowhere; a click follows its link to BNP Paribas", async ({ page }) => {
+    await page.goto("/");
+    await hung(page);
+    const { x, y } = await centreOf(page);
     await page.mouse.move(x, y);
     await page.mouse.down();
     await page.mouse.move(x + 60, y + 40, { steps: 6 });
@@ -211,17 +182,16 @@ test.describe("The 3D staff passes", () => {
 
     await page.reload();
     await hung(page);
-    const rest = await centreOf(page, 0);
+    const rest = await centreOf(page);
     await page.mouse.click(rest.x, rest.y);
     await expect(page).toHaveURL(/#bnp-paribas$/);
   });
 
-  test("a Ctrl or Cmd click on a card opens its link in a new tab, as on the printed pass", async ({ page, context }, info) => {
-    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
+  test("a Ctrl or Cmd click on the card opens its link in a new tab, as on the printed pass", async ({ page, context }, info) => {
     test.skip(!info.project.name.includes("-1440-"), "A mouse, at the desktop width");
     await page.goto("/");
     await hung(page);
-    const { x, y } = await centreOf(page, 0);
+    const { x, y } = await centreOf(page);
     const opened = context.waitForEvent("page");
     await page.keyboard.down("ControlOrMeta");
     await page.mouse.click(x, y);
@@ -230,32 +200,19 @@ test.describe("The 3D staff passes", () => {
     expect(new URL(page.url()).hash).toBe("");
   });
 
-  test("a middle press let go off the canvas leaves the cards working", async ({ page }, info) => {
-    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
+  test("a middle press let go off the canvas leaves the card working", async ({ page }, info) => {
     test.skip(!info.project.name.includes("-1440-"), "A mouse, at the desktop width");
     await page.goto("/");
     await hung(page);
-    const { x, y } = await centreOf(page, 0);
+    const { x, y } = await centreOf(page);
     await page.mouse.move(x, y);
     await page.mouse.down({ button: "middle" });
     await page.mouse.move(5, 5, { steps: 4 });
     await page.mouse.up({ button: "middle" });
     await page.waitForTimeout(1500);
-    const rest = await centreOf(page, 0);
+    const rest = await centreOf(page);
     await page.mouse.click(rest.x, rest.y);
     await expect(page).toHaveURL(/#bnp-paribas$/);
-  });
-
-  test("the canvas narrows with the rail when the window does", async ({ page }, info) => {
-    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
-    test.skip(!info.project.name.includes("-390-"), "From a tablet width down to the phone's");
-    await page.setViewportSize({ width: 820, height: 844 });
-    await page.goto("/");
-    await hung(page);
-    await page.setViewportSize({ width: 390, height: 844 });
-    // The canvas spans the passes and no further: the rail scrolls exactly as far as without it.
-    const content = () => rail(page).evaluate((element) => Math.max(...[...element.querySelectorAll<HTMLElement>(".pass")].map((pass) => pass.offsetLeft + pass.offsetWidth)) + parseFloat(getComputedStyle(element).paddingRight));
-    await expect.poll(async () => Math.abs((await scene(page).evaluate((canvas: HTMLCanvasElement) => canvas.offsetWidth)) - (await content()))).toBeLessThanOrEqual(1);
   });
 
   test("the canvas reaches the window's sides, so a swung card is not cut, and follows the window without scrolling the page", async ({ page }, info) => {
@@ -293,15 +250,11 @@ test.describe("The 3D staff passes", () => {
     expect(page.url()).toMatch(/\/work\/joveen$/);
   });
 
-  test("the material textures load only with the scene, and a failed texture load falls back to the printed passes", async ({ page }, info) => {
-    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
+  test("a failed texture load falls back to the printed pass without leaving a canvas", async ({ page }, info) => {
     test.skip(!info.project.name.includes("-1440-"), "Once, at the desktop width");
-    const loaded = trackTextures(page, "response");
     await page.goto("/");
     await hung(page);
-    expect([...new Set(loaded)].sort()).toEqual(["/lanyard/foil.webp", "/lanyard/webbing.webp"]);
 
-    // If either material texture cannot load, the scene fails cleanly without leaving a canvas and shows the printed passes.
     for (const url of ["**/lanyard/webbing.webp", "**/lanyard/foil.webp"]) {
       await page.route(url, (route) => route.abort());
       await page.reload();
@@ -312,8 +265,7 @@ test.describe("The 3D staff passes", () => {
     }
   });
 
-  test("reduced motion turned on puts the printed passes back, and turned off hangs them again", async ({ page }, info) => {
-    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
+  test("reduced motion turned on puts the printed pass back, and turned off hangs it again", async ({ page }, info) => {
     test.skip(!info.project.name.includes("-1440-"), "Once, at the desktop width");
     await page.goto("/");
     await hung(page);
@@ -325,8 +277,7 @@ test.describe("The 3D staff passes", () => {
     await expect(scene(page)).toHaveCount(1);
   });
 
-  test("the printed passes never show before the scene takes over", async ({ page }) => {
-    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
+  test("the printed pass never shows before the scene takes over", async ({ page }) => {
     // Every frame from the first paint: the print's opacity, until the scene has drawn.
     await page.addInitScript(() => {
       const seen: string[] = ((window as unknown as { printSeen: string[] }).printSeen = []);
@@ -346,7 +297,6 @@ test.describe("The 3D staff passes", () => {
   });
 
   test("the scene shifts nothing on the page", async ({ page }) => {
-    test.skip((page.viewportSize()?.width ?? 0) < 720, "On a phone the homepage's passes hang in Work's panels, without the scene");
     await page.goto("/");
     const total = page.evaluate(
       () =>
@@ -365,17 +315,15 @@ test.describe("The 3D staff passes", () => {
 });
 
 test.describe("With reduced motion", () => {
-  test("the printed passes stay, with no scene", async ({ page, browserName }) => {
+  test("the printed pass stays, with no scene", async ({ page, browserName }) => {
     test.skip(browserName !== "chromium", "Chromium");
-    const phone = (page.viewportSize()?.width ?? 0) < 720;
     const textures = trackTextures(page);
     await page.goto("/");
-    const stage = phone ? workPass(page, "bnp-paribas") : rail(page);
-    await stage.scrollIntoViewIfNeeded();
+    await rail(page).scrollIntoViewIfNeeded();
     await page.waitForTimeout(1000);
     await expect(scene(page)).toHaveCount(0);
-    await expect(stage).not.toHaveAttribute("data-lanyard", "3d");
-    await expect(stage.locator(".pass__card").first()).toHaveCSS("opacity", "1");
+    await expect(rail(page)).not.toHaveAttribute("data-lanyard", "3d");
+    await expect(rail(page).locator(".pass__card").first()).toHaveCSS("opacity", "1");
     expect(textures).toEqual([]);
   });
 });

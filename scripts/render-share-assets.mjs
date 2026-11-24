@@ -68,7 +68,6 @@ try {
       const clone = pass.cloneNode(true);
       clone.style.setProperty("--card", "264px");
       clone.style.setProperty("--drop", "280px");
-      clone.style.setProperty("--drop-by", "1");
       clone.style.margin = "0";
       clone.style.animation = "none";
       clone.style.transition = "none";

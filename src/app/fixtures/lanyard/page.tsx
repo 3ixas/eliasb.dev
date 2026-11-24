@@ -7,9 +7,10 @@ import { LanyardStatus } from "./status";
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 /*
- * The 3D staff passes' check page (#448): the homepage's opening, its three passes hanging in 3D, with a line under it
- * saying how far the scene got, so a phone with no console can show why it fell back to the printed passes. Like the
- * other fixtures it is absent in production; unlike them it is also served on Vercel's previews, where Elias judges it.
+ * The 3D staff pass check page (#448, #514): the homepage's opening with its single BNP Paribas pass hanging in 3D,
+ * and a line under it saying how far the scene got, so a phone with no console can show why it fell back to the printed
+ * pass. Like the other fixtures it is absent in production; unlike them it is also served on Vercel's previews, where
+ * Elias judges it.
  */
 export default async function LanyardFixture() {
   await connection();

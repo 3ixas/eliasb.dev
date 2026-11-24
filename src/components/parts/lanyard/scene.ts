@@ -175,7 +175,7 @@ export async function mountLanyard({ stage, passes, onReady, onHide, onContextLo
     [canvas.style.width, pad.style.width] = was;
     return width;
   };
-  // Nearest horizontally clipping ancestor (e.g. a phone Work `.panel`), or the window's sides when nothing clips.
+  // Nearest horizontally clipping ancestor, or the window's sides when nothing clips.
   const clipBounds = () => {
     for (let at = stage.parentElement; at && at !== document.documentElement; at = at.parentElement) {
       if (getComputedStyle(at).overflowX !== "visible") return at.getBoundingClientRect();

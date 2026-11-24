@@ -60,11 +60,40 @@ export function rightPaddingFor(asset: LoadedShareAsset, displayWidth: number): 
   return Math.max(0, Math.round(shareMargins.side - scaledShadow));
 }
 
+const hangingPassWidth = 334;
+
+/** Single hanging Staff pass aside shared by the homepage and Role story share cards (R-26, R-44). */
+export async function hangingPassAside(file: string): Promise<ReactNode> {
+  const pass = await shareAsset(file);
+  const passHeight = Math.round((hangingPassWidth * pass.height) / pass.width);
+  const paddingRight = rightPaddingFor(pass, hangingPassWidth);
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        paddingRight,
+        height: "100%",
+        flexShrink: 0,
+      }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element -- Satori ImageResponse renders raw <img> elements */}
+      <img
+        src={pass.src}
+        alt=""
+        width={hangingPassWidth}
+        height={passHeight}
+        style={{ marginTop: -38 }}
+      />
+    </div>
+  );
+}
+
 /**
- * The one share card template (docs/design/DESIGN.md "Share cards and favicon", R-26, #469): a field, the page's own
- * words at the top in Newsreader, "ELIAS BENNETT" at the foot, and an optional object beside the words (the three staff
- * passes on the homepage, the employer's pass on a Role story, the project's screenshot on a case study), on 1200 × 630
- * with the same 64 × 80 × 68 px margins everywhere.
+ * The one share card template (docs/design/DESIGN.md "Share cards and favicon", R-26, #469, R-44): a field, the page's own
+ * words at the top in Newsreader, "ELIAS BENNETT" at the foot, and an optional object beside the words (the current BNP
+ * Paribas staff pass on the homepage, the employer's pass on a Role story, the project's screenshot on a case study), on
+ * 1200 × 630 with the same 64 × 80 × 68 px margins everywhere.
  */
 export async function shareCard({
   field,

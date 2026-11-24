@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties } from "react";
 import { roleStories } from "@/content/stretch/role-stories";
 import type { RoleStorySlug } from "@/content/stretch/role-story";
 import { passName } from "@/content/stretch/pass-name";
@@ -17,9 +17,9 @@ const portrait = { src: "/profile/elias-evening-pass.webp", width: 352, height: 
  * name is its print. With `href` it is a link (the homepage's, to its employer in Work); without, it is an image (a Role
  * story's own pass, which has nowhere further to go). Sizes inside are in em of the card's width ÷ 14.5 (pass.css).
  */
-export function StaffPass({ slug, href, lead = false, drop = 1, priority = false, renderBandName }: { slug: RoleStorySlug; href?: string; lead?: boolean; drop?: number; priority?: boolean; renderBandName?: (label: ReactNode) => ReactNode }) {
+export function StaffPass({ slug, href, lead = false, priority = false }: { slug: RoleStorySlug; href?: string; lead?: boolean; priority?: boolean }) {
   const { role, dates, panel } = roleStories[slug];
-  return <PassCard id={slug} name={passName(slug)} record={passRecords[slug]} hang={passHang[slug]} role={role} dates={dates} panel={panel} href={href} lead={lead} drop={drop} priority={priority} renderBandName={renderBandName} />;
+  return <PassCard id={slug} name={passName(slug)} record={passRecords[slug]} hang={passHang[slug]} role={role} dates={dates} panel={panel} href={href} lead={lead} priority={priority} />;
 }
 
 /** A date range may wrap only after its dash, so a month never parts from its year ("Aug 2024 –" over "Jun 2025"). */
@@ -36,17 +36,15 @@ type PassCardProps = {
   panel: PanelColours;
   href?: string;
   lead?: boolean;
-  drop?: number;
   priority?: boolean;
-  renderBandName?: (label: ReactNode) => ReactNode;
 };
 
 /** The pass from the values it prints, so a fixture can print any values through the same markup. */
-export function PassCard({ id, name, record, hang, role, dates, panel, href, lead = false, drop = 1, priority = false, renderBandName }: PassCardProps) {
+export function PassCard({ id, name, record, hang, role, dates, panel, href, lead = false, priority = false }: PassCardProps) {
   const { short, lanyard } = record;
   const { state, tilt } = hang;
   const slug = id;
-  const style = { "--field": panel.field, "--band-ink": panel.ink, "--lanyard": lanyard, "--tilt": `${tilt}deg`, "--drop-by": drop } as CSSProperties;
+  const style = { "--field": panel.field, "--band-ink": panel.ink, "--lanyard": lanyard, "--tilt": `${tilt}deg` } as CSSProperties;
   const Tag = href ? "a" : "div";
   return (
     <Tag className={lead ? "pass pass--lead" : "pass"} {...(href ? { href } : { role: "img" })} style={style} data-state={state} aria-label={name}>
@@ -73,7 +71,7 @@ export function PassCard({ id, name, record, hang, role, dates, panel, href, lea
       </svg>
       <span className="pass__card" aria-hidden="true">
         <span className="pass__band">
-          {renderBandName ? renderBandName(<span>{short}</span>) : <span>{short}</span>}
+          <span>{short}</span>
         </span>
         <i className="pass__slot" />
         <Image className="pass__photo" src={portrait.src} width={portrait.width} height={portrait.height} alt="" sizes="80px" preload={priority} />
