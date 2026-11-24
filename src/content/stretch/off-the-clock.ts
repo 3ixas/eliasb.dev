@@ -21,18 +21,19 @@ export const offTheClock = {
     photoCaption: "Out on a run, central London.",
     photo: {
       src: "/signals/running-central-london.webp",
+      alt: "Elias mid-run on a rainy street in central London",
       width: 960,
       height: 1280,
     },
-    /** Monday to Sunday: his usual week, a plan and never a log. */
+    /** Monday to Sunday: his usual week, a plan and never a log. Each compact cue comes from its session. */
     days: [
-      { short: "Mon", long: "Monday", session: "Upper body gym" },
-      { short: "Tue", long: "Tuesday", session: "Lower body gym" },
-      { short: "Wed", long: "Wednesday", session: "Zone 2, assault bike" },
-      { short: "Thu", long: "Thursday", session: "Upper body gym" },
-      { short: "Fri", long: "Friday", session: "Lower body gym" },
-      { short: "Sat", long: "Saturday", session: "Skipping rope intervals" },
-      { short: "Sun", long: "Sunday", session: "Assault bike intervals" },
+      { short: "Mon", long: "Monday", cue: "Upper", session: "Upper body gym" },
+      { short: "Tue", long: "Tuesday", cue: "Lower", session: "Lower body gym" },
+      { short: "Wed", long: "Wednesday", cue: "Zone 2", session: "Zone 2, assault bike" },
+      { short: "Thu", long: "Thursday", cue: "Upper", session: "Upper body gym" },
+      { short: "Fri", long: "Friday", cue: "Lower", session: "Lower body gym" },
+      { short: "Sat", long: "Saturday", cue: "Rope", session: "Skipping rope intervals" },
+      { short: "Sun", long: "Sunday", cue: "Bike", session: "Assault bike intervals" },
     ],
   },
   /** The heading over the book and the film together (Elias, 2026-11-15). */
@@ -68,7 +69,7 @@ export const offTheClock = {
     sourceName: "GitHub",
   },
   github: {
-    /** Heard by screen readers only; the visible line leads with the total. */
+    /** The GitHub row's margin heading (R-50). */
     heading: "GitHub, the past year",
     sourceName: "GitHub",
     contributions: (count: string) => `${count} contributions in the past year`,

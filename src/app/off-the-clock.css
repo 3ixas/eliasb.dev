@@ -1,26 +1,25 @@
 /*
- * Off the clock (docs/design/DESIGN.md "The homepage, in order" 7; R-19; #493): one paper panel that follows the theme,
- * four sections each under a rule: Today's workout; On my shelf and screen; this week in history; the GitHub year, with
- * what I'm building now. From 960 px each section is a row, its heading in a margin column at the left and its content to
- * the right; under it the sections stack. The panel and the pill are parts.css's; the GitHub year's structure is
- * github-year.tsx's, restyled here onto the year ramps.
+ * Off the clock (docs/design/DESIGN.md "The homepage, in order" 6; R-19; R-50): one bordered paper panel holding four
+ * nested stone rows (--page fill inside --paper, 1 px --hair border, 16 px radius): Today's workout, On my shelf and
+ * screen, Odd but true from this week in history, and GitHub, the past year. From 960 px every row places its heading in
+ * a left margin column and its content to the right; under 960 px each row stacks. The panel and pill are parts.css's;
+ * the lightbox is zoom.css's; the GitHub year's grid is github-year.tsx's, styled onto the year ramps here.
  */
 
 .otc {
   --otc-margin: clamp(184px, 17vw, 232px);
-  display: block;
+  display: grid;
+  gap: 16px;
 }
 
 .otc__section {
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid var(--hair);
-}
-
-.otc > .otc__section:first-child {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  padding: 24px;
+  border: 1px solid var(--hair);
+  border-radius: 16px;
+  background-color: var(--page);
 }
 
 .otc :is(h3, h4) {
@@ -35,7 +34,7 @@
 }
 
 .otc .otc__title {
-  margin-bottom: 14px;
+  margin: 0;
 }
 
 .otc p {
@@ -44,14 +43,22 @@
   font-size: var(--type-small);
 }
 
-/* ---- Today's workout ---- */
+/* ---- Today's workout & Central London running photo ---- */
 
-.otc__training {
+.otc__training-body {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) 156px;
+  gap: 18px 28px;
+  align-items: start;
 }
 
-/* Today's session, the one strong line. It is filled in once the day is known; the longest session, invisible, holds its height until then. */
+.otc__training-main {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* Today's session, the one strong line. Filled in once the day is known; the invisible sizer holds its height until then. */
 .otc .otc__today {
   display: grid;
   margin: 0;
@@ -71,51 +78,62 @@
   visibility: hidden;
 }
 
-/*
- * The week is one list, read the same everywhere ("Monday: Upper body gym"). From 960 px it is seven quiet columns of
- * words under a rule. Under 960 px, once the page has script (the boot script marks it before first paint), it is a
- * strip: a letter a day over a short rule, each day and its session read but clipped to a pixel as .sr-only is. Without
- * script there it is the week's rows, since today's line is blank. Today is in ink, with a cobalt dot.
- */
+/* Calm, static 7-day schedule of compact cue tiles (Mon · Upper … Sun · Bike), read in full by assistive technology. */
 .otc__week {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 20px;
-  padding-top: 14px;
-  border-top: 1px solid var(--hair);
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.otc__day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 68px;
+  padding: 8px 4px;
+  border: 1px solid var(--hair);
+  border-radius: 12px;
+  background-color: var(--paper);
   color: var(--muted);
-  font-size: var(--type-label);
-  line-height: 1.35;
-}
-
-.otc__week li {
-  display: grid;
-  align-content: start;
-  gap: 3px;
-}
-
-.otc__week-letter {
-  display: none;
+  text-align: center;
 }
 
 .otc__week-day {
-  font-weight: 600;
-}
-
-.otc__week li[data-today] {
   color: var(--ink);
+  font-size: var(--type-label);
+  font-weight: 600;
+  line-height: 1.2;
 }
 
-/* Today's dot arrives with the day: the one moment the week has. */
-.otc__week li[data-today] .otc__week-day::after {
+.otc__week-cue {
+  color: var(--muted);
+  font-size: var(--type-label);
+  line-height: 1.15;
+}
+
+/* Today stands out without colour alone: solid inverted tile, heavier edge and a dot mark. */
+.otc__day[data-today] {
+  border-color: var(--ink);
+  background-color: var(--ink);
+  color: var(--page);
+}
+
+.otc__day[data-today] .otc__week-day,
+.otc__day[data-today] .otc__week-cue {
+  color: var(--page);
+}
+
+.otc__day[data-today]::after {
   content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  margin: 0 0 2px 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background: var(--cobalt);
+  background-color: var(--page);
   animation: otc-arrive 500ms var(--spring) both;
 }
 
@@ -125,12 +143,50 @@
   }
 }
 
+/* Central London running photo: opens full-size in the shared ZoomableImage lightbox, with no clipping around .zoom's ring. */
+.otc__run-photo {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.otc__run-photo .zoom {
+  border-radius: 12px;
+}
+
+.otc__run-photo .zoom img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 4.2;
+  object-fit: cover;
+  object-position: 50% 42%;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--hair);
+  transition: transform 200ms var(--out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .otc__run-photo .zoom:hover img,
+  .otc__history-image .zoom:hover img {
+    transform: scale(1.02);
+  }
+}
+
+.otc__run-caption {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--type-label);
+  line-height: 1.3;
+}
+
 /* ---- The book and the film ---- */
 
 .otc__shelf-cells {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px 32px;
+  gap: 24px 32px;
+  min-width: 0;
 }
 
 .otc__media {
@@ -151,7 +207,7 @@
   margin-bottom: 2px;
 }
 
-/* A cover is a print: a thin edge and a soft shadow. It lifts a little under the pointer (feedback, not content). */
+/* A cover is a print: a thin edge and a soft shadow. It lifts a little under a fine pointer (feedback, not content). */
 .otc__cover {
   width: 88px;
   height: auto;
@@ -166,7 +222,7 @@
     box-shadow 220ms ease;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .otc__media:hover .otc__cover {
     transform: translateY(-3px);
     box-shadow:
@@ -181,45 +237,59 @@
 
 /* ---- This week in history ---- */
 
-.otc__history {
+.otc__history-body {
   --picture: 220px;
   display: grid;
-  grid-template-columns: var(--picture) minmax(0, 1fr) auto;
+  grid-template-columns: var(--picture) minmax(0, 1fr);
   align-items: start;
   gap: 16px 24px;
+  min-width: 0;
 }
 
 /* With no picture in the week there is no frame. */
-.otc__history:not([data-pictured]) {
-  grid-template-columns: minmax(0, 1fr) auto;
-}
-
-.otc__history > .otc__title {
-  grid-column: 1 / -1;
-  margin-bottom: 4px;
+.otc__history:not([data-pictured]) .otc__history-body {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 /*
- * The picture is large enough to look at, framed at 3:2 (#493, Elias: at 76 px "hard to tell what it is"). Every oddity
- * shares the frame, so stepping moves nothing; one with no picture shows its year there instead.
+ * Enlarged 3:2 frame shared by every oddity so stepping moves nothing; an oddity with no picture shows its year there.
+ * Children fill the box absolutely so portrait or landscape images never stretch the 3:2 height, and without overflow: hidden
+ * ZoomableImage's focus ring is never clipped.
  */
 .otc__history-image {
-  display: grid;
+  position: relative;
   aspect-ratio: 3 / 2;
-  overflow: hidden;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--ink) 5%, transparent);
 }
 
-.otc__history-image img {
+.otc__history-image .zoom,
+.otc__history-year {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.otc__history-image .zoom {
+  display: block;
+  border-radius: 12px;
+}
+
+.otc__history-image .zoom img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--hair);
+  transition: transform 200ms var(--out);
 }
 
 .otc__history-year {
-  place-self: center;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--hair);
+  border-radius: 12px;
+  background-color: var(--paper);
   color: var(--muted);
   font-family: var(--serif);
   font-optical-sizing: auto;
@@ -227,8 +297,15 @@
   font-variant-numeric: lining-nums;
 }
 
-.otc__history .otc__step {
-  align-self: center;
+.otc__history-content {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.otc__history-content p {
+  margin-top: 0;
 }
 
 .otc__history-text {
@@ -236,7 +313,7 @@
   max-width: var(--measure);
 }
 
-/* Every oddity in one cell: the hidden ones hold the band at the tallest, so stepping moves nothing. */
+/* Every oddity in one cell: the hidden ones hold the row at the tallest, so stepping moves nothing. */
 .otc__history-text > * {
   grid-area: 1 / 1;
 }
@@ -256,7 +333,12 @@
 }
 
 .otc__credit {
+  margin-top: 6px;
   font-size: var(--type-label);
+}
+
+.otc__history-content .otc__credit {
+  margin-top: 6px;
 }
 
 /* The pill keeps one width whatever the count says, so stepping moves nothing. */
@@ -267,92 +349,52 @@
 
 /* ---- The GitHub year and Now making ---- */
 
-.otc__year {
+.otc__github-body {
   display: grid;
-  grid-template-columns: var(--otc-margin) minmax(0, 1fr);
-  gap: 8px 40px;
+  gap: 12px;
+  min-width: 0;
 }
 
-.otc__year > :is(.stretch-gh__total, .stretch-gh__readout, .stretch-gh__scroll, .stretch-gh__foot) {
-  grid-column: 2;
+/* What I'm building now: full-width bordered paper strip directly above the contribution grid. */
+.otc__making-band {
+  display: grid;
+  gap: 4px;
+  padding: 12px 16px;
+  border: 1px solid var(--hair);
+  border-radius: 12px;
+  background-color: var(--paper);
 }
 
-.otc__year > .stretch-gh__total {
-  grid-row: 1;
-  margin: 0;
-  color: var(--ink);
-  font-size: var(--type-ui);
-}
-
-.otc__year > .stretch-gh__readout {
-  grid-row: 2;
-}
-
-.otc__year > .stretch-gh__scroll {
-  grid-row: 3;
-}
-
-.otc__year > .stretch-gh__foot {
-  grid-row: 4;
-  color: var(--muted);
-}
-
-.otc__year .stretch-gh__count {
-  display: block;
-  margin-bottom: 4px;
-  font-family: var(--serif);
-  font-optical-sizing: auto;
-  font-size: var(--type-panel);
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  font-variant-numeric: lining-nums tabular-nums;
-}
-
-/* What I'm building now, in the margin beside the year. */
-.otc__year-side {
-  grid-column: 1;
-  grid-row: 1 / span 4;
-  align-self: start;
-}
-
-.otc__year-side:empty {
-  display: none;
+.otc__making-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 16px;
 }
 
 .otc .otc__subtitle {
-  margin-bottom: 10px;
-}
-
-/* The year ramps (tokens.css), light and dark; today is a cobalt ring around its own level. */
-.otc__year .stretch-gh__day {
-  background-color: var(--year-0);
-}
-
-.otc__year .stretch-gh__day[data-level="1"] { background-color: var(--year-1); }
-.otc__year .stretch-gh__day[data-level="2"] { background-color: var(--year-2); }
-.otc__year .stretch-gh__day[data-level="3"] { background-color: var(--year-3); }
-.otc__year .stretch-gh__day[data-level="4"] { background-color: var(--year-4); }
-
-.otc__year .stretch-gh__day[data-today] {
-  box-shadow:
-    0 0 0 1.5px var(--paper),
-    0 0 0 3.5px var(--cobalt);
-}
-
-.otc__year .stretch-gh__months,
-.otc__year .stretch-gh__foot,
-.otc__year .stretch-gh__readout {
+  margin: 0;
   color: var(--muted);
   font-family: var(--sans);
+  font-size: var(--type-label);
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
-/* What I'm building now: the live mark, then the repository's name as a link and GitHub's description of it. */
 .otc .otc__live {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   margin: 0;
+  font-size: var(--type-label);
+}
+
+.otc__making-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 16px;
 }
 
 .otc__making {
@@ -371,7 +413,7 @@
 
 .otc .otc__making-line {
   max-width: 46em;
-  margin-top: 2px;
+  margin: 0;
 }
 
 .otc__dot {
@@ -381,175 +423,144 @@
   background: var(--cobalt);
 }
 
-/* ---- From 960 px: each section a row, its heading in the margin ---- */
+.otc__year .stretch-gh__total {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--type-ui);
+}
+
+.otc__year .stretch-gh__count {
+  display: inline;
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-size: var(--type-panel);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* The year ramps (tokens.css), light and dark; today is a cobalt ring around its own level on the stone row. */
+.otc__year .stretch-gh__day {
+  background-color: var(--year-0);
+}
+
+.otc__year .stretch-gh__day[data-level="1"] { background-color: var(--year-1); }
+.otc__year .stretch-gh__day[data-level="2"] { background-color: var(--year-2); }
+.otc__year .stretch-gh__day[data-level="3"] { background-color: var(--year-3); }
+.otc__year .stretch-gh__day[data-level="4"] { background-color: var(--year-4); }
+
+.otc__year .stretch-gh__day[data-today] {
+  box-shadow:
+    0 0 0 1.5px var(--page),
+    0 0 0 3.5px var(--cobalt);
+}
+
+.otc__year .stretch-gh__months,
+.otc__year .stretch-gh__foot,
+.otc__year .stretch-gh__readout {
+  color: var(--muted);
+  font-family: var(--sans);
+}
+
+/* ---- From 960 px: every nested stone row places its heading in the left margin column ---- */
 
 @media (min-width: 960px) {
   .otc__section {
-    display: grid;
     grid-template-columns: var(--otc-margin) minmax(0, 1fr);
-    column-gap: 40px;
-    margin-top: 28px;
-    padding-top: 28px;
-  }
-
-  /* The year places its own parts (above): its margin holds what I'm building now. */
-  .otc__section:not(.otc__year) > * {
-    grid-column: 2;
+    gap: 16px 32px;
+    align-items: start;
   }
 
   .otc__section > .otc__title {
-    grid-column: 1;
-    grid-row: 1 / span 3;
-    margin: 0;
-    padding-top: 4px;
+    padding-top: 2px;
   }
 
   .otc__cover {
     width: 112px;
   }
+}
 
-  /* History's row: its heading in the margin, then the picture, the date and fact, and the pill. */
-  .otc__history {
-    --picture: 280px;
-    grid-template-columns: var(--otc-margin) var(--picture) minmax(0, 1fr) auto;
+@media (min-width: 1200px) {
+  .otc__history-body {
+    --picture: 260px;
   }
-
-  .otc__history:not([data-pictured]) {
-    grid-template-columns: var(--otc-margin) minmax(0, 1fr) auto;
-  }
-
-  .otc__history > :not(.otc__title) {
-    grid-column: auto;
-    grid-row: 1;
-  }
-
-  .otc__history > .otc__title {
-    grid-row: 1;
-  }
-
 }
 
 /* ---- Narrower ---- */
 
-/* Under 1260 px the year needs the width to itself: the total and the grid full width, what I'm building under them. */
-@media (max-width: 1259.98px) {
-  .otc__year {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .otc__year > :is(.stretch-gh__total, .stretch-gh__readout, .stretch-gh__scroll, .stretch-gh__foot),
-  .otc__year-side {
-    grid-column: 1;
-    grid-row: auto;
-  }
-
-  .otc__year-side {
-    margin-top: 16px;
-  }
-}
-
-@media (max-width: 959.98px) {
-  .otc__week {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
-    padding-top: 0;
-    border-top: 0;
-    font-size: var(--type-small);
-  }
-
-  .otc__week li {
-    grid-template-columns: 3.4em minmax(0, 1fr);
-    padding: 7px 0;
-    border-top: 1px solid var(--hair);
-  }
-
-  .otc__week li:last-child {
-    border-bottom: 1px solid var(--hair);
-  }
-
-  :root[data-script] .otc__week {
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    column-gap: 6px;
-    margin-top: 18px;
-    font-size: var(--type-label);
-    font-weight: 600;
-  }
-
-  :root[data-script] .otc__week li {
-    grid-template-columns: none;
-    justify-items: center;
-    gap: 6px;
-    padding: 0;
-    border: 0;
-  }
-
-  :root[data-script] .otc__week-letter {
-    display: block;
-  }
-
-  :root[data-script] .otc__week :is(.otc__week-day, .otc__week-session) {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-
-  :root[data-script] .otc__week li::after {
-    content: "";
-    width: 100%;
-    height: 3px;
-    border-radius: 2px;
-    background: var(--hair);
-  }
-
-  :root[data-script] .otc__week li[data-today]::after {
-    background: var(--ink);
-  }
-}
-
 @media (max-width: 719.98px) {
+  .otc__section {
+    padding: 16px 14px;
+  }
+
+  .otc__training-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .otc__week {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .otc__run-photo .zoom img {
+    aspect-ratio: 4 / 3;
+  }
+
   .otc__shelf-cells {
     grid-template-columns: minmax(0, 1fr);
   }
 
   /* On a phone the picture takes the full width, over its date and fact. */
-  .otc__history,
-  .otc__history:not([data-pictured]) {
+  .otc__history-body,
+  .otc__history:not([data-pictured]) .otc__history-body {
     grid-template-columns: minmax(0, 1fr);
   }
+}
 
-  .otc__history .otc__step {
-    justify-self: start;
+@media (max-width: 379.98px) {
+  .otc__week {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .otc__week li[data-today] .otc__week-day::after {
+  .otc__day[data-today]::after {
     animation: none;
   }
 
-  .otc__cover {
+  .otc__cover,
+  .otc__run-photo .zoom img,
+  .otc__history-image .zoom img {
     transition: none;
+  }
+
+  .otc__run-photo .zoom:hover img,
+  .otc__history-image .zoom:hover img {
+    transform: none;
   }
 }
 
 @media (forced-colors: active) {
-  /* Today keeps its mark: the dot, the strip's rule and the row's ink, in the highlight; the strip's other rules in GrayText. */
-  .otc__week li[data-today] {
-    color: Highlight;
+  .otc__section {
+    border-color: CanvasText;
   }
 
-  .otc__week li[data-today] .otc__week-day::after,
-  :root[data-script] .otc__week li[data-today]::after {
+  /* Today keeps its distinct fill, border and dot in forced colours. */
+  .otc__day[data-today] {
     forced-color-adjust: none;
-    background: Highlight;
+    border-color: Highlight;
+    background-color: Highlight;
+    color: HighlightText;
   }
 
-  :root[data-script] .otc__week li:not([data-today])::after {
+  .otc__day[data-today] .otc__week-day,
+  .otc__day[data-today] .otc__week-cue {
+    color: HighlightText;
+  }
+
+  .otc__day[data-today]::after {
     forced-color-adjust: none;
-    background: GrayText;
+    background-color: HighlightText;
   }
 
   .otc__dot {
@@ -620,7 +631,7 @@
   row-gap: 3px;
 }
 
-/* GitHub's own five levels (--gh-0 to --gh-4), the only place their greens appear. */
+/* GitHub's own five levels (--year-0 to --year-4), the only place their greens appear. */
 .stretch-gh__day {
   display: block;
   aspect-ratio: 1;
@@ -705,7 +716,6 @@ button.stretch-gh__day[data-selected] {
 
 /* Forced colours keep the year's data: GitHub's five levels, each cell with a hairline so an empty day still shows (R-29). */
 @media (forced-colors: active) {
-  /* The GitHub year keeps GitHub's five levels (they are the data), each cell with a hairline so an empty day still shows. */
   .stretch-gh__day {
     forced-color-adjust: none;
     outline: 1px solid GrayText;

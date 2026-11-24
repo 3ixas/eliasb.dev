@@ -130,31 +130,34 @@ export function HistoryCell({ history }: { history: HistorySignal }) {
   return <HistoryBand events={history.events} dates={history.events.map((event) => printedDate(event, day))} source={day ? undefined : copy.curiosity.fallback} />;
 }
 
-/** What I'm building now: its heading, the live mark, the repository's name as a link and its description. */
+/** What I'm building now: a full-width strip above the contribution grid with its heading, live mark, repo link and description. */
 function MakingBand({ making, live }: { making: NonNullable<ReturnType<typeof nowMakingEntry>>; live: boolean }) {
   return (
     <div className="otc__making-band" data-otc="making">
-      <h3 className="otc__subtitle">{copy.nowMaking.label}</h3>
-      {live && (
-        <p className="otc__live">
-          <i className="otc__dot" aria-hidden="true" />
-          {copy.live(copy.nowMaking.sourceName)}
-        </p>
-      )}
-      <p>
+      <div className="otc__making-head">
+        <h4 className="otc__subtitle">{copy.nowMaking.label}</h4>
+        {live && (
+          <p className="otc__live">
+            <i className="otc__dot" aria-hidden="true" />
+            {copy.live(copy.nowMaking.sourceName)}
+          </p>
+        )}
+      </div>
+      <div className="otc__making-row">
         <SiteLink href={making.href} className="otc__making">
           {making.name}
           {!isInternalHref(making.href) && <Out href={making.href} />}
         </SiteLink>
-      </p>
-      {making.description && <p className="otc__making-line">{making.description}</p>}
+        {making.description && <p className="otc__making-line">{making.description}</p>}
+      </div>
     </div>
   );
 }
 
 /**
- * The GitHub year's band: the total, and under it what I'm building now, beside the year's grid. Saved data gone stale
- * says so. With no year and nothing being made, the band still has a link to GitHub, so the panel keeps its bands.
+ * The GitHub year's nested stone row (R-50): its heading in the left margin column, with What I'm building now as a
+ * full-width strip above the contribution grid. Saved data gone stale says so. With no year and nothing being made, the
+ * row still has a link to GitHub, so the panel keeps its four rows.
  */
 export function GitHubCell({ github, latest, now }: { github: GitHubSignal; latest: LatestRepositorySignal; now: Date }) {
   const status = pinStatus("github", github, now);
@@ -162,9 +165,10 @@ export function GitHubCell({ github, latest, now }: { github: GitHubSignal; late
   const year = status.kind !== "removed" && github.activity.length > 0;
   return (
     <div className="otc__year otc__section" data-otc="github" data-state={status.kind === "stale" ? "stale" : "current"}>
-      <h3 className="sr-only">{copy.github.heading}</h3>
-      {year && <GitHubYear activity={github.activity} total={github.total} />}
-      <div className="otc__year-side">
+      <h3 className="otc__title">{copy.github.heading}</h3>
+      <div className="otc__github-body">
+        {making && <MakingBand making={making} live={latest.state === "live"} />}
+        {year && <GitHubYear activity={github.activity} total={github.total} />}
         <Stale source={copy.github.sourceName} status={status} />
         {!year && !making && (
           <p>
@@ -174,13 +178,12 @@ export function GitHubCell({ github, latest, now }: { github: GitHubSignal; late
             </SiteLink>
           </p>
         )}
-        {making && <MakingBand making={making} live={latest.state === "live"} />}
       </div>
     </div>
   );
 }
 
-/** The one paper panel: its sections, each under a rule: the workout, the shelf and screen, this week in history, the GitHub year. */
+/** The one paper panel: four nested stone rows — the workout, the shelf and screen, this week in history, and the GitHub year. */
 export function OffTheClockPanel({ training, book, film, history, year }: { training: ReactNode; book: ReactNode; film: ReactNode; history: ReactNode; year: ReactNode }) {
   return (
     <Panel className="otc">

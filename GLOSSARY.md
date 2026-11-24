@@ -78,11 +78,11 @@ The homepage section for Elias's own projects: **Featured work** above the **Pro
 _Avoid_: Work (that means employment), On my own
 
 **Off the clock**:
-The homepage section for Elias's own time: one paper **Panel** in four sections, each under a rule (DESIGN.md "The homepage, in order" 7, R-19): his training week with today marked, the book he is reading and the film he last watched, this week in history stepping through three facts, and his GitHub year with **Now making** beside it. From 960 px each section's heading sits in a margin column with its content to the right. Each item is a **Live signal** with a fallback, and stale saved data says where and when it is from.
+The homepage section for Elias's own time: one bordered paper **Panel** holding four nested stone rows (`--page` with a `1 px` hairline), each with its heading in a left margin column from 960 px and stacked under it (DESIGN.md "The homepage, in order" 6, R-19, R-50): today's workout over a calm static 7-day schedule beside a tap-to-enlarge Central London running photo, the book he is reading and the film he last watched, this week in history with a tap-to-enlarge 3:2 illustration stepping through three facts, and his GitHub year with **Now making** as a full-width strip above the contribution grid. Each item is a **Live signal** with a fallback, and stale saved data says where and when it is from.
 _Avoid_: Library, Personal signals, Board
 
 **Now making**:
-What I'm building now, beside the GitHub year in **Off the clock**, that follows Elias's latest pushed public GitHub repository (not forks, archives, the profile repository or `personal-portfolio-v1`), refreshed with the page and cached for six hours. A repository that is one of his projects shows the project's name and links to its case study; any other shows its name and GitHub description and links to GitHub. With no year and nothing being made, the band shows the GitHub profile link instead. It replaces the **Making pin**.
+What I'm building now, a full-width strip above the GitHub contribution grid in **Off the clock** (R-50), that follows Elias's latest pushed public GitHub repository (not forks, archives, the profile repository or `personal-portfolio-v1`), refreshed with the page and cached for six hours. A repository that is one of his projects shows the project's name and links to its case study; any other shows its name and GitHub description and links to GitHub. With no year and nothing being made, the row shows the GitHub profile link instead. It replaces the **Making pin**.
 _Avoid_: Experiments, Lab
 
 **One-page home**:

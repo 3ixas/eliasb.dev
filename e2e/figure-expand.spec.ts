@@ -4,6 +4,7 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 // A screenshot on a long-form page opens large in the same window: a case study's opening one (its section screenshots are now
 // the stills behind working figures, #462 and #463), and a Role story's (and its certificate).
 const pages = [
+  { route: "/", trigger: "#off-the-clock [data-otc='training'] .zoom" },
   { route: "/things-i-make/threshold", trigger: ".case-open .zoom" },
   { route: "/things-i-make/argus-risk", trigger: ".case-open .zoom" },
   { route: "/work/joveen", trigger: ".story-fig .zoom" },
