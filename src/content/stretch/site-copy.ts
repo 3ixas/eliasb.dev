@@ -30,6 +30,8 @@ export const siteCopy = {
   ],
   header: {
     darkTheme: "Dark theme",
+    /** The name of the greeting's tab stop on a wide screen, where it is a group. */
+    greeting: "Greeting",
     backToWork: "← Work",
     /** Said beside the greeting on a wide screen while it is hovered or focused: London's time, as {HH:MM}. */
     londonTime: (time: string) => `It’s ${time} here in London`,

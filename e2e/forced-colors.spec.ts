@@ -79,6 +79,32 @@ test.describe("Forced colours", () => {
     expect(new Set(Object.values(byLevel)).size).toBe(Object.keys(byLevel).length);
   });
 
+  // Authored box-shadow outlines are dropped in forced colours, so a pill or button would render as bare words without a real border.
+  test("pills and buttons keep a 1 px edge: the hero CTA, Copy and the simulation controls", async ({ page }) => {
+    const edges = (selector: string) =>
+      page.locator(selector).first().evaluate((el) => {
+        const style = getComputedStyle(el);
+        return { width: style.borderTopWidth, style: style.borderTopStyle, color: style.borderTopColor };
+      });
+    const canvas = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    const expectEdge = async (selector: string) => {
+      const edge = await edges(selector);
+      expect(edge.width, selector).toBe("1px");
+      expect(edge.style, selector).toBe("solid");
+      expect(edge.color, selector).not.toBe(canvas);
+    };
+
+    await page.goto("/");
+    await expectEdge(".opening a.pill");
+    await expectEdge(".opening a.pill--outline");
+    await expectEdge("#say-hello .copy-button");
+
+    await page.goto("/work/bnp-paribas");
+    await expectEdge(".sim__step");
+    await expectEdge(".sim button.pill");
+    await expectEdge(".lane__flip");
+  });
+
   test("a staff pass keeps its printed colours: it is a picture of a printed card", async ({ page }) => {
     await page.goto("/");
     const card = page.locator(".opening .pass__card").first();

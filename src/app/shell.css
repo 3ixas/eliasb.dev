@@ -79,7 +79,10 @@ html:has([data-site]) {
   left: 16px;
   top: 10px;
   z-index: 60;
-  padding: 12px 16px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
   border-radius: 999px;
   background-color: var(--ink);
   color: var(--page);
@@ -292,6 +295,13 @@ html:has([data-site]) {
   border-radius: 8px;
 }
 
+/* A 44 px target, within the header's 64 px, as the theme control's is. */
+.greeting::after {
+  content: "";
+  position: absolute;
+  inset: -8px 0;
+}
+
 /* The longest greeting is laid out unseen in the same cell as the shown one, so the words are the same width whichever shows. */
 .greeting__words {
   display: inline-grid;
@@ -316,13 +326,6 @@ html:has([data-site]) {
     cursor: pointer;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
-  }
-
-  /* A 44 px target, within the header's 64 px. */
-  .greeting::after {
-    content: "";
-    position: absolute;
-    inset: -8px 0;
   }
 }
 

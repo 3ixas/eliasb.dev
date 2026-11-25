@@ -283,6 +283,10 @@
     color: CanvasText;
   }
 
+  .sim__step {
+    border: 1px solid ButtonText;
+  }
+
   .sim__step[aria-pressed="true"] {
     forced-color-adjust: none;
     background: Highlight;

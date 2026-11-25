@@ -78,6 +78,7 @@ export function CopyButton({ text, textId, label, srSuffix, done, className }: {
         type="button"
         className={className ? `button copy-button ${className}` : "button copy-button"}
         hidden={!ready}
+        aria-label={srSuffix ? `${label} ${srSuffix}` : label}
         data-copied={morphed ? "" : undefined}
         onClick={copy}
       >
@@ -90,10 +91,7 @@ export function CopyButton({ text, textId, label, srSuffix, done, className }: {
               {done}
             </>
           ) : (
-            <>
-              {label}
-              {srSuffix && <span className="sr-only">{` ${srSuffix}`}</span>}
-            </>
+            label
           )}
         </span>
         <span className="copy-button__room" aria-hidden="true">

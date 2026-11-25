@@ -96,7 +96,8 @@ test.describe("Say hello", () => {
     await copy.click();
     // Away from the button, so the fill is Copied's own and not hover's.
     await page.mouse.move(0, 0);
-    await expect(copy).toHaveAccessibleName(sayHello.copied);
+    // The name stays put while it morphs; the status node alone says "Copied".
+    await expect(copy).toHaveAccessibleName(copyIdleName);
     await expect(copy.locator(".copy-button__word")).toContainText("✓");
     await expect(copy.locator(".copy-button__word")).toContainText(sayHello.copied);
     expect((await copy.boundingBox())!.width).toBe(quietWidth);
@@ -105,7 +106,8 @@ test.describe("Say hello", () => {
     const ink = await page.evaluate(() => getComputedStyle(document.body).color);
     await expect.poll(() => copy.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe(ink);
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(address);
-    await expect(copy).toHaveAccessibleName(copyIdleName, { timeout: 5000 });
+    await expect(copy).not.toHaveAttribute("data-copied", "", { timeout: 5000 });
+    await expect(copy).toHaveAccessibleName(copyIdleName);
     await expect.poll(() => copy.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe(quiet);
   });
 
