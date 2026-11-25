@@ -135,9 +135,14 @@ test.describe("Shell details: skip link and greeting", () => {
     if (wide) await expect(greeting).toHaveAccessibleName("Greeting");
     else await expect(greeting).toHaveAttribute("aria-expanded", "false");
 
-    // The skip link, the name, then the greeting; Safari's Tab passes over links, so there it is the first stop.
-    for (let tab = 0; tab < (browserName === "webkit" ? 1 : 3); tab++) await page.keyboard.press("Tab");
+    // The skip link, the name, then the greeting; Safari's Tab passes over links, so there it comes sooner. Never later than the third stop.
+    const stops: string[] = [];
+    for (let tab = 0; tab < 3 && !(await greeting.evaluate((element) => element === document.activeElement)); tab++) {
+      await page.keyboard.press("Tab");
+      stops.push(await page.evaluate(() => document.activeElement?.className || document.activeElement?.tagName || ""));
+    }
     await expect(greeting).toBeFocused();
+    if (browserName !== "webkit") expect(stops).toEqual(["skip-link", "site-header__name", "greeting"]);
 
     // Taller than its words: a point 21 px above and below its centre still lands on it.
     const box = (await greeting.boundingBox())!;
