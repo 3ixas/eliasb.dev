@@ -246,6 +246,21 @@ test.describe("Off the clock: the book and the film", () => {
     await expect(book.getByRole("heading", { level: 4 })).toHaveText("Dark Age");
   });
 
+  test("a film date never splits across lines", async ({ page }) => {
+    const line = cell(fixture(page, "film-long"), "film").locator("p").first();
+    // textContent, since toContainText folds a non-breaking space into a plain one.
+    expect(await line.evaluate((element) => element.textContent)).toContain("9\u00a0Oct");
+    await expect.poll(() => line.evaluate((element) => {
+      const text = [...element.querySelectorAll("span"), element].flatMap((node) => [...node.childNodes]).find((node) => node.nodeType === 3 && node.textContent?.includes("9\u00a0Oct"));
+      if (!text) return -1;
+      const range = document.createRange();
+      const start = text.textContent!.indexOf("9\u00a0Oct");
+      range.setStart(text, start);
+      range.setEnd(text, start + 5);
+      return range.getClientRects().length;
+    })).toBe(1);
+  });
+
   test("the film links out to Letterboxd, marked ↗: its poster, title, Last watched with its date and stars", async ({ page }) => {
     const film = cell(fixture(page, "film"), "film");
     await expect(film.getByRole("link")).toHaveAttribute("href", /letterboxd\.com/);
@@ -301,6 +316,15 @@ test.describe("Off the clock: the book and the film", () => {
 test.describe("Off the clock: this week in history", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/fixtures/off-the-clock");
+  });
+
+  test("every history picture is described in words, never by a file name", async ({ page }) => {
+    const alts = await page.locator("[data-otc='history'] .otc__history-image img").evaluateAll((images) => images.map((image) => image.getAttribute("alt") ?? ""));
+    expect(alts.length).toBeGreaterThan(0);
+    for (const alt of alts) {
+      expect(alt.length).toBeGreaterThan(0);
+      expect(alt).not.toMatch(/(?:\d|\.(?:jpe?g|png|webp|gif|avif|svg))$/i);
+    }
   });
 
   test("full width: the zoomable picture, the title, the date and fact, its credit, and an outline pill that counts", async ({ page }) => {
@@ -447,6 +471,18 @@ test.describe("Off the clock: the GitHub year", () => {
     await expect(card.locator("[data-readout]")).toHaveText(/2 Oct/);
     await page.keyboard.press("ArrowUp");
     await expect(card.locator("[data-github-days] button:focus")).toHaveAttribute("aria-label", /1 Oct/);
+  });
+
+  test("Escape lets go of the grid: the next Tab leaves it instead of landing on today", async ({ page }) => {
+    const card = cell(fixture(page, "github"), "github");
+    const days = card.locator("[data-github-days]");
+    await card.locator("[data-github-days] button[data-today]").focus();
+    for (let step = 0; step < 4; step += 1) await page.keyboard.press("ArrowLeft");
+    await expect(days.locator("button:focus")).toHaveAttribute("aria-label", /\d+ contributions? on /);
+    await page.keyboard.press("Escape");
+    await expect(days.locator("button:focus")).toHaveCount(0);
+    await page.keyboard.press("Tab");
+    await expect.poll(() => days.evaluate((element) => element.contains(document.activeElement))).toBe(false);
   });
 
   test("a stale year says when its data is from; a missing year still keeps the row", async ({ page }) => {
