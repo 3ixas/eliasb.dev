@@ -3,6 +3,7 @@ import { MeasureSide } from "@/components/parts/measure";
 import { OnView } from "@/components/parts/on-view";
 import { OUT, Panel } from "@/components/parts/panel";
 import { FlagLanes } from "@/components/site/flag-lanes";
+import { hostLabel } from "@/components/site/host-label";
 import { Simulation } from "@/components/site/simulation";
 import { SiteLink } from "@/components/site/site-link";
 import { columnImageSizes, StoryImage } from "@/components/site/story-parts";
@@ -100,7 +101,10 @@ function ScreensFigure({ figure }: { figure: Extract<RoleStoryFigure, { kind: "s
       </div>
       <figcaption>
         <SiteLink className="story-fig__source" href={figure.source.href}>
-          {figure.source.label} <span aria-hidden="true">{OUT}</span>
+          {figure.source.label}
+          {"\u00a0"}
+          <span aria-hidden="true">{OUT}</span>
+          <span className="sr-only"> opens {hostLabel(figure.source.href)} in a new tab</span>
         </SiteLink>
       </figcaption>
     </figure>

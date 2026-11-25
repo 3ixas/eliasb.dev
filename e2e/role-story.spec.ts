@@ -5,6 +5,7 @@ import { passName } from "../src/content/stretch/pass-name";
 import { roleStories, roleStorySlugs } from "../src/content/stretch/role-stories";
 import { roleStoryBack, roleStoryCopy, roleStoryDescription, roleStoryName, roleStorySectionKeys, roleStorySectionLabels } from "../src/content/stretch/role-story";
 import { passRecords } from "../src/content/stretch/staff-pass";
+import { hostLabel } from "../src/components/site/host-label";
 import { drawn, expectDrawn } from "./support/measure";
 import { spoken } from "./support/roll";
 import { renderedContrast } from "./support/rendered-contrast";
@@ -47,7 +48,8 @@ for (const slug of roleStorySlugs) {
       // The arrow and the word are two spans, spaced by the link's gap.
       await expect(back).toHaveText(roleStoryBack.label.replace(" ", ""));
       const parts = opening(page).locator(".story-open__part");
-      await expect(parts).toHaveText([story.role, story.dates, ...(story.setting ? [story.setting] : [])]);
+      // A setting of two facts is two parts, so every dot on the line is spaced alike (#540).
+      await expect(parts).toHaveText([story.role, story.dates, ...(story.setting?.split(" · ") ?? [])]);
       await expect(opening(page).locator(".story-open__lede")).toHaveText(story.sections.summary.paragraphs[0]);
     });
 
@@ -57,6 +59,90 @@ for (const slug of roleStorySlugs) {
       await expect(list.locator("b").first()).toHaveCSS("font-family", /Newsreader/);
       await expect(list.getByRole("listitem").first()).toHaveCSS("border-top-width", "1px");
     });
+
+    test("each hero figure stays on one line inside its card, and the figures in a row start level (#540)", async ({ page }, testInfo) => {
+      test.skip(!/-1440-light$/.test(testInfo.project.name), "Sweeps its own widths: once per engine");
+      for (const at of [320, 390, 820, 960, 1024, 1260, 1440]) {
+        await page.setViewportSize({ width: at, height: 900 });
+        await page.evaluate(() => document.fonts.ready);
+        await expect
+          .poll(
+            () =>
+              opening(page).locator(".story-figures li").evaluateAll((cards) => {
+                const levels = new Map<number, Set<number>>();
+                return cards.flatMap((card) => {
+                  const figure = card.querySelector("b")!;
+                  // A rolling figure is drawn by its face, whose hidden digit columns are not lines of their own.
+                  const drawn = figure.querySelector(".roll__face") ?? figure;
+                  const lines = figure.getBoundingClientRect().height > parseFloat(getComputedStyle(figure).fontSize) * 1.5;
+                  const words = document.createRange();
+                  words.selectNodeContents(drawn);
+                  const right = drawn === figure ? words.getBoundingClientRect().right : drawn.getBoundingClientRect().right;
+                  const spills = right > card.getBoundingClientRect().right - parseFloat(getComputedStyle(card).paddingRight) + 0.5;
+                  const row = Math.round(card.getBoundingClientRect().top);
+                  levels.set(row, (levels.get(row) ?? new Set()).add(Math.round(figure.getBoundingClientRect().top)));
+                  return [
+                    ...(lines && window.innerWidth >= 390 ? [`${figure.textContent} wraps`] : []),
+                    ...(spills ? [`${figure.textContent} spills`] : []),
+                    ...(levels.get(row)!.size > 1 ? [`${figure.textContent} sits off its row's level`] : []),
+                  ];
+                });
+              }),
+            { message: `at ${at} px` },
+          )
+          .toEqual([]);
+      }
+    });
+
+    test("on a phone an odd last figure card fills its row; the others share theirs (#540)", async ({ page }) => {
+      const list = opening(page).getByRole("list", { name: "Evidence" });
+      const odd = width(page) < 720 && story.evidence.length % 2 === 1;
+      await expect
+        .poll(async () => {
+          const [whole, last, first] = await Promise.all([list, list.locator("li").last(), list.locator("li").first()].map(async (box) => (await box.boundingBox())!.width));
+          if (odd) return Math.abs(last - whole) < 1 && first < whole / 2;
+          return Math.abs(last - first) < 1;
+        })
+        .toBe(true);
+    });
+
+    test("the parts of the role, dates and setting line are evenly spaced (#540)", async ({ page }) => {
+      await expect
+        .poll(() =>
+          opening(page).locator(".story-open__part").evaluateAll((parts) => {
+            const boxes = parts.map((part) => part.getBoundingClientRect());
+            const gaps = boxes.slice(1).flatMap((box, index) => (Math.abs(box.top - boxes[index].top) < 2 ? [Math.round(box.left - boxes[index].right)] : []));
+            return new Set(gaps).size <= 1 && parts.every((part) => !part.textContent!.includes("·"));
+          }),
+        )
+        .toBe(true);
+    });
+
+    const screens = Object.values(story.figures ?? {}).flatMap((figure) => (figure.kind === "screens" ? [figure] : []));
+    if (screens.length) {
+      test("each figure's source link is a 44 px target, keeps its ↗ after its words and says it opens a new tab (#540)", async ({ page }) => {
+        const links = page.locator(".story-fig__source");
+        await expect(links).toHaveCount(screens.length);
+        for (const [index, { source }] of screens.entries()) {
+          const link = links.nth(index);
+          await expect(link).toHaveAttribute("target", "_blank");
+          await expect(link).toHaveAccessibleName(`${source.label} opens ${hostLabel(source.href)} in a new tab`);
+          await expect.poll(async () => (await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+          await expect
+            .poll(() =>
+              link.evaluate((anchor) => {
+                const words = document.createRange();
+                words.setStart(anchor.firstChild!, 0);
+                words.setEnd(anchor.firstChild!, anchor.firstChild!.textContent!.trimEnd().length);
+                const end = [...words.getClientRects()].at(-1)!;
+                const arrow = anchor.querySelector('[aria-hidden="true"]')!.getBoundingClientRect();
+                return Math.abs(arrow.top + arrow.height / 2 - (end.top + end.height / 2)) < end.height / 2 && arrow.left - end.right >= 0 && arrow.left - end.right < 12;
+              }),
+            )
+            .toBe(true);
+        }
+      });
+    }
 
     test("the header is the shared one, and the sections are in order with their headings: no Summary heading and no numbers", async ({ page }) => {
       await expect(page.locator("[data-site-header]")).toHaveCount(1);
@@ -271,7 +357,7 @@ for (const slug of roleStorySlugs) {
           if (figure.kind === "scale") continue;
           if (figure.kind !== "screens") throw new Error(`${slug}'s other figures are screenshots`);
           const block = page.locator(`section#${key} figure`);
-          await expect(block.locator("figcaption")).toHaveText(`${figure.source.label} \u2197\uFE0E`);
+          await expect(block.locator("figcaption")).toHaveText(`${figure.source.label} \u2197\uFE0E opens ${hostLabel(figure.source.href)} in a new tab`);
           await expect(block.locator("figcaption a")).toHaveAttribute("href", figure.source.href);
           await expect(block.locator(".zoom img")).toHaveCount(figure.images.length);
           for (const [index, image] of figure.images.entries()) {
@@ -292,7 +378,7 @@ for (const slug of roleStorySlugs) {
         await expect(shots).toHaveCount(2);
         await expect(shots.first()).toHaveAttribute("data-device", "desktop");
         await expect(shots.last()).toHaveAttribute("data-device", "phone");
-        await expect(page.locator("section#the-role figcaption")).toHaveText("joveen.com \u2197\uFE0E");
+        await expect(page.locator("section#the-role figcaption")).toHaveText("joveen.com \u2197\uFE0E opens joveen.com in a new tab");
         await expect
           .poll(async () => {
             const [a, b] = [await shots.first().locator("img").boundingBox(), await shots.last().locator("img").boundingBox()];
