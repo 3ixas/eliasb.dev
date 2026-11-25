@@ -43,8 +43,9 @@ export function GitHubYear({ activity, total, mark }: { activity: ActivityDay[];
   const totalText = grouped(total);
 
   function move(event: KeyboardEvent<HTMLButtonElement>, index: number) {
+    // Let go of the grid but keep its tab stop here, so the next Tab moves on instead of landing on today.
     if (event.key === "Escape") {
-      setSelected(null);
+      event.currentTarget.blur();
       return;
     }
     const next = moveContributionCalendarIndex(calendar!, index, event.key);

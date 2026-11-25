@@ -208,7 +208,7 @@ function eventFrom(value: unknown, kind: HistoryEvent["kind"]): MappedHistoryEve
   const sourcePage = pageRecords[0];
   const sourceUrl = sourcePage?.sourceUrl;
   if (!sourceUrl) return undefined;
-  const normalizedText = value.text.replace(/\s+/g, " ").trim();
+  const normalizedText = value.text.replace(/\s+/g, " ").trim().replace(/(\w)'(\w)/g, "$1’$2");
   const text = kind === "birth"
     ? normalizedText.replace(/\s+\(died\s+\d{1,4}\)\s*$/i, "")
     : normalizedText;
@@ -359,22 +359,7 @@ function safeHttpsUrl(value: unknown, hostnames: string[]): string | undefined {
   }
 }
 
-function historyImageAlt(objectName: string | undefined, fileTitle: string): string {
-  const cleanedObjectName = objectName?.replace(/\.(?:jpe?g|png|webp|gif|avif|svg)$/i, "");
-  const title = cleanedObjectName && /[\s_-]/.test(cleanedObjectName)
-    ? cleanedObjectName
-    : fileTitle.replace(/\.[^.]+$/, "");
-  return title
-    .replace(/([a-z])([A-Z])/g, "$1 $2")
-    .replace(/([A-Z])([A-Z][a-z])/g, "$1 $2")
-    .replace(/([A-Za-z])(\d)/g, "$1 $2")
-    .replace(/(\d)([A-Za-z])/g, "$1 $2")
-    .replace(/[_-]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-async function fetchCommonsImage(fileTitle: string): Promise<HistoryImage | undefined> {
+async function fetchCommonsImage(fileTitle: string, alt: string): Promise<HistoryImage | undefined> {
   const requestUrl = new URL("https://commons.wikimedia.org/w/api.php");
   requestUrl.search = new URLSearchParams({
     action: "query",
@@ -384,7 +369,7 @@ async function fetchCommonsImage(fileTitle: string): Promise<HistoryImage | unde
     titles: `File:${fileTitle}`,
     iiprop: "url|mime|thumbmime|extmetadata",
     iiurlwidth: "800",
-    iiextmetadatafilter: "ObjectName|Artist|LicenseShortName|LicenseUrl",
+    iiextmetadatafilter: "Artist|LicenseShortName|LicenseUrl",
     iiextmetadatalanguage: "en",
   }).toString();
 
@@ -409,7 +394,6 @@ async function fetchCommonsImage(fileTitle: string): Promise<HistoryImage | unde
     const sourceUrl = safeHttpsUrl(imageInfo.descriptionurl, ["commons.wikimedia.org"]);
     const thumbnailMime = typeof imageInfo.thumbmime === "string" ? imageInfo.thumbmime : imageInfo.mime;
     const extmetadata = isRecord(imageInfo.extmetadata) ? imageInfo.extmetadata : {};
-    const objectName = isRecord(extmetadata.ObjectName) ? metadataText(extmetadata.ObjectName.value) : undefined;
     const creator = isRecord(extmetadata.Artist) ? metadataText(extmetadata.Artist.value) : undefined;
     const licenseName = isRecord(extmetadata.LicenseShortName) ? metadataText(extmetadata.LicenseShortName.value) : undefined;
     const rawLicenseUrl = isRecord(extmetadata.LicenseUrl) ? extmetadata.LicenseUrl.value : undefined;
@@ -431,7 +415,6 @@ async function fetchCommonsImage(fileTitle: string): Promise<HistoryImage | unde
       || height < 120
     ) return undefined;
 
-    const alt = historyImageAlt(objectName, fileTitle);
     return { src, alt, creator, sourceUrl, licenseName, licenseUrl, width, height };
   } catch (error) {
     historyWarning("Commons image", error instanceof Error ? error.name : "request failed");
@@ -479,7 +462,7 @@ export async function getHistorySignal(now = new Date()): Promise<HistorySignal>
     }
     const illustrated = await Promise.all(candidates.map(async ({ event, commonsFileTitle }) => {
       if (!commonsFileTitle) return event;
-      const image = await fetchCommonsImage(commonsFileTitle);
+      const image = await fetchCommonsImage(commonsFileTitle, `Picture for: ${event.text}`);
       return image ? { ...event, image } : event;
     }));
     const events = withPicturedLead(illustrated);

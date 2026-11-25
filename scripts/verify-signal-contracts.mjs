@@ -138,7 +138,6 @@ const commonsImageResponse = (title, { withoutLicense = false, licenseUrl = "htt
         thumbmime: "image/jpeg",
         descriptionurl: `https://commons.wikimedia.org/wiki/File:${encodeURIComponent(title)}`,
         extmetadata: {
-          ObjectName: { value: `<i>${title.replaceAll("_", " ")}</i>` },
           Artist: { value: '<a href="https://commons.wikimedia.org/wiki/User:Example">Ada Example</a>' },
           ...(!withoutLicense ? {
             LicenseShortName: { value: "CC BY-SA 4.0" },
@@ -168,7 +167,7 @@ try {
   const imageRequests = historyRequestUrls.filter((requestUrl) => new URL(requestUrl).hostname === "commons.wikimedia.org");
   assert.deepEqual(feedRequests.map((requestUrl) => new URL(requestUrl).pathname.split("/").at(-3)).sort(), ["births", "events", "selected"]);
   assert.equal(imageRequests.length, 3);
-  assert.equal(imageRequests.every((requestUrl) => new URL(requestUrl).searchParams.get("iiextmetadatafilter") === "ObjectName|Artist|LicenseShortName|LicenseUrl"), true);
+  assert.equal(imageRequests.every((requestUrl) => new URL(requestUrl).searchParams.get("iiextmetadatafilter") === "Artist|LicenseShortName|LicenseUrl"), true);
   assert.equal(historyRequestCacheDurations.every((seconds) => seconds === 604800), true);
   assert.ok(historyRequestAgents.every((agent) => agent === "EliasBHistory/1.0 (https://www.eliasb.dev/)"), "Feed and Commons requests must identify the site to Wikimedia");
   assert.deepEqual(commonsRequestTitles.sort(), ["Galileo_spacecraft.jpg", "Montgolfier_balloon.jpg", "Salvador_Lutteroth.jpg"]);
@@ -183,6 +182,28 @@ try {
   assert.equal(liveHistory.events.every(({ image }) => image?.src.startsWith("https://upload.wikimedia.org/wikipedia/commons/")), true);
   assert.equal(liveHistory.events.every(({ image }) => image?.licenseUrl === "https://creativecommons.org/licenses/by-sa/4.0/"), true);
   assert.equal(liveHistory.events.every(({ image }) => image?.alt.length > 0 && !image.alt.includes("<")), true);
+  // The picture is described by the story it illustrates, never by its Commons file name.
+  assert.equal(liveHistory.events.every(({ text, image }) => image?.alt === `Picture for: ${text}`), true);
+  assert.equal(liveHistory.events.some(({ image }) => /\d$|\.(?:jpe?g|png|webp|gif|avif)$/i.test(image.alt)), false);
+
+  const namedFile = structuredClone(historyFixture);
+  namedFile.events[0].pages = [historyPage("Montgolfier_brothers", "MS_Explorer_2005_1.jpg")];
+  globalThis.fetch = async (input) => {
+    const url = new URL(String(input));
+    if (url.hostname === "commons.wikimedia.org") return commonsImageResponse(url.searchParams.get("titles").replace(/^File:/, ""));
+    const feedName = url.pathname.split("/").at(-3);
+    return new Response(JSON.stringify({ [feedName]: namedFile[feedName] }), { status: 200 });
+  };
+  const namedFileHistory = await getHistorySignal(historyNow);
+  const namedFileEvent = namedFileHistory.events.find(({ year }) => year === 1783);
+  assert.equal(namedFileEvent.image.alt, `Picture for: ${namedFileEvent.text}`, "A Commons file name is never the alt");
+  assert.equal(namedFileEvent.image.alt.includes("MS Explorer"), false);
+
+  // Wikipedia's straight apostrophes inside a word are written curly, like the saved facts.
+  const straight = structuredClone(historyFixture);
+  straight.events[0].text = "Doctor Who, the world's longest-running science fiction series, begins. 'Quoted' stays.";
+  const straightEvent = selectHistoryEvents(straight, historyNow).find(({ year }) => year === 1783);
+  assert.equal(straightEvent.text, "Doctor Who, the world’s longest-running science fiction series, begins. 'Quoted' stays.");
 
   for (const failedFeed of ["births", "selected"]) {
     globalThis.fetch = async (input) => {
@@ -356,9 +377,10 @@ assert.equal(filmFromLetterboxd({ title: " " }, letterboxdProfile), null);
 
 // The ticket's line, shown and spoken.
 const watched = { short: "14 Sept", long: "14 September" };
-assert.deepEqual(filmLine(watched, 4), { shown: "Watched 14 Sept\u00a0·\u00a0★★★★", spoken: "Watched 14 September, rated 4 out of 5" });
-assert.deepEqual(filmLine(watched, 4.5), { shown: "Watched 14 Sept\u00a0·\u00a0★★★★½", spoken: "Watched 14 September, rated 4.5 out of 5" });
-assert.deepEqual(filmLine(watched, null), { shown: "Watched 14 Sept", spoken: "Watched 14 September" });
+assert.deepEqual(filmLine(watched, 4), { shown: "Watched 14\u00a0Sept\u00a0·\u00a0★★★★", spoken: "Watched 14 September, rated 4 out of 5" });
+assert.deepEqual(filmLine(watched, 4.5), { shown: "Watched 14\u00a0Sept\u00a0·\u00a0★★★★½", spoken: "Watched 14 September, rated 4.5 out of 5" });
+assert.deepEqual(filmLine(watched, null), { shown: "Watched 14\u00a0Sept", spoken: "Watched 14 September" });
+assert.equal(filmLine({ short: "9 Oct", long: "9 October" }, 3.5, "Last watched").shown, "Last watched 9\u00a0Oct\u00a0·\u00a0★★★½", "The date never splits across lines");
 assert.deepEqual(filmLine(null, 3), { shown: "★★★", spoken: "Rated 3 out of 5" });
 assert.equal(filmLine(null, null), null);
 
@@ -398,14 +420,25 @@ for (const { column, row, span } of contributionCalendar.monthLabels) {
   assert.ok(column + span <= contributionCalendar.weekCount, "Month labels should fit within the year grid");
   labelEndByRow.set(row, column + span);
 }
-const monthBoundaryCalendar = createContributionCalendar(
-  datesForWindow(GITHUB_ACTIVITY_DAYS, new Date("2026-09-26T12:00:00.000Z")),
-);
-assert.ok(monthBoundaryCalendar);
-const openingSeptember = monthBoundaryCalendar.monthLabels.find(({ column }) => column === 0);
-const openingOctober = monthBoundaryCalendar.monthLabels.find(({ label }) => label === "Oct");
-assert.ok(openingSeptember && openingOctober, "The calendar should label both opening months");
-assert.notEqual(openingSeptember.row, openingOctober.row, "Closely spaced opening month labels should use separate rows");
+// Every label sits on one row in every window, so the axis never drops a month a line below the rest. A leading
+// partial month with no room for its label before the next month's is left unlabelled, as GitHub's own graph does.
+for (let offset = 0; offset < 366; offset += 1) {
+  const end = new Date(Date.UTC(2026, 0, 1 + offset, 12));
+  const calendar = createContributionCalendar(datesForWindow(GITHUB_ACTIVITY_DAYS, end));
+  assert.ok(calendar);
+  let labelEnd = 0;
+  for (const { column, row, span, label } of calendar.monthLabels) {
+    assert.equal(row, 0, `Month label ${label} must stay on row 0 in the window ending ${end.toISOString().slice(0, 10)}`);
+    assert.ok(column >= labelEnd, `Month label ${label} overlaps the one before it`);
+    assert.ok(column + span <= calendar.weekCount, `Month label ${label} runs past the grid`);
+    labelEnd = column + span;
+  }
+}
+const lateMonthStart = createContributionCalendar(datesForWindow(GITHUB_ACTIVITY_DAYS, new Date("2026-11-25T12:00:00.000Z")));
+assert.ok(lateMonthStart);
+assert.equal(lateMonthStart.days[0].date, "2025-11-26");
+assert.deepEqual(lateMonthStart.monthLabels.slice(0, 2).map(({ label }) => label), ["Dec", "Jan"], "A leading November with no room for its label is left unlabelled");
+assert.deepEqual(contributionCalendar.monthLabels.slice(0, 2).map(({ label }) => label), ["Sep", "Oct"], "A leading month with room for its label keeps it");
 assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "ArrowLeft"), 93);
 assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "ArrowRight"), 107);
 assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "ArrowDown"), 101);

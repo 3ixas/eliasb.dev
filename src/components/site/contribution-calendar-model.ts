@@ -11,7 +11,7 @@ export type ContributionCalendarModel = {
   rows: (ActivityDay | null)[][];
   startWeekday: number;
   weekCount: number;
-  monthLabels: { column: number; label: string; row: number; span: number }[];
+  monthLabels: { column: number; label: string; row: 0; span: number }[];
 };
 
 function dateFromIsoDay(value: string) {
@@ -30,33 +30,23 @@ export function createContributionCalendar(activity: ActivityDay[]): Contributio
   const rows = CONTRIBUTION_WEEKDAYS.map((_, weekday) =>
     Array.from({ length: weekCount }, (_, week) => columns[week * 7 + weekday]),
   );
-  const monthsByColumn = new Map<number, string[]>();
+  // One label per month, at the week the month starts, all on one row. A label with no room before the next one is
+  // left out, as GitHub's own graph does for the partial month the window opens on.
+  const starts: { column: number; label: string }[] = [];
   let previousMonth = "";
-
   days.forEach((day, index) => {
     const date = dateFromIsoDay(day.date);
     const month = `${date.getUTCFullYear()}-${date.getUTCMonth()}`;
     if (month === previousMonth) return;
     previousMonth = month;
-
-    const column = Math.floor((startWeekday + index) / 7);
-    const labels = monthsByColumn.get(column) ?? [];
-    labels.push(SHORT_MONTH_NAMES[date.getUTCMonth()]);
-    monthsByColumn.set(column, labels);
+    starts.push({ column: Math.floor((startWeekday + index) / 7), label: SHORT_MONTH_NAMES[date.getUTCMonth()] });
   });
 
-  const occupiedUntilByRow: number[] = [];
-  const monthLabels = [...monthsByColumn].map(([column, labels]) => {
-    const label = labels.join(" · ");
+  const placed = starts.map(({ column, label }) => {
     const span = Math.min(weekCount, Math.max(2, Math.ceil((label.length * 6) / 16)));
-    const visibleColumn = Math.min(column, weekCount - span);
-    let row = occupiedUntilByRow.findIndex((occupiedUntil) => visibleColumn >= occupiedUntil);
-
-    if (row === -1) row = occupiedUntilByRow.length;
-    occupiedUntilByRow[row] = visibleColumn + span;
-
-    return { column: visibleColumn, label, row, span };
+    return { column: Math.min(column, weekCount - span), label, row: 0 as const, span };
   });
+  const monthLabels = placed.filter(({ column, span }, index) => column + span <= (placed[index + 1]?.column ?? weekCount));
 
   return {
     days,
