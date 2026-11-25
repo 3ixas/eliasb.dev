@@ -22,7 +22,7 @@ Steps 1 to 11 replace the quiet index's walk ([#363](https://github.com/3ixas/el
 
 - **Layout shift** (`e2e/layout-shift.spec.ts`): at most 0.01 on the homepage, BNP Paribas and Threshold, on Chromium at 390 and 1440 px.
 - **Arrivals and presses** (`e2e/parts.spec.ts`): a panel rises, a figure counts and bars grow once, ending where the server drew them; an interrupted arrival is let go at once; every control answers within 100 to 250 ms.
-- **JavaScript size** (`pnpm check:built`): a route fails when its gzipped scripts grow more than 10% over the baseline in `scripts/js-budget.json`. After an intended change, re-measure and update the baseline in the same pull request, saying why.
+- **JavaScript size** (`pnpm check:built`): a route fails when its gzipped scripts grow more than 10% over the baseline in `scripts/js-budget.json`, and so does the lanyard's scene chunks (`sceneChunk`). After an intended change, re-measure and update the baseline in the same pull request, saying why.
 
 ## The "before" for sign-off
 

@@ -60,9 +60,14 @@ test("headless WebKit, which draws in software in CI, keeps the printed pass", a
   if (process.env.CI) expect(state).toMatch(/^failed /);
 });
 
-/** Waits for the scene to take the pass's place: it loads once the rail is near the view. */
+/**
+ * Waits for the scene to take the pass's place: it loads once the rail is near the view and the visitor has arrived (the first
+ * pointer move or scroll) or the page has settled. A pointer move stands in for the visitor, so a spec does not wait out
+ * the settling; "waits for the page to open" below covers the wait itself.
+ */
 const hung = async (page: Page, stage = rail(page)) => {
   test.skip(!(await canDrawScene(page)), "No WebGL 2 in this browser");
+  await page.mouse.move(2, 2);
   await expect(stage).toHaveAttribute("data-lanyard", "3d", { timeout: 15_000 });
 };
 
@@ -296,21 +301,52 @@ test.describe("The 3D staff pass", () => {
     expect(seen.filter((opacity) => opacity !== "0")).toEqual([]);
   });
 
+  test.describe("The scene waits for the page to open", () => {
+    test("its chunk and textures do not load until the first pointer move", async ({ page }) => {
+      test.skip(!(await canDrawScene(page)), "No WebGL 2 in this browser");
+      const textures = trackTextures(page);
+      await page.goto("/");
+      await rail(page).scrollIntoViewIfNeeded();
+      // The page has not settled yet, and the stage stays unseen meanwhile, so the print never shows and is then swapped.
+      await page.waitForTimeout(1500);
+      await expect(rail(page)).toHaveAttribute("data-lanyard", "waiting");
+      await expect(scene(page)).toHaveCount(0);
+      await expect(rail(page).locator(".pass__card").first()).toHaveCSS("opacity", "0");
+      expect(textures).toEqual([]);
+      await page.mouse.move(40, 40);
+      await hung(page);
+      await expect(scene(page)).toHaveCount(1);
+    });
+
+    test("the first scroll starts it too", async ({ page }) => {
+      test.skip(!(await canDrawScene(page)), "No WebGL 2 in this browser");
+      await page.goto("/");
+      await page.waitForTimeout(1000);
+      await expect(rail(page)).toHaveAttribute("data-lanyard", "waiting");
+      await page.evaluate(() => window.scrollBy(0, 1));
+      await expect(rail(page)).toHaveAttribute("data-lanyard", "3d", { timeout: 15_000 });
+    });
+
+    test("with no input at all, it starts once the page has settled", async ({ page }) => {
+      test.skip(!(await canDrawScene(page)), "No WebGL 2 in this browser");
+      await page.goto("/");
+      await expect(rail(page)).toHaveAttribute("data-lanyard", "3d", { timeout: 15_000 });
+    });
+  });
+
   test("the scene shifts nothing on the page", async ({ page }) => {
     await page.goto("/");
-    const total = page.evaluate(
-      () =>
-        new Promise<number>((resolve) => {
-          let sum = 0;
-          new PerformanceObserver((list) => {
-            for (const entry of list.getEntries() as (PerformanceEntry & { value: number; hadRecentInput: boolean })[]) if (!entry.hadRecentInput) sum += entry.value;
-          }).observe({ type: "layout-shift", buffered: true });
-          // Long enough for the scene to load, take over and swing once.
-          setTimeout(() => resolve(sum), 4000);
-        }),
-    );
+    // Layout shift from now until a moment after the scene has taken over and swung once.
+    await page.evaluate(() => {
+      const watch = window as unknown as { shift: number };
+      watch.shift = 0;
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries() as (PerformanceEntry & { value: number; hadRecentInput: boolean })[]) if (!entry.hadRecentInput) watch.shift += entry.value;
+      }).observe({ type: "layout-shift", buffered: true });
+    });
     await hung(page);
-    expect(await total).toBeLessThanOrEqual(0.01);
+    await page.waitForTimeout(2000);
+    expect(await page.evaluate(() => (window as unknown as { shift: number }).shift)).toBeLessThanOrEqual(0.01);
   });
 });
 

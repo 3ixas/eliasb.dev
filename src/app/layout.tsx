@@ -1,7 +1,8 @@
 import { homeTitle, siteDescription, siteName } from "@/content/site";
 import type { Metadata } from "next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Instrument_Sans, Newsreader } from "next/font/google";
+import { Instrument_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "./base.css";
 import "./tokens.css";
 import "./zoom.css";
@@ -18,15 +19,20 @@ import "./story.css";
 import "./simulation.css";
 import "./resume.css";
 
-// Self-hosted at build time by next/font, so no request goes to Google when a visitor loads a page.
+// Both faces are self-hosted, so no request goes to Google when a visitor loads a page.
 // Passes and panels (docs/design/DESIGN.md "Type"): Newsreader for headings, figures and prose, with its
-// optical-size axis; Instrument Sans for interface text. Both variable in weight, Latin only, and given
-// next/font's fallback faces, which it sizes from each font's own metrics so a late font moves nothing.
+// optical-size axis; Instrument Sans for interface text. Both variable in weight and given next/font's fallback
+// faces, which it sizes from each font's own metrics so a late font moves nothing.
 // tokens.css reads them as --serif and --sans; every route, including the Résumé sheet, uses only these two faces.
-const newsreader = Newsreader({
-  subsets: ["latin"],
-  axes: ["opsz"],
+// Newsreader is the Google latin file instanced to the weights the site sets (300 to 650) and cut to the characters it
+// sets, both axes kept, so headings draw as before from a file 40% smaller (#539; scripts/subset-newsreader.sh).
+const newsreader = localFont({
+  src: "./fonts/newsreader/newsreader-var-latin.woff2",
+  weight: "300 650",
   style: "normal",
+  display: "swap",
+  adjustFontFallback: "Times New Roman",
+  declarations: [{ prop: "font-family", value: "Newsreader" }],
   variable: "--font-newsreader",
 });
 

@@ -6,7 +6,8 @@ import { useEffect, type RefObject } from "react";
  * Hangs a stage's staff passes in 3D (#448). The CSS passes inside are the server render, the accessible names and the
  * fallback: with no script, no WebGL or reduced motion they are all there is. When the stage comes near the view, the
  * scene (three.js) loads, paints each card from its pass's own print and takes its place at its exact size; the passes
- * stay in the page, unseen, for assistive technology and the keyboard.
+ * stay in the page, unseen, for assistive technology and the keyboard. The scene is three.js and its parse is a long task, so
+ * it does not start while the page is opening: it waits for the first input or an idle moment (`released`).
  */
 export function useLanyard(stage: RefObject<HTMLElement | null>) {
   useEffect(() => {
@@ -83,7 +84,7 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
           if (wanted()) fail(error instanceof Error ? error.message : String(error));
         });
     };
-    const near = new IntersectionObserver(([entry]) => entry.isIntersecting && start(), { rootMargin: "200px" });
+    const near = new IntersectionObserver(([entry]) => entry.isIntersecting && released().then(start), { rootMargin: "200px" });
     if (wanted()) wait();
     near.observe(element);
     // Reduced motion turned on later puts the printed passes back; turned off again, the passes hang once more when the
@@ -110,6 +111,31 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
       delete element.dataset.lanyardError;
     };
   }, [stage]);
+}
+
+/** How long the page is open before the scene may load without any input (ms). */
+const SETTLE_MS = 3500;
+/** Then the longest it waits for an idle moment (ms). */
+const IDLE_MS = 1000;
+/** What counts as the visitor arriving: the first of these starts the scene at once. */
+const ARRIVAL = ["pointerdown", "pointermove", "scroll", "keydown", "touchstart"] as const;
+
+let release: Promise<void> | undefined;
+/** Resolves once, for every stage on the page, at the first input or, failing that, an idle moment once the page has settled. */
+function released(): Promise<void> {
+  return (release ??= new Promise((resolve) => {
+    let settle = 0;
+    let idle = 0;
+    const go = () => {
+      ARRIVAL.forEach((name) => window.removeEventListener(name, go));
+      clearTimeout(settle);
+      if ("cancelIdleCallback" in window) cancelIdleCallback(idle);
+      resolve();
+    };
+    ARRIVAL.forEach((name) => window.addEventListener(name, go, { passive: true }));
+    // Safari has no requestIdleCallback: once settled, the scene simply starts.
+    settle = window.setTimeout(() => ("requestIdleCallback" in window ? (idle = requestIdleCallback(go, { timeout: IDLE_MS })) : go()), SETTLE_MS);
+  }));
 }
 
 /** Renderers that draw on the processor, not a graphics chip: the scene would take the page's time from everything else. */
