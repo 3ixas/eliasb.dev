@@ -1,5 +1,6 @@
 import { homeTitle, siteDescription, siteName } from "@/content/site";
 import type { Metadata } from "next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Instrument_Sans, Newsreader } from "next/font/google";
 import "./base.css";
 import "./tokens.css";
@@ -101,7 +102,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <script dangerouslySetInnerHTML={{ __html: siteBootScript }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        {/* Field Core Web Vitals from real visitors (Vercel Speed Insights, free tier). No cookies; loads from /_vercel/, after the page. */}
+        <SpeedInsights />
+      </body>
     </html>
   );
 }
