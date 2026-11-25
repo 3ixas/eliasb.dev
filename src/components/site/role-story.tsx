@@ -21,7 +21,8 @@ const sectionKeys = roleStorySectionKeys.filter((key) => key !== "summary");
  */
 export function RoleStoryPage({ story }: { story: RoleStory }) {
   const next = story.next ? roleStories[story.next] : null;
-  const meta = [story.role, story.dates, story.setting].filter((part): part is string => !!part);
+  // A setting of two facts ("Risk division · London") is two parts, so the stylesheet spaces every dot alike.
+  const meta = [story.role, story.dates, ...(story.setting?.split(" · ") ?? [])];
   const titleName = employerTitleTransition(story.slug);
   const chapters = sectionKeys.map((key) => ({ id: key, title: roleStorySectionLabels[key] }));
 

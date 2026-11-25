@@ -48,7 +48,7 @@ const expectedRoleStoryCards = new Map([
   }],
   ["/work/optegra", {
     title: "Marketing executive at Optegra Eye Healthcare & Kensington Medical · Elias Bennett",
-    description: "I was a marketing executive across two healthcare providers: private, at Kensington Medical, and NHS work through Optegra Eye Healthcare. The best part of the job was working with the engineers who built our website.",
+    description: "I was a marketing executive at Kensington Medical and Optegra Eye Healthcare, and the best part was working with the engineers who built our website.",
     image: "/work/optegra/opengraph-image",
   }],
 ]);

@@ -159,6 +159,14 @@
   color: inherit;
 }
 
+/* Beside the pass the cards are narrow, so from 720 px each value is a step smaller and stays on one line (#540). */
+@media (min-width: 720px) {
+  .story-open__card .story-figures b {
+    font-size: clamp(28px, 2.4vw, 34px);
+    white-space: nowrap;
+  }
+}
+
 /* On desktop, shorten the lanyard drop slightly so the card centres beside the coloured hero panel (.pass-rail in parts.css owns the rail geometry and phone steps). */
 @media (min-width: 960px) {
   .story-open__rail .pass {
@@ -697,11 +705,11 @@
   margin-top: 24px;
 }
 
-/* On its own line, so the link is a 44 px target. */
+/* On its own line and padded, so the link is a 44 px target; its words and arrow wrap as one run of text. */
 .story-fig__source {
-  display: inline-flex;
-  align-items: center;
+  display: inline-block;
   min-height: 44px;
+  padding-block: 10px;
   color: inherit;
   text-decoration: underline;
   text-decoration-color: var(--hair);
@@ -831,6 +839,11 @@
 
   .story-figures li {
     padding: 12px 14px;
+  }
+
+  /* An odd last card fills its row rather than leaving a cell empty. */
+  .story-figures li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 
   .case-header {
