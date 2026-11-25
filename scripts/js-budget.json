@@ -1,5 +1,8 @@
 {
-  "/": 192598,
-  "/work/bnp-paribas": 189221,
-  "/things-i-make/threshold": 188419
+  "routes": {
+    "/": 192598,
+    "/work/bnp-paribas": 189221,
+    "/things-i-make/threshold": 188419
+  },
+  "sceneChunk": 145229
 }

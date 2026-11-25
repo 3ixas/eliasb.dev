@@ -2,7 +2,8 @@ import { spawn } from "node:child_process";
 import net from "node:net";
 import process from "node:process";
 import { setTimeout as delay } from "node:timers/promises";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 
 const compatibilityRedirects = new Map([
@@ -59,7 +60,7 @@ const expectedIndexableRobots = [
 const requiredHomepageSections = ["work", "things-i-make", "how-i-work", "off-the-clock", "say-hello"];
 // A route's JavaScript may grow by this much over its measured baseline in scripts/js-budget.json (gzipped bytes of the scripts its HTML loads).
 const jsBudgetGrowth = 0.1;
-const jsBudget = JSON.parse(readFileSync(new URL("./js-budget.json", import.meta.url), "utf8"));
+const { routes: jsBudget, sceneChunk: sceneBudget } = JSON.parse(readFileSync(new URL("./js-budget.json", import.meta.url), "utf8"));
 const failures = [];
 let checkCount = 0;
 
@@ -300,6 +301,22 @@ async function pageScriptBytes(baseUrl, document) {
   return bytes;
 }
 
+/**
+ * The gzipped size of the chunks that hold three.js's WebGLRenderer, the lanyard's scene (#539). A route's HTML never names
+ * them: the lanyard imports the scene once the page has opened, so the route figures above leave it out. They are found in
+ * the build's own static files, not by name (the names change with every build); webpack splits the scene in two and
+ * Turbopack keeps it in one, so the figure is their sum.
+ */
+function sceneChunkBytes() {
+  const root = new URL("../.next/static/", import.meta.url);
+  const holding = readdirSync(root, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".js"))
+    .map((entry) => readFileSync(join(entry.parentPath, entry.name)))
+    .filter((file) => file.includes("WebGLRenderer"));
+  check(holding.length > 0, "A built chunk should hold WebGLRenderer, the lanyard's scene");
+  return holding.reduce((total, file) => total + gzipSync(file).length, 0);
+}
+
 async function verifyJavaScriptBudget(baseUrl, pages) {
   for (const route of Object.keys(jsBudget)) {
     const page = pages.get(route) ?? await fetchPage(baseUrl, route);
@@ -309,6 +326,11 @@ async function verifyJavaScriptBudget(baseUrl, pages) {
     console.log(`JavaScript on ${route}: ${bytes} bytes gzipped (baseline ${jsBudget[route]}, limit ${limit})`);
     check(bytes <= limit, `${route} loads ${bytes} bytes of JavaScript, over its ${limit} limit (10% over the ${jsBudget[route]} baseline in scripts/js-budget.json)`);
   }
+
+  const scene = sceneChunkBytes();
+  const sceneLimit = Math.round(sceneBudget * (1 + jsBudgetGrowth));
+  console.log(`JavaScript in the lanyard scene chunk: ${scene} bytes gzipped (baseline ${sceneBudget}, limit ${sceneLimit})`);
+  check(scene <= sceneLimit, `The lanyard scene chunk is ${scene} bytes of JavaScript, over its ${sceneLimit} limit (10% over the ${sceneBudget} sceneChunk baseline in scripts/js-budget.json)`);
 }
 
 async function verifyRoutes(baseUrl, pages) {
