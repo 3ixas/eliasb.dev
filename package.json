@@ -33,6 +33,7 @@
     "resume:pdf": "node --no-warnings --experimental-strip-types scripts/render-resume-pdf.mjs"
   },
   "dependencies": {
+    "@vercel/speed-insights": "2.1.0",
     "next": "16.4.3",
     "react": "19.2.8",
     "react-dom": "19.2.8",
