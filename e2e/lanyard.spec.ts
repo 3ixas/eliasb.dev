@@ -47,6 +47,8 @@ test("headless WebKit, which draws in software in CI, keeps the printed pass", a
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   await rail(page).scrollIntoViewIfNeeded();
+  // The scene starts at the first input, or once the page has settled; a pointer move stands in for the visitor.
+  await page.mouse.move(2, 2);
   await expect(rail(page)).toHaveAttribute("data-lanyard", /^(failed|3d)$/);
   const state = await rail(page).evaluate((element) => {
     const gl = document.createElement("canvas").getContext("webgl2");
