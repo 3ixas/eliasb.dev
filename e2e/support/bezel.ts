@@ -82,3 +82,31 @@ export function expectOpticalBezel(reading: BezelReading, label: string, phone: 
   expect(Math.abs(reading.matLuminance - reading.fieldLuminance), `${label} mat separates from field`).toBeGreaterThan(0.006);
   expect(Math.abs(reading.borderLuminance - reading.fieldLuminance), `${label} hairline separates from field`).toBeGreaterThan(0.015);
 }
+
+/**
+ * Panels set beside each other (#541): every bezel has one 8:5 shape with its screenshot inside it, and the bezels in a
+ * row of `across` panels start and end level.
+ */
+export async function expectLevelBezels(panels: Locator, across: number) {
+  await expect
+    .poll(() =>
+      panels.evaluateAll((all, perRow) => {
+        const bezels = all.map((panel) => {
+          const bezel = panel.querySelector(".project__shot")!.getBoundingClientRect();
+          const image = panel.querySelector(".project__shot > img")!.getBoundingClientRect();
+          const inside = image.left >= bezel.left && image.right <= bezel.right && image.top >= bezel.top && image.bottom <= bezel.bottom;
+          return { top: bezel.top, bottom: bezel.bottom, shape: bezel.width / bezel.height, inside: inside && image.width > 0 };
+        });
+        return bezels.flatMap((bezel, index) => {
+          const first = bezels[index - (index % perRow)];
+          return [
+            Math.abs(bezel.shape - 1.6) > 0.02 && `bezel ${index} is ${bezel.shape.toFixed(2)}:1`,
+            !bezel.inside && `screenshot ${index} leaves its bezel`,
+            Math.abs(bezel.top - first.top) > 0.5 && `bezel ${index} starts ${bezel.top - first.top} px off its row`,
+            Math.abs(bezel.bottom - first.bottom) > 0.5 && `bezel ${index} ends ${bezel.bottom - first.bottom} px off its row`,
+          ].filter(Boolean);
+        });
+      }, across),
+    )
+    .toEqual([]);
+}

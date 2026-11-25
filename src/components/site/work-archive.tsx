@@ -26,7 +26,7 @@ export function WorkArchiveList({ items }: { items: readonly { slug: string; cat
           ))}
         </div>
       )}
-      <ul className="panels panels--three archive__grid">
+      <ul className="panels panels--three panels--level archive__grid">
         {shown.map(({ slug, panel }) => (
           <Fragment key={slug}>{panel}</Fragment>
         ))}

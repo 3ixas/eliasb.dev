@@ -27,8 +27,16 @@ export function WorkArchivePage({ catalogue }: { catalogue: readonly Project[] }
             category: project.category,
             panel: (
               <li>
-                <OnView motion="rise" className="archive__arrival">
-                  <ProjectPanel project={project} line={project.outcome} level={2} meta eager={index < FIRST_SCREEN} titleTransition />
+                <OnView motion="rise">
+                  <ProjectPanel
+                    project={project}
+                    line={project.outcome}
+                    level={2}
+                    meta
+                    eager={index < FIRST_SCREEN}
+                    fetchPriority={index > 0 && index < FIRST_SCREEN ? "low" : undefined}
+                    titleTransition
+                  />
                 </OnView>
               </li>
             ),
