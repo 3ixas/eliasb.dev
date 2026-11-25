@@ -255,7 +255,7 @@ Shared labels: ← Work · Next role · Evidence. Chapter rail landmark name (no
 | Part | Copy |
 | --- | --- |
 | Opening | Marketing executive · Sep 2021 – Aug 2024 |
-| 01 Summary | I was a marketing executive across two healthcare providers: private, at Kensington Medical, and NHS work through Optegra Eye Healthcare. The best part of the job was working with the engineers who built our website. |
+| 01 Summary | I was a marketing executive at Kensington Medical and Optegra Eye Healthcare, and the best part was working with the engineers who built our website. |
 | 02 The role | From September 2021 at Kensington Medical, and from October 2022 at Optegra, I did digital marketing: campaign analysis, split tests and analytics dashboards. I also worked with the engineers on the company website, scoping and ticketing fixes. |
 | 03 The problems | *Slow, uneven pages.* The Core Web Vitals pass rate was 62%, and page loads were slower than they needed to be. *No clear view of what worked.* We couldn’t easily tell which changes brought in consultations. |
 | 04 Decisions | *Scope the fix so it can be built.* I scoped performance fixes with the engineers and ticketed them, so each one was something they could build and I could measure. *Test, then build.* Split tests and analytics dashboards showed which changes helped, and that guided what the engineers worked on next. |
@@ -263,7 +263,7 @@ Shared labels: ← Work · Next role · Evidence. Chapter rail landmark name (no
 | 06 What I took with me | The click came in early 2024. A friend loved his work so much that even a hectic week sounded exciting, and I wanted that from mine. I started coding in my spare time, just to see, and by August 2024 I was doing it for a living. |
 | Figures | Under 02 The role, the Optegra homepage as it was on 5 June 2024. Link: Optegra’s homepage in June 2024, on the Wayback Machine. Alt: The Optegra homepage in June 2024: a sunset beach behind the headline Choose Our Top Rated Eye Hospitals, a booking panel for a free video or telephone consultation, and the Trustpilot and NHS marks. Under 04 Decisions, the dry AMD treatment launch page as it was on 13 June 2024. Link: Optegra’s dry AMD page in June 2024, on the Wayback Machine. Alt: Optegra’s dry AMD treatment page in June 2024: the headline Dry AMD Treatment, Available at our Central London and Manchester Eye Hospitals, Valeda Light Therapy, and a Request a Callback form. Under 05 What changed, three bars to scale: Core Web Vitals pass rate (Before · 62% / After · 88%), p95 page load (After · −30%) and Consultation conversion (After · +15%). Caption: Bars to scale. A change in per cent is drawn from 100. |
 | Title | Marketing executive at Optegra Eye Healthcare & Kensington Medical · Elias Bennett |
-| Meta description | I was a marketing executive across two healthcare providers: private, at Kensington Medical, and NHS work through Optegra Eye Healthcare. The best part of the job was working with the engineers who built our website. |
+| Meta description | I was a marketing executive at Kensington Medical and Optegra Eye Healthcare, and the best part was working with the engineers who built our website. |
 | Social card | Optegra Eye Healthcare & Kensington Medical · Marketing executive · ELIAS BENNETT |
 
 ## Checks
