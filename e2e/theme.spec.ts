@@ -234,6 +234,37 @@ test.describe("Lights and theme", () => {
     expect(path.reversed).toBeCloseTo(path.middle, 1);
   });
 
+  test("pressing it again part-way carries the turn on from where the icon has reached, not from its start", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "light", reducedMotion: "no-preference" });
+    await page.goto("/");
+    await expect.poll(() => page.evaluate(() => Object.keys(document.querySelector("[data-eclipse]")!).some((key) => key.startsWith("__reactProps$")))).toBe(true);
+    const path = await page.evaluate(() => {
+      const button = document.querySelector<HTMLButtonElement>("[data-eclipse]")!;
+      const icon = button.querySelector("svg")!;
+      const pose = () => {
+        const matrix = new DOMMatrix(getComputedStyle(icon).transform);
+        return { angle: (Math.atan2(matrix.b, matrix.a) * 180) / Math.PI, scale: Math.hypot(matrix.a, matrix.b) };
+      };
+      const hold = (time: number) => {
+        for (const animation of icon.getAnimations()) {
+          animation.pause();
+          animation.currentTime = time;
+        }
+      };
+      button.click();
+      // Fixed animation time, so a busy runner cannot miss the 300 ms.
+      hold(300);
+      const before = pose();
+      button.click();
+      hold(0);
+      return { before, after: pose() };
+    });
+    // The first press is part-way, not at rest, and the second starts where it was.
+    expect(Math.abs(path.before.angle) + Math.abs(1 - path.before.scale)).toBeGreaterThan(0.5);
+    expect(Math.abs(path.after.angle - path.before.angle)).toBeLessThan(5);
+    expect(Math.abs(path.after.scale - path.before.scale)).toBeLessThan(0.05);
+  });
+
   test("the page fades over 300 ms with a prompt start, and settles afterwards", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");

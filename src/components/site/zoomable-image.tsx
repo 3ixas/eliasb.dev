@@ -147,21 +147,25 @@ export function ZoomableImage({ src, alt, width, height, sizes, preload }: { src
   const open = async () => {
     if (opening.current || dialog.current?.open) return;
     opening.current = true;
+    // Escape cancels the open until `showModal()` has run: the listener outlives the decode wait and the transition's gap before it.
     let cancelled = false;
     const cancelPending = (event: KeyboardEvent) => {
       if (event.key === "Escape") cancelled = true;
     };
+    const stopListening = () => window.removeEventListener("keydown", cancelPending);
     window.addEventListener("keydown", cancelPending);
     try {
       // A click with no pointer or focus before it (assistive technology) still gets an image to wait for.
       flushSync(want);
       await Promise.race([large.current?.decode().catch(() => undefined), new Promise((resolve) => window.setTimeout(resolve, DECODE_WAIT_MS))]);
     } finally {
-      window.removeEventListener("keydown", cancelPending);
       opening.current = false;
     }
     const dialogEl = dialog.current;
-    if (cancelled || !dialogEl || dialogEl.open) return;
+    if (cancelled || !dialogEl || dialogEl.open) {
+      stopListening();
+      return;
+    }
 
     const inlineImg = inlineImage();
     const largeImg = large.current;
@@ -175,6 +179,7 @@ export function ZoomableImage({ src, alt, width, height, sizes, preload }: { src
 
     if (!canUseViewTransition() || !inlineImg || !largeImg) {
       showModal();
+      stopListening();
       return;
     }
 
@@ -186,7 +191,8 @@ export function ZoomableImage({ src, alt, width, height, sizes, preload }: { src
         inlineImg.style.viewTransitionName = "zoom-shot";
       },
       () => {
-        if (!dialogEl.isConnected) return;
+        stopListening();
+        if (!dialogEl.isConnected || cancelled) return;
         inlineImg.style.viewTransitionName = "";
         delete inlineImg.dataset.zooming;
         inlineImg.dataset.zoomHidden = "";
@@ -194,6 +200,7 @@ export function ZoomableImage({ src, alt, width, height, sizes, preload }: { src
         largeImg.style.viewTransitionName = "zoom-shot";
       },
       () => {
+        stopListening();
         inlineImg.style.viewTransitionName = "";
         delete inlineImg.dataset.zooming;
         largeImg.style.viewTransitionName = "";
@@ -383,7 +390,7 @@ export function ZoomableImage({ src, alt, width, height, sizes, preload }: { src
       <dialog
         ref={dialog}
         className="zoom__dialog"
-        aria-label={alt}
+        aria-label="Larger view"
         onCancel={(event) => {
           if (closing.current) return;
           event.preventDefault();

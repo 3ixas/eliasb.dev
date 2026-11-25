@@ -479,7 +479,8 @@ test.describe("Case study: Threshold's working link", () => {
     const copy = figure(page).locator(".copy-button");
     const quietWidth = (await copy.boundingBox())!.width;
     await copy.click();
-    await expect(figure(page).getByRole("button", { name: thresholdLinkCopy.copied })).toBeVisible();
+    // The name stays "Copy link"; only the status says "Copied".
+    await expect(copy).toHaveAccessibleName(thresholdLinkCopy.copy);
     await expect(copy.locator(".copy-button__word")).toContainText("✓");
     expect((await copy.boundingBox())!.width).toBe(quietWidth);
     await expect(figure(page).locator('[role="status"]')).toHaveText(thresholdLinkCopy.copied);

@@ -111,3 +111,48 @@ test.describe("Shell details: hover and height", () => {
     expect(declared).toBe("100svh");
   });
 });
+
+test.describe("Shell details: skip link and greeting", () => {
+  for (const route of ["/", "/work/bnp-paribas", "/things-i-make"]) {
+    test(`the skip link on ${route} is at least 44 px tall once focused`, async ({ page, browserName }) => {
+      test.skip(browserName === "webkit", "Safari's Tab skips links unless the visitor has turned that on");
+      await page.goto(route);
+      await page.keyboard.press("Tab");
+      const skip = page.locator("a.skip-link");
+      await expect(skip).toBeFocused();
+      expect((await skip.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    });
+  }
+
+  test("the greeting keeps its tab stop after the name, has a role, a 44 px hit area and says London's time in a status", async ({ page, browserName }) => {
+    test.skip((page.viewportSize()?.width ?? 0) < 400, "The greeting hides under 400 px");
+    await page.goto("/");
+    const greeting = page.locator(".greeting");
+    const wide = await page.evaluate(() => matchMedia("(hover: hover) and (min-width: 900px)").matches);
+    // Script sets the role for the visitor's screen; the server renders the button.
+    await expect(greeting).toHaveAttribute("role", wide ? "group" : "button");
+    await expect(greeting).toHaveRole(wide ? "group" : "button");
+    if (wide) await expect(greeting).toHaveAccessibleName("Greeting");
+    else await expect(greeting).toHaveAttribute("aria-expanded", "false");
+
+    // The skip link, the name, then the greeting; Safari's Tab passes over links, so there it comes sooner. Never later than the third stop.
+    const stops: string[] = [];
+    for (let tab = 0; tab < 3 && !(await greeting.evaluate((element) => element === document.activeElement)); tab++) {
+      await page.keyboard.press("Tab");
+      stops.push(await page.evaluate(() => document.activeElement?.className || document.activeElement?.tagName || ""));
+    }
+    await expect(greeting).toBeFocused();
+    if (browserName !== "webkit") expect(stops).toEqual(["skip-link", "site-header__name", "greeting"]);
+
+    // Taller than its words: a point 21 px above and below its centre still lands on it.
+    const box = (await greeting.boundingBox())!;
+    const centre = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    for (const dy of [-21, 21]) {
+      expect(await page.evaluate(({ x, y }) => !!document.elementFromPoint(x, y)?.closest(".greeting"), { x: centre.x, y: centre.y + dy }), `${dy} px from the centre`).toBe(true);
+    }
+
+    // Where it is a button, a key opens London's time; where it is not, focus has already said it.
+    if (!wide) await page.keyboard.press("Enter");
+    await expect(page.locator("[data-site-header]").getByRole("status")).toHaveText(/\d{2}:\d{2}/);
+  });
+});

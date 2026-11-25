@@ -76,13 +76,16 @@ for (const { route, trigger } of pages) {
       const inline = (await button.locator("img").boundingBox())!;
       await expect(button).toHaveAttribute("aria-haspopup", "dialog");
       await expect(button).toHaveCSS("cursor", "zoom-in");
-      const dialog = page.getByRole("dialog", { name: alt });
+      const dialog = page.getByRole("dialog", { name: "Larger view" });
       await expect(dialog).toBeHidden();
       const url = page.url();
       await button.click();
       await expect(dialog).toBeVisible();
       expect(page.url()).toBe(url);
       const image = dialog.locator("img");
+      // The dialog's name is short; the alt stays on the image alone, so a long alt is read once.
+      await expect(dialog).toHaveAccessibleName("Larger view");
+      await expect(image).toHaveAttribute("alt", alt);
       await expect.poll(() => image.evaluate((img) => (img as HTMLImageElement).complete && (img as HTMLImageElement).naturalWidth > 0)).toBe(true);
       // The image may still be settling (the browser picks its source and lays it out), so wait for the large size.
       await expect.poll(async () => (await image.boundingBox())!.width).toBeGreaterThan(inline.width);
@@ -458,4 +461,54 @@ test.describe("Closing the dialog returns focus without a ring for a pointer", (
     await page.keyboard.press("Enter");
     await expect(page.locator("dialog.zoom__dialog[open]")).toBeVisible();
   });
+});
+
+// Escape pressed after the image has decoded but before the view transition has run `showModal()` must still cancel the open
+// (F-01): the window's keydown listener stays until `showModal()` has run inside the transition's callback.
+test.describe("Esc between decode and the view transition cancels the pending open", () => {
+  test.use({ reducedMotion: "no-preference" });
+
+  const cases = [
+    { route: "/work/bnp-paribas", trigger: "#take-ownership-certificate .zoom", reachable: ".chapter-rail a" },
+    { route: "/", trigger: "#off-the-clock [data-otc='training'] .zoom", reachable: "[data-site-header] .site-nav a" },
+  ];
+
+  for (const { route, trigger, reachable } of cases) {
+    test(`${route}: the dialog never opens, focus stays on the trigger and the page stays clickable`, async ({ page }) => {
+      await page.goto(route);
+      const button = page.locator(trigger).first();
+      await button.scrollIntoViewIfNeeded();
+      await expect(button).toBeVisible();
+      await waitForHydration(button);
+
+      // Hold the transition's update callback, as a busy main thread would, so the gap after decode is long enough to press into.
+      await page.evaluate(() => {
+        const original = document.startViewTransition.bind(document);
+        const w = window as unknown as { releaseTransition: () => void; transitionHeld: boolean };
+        document.startViewTransition = function (callback) {
+          document.startViewTransition = original;
+          w.transitionHeld = true;
+          const gate = new Promise<void>((resolve) => (w.releaseTransition = resolve));
+          const update = typeof callback === "function" ? callback : callback?.update;
+          return original(async () => {
+            await gate;
+            await update?.();
+          });
+        };
+      });
+
+      await button.focus();
+      await page.keyboard.press("Enter");
+      await expect.poll(() => page.evaluate(() => (window as unknown as { transitionHeld?: boolean }).transitionHeld === true)).toBe(true);
+      await page.keyboard.press("Escape");
+      await page.evaluate(() => (window as unknown as { releaseTransition: () => void }).releaseTransition());
+
+      await page.waitForTimeout(500);
+      await expect(page.locator("dialog.zoom__dialog[open]")).toHaveCount(0);
+      await expect(button).toBeFocused();
+      const link = page.locator(reachable).filter({ visible: true }).first();
+      test.skip((await link.count()) === 0, "The chapter rail collapses under 960 px");
+      await link.click({ trial: true });
+    });
+  }
 });

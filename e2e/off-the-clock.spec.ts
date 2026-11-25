@@ -163,7 +163,7 @@ test.describe("Off the clock: tap-to-enlarge imagery", () => {
     await expect(button).toHaveAccessibleName(`${offTheClock.training.photo.alt} (view larger)`);
     await expect(training.locator(".otc__run-caption")).toHaveText(offTheClock.training.photoCaption);
 
-    const dialog = page.getByRole("dialog", { name: offTheClock.training.photo.alt }).first();
+    const dialog = page.getByRole("dialog", { name: "Larger view" }).first();
     await button.click();
     await expect(dialog).toBeVisible();
     await page.keyboard.press("Escape");
@@ -199,7 +199,7 @@ test.describe("Off the clock: tap-to-enlarge imagery", () => {
     });
     expect(clipped).toBeNull();
 
-    const firstDialog = page.getByRole("dialog", { name: "Douglas World Cruisers on a beach" });
+    const firstDialog = page.getByRole("dialog", { name: "Larger view" });
     await button.click();
     await expect(firstDialog).toBeVisible();
     await expect.poll(() => firstDialog.locator("img").evaluate((img) => (img as HTMLImageElement).complete && (img as HTMLImageElement).naturalWidth > 0)).toBe(true);
@@ -223,7 +223,7 @@ test.describe("Off the clock: tap-to-enlarge imagery", () => {
     const thirdButton = history.locator(".otc__history-image .zoom");
     await expect(thirdButton).toHaveAccessibleName("Henri Moissan in his laboratory (view larger)");
     await thirdButton.click();
-    const thirdDialog = page.getByRole("dialog", { name: "Henri Moissan in his laboratory" });
+    const thirdDialog = page.getByRole("dialog", { name: "Larger view" });
     await expect(thirdDialog).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(thirdDialog).toBeHidden();

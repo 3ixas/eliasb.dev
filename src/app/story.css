@@ -901,6 +901,10 @@
     border-color: CanvasText;
   }
 
+  .lane__flip {
+    border: 1px solid ButtonText;
+  }
+
   .lane__switch::after {
     forced-color-adjust: none;
     background: CanvasText;

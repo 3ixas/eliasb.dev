@@ -751,6 +751,12 @@
     outline-offset: -1px;
   }
 
+  /* The inset box-shadow edge is dropped here, so a pill or button keeps its edge as a real border. */
+  .pill,
+  .button {
+    border: 1px solid ButtonText;
+  }
+
   .pass-rail,
   .optical-bezel {
     border-color: CanvasText;

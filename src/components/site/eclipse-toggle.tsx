@@ -17,22 +17,29 @@ function subscribe(onChange: () => void) {
 }
 
 /** The icon turns over as it is pressed: it starts turned back and small, and springs upright. */
-const TURN_OVER = [{ transform: "rotate(-120deg) scale(0.6)" }, { transform: "none" }];
+const TURNED_BACK = "rotate(-120deg) scale(0.6)";
 const TURN_OVER_TIMING = { duration: 600, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" };
 
 /**
  * The Eclipse, the header's theme control (DESIGN.md "Controls"): a 36 px round
  * icon button, named "Dark theme" and pressed while the dark theme is in force. Which icon shows comes from the theme in CSS, so
  * it is right from the first paint; the pressed state follows once script runs.
- * Pressing it also turns the whole icon over (not with reduced motion).
+ * Pressing it also turns the whole icon over (not with reduced motion); pressed again part-way, the turn starts from
+ * where the icon has reached, so nothing snaps.
  */
 export function EclipseToggle() {
   const dark = useSyncExternalStore(subscribe, darkIsOn, () => null);
   const icon = useRef<SVGSVGElement>(null);
+  const turn = useRef<Animation | null>(null);
 
   function press() {
     flipLights();
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) icon.current?.animate(TURN_OVER, TURN_OVER_TIMING);
+    const svg = icon.current;
+    if (!svg || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const state = turn.current?.playState;
+    const from = state === "running" || state === "paused" ? getComputedStyle(svg).transform : TURNED_BACK;
+    turn.current?.cancel();
+    turn.current = svg.animate([{ transform: from }, { transform: "none" }], TURN_OVER_TIMING);
   }
 
   useEffect(() => watchSystemTheme(), []);

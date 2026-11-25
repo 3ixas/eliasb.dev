@@ -38,7 +38,7 @@ const longest = greetingLines.reduce((a, b) => (b.length > a.length ? b : a));
  * know the hour or the day: the server and the first browser render say "Hello" with its prompt, then the browser's
  * own clock picks the words and the scene (and, in the afternoon, whether it is a weekend). The time never leaves the browser. The words are as wide as the longest greeting
  * (shell.css sets it from data-longest), so the swap moves nothing, and it is not a live region, so a change
- * is not announced.
+ * is not announced; London's time is, in a status.
  *
  * The scene plays once on every load (data-playing), and again on hover or focus. With reduced motion it rests:
  * shell.css moves nothing. On a wide screen, hover or focus also adds London's time, read when the pointer
@@ -52,6 +52,7 @@ export function SiteGreeting() {
   const [playing, setPlaying] = useState(false);
   const [london, setLondon] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [focused, setFocused] = useState(false);
 
   useEffect(() => {
     const start = window.setTimeout(() => setPlaying(true), PLAY_AFTER);
@@ -72,37 +73,51 @@ export function SiteGreeting() {
     setOpen(!open);
   };
 
+  // London's time is said once it is shown: where the greeting is a button, when it opens; elsewhere, when it has focus.
+  const said = wide ? focused : open;
+
   return (
-    <p
-      className="greeting"
-      data-greeting={key}
-      data-playing={playing || undefined}
-      data-open={open || undefined}
-      tabIndex={0}
-      role={wide ? undefined : "button"}
-      aria-expanded={wide ? undefined : open}
-      onPointerEnter={wide ? readLondon : undefined}
-      onFocus={wide ? readLondon : undefined}
-      onClick={wide ? undefined : toggle}
-      onKeyDown={
-        wide
-          ? undefined
-          : (event) => {
-              if (event.key !== "Enter" && event.key !== " ") return;
-              event.preventDefault();
-              toggle();
-            }
-      }
-    >
-      <GreetingScene period={key} />
-      <span className="greeting__words" data-longest={longest}>
-        <span>{greetingLine(key, weekend)}</span>
-      </span>
-      <span className="greeting__more">
-        <span>
-          <span>{london && siteCopy.header.londonTime(london)}</span>
+    <>
+      <p
+        className="greeting"
+        data-greeting={key}
+        data-playing={playing || undefined}
+        data-open={open || undefined}
+        tabIndex={0}
+        role={wide ? "group" : "button"}
+        aria-label={wide ? siteCopy.header.greeting : undefined}
+        aria-expanded={wide ? undefined : open}
+        onPointerEnter={wide ? readLondon : undefined}
+        onFocus={() => {
+          setFocused(true);
+          if (wide) readLondon();
+        }}
+        onBlur={() => setFocused(false)}
+        onClick={wide ? undefined : toggle}
+        onKeyDown={
+          wide
+            ? undefined
+            : (event) => {
+                if (event.key !== "Enter" && event.key !== " ") return;
+                event.preventDefault();
+                toggle();
+              }
+        }
+      >
+        <GreetingScene period={key} />
+        <span className="greeting__words" data-longest={longest}>
+          <span>{greetingLine(key, weekend)}</span>
         </span>
+        <span className="greeting__more" aria-hidden="true">
+          <span>
+            <span>{london && siteCopy.header.londonTime(london)}</span>
+          </span>
+        </span>
+      </p>
+      {/* Outside the button, whose children are presentational to assistive technology. */}
+      <span className="sr-only" role="status">
+        {said && london ? siteCopy.header.londonTime(london) : ""}
       </span>
-    </p>
+    </>
   );
 }
