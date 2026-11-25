@@ -4,6 +4,8 @@ Diagnosis sweep for #534 against production (`https://www.eliasb.dev`, `main` at
 
 **To use this:** set each finding's **Pick** to `picked` or `declined`. Findings left `open` stay in the document as declined. After the picks, the picked findings are grouped by surface into the fix tickets of #533.
 
+**Answered 25 November 2026:** D1–D7 accept the recommendations. 42 findings are picked and F-03 is declined (its slot shows the latest public repository by design, and the latest commits are on this repo).
+
 43 findings after merging duplicates: **2 High, 11 Medium, 30 Low or preference**. Axe reports 0 violations on all 32 route, viewport and theme combinations. CLS is 0.000 on every route. Reduced motion is clean on all of them.
 
 ## Decisions for Elias
@@ -51,7 +53,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Consequence and reach:** a quick keyboard or mouse visitor dismisses the lightbox and it opens anyway, locking the page until a second Escape or Close. Affects all 7 zoomable images. **Priority: High**
 - **Correction:** keep `cancelPending` active until `showModal()` has run inside the transition callback, or abort the pending transition and skip `showModal()` when cancelled.
 - **Verification:** Playwright spec on `/work/bnp-paribas` and `/` that delays the image decode, presses Escape before the transition commits, and asserts `dialog[open]` count 0, focus on the trigger, and the chapter-rail link clickable.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-02. GitHub year month labels wrap onto a second row in the last ~10 days of a month
 - **Lens:** craft-review, dogfood · **Surface:** Off the clock
@@ -60,7 +62,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Consequence and reach:** about 30–40% of the year, every visitor sees a misaligned axis on the page's most data-dense figure. **Priority: High**
 - **Correction:** keep every label on one row. When the leading partial month has fewer than `span` columns before the next month, omit its label (as GitHub's own graph does).
 - **Verification:** unit test on `createContributionCalendar` with windows starting on the 26th–31st asserting every label has `row === 0`; check `/#off-the-clock` at 1440 and 390.
-- **Pick:** open
+- **Pick:** picked
 
 ### Medium
 
@@ -71,7 +73,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Consequence and reach:** every push to this repo makes the "now" slot point back at the site being read, displacing real work. **Priority: Medium**
 - **Correction:** add `"eliasb.dev"` to `EXCLUDED_REPOSITORIES`; update the GLOSSARY "Now making" entry to name both.
 - **Verification:** unit test on `latestRepository()`; live check that the next most recent public repo renders.
-- **Pick:** open
+- **Pick:** declined. The slot shows the latest public repository by design, and eliasb.dev is where the latest commits are.
 
 #### F-04. Joveen hero figure "Under 2" wraps onto two lines
 - **Lens:** craft-review, dogfood · **Surface:** Role stories
@@ -80,7 +82,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Consequence and reach:** every desktop visitor, above the fold, on one Role story. **Priority: Medium**
 - **Correction:** either `white-space: nowrap` with a slightly smaller `--type-figure` clamp in `.story-open__card .story-figures b`, or the compact figure `<2 min` (already noted as an option in #528 R14). A copy change needs your exact string.
 - **Verification:** `/work/joveen` at 1440 and 1024: all four `b` elements one line high and top-aligned.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-05. Optegra source links strand their ↗ at the right edge on phones
 - **Lens:** craft-review · **Surface:** Role stories
@@ -89,7 +91,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Consequence and reach:** every phone visitor on this story, two figures. **Priority: Medium**
 - **Correction:** `display: inline-block; padding-block: 10px` (as `.text-link` in `parts.css:254-257`), keeping the 44 px target.
 - **Verification:** `/work/optegra` at 390: both links at least 44 px tall, the arrow directly after "Wayback Machine".
-- **Pick:** open
+- **Pick:** picked
 
 #### F-06. Project screenshots sit at ragged heights across the archive and the homepage pair
 - **Lens:** craft-review · **Surface:** archive, homepage (`ProjectPanel`)
@@ -98,7 +100,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Consequence and reach:** all 6 archive panels and the homepage pair; a 56 px empty band above Argus. **Priority: Medium**
 - **Correction:** align rows with `subgrid` as `.panels--aligned` does (`work.css:212-229`) and give `.project__shot` one aspect ratio with `object-fit: contain`, so no screenshot is cropped.
 - **Verification:** `/things-i-make` and `/` at 1440: bezel tops and bottoms equal across a row. Visual baselines for both change, so this needs your pick.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-07. BNP hero meta line has two different dot spacings
 - **Lens:** craft-review, dogfood · **Surface:** Role stories
@@ -107,7 +109,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Consequence and reach:** the flagship story's first line under the heading. **Priority: Medium**
 - **Correction:** split `setting` on `" · "` into sibling `.story-open__part` spans.
 - **Verification:** `/work/bnp-paribas` shows four parts with equal gaps at both widths.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-08. Argus announcement calls P&L "a new price"
 - **Lens:** writing · **Surface:** case studies (Argus Risk)
@@ -116,7 +118,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Consequence and reach:** screen-reader users hear a wrong fact on each New event press. **Priority: Medium**
 - **Correction (exact):** before `TTE.PA: a new price, −$324` → after `TTE.PA: a new price of 62.10 EUR, unrealised P&L −$324`. Update the deck line.
 - **Verification:** press New event and read `.argus__foot .sr-only`; `pnpm verify:copy` covers the deck line.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-09. The history image's alt text is a filename
 - **Lens:** accessibility · **Surface:** Off the clock
@@ -125,7 +127,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Consequence and reach:** the one informative image in the band, every week the feed returns a pictured event. **Priority: Medium**
 - **Correction:** derive alt from the event's own text, for example `Picture for: ${event.text}`; keep the curated alts. No new claim.
 - **Verification:** unit test with `MS_Explorer_2005_1.jpg`; an `off-the-clock.spec` assertion that no history alt ends in a digit or extension.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-10. Pills and outline buttons lose their edge in forced colours
 - **Lens:** accessibility · **Surface:** shell and shared parts
@@ -134,7 +136,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Consequence and reach:** Windows high-contrast visitors on every route. **Priority: Medium**
 - **Correction:** `.pill, .button { border: 1px solid ButtonText }` inside the forced-colours block; same for `.sim__step` and `.lane__flip`. Normal rendering is unchanged, so baselines hold.
 - **Verification:** extend `forced-colors.spec.ts` to assert a non-zero border on the hero CTA, Copy and the simulation controls; confirm on a Windows device.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-11. Flowtime break numbers flicker to invisible while the slider moves
 - **Lens:** motion · **Surface:** case studies (Flowtime)
@@ -143,7 +145,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Consequence and reach:** both proof numbers pulse out during the figure's only continuous input; breaks DESIGN.md's "reverses from where it has reached". **Priority: Medium**
 - **Correction:** keep the node stable and retrigger only the wash on slider steps; Threshold's discrete choice keeps the fade.
 - **Verification:** repeat the arrow-key run sampling opacity per frame: none below ~0.9; a Threshold choice still arrives.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-12. The 3D lanyard downloads and runs at page open on the homepage and Role stories
 - **Lens:** performance · **Surface:** homepage, Role stories (`lanyard.ts`)
@@ -152,7 +154,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Consequence and reach:** the only TBT cost on the routes a hiring manager opens first; phones freeze 150–200 ms as the scene mounts. **Priority: Medium**
 - **Correction:** start the import on `requestIdleCallback` (about 2 s timeout) or first pointer or scroll, keeping the IntersectionObserver gate and the printed pass as the interim state. The hang appears 1–2 s later. One file.
 - **Verification:** re-run the `/` and BNP Lighthouse sets (TBT median under 100 ms); `e2e/lanyard.spec.ts` and `/fixtures/lanyard`.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-13. The 132 KB Newsreader heading font sits on the LCP path
 - **Lens:** performance · **Surface:** shell (homepage, Role stories)
@@ -161,7 +163,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Consequence and reach:** about 0.6–0.75 s of simulated LCP on the routes that most miss the target; smaller in real Chrome, with the metric-matched fallback shown meanwhile and no layout shift. **Priority: Medium**
 - **Correction:** (a) serve an instanced, subsetted woff2 (likely under 60 KB) through `next/font/local`, headings unchanged; or (b) drop the optical-size axis, which rewrites `DESIGN.md` Type (D2).
 - **Verification:** Lighthouse LCP median 2.0–2.3 s on `/`, at most 2.0 s on Role stories; heading baselines unchanged for (a).
-- **Pick:** open
+- **Pick:** picked
 
 ### Medium-low
 
@@ -172,7 +174,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Consequence and reach:** a quick double press on any page; the theme state stays correct. Breaks "reverses from where it has reached". **Priority: Medium-low**
 - **Correction:** keep the animation handle in a ref and restart from the current rotation and scale, or drive the turn with a retargeting CSS transition.
 - **Verification:** click, wait 300 ms, click: the next-frame transform stays within a few degrees of its pre-click value.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-15. The worst-case fixture misses most of the refinement-era components
 - **Lens:** ui-polish · **Surface:** platform and types
@@ -181,7 +183,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Consequence and reach:** content edits continue after the freeze, so this is where overflow can slip in unseen. **Priority: Medium-low**
 - **Correction:** add those components with long values and a `worst-case.spec.ts` overflow check at 320 and 390 px.
 - **Verification:** `BOARD_FIXTURES=1`, one worker, `e2e/worst-case.spec.ts` on `chromium-320-light`: no overflow, no clipped text.
-- **Pick:** open
+- **Pick:** picked
 
 ### Low and preference
 
@@ -192,7 +194,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Consequence and reach:** tuning `spring.ts` changes nothing on screen; `verify:springs` guards unused code. **Priority: Low-medium**
 - **Correction:** wire `passLean.easing`/`duration` into `.pass` through CSS custom properties (tune `spring(0.4, 0.7)` from its ~1.9 s settle toward today's 0.8 s), or update the header, `DESIGN.md` and `GLOSSARY.md` to say the pass uses `--spring`.
 - **Verification:** production CSS emits a `linear(` curve for `.pass` and `pnpm verify:springs` passes; or the docs match the code.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-17. The Off the clock film line breaks inside a date
 - **Lens:** dogfood · **Surface:** Off the clock
@@ -200,7 +202,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** observed defect · **Priority: Low**
 - **Correction:** non-breaking space inside the date (`9 Oct`).
 - **Verification:** `9 Oct` stays on one line at 1440 and 390.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-18. The Flowtime slider announces "a 18-minute break"
 - **Lens:** dogfood · **Surface:** case studies (Flowtime)
@@ -208,7 +210,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** observed defect · **Priority: Low**
 - **Correction (exact):** before `90 minutes of focus, a 18-minute break` → after `90 minutes of focus, an 18-minute break`; use "an" when `rest` is 8, 11 or 18.
 - **Verification:** unit test for 8, 11, 18, 9, 12.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-19. How I work card 3 splits its two route chips across lines on phones
 - **Lens:** craft-review · **Surface:** homepage
@@ -216,7 +218,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** observed defect · **Priority: Low**
 - **Correction:** wrap the two chips in a `.flag-route__chips` flex-wrap container so they wrap as a pair.
 - **Verification:** at 390 both chips share a `y`; at 1440 all three stay on one line.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-20. Optegra's three-card figure strip leaves an empty cell on phones
 - **Lens:** craft-review · **Surface:** Role stories
@@ -224,7 +226,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** preference · **Priority: Low**
 - **Correction:** `.story-figures li:last-child:nth-child(odd) { grid-column: 1 / -1 }` under 720 px.
 - **Verification:** Optegra's third card spans full width; BNP (2) and Joveen (4) unchanged.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-21. The skip link is 42 px tall
 - **Lens:** ui-polish · **Surface:** shell
@@ -232,7 +234,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** observed defect · **Priority: Low** (keyboard and switch users, while focused)
 - **Correction:** `min-height: 44px` on `.skip-link`.
 - **Verification:** Tab once on any route; focused height at least 44 px.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-22. The header greeting is a focusable paragraph with a 28 px target
 - **Lens:** ui-polish, accessibility · **Surface:** shell
@@ -240,7 +242,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** observed defect (WCAG 4.1.2), mild · **Priority: Low**
 - **Correction:** give the stop a role (`role="group"` with `aria-label`, or `button` consistently), pad a 44 px hit area as the theme control does, and put the tablet-width time in a `role=status` node. Dropping the stop is the alternative (D3).
 - **Verification:** `shell-details.spec` checks tab order and role at 1440 and 820; hit box at least 44 px.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-23. GitHub year day cells are 10 px targets
 - **Lens:** accessibility · **Surface:** Off the clock
@@ -248,7 +250,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** observed (WCAG 2.5.8; a deliberate GitHub-faithful drawing) · **Priority: Low**
 - **Correction:** exempt it in `DESIGN.md` Accessibility as an information-only grid (D4), or enlarge cells to a 24 px pitch.
 - **Verification:** the `DESIGN.md` rationale; or axe `target-size` and the `off-the-clock` spec.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-24. Three figure-source links open a new tab without saying so
 - **Lens:** accessibility · **Surface:** Role stories
@@ -256,7 +258,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** observed defect · **Priority: Low**
 - **Correction:** append `<span className="sr-only"> opens {hostLabel(href)} in a new tab</span>`, as `OutLink` does.
 - **Verification:** include `figure.source` links in the external-link assertion in `standing-checks` or `role-story.spec`.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-25. Small keyboard and announcement oddities
 - **Lens:** accessibility · **Surface:** Off the clock, shell, case studies
@@ -264,7 +266,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** observed (a, b), preference (c, d) · **Priority: Low**
 - **Correction:** (a) blur instead of clearing the roving stop; (b) stable name, let the status carry "Copied"; (c) short dialog name ("Larger view"), alt stays on the image; (d) no change proposed.
 - **Verification:** extend `off-the-clock.spec`, `say-hello.spec`, `figure-expand.spec`.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-26. The axe gate runs only at 1440 and no open states
 - **Lens:** accessibility · **Surface:** platform and types
@@ -272,7 +274,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** observed (coverage gap) · **Priority: Low** (feeds the close ticket's axe gate)
 - **Correction:** also run at `chromium-390-light` and `-dark`; name `wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa`; add one state-sweep test that opens the Menu, lightbox, Argus and switches before one axe run.
 - **Verification:** break a state on purpose (an unlabelled switch) and the gate fails.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-27. Live Wikipedia history facts keep straight apostrophes
 - **Lens:** writing · **Surface:** Off the clock
@@ -280,7 +282,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** observed defect · **Priority: Low**
 - **Correction (exact):** before `world's longest-running` → after `world’s longest-running`; normalise with `.replace(/(\w)'(\w)/g, "$1’$2")` after the whitespace collapse.
 - **Verification:** a fixture event containing `'` renders `’` and passes `verify:signals`.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-28. The copy deck and `verify:copy` skip the machine surfaces
 - **Lens:** writing · **Surface:** platform and types
@@ -288,7 +290,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** observed defect · **Priority: Low**
 - **Correction:** add a "Machine surfaces" table (`llms.txt` intro and link lines, `/index.md` Off the clock lines, host labels) and have `verify:copy` enforce it.
 - **Verification:** `pnpm verify:copy` fails when one of those strings drifts.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-29. Optegra's meta description is 216 characters
 - **Lens:** writing · **Surface:** Role stories
@@ -296,7 +298,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** preference · **Priority: Low**
 - **Correction (exact):** before `I was a marketing executive across two healthcare providers: private, at Kensington Medical, and NHS work through Optegra Eye Healthcare. The best part of the job was working with the engineers who built our website.` → after `I was a marketing executive at Kensington Medical and Optegra Eye Healthcare, and the best part was working with the engineers who built our website.` (149 characters).
 - **Verification:** curl `/work/optegra` and check the meta length and deck parity.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-30. Project screenshots take 700 ms to lift on hover
 - **Lens:** motion · **Surface:** homepage, archive
@@ -304,7 +306,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** preference · **Priority: Low**
 - **Correction:** 250–300 ms on `--out`.
 - **Verification:** the lift completes in about 250 ms and reverses smoothly.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-31. The JS budget does not count the 153 KB lanyard chunk
 - **Lens:** performance · **Surface:** platform and types
@@ -312,7 +314,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** code-only · **Priority: Low**
 - **Correction:** add a second figure for the chunk containing `WebGLRenderer` (about 153 KB baseline) and re-baseline once when #535 lands.
 - **Verification:** `pnpm check:built` fails on a +10% change to the scene chunk.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-32. Case-study and archive LCP images wait to load and render
 - **Lens:** performance · **Surface:** case studies, archive
@@ -320,7 +322,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** preference (the arrival hold is deliberate), observed for the archive contention · **Priority: Low**
 - **Correction:** leave the arrival hold; set `FIRST_SCREEN` to 1 on phones or `fetchPriority="low"` on the 2nd and 3rd.
 - **Verification:** archive LCP load delay under 500 ms; archive baselines unchanged.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-33. Unhashed static files revalidate on every visit
 - **Lens:** performance · **Surface:** platform and types
@@ -328,7 +330,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** observed defect · **Priority: Low** (31 KB of textures)
 - **Correction:** a `headers()` rule for `/lanyard/(.*)` with `public, max-age=86400, stale-while-revalidate=604800`. Not for `/work/*`, whose filenames are unhashed.
 - **Verification:** `curl -I` after deploy; `verify:release` still passes.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-34. `londonDayOfMonth` has no callers
 - **Lens:** typescript · **Surface:** platform and types
@@ -336,7 +338,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** observed defect · **Priority: Low**
 - **Correction:** delete it.
 - **Verification:** `pnpm check` stays green; the grep finds nothing.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-35. A client component imports the server mapper module, and the 365-day window is defined twice
 - **Lens:** typescript · **Surface:** platform and types
@@ -344,7 +346,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** code-only · **Priority: Low**
 - **Correction:** move the London time helpers to their own module and export one `ACTIVITY_DAYS`.
 - **Verification:** `pnpm check`; `grep -rn "365" src/integrations src/components/site` shows one definition.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-36. A misspelt project slug in `rowOutcomes` is silently ignored
 - **Lens:** typescript · **Surface:** homepage
@@ -352,7 +354,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** code-only · **Priority: Low**
 - **Correction:** `satisfies Partial<Record<ProjectSlug, string>>` in place of the cast.
 - **Verification:** `pnpm typecheck` passes; a bogus slug fails to compile.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-37. `Project.links` is all-optional, forcing `!` at three call sites
 - **Lens:** typescript · **Surface:** archive
@@ -360,7 +362,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** preference · **Priority: Low**
 - **Correction:** add the one-link rule to `catalogueProblems`; `flatMap` in `markdown.ts` removes its `!`.
 - **Verification:** `pnpm verify:catalogue` fails on a link-less entry.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-38. Neither `tsc` nor `lint` catches unused code
 - **Lens:** typescript · **Surface:** platform and types
@@ -368,7 +370,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** code-only · **Priority: Low**, optional
 - **Correction:** add `noUnusedLocals`, `noUnusedParameters` and `--max-warnings 0` after one clean CI run confirms no existing hits.
 - **Verification:** `pnpm lint` and `tsc --noEmit` pass in CI with the flags on.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-39. `eliasb-dev.vercel.app` serves the full indexable site
 - **Lens:** vercel · **Surface:** platform and types (dashboard)
@@ -376,7 +378,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** observed defect · **Priority: Low**
 - **Correction:** Vercel dashboard, Settings, Domains: redirect 308 to `www.eliasb.dev` (D6). No code, no cost.
 - **Verification:** `curl -sI https://eliasb-dev.vercel.app/` shows 308 and `location: https://www.eliasb.dev/`.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-40. Node is 24.x on Vercel and 22 in CI
 - **Lens:** vercel · **Surface:** platform and types
@@ -384,7 +386,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** observed (config drift) · **Priority: Low**
 - **Correction:** `"engines": {"node": "24.x"}` and CI on 24 (D5).
 - **Verification:** the build log and CI log name the same Node; `pnpm check` and `check:built` stay green.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-41. `/favicon.ico` returns a full 404 page
 - **Lens:** vercel · **Surface:** platform and types
@@ -392,7 +394,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** observed defect · **Priority: Low**
 - **Correction:** one permanent redirect in `next.config.ts` `redirects()` from `/favicon.ico` to `/icon1.png`.
 - **Verification:** `curl -I` returns 308 or an `image/*` 200.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-42. Open Graph image URLs have no cache-busting hash on `/things-i-make` and `/resume`
 - **Lens:** vercel · **Surface:** platform and types
@@ -400,7 +402,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** code-only · **Priority: Low** (a stale card in unfurlers if the shared card changes; the Résumé sheet itself stays untouched)
 - **Correction:** let both routes inherit the root `openGraph.images` so Next appends its hash.
 - **Verification:** `curl -s https://www.eliasb.dev/resume | grep -o 'og:image" content="[^"]*'` shows `?<hash>`.
-- **Pick:** open
+- **Pick:** picked
 
 #### F-43. Cross-origin and HSTS header extras are absent
 - **Lens:** vercel · **Surface:** platform and types
@@ -408,7 +410,7 @@ Ranked by priority, then by reach. Each fix names the surface that owns it.
 - **Evidence class:** preference · **Priority: Low** (a scanner score; no exposure on a static site with no cookies or forms)
 - **Correction:** optionally add `Cross-Origin-Opener-Policy: same-origin` to `securityHeaders` in `next.config.ts`; leave HSTS and the CSP alone.
 - **Verification:** the header appears on `/`, `/_next/static/…` and `/resume`; `verify:release` passes.
-- **Pick:** open
+- **Pick:** picked
 
 ## What held up
 
