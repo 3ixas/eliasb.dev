@@ -61,7 +61,7 @@ One read-only diagnosis sweep runs every relevant lens against production and pr
 - Diagnosis runs against production at `53bfac0` or later. There's no local `next build`. Any local Playwright run uses one worker on relevant specs only (`docs/runbooks/local-testing.md`).
 - Coverage, all at equal depth:
   - the homepage;
-  - all four Role stories;
+  - all three Role stories;
   - every case study;
   - the `/things-i-make` archive;
   - 390 and 1440 px, light and dark.

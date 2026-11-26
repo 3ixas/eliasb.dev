@@ -35,7 +35,7 @@ The bar is that a careful reader finds nothing to flag. This is the third full-s
 
 ## Coverage
 
-Every public surface gets the same depth: the homepage, all four Role stories, every case study and the `/things-i-make` archive, each at 390 and 1440 px in both themes. `/lab`, `/library` and `/about` are redirects and only need checking as redirects.
+Every public surface gets the same depth: the homepage, all three Role stories, every case study and the `/things-i-make` archive, each at 390 and 1440 px in both themes. `/lab`, `/library` and `/about` are redirects and only need checking as redirects.
 
 ## Rules (carried over from the Lens pass)
 
