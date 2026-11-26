@@ -22,43 +22,44 @@ async function waitForHydration(locator: Locator) {
 /**
  * Intercepts the next `document.startViewTransition` call, pauses `::view-transition-group(zoom-shot)` once ready,
  * seeks to 0%, 25% and 100%, and skips the transition so the spec proves the morph without waiting out its length.
+ * The interception is in place before `action` runs: a key press sent alongside the evaluate can reach the page first.
  */
 async function sampleZoomTransition(page: Page, action: () => Promise<void>): Promise<TransitionSample> {
-  const sample = page.evaluate(
-    () =>
-      new Promise<TransitionSample>((resolve, reject) => {
-        const original = document.startViewTransition.bind(document);
-        document.startViewTransition = function (updateCallback) {
-          document.startViewTransition = original;
-          const vt = original(updateCallback);
-          vt.ready
-            .then(() => {
-              const group = document.getAnimations().find((animation) => (animation.effect as KeyframeEffect | null)?.pseudoElement === "::view-transition-group(zoom-shot)");
-              if (!group) {
-                vt.skipTransition();
-                reject(new Error("No ::view-transition-group(zoom-shot) animation found"));
-                return;
-              }
-              const duration = Number(group.effect!.getComputedTiming().duration);
-              const readAt = (time: number): GroupFrame => {
-                group.pause();
-                group.currentTime = time;
-                const style = getComputedStyle(document.documentElement, "::view-transition-group(zoom-shot)");
-                const matrix = new DOMMatrix(style.transform);
-                return { x: matrix.m41, y: matrix.m42, w: parseFloat(style.width), h: parseFloat(style.height) };
-              };
-              const result = { duration, start: readAt(0), mid: readAt(duration * 0.25), end: readAt(duration) };
-              group.finish();
+  // The promise is wrapped in an object so this call returns once the interception is installed, not once it resolves.
+  const interception = await page.evaluateHandle(() => ({
+    sample: new Promise<TransitionSample>((resolve, reject) => {
+      const original = document.startViewTransition.bind(document);
+      document.startViewTransition = function (updateCallback) {
+        document.startViewTransition = original;
+        const vt = original(updateCallback);
+        vt.ready
+          .then(() => {
+            const group = document.getAnimations().find((animation) => (animation.effect as KeyframeEffect | null)?.pseudoElement === "::view-transition-group(zoom-shot)");
+            if (!group) {
               vt.skipTransition();
-              resolve(result);
-            })
-            .catch(reject);
-          return vt;
-        };
-      }),
-  );
+              reject(new Error("No ::view-transition-group(zoom-shot) animation found"));
+              return;
+            }
+            const duration = Number(group.effect!.getComputedTiming().duration);
+            const readAt = (time: number): GroupFrame => {
+              group.pause();
+              group.currentTime = time;
+              const style = getComputedStyle(document.documentElement, "::view-transition-group(zoom-shot)");
+              const matrix = new DOMMatrix(style.transform);
+              return { x: matrix.m41, y: matrix.m42, w: parseFloat(style.width), h: parseFloat(style.height) };
+            };
+            const result = { duration, start: readAt(0), mid: readAt(duration * 0.25), end: readAt(duration) };
+            group.finish();
+            vt.skipTransition();
+            resolve(result);
+          })
+          .catch(reject);
+        return vt;
+      };
+    }),
+  }));
   await action();
-  return sample;
+  return interception.evaluate(({ sample }) => sample);
 }
 
 for (const { route, trigger } of pages) {
