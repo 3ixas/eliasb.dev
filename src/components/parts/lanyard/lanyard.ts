@@ -2,12 +2,20 @@
 
 import { useEffect, type RefObject } from "react";
 
+/** Seamless material textures fetched in parallel with the scene chunk (#486). */
+const WEBBING_URL = "/lanyard/webbing.webp";
+const FOIL_URL = "/lanyard/foil.webp";
+/** How long the scene waits for a material texture before falling back to the printed pass (ms). */
+const TEXTURE_WAIT = 4000;
+/** How long the scene may take to arrive before the print shows meanwhile (ms). */
+const SLOW_MS = 5000;
+
 /**
  * Hangs a stage's staff passes in 3D (#448). The CSS passes inside are the server render, the accessible names and the
- * fallback: with no script, no WebGL or reduced motion they are all there is. When the stage comes near the view, the
- * scene (three.js) loads, paints each card from its pass's own print and takes its place at its exact size; the passes
- * stay in the page, unseen, for assistive technology and the keyboard. The scene is three.js and its parse is a long task, so
- * it does not start while the page is opening: it waits for the first input or an idle moment (`released`).
+ * fallback: with no script, no WebGL or reduced motion they are all there is. Once the page has painted its first frame
+ * and the stage is near the view, the scene (three.js) and its textures load in parallel, painting each card from its
+ * pass's own print and taking its place at its exact size; the passes stay in the page, unseen, for assistive technology
+ * and the keyboard.
  */
 export function useLanyard(stage: RefObject<HTMLElement | null>) {
   useEffect(() => {
@@ -16,6 +24,7 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
     if (!element || !passes.length) return;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)");
     let dispose: (() => void) | undefined;
+    let cancelPaint: (() => void) | undefined;
     let loading = false;
     let cancelled = false;
     // Loading takes a moment; if the page is left or reduced motion turns on meanwhile, the scene is not shown.
@@ -32,6 +41,8 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
       element.dataset.lanyardError = reason;
     };
     const clear = () => {
+      cancelPaint?.();
+      cancelPaint = undefined;
       dispose?.();
       dispose = undefined;
       delete element.dataset.lanyardFrame;
@@ -49,6 +60,7 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
       near.observe(element);
     };
     const start = () => {
+      cancelPaint = undefined;
       if (!wanted() || dispose || loading) return;
       // A stage hidden by CSS stays unmounted until it has non-zero layout dimensions.
       if (!element.offsetWidth || !element.offsetHeight) return;
@@ -58,19 +70,27 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
       loading = true;
       // A scene that takes this long to arrive shows the print meanwhile; it still takes over when it draws.
       slow = window.setTimeout(() => element.dataset.lanyard === "loading" && (element.dataset.lanyard = "slow"), SLOW_MS);
-      import("./scene")
-        .then(({ mountLanyard }) =>
-          mountLanyard({
+      const needsFoil = passes.some((pass) => Boolean(pass.querySelector(".pass__holo")));
+      Promise.all([
+        import("./scene"),
+        loadImage(WEBBING_URL, TEXTURE_WAIT),
+        needsFoil ? loadImage(FOIL_URL, TEXTURE_WAIT) : Promise.resolve(null),
+      ])
+        .then(([{ mountLanyard }, webbing, foil]) => {
+          if (!wanted()) return undefined;
+          return mountLanyard({
             stage: element,
             passes,
+            textures: { webbing, foil },
+            isWanted: wanted,
             onReady: () => wanted() && (element.dataset.lanyard = "3d"),
             onHide: rearm,
             onContextLost: () => {
               clear();
               if (wanted()) fail("WebGL context lost");
             },
-          }),
-        )
+          });
+        })
         .then((stop) => {
           loading = false;
           clearTimeout(slow);
@@ -84,7 +104,21 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
           if (wanted()) fail(error instanceof Error ? error.message : String(error));
         });
     };
-    const near = new IntersectionObserver(([entry]) => entry.isIntersecting && released().then(start), { rootMargin: "200px" });
+    const scheduleStart = () => {
+      if (cancelPaint || !wanted() || dispose || loading) return;
+      // Let the first frame paint cleanly before starting three.js chunk + texture fetches.
+      cancelPaint = afterPaint(start);
+    };
+    const near = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) scheduleStart();
+        else {
+          cancelPaint?.();
+          cancelPaint = undefined;
+        }
+      },
+      { rootMargin: "200px" },
+    );
     if (wanted()) wait();
     near.observe(element);
     // Reduced motion turned on later puts the printed passes back; turned off again, the passes hang once more when the
@@ -113,29 +147,31 @@ export function useLanyard(stage: RefObject<HTMLElement | null>) {
   }, [stage]);
 }
 
-/** How long the page is open before the scene may load without any input (ms). */
-const SETTLE_MS = 3500;
-/** Then the longest it waits for an idle moment (ms). */
-const IDLE_MS = 1000;
-/** What counts as the visitor arriving: the first of these starts the scene at once. */
-const ARRIVAL = ["pointerdown", "pointermove", "scroll", "keydown", "touchstart"] as const;
+/** Runs `callback` after the next browser paint (two animation frames), returning a cancel function. */
+function afterPaint(callback: () => void): () => void {
+  let frame = requestAnimationFrame(() => {
+    frame = requestAnimationFrame(callback);
+  });
+  return () => cancelAnimationFrame(frame);
+}
 
-let release: Promise<void> | undefined;
-/** Resolves once, for every stage on the page, at the first input or, failing that, an idle moment once the page has settled. */
-function released(): Promise<void> {
-  return (release ??= new Promise((resolve) => {
-    let settle = 0;
-    let idle = 0;
-    const go = () => {
-      ARRIVAL.forEach((name) => window.removeEventListener(name, go));
-      clearTimeout(settle);
-      if ("cancelIdleCallback" in window) cancelIdleCallback(idle);
-      resolve();
-    };
-    ARRIVAL.forEach((name) => window.addEventListener(name, go, { passive: true }));
-    // Safari has no requestIdleCallback: once settled, the scene simply starts.
-    settle = window.setTimeout(() => ("requestIdleCallback" in window ? (idle = requestIdleCallback(go, { timeout: IDLE_MS })) : go()), SETTLE_MS);
-  }));
+/** Loads an image texture with a hard timeout so a broken or hung asset falls back cleanly to the printed pass. */
+async function loadImage(url: string, timeoutMs: number): Promise<HTMLImageElement> {
+  const image = new Image();
+  image.decoding = "async";
+  image.src = url;
+  let timer = 0;
+  try {
+    await Promise.race([
+      image.decode().catch(() => Promise.reject(new Error(`Could not load ${url}`))),
+      new Promise<never>((_, reject) => {
+        timer = window.setTimeout(() => reject(new Error(`Timed out loading ${url}`)), timeoutMs);
+      }),
+    ]);
+    return image;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 /** Renderers that draw on the processor, not a graphics chip: the scene would take the page's time from everything else. */
@@ -144,9 +180,6 @@ const SOFTWARE = /swiftshader|llvmpipe|softpipe|software|basic render/i;
 const UNNAMED = /^(webkit )?webgl$|^webkit$|^mozilla$/i;
 
 /** Why this browser should keep the printed passes, or nothing if it can draw the scene on a graphics chip. */
-/** How long the scene may take to arrive before the print shows meanwhile (ms). */
-const SLOW_MS = 5000;
-
 function cannotDraw() {
   try {
     const context = document.createElement("canvas").getContext("webgl2", { failIfMajorPerformanceCaveat: true });

@@ -71,7 +71,7 @@ The live site, at the top of this page. The opening hangs the single current BNP
 - [Next.js](https://nextjs.org) 16 (App Router) and React 19, written in TypeScript
 - Tailwind CSS 4 for the reset, with the design in plain CSS custom properties (`src/app/tokens.css`, `parts.css`, and route-split stylesheets)
 - Self-hosted Newsreader (subsetted variable Latin WOFF2) and Instrument Sans through `next/font`, used across the whole site including the Résumé sheet and PDF
-- [Three.js](https://threejs.org) for the interactive 3D Staff pass, loaded lazily after first interaction or idle so first paint stays fast, with a CSS printed pass fallback
+- [Three.js](https://threejs.org) for the interactive 3D Staff pass, loaded lazily after first paint with parallel texture fetches so the page opens fast, with a CSS printed pass fallback
 - CSS custom-property curves (`--out`, `--spring`) for UI motion; [`motion`](https://motion.dev) is a dev-only dependency used by `verify:springs`
 - [`@vercel/speed-insights`](https://vercel.com/docs/speed-insights) on the free tier for real-visitor performance data (no cookies)
 - A small inline script sets light or dark before paint, so nothing flashes or waits on hydration
