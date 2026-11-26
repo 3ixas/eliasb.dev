@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { withoutScene } from "./support/scene";
 
 // A screenshot on a long-form page opens large in the same window: a case study's opening one (its section screenshots are now
 // the stills behind working figures, #462 and #463), and a Role story's (and its certificate).
@@ -476,6 +477,9 @@ test.describe("Esc between decode and the view transition cancels the pending op
 
   for (const { route, trigger, reachable } of cases) {
     test(`${route}: the dialog never opens, focus stays on the trigger and the page stays clickable`, async ({ page }) => {
+      // Both routes hang a 3D staff pass (lanyard.spec). CI's WebKit builds it on the processor before it can tell it is slow
+      // and keep the print, which freezes the page through the polls below (#562). The pass plays no part here.
+      await withoutScene(page);
       await page.goto(route);
       const button = page.locator(trigger).first();
       await button.scrollIntoViewIfNeeded();
