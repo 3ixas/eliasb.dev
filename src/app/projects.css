@@ -58,13 +58,15 @@
 
 /*
  * Panels set beside each other (the homepage's pair and the archive's grid). Every screenshot gets a bezel of one shape and
- * sits whole inside it at its own ratio, so its corners and shadow stay on the picture.
+ * sits whole inside it at its own ratio, so its corners and shadow stay on the picture. The zero minimum height keeps the
+ * screenshot from stretching its bezel: a resized file's own ratio can be a fraction taller than the one declared (#559).
  */
 .panels--level .project__shot {
   container-type: size;
   display: grid;
   place-items: center;
   aspect-ratio: 8 / 5;
+  min-height: 0;
 }
 
 .panels--level .project__shot > img {
