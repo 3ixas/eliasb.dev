@@ -1,0 +1,80 @@
+"use client";
+
+import type { CSSProperties } from "react";
+import { DrawnTicks } from "@/components/parts/drawn-ticks";
+import type { HeadedProof } from "@/content/stretch/work";
+
+/**
+ * Each part's proof drawn in the language of How I work's proof feet (#459): hidden from assistive technology because
+ * its "So far" line already states it, and drawn in its source's thread colour where that holds 3:1, else cobalt.
+ * A client component so the page payload carries the proof, not a node for every part of these drawings (#572).
+ */
+export function HeadedDrawn({ proof, colour }: { proof: HeadedProof; colour: string }) {
+  return (
+    <div className="headed__proof" style={{ "--drawn": colour } as CSSProperties} aria-hidden="true" data-proof={proof.kind}>
+      {proof.kind === "split" ? (
+        <svg className="headed__split" viewBox="0 0 82 20" width="82" height="20" focusable="false">
+          {/* Control variant: dashed outline and muted layout lines, left behind. */}
+          <g className="headed__split-off" data-variant="other">
+            <rect x="1" y="2" width="24" height="16" rx="3" fill="none" strokeWidth="1.25" strokeDasharray="2.5 2" />
+            <rect className="headed__split-bar" x="5" y="6.5" width="11" height="2" rx="1" />
+            <rect className="headed__split-bar" x="5" y="11.5" width="15" height="2" rx="1" />
+          </g>
+          {/* Split divider between the two variants. */}
+          <line className="headed__split-rule" x1="31" y1="4" x2="31" y2="16" strokeWidth="1" />
+          {/* Chosen variant: solid outline, soft tint, stronger bars, and an arrow showing it went on. */}
+          <g className="headed__split-on" data-variant="chosen">
+            <rect className="headed__split-box" x="37" y="2" width="24" height="16" rx="3" strokeWidth="1.5" />
+            <rect className="headed__split-bar" x="41" y="6.5" width="16" height="2.25" rx="1.125" />
+            <rect className="headed__split-bar" x="41" y="11.5" width="10" height="2.25" rx="1.125" />
+            <path className="headed__split-arrow" d="M66 10h12m-4-4 4 4-4 4" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </g>
+        </svg>
+      ) : proof.kind === "months-to-prod" ? (
+        (() => {
+          const segW = 10;
+          const segGap = 4;
+          const segStart = 16;
+          const segSpan = proof.months * segW + (proof.months - 1) * segGap;
+          const arrowStart = segStart + segSpan + 5;
+          const boxX = arrowStart + 17;
+          const totalW = boxX + 26;
+          return (
+            <svg className="headed__months" viewBox={`0 0 ${totalW} 20`} width={totalW} height="20" focusable="false">
+              {/* Zero start: hollow dashed ring, starting from nothing. */}
+              <circle className="headed__zero" data-stage="zero" cx="6" cy="10" r="4.5" fill="none" strokeWidth="1.25" strokeDasharray="2 1.8" />
+              {/* Six counted month segments spanning the climb. */}
+              {Array.from({ length: proof.months }, (_, index) => (
+                <rect key={index} className="headed__month" data-month={index + 1} x={segStart + index * (segW + segGap)} y="8.75" width={segW} height="2.5" rx="1.25" />
+              ))}
+              {/* Arrow into production code. */}
+              <path className="headed__months-arrow" d={`M${arrowStart} 10h12m-4-4 4 4-4 4`} fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              {/* Production code: solid tinted frame with code chevrons, matching the split test's chosen card. */}
+              <g className="headed__prod" data-stage="prod">
+                <rect className="headed__prod-box" x={boxX} y="2" width="24" height="16" rx="3" strokeWidth="1.5" />
+                <path
+                  className="headed__prod-code"
+                  d={`M${boxX + 8.25} 7.25L${boxX + 5.25} 10l3 2.75M${boxX + 13.1} 6.75l-2.2 6.5M${boxX + 15.75} 7.25l3 2.75-3 2.75`}
+                  fill="none"
+                  strokeWidth="1.35"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </g>
+            </svg>
+          );
+        })()
+      ) : (
+        <>
+          <DrawnTicks count={proof.value} />
+          <span className="headed__live-trail">
+            <svg className="headed__live-arrow" viewBox="0 0 14 10" width="14" height="10" focusable="false">
+              <path d="M1 5h11m-3.5-3.5L12 5 8.5 8.5" fill="none" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <i className="headed__live" />
+          </span>
+        </>
+      )}
+    </div>
+  );
+}

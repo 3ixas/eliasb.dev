@@ -7,6 +7,9 @@ import { projects } from "@/content/projects";
 import { caseStudyFor, caseStudySlugs } from "@/content/stretch/case-studies";
 import { caseStudyOpening } from "@/content/stretch/case-study";
 
+// Any other slug is an unmatched address, so it gets the 404 (global-not-found.tsx).
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return caseStudySlugs.map((slug) => ({ slug }));
 }
