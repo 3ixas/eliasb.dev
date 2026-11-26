@@ -112,6 +112,18 @@ test.describe("Work archive: the catalogue", () => {
     await expectLevelBezels(panels(page), width(page) >= 1260 ? 3 : width(page) >= 720 ? 2 : 1);
   });
 
+  test("a screenshot taller than its declared size does not stretch its bezel (#559)", async ({ page }) => {
+    const tall = '<svg xmlns="http://www.w3.org/2000/svg" width="750" height="900"/>';
+    await page.route(/_next\/image.*ask-professor-past/, (route) => route.fulfill({ contentType: "image/svg+xml", body: tall }));
+    await page.reload();
+    const panel = panels(page).filter({ has: page.getByRole("heading", { name: "Ask Professor Past", exact: true }) });
+    const image = panel.locator(".project__shot > img");
+    await image.scrollIntoViewIfNeeded();
+    // A `w` srcset scales the natural size, so wait on the shape.
+    await expect.poll(() => image.evaluate((el) => (el as HTMLImageElement).naturalHeight > (el as HTMLImageElement).naturalWidth)).toBe(true);
+    await expect.poll(() => panel.locator(".project__shot").evaluate((el) => Math.abs(el.getBoundingClientRect().height - el.getBoundingClientRect().width / 1.6))).toBeLessThan(0.05);
+  });
+
   test("featured and archive screenshots sit whole and uncropped inside concentric optical bezels", async ({ page }) => {
     const phone = width(page) < 720;
     const all = await panels(page).all();
