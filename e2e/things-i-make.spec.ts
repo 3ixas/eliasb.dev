@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { featuredProjects, featuredSlugs, HOMEPAGE_INDEX_ROWS, projectIndex, projects } from "../src/content/projects";
 import { thingsIMake } from "../src/content/stretch/site-copy";
-import { thresholdCities, thresholdCityChoice, thresholdDisplayLink, thresholdLinkCopy } from "../src/content/stretch/threshold-link";
+import { thresholdCities, thresholdCityChoice, thresholdDisplayLink, thresholdLink, thresholdLinkCopy } from "../src/content/stretch/threshold-link";
 import { expectLevelBezels, expectOpticalBezel, readOpticalBezel } from "./support/bezel";
 import { renderedContrast } from "./support/rendered-contrast";
 
@@ -87,24 +87,44 @@ test.describe("Things I make", () => {
     }
   });
 
-  test("Threshold's inline city switcher uses the canonical serializer, updates politely, has 44 px targets and works by keyboard", async ({ page }) => {
+  test("Threshold's inline city switcher uses the canonical serializer, links each scenario externally, updates politely once, has 44 px targets and works by keyboard", async ({ page }) => {
     for (const { id } of thresholdCities) {
       expect(thresholdDisplayLink(thresholdCityChoice(id))).toBe(expectedCityUrls[id]);
     }
     const wide = panels(page).first();
     const group = wide.getByRole("group", { name: thresholdLinkCopy.city });
     const output = wide.locator("output.project-city__url");
+    const previewLink = output.locator("a.project-city__link");
+    const previewAddress = previewLink.locator(".project-city__address");
+    const expectScenario = async (city: keyof typeof expectedCityUrls) => {
+      const display = expectedCityUrls[city];
+      await expect(previewAddress).toHaveText(display);
+      await expect(previewLink).toHaveAttribute("href", thresholdLink(thresholdCityChoice(city)));
+      await expect(previewLink).toHaveAttribute("target", "_blank");
+      await expect(previewLink).toHaveAttribute("rel", "noopener noreferrer");
+      await expect(previewLink.locator(".arrow--out")).toHaveText("\u2197\uFE0E");
+      await expect(previewLink).toHaveAccessibleName(`${display} opens Threshold in a new tab`);
+    };
 
+    // Threshold carries controls, so the panel is an <article> and the preview link is never nested inside another link.
+    await expect.poll(() => wide.evaluate((el) => el.tagName)).toBe("ARTICLE");
+    await expect.poll(() => previewLink.evaluate((el) => el.parentElement?.closest("a") === null)).toBe(true);
+
+    // One polite live region only, so a city change is announced once.
+    await expect(wide.locator(".project-city :is(output, [aria-live], [role='status'])")).toHaveCount(1);
     await expect(group.getByRole("button")).toHaveText(thresholdCities.map((c) => c.name));
     await expect(output).toHaveAttribute("aria-live", "polite");
     await expect(output).toHaveAttribute("aria-atomic", "true");
-    await expect(output).toHaveText(expectedCityUrls.london);
+    await expectScenario("london");
     await expect(group.getByRole("button", { name: "London" })).toHaveAttribute("aria-pressed", "true");
 
-    for (const button of await group.getByRole("button").all()) {
-      const box = await boxOf(button);
-      expect(box.height).toBeGreaterThanOrEqual(44);
-      expect(box.width).toBeGreaterThanOrEqual(44);
+    for (const target of [...(await group.getByRole("button").all()), previewLink]) {
+      await expect
+        .poll(async () => {
+          const box = await target.boundingBox();
+          return box ? box.height >= 44 && box.width >= 44 : false;
+        })
+        .toBe(true);
     }
 
     await expect
@@ -115,7 +135,7 @@ test.describe("Things I make", () => {
     await group.getByRole("button", { name: "Basel" }).click();
     await expect(group.getByRole("button", { name: "Basel" })).toHaveAttribute("aria-pressed", "true");
     await expect(group.getByRole("button", { name: "London" })).toHaveAttribute("aria-pressed", "false");
-    await expect(output).toHaveText(expectedCityUrls.basel);
+    await expectScenario("basel");
     await expect(output).not.toContainText("?city=");
 
     // Keyboard activation on Zurich.
@@ -123,14 +143,14 @@ test.describe("Things I make", () => {
     await zurich.focus();
     await page.keyboard.press("Enter");
     await expect(zurich).toHaveAttribute("aria-pressed", "true");
-    await expect(output).toHaveText(expectedCityUrls.zurich);
+    await expectScenario("zurich");
 
     // Space returns to London (Hackney default).
     const london = group.getByRole("button", { name: "London" });
     await london.focus();
     await page.keyboard.press("Space");
     await expect(london).toHaveAttribute("aria-pressed", "true");
-    await expect(output).toHaveText(expectedCityUrls.london);
+    await expectScenario("london");
   });
 
   test("the others are bordered paper strips newest first with visible 60 × 40 px thumbnails, marked ↗ when leaving the site", async ({ page }) => {
@@ -204,7 +224,12 @@ test.describe("Things I make", () => {
     await page.reload();
     await expect(panels(page)).toHaveCount(featured.length);
     await expect(rows(page)).toHaveCount(others.length);
-    await expect(panels(page).first().locator("output.project-city__url")).toHaveText(expectedCityUrls.london);
+    const previewLink = panels(page).first().locator("output.project-city__url a.project-city__link");
+    await expect(previewLink.locator(".project-city__address")).toHaveText(expectedCityUrls.london);
+    await expect(previewLink).toHaveAttribute("href", thresholdLink(thresholdCityChoice("london")));
+    await expect(previewLink).toHaveAttribute("target", "_blank");
+    await expect(previewLink).toHaveAttribute("rel", "noopener noreferrer");
+    await expect(previewLink).toHaveAccessibleName(`${expectedCityUrls.london} opens Threshold in a new tab`);
     await expect(panels(page).first().getByRole("button", { name: "London" })).toHaveAttribute("aria-pressed", "true");
   });
 
