@@ -9,7 +9,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint --max-warnings 0",
     "verify:signals": "node --no-warnings --experimental-strip-types scripts/verify-signal-contracts.mjs && node --no-warnings --experimental-strip-types scripts/verify-history-cache.mjs",
     "verify:catalogue": "node --no-warnings --experimental-strip-types scripts/verify-catalogue.mjs",
     "verify:copy": "node --no-warnings --experimental-strip-types scripts/verify-copy.mjs",

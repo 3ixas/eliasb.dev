@@ -197,7 +197,7 @@ Every text pair passes WCAG 2.2 AA, measured on the rendered page and on every p
 
 ## Motion
 
-- **Easings**: `--out: cubic-bezier(.22, 1, .36, 1)` for things that settle, `--spring: cubic-bezier(.3, 1.5, .4, 1)` for things that swing.
+- **Easings**: `--out: cubic-bezier(.22, 1, .36, 1)` for things that settle, `--spring: cubic-bezier(.3, 1.5, .4, 1)` for things that swing. A Staff pass's hover lean plays `--spring` over 0.8 s; its arrival swing has its own curve, `cubic-bezier(.3, 1.35, .4, 1)` (`pass.css`). The spring module (`components/site/spring.ts`, `linear()` curves) plays on no surface today: `verify:springs` holds it to Motion's `spring` for future use.
 - **Passes** swing to rest once on arrival (1.8 s, each 80 ms after the last). On hover a pass leans the other way, catches the light where the pointer is, and its hologram turns. In 3D a pass swings once on its strap where it was printed, within the gap to its neighbour, and settles; its hologram turns its colours as the card turns.
 - **Panels and cards** rise 16 px and fade in once, when 15% in view.
 - **Display and evidence figures** roll to their value once, over 1.2 s: each digit turns, behind a window that fades at its top and bottom, from its start digit to its own, all together; digits the start does not reach fade in. A screen reader is given the value, never the rolling digits.

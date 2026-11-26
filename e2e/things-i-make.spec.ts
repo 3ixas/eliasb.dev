@@ -21,7 +21,8 @@ const rows = (page: Page) => section(page).locator(".things__rows .row");
 const width = (page: Page) => page.viewportSize()?.width ?? 0;
 const boxOf = async (locator: Locator) => (await locator.boundingBox())!;
 const rgb = (hex: string) => `rgb(${[1, 3, 5].map((start) => parseInt(hex.slice(start, start + 2), 16)).join(", ")})`;
-const line = (slug: string, outcome: string) => thingsIMake.rowOutcomes[slug] ?? outcome;
+const rowOutcomes: Readonly<Partial<Record<string, string>>> = thingsIMake.rowOutcomes;
+const line = (slug: string, outcome: string) => rowOutcomes[slug] ?? outcome;
 const expectedCityUrls = {
   london: "threshold-beta.vercel.app/london?district=hackney&type=room",
   basel: "threshold-beta.vercel.app/basel?district=altstadt&type=room",

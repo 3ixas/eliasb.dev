@@ -83,12 +83,10 @@ export function resumeSheet(): ResumeSheet {
         story: { label: `${siteHost}/work/${slug}`, href: `/work/${slug}` },
       };
     }),
-    projects: featuredProjects(projects, featuredSlugs).map((project) => ({
-      name: project.name,
-      outcome: project.outcome,
-      meta: `${project.type} · ${project.year}`,
-      study: { label: `${siteHost}${project.links.caseStudy}`, href: project.links.caseStudy! },
-    })),
+    // A featured project always has a case study (catalogueProblems).
+    projects: featuredProjects(projects, featuredSlugs).flatMap(({ name, outcome, type, year, links: { caseStudy } }) =>
+      caseStudy ? [{ name, outcome, meta: `${type} · ${year}`, study: { label: `${siteHost}${caseStudy}`, href: caseStudy } }] : [],
+    ),
     awards: passRecords["bnp-paribas"].pins?.map(({ label, detail }) => ({ label, detail })) ?? [],
     skills,
     education,

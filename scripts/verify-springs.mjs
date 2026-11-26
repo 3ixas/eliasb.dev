@@ -3,8 +3,8 @@ import { spring as motionSpring } from 'motion';
 import { spring } from '../src/components/site/spring.ts';
 import { signatureSpringPairs } from '../src/components/site/signature-springs.ts';
 
-// The site's spring (spring.ts) must match Motion's: at the settings the Signature motions play, and across the bounces
-// and durations the Signature motions may use (bounce 0 to 0.45). A `linear()` curve is straight between its
+// The spring module (spring.ts) must match Motion's: at the named settings (signature-springs.ts), and across the bounces
+// and durations it supports (bounce 0 to 0.45). No surface plays it today; this keeps it correct for future use. A `linear()` curve is straight between its
 // samples, so it is compared between them as well as at them. Every failure names the parameters.
 const springCurveTolerance = 0.02;
 // At a sample the two agree to Motion's own rest threshold (0.005: it snaps to 1 once at rest, while the model
@@ -53,4 +53,4 @@ for (const { bounce, visualDuration } of [...signatureSprings, ...springGrid]) {
   }
 }
 
-console.log('Spring checks passed: the site spring matches Motion across the bounces and durations the Signature motions use.');
+console.log('Spring checks passed: the spring module matches Motion across the bounces and durations it supports.');

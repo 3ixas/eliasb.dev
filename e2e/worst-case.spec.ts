@@ -37,6 +37,60 @@ async function overflows(page: Page) {
   });
 }
 
+/** The cases for the parts the refinement added (#544), each with something only it draws. */
+const refinementCases = {
+  trays: ".work-metric",
+  headed: ".headed__parts li",
+  how: ".card__proof",
+  switcher: ".project-city__btn",
+  working: ".argus__source:visible",
+  cards: ".story-card",
+  rows: ".row",
+};
+
+/**
+ * Words that run past the page, their own box or the surface they sit on, or out of an ancestor that cuts them off. A
+ * part's element can sit inside its panel while its words do not, so this measures each word.
+ */
+async function strayWords(page: Page, name: string) {
+  return page.locator(`[data-case=${name}]`).evaluate((root) => {
+    const edge = document.documentElement.clientWidth;
+    const out: string[] = [];
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      const parent = node.parentElement!;
+      // A rolling figure's face holds every digit behind a window by design; a select draws its own options.
+      if (parent.closest(".sr-only, .roll__face, option")) continue;
+      let own: Element = parent;
+      while (own !== root && ["inline", "contents"].includes(getComputedStyle(own).display)) own = own.parentElement!;
+      const holds = [own];
+      const clips: Element[] = [];
+      for (let box: Element | null = parent; box && root.contains(box); box = box.parentElement) {
+        if (box.matches(".surface, .row")) holds.push(box);
+        if (getComputedStyle(box).overflow !== "visible") clips.push(box);
+      }
+      for (const word of node.textContent!.matchAll(/\S+/g)) {
+        const range = document.createRange();
+        range.setStart(node, word.index);
+        range.setEnd(node, word.index + word[0].length);
+        for (const rect of range.getClientRects()) {
+          // Two pixels of grace: a glyph's own side bearing and negative tracking.
+          const past = rect.right > edge + 2 || holds.some((hold) => {
+            const frame = hold.getBoundingClientRect();
+            return rect.left < frame.left - 2 || rect.right > frame.right + 2;
+          });
+          const cut = clips.some((clip) => {
+            const frame = clip.getBoundingClientRect();
+            return rect.left < frame.left - 2 || rect.right > frame.right + 2 || rect.top < frame.top - 2 || rect.bottom > frame.bottom + 2;
+          });
+          if (past || cut) out.push(`"${word[0].slice(0, 32)}" ${cut ? "is cut off" : "runs past its box"}`);
+        }
+      }
+    }
+    return out;
+  });
+}
+
 test.describe("Worst-case data", () => {
   test("no value reaches past the page or its own panel", async ({ page }) => {
     await open(page);
@@ -49,6 +103,14 @@ test.describe("Worst-case data", () => {
     await open(page);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
     expect(await overflows(page)).toEqual([]);
+  });
+
+  test("every word of the refinement's parts stays in its box, uncut", async ({ page }) => {
+    await open(page);
+    for (const [name, part] of Object.entries(refinementCases)) {
+      await expect(page.locator(`[data-case=${name}] ${part}`).first(), name).toBeVisible();
+      await expect.poll(() => strayWords(page, name), { message: name }).toEqual([]);
+    }
   });
 
   test("a pass band holds a name at its limit in two lines, and ends a longer one with an ellipsis", async ({ page }) => {

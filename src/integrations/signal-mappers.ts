@@ -1,10 +1,9 @@
+import { ACTIVITY_DAYS } from "./activity-days.ts";
 import type { Book, Film, GitHubRepository } from "./types";
 
 export type ActivityDay = { date: string; count: number };
 
 export type ContributionDayShape = { date: string; contributionCount: number };
-
-export const GITHUB_ACTIVITY_DAYS = 365;
 
 export function datesForWindow(length: number, now = new Date()): ActivityDay[] {
   return Array.from({ length }, (_, index) => {
@@ -14,40 +13,13 @@ export function datesForWindow(length: number, now = new Date()): ActivityDay[] 
   });
 }
 
-export function mapContributionDays(days: ContributionDayShape[], length = GITHUB_ACTIVITY_DAYS, now = new Date()) {
+export function mapContributionDays(days: ContributionDayShape[], length = ACTIVITY_DAYS, now = new Date()) {
   const byDate = new Map(days.map((day) => [day.date, day.contributionCount]));
 
   return datesForWindow(length, now).map((day) => ({
     date: day.date,
     count: byDate.get(day.date) ?? 0,
   }));
-}
-
-const london = new Intl.DateTimeFormat("en-GB", {
-  timeZone: "Europe/London",
-  year: "numeric",
-  month: "numeric",
-  day: "numeric",
-  hour: "numeric",
-  minute: "numeric",
-  second: "numeric",
-  hourCycle: "h23",
-});
-
-/** The time in London written as if it were UTC, so its calendar day is London's. */
-function londonWallClock(instant: number) {
-  const part = (type: string) => Number(london.formatToParts(instant).find((entry) => entry.type === type)?.value);
-  return Date.UTC(part("year"), part("month") - 1, part("day"), part("hour"), part("minute"), part("second"));
-}
-
-/** The day of the week in London, counting from Monday (0) to Sunday (6). */
-export function londonWeekday(now = new Date()) {
-  return (new Date(londonWallClock(now.getTime())).getUTCDay() + 6) % 7;
-}
-
-/** The day of the month in London. */
-export function londonDayOfMonth(now = new Date()) {
-  return new Date(londonWallClock(now.getTime())).getUTCDate();
 }
 
 /** The fields read from a Goodreads currently-reading item, already decoded. */

@@ -1,13 +1,13 @@
 import { spring } from "./spring.ts";
 
 /**
- * The springs the Signature motions play (GLOSSARY.md), each specified as
- * `spring(bounce, duration)` so a motion's feel is one pair of numbers
- * (#199). `scripts/verify-springs.mjs` checks `spring` against Motion's.
+ * Named springs, each specified as `spring(bounce, duration)` so a motion's
+ * feel is one pair of numbers (#199). No surface plays them today (spring.ts);
+ * `scripts/verify-springs.mjs` checks them against Motion's.
  */
 
-/** Each spring's `[bounce, visualDuration]`, so `scripts/verify-springs.mjs` checks the pairs actually played. */
+/** Each spring's `[bounce, visualDuration]`, which `scripts/verify-springs.mjs` checks. */
 export const signatureSpringPairs = { passLean: [0.4, 0.7] } as const;
 
-/** The employer Staff pass leaning away from the pointer and settling. */
+/** Tuned for a Staff pass leaning away from the pointer and settling; the pass plays `--spring` today. */
 export const passLean = spring(...signatureSpringPairs.passLean);

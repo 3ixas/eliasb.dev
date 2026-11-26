@@ -32,7 +32,8 @@ import { simulationCopy } from "../src/content/stretch/simulation-copy.ts";
 import { thresholdLinkCopy } from "../src/content/stretch/threshold-link.ts";
 import { argusProvenanceCopy } from "../src/content/stretch/argus-provenance.ts";
 import { flowtimeBreakCopy } from "../src/content/stretch/flowtime-break.ts";
-import { hostLabel } from "../src/components/site/host-label.ts";
+import { hostLabel, KNOWN_HOSTS } from "../src/components/site/host-label.ts";
+import { homepageMarkdown, llmsTxt } from "../src/content/markdown.ts";
 
 const raw = readFileSync(new URL("../docs/content/redesign-copy.md", import.meta.url), "utf8");
 // Emphasis stars and the {braces} around live values are markup, not words.
@@ -462,6 +463,21 @@ for (const [href, expected] of [
   ["https://www.joveen.com/", "joveen.com"],
 ]) {
   assert.equal(hostLabel(href), expected, `hostLabel(${href})`);
+}
+
+// Machine surfaces: what only a machine or a screen reader is given, line for line and in order. The Work and Case
+// studies links of llms.txt and the training week of /index.md are built from copy checked above.
+{
+  const table = rows(raw, "## Machine surfaces");
+  const listed = (surface) => table.filter(([name]) => name === surface).map(([, text]) => text);
+  const lines = (text) => text.split("\n").filter(Boolean);
+  const llms = llmsTxt();
+  const authored = llms.slice(0, llms.indexOf("## Work")) + llms.slice(llms.indexOf("## Contact"));
+  assert.deepEqual(lines(authored), listed("llms.txt"), "llms.txt: its intro and link lines");
+  const index = homepageMarkdown();
+  const offTheClockLines = lines(index.slice(index.indexOf(`## ${offTheClock.heading}`), index.indexOf("## Say hello")));
+  assert.deepEqual(offTheClockLines.filter((line) => !line.startsWith("- ")), listed("/index.md"), "/index.md: its Off the clock lines");
+  assert.deepEqual(Object.entries(KNOWN_HOSTS).map((pair) => pair.join(" → ")), listed("Host label"), "Host labels");
 }
 
 console.log("Redesign copy checks passed.");

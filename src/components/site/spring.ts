@@ -1,8 +1,9 @@
 /**
- * The site's one spring: every Signature motion is specified as
- * `spring(bounce, duration)` and played from the CSS `linear()` curve it
- * returns, so no motion library runs in the browser (ADR 0004, amended by ADR
- * 0005). `scripts/verify-springs.mjs` checks it against Motion's `spring`.
+ * The site's spring module: `spring(bounce, duration)` returns a CSS `linear()`
+ * curve, so a spring needs no motion library in the browser (ADR 0004, amended
+ * by ADR 0005). No surface plays it today: a Staff pass's hover lean plays the
+ * CSS `--spring` curve (tokens.css, pass.css). `scripts/verify-springs.mjs`
+ * checks this module against Motion's `spring`, so it is ready for future use.
  *
  * This module has no imports so `scripts/verify-springs.mjs` can load it.
  */

@@ -141,7 +141,7 @@ function Card({ beat }: { beat: Beat }) {
  * `--band` section, stacking under 720 px, each with its own distinct inset proof tray. Threshold's PRD date is derived
  * from its case study so the two cannot drift apart.
  */
-export function HowIWork() {
+export function HowIWork({ beats = howIWork.beats }: { /** The worst-case fixture passes its own. */ beats?: readonly Beat[] }) {
   return (
     <section id="how-i-work" className="how" aria-labelledby="how-i-work-heading">
       <div className="section__head">
@@ -151,7 +151,7 @@ export function HowIWork() {
         <p className="section__note">{howIWork.note}</p>
       </div>
       <ol className="cards">
-        {howIWork.beats.map((beat) => (
+        {beats.map((beat) => (
           <Card key={beat.habit} beat={beat} />
         ))}
       </ol>

@@ -15,7 +15,7 @@ import { thingsIMake } from "../src/content/stretch/site-copy.ts";
 
 const caseStudySlugs = Object.keys(caseStudies);
 const shot = { src: "/x.webp", alt: "x", width: 1, height: 1 };
-const base = (slug, year = 2025, overrides = {}) => ({ slug, name: slug, outcome: "o", type: "t", year, category: "products", links: {}, screenshot: shot, crop: { x: 0.5, y: 0.5, zoom: 2 }, ...overrides });
+const base = (slug, year = 2025, overrides = {}) => ({ slug, name: slug, outcome: "o", type: "t", year, category: "products", links: { code: "https://example.com" }, screenshot: shot, crop: { x: 0.5, y: 0.5, zoom: 2 }, ...overrides });
 const featurable = (slug) =>
   base(slug, 2026, {
     links: { caseStudy: `/things-i-make/${slug}` },
@@ -46,6 +46,8 @@ assert.match(catalogueProblems([base("a", 2025, { crop: undefined })], [], [])[0
 assert.match(catalogueProblems([base("a", 2025, { name: "x".repeat(61) })], [], [])[0], /"a" has a name longer than 60/);
 assert.deepEqual(catalogueProblems([base("a", 2025, { name: "x".repeat(60) })], [], []), []);
 assert.match(catalogueProblems([base("a", 2025, { screenshot: undefined })], [], [])[0], /needs a screenshot and a crop/);
+// Every project opens somewhere.
+assert.match(catalogueProblems([base("a", 2025, { links: {} })], [], [])[0], /"a" needs a link/);
 assert.match(catalogueProblems([base("a", 2025, { crop: { x: 1.2, y: 0.5, zoom: 2 } })], [], [])[0], /needs a screenshot and a crop/);
 assert.match(catalogueProblems([base("a", 2025, { crop: { x: 0.5, y: 0.5, zoom: 0.5 } })], [], [])[0], /needs a screenshot and a crop/);
 
@@ -66,7 +68,7 @@ assert.deepEqual(catalogueProblems(featuredOne, ["a"], ["a"]), []);
 const failing = (project, slugs = ["a"]) => catalogueProblems([project], ["a"], slugs);
 assert.match(failing(base("a"), [])[0], /Featured project "a" needs a case study/);
 assert.match(failing(featurable("a"), [])[0], /needs a case study/, "A link alone is not a case study");
-assert.match(failing({ ...featurable("a"), links: {} })[0], /needs a case study/, "A case study with no link is not shown");
+assert.match(failing({ ...featurable("a"), links: { code: "https://example.com" } })[0], /needs a case study/, "A case study with no link is not shown");
 assert.match(failing({ ...featurable("a"), screenshot: undefined }).join(" "), /Featured project "a" needs a screenshot/);
 assert.match(failing({ ...featurable("a"), colours: undefined })[0], /Featured project "a" needs its colours/);
 assert.match(failing({ ...featurable("a"), colours: { field: "red", ink: "#ffffff", swatch: "#808080" } })[0], /needs its colours/);
