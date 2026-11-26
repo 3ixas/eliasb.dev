@@ -1,0 +1,5 @@
+/* Homepage-only stylesheets bundled together so routes and fixtures share one chunk instead of fragmenting per section. */
+@import "./opening.css";
+@import "./work.css";
+@import "./headed-how.css";
+@import "./off-the-clock.css";

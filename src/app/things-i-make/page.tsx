@@ -1,4 +1,5 @@
 import type { Metadata, ResolvingMetadata } from "next";
+import "../projects.css";
 import { WorkArchivePage } from "@/components/site/work-archive-page";
 import { projects } from "@/content/projects";
 import { pageTitle, siteName } from "@/content/site";

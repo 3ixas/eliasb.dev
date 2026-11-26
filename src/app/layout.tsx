@@ -5,19 +5,10 @@ import { Instrument_Sans } from "next/font/google";
 import localFont from "next/font/local";
 import "./base.css";
 import "./tokens.css";
-import "./zoom.css";
 import "./transitions.css";
+import "./zoom.css";
 import "./shell.css";
 import "./parts.css";
-import "./pass.css";
-import "./opening.css";
-import "./work.css";
-import "./headed-how.css";
-import "./projects.css";
-import "./off-the-clock.css";
-import "./story.css";
-import "./simulation.css";
-import "./resume.css";
 
 // Both faces are self-hosted, so no request goes to Google when a visitor loads a page.
 // Passes and panels (docs/design/DESIGN.md "Type"): Newsreader for headings, figures and prose, with its
@@ -71,31 +62,12 @@ export const metadata: Metadata = {
   robots: { index: isIndexable, follow: isIndexable },
 };
 
-const siteBootScript = `
-  try {
-    const root = document.documentElement;
-    // Script runs: the header's links may wait behind Menu on a phone (shell.css). Without it they show.
-    root.dataset.script = '';
-    let saved = null;
-    try { saved = localStorage.getItem('elias-theme'); } catch (_) {}
-    if (saved === 'light' || saved === 'dark') root.dataset.theme = saved;
-    else delete root.dataset.theme;
-    // data-lights follows the appearance once script runs, so the theme
-    // controller decides when the room changes, including when the device
-    // setting does.
-    const dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
-    root.dataset.lights = dark ? 'on' : 'off';
-    // The browser's toolbar colour follows the page, including a remembered
-    // choice that differs from the device. This meta is made here, not in JSX:
-    // React would recreate a hoisted meta whose attributes script had changed.
-    // The page colours, as in TOOLBAR_COLOUR (components/site/theme.ts); theme.spec.ts keeps them level.
-    const toolbar = { light: '#eeede9', dark: '#0d0d0f' };
-    const meta = document.createElement('meta');
-    meta.name = 'theme-color';
-    meta.content = dark ? toolbar.dark : toolbar.light;
-    document.head.appendChild(meta);
-  } catch (_) {}
-`;
+// Boot script run synchronously in <head> before paint:
+// - Sets data-script so header links may wait behind Menu on phones (shell.css); without script they show.
+// - Restores remembered theme (elias-theme) and sets data-lights so the theme controller decides when the room changes.
+// - Creates <meta name="theme-color"> matching TOOLBAR_COLOUR (components/site/theme.ts; theme.spec.ts keeps them level)
+//   imperatively rather than in JSX so React does not recreate a hoisted meta whose content script has changed.
+const siteBootScript = `try{const r=document.documentElement;r.dataset.script='';let s=null;try{s=localStorage.getItem('elias-theme');}catch(_){}if(s==='light'||s==='dark')r.dataset.theme=s;else delete r.dataset.theme;const d=s?s==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;r.dataset.lights=d?'on':'off';const m=document.createElement('meta');m.name='theme-color';m.content=d?'#0d0d0f':'#eeede9';document.head.appendChild(m);}catch(_){}`;
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (

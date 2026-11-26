@@ -102,7 +102,7 @@ test.describe("Work archive: the catalogue", () => {
   test("the first screen's screenshots load at once, the first ahead of the other two", async ({ page }) => {
     const images = panels(page).locator(".project__shot img");
     for (const index of [0, 1, 2]) await expect(images.nth(index)).toHaveAttribute("loading", "eager");
-    await expect(images.nth(0)).not.toHaveAttribute("fetchpriority", "low");
+    await expect(images.nth(0)).toHaveAttribute("fetchpriority", "high");
     for (const index of [1, 2]) await expect(images.nth(index)).toHaveAttribute("fetchpriority", "low");
     await expect(images.nth(3)).toHaveAttribute("loading", "lazy");
   });

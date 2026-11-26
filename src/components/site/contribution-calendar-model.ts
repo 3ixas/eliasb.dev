@@ -6,6 +6,11 @@ import { MONTH_NAMES, SHORT_MONTH_NAMES } from "../../integrations/pin-rules.ts"
 // Their Intl locale data can disagree, for example "Sept" versus "Sep".
 export const CONTRIBUTION_WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] as const;
 
+export type CompactActivity = {
+  start: string;
+  counts: readonly number[];
+};
+
 export type ContributionCalendarModel = {
   days: ActivityDay[];
   rows: (ActivityDay | null)[][];
@@ -16,6 +21,38 @@ export type ContributionCalendarModel = {
 
 function dateFromIsoDay(value: string) {
   return new Date(`${value}T00:00:00.000Z`);
+}
+
+function isoDayFromUtc(startMs: number, offsetDays: number) {
+  return new Date(startMs + offsetDays * 86_400_000).toISOString().slice(0, 10);
+}
+
+/**
+ * Packs consecutive UTC days into a start ISO date and count array so the RSC payload sends one date string
+ * instead of 365 `{ date, count }` objects across the Server→Client boundary.
+ */
+export function packContributionActivity(activity: readonly ActivityDay[]): CompactActivity | null {
+  const days = activity.slice(-ACTIVITY_DAYS);
+  if (!days.length) return null;
+  const start = days[0].date;
+  const startMs = dateFromIsoDay(start).getTime();
+  const counts = days.map((day, index) => {
+    const expected = isoDayFromUtc(startMs, index);
+    if (day.date !== expected) {
+      throw new Error(`Expected consecutive UTC contribution day ${expected}, received ${day.date}`);
+    }
+    return day.count;
+  });
+  return { start, counts };
+}
+
+/** Restores the `{ date, count }` day list from a compact start date and daily count array. */
+export function unpackContributionActivity({ start, counts }: CompactActivity): ActivityDay[] {
+  const startMs = dateFromIsoDay(start).getTime();
+  return counts.map((count, index) => ({
+    date: isoDayFromUtc(startMs, index),
+    count,
+  }));
 }
 
 export function createContributionCalendar(activity: ActivityDay[]): ContributionCalendarModel | null {

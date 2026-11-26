@@ -1,4 +1,5 @@
 import type { Metadata, ResolvingMetadata } from "next";
+import "../resume.css";
 import { ResumePage } from "@/components/site/resume";
 import { resumeCopy } from "@/content/resume";
 import { pageTitle, siteName } from "@/content/site";

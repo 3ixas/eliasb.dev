@@ -34,7 +34,7 @@ export function WorkArchivePage({ catalogue }: { catalogue: readonly Project[] }
                     level={2}
                     meta
                     eager={index < FIRST_SCREEN}
-                    fetchPriority={index > 0 && index < FIRST_SCREEN ? "low" : undefined}
+                    fetchPriority={index === 0 ? "high" : index < FIRST_SCREEN ? "low" : undefined}
                     titleTransition
                   />
                 </OnView>

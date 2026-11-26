@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
+import "@/app/pass.css";
+import "@/app/projects.css";
+import "@/app/home.css";
+import "@/app/story.css";
 import { Panel, PanelHead } from "@/components/parts/panel";
 import { PassCard } from "@/components/parts/staff-pass";
 import { ProjectPanel } from "@/components/parts/project-panel";

@@ -41,7 +41,8 @@ export function Opening() {
         </div>
       </div>
       <PassLight className="opening__rail">
-        <StaffPass slug="bnp-paribas" href="#bnp-paribas" lead priority />
+        {/* Omit priority so the homepage does not preload the portrait in <head> ahead of LCP; the pass is above the fold so the browser still loads it promptly where the printed pass shows (reduced motion, no WebGL, no script). */}
+        <StaffPass slug="bnp-paribas" href="#bnp-paribas" lead />
       </PassLight>
     </section>
   );

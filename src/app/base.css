@@ -1,9 +1,11 @@
-@import "tailwindcss";
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
 
 /*
- * What the whole site shares beneath its stylesheets: Tailwind's reset and its
- * sr-only utility, the font families Tailwind reads, and the page-wide motion
- * rules. Colours, type and curves live in tokens.css.
+ * What the whole site shares beneath its stylesheets: Tailwind's theme and Preflight reset,
+ * the sr-only utility (without scanning prose/comments for unused utility classes), the font
+ * families, and the page-wide motion rules. Colours, type and curves live in tokens.css.
  */
 @theme inline {
   --font-display: var(--font-newsreader), Georgia, serif;
@@ -29,5 +31,19 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0s !important;
     }
+  }
+}
+
+@layer utilities {
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border-width: 0;
   }
 }

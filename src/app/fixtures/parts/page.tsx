@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
+import "@/app/story.css";
 import { MeasurePair, MeasureSide } from "@/components/parts/measure";
 import { Count, OnView } from "@/components/parts/on-view";
 import { Arrow, Panel, PanelHead } from "@/components/parts/panel";

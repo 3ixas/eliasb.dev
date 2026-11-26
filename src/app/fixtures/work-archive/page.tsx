@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
+import "@/app/projects.css";
 import { WorkArchivePage } from "@/components/site/work-archive-page";
 import { PROJECT_CATEGORIES, projects, type Project } from "@/content/projects";
 

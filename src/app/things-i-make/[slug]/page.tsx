@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import "../../story.css";
 import { CaseStudyPage } from "@/components/site/case-study";
 import { pageTitle, siteName } from "@/content/site";
 import { projects } from "@/content/projects";

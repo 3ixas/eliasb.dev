@@ -5,6 +5,12 @@ import { ZoomableImage } from "@/components/site/zoomable-image";
 import { offTheClock } from "@/content/stretch/off-the-clock";
 import type { HistoryEvent } from "@/integrations/types";
 
+export type HistoryBandEvent = {
+  year: number;
+  text: string;
+  image?: Pick<NonNullable<HistoryEvent["image"]>, "src" | "alt" | "width" | "height" | "creator" | "licenseName">;
+};
+
 const copy = offTheClock.curiosity;
 
 /**
@@ -13,7 +19,7 @@ const copy = offTheClock.curiosity;
  * ("1 of 3") that steps to the next in place. The fact is announced politely when it changes; every oddity shares one
  * stacked sizer cell so stepping moves nothing. With no script, or one oddity, the first shows and there is no pill.
  */
-export function HistoryBand({ events, dates, source }: { events: HistoryEvent[]; dates: string[]; source?: string }) {
+export function HistoryBand({ events, dates, source }: { events: readonly HistoryBandEvent[]; dates: string[]; source?: string }) {
   const [position, setPosition] = useState(0);
   const { image } = events[position];
   const pictured = events.some((event) => event.image);
