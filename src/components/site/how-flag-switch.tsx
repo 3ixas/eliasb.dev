@@ -46,7 +46,7 @@ export function HowFlagSwitch({
           role="switch"
           className="flag-switch"
           aria-checked={enabled}
-          aria-labelledby={enabled ? undefined : `${id}-new`}
+          aria-labelledby={`${id}-new`}
           aria-describedby={describedBy}
           onClick={() => setEnabled((prev) => !prev)}
         >
