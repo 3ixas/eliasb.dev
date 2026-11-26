@@ -30,7 +30,12 @@ const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
 ];
+
+// The lanyard's textures keep their names between builds, so they cannot be immutable: a day fresh, then a week served
+// stale while the browser checks again. The screenshots under /work/ are unhashed too and keep the default.
+const lanyardCaching = [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }];
 
 const nextConfig: NextConfig = {
   // The dev badge is a tab stop and floats over page controls, so the focus and
@@ -46,10 +51,15 @@ const nextConfig: NextConfig = {
     ],
   },
   async redirects() {
-    return movedProjectPaths.map((path) => ({ ...path, permanent: true }));
+    // Some previewers and bots ask for /favicon.ico without reading the page's icon links.
+    const faviconPath = { source: "/favicon.ico", destination: "/icon1.png" };
+    return [...movedProjectPaths, faviconPath].map((path) => ({ ...path, permanent: true }));
   },
   async headers() {
-    return [{ source: "/(.*)", headers: securityHeaders }];
+    return [
+      { source: "/(.*)", headers: securityHeaders },
+      { source: "/lanyard/(.*)", headers: lanyardCaching },
+    ];
   },
 };
 

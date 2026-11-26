@@ -128,10 +128,12 @@ test.describe("Share cards", () => {
     ...caseStudySlugs.map((slug) => [`/things-i-make/${slug}`, `/things-i-make/${slug}/opengraph-image`]),
   ];
   for (const [path, card] of cards) {
+    // The query is Next's cache hash, so a changed card is fetched again.
+    const hashed = new RegExp(`${card}\\?.`);
     test(`${path} shares with ${card}`, async ({ page }) => {
       await page.goto(path);
-      await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", new RegExp(`${card}(\\?|$)`));
-      await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", new RegExp(`${card}(\\?|$)`));
+      await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", hashed);
+      await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", hashed);
       await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
     });
   }
