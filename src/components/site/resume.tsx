@@ -146,7 +146,7 @@ export function ResumePage() {
           </section>
         </article>
       </main>
-      <SayHello />
+      <SayHello includeResume={false} />
     </div>
   );
 }
