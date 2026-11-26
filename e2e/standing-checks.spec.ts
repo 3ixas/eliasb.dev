@@ -108,21 +108,116 @@ test("every page has one h1, a skip link to its content, and its content without
   await context.close();
 });
 
-test.describe("accessibility on every page", () => {
-  // Axe and the rendered contrast read the page as drawn, which changes with the scheme but not the engine: Chromium at 1440 px, in both schemes.
+/** WCAG 2.2 AA tags held on every public route and open state (F-26). */
+const axeTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
+
+async function axeViolations(page: Page) {
+  const { violations } = await new AxeBuilder({ page }).withTags(axeTags).analyze();
+  return violations.map(({ id, nodes }) => `${id} (${nodes.length})`);
+}
+
+async function waitForHydration(locator: ReturnType<Page["locator"]>) {
+  await expect.poll(() => locator.evaluate((element) => Object.keys(element).some((key) => key.startsWith("__reactProps$")))).toBe(true);
+}
+
+test.describe("axe on every page and open state", () => {
+  // Axe runs at phone and desktop widths in both schemes (F-26).
+  test.beforeEach(({}, testInfo) => {
+    test.skip(!/^chromium-(390|1440)-/.test(testInfo.project.name), "Read in Chromium at 390 and 1440 px, in both schemes");
+  });
+
+  test("every page has no axe violations", async ({ page, request }) => {
+    const routes = await pages(request);
+    test.setTimeout(routes.length * perPage);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    for (const route of routes) {
+      await test.step(route, async () => {
+        await open(page, route);
+        soft(await axeViolations(page), `${route}: axe`).toEqual([]);
+      });
+    }
+  });
+
+  test("open states (Menu, lightbox, Argus disclosures and switches) have no axe violations", async ({ page }) => {
+    test.setTimeout(perPage * 4);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    const isNarrow = (page.viewportSize()?.width ?? 0) < 900;
+
+    await test.step("/: Menu and How I work switch", async () => {
+      await open(page, "/");
+      const howSwitch = page.locator("#how-i-work [role='switch']");
+      await expect(howSwitch).toHaveCount(1);
+      await howSwitch.click();
+      await expect(howSwitch).toHaveAttribute("aria-checked", "true");
+
+      if (isNarrow) {
+        const menu = page.locator("button.menu-button");
+        await expect(menu).toBeVisible();
+        await waitForHydration(menu);
+        await menu.click();
+        await expect(menu).toHaveAttribute("aria-expanded", "true");
+      }
+
+      soft(await axeViolations(page), "/ (Menu and switch): axe").toEqual([]);
+
+      if (isNarrow) {
+        await page.keyboard.press("Escape");
+        await expect(page.locator("button.menu-button")).toHaveAttribute("aria-expanded", "false");
+      }
+    });
+
+    await test.step("/: lightbox", async () => {
+      const trigger = page.locator("#off-the-clock [data-otc='training'] .zoom").first();
+      await trigger.scrollIntoViewIfNeeded();
+      await waitForHydration(trigger);
+      await trigger.click();
+      const dialog = page.locator("dialog.zoom__dialog[open]");
+      await expect(dialog).toBeVisible();
+      soft(await axeViolations(page), "/ (lightbox): axe").toEqual([]);
+      await page.keyboard.press("Escape");
+      await expect(dialog).toHaveCount(0);
+    });
+
+    await test.step("/work/bnp-paribas: flag switch", async () => {
+      await open(page, "/work/bnp-paribas");
+      const flagSwitch = page.locator("section#decisions [role='switch']");
+      await expect(flagSwitch).toHaveCount(1);
+      await flagSwitch.click();
+      await expect(flagSwitch).toHaveAttribute("aria-checked", "true");
+      soft(await axeViolations(page), "/work/bnp-paribas (flag switch): axe").toEqual([]);
+    });
+
+    await test.step("/things-i-make/argus-risk: Argus disclosures", async () => {
+      await open(page, "/things-i-make/argus-risk");
+      const figure = page.locator("section#decisions figure.working-fig");
+      await figure.scrollIntoViewIfNeeded();
+      await expect(figure.locator(".argus[data-live]")).toHaveCount(1);
+      const disclosures = figure.locator("button[aria-expanded]");
+      const count = await disclosures.count();
+      expect(count, "Argus disclosures").toBeGreaterThan(0);
+      for (let index = 0; index < count; index++) {
+        const button = disclosures.nth(index);
+        await button.click();
+        await expect(button).toHaveAttribute("aria-expanded", "true");
+      }
+      soft(await axeViolations(page), "/things-i-make/argus-risk (Argus disclosures): axe").toEqual([]);
+    });
+  });
+});
+
+test.describe("contrast and focus rings on every page", () => {
+  // Rendered contrast reads the page as drawn, which changes with the scheme but not the engine: Chromium at 1440 px, in both schemes.
   test.beforeEach(({}, testInfo) => {
     test.skip(!/^chromium-1440-/.test(testInfo.project.name), "Read once per scheme, in Chromium at 1440 px");
   });
 
-  test("every page has no axe violations, and every text pair passes AA on the rendered page", async ({ page, request }) => {
+  test("every text pair passes AA on the rendered page", async ({ page, request }) => {
     const routes = await pages(request);
     test.setTimeout(routes.length * perPage * 2);
     await page.emulateMedia({ reducedMotion: "reduce" });
     for (const route of routes) {
       await test.step(route, async () => {
         await open(page, route);
-        const { violations } = await new AxeBuilder({ page }).analyze();
-        soft(violations.map(({ id, nodes }) => `${id} (${nodes.length})`), `${route}: axe`).toEqual([]);
         const failing = (await renderedContrast(page)).filter((reading) => reading.median < reading.needs || reading.worst < reading.needs);
         soft(failing.map(({ text, median }) => `${text.slice(0, 40)}: ${median.toFixed(2)}`), `${route}: contrast`).toEqual([]);
       });
