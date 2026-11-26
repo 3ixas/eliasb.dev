@@ -1,6 +1,5 @@
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
-import "@/app/projects.css";
 import { hostLabel } from "@/components/site/host-label";
 import { isInternalHref, SiteLink } from "@/components/site/site-link";
 import { Arrow, OUT, panelSurface } from "@/components/parts/panel";

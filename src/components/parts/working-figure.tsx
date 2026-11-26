@@ -1,5 +1,4 @@
 import type { CSSProperties, ReactNode } from "react";
-import "@/app/story.css";
 import type { PanelColours } from "@/content/stretch/story";
 
 /**

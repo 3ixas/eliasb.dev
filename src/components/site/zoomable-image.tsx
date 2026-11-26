@@ -1,6 +1,5 @@
 "use client";
 
-import "@/app/zoom.css";
 import Image from "next/image";
 import { ArrivalImage } from "@/components/site/arrival-image";
 import { useEffect, useRef, useState, type CSSProperties, type MouseEvent, type TouchEvent } from "react";

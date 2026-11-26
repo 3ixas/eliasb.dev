@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import "./pass.css";
 import "./story.css";
 import { Arrow } from "@/components/parts/panel";
 import { LongForm } from "@/components/site/long-form";

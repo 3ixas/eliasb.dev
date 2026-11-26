@@ -1,4 +1,3 @@
-import "@/app/story.css";
 import { Panel } from "@/components/parts/panel";
 import { projectPanelTransition, projectTitleTransition, titleLinkTypes, TitleTransition } from "@/components/parts/title-transition";
 import { WorkingFigure } from "@/components/parts/working-figure";

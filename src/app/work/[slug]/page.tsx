@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import "../../pass.css";
+import "../../story.css";
+import "../../simulation.css";
 import { RoleStoryPage } from "@/components/site/role-story";
 import { pageTitle, siteName } from "@/content/site";
 import { roleStoryFor, roleStorySlugs } from "@/content/stretch/role-stories";

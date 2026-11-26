@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import type { ReactNode } from "react";
+import "@/app/home.css";
 import { BookCell, FilmCell, GitHubCell, HistoryCell, OffTheClockPanel } from "@/components/site/off-the-clock-cells";
 import { TrainingCell } from "@/components/site/training-today";
 import { ACTIVITY_DAYS } from "@/integrations/activity-days";

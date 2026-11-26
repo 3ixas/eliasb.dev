@@ -1,6 +1,5 @@
 "use client";
 
-import "@/app/pass.css";
 import { useEffect, useRef, type ReactNode } from "react";
 import { useLanyard } from "@/components/parts/lanyard/lanyard";
 

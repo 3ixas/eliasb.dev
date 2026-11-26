@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
+import "@/app/pass.css";
+import "@/app/home.css";
 import { Opening } from "@/components/site/opening";
 import { LanyardStatus } from "./status";
 

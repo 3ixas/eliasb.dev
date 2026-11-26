@@ -1,4 +1,3 @@
-import "@/app/opening.css";
 import { PassLight } from "@/components/parts/pass-light";
 import { StaffPass } from "@/components/parts/staff-pass";
 import { opening, type Run } from "@/content/stretch/opening";

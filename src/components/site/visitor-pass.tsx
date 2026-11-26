@@ -1,6 +1,5 @@
 "use client";
 
-import "@/app/pass.css";
 import { useSyncExternalStore } from "react";
 import { TEXT_LIMITS } from "@/content/stretch/story";
 import { notFound as copy } from "@/content/stretch/site-copy";

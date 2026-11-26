@@ -1,7 +1,6 @@
 "use client";
 
 import { useId, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
-import "@/app/off-the-clock.css";
 import { Count } from "@/components/parts/on-view";
 import {
   contributionAccessibleTag,

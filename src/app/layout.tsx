@@ -6,6 +6,7 @@ import localFont from "next/font/local";
 import "./base.css";
 import "./tokens.css";
 import "./transitions.css";
+import "./zoom.css";
 import "./shell.css";
 import "./parts.css";
 

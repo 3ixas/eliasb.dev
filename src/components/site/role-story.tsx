@@ -1,4 +1,3 @@
-import "@/app/story.css";
 import { Panel } from "@/components/parts/panel";
 import { PassLight } from "@/components/parts/pass-light";
 import { StaffPass } from "@/components/parts/staff-pass";

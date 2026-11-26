@@ -1,4 +1,3 @@
-import "@/app/projects.css";
 import { OnView } from "@/components/parts/on-view";
 import { ProjectPanel } from "@/components/parts/project-panel";
 import { LongForm } from "@/components/site/long-form";

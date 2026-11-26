@@ -1,6 +1,5 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
-import "@/app/off-the-clock.css";
 import { OUT, Panel } from "@/components/parts/panel";
 import { packContributionActivity } from "@/components/site/contribution-calendar-model";
 import { GitHubYear } from "@/components/site/github-year";

@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import "@/app/projects.css";
 import { OnView } from "@/components/parts/on-view";
 import { Arrow, OUT } from "@/components/parts/panel";
 import { ProjectPanel, projectHref } from "@/components/parts/project-panel";
