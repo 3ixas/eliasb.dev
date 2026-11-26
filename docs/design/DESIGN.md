@@ -150,7 +150,7 @@ The `h1`, "This page doesn’t exist.", and its line. Then the visitor pass, the
 
 ## Say hello
 
-In a full-bleed `--band` closing band under a subtle `1 px` grey hairline (`--hair`): the title; the email in Newsreader 300 at `clamp(28px, 3.4vw, 48px)` with a cobalt underline, and a synchronous morphing `Copy → ✓ Copied` button (fixed width, zero shift); then Résumé, GitHub and LinkedIn in Newsreader 18 px. If the browser refuses the clipboard, Copy selects the address. No page has any other footer.
+In a full-bleed `--band` closing band under a subtle `1 px` grey hairline (`--hair`): the title; the email in Newsreader 300 at `clamp(28px, 3.4vw, 48px)` with a cobalt underline, and a synchronous morphing `Copy → ✓ Copied` button (fixed width, zero shift); then Résumé (omitted on `/resume`), GitHub and LinkedIn in Newsreader 18 px. If the browser refuses the clipboard, Copy selects the address. No page has any other footer.
 
 ## Share cards and favicon
 

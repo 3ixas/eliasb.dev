@@ -94,6 +94,7 @@ test.describe("The Résumé", () => {
     await expect(page.locator("[data-site-header]").getByRole("link", { name: "Elias Bennett", exact: true })).toHaveAttribute("href", "/");
     await expect(page.getByRole("navigation", { name: siteCopy.header.siteLinksLabel, includeHidden: true })).toHaveCount(1);
     await expect(page.locator("section#say-hello")).toHaveCount(1);
+    await expect(page.locator('section#say-hello a[href="/resume"]')).toHaveCount(0);
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     await expect(sheet(page)).toBeVisible();
     // On the sheet's top edge, at its right (R-24): 16 px above it, its right edge on the sheet's (inside the gutter on a phone).
