@@ -79,7 +79,7 @@ function BnpPanel() {
 }
 
 /** Joveen or Optegra: a display figure that rolls to its value once, a compact three-metric tray and the link to the story. */
-function RolePanelView({ panel }: { panel: RolePanel }) {
+export function RolePanelView({ panel }: { panel: RolePanel }) {
   const story = roleStories[panel.slug];
   const { value, label } = displayFigure(story, panel.figure)!;
   return (

@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import { DrawnTicks } from "@/components/parts/drawn-ticks";
 import { OnView } from "@/components/parts/on-view";
 import { Panel } from "@/components/parts/panel";
-import { shownSource, work, type HeadedProof } from "@/content/stretch/work";
+import { shownSource, work, type HeadedBar, type HeadedProof } from "@/content/stretch/work";
 
 /**
  * Each part's proof drawn in the language of How I work's proof feet (#459): hidden from assistive technology because
@@ -84,8 +84,8 @@ function Drawn({ proof, colour }: { proof: HeadedProof; colour: string }) {
  * Each part starts from a chip naming where its evidence comes from, in that source's colour, then its heading, its one
  * line, and its drawn proof. No destination label and no job title.
  */
-export function WhereImHeaded() {
-  const { heading, line, bars } = work.headed;
+export function WhereImHeaded({ bars = work.headed.bars }: { /** The worst-case fixture passes its own. */ bars?: readonly HeadedBar[] }) {
+  const { heading, line } = work.headed;
   return (
     <section aria-labelledby="headed-heading">
       <OnView motion="rise">

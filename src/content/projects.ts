@@ -230,6 +230,8 @@ export function catalogueProblems(
       problems.push(`"${project.slug}" needs a screenshot and a crop of it (x and y between 0 and 1, zoom at least 1).`);
     }
     if (project.name.length > TEXT_LIMITS.name) problems.push(`"${project.slug}" has a name longer than ${TEXT_LIMITS.name} characters.`);
+    const { caseStudy, live, code } = project.links;
+    if (!caseStudy && !live && !code) problems.push(`"${project.slug}" needs a link: a case study, a live site or its code.`);
     if (!Number.isInteger(project.year)) problems.push(`"${project.slug}" needs a whole-number year.`);
     if (!PROJECT_CATEGORIES.includes(project.category)) {
       problems.push(`"${project.slug}" needs a category: ${PROJECT_CATEGORIES.join(", ")}.`);

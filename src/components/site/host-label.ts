@@ -1,6 +1,7 @@
 import { projects } from "../../content/projects.ts";
 
-const KNOWN_HOSTS: Readonly<Record<string, string>> = {
+/** Hosts read aloud by name (a link's screen-reader suffix); the copy deck's "Machine surfaces" table lists each. */
+export const KNOWN_HOSTS: Readonly<Record<string, string>> = {
   "github.com": "GitHub",
   "linkedin.com": "LinkedIn",
   "goodreads.com": "Goodreads",

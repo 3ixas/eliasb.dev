@@ -7,7 +7,7 @@
  * (the contract script) as well as Next.
  */
 
-import type { ProjectCategory } from "../projects";
+import type { ProjectCategory, ProjectSlug } from "../projects";
 
 export const siteCopy = {
   titleHome: "Elias Bennett, software engineer at BNP Paribas",
@@ -78,7 +78,7 @@ export const thingsIMake = {
   rowOutcomes: {
     "argus-risk": "A risk simulator where every number shows its source and age.",
     "home-secretary": "A household coordination prototype, built for coursework.",
-  } as Readonly<Record<string, string>>,
+  } satisfies Partial<Record<ProjectSlug, string>>,
   /** The link to the archive, with the true count; its arrow is drawn beside it. */
   allThings: (built: number) => `Everything I’ve built (${built})`,
 } as const;

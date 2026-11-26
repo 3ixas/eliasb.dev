@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import type { ReactNode } from "react";
 import { BookCell, FilmCell, GitHubCell, HistoryCell, OffTheClockPanel } from "@/components/site/off-the-clock-cells";
 import { TrainingCell } from "@/components/site/training-today";
+import { ACTIVITY_DAYS } from "@/integrations/activity-days";
 import { savedHistorySignal } from "@/integrations/history";
 import type { ActivityDay, Book, Film, FilmSignal, GitHubSignal, HistorySignal, LatestRepositorySignal, ReadingSignal } from "@/integrations/types";
 
@@ -43,7 +44,7 @@ const diary = (overrides: Partial<FilmSignal>): FilmSignal => ({
 });
 
 // A year of activity ending on the fixed "now": busy in mid-July, quiet on Sundays.
-const year: ActivityDay[] = Array.from({ length: 365 }, (_, index) => {
+const year: ActivityDay[] = Array.from({ length: ACTIVITY_DAYS }, (_, index) => {
   const date = new Date(now.getTime() - (364 - index) * 86_400_000);
   const month = date.getUTCMonth();
   const base = month === 6 ? 6 : (date.getUTCDate() * 7 + month * 3) % 5;

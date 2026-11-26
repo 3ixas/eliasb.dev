@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { ZoomableImage } from "@/components/site/zoomable-image";
 import { offTheClock } from "@/content/stretch/off-the-clock";
-import { londonWeekday } from "@/integrations/signal-mappers";
+import { londonWeekday } from "@/integrations/london-time";
 
 const { days, week, title, photo, photoCaption } = offTheClock.training;
 

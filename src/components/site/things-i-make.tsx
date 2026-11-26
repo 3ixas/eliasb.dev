@@ -11,7 +11,8 @@ import { thingsIMake } from "@/content/stretch/site-copy";
 import { thresholdCities, thresholdCityChoice, thresholdDisplayLink, thresholdLinkCopy, thresholdStart } from "@/content/stretch/threshold-link";
 
 /** A row's line: the shorter one the homepage gives a project, else its own outcome. */
-const rowLine = (project: Project) => thingsIMake.rowOutcomes[project.slug] ?? project.outcome;
+const rowOutcomes: Readonly<Partial<Record<string, string>>> = thingsIMake.rowOutcomes;
+const rowLine = (project: Project) => rowOutcomes[project.slug] ?? project.outcome;
 
 /** Canonical Threshold URLs for each city, serialized once on the server so the client switcher stays tiny. */
 const thresholdCityPreviews = thresholdCities.map(({ id, name }) => ({
@@ -21,7 +22,7 @@ const thresholdCityPreviews = thresholdCities.map(({ id, name }) => ({
 })) as [ThresholdCityPreview, ...ThresholdCityPreview[]];
 
 /** One of the other projects: bordered paper strip with a visible 60 × 40 px thumbnail, name, line and year, marked ↗ when it leaves the site. */
-function ProjectRow({ project }: { project: Project }) {
+export function ProjectRow({ project }: { project: Project }) {
   const href = projectHref(project);
   const external = !isInternalHref(href);
   return (

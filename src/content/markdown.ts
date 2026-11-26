@@ -1,11 +1,12 @@
-import { profile, siteName } from "@/content/site";
-import { projects } from "@/content/projects";
-import { howIWork } from "@/content/stretch/how-i-work";
-import { offTheClock } from "@/content/stretch/off-the-clock";
-import { opening } from "@/content/stretch/opening";
-import { roleStories } from "@/content/stretch/role-stories";
-import { thingsIMake } from "@/content/stretch/site-copy";
-import { work } from "@/content/stretch/work";
+// Relative, with the extension, so Node can load this file directly (verify:copy) as well as Next.
+import { profile, siteName } from "./site.ts";
+import { projects } from "./projects.ts";
+import { howIWork } from "./stretch/how-i-work.ts";
+import { offTheClock } from "./stretch/off-the-clock.ts";
+import { opening } from "./stretch/opening.ts";
+import { roleStories } from "./stretch/role-stories.ts";
+import { thingsIMake } from "./stretch/site-copy.ts";
+import { work } from "./stretch/work.ts";
 
 /**
  * The site as Markdown, for people and agents who would rather read text than a page: `/index.md` is the homepage, and
@@ -30,9 +31,7 @@ export function homepageMarkdown(): string {
     ].join("\n");
   });
   const strands = work.headed.bars.map(({ label, title, soFar }) => `- ${label}: ${title} ${soFar.text}`);
-  const made = projects
-    .filter((project) => project.links.caseStudy)
-    .map((project) => `- ${link(project.name, project.links.caseStudy!)} (${project.year}): ${project.outcome}`);
+  const made = projects.flatMap(({ name, year, outcome, links }) => (links.caseStudy ? [`- ${link(name, links.caseStudy)} (${year}): ${outcome}`] : []));
   const others = projects
     .filter((project) => !project.links.caseStudy)
     .map((project) => {
@@ -99,7 +98,7 @@ export function homepageMarkdown(): string {
 /** The short index: who this is, and where each part of the site is in text. */
 export function llmsTxt(): string {
   const stories = Object.values(roleStories).map((story) => `- ${link(`${story.role} at ${story.employer}`, `/work/${story.slug}`)}: ${story.dates}`);
-  const caseStudies = projects.filter((project) => project.links.caseStudy).map((project) => `- ${link(project.name, project.links.caseStudy!)}: ${project.outcome}`);
+  const caseStudies = projects.flatMap(({ name, outcome, links }) => (links.caseStudy ? [`- ${link(name, links.caseStudy)}: ${outcome}`] : []));
   return [
     `# ${siteName}`,
     "",

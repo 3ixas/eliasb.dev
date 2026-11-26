@@ -1,14 +1,14 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
-  GITHUB_ACTIVITY_DAYS,
   bookFromGoodreads,
   datesForWindow,
   filmFromLetterboxd,
   mapContributionDays,
   latestRepository,
-  londonWeekday,
 } from "../src/integrations/signal-mappers.ts";
+import { ACTIVITY_DAYS } from "../src/integrations/activity-days.ts";
+import { londonWeekday } from "../src/integrations/london-time.ts";
 import { bookFromGoodreadsWidget } from "../src/integrations/goodreads-widget.ts";
 import { integrationConfig } from "../src/content/integration-config.ts";
 import { asOfDate, pinStatus, staleAfterDays } from "../src/integrations/pin-rules.ts";
@@ -400,8 +400,8 @@ try {
   Intl.DateTimeFormat = originalDateTimeFormat;
 }
 
-assert.equal(GITHUB_ACTIVITY_DAYS, 365);
-const contributionDays = datesForWindow(GITHUB_ACTIVITY_DAYS, now).map((day, index) => ({
+assert.equal(ACTIVITY_DAYS, 365);
+const contributionDays = datesForWindow(ACTIVITY_DAYS, now).map((day, index) => ({
   ...day,
   count: index === 100 ? 4 : day.count,
 }));
@@ -424,7 +424,7 @@ for (const { column, row, span } of contributionCalendar.monthLabels) {
 // partial month with no room for its label before the next month's is left unlabelled, as GitHub's own graph does.
 for (let offset = 0; offset < 366; offset += 1) {
   const end = new Date(Date.UTC(2026, 0, 1 + offset, 12));
-  const calendar = createContributionCalendar(datesForWindow(GITHUB_ACTIVITY_DAYS, end));
+  const calendar = createContributionCalendar(datesForWindow(ACTIVITY_DAYS, end));
   assert.ok(calendar);
   let labelEnd = 0;
   for (const { column, row, span, label } of calendar.monthLabels) {
@@ -434,7 +434,7 @@ for (let offset = 0; offset < 366; offset += 1) {
     labelEnd = column + span;
   }
 }
-const lateMonthStart = createContributionCalendar(datesForWindow(GITHUB_ACTIVITY_DAYS, new Date("2026-11-25T12:00:00.000Z")));
+const lateMonthStart = createContributionCalendar(datesForWindow(ACTIVITY_DAYS, new Date("2026-11-25T12:00:00.000Z")));
 assert.ok(lateMonthStart);
 assert.equal(lateMonthStart.days[0].date, "2025-11-26");
 assert.deepEqual(lateMonthStart.monthLabels.slice(0, 2).map(({ label }) => label), ["Dec", "Jan"], "A leading November with no room for its label is left unlabelled");
@@ -468,7 +468,7 @@ assert.deepEqual(
   ],
 );
 
-const quietYear = datesForWindow(GITHUB_ACTIVITY_DAYS, new Date("2026-10-02T12:00:00Z")).map(({ date }) => ({ date, count: 0 }));
+const quietYear = datesForWindow(ACTIVITY_DAYS, new Date("2026-10-02T12:00:00Z")).map(({ date }) => ({ date, count: 0 }));
 // Day tags and month labels are written by the site, the same in every locale.
 assert.equal(contributionTag({ date: "2026-01-15", count: 12 }), "12 contributions on Thu 15 Jan");
 assert.equal(contributionTag({ date: "2026-01-15", count: 1 }), "1 contribution on Thu 15 Jan");

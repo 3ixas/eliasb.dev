@@ -234,6 +234,10 @@ a.project:focus-visible {
   object-position: top left;
 }
 
+.things__rows .row__name {
+  overflow-wrap: anywhere;
+}
+
 .things__rows .row__meta {
   min-width: 0;
 }

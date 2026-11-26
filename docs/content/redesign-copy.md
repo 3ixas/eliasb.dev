@@ -266,6 +266,34 @@ Shared labels: ← Work · Next role · Evidence. Chapter rail landmark name (no
 | Meta description | I was a marketing executive at Kensington Medical and Optegra Eye Healthcare, and the best part was working with the engineers who built our website. |
 | Social card | Optegra Eye Healthcare & Kensington Medical · Marketing executive · ELIAS BENNETT |
 
+## Machine surfaces
+
+What only a machine or a screen reader is given (`src/content/markdown.ts`, `src/components/site/host-label.ts`). `verify:copy` holds these line for line and in order. The Work and Case studies links of `llms.txt` and the training week of `/index.md` are built from copy listed above. A host label is the name in a link’s screen-reader suffix, “opens {name} in a new tab”; any other host is read without its “www.”.
+
+| Surface | Line |
+| --- | --- |
+| llms.txt | # Elias Bennett |
+| llms.txt | > Software engineer in London. I build pricing and risk engines at BNP Paribas, and products of my own. |
+| llms.txt | My personal site. The Markdown homepage below covers the whole site in plain text; the pages under it go deeper into each role and project. |
+| llms.txt | ## The site |
+| llms.txt | - [Homepage as Markdown](https://www.eliasb.dev/index.md): who I am, my work, what I make, how I work, off the clock and how to reach me |
+| llms.txt | - [Résumé](https://www.eliasb.dev/resume): my career on one page |
+| llms.txt | - [Things I make](https://www.eliasb.dev/things-i-make): everything I’ve built that I’d happily talk through |
+| llms.txt | ## Contact |
+| llms.txt | - Email: eliasthebennett@gmail.com |
+| llms.txt | - [GitHub](https://github.com/3ixas) |
+| llms.txt | - [LinkedIn](https://linkedin.com/in/elias-t-bennett/) |
+| /index.md | ## Off the clock |
+| /index.md | What my own time looks like this week. My usual training week: |
+| /index.md | The page also shows what I’m reading, the last film I watched, an odd fact from this week in history, what I’m building now and my GitHub year, live from Goodreads, Letterboxd, Wikipedia and GitHub. |
+| Host label | github.com → GitHub |
+| Host label | linkedin.com → LinkedIn |
+| Host label | goodreads.com → Goodreads |
+| Host label | letterboxd.com → Letterboxd |
+| Host label | web.archive.org → the Wayback Machine |
+| Host label | threshold-beta.vercel.app → Threshold |
+| Host label | flowtime-focus-timer.vercel.app → Flowtime |
+
 ## Checks
 
 - **Facts:** every claim traces to #103, the CV, `docs/content/CASE-STUDY-SOURCES.md`, or the project specs (Argus `project-spec.md`; Flowtime `project-spec.md`, added 3 January 2026). Threshold’s figures come from the evidence note.

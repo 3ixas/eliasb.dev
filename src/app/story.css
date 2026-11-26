@@ -453,6 +453,8 @@
 .story-cards li.story-card {
   padding: 20px 24px;
   border-radius: 16px;
+  /* A long identifier breaks inside its card rather than widening it. */
+  overflow-wrap: anywhere;
 }
 
 .story-cards b {

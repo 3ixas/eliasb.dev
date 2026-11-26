@@ -7,7 +7,11 @@ import { projectPanelTransition, titleLinkTypes, TitleTransition } from "@/compo
 import type { Project } from "@/content/projects";
 
 /** A project opens at its case study, else its live site, else its code. */
-export const projectHref = ({ links }: Project) => (links.caseStudy ?? links.live ?? links.code)!;
+export function projectHref({ slug, links }: Project): string {
+  const href = links.caseStudy ?? links.live ?? links.code;
+  if (!href) throw new Error(`Project "${slug}" has no link; catalogueProblems requires one.`);
+  return href;
+}
 
 /** Its type and year, as the archive prints them under its line. */
 export const projectMeta = ({ type, year }: Project) => `${type} · ${year}`;

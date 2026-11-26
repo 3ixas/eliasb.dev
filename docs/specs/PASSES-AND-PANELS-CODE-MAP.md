@@ -174,7 +174,7 @@ No code to replace. They check the finished build; see the tickets.
 
 ### States and worst-case data (#426)
 
-- As built: `/fixtures/worst-case` (`BOARD_FIXTURES=1` only, like the other fixtures) prints the worst plausible value for each field through the real parts, at the limits, past them and empty. `e2e/worst-case.spec.ts` holds it at every width and theme of the matrix and at 200% zoom of a 1280 px window.
+- As built: `/fixtures/worst-case` (`BOARD_FIXTURES=1` only, like the other fixtures) prints the worst plausible value for each field through the real parts, at the limits, past them and empty. `e2e/worst-case.spec.ts` holds it at every width and theme of the matrix and at 200% zoom of a 1280 px window. [#544](https://github.com/3ixas/eliasb.dev/issues/544) adds the refinement's parts (Joveen's and Optegra's trays, Where I'm headed, How I work, the Threshold link and city switcher, Argus's rows, Problem and Decision cards and the homepage's project rows) with long values, and the spec measures each of their words against its box, its surface and any clip.
 - `TEXT_LIMITS` in `src/content/stretch/story.ts` states each value's measured limit (pass name 32 characters, a name 60, a display figure 8); `passProblems`, `roleStoryProblems`, `caseStudyProblems` and `catalogueProblems` refuse a longer one, and `verify:copy` and `verify:catalogue` show each going red.
 - `StaffPass` now hands its values to `PassCard`, which prints any values, so the fixture can pass the card a name no pass has.
 - The checkpoint found and fixed: the pass band ends a third line in an ellipsis instead of running under the clip; `.project__name`, `.next-panel__name` and `.panel__meta` break an unbroken word instead of stretching their panel.

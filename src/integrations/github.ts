@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { integrationConfig } from "@/content/integration-config";
-import { GITHUB_ACTIVITY_DAYS, latestRepository, mapContributionDays } from "@/integrations/signal-mappers";
+import { ACTIVITY_DAYS } from "@/integrations/activity-days";
+import { latestRepository, mapContributionDays } from "@/integrations/signal-mappers";
 import type { GitHubSignal, LatestRepositorySignal } from "@/integrations/types";
 
 const { username, profileUrl } = integrationConfig.github;
@@ -37,7 +38,7 @@ const fetchYear = unstable_cache(
     if (!token) throw new Error("GITHUB_SIGNAL_TOKEN is not set");
     const to = new Date();
     const from = new Date(to);
-    from.setUTCDate(to.getUTCDate() - (GITHUB_ACTIVITY_DAYS - 1));
+    from.setUTCDate(to.getUTCDate() - (ACTIVITY_DAYS - 1));
 
     const response = await fetch("https://api.github.com/graphql", {
       method: "POST",
@@ -72,7 +73,7 @@ const fetchYear = unstable_cache(
 
     return {
       state: "live",
-      activity: mapContributionDays(days, GITHUB_ACTIVITY_DAYS, to),
+      activity: mapContributionDays(days, ACTIVITY_DAYS, to),
       total: calendar.totalContributions,
       updatedAt: to.toISOString(),
       href: profileUrl,

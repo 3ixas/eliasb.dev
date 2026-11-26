@@ -1,7 +1,7 @@
 import type { ActivityDay } from "@/integrations/types";
+import { ACTIVITY_DAYS } from "../../integrations/activity-days.ts";
 import { MONTH_NAMES, SHORT_MONTH_NAMES } from "../../integrations/pin-rules.ts";
 
-export const CONTRIBUTION_WINDOW_DAYS = 365;
 // Explicit English names keep server and browser output identical during hydration.
 // Their Intl locale data can disagree, for example "Sept" versus "Sep".
 export const CONTRIBUTION_WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] as const;
@@ -19,7 +19,7 @@ function dateFromIsoDay(value: string) {
 }
 
 export function createContributionCalendar(activity: ActivityDay[]): ContributionCalendarModel | null {
-  const days = activity.slice(-CONTRIBUTION_WINDOW_DAYS);
+  const days = activity.slice(-ACTIVITY_DAYS);
   if (!days.length) return null;
 
   const startWeekday = dateFromIsoDay(days[0].date).getUTCDay();
