@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { withoutScene } from "./support/scene";
 
 // Motion on the finished page: hover that only moves things where there is a hover. (How I work's pen, which drew with the scroll, retired in #414.)
@@ -121,6 +121,26 @@ test.describe("Panel to page title transitions", () => {
   }
 
   /**
+   * Waits until the panel holding `link` has finished its 900 ms rise (`[data-rise]`, parts.css), with its title and the
+   * link on screen. A click on a moving link is retried at other scroll positions, one of which puts the title off
+   * screen, where it takes no part in the transition (#553).
+   */
+  async function waitForArrival(link: Locator) {
+    await expect
+      .poll(() =>
+        link.evaluate((element) => {
+          const title = element.closest(".panel")?.querySelector(".panel__name, .project__name");
+          const rise = element.closest("[data-rise]");
+          if (!title || !rise) return false;
+          const { opacity, transform } = getComputedStyle(rise);
+          const inView = ({ top, bottom }: DOMRect) => bottom > 0 && top < innerHeight;
+          return parseFloat(opacity) > 0.99 && transform === "none" && inView(title.getBoundingClientRect()) && inView(element.getBoundingClientRect());
+        }),
+      )
+      .toBe(true);
+  }
+
+  /**
    * Intercepts the next `document.startViewTransition` call, pauses the shared title group once ready,
    * seeks to 0%, 25% and 100%, and skips the transition so the spec proves the morph without waiting it out.
    */
@@ -231,6 +251,7 @@ test.describe("Panel to page title transitions", () => {
     const thresholdPanel = page.locator('#things-i-make .project a[href="/things-i-make/threshold"]');
     await thresholdPanel.scrollIntoViewIfNeeded();
     await waitForHydration(page, '#things-i-make .project a[href="/things-i-make/threshold"]');
+    await waitForArrival(thresholdPanel);
 
     const forward = await sampleRouteTransition(page, () => thresholdPanel.click(), /\/things-i-make\/threshold$/);
     expectSingleTitleMorph(forward, "route-title-project-threshold");
@@ -249,6 +270,7 @@ test.describe("Panel to page title transitions", () => {
     const flowtimePanel = page.locator('a.project[href="/things-i-make/flowtime"]');
     await flowtimePanel.scrollIntoViewIfNeeded();
     await waitForHydration(page, 'a.project[href="/things-i-make/flowtime"]');
+    await waitForArrival(flowtimePanel);
 
     const forward = await sampleRouteTransition(page, () => flowtimePanel.click(), /\/things-i-make\/flowtime$/);
     expectSingleTitleMorph(forward, "route-title-project-flowtime");
@@ -269,23 +291,10 @@ test.describe("Panel to page title transitions", () => {
     await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
     await page.evaluate(() => document.fonts.ready);
 
-    // Center Joveen so both its visible title (.panel__name) and story link stay on-screen,
-    // and wait for its OnView arrival to finish before clicking.
+    // Center Joveen so both its visible title (.panel__name) and story link stay on-screen.
     await page.locator("#joveen").evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
     await waitForHydration(page, "#joveen .work__story");
-    await expect
-      .poll(() =>
-        page.evaluate(() => {
-          const titleRect = document.querySelector("#joveen .panel__name")?.getBoundingClientRect();
-          const linkRect = document.querySelector("#joveen .work__story")?.getBoundingClientRect();
-          const arrival = document.querySelector("#joveen")?.closest(".work-role__arrival");
-          const arrivalStyle = arrival ? getComputedStyle(arrival) : null;
-          const settled = !arrivalStyle || (parseFloat(arrivalStyle.opacity) > 0.99 && arrivalStyle.transform === "none");
-          const inView = (rect?: DOMRect) => Boolean(rect && rect.bottom > 0 && rect.top < window.innerHeight);
-          return settled && inView(titleRect) && inView(linkRect);
-        }),
-      )
-      .toBe(true);
+    await waitForArrival(page.locator("#joveen .work__story"));
 
     const toJoveen = await sampleRouteTransition(page, () => page.locator("#joveen .work__story").click(), /\/work\/joveen$/);
     expectSingleTitleMorph(toJoveen, "route-title-employer-joveen");
