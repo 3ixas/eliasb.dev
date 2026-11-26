@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import "@/app/off-the-clock.css";
 import { ZoomableImage } from "@/components/site/zoomable-image";
 import { offTheClock } from "@/content/stretch/off-the-clock";
 import { londonWeekday } from "@/integrations/london-time";

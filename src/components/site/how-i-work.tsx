@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
+import "@/app/headed-how.css";
 import { MeasureSide } from "@/components/parts/measure";
 import { OnView } from "@/components/parts/on-view";
 import { Arrow } from "@/components/parts/panel";

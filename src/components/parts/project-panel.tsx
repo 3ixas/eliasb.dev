@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
+import "@/app/projects.css";
 import { hostLabel } from "@/components/site/host-label";
 import { isInternalHref, SiteLink } from "@/components/site/site-link";
 import { Arrow, OUT, panelSurface } from "@/components/parts/panel";
@@ -28,8 +29,8 @@ type ProjectPanelProps = {
   meta?: boolean;
   /** On the first screen, so the screenshot loads at once. */
   eager?: boolean;
-  /** "low" for a first-screen screenshot that a phone shows below the first one, which then loads ahead of it. */
-  fetchPriority?: "low";
+  /** "high" for the archive's first screenshot (its LCP); "low" for the rest of the first screen so the first loads ahead of them. */
+  fetchPriority?: "high" | "low";
   /** Opts this panel's title into the shared route view transition to its case study h1 (#472). */
   titleTransition?: boolean;
   /** Inline interactive controls (e.g. Threshold's homepage city switcher); renders an article with a case-study pill so controls never nest inside a link. */

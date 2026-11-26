@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
+import "@/app/off-the-clock.css";
 import { Count } from "@/components/parts/on-view";
 import {
   contributionAccessibleTag,
@@ -8,10 +9,11 @@ import {
   contributionTag,
   createContributionCalendar,
   moveContributionCalendarIndex,
+  unpackContributionActivity,
+  type CompactActivity,
 } from "@/components/site/contribution-calendar-model";
 import { DotLine } from "@/components/site/dot-line";
 import { offTheClock } from "@/content/stretch/off-the-clock";
-import type { ActivityDay } from "@/integrations/types";
 
 const copy = offTheClock.github;
 
@@ -23,8 +25,8 @@ const grouped = (value: number) => String(Math.round(value)).replace(/\B(?=(\d{3
  * time it is on screen. Hover, focus or tap a day to read its count. On phones the grid scrolls sideways inside its
  * own column and opens on today, with its left edge faded. `mark` is the source mark that ends the total's line.
  */
-export function GitHubYear({ activity, total, mark }: { activity: ActivityDay[]; total: number; mark?: ReactNode }) {
-  const calendar = createContributionCalendar(activity);
+export function GitHubYear({ activity, total, mark }: { activity: CompactActivity; total: number; mark?: ReactNode }) {
+  const calendar = createContributionCalendar(unpackContributionActivity(activity));
   const [selected, setSelected] = useState<number | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const buttons = useRef(new Map<number, HTMLButtonElement>());

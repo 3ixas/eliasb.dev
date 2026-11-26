@@ -1,4 +1,5 @@
 import Link from "next/link";
+import "@/app/work.css";
 import { MeasureSide } from "@/components/parts/measure";
 import { OnView, Count } from "@/components/parts/on-view";
 import { Arrow, Panel, PanelHead } from "@/components/parts/panel";

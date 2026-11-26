@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import "@/app/story.css";
 import { Count } from "@/components/parts/on-view";
 import { Arrow, panelSurface } from "@/components/parts/panel";
 import { titleLinkTypes, TitleTransition, type PanelTitleTransition } from "@/components/parts/title-transition";

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import "@/app/resume.css";
 import { SiteLink } from "@/components/site/site-link";
 import { SayHello } from "@/components/site/say-hello";
 import { SiteHeader } from "@/components/site/site-header";

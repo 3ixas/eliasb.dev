@@ -4,7 +4,7 @@ import process from "node:process";
 import { setTimeout as delay } from "node:timers/promises";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { gzipSync } from "node:zlib";
+import { brotliCompressSync, constants as zlibConstants, gzipSync } from "node:zlib";
 
 const compatibilityRedirects = new Map([
   ["/about", "/#work"],
@@ -68,6 +68,24 @@ const requiredHomepageSections = ["work", "things-i-make", "how-i-work", "off-th
 // A route's JavaScript may grow by this much over its measured baseline in scripts/js-budget.json (gzipped bytes of the scripts its HTML loads).
 const jsBudgetGrowth = 0.1;
 const { routes: jsBudget, sceneChunk: sceneBudget } = JSON.parse(readFileSync(new URL("./js-budget.json", import.meta.url), "utf8"));
+// First-load budgets (#572): brotli q4 of the server HTML plus every linked /_next/static/ stylesheet.
+// Lighthouse's mobile simulation hits a TCP-window cliff at 43,800 bytes on `/`, so the budget leaves margin
+// below it. CI builds with `--webpack` and without GITHUB_SIGNAL_TOKEN while Vercel production uses Turbopack
+// with live GitHub activity; the CSS-only caps and route non-leakage checks hold in both.
+const firstLoadBudgets = {
+  "/": {
+    maxCssBr4: 19_000,
+    maxTotalBr4: 41_000,
+    requiredCss: [".opening__line", ".otc__section"],
+    forbiddenCss: [".resume__sheet", ".story-open", ".sim__plot"],
+  },
+  "/things-i-make": {
+    maxCssBr4: 12_000,
+    maxTotalBr4: 22_000,
+    requiredCss: [".archive__grid"],
+    forbiddenCss: [".resume__sheet", ".story-open", ".sim__plot", ".otc__section", ".opening__line", ".pass__card"],
+  },
+};
 const failures = [];
 let checkCount = 0;
 
@@ -340,6 +358,89 @@ async function verifyJavaScriptBudget(baseUrl, pages) {
   check(scene <= sceneLimit, `The lanyard scene chunk is ${scene} bytes of JavaScript, over its ${sceneLimit} limit (10% over the ${sceneBudget} sceneChunk baseline in scripts/js-budget.json)`);
 }
 
+function brotliBytes(content) {
+  return brotliCompressSync(Buffer.from(content), {
+    params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 4 },
+  }).length;
+}
+
+function imagePreloadTags(document) {
+  return tags(document, "link").filter((tag) => attribute(tag, "rel") === "preload" && attribute(tag, "as") === "image");
+}
+
+function hasImageTarget(tag, pathFragment) {
+  const encoded = encodeURIComponent(pathFragment);
+  const haystack = `${attribute(tag, "href") ?? ""} ${attribute(tag, "src") ?? ""} ${attribute(tag, "srcset") ?? ""} ${attribute(tag, "imagesrcset") ?? ""}`;
+  return haystack.includes(pathFragment) || haystack.includes(encoded);
+}
+
+/** Deterministic byte and markup gates for first-load CSS/HTML transfer and image priority (#572). */
+async function verifyFirstLoadBudget(baseUrl, pages) {
+  for (const [route, budget] of Object.entries(firstLoadBudgets)) {
+    const page = pages.get(route) ?? await fetchPage(baseUrl, route);
+    pages.set(route, page);
+
+    const stylesheetHrefs = [...new Set(
+      tags(page.document, "link")
+        .filter((tag) => attribute(tag, "rel") === "stylesheet")
+        .map((tag) => attribute(tag, "href"))
+        .filter((href) => href?.includes("/_next/static/")),
+    )];
+    check(stylesheetHrefs.length > 0, `${route} should link at least one /_next/static/ stylesheet`);
+
+    let cssBr4 = 0;
+    const cssTexts = [];
+    for (const href of stylesheetHrefs) {
+      const response = await fetch(new URL(href, baseUrl), { redirect: "manual" });
+      equal(response.status, 200, `${route} stylesheet ${href} should return 200`);
+      const css = await response.text();
+      cssBr4 += brotliBytes(css);
+      cssTexts.push(css);
+    }
+
+    const combinedCss = cssTexts.join("\n");
+    const docBr4 = brotliBytes(page.document);
+    const totalBr4 = docBr4 + cssBr4;
+    console.log(
+      `First-load bytes on ${route}: doc ${docBr4} B + CSS ${cssBr4} B (${stylesheetHrefs.length} file${stylesheetHrefs.length === 1 ? "" : "s"}) = ${totalBr4} B brotli q4 (limits: CSS <= ${budget.maxCssBr4}, total <= ${budget.maxTotalBr4})`,
+    );
+    check(cssBr4 <= budget.maxCssBr4, `${route} linked CSS is ${cssBr4} bytes brotli q4, over its ${budget.maxCssBr4} limit`);
+    check(totalBr4 <= budget.maxTotalBr4, `${route} document + CSS is ${totalBr4} bytes brotli q4, over its ${budget.maxTotalBr4} limit`);
+
+    for (const selector of budget.requiredCss) {
+      check(combinedCss.includes(selector), `${route} linked CSS should include ${selector}`);
+    }
+    for (const selector of budget.forbiddenCss) {
+      check(!combinedCss.includes(selector), `${route} linked CSS must not pull in route-only selector ${selector}`);
+    }
+  }
+
+  const home = pages.get("/");
+  check(
+    !imagePreloadTags(home.document).some((tag) => hasImageTarget(tag, "elias-evening-pass")),
+    "Homepage should not preload the staff pass portrait in <head>",
+  );
+  const passPhoto = tags(home.markup, "img").find((tag) => (attribute(tag, "class") ?? "").split(/\s+/).includes("pass__photo"));
+  check(Boolean(passPhoto), "Homepage should render the printed staff pass portrait");
+  equal(attribute(passPhoto ?? "", "loading"), "lazy", "Homepage staff pass portrait should defer preload without blocking LCP");
+  check(attribute(passPhoto ?? "", "fetchpriority") !== "high", "Homepage staff pass portrait should not claim high fetchpriority");
+
+  const archive = pages.get("/things-i-make");
+  const firstArchivePreload = imagePreloadTags(archive.document).find((tag) => hasImageTarget(tag, "threshold/answer.webp"));
+  check(Boolean(firstArchivePreload), "Archive should preload its first screenshot (Threshold) in <head>");
+  equal(attribute(firstArchivePreload ?? "", "fetchpriority"), "high", "Archive first screenshot preload fetchpriority");
+
+  const archiveImages = tags(archive.markup, "img");
+  check(archiveImages.length >= 3, "Archive should render its first-screen project screenshots");
+  check(hasImageTarget(archiveImages[0] ?? "", "threshold/answer.webp"), "Archive first image should be Threshold's screenshot");
+  equal(attribute(archiveImages[0] ?? "", "loading"), "eager", "Archive first screenshot loading");
+  equal(attribute(archiveImages[0] ?? "", "fetchpriority"), "high", "Archive first screenshot fetchpriority");
+  for (const index of [1, 2]) {
+    equal(attribute(archiveImages[index] ?? "", "loading"), "eager", `Archive screenshot #${index + 1} loading`);
+    equal(attribute(archiveImages[index] ?? "", "fetchpriority"), "low", `Archive screenshot #${index + 1} fetchpriority`);
+  }
+}
+
 /** Every card address carries Next's cache hash, so a changed card is fetched again; a page without its own card takes the homepage's. */
 function verifyCardAddresses(pages) {
   const home = pages.get("/").document;
@@ -570,6 +671,7 @@ try {
   verifyCardAddresses(pages);
   await verifyHeaders(baseUrl, pages);
   await verifyJavaScriptBudget(baseUrl, pages);
+  await verifyFirstLoadBudget(baseUrl, pages);
 
   const robots = await fetchAsset(baseUrl, "/robots.txt");
   equal(

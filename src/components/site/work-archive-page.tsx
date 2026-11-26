@@ -1,3 +1,4 @@
+import "@/app/projects.css";
 import { OnView } from "@/components/parts/on-view";
 import { ProjectPanel } from "@/components/parts/project-panel";
 import { LongForm } from "@/components/site/long-form";
@@ -34,7 +35,7 @@ export function WorkArchivePage({ catalogue }: { catalogue: readonly Project[] }
                     level={2}
                     meta
                     eager={index < FIRST_SCREEN}
-                    fetchPriority={index > 0 && index < FIRST_SCREEN ? "low" : undefined}
+                    fetchPriority={index === 0 ? "high" : index < FIRST_SCREEN ? "low" : undefined}
                     titleTransition
                   />
                 </OnView>

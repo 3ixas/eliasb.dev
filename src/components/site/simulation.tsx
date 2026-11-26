@@ -1,3 +1,4 @@
+import "@/app/simulation.css";
 import { SimulationPlot } from "@/components/site/simulation-plot";
 import { simulationCopy } from "@/content/stretch/simulation-copy";
 

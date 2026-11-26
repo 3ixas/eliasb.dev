@@ -22,6 +22,8 @@ import {
   createContributionCalendar,
   formatContributionDate,
   moveContributionCalendarIndex,
+  packContributionActivity,
+  unpackContributionActivity,
 } from "../src/components/site/contribution-calendar-model.ts";
 
 const now = new Date("2026-09-16T12:00:00.000Z");
@@ -447,6 +449,29 @@ assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "Home"), 9
 assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "End"), 101);
 assert.equal(moveContributionCalendarIndex(contributionCalendar, 100, "Escape"), null);
 assert.equal(createContributionCalendar([]), null);
+
+// Compact activity round-trips consecutive UTC days (including leap days and year boundaries) and rejects gaps.
+const packedYear = packContributionActivity(contributionDays);
+assert.ok(packedYear);
+assert.equal(packedYear.start, "2025-09-17");
+assert.equal(packedYear.counts.length, ACTIVITY_DAYS);
+assert.deepEqual(unpackContributionActivity(packedYear), contributionDays);
+const leapDays = [
+  { date: "2024-02-28", count: 2 },
+  { date: "2024-02-29", count: 5 },
+  { date: "2024-03-01", count: 0 },
+];
+assert.deepEqual(unpackContributionActivity(packContributionActivity(leapDays)), leapDays);
+const yearBoundary = [
+  { date: "2025-12-31", count: 3 },
+  { date: "2026-01-01", count: 1 },
+];
+assert.deepEqual(unpackContributionActivity(packContributionActivity(yearBoundary)), yearBoundary);
+assert.equal(packContributionActivity([]), null);
+assert.throws(
+  () => packContributionActivity([{ date: "2026-01-01", count: 1 }, { date: "2026-01-03", count: 2 }]),
+  /Expected consecutive UTC contribution day/,
+);
 
 // The plan's "today" is the day in London, Monday (0) to Sunday (6), through BST and GMT.
 assert.equal(londonWeekday(new Date("2026-10-04T22:59:00Z")), 6, "Sunday 23:59 BST");

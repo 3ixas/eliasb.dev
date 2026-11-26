@@ -39,3 +39,66 @@ test("an inner page's header links lead to the homepage's five sections", async 
     await expect(nav.locator("[aria-current]"), route).toHaveCount(0);
   }
 });
+
+test.describe("route stylesheet loading and client navigation (#572)", () => {
+  test("every route loads its own stylesheets on direct navigation", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator(".opening__actions")).toHaveCSS("display", "flex");
+    await expect(page.locator(".pass__card").first()).toHaveCSS("display", "block");
+    await expect(page.locator(".work-metrics").first()).toHaveCSS("display", "grid");
+    await expect(page.locator(".project").first()).toHaveCSS("display", "grid");
+    await expect(page.locator(".cards")).toHaveCSS("display", "grid");
+    await expect(page.locator(".otc__section").first()).toHaveCSS("display", "grid");
+    await expect(page.locator(".zoom").first()).toHaveCSS("cursor", "zoom-in");
+
+    await page.goto("/things-i-make");
+    await expect(page.locator(".archive__grid .project").first()).toHaveCSS("display", "grid");
+
+    await page.goto("/things-i-make/threshold");
+    await expect(page.locator(".story-back")).toHaveCSS("display", "inline-flex");
+    await expect(page.locator(".zoom").first()).toHaveCSS("cursor", "zoom-in");
+
+    await page.goto("/work/bnp-paribas");
+    await expect(page.locator(".story-back")).toHaveCSS("display", "inline-flex");
+    await expect(page.locator(".pass__card").first()).toHaveCSS("display", "block");
+    await expect(page.locator(".sim")).toHaveCSS("display", "grid");
+    await expect(page.locator(".sim figcaption")).toHaveCSS("font-size", "15px");
+
+    await page.goto("/resume");
+    await expect(page.locator(".resume__sheet")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+
+    await page.goto("/nothing-here");
+    await expect(page.locator(".not-found__pass")).toHaveCSS("display", "flex");
+    await expect(page.locator(".pass__card").first()).toHaveCSS("display", "block");
+  });
+
+  test("client navigation loads target route styles and keeps cascade intact", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    // Start on the leanest route (projects.css only), then traverse into story, home, simulation, and resume.
+    await page.goto("/things-i-make");
+    await expect(page.locator(".archive__grid .project").first()).toHaveCSS("display", "grid");
+
+    await page.locator('.archive__grid a[href="/things-i-make/threshold"]').click();
+    await expect(page).toHaveURL(/\/things-i-make\/threshold$/);
+    await expect(page.locator(".story-back")).toHaveCSS("display", "inline-flex");
+    await expect(page.locator(".zoom").first()).toHaveCSS("cursor", "zoom-in");
+
+    await page.locator(".site-header__name").click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.locator(".opening__actions")).toHaveCSS("display", "flex");
+    await expect(page.locator(".pass__card").first()).toHaveCSS("display", "block");
+    await expect(page.locator(".work-metrics").first()).toHaveCSS("display", "grid");
+    await expect(page.locator(".cards")).toHaveCSS("display", "grid");
+    await expect(page.locator(".otc__section").first()).toHaveCSS("display", "grid");
+
+    // story.css is already loaded before simulation.css here; .sim figcaption must still keep simulation.css's 15px size.
+    await page.locator('a[href="/work/bnp-paribas"]').first().click();
+    await expect(page).toHaveURL(/\/work\/bnp-paribas$/);
+    await expect(page.locator(".sim")).toHaveCSS("display", "grid");
+    await expect(page.locator(".sim figcaption")).toHaveCSS("font-size", "15px");
+
+    await page.locator('a[href="/resume"]').first().click();
+    await expect(page).toHaveURL(/\/resume$/);
+    await expect(page.locator(".resume__sheet")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  });
+});

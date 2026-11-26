@@ -1,8 +1,10 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
+import "@/app/off-the-clock.css";
 import { OUT, Panel } from "@/components/parts/panel";
+import { packContributionActivity } from "@/components/site/contribution-calendar-model";
 import { GitHubYear } from "@/components/site/github-year";
-import { HistoryBand } from "@/components/site/history-band";
+import { HistoryBand, type HistoryBandEvent } from "@/components/site/history-band";
 import { hostLabel } from "@/components/site/host-label";
 import { isInternalHref, SiteLink } from "@/components/site/site-link";
 import { projects } from "@/content/projects";
@@ -127,7 +129,23 @@ function printedDate(event: HistorySignal["events"][number], day: ReturnType<typ
 export function HistoryCell({ history }: { history: HistorySignal }) {
   if (history.events.length === 0) return null;
   const day = history.weekOf ? asOfDate(new Date(`${history.weekOf}T12:00:00Z`)) : null;
-  return <HistoryBand events={history.events} dates={history.events.map((event) => printedDate(event, day))} source={day ? undefined : copy.curiosity.fallback} />;
+  const events: HistoryBandEvent[] = history.events.map(({ year, text, image }) => ({
+    year,
+    text,
+    ...(image
+      ? {
+          image: {
+            src: image.src,
+            alt: image.alt,
+            width: image.width,
+            height: image.height,
+            creator: image.creator,
+            licenseName: image.licenseName,
+          },
+        }
+      : {}),
+  }));
+  return <HistoryBand events={events} dates={history.events.map((event) => printedDate(event, day))} source={day ? undefined : copy.curiosity.fallback} />;
 }
 
 /** What I'm building now: a full-width strip above the contribution grid with its heading, live mark, repo link and description. */
@@ -162,15 +180,15 @@ function MakingBand({ making, live }: { making: NonNullable<ReturnType<typeof no
 export function GitHubCell({ github, latest, now }: { github: GitHubSignal; latest: LatestRepositorySignal; now: Date }) {
   const status = pinStatus("github", github, now);
   const making = nowMakingEntry(latest.repository, projects);
-  const year = status.kind !== "removed" && github.activity.length > 0;
+  const activity = status.kind !== "removed" ? packContributionActivity(github.activity) : null;
   return (
     <div className="otc__year otc__section" data-otc="github" data-state={status.kind === "stale" ? "stale" : "current"}>
       <h3 className="otc__title">{copy.github.heading}</h3>
       <div className="otc__github-body">
         {making && <MakingBand making={making} live={latest.state === "live"} />}
-        {year && <GitHubYear activity={github.activity} total={github.total} />}
+        {activity && <GitHubYear activity={activity} total={github.total} />}
         <Stale source={copy.github.sourceName} status={status} />
-        {!year && !making && (
+        {!activity && !making && (
           <p>
             <SiteLink href={profile.links.github} className="otc__making">
               {copy.github.sourceName}

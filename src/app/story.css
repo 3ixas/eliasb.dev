@@ -481,7 +481,7 @@
   margin: 36px 0 0;
 }
 
-.story-fig figcaption {
+.story-fig > figcaption {
   margin-top: 12px;
   color: var(--muted);
   font-size: var(--type-small);

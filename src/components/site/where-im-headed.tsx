@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import "@/app/headed-how.css";
 import { DrawnTicks } from "@/components/parts/drawn-ticks";
 import { OnView } from "@/components/parts/on-view";
 import { Panel } from "@/components/parts/panel";
