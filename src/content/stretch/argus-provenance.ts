@@ -16,8 +16,8 @@ export const argusProvenanceCopy = {
   topic: "A price tick on market-data.prices",
   caption: "Press a number to see the price it came from and how old it is. New event brings a new price for the oldest one.",
   description: "Illustrative positions in Argus’s own shapes. Argus counts a price older than 5 seconds as stale.",
-  /** Said politely when a new event lands: "AAPL: a new price, +$1,402". */
-  announce: (symbol: string, value: string) => `${symbol}: a new price, ${value}`,
+  /** Said politely when a new event lands: "TTE.PA: a new price of 62.10 EUR, unrealised P&L −$324". */
+  announce: (symbol: string, price: string, value: string) => `${symbol}: a new price of ${price}, unrealised P&L ${value}`,
 } as const;
 
 /** Argus's staleness threshold: a price older than this many seconds is stale. */
@@ -56,8 +56,11 @@ const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD",
 /** "+$1,344" or "−$365", with a true minus sign. */
 export const formatUsd = (value: number) => usd.format(Math.round(value)).replace("-", "−");
 
+/** "182.40 USD". */
+export const priceText = ({ price, currency }: Pick<ArgusPosition, "price" | "currency">) => `${price.toFixed(2)} ${currency}`;
+
 /** "AAPL at 182.40 USD". */
-export const pricedAt = ({ symbol, price, currency }: Pick<ArgusPosition, "symbol" | "price" | "currency">) => `${symbol} at ${price.toFixed(2)} ${currency}`;
+export const pricedAt = (position: Pick<ArgusPosition, "symbol" | "price" | "currency">) => `${position.symbol} at ${priceText(position)}`;
 
 /** "Converted at GBP/USD 1.27", or nothing for a USD position. */
 export const convertedAt = (currency: ArgusCurrency) => (currency === "USD" ? "" : `Converted at ${currency}/USD ${usdPer[currency].toFixed(2)}`);

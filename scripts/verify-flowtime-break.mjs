@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { breakMinutes, breakSeconds, focusRange, pomodoro } from "../src/content/stretch/flowtime-break.ts";
+import { breakMinutes, breakSeconds, flowtimeBreakCopy, focusRange, pomodoro } from "../src/content/stretch/flowtime-break.ts";
 
 // Flowtime's break rule (#464), pinned to its repository's own cases (`3ixas/flowtime-focus-timer`,
 // src/lib/breakCalculation.test.ts on main): focus seconds in, break seconds out, at the default ratio of 5.
@@ -35,5 +35,17 @@ for (let focus = focusRange.min; focus <= focusRange.max; focus += 1, values += 
 }
 assert.ok(focusRange.start >= focusRange.min && focusRange.start <= focusRange.max, "The start is on the slider");
 assert.equal(breakMinutes(pomodoro.focus), pomodoro.rest, "At 25 minutes Flowtime and a Pomodoro agree");
+
+// The slider's spoken value takes "an" before a break that starts with a vowel sound.
+for (const [focus, rest, said] of [
+  [40, 8, "40 minutes of focus, an 8-minute break"],
+  [55, 11, "55 minutes of focus, an 11-minute break"],
+  [90, 18, "90 minutes of focus, an 18-minute break"],
+  [45, 9, "45 minutes of focus, a 9-minute break"],
+  [60, 12, "60 minutes of focus, a 12-minute break"],
+]) {
+  assert.equal(breakMinutes(focus), rest, `${focus} min of focus`);
+  assert.equal(flowtimeBreakCopy.valueText(focus, rest), said);
+}
 
 console.log(`Flowtime break checks passed: ${repositoryCases.length} repository cases, ${values} slider values.`);

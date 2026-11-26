@@ -622,7 +622,7 @@ test.describe("Case study: Argus Risk's numbers with their history", () => {
     await expect(number(page, oldest.symbol)).toHaveAttribute("aria-expanded", "true");
     await expect(source(page, oldest.symbol)).toContainText(pricedAt(next));
     await expect(source(page, oldest.symbol)).toContainText(`${argusProvenanceCopy.age}0 s`);
-    await expect(figure(page).getByRole("status")).toHaveText(argusProvenanceCopy.announce(oldest.symbol, formatUsd(unrealisedUsd(next))));
+    await expect(figure(page).getByRole("status")).toHaveText("TTE.PA: a new price of 62.10 EUR, unrealised P&L −$324");
     // New event is a key in Argus's colour, and an open number rises into one; a closed number stays plain.
     const argus = projects.find(({ slug }) => slug === "argus-risk")!.panel!;
     for (const key of [figure(page).getByRole("button", { name: argusProvenanceCopy.newEvent }), number(page, oldest.symbol)]) {
@@ -725,10 +725,12 @@ test.describe("Case study: Flowtime's break that follows the focus", () => {
     await expectFlowtime(page, 20);
   });
 
-  test("with reduced motion, the minutes jump to length", async ({ page }) => {
+  test("with reduced motion, the minutes jump to length and nothing washes", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await live(page);
     await expect(figure(page).locator(".measure--minutes i").first()).toHaveCSS("transition-duration", "0s");
+    await slider(page).press("ArrowRight");
+    await expect(figure(page).locator("[data-wash]").first()).toHaveCSS("animation-name", "none");
   });
 
   test.describe("without script", () => {

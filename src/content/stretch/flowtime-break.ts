@@ -16,8 +16,8 @@ export const flowtimeBreakCopy = {
   caption: "Flowtime’s break is a fifth of your focus, rounded up to the minute. A Pomodoro is 25 and 5, however the work is going.",
   /** "45 min". */
   minutes: (minutes: number) => `${minutes} min`,
-  /** What the slider says as its value: "45 minutes of focus, a 9-minute break". */
-  valueText: (focus: number, rest: number) => `${focus} minutes of focus, a ${rest}-minute break`,
+  /** What the slider says as its value: "45 minutes of focus, a 9-minute break". "Eight", "eleven" and "eighteen" take "an". */
+  valueText: (focus: number, rest: number) => `${focus} minutes of focus, ${[8, 11, 18].includes(rest) ? "an" : "a"} ${rest}-minute break`,
 } as const;
 
 /** Flowtime's default ratio: the break is work time ÷ 5 (`DEFAULT_BREAK_RATIO`). */

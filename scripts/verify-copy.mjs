@@ -89,7 +89,7 @@ const built = [
   offTheClock.github.contributions("1,221"),
   ...["GitHub", "Wikipedia"].map(offTheClock.live),
   offTheClock.fromAsOf("Goodreads", "date"),
-  argusProvenanceCopy.announce("symbol", "value"),
+  argusProvenanceCopy.announce("symbol", "price currency", "value"),
   flowtimeBreakCopy.minutes("n"),
   flowtimeBreakCopy.valueText("focus", "break"),
 ];

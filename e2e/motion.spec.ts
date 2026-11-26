@@ -97,6 +97,61 @@ test.describe("Threshold's link rewrites itself", () => {
   });
 });
 
+// Flowtime's slider (#542): the one continuous control in a working figure, so its numbers hold still through a run of
+// steps and only their wash replays behind them.
+test.describe("Flowtime's numbers under a moving slider", () => {
+  test.use({ reducedMotion: "no-preference" });
+
+  test("12 steps at 50 ms never fade a number, and each change replays its wash", async ({ page }) => {
+    await page.goto("/things-i-make/flowtime");
+    const figure = page.locator("section#decisions .working-fig");
+    await figure.scrollIntoViewIfNeeded();
+    await expect(figure.locator(".ftbreak[data-live]")).toHaveCount(1);
+    const slider = figure.getByRole("slider");
+    const start = Number(await slider.inputValue());
+    await slider.focus();
+    // Every frame: the faintest either of Flowtime's numbers is drawn, and whether either node has been swapped out.
+    const record = await figure.locator(".ftbreak").evaluateHandle((box) => {
+      const numbers = () => [...box.querySelectorAll(".ftbreak__round:first-child .cmp b")];
+      const first = numbers();
+      const seen = { frames: 0, lowest: 1, swapped: false };
+      const sample = () => {
+        numbers().forEach((number, index) => {
+          let opacity = 1;
+          for (let element: Element | null = number; element && element !== box.parentElement; element = element.parentElement) {
+            opacity *= Number(getComputedStyle(element).opacity);
+          }
+          seen.lowest = Math.min(seen.lowest, opacity);
+          seen.swapped ||= number !== first[index];
+        });
+        seen.frames += 1;
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+      return seen;
+    });
+    for (let step = 0; step < 12; step += 1) {
+      await page.keyboard.press("ArrowRight");
+      await page.waitForTimeout(50);
+    }
+    await expect(slider).toHaveValue(String(start + 12));
+    // Keep sampling past the 200 ms an arrival would take after the last step.
+    const atLastStep = await record.evaluate(({ frames }) => frames);
+    await expect.poll(() => record.evaluate(({ frames }) => frames)).toBeGreaterThan(atLastStep + 15);
+    const { lowest, swapped } = await record.jsonValue();
+    expect(swapped).toBe(false);
+    expect(lowest).toBeGreaterThanOrEqual(0.9);
+
+    const wash = figure.locator(".ftbreak__round").first().locator("[data-wash]").first();
+    await expect(wash).toHaveCSS("animation-name", "working-wash");
+    await expect(wash).toHaveCSS("animation-duration", "1.2s");
+    const last = await wash.elementHandle();
+    await page.keyboard.press("ArrowRight");
+    await expect.poll(() => last!.evaluate((element) => element.isConnected)).toBe(false);
+    await expect(wash).toHaveCSS("animation-name", "working-wash");
+  });
+});
+
 // Panel to page (#472, quietened in #493): only the clicked employer or project title carries across,
 // in 240 ms (< 300 ms) on --out; the root never fades, screenshots do not travel, and reduced motion
 // or browsers without View Transitions change at once.
