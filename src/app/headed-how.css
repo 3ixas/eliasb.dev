@@ -376,6 +376,12 @@
   gap: 8px 10px;
 }
 
+.flag-route__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: inherit;
+}
+
 .flag-switch {
   display: inline-flex;
   align-items: center;

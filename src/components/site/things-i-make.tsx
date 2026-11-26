@@ -80,9 +80,9 @@ export function ThingsIMake() {
           </OnView>
         )}
         {pair.length > 0 && (
-          <div className="panels panels--two">
+          <div className="panels panels--two panels--level">
             {pair.map((project) => (
-              <OnView key={project.slug} motion="rise" className="things__arrival">
+              <OnView key={project.slug} motion="rise">
                 <ProjectPanel project={project} line={rowLine(project)} titleTransition />
               </OnView>
             ))}

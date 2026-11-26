@@ -263,6 +263,20 @@ test.describe("How I work", () => {
       .toBeCloseTo(1.15, 2);
   });
 
+  test("the two route chips wrap as a pair, and from 1440 px share the switch's line", async ({ page }) => {
+    const ship = cards(page).nth(2).locator(".card__proof");
+    const width = page.viewportSize()!.width;
+    test.skip(width < 390, "At 320 px the pair itself may wrap");
+    await page.evaluate(() => document.fonts.ready);
+    const middle = async (locator: Locator) => {
+      const box = await boxOf(locator);
+      return box.y + box.height / 2;
+    };
+    const chips = ship.locator(".route-chip");
+    await expect.poll(async () => Math.abs((await middle(chips.nth(0))) - (await middle(chips.nth(1))))).toBeLessThan(1);
+    if (width >= 1440) await expect.poll(async () => Math.abs((await middle(ship.locator(".flag-switch"))) - (await middle(chips.nth(0))))).toBeLessThan(1);
+  });
+
   test("the feature-flag switch toggles with click, Space and Enter, keeps its accessible name, updates aria-checked and moves the active route highlight", async ({ page }) => {
     const ship = cards(page).nth(2).locator(".card__proof");
     const sw = ship.getByRole("switch", { name: "New cached path" });

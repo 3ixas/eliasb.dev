@@ -55,12 +55,15 @@ export function HowFlagSwitch({
       ) : (
         <span className="flag-switch">{label}</span>
       )}
-      <span className="route-chip" data-live={enabled ? "false" : "true"}>
-        {currentPath}
-      </span>
-      <span id={`${id}-new`} className="route-chip" data-live={enabled ? "true" : "false"}>
-        {newPath}
-      </span>
+      {/* The two routes wrap as a pair, so they stay side by side where they leave the switch's line. */}
+      <div className="flag-route__chips">
+        <span className="route-chip" data-live={enabled ? "false" : "true"}>
+          {currentPath}
+        </span>
+        <span id={`${id}-new`} className="route-chip" data-live={enabled ? "true" : "false"}>
+          {newPath}
+        </span>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { hostLabel } from "@/components/site/host-label";
 import { isInternalHref, SiteLink } from "@/components/site/site-link";
 import { Arrow, OUT, panelSurface } from "@/components/parts/panel";
@@ -24,6 +24,8 @@ type ProjectPanelProps = {
   meta?: boolean;
   /** On the first screen, so the screenshot loads at once. */
   eager?: boolean;
+  /** "low" for a first-screen screenshot that a phone shows below the first one, which then loads ahead of it. */
+  fetchPriority?: "low";
   /** Opts this panel's title into the shared route view transition to its case study h1 (#472). */
   titleTransition?: boolean;
   /** Inline interactive controls (e.g. Threshold's homepage city switcher); renders an article with a case-study pill so controls never nest inside a link. */
@@ -44,6 +46,7 @@ export function ProjectPanel({
   wide = false,
   meta = false,
   eager = false,
+  fetchPriority,
   titleTransition = false,
   controls,
 }: ProjectPanelProps) {
@@ -91,8 +94,8 @@ export function ProjectPanel({
         )}
       </TextTag>
       {screenshot && (
-        <ShotTag className="optical-bezel project__shot">
-          <Image src={screenshot.src} alt={screenshot.alt} width={screenshot.width} height={screenshot.height} sizes={sizes} loading={eager ? "eager" : "lazy"} />
+        <ShotTag className="optical-bezel project__shot" style={{ "--shot-ratio": screenshot.width / screenshot.height } as CSSProperties}>
+          <Image src={screenshot.src} alt={screenshot.alt} width={screenshot.width} height={screenshot.height} sizes={sizes} loading={eager ? "eager" : "lazy"} fetchPriority={fetchPriority} />
         </ShotTag>
       )}
     </>

@@ -4,7 +4,7 @@ import { projectIndex, projects } from "../src/content/projects";
 import { caseStudies } from "../src/content/stretch/case-studies";
 import { roleStorySlugs } from "../src/content/stretch/role-stories";
 import { siteCopy, thingsIMake, workArchive } from "../src/content/stretch/site-copy";
-import { expectOpticalBezel, readOpticalBezel } from "./support/bezel";
+import { expectLevelBezels, expectOpticalBezel, readOpticalBezel } from "./support/bezel";
 import { renderedContrast } from "./support/rendered-contrast";
 
 /*
@@ -99,9 +99,17 @@ test.describe("Work archive: the catalogue", () => {
     for (const panel of await panels(page).all()) await expect(panel).toBeVisible();
   });
 
-  test("the first screen's screenshots load at once", async ({ page }) => {
+  test("the first screen's screenshots load at once, the first ahead of the other two", async ({ page }) => {
     const images = panels(page).locator(".project__shot img");
-    for (const image of (await images.all()).slice(0, 3)) await expect(image).toHaveAttribute("loading", "eager");
+    for (const index of [0, 1, 2]) await expect(images.nth(index)).toHaveAttribute("loading", "eager");
+    await expect(images.nth(0)).not.toHaveAttribute("fetchpriority", "low");
+    for (const index of [1, 2]) await expect(images.nth(index)).toHaveAttribute("fetchpriority", "low");
+    await expect(images.nth(3)).toHaveAttribute("loading", "lazy");
+  });
+
+  test("every bezel has one shape and the bezels in a row start and end level", async ({ page }) => {
+    await page.evaluate(() => document.fonts.ready);
+    await expectLevelBezels(panels(page), width(page) >= 1260 ? 3 : width(page) >= 720 ? 2 : 1);
   });
 
   test("featured and archive screenshots sit whole and uncropped inside concentric optical bezels", async ({ page }) => {

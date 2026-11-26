@@ -3,7 +3,7 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { featuredProjects, featuredSlugs, HOMEPAGE_INDEX_ROWS, projectIndex, projects } from "../src/content/projects";
 import { thingsIMake } from "../src/content/stretch/site-copy";
 import { thresholdCities, thresholdCityChoice, thresholdDisplayLink, thresholdLinkCopy } from "../src/content/stretch/threshold-link";
-import { expectOpticalBezel, readOpticalBezel } from "./support/bezel";
+import { expectLevelBezels, expectOpticalBezel, readOpticalBezel } from "./support/bezel";
 import { renderedContrast } from "./support/rendered-contrast";
 
 /*
@@ -64,6 +64,11 @@ test.describe("Things I make", () => {
     const [a, b] = await Promise.all([boxOf(panels(page).nth(1)), boxOf(panels(page).nth(2))]);
     if (width(page) >= 720) expect(Math.abs(a.y - b.y)).toBeLessThan(1);
     else expect(b.y).toBeGreaterThan(a.y + a.height);
+  });
+
+  test("Argus Risk's and Flowtime's bezels have one shape and, side by side, start and end level", async ({ page }) => {
+    await page.evaluate(() => document.fonts.ready);
+    await expectLevelBezels(section(page).locator(".panels--two .project"), width(page) >= 720 ? 2 : 1);
   });
 
   test("featured screenshots sit whole and uncropped inside concentric optical bezels with measurable dark-theme separation", async ({ page }) => {
@@ -267,6 +272,42 @@ test.describe("Things I make", () => {
 });
 
 test.describe("Things I make: hover", () => {
+  test("the lift takes 250 ms and, interrupted, returns from where it has reached", async ({ page, browserName }) => {
+    test.skip(width(page) < 1180, "A hovering fine pointer");
+    test.skip(browserName === "webkit", "Hover emulation, Chromium");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/");
+    const panel = panels(page).nth(1);
+    const shot = panel.locator(".project__shot");
+    await expect(shot).toHaveCSS("transition-duration", "0.25s");
+    await panel.scrollIntoViewIfNeeded();
+    // The panel rises into view first (parts.css), and the pointer waits for it to settle.
+    await expect.poll(() => panel.evaluate((element) => getComputedStyle(element.parentElement!).transform)).toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
+    // Holds the lift 60 ms in as it starts, so the pointer can leave it part-way, then notes where the return starts from.
+    await shot.evaluate((element) => {
+      element.addEventListener("transitionrun", () => {
+        const [transition] = element.getAnimations();
+        if (element.dataset.reached === undefined) {
+          transition.pause();
+          transition.currentTime = 60;
+          element.dataset.reached = String(new DOMMatrix(getComputedStyle(element).transform).m42);
+        } else {
+          const from = (transition.effect as KeyframeEffect).getKeyframes()[0].transform as string;
+          element.dataset.returnedFrom = String(new DOMMatrix(from).m42);
+        }
+      });
+    });
+    await panel.hover();
+    await expect(shot).toHaveAttribute("data-reached", /./);
+    const reached = Number(await shot.getAttribute("data-reached"));
+    expect(reached).toBeLessThan(-1);
+    expect(reached).toBeGreaterThan(-9.5);
+    await page.mouse.move(0, 0);
+    await expect(shot).toHaveAttribute("data-returned-from", /./);
+    expect(Number(await shot.getAttribute("data-returned-from"))).toBeCloseTo(reached, 0);
+    await expect.poll(() => shot.evaluate((element) => new DOMMatrix(getComputedStyle(element).transform).m42)).toBe(0);
+  });
+
   test("a screenshot lifts 10 px and a secondary strip tints on fine-pointer hover", async ({ page, browserName }) => {
     test.skip(width(page) < 1180, "A hovering fine pointer");
     test.skip(browserName === "webkit", "Hover emulation, Chromium");
