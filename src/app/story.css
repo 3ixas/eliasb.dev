@@ -1121,12 +1121,23 @@
   white-space: nowrap;
 }
 
-/* What a choice or an event just changed, in any working figure: it arrives in 200 ms on a wash of the project's colour. */
-.working-fig [data-new] {
+/*
+ * What a choice or an event just changed, in any working figure: it arrives in 200 ms on a wash of the project's colour.
+ * A value that follows a continuous control never fades: only its wash replays, on a layer behind it (`data-wash`).
+ */
+.working-fig [data-new],
+.working-fig [data-wash] {
   border-radius: 4px;
+}
+
+.working-fig [data-new] {
   animation:
     working-arrive 0.2s var(--out),
     working-wash 1.2s var(--out);
+}
+
+.working-fig [data-wash] {
+  animation: working-wash 1.2s var(--out);
 }
 
 @keyframes working-arrive {
@@ -1181,7 +1192,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .working-fig [data-new] {
+  .working-fig [data-new],
+  .working-fig [data-wash] {
     animation: none;
   }
 }
@@ -1465,8 +1477,16 @@
 
 /* A number's wash sits behind its words. */
 .ftbreak .cmp b {
+  position: relative;
+  isolation: isolate;
   justify-self: end;
   padding: 0 4px;
+}
+
+.ftbreak [data-wash] {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
 }
 
 /* A round's minutes follow the slider: ticks grow and fill as it moves (named in verify-craft.mjs). */

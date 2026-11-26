@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArgusProvenanceView } from "@/components/site/argus-provenance";
-import { argusPositions, argusProvenanceCopy as copy, formatUsd, priceSteps, unrealisedUsd, type ArgusPosition } from "@/content/stretch/argus-provenance";
+import { argusPositions, argusProvenanceCopy as copy, formatUsd, priceSteps, priceText, unrealisedUsd, type ArgusPosition } from "@/content/stretch/argus-provenance";
 
 type Held = Omit<ArgusPosition, "age"> & { at: number };
 
@@ -54,7 +54,7 @@ export default function ArgusProvenanceLive() {
     setNow(at);
     setChanged(oldest.symbol);
     setOpen((was) => (was.includes(oldest.symbol) ? was : [...was, oldest.symbol]));
-    setAnnouncement(copy.announce(oldest.symbol, formatUsd(unrealisedUsd(next))));
+    setAnnouncement(copy.announce(next.symbol, priceText(next), formatUsd(unrealisedUsd(next))));
   };
 
   const positions = held.map(({ at, ...position }) => ({ ...position, age: Math.max(0, (now - at) / 1000) }));

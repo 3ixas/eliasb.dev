@@ -13,7 +13,9 @@ function Round({ name, minutes, side, moved }: { name: string; minutes: number; 
   return (
     <p className={side === "after" ? "cmp cmp--after" : "cmp"}>
       <span>{name}</span>
-      <b key={minutes} data-new={moved ? "" : undefined}>
+      <b>
+        {/* Keyed by the minutes, so each change replays the wash behind a number that stays put. */}
+        {moved && <i key={minutes} data-wash="" aria-hidden="true" />}
         {copy.minutes(minutes)}
       </b>
       <MinuteTicks scale={SCALE} amount={minutes} side={side} />
@@ -26,8 +28,8 @@ function Round({ name, minutes, side, moved }: { name: string; minutes: number; 
  * of focus, and Flowtime's focus and break drawn as minutes on the slider's one scale, solid, over a Pomodoro's fixed 25
  * and 5, soft. The server draws it at the start with the slider held still; the island (flowtime-break-live.tsx) draws
  * the same markup with its handler, so nothing moves when it takes over, and without script the drawing is the figure's
- * still at that example value. Once the slider has moved (`moved`), a changed number arrives as every working figure's
- * does (story.css). The slider's value is written as Flowtime's Focus line and announced with its break; the ticks are pictures of the words.
+ * still at that example value. Once the slider has moved (`moved`), a changed number holds still on a working figure's
+ * wash, without the fade a choice arrives with (story.css). The slider's value is written as Flowtime's Focus line and announced with its break; the ticks are pictures of the words.
  */
 export function FlowtimeBreakView({ focus, moved, change }: { focus: number; moved?: boolean; change?: (minutes: number) => void }) {
   const rest = breakMinutes(focus);
