@@ -74,13 +74,13 @@ The live site, at the top of this page. The passes are the first thing you see, 
 - [Motion](https://motion.dev) for the shared spring that every moving object uses
 - The light and dark setting runs from a small inline script, so the page is served finished and nothing is held at first paint
 - [Playwright](https://playwright.dev) and axe for end-to-end, accessibility and contrast tests
-- pnpm 10 and Node 22, deployed on Vercel
+- pnpm 10 and Node 24, deployed on Vercel
 
 The architecture decisions are in [`docs/adr/`](docs/adr).
 
 ## Run it
 
-You need Node 22 and pnpm 10 (`corepack enable` will pick the pnpm version from `package.json`).
+You need Node 24 and pnpm 10 (`corepack enable` will pick the pnpm version from `package.json`).
 
 ```bash
 pnpm install

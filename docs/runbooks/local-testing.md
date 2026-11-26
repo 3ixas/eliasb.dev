@@ -29,7 +29,7 @@ The config starts `pnpm start` (a production build) on port 3100 if nothing is l
 
 ## Node
 
-Use Node 22 at `/usr/local/bin`; the Hermes symlinks on the default path are older.
+CI and Vercel run Node 24 (`engines` in `package.json`). The laptop has Node 22 at `/usr/local/bin`, where pnpm warns about the engine and carries on; use that one, since the Hermes symlinks on the default path are older.
 
 ## The weekly link check
 

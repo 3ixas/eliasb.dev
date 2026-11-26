@@ -57,6 +57,13 @@ const expectedIndexableRobots = [
   ["host: https://www.eliasb.dev", "sitemap: https://www.eliasb.dev/sitemap.xml"],
 ];
 
+// The headers next.config.ts adds beyond the security set it always had.
+const openerPolicyRoutes = ["/", "/resume"];
+const lanyardTextures = ["/lanyard/webbing.webp", "/lanyard/foil.webp"];
+const lanyardCacheControl = "public, max-age=86400, stale-while-revalidate=604800";
+// The pages with no card of their own, which take the homepage's.
+const headlineCardRoutes = ["/things-i-make", "/resume"];
+
 const requiredHomepageSections = ["work", "things-i-make", "how-i-work", "off-the-clock", "say-hello"];
 // A route's JavaScript may grow by this much over its measured baseline in scripts/js-budget.json (gzipped bytes of the scripts its HTML loads).
 const jsBudgetGrowth = 0.1;
@@ -333,6 +340,46 @@ async function verifyJavaScriptBudget(baseUrl, pages) {
   check(scene <= sceneLimit, `The lanyard scene chunk is ${scene} bytes of JavaScript, over its ${sceneLimit} limit (10% over the ${sceneBudget} sceneChunk baseline in scripts/js-budget.json)`);
 }
 
+/** Every card address carries Next's cache hash, so a changed card is fetched again; a page without its own card takes the homepage's. */
+function verifyCardAddresses(pages) {
+  const home = pages.get("/").document;
+  for (const [route, { document }] of pages) {
+    for (const [key, attributeName] of [["og:image", "property"], ["twitter:image", "name"]]) {
+      const image = metaContent(document, key, attributeName);
+      check(/\/opengraph-image\?./.test(image ?? ""), `${route} ${key} should carry Next's cache hash (received ${JSON.stringify(image)})`);
+      if (!headlineCardRoutes.includes(route)) continue;
+      equal(image, metaContent(home, key, attributeName), `${route} ${key} should be the homepage's card`);
+      equal(metaContent(document, `${key}:alt`, attributeName), headlineAlt, `${route} ${key} alternative text`);
+    }
+  }
+}
+
+async function verifyHeaders(baseUrl, pages) {
+  const script = tags(pages.get("/").document, "script").map((tag) => attribute(tag, "src")).find((src) => src?.includes("/_next/static/"));
+  check(Boolean(script), "The homepage should load a /_next/static/ script");
+  for (const route of [...openerPolicyRoutes, ...(script ? [script] : [])]) {
+    const response = await fetch(new URL(route, baseUrl), { redirect: "manual" });
+    equal(response.status, 200, `${route} should return 200`);
+    equal(response.headers.get("cross-origin-opener-policy"), "same-origin", `${route} Cross-Origin-Opener-Policy`);
+  }
+
+  for (const texture of lanyardTextures) {
+    const response = await fetch(new URL(texture, baseUrl), { redirect: "manual" });
+    equal(response.status, 200, `${texture} should return 200`);
+    equal(response.headers.get("cache-control"), lanyardCacheControl, `${texture} Cache-Control`);
+  }
+  const screenshot = await fetch(new URL("/work/flowtime/break.webp", baseUrl), { redirect: "manual" });
+  equal(screenshot.status, 200, "A project screenshot should return 200");
+  check(screenshot.headers.get("cache-control") !== lanyardCacheControl, "Project screenshots keep their names, so they must not take the textures' caching");
+
+  const favicon = await fetch(new URL("/favicon.ico", baseUrl), { redirect: "manual" });
+  equal(favicon.status, 308, "/favicon.ico should permanently redirect");
+  equal(favicon.headers.get("location"), "/icon1.png", "/favicon.ico target");
+  const icon = await fetch(new URL("/icon1.png", baseUrl), { redirect: "manual" });
+  equal(icon.status, 200, "/icon1.png should return 200 without Next's query");
+  equal(icon.headers.get("content-type"), "image/png", "/icon1.png content type");
+}
+
 async function verifyRoutes(baseUrl, pages) {
   for (const route of canonicalPages) {
     const page = pages.get(route) ?? await fetchPage(baseUrl, route);
@@ -520,6 +567,8 @@ try {
   verifyHomepage(homepage.markup);
 
   await verifyRoutes(baseUrl, pages);
+  verifyCardAddresses(pages);
+  await verifyHeaders(baseUrl, pages);
   await verifyJavaScriptBudget(baseUrl, pages);
 
   const robots = await fetchAsset(baseUrl, "/robots.txt");
