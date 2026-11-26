@@ -6,6 +6,7 @@ import { PassCard } from "@/components/parts/staff-pass";
 import { ProjectPanel } from "@/components/parts/project-panel";
 import { WorkingFigure } from "@/components/parts/working-figure";
 import { ArgusProvenanceView } from "@/components/site/argus-provenance";
+import { hostLabel } from "@/components/site/host-label";
 import { HowIWork } from "@/components/site/how-i-work";
 import { EvidenceFigures, NextPanel, StoryText } from "@/components/site/story-parts";
 import { ProjectRow } from "@/components/site/things-i-make";
@@ -19,7 +20,7 @@ import { howIWork, type Beat, type BeatProof } from "@/content/stretch/how-i-wor
 import { roleStories } from "@/content/stretch/role-stories";
 import { passHang, passRecords } from "@/content/stretch/staff-pass";
 import { MAX_EVIDENCE, TEXT_LIMITS, type EvidenceItem } from "@/content/stretch/story";
-import { thresholdDisplayLink, thresholdLinkCopy, type ThresholdChoice } from "@/content/stretch/threshold-link";
+import { thresholdDisplayLink, thresholdLink, thresholdLinkCopy, type ThresholdChoice } from "@/content/stretch/threshold-link";
 import { work, type HeadedProof } from "@/content/stretch/work";
 import { workPanels, type RolePanel } from "@/content/stretch/work-panels";
 
@@ -75,11 +76,13 @@ const beats: readonly Beat[] = howIWork.beats.map((beat) => ({ ...beat, habit: `
 
 /** Threshold's longest real link: the choices come from Threshold's own lists. */
 const longChoice: ThresholdChoice = { city: "london", district: "hammersmith-fulham", place: "studio" };
+const longHref = thresholdLink(longChoice);
 const longUrl = thresholdDisplayLink(longChoice);
+const longHost = hostLabel(longHref);
 const cities = [
-  { id: "london", name: "Newcastle upon Tyne", displayUrl: longUrl },
-  { id: "basel", name: "La Chaux-de-Fonds", displayUrl: longUrl },
-  { id: "zurich", name: "Affoltern am Albis", displayUrl: longUrl },
+  { id: "london", name: "Newcastle upon Tyne", href: longHref, displayUrl: longUrl, host: longHost },
+  { id: "basel", name: "La Chaux-de-Fonds", href: longHref, displayUrl: longUrl, host: longHost },
+  { id: "zurich", name: "Affoltern am Albis", href: longHref, displayUrl: longUrl, host: longHost },
 ] as const;
 const threshold = projects.find(({ slug }) => slug === "threshold")!;
 

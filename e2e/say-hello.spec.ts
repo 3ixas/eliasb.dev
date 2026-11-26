@@ -262,6 +262,20 @@ test.describe("No footer", () => {
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     });
   }
+
+  test("on /resume, Say hello leaves out the link to /resume while every other page keeps it", async ({ page }, testInfo) => {
+    test.skip(!/-(390|1440)-light$/.test(testInfo.project.name), "Sweeps its own pages: once per engine and width");
+    await page.goto("/resume");
+    await expect(section(page).locator('a[href="/resume"]')).toHaveCount(0);
+    await expect
+      .poll(() => section(page).locator("a[href]").evaluateAll((all) => all.map((link) => link.getAttribute("href"))))
+      .toEqual([profile.links.email, profile.links.github, profile.links.linkedin]);
+
+    for (const path of ["/", "/things-i-make", "/things-i-make/threshold", "/work/joveen", "/this-page-does-not-exist"]) {
+      await page.goto(path);
+      await expect(section(page).locator('a[href="/resume"]'), path).toHaveCount(1);
+    }
+  });
 });
 
 // iOS draws a bare ↗ as a colour emoji when the page's font lacks it, so every one carries the text-presentation selector.
