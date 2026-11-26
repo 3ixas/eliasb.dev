@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Arrow } from "@/components/parts/panel";
 import { LongForm } from "@/components/site/long-form";
 import { VisitorPass } from "@/components/site/visitor-pass";
+import { headlineCard } from "@/content/share";
 import { pageTitle } from "@/content/site";
 import { notFound as copy, siteCopy } from "@/content/stretch/site-copy";
 
@@ -11,7 +12,7 @@ export const notFoundMetadata: Metadata = {
   description: null,
   alternates: { canonical: null },
   // Shared under its own title, without claiming the homepage's address.
-  openGraph: { title: pageTitle(copy.title) },
+  openGraph: { title: pageTitle(copy.title), images: [headlineCard] },
   twitter: { card: "summary_large_image", title: pageTitle(copy.title) },
   // Next.js adds its own noindex to a 404; this keeps the two aligned.
   robots: { index: false, follow: true },
