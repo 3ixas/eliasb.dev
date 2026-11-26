@@ -1,8 +1,8 @@
 # App audit
 
 - **Date:** 26 November 2026
-- **Commit:** `14f4a40` on `main`, as served at `https://www.eliasb.dev`
-- **Pass:** the final pass ([#533](https://github.com/3ixas/eliasb.dev/issues/533)), closed by [#545](https://github.com/3ixas/eliasb.dev/issues/545). The diagnosis and its findings are in [2026-11-25-final-pass/FINDINGS.md](2026-11-25-final-pass/FINDINGS.md): 43 findings, 42 picked, F-03 declined by design.
+- **Commit:** `14f4a40` on `main` (pass close); performance follow-up verified at `7bfdea6`, as served at `https://www.eliasb.dev`
+- **Pass:** the final pass ([#533](https://github.com/3ixas/eliasb.dev/issues/533)), closed by [#545](https://github.com/3ixas/eliasb.dev/issues/545), with load-time follow-up [#572](https://github.com/3ixas/eliasb.dev/issues/572) closed at `7bfdea6`. The diagnosis and its findings are in [2026-11-25-final-pass/FINDINGS.md](2026-11-25-final-pass/FINDINGS.md): 43 findings, 42 picked, F-03 declined by design.
 
 ## Areas
 
@@ -13,7 +13,7 @@
 | Stateful risks | Not applicable | No accounts, forms or saved server state. The screenshot viewer's open and cancel race (F-01) is fixed and tested |
 | Accessibility | Pass | axe reports 0 violations on every public route and the open states, at 390 and 1440 px in both themes, in CI. No screen reader or physical device was used |
 | Responsive craft, consistency and copy | Fixed | The picked craft, motion and writing findings; worst-case data check extended to the newer components |
-| Performance | Accepted gap | See below; follow-up [#572](https://github.com/3ixas/eliasb.dev/issues/572) |
+| Performance | Fixed | Both remaining load-time targets met at `7bfdea6` ([#572](https://github.com/3ixas/eliasb.dev/issues/572), [#573](https://github.com/3ixas/eliasb.dev/pull/573), [#574](https://github.com/3ixas/eliasb.dev/pull/574)); see below |
 | Security | Fixed | Next.js 16.4.5 clears seven moderate advisories ([#551](https://github.com/3ixas/eliasb.dev/pull/551)); `Cross-Origin-Opener-Policy` added. No dedicated security audit ran |
 | Types and code | Fixed | F-34 to F-38; unused locals and parameters fail `tsc`, and lint allows no warnings |
 
@@ -45,15 +45,28 @@ Lighthouse 12.8.2, mobile, simulated throttling, sequential runs against product
 
 Transfer and JS are summed from each run's network requests; compare them with the baseline's as indicative only.
 
+### Performance follow-up (`#572`, `7bfdea6`)
+
+Measured on production at `7bfdea6` after [#573](https://github.com/3ixas/eliasb.dev/pull/573) (route-split CSS, trimmed homepage payload, prioritised archive LCP image) and [#574](https://github.com/3ixas/eliasb.dev/pull/574) (stopped the 404 leaking onto every route, added `verify:first-load` on Turbopack). Same method: Lighthouse 12.8.2, mobile, simulated throttling, 15 sequential runs per route on the same M1 laptop, no discarded runs.
+
+| Measure | Before (`14f4a40`) | After (`7bfdea6`, median of 15) | Range | Target |
+|---|---|---|---|---|
+| `/` LCP | 2.70 s | **2.13 s** | 1.53–2.49 s | under 2.5 s |
+| `/things-i-make` LCP load delay (F-32) | 589 ms | **409 ms** | 0–786 ms | under 500 ms |
+
+- Load delay: 11 of 15 archive runs were under 500 ms (the target is on the median).
+- `/` document and CSS transferred fell from ~50.9 KB to 42.2 KB.
+- CLS stayed `0.000` on both routes; TBT medians were `60 ms` on `/` (range 18–561 ms; was `258 ms` at baseline) and `23 ms` on `/things-i-make`.
+
 ### Targets
 
-The target set on 25 November (D1) was LCP at most 2.0 s on the Role stories and about 2.5 s elsewhere. On 26 November Elias set **about 2.5 s for every route**, then accepted the two gaps below.
+The target set on 25 November (D1) was LCP at most 2.0 s on the Role stories and about 2.5 s elsewhere. On 26 November Elias set **about 2.5 s for every route**; both remaining gaps closed in [#572](https://github.com/3ixas/eliasb.dev/issues/572):
 
-- **LCP:** met on seven routes. `/` is 2.70 s over 15 runs. An earlier set of 5 at `8c183f2` had a median of 2.23 s; single runs cluster near 2.0 s and 2.7 s. The time is render delay on the opening heading.
+- **LCP:** met on all eight routes (`/` median `2.13 s` at `7bfdea6`, all 15 runs 1.53–2.49 s; the other seven routes 1.95–2.41 s at `14f4a40`).
 - **CLS at most 0.05:** met, 0.000 everywhere.
-- **TBT not worse than baseline:** far lower on `/` and the Role stories. The archive and case studies are 8 to 23 ms higher, with single runs spread from 8 to 51 ms.
+- **TBT not worse than baseline:** far lower on `/` (`60 ms` vs `258 ms`) and the Role stories. The archive (`23 ms`) and case studies (`28–42 ms`) sit within a few milliseconds of baseline.
 - **Lanyard TBT under 100 ms (F-12):** met on `/` and BNP Paribas.
-- **Archive image load delay under 500 ms (F-32):** 589 ms median [26–1249]. Accepted; in [#572](https://github.com/3ixas/eliasb.dev/issues/572).
+- **Archive image load delay under 500 ms (F-32):** met, `409 ms` median [0–786] over 15 runs at `7bfdea6`.
 
 ## Walkthrough
 
@@ -72,6 +85,7 @@ All run in the `Quality` workflow.
 |---|---|
 | `standing-checks` axe | Every public route and the open states, 390 and 1440 px, both themes, WCAG 2.2 AA |
 | `verify:release` | Opener policy, lanyard caching, favicon redirect, share-card addresses |
+| `verify:first-load` | First-load document and CSS bytes on a Turbopack production build ([#574](https://github.com/3ixas/eliasb.dev/pull/574)) |
 | `worst-case.spec.ts` | Long values stay inside their boxes in the newer components |
 | `verify:copy` | The machine-readable surfaces match the copy deck |
 | `verify:catalogue` | Every project has a link |
@@ -80,4 +94,4 @@ All run in the `Quality` workflow.
 
 ## CI
 
-The 8-shard production Playwright matrix and the `quality` job passed on `main` at `14f4a40` ([run 45836528514](https://github.com/3ixas/eliasb.dev/actions/runs/45836528514)). The stronger axe gate arrives with this record's pull request, [#567](https://github.com/3ixas/eliasb.dev/pull/567); it passed on `4441fa4` ([run 45826633784](https://github.com/3ixas/eliasb.dev/actions/runs/45826633784)).
+The 8-shard production Playwright matrix and the `quality` job passed on `main` at `14f4a40` ([run 45836528514](https://github.com/3ixas/eliasb.dev/actions/runs/45836528514)), on `4441fa4` for [#567](https://github.com/3ixas/eliasb.dev/pull/567) ([run 45826633784](https://github.com/3ixas/eliasb.dev/actions/runs/45826633784)), and at `7bfdea6` after [#572](https://github.com/3ixas/eliasb.dev/issues/572) ([run 45887007678](https://github.com/3ixas/eliasb.dev/actions/runs/45887007678)). Intermittent WebKit retries observed in CI are tracked in [#575](https://github.com/3ixas/eliasb.dev/issues/575).
