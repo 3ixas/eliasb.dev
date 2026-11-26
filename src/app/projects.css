@@ -115,12 +115,12 @@
 .project-city {
   width: 100%;
   margin-top: 20px;
-  padding: 12px 14px;
+  padding: 12px 14px 6px;
   border: 1px solid var(--edge);
   border-radius: 16px;
   background: rgb(255 255 255 / 0.24);
   display: grid;
-  gap: 10px;
+  gap: 6px;
 }
 
 .project-city__row {
@@ -159,13 +159,39 @@
 
 .project-city__url {
   display: block;
+  min-width: 0;
+}
+
+.project-city__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-height: 44px;
+  padding-block: 4px;
+  border-radius: 6px;
   color: var(--panel-ink);
   font-family: var(--sans);
   font-size: var(--type-label);
   font-weight: 500;
   line-height: 1.4;
   font-variant-numeric: lining-nums tabular-nums;
+  text-decoration: none;
+}
+
+.project-city__address {
+  min-width: 0;
   overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition: text-decoration-color 150ms var(--out);
+}
+
+.project-city__link .arrow {
+  flex: none;
+  margin-left: 0;
 }
 
 .project__actions {
@@ -188,6 +214,14 @@ a.project:focus-visible {
 
   .project-city__btn:not([aria-pressed="true"]):hover {
     background: rgb(255 255 255 / 0.46);
+  }
+
+  .project-city__link:hover .project-city__address {
+    text-decoration-color: currentColor;
+  }
+
+  .project-city__link:hover .arrow--out {
+    transform: translate(3px, -3px);
   }
 }
 
