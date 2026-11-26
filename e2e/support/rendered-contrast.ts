@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 
 export type ContrastReading = {
   text: string;
@@ -43,19 +43,76 @@ export async function renderedContrast(page: Page): Promise<ContrastReading[]> {
   return readings;
 }
 
-async function measureOnce(page: Page): Promise<ContrastReading[]> {
-  // Let lazy images and in-view objects settle before measuring.
+/**
+ * Settles lazy images, viewport-gated figures and web fonts before reading boxes
+ * or taking the full-page capture. A rapid scrollTo/setTimeout loop deadlocks
+ * Chromium's headless shell compositor under trace screencasting (#565), so
+ * images load eagerly without scrolling and only elements whose render waits on
+ * viewport intersection are scrolled into view one at a time.
+ */
+async function settlePage(page: Page) {
   await page.evaluate(async () => {
-    for (let y = 0; y < document.documentElement.scrollHeight; y += 600) {
-      scrollTo(0, y);
-      await new Promise((resolve) => setTimeout(resolve, 30));
+    const images = [...document.querySelectorAll("img")].filter((image) => image.checkVisibility({ visibilityProperty: true }));
+    for (const image of images) {
+      if (image.loading === "lazy") image.loading = "eager";
     }
-    scrollTo(0, 0);
+    await Promise.all(
+      images.map(
+        (image) =>
+          new Promise<void>((resolve) => {
+            if (!image.getAttribute("src") && !image.getAttribute("srcset")) {
+              resolve();
+              return;
+            }
+            const finish = () => {
+              void image.decode().catch(() => undefined).then(() => resolve());
+            };
+            if (image.complete) {
+              finish();
+              return;
+            }
+            image.addEventListener("load", finish, { once: true });
+            image.addEventListener("error", () => resolve(), { once: true });
+          }),
+      ),
+    );
+  });
+
+  let scrolled = false;
+  const center = async (locator: ReturnType<Page["locator"]>) => {
+    await locator.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+    scrolled = true;
+  };
+
+  for (const plot of await page.locator(".sim__plot:visible").all()) {
+    if ((await plot.getAttribute("data-drawn")) !== null) continue;
+    await center(plot);
+    await expect(plot).toHaveAttribute("data-drawn", /.+/);
+  }
+  for (const island of await page.locator(".working-fig__island:visible").all()) {
+    if ((await island.locator("[data-live]").count()) > 0) continue;
+    await center(island);
+    await expect(island.locator("[data-live]")).toHaveCount(1);
+  }
+  const armed = page.locator("[data-armed]:visible");
+  while ((await armed.count()) > 0) {
+    const before = await armed.count();
+    await center(armed.first());
+    await expect.poll(() => armed.count()).toBeLessThan(before);
+  }
+
+  await page.evaluate(async (resetScroll) => {
+    if (resetScroll || scrollY !== 0) scrollTo({ top: 0, behavior: "instant" });
     // A web font that swaps in after the boxes are measured moves them off the
     // pixels they are compared with.
     await document.fonts.ready;
-  });
-  await page.waitForTimeout(600);
+    // Two frames let scroll listeners (chapter rail / section nav) and layout commit cleanly.
+    await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+  }, scrolled);
+}
+
+async function measureOnce(page: Page): Promise<ContrastReading[]> {
+  await settlePage(page);
 
   const runs = await page.evaluate(() => {
     // Any CSS colour (rgb(), color(srgb …), color-mix() results) to 0–255 RGBA,
