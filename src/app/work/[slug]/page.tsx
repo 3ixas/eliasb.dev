@@ -8,6 +8,9 @@ import { pageTitle, siteName } from "@/content/site";
 import { roleStoryFor, roleStorySlugs } from "@/content/stretch/role-stories";
 import { roleStoryDescription, roleStoryName } from "@/content/stretch/role-story";
 
+// Any other slug is an unmatched address, so it gets the 404 (global-not-found.tsx).
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return roleStorySlugs.map((slug) => ({ slug }));
 }

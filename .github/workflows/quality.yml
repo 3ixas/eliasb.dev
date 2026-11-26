@@ -59,6 +59,13 @@ jobs:
       - name: Check the build
         run: pnpm check:built
 
+      # Production builds with Turbopack, which splits CSS differently, so first-load bytes are held on that build (#572).
+      - name: Build with Turbopack
+        run: rm -rf .next && SITE_INDEXABLE=true pnpm build
+
+      - name: Check first-load bytes
+        run: pnpm verify:first-load
+
       - name: Check diff whitespace
         run: git diff --check
 

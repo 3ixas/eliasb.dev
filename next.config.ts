@@ -38,6 +38,8 @@ const securityHeaders = [
 const lanyardCaching = [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }];
 
 const nextConfig: NextConfig = {
+  // app/global-not-found.tsx: keeps the 404's stylesheets and markup off every other route (#572).
+  experimental: { globalNotFound: true },
   // The dev badge is a tab stop and floats over page controls, so the focus and
   // contrast specs would measure it instead of the page. Errors still show.
   devIndicators: false,

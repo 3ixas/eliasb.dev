@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { MinuteTicks } from "@/components/parts/measure";
+import { MinuteTicks } from "@/components/parts/minute-ticks";
 import { breakMinutes, flowtimeBreakCopy as copy, focusRange, pomodoro } from "@/content/stretch/flowtime-break";
 
 const ID = "flowtime-break";

@@ -1,22 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import "./pass.css";
-import "./story.css";
 import { Arrow } from "@/components/parts/panel";
 import { LongForm } from "@/components/site/long-form";
 import { VisitorPass } from "@/components/site/visitor-pass";
+import { headlineCard } from "@/content/share";
 import { pageTitle } from "@/content/site";
 import { notFound as copy, siteCopy } from "@/content/stretch/site-copy";
 
-export const metadata: Metadata = {
+export const notFoundMetadata: Metadata = {
   title: { absolute: pageTitle(copy.title) },
   description: null,
   alternates: { canonical: null },
-  // Not the home page's share card.
-  openGraph: null,
-  twitter: null,
-  // Next.js adds its own noindex to a 404; this overrides the layout's robots,
-  // so the two agree.
+  // Shared under its own title, without claiming the homepage's address.
+  openGraph: { title: pageTitle(copy.title), images: [headlineCard] },
+  twitter: { card: "summary_large_image", title: pageTitle(copy.title) },
+  // Next.js adds its own noindex to a 404; this keeps the two aligned.
   robots: { index: false, follow: true },
 };
 
@@ -25,7 +23,7 @@ export const metadata: Metadata = {
  * line; a small, still visitor pass with the address asked for struck through and "Not on file", and "404" beside it;
  * then "Try one of these" and the homepage's five sections as rows with the copy deck's lines.
  */
-export default function NotFound() {
+export function NotFoundView() {
   return (
     <LongForm attrs={{ "data-not-found": "" }}>
       <section className="frame not-found" aria-labelledby="not-found-title">

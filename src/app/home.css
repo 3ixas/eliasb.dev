@@ -1,4 +1,9 @@
-/* Homepage-only stylesheets bundled together so routes and fixtures share one chunk instead of fragmenting per section. */
+/*
+ * Everything the homepage adds to the shared sheets, in one request (#572). pass.css and projects.css also stay their
+ * own sheets for the other routes that import them: Tailwind inlines each @import here, so this file carries a copy.
+ */
+@import "./pass.css";
+@import "./projects.css";
 @import "./opening.css";
 @import "./work.css";
 @import "./headed-how.css";

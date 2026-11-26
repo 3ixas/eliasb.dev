@@ -68,22 +68,42 @@ const requiredHomepageSections = ["work", "things-i-make", "how-i-work", "off-th
 // A route's JavaScript may grow by this much over its measured baseline in scripts/js-budget.json (gzipped bytes of the scripts its HTML loads).
 const jsBudgetGrowth = 0.1;
 const { routes: jsBudget, sceneChunk: sceneBudget } = JSON.parse(readFileSync(new URL("./js-budget.json", import.meta.url), "utf8"));
-// First-load budgets (#572): brotli q4 of the server HTML plus every linked /_next/static/ stylesheet.
-// Lighthouse's mobile simulation hits a TCP-window cliff at 43,800 bytes on `/`, so the budget leaves margin
-// below it. CI builds with `--webpack` and without GITHUB_SIGNAL_TOKEN while Vercel production uses Turbopack
-// with live GitHub activity; the CSS-only caps and route non-leakage checks hold in both.
+// First-load budgets (#572), held on a Turbopack build, which is what production serves (`--first-load`). Vercel sends
+// brotli quality 3, and Lighthouse counts about 375 bytes of headers on each request; its mobile simulation hits a
+// TCP-window cliff at 43,800 bytes on `/`, and the target there is 42,500. CI builds without GITHUB_SIGNAL_TOKEN, which
+// leaves about 3,300 bytes of GitHub year out of the homepage's HTML, so its limit on `/` sits that far under the target.
+// A route's CSS is every stylesheet its HTML links or preloads.
+const firstLoadOnly = process.argv.includes("--first-load");
+const headerBytes = 375;
 const firstLoadBudgets = {
   "/": {
-    maxCssBr4: 19_000,
-    maxTotalBr4: 41_000,
-    requiredCss: [".opening__line", ".otc__section"],
+    maxCss: 18_600,
+    maxTransfer: 39_200,
+    requiredCss: [".opening__line", ".otc__section", ".pass__card", ".project-city"],
     forbiddenCss: [".resume__sheet", ".story-open", ".sim__plot"],
   },
   "/things-i-make": {
-    maxCssBr4: 12_000,
-    maxTotalBr4: 22_000,
+    maxCss: 11_500,
+    maxTransfer: 21_200,
     requiredCss: [".archive__grid"],
     forbiddenCss: [".resume__sheet", ".story-open", ".sim__plot", ".otc__section", ".opening__line", ".pass__card"],
+  },
+  "/things-i-make/threshold": {
+    requiredCss: [".story-open"],
+    forbiddenCss: [".resume__sheet", ".sim__plot", ".otc__section", ".opening__line", ".pass__card", ".archive__grid"],
+  },
+  "/work/bnp-paribas": {
+    requiredCss: [".story-open", ".pass__card", ".sim__plot"],
+    forbiddenCss: [".resume__sheet", ".otc__section", ".opening__line", ".archive__grid"],
+  },
+  "/resume": {
+    requiredCss: [".resume__sheet"],
+    forbiddenCss: [".story-open", ".sim__plot", ".otc__section", ".opening__line", ".pass__card", ".archive__grid"],
+  },
+  "/nothing-here-at-all": {
+    status: 404,
+    requiredCss: [".not-found", ".pass--visitor"],
+    forbiddenCss: [".resume__sheet", ".sim__plot", ".otc__section", ".opening__line", ".archive__grid"],
   },
 };
 const failures = [];
@@ -360,7 +380,7 @@ async function verifyJavaScriptBudget(baseUrl, pages) {
 
 function brotliBytes(content) {
   return brotliCompressSync(Buffer.from(content), {
-    params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 4 },
+    params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 3 },
   }).length;
 }
 
@@ -375,43 +395,49 @@ function hasImageTarget(tag, pathFragment) {
 }
 
 /** Deterministic byte and markup gates for first-load CSS/HTML transfer and image priority (#572). */
-async function verifyFirstLoadBudget(baseUrl, pages) {
+async function verifyFirstLoadBudget(baseUrl) {
+  const pages = new Map();
   for (const [route, budget] of Object.entries(firstLoadBudgets)) {
-    const page = pages.get(route) ?? await fetchPage(baseUrl, route);
+    const page = await fetchPage(baseUrl, route);
     pages.set(route, page);
+    equal(page.response.status, budget.status ?? 200, `${route} status`);
 
+    // A preloaded stylesheet is downloaded like a linked one, whether or not the page applies it.
     const stylesheetHrefs = [...new Set(
       tags(page.document, "link")
-        .filter((tag) => attribute(tag, "rel") === "stylesheet")
+        .filter((tag) => attribute(tag, "rel") === "stylesheet" || (attribute(tag, "rel") === "preload" && attribute(tag, "as") === "style"))
         .map((tag) => attribute(tag, "href"))
         .filter((href) => href?.includes("/_next/static/")),
     )];
     check(stylesheetHrefs.length > 0, `${route} should link at least one /_next/static/ stylesheet`);
 
-    let cssBr4 = 0;
+    let cssBytes = 0;
     const cssTexts = [];
     for (const href of stylesheetHrefs) {
       const response = await fetch(new URL(href, baseUrl), { redirect: "manual" });
       equal(response.status, 200, `${route} stylesheet ${href} should return 200`);
       const css = await response.text();
-      cssBr4 += brotliBytes(css);
+      cssBytes += brotliBytes(css);
       cssTexts.push(css);
     }
 
     const combinedCss = cssTexts.join("\n");
-    const docBr4 = brotliBytes(page.document);
-    const totalBr4 = docBr4 + cssBr4;
+    const docBytes = brotliBytes(page.document);
+    const transfer = docBytes + cssBytes + (1 + stylesheetHrefs.length) * headerBytes;
     console.log(
-      `First-load bytes on ${route}: doc ${docBr4} B + CSS ${cssBr4} B (${stylesheetHrefs.length} file${stylesheetHrefs.length === 1 ? "" : "s"}) = ${totalBr4} B brotli q4 (limits: CSS <= ${budget.maxCssBr4}, total <= ${budget.maxTotalBr4})`,
+      `First-load bytes on ${route}: document ${docBytes} + CSS ${cssBytes} (${stylesheetHrefs.length} files) brotli q3; ${transfer} with headers`
+        + (budget.maxTransfer ? ` (limits: CSS ${budget.maxCss}, transfer ${budget.maxTransfer})` : ""),
     );
-    check(cssBr4 <= budget.maxCssBr4, `${route} linked CSS is ${cssBr4} bytes brotli q4, over its ${budget.maxCssBr4} limit`);
-    check(totalBr4 <= budget.maxTotalBr4, `${route} document + CSS is ${totalBr4} bytes brotli q4, over its ${budget.maxTotalBr4} limit`);
+    if (budget.maxTransfer) {
+      check(cssBytes <= budget.maxCss, `${route} CSS is ${cssBytes} bytes brotli q3, over its ${budget.maxCss} limit`);
+      check(transfer <= budget.maxTransfer, `${route} document + CSS is ${transfer} bytes as transferred, over its ${budget.maxTransfer} limit`);
+    }
 
     for (const selector of budget.requiredCss) {
-      check(combinedCss.includes(selector), `${route} linked CSS should include ${selector}`);
+      check(combinedCss.includes(selector), `${route} CSS should include ${selector}`);
     }
     for (const selector of budget.forbiddenCss) {
-      check(!combinedCss.includes(selector), `${route} linked CSS must not pull in route-only selector ${selector}`);
+      check(!combinedCss.includes(selector), `${route} must not download route-only selector ${selector}`);
     }
   }
 
@@ -569,6 +595,12 @@ async function verifyHomeSocialMetadata(baseUrl, document) {
 }
 
 async function verifyNotFound(baseUrl) {
+  // An unknown slug under a story route is an unmatched address too.
+  for (const route of ["/work/not-a-story", "/things-i-make/not-a-project"]) {
+    const unknown = await fetchPage(baseUrl, route);
+    equal(unknown.response.status, 404, `${route} should return 404`);
+    equal(unknown.document.match(/<title>([^<]*)<\/title>/i)?.[1], "Nothing here · Elias Bennett", `${route} should show the 404`);
+  }
   const { response, document, markup } = await fetchPage(baseUrl, "/nothing-here-at-all");
   equal(response.status, 404, "An unknown route should return 404");
   verifyPageShell(markup, "/404");
@@ -577,6 +609,13 @@ async function verifyNotFound(baseUrl) {
   check(robots.length > 0 && robots.every((content) => /noindex/.test(content)), `Every robots tag on the 404 should say noindex (received ${JSON.stringify(robots)})`);
   equal(metaContent(document, "og:title"), "Nothing here · Elias Bennett", "The 404 should share under its own title, not the home page's");
   equal(metaContent(document, "og:url"), null, "The 404 should not claim the home page's URL when shared");
+  check(metaContent(document, "og:image")?.includes("/opengraph-image"), "The 404 should share the site's card");
+  equal(metaContent(document, "twitter:card", "name"), "summary_large_image", "404 twitter card");
+  equal(metaContent(document, "description", "name"), null, "The 404 has no description");
+  check(!tags(document, "link").some((tag) => attribute(tag, "rel") === "canonical"), "The 404 has no canonical address");
+  for (const icon of ["/icon.svg", "/icon1.png", "/apple-icon.png"]) {
+    check(tags(document, "link").some((tag) => attribute(tag, "href")?.startsWith(icon)), `The 404 should link ${icon}`);
+  }
   const heading = markup.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] ?? "";
   equal(plainText(heading), "This page doesn’t exist.", "404 heading");
   check(plainText(markup).includes("It’s moved, or it never did. Everything else is where you left it."), "404 line");
@@ -652,15 +691,7 @@ async function verifyInternalLinks(baseUrl, pages) {
   }
 }
 
-let server;
-let baseUrl;
-
-try {
-  const port = await findAvailablePort();
-  server = startBuiltServer(port);
-  baseUrl = new URL(`http://127.0.0.1:${port}`);
-  await waitForServer(baseUrl, server);
-
+async function verifyReleaseContract(baseUrl) {
   const pages = new Map();
   const homepage = await fetchPage(baseUrl, "/");
   pages.set("/", homepage);
@@ -671,7 +702,6 @@ try {
   verifyCardAddresses(pages);
   await verifyHeaders(baseUrl, pages);
   await verifyJavaScriptBudget(baseUrl, pages);
-  await verifyFirstLoadBudget(baseUrl, pages);
 
   const robots = await fetchAsset(baseUrl, "/robots.txt");
   equal(
@@ -690,13 +720,25 @@ try {
   );
 
   await verifyInternalLinks(baseUrl, pages);
+}
+
+let server;
+let baseUrl;
+
+try {
+  const port = await findAvailablePort();
+  server = startBuiltServer(port);
+  baseUrl = new URL(`http://127.0.0.1:${port}`);
+  await waitForServer(baseUrl, server);
+
+  await (firstLoadOnly ? verifyFirstLoadBudget(baseUrl) : verifyReleaseContract(baseUrl));
 
   if (failures.length) {
-    console.error(`Release verification failed with ${failures.length} finding(s) after ${checkCount} checks.`);
+    console.error(`${firstLoadOnly ? "First-load" : "Release"} verification failed with ${failures.length} finding(s) after ${checkCount} checks.`);
     for (const failure of failures) console.error(`- ${failure}`);
     process.exitCode = 1;
   } else {
-    console.log(`Release production contract checks passed with ${checkCount} checks.`);
+    console.log(`${firstLoadOnly ? "First-load" : "Release production contract"} checks passed with ${checkCount} checks.`);
   }
 } catch (error) {
   console.error(`Release verification could not complete: ${error instanceof Error ? error.message : String(error)}`);

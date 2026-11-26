@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import "./pass.css";
-import "./projects.css";
 import "./home.css";
 import { Homepage } from "@/components/site/homepage";
 import { siteCopy } from "@/content/stretch/site-copy";
