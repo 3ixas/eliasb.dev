@@ -47,8 +47,6 @@ test("headless WebKit, which draws in software in CI, keeps the printed pass", a
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
   await rail(page).scrollIntoViewIfNeeded();
-  // The scene starts at the first input, or once the page has settled; a pointer move stands in for the visitor.
-  await page.mouse.move(2, 2);
   await expect(rail(page)).toHaveAttribute("data-lanyard", /^(failed|3d)$/);
   const state = await rail(page).evaluate((element) => {
     const gl = document.createElement("canvas").getContext("webgl2");
@@ -62,14 +60,9 @@ test("headless WebKit, which draws in software in CI, keeps the printed pass", a
   if (process.env.CI) expect(state).toMatch(/^failed /);
 });
 
-/**
- * Waits for the scene to take the pass's place: it loads once the rail is near the view and the visitor has arrived (the first
- * pointer move or scroll) or the page has settled. A pointer move stands in for the visitor, so a spec does not wait out
- * the settling; "waits for the page to open" below covers the wait itself.
- */
+/** Waits for the 3D scene to mount after the first paint, without needing pointer or scroll input. */
 const hung = async (page: Page, stage = rail(page)) => {
   test.skip(!(await canDrawScene(page)), "No WebGL 2 in this browser");
-  await page.mouse.move(2, 2);
   await expect(stage).toHaveAttribute("data-lanyard", "3d", { timeout: 15_000 });
 };
 
@@ -303,36 +296,16 @@ test.describe("The 3D staff pass", () => {
     expect(seen.filter((opacity) => opacity !== "0")).toEqual([]);
   });
 
-  test.describe("The scene waits for the page to open", () => {
-    test("its chunk and textures do not load until the first pointer move", async ({ page }) => {
+  test.describe("The scene loads right after first paint", () => {
+    test("with no pointer move or scroll, it leaves waiting promptly and hangs in 3D", async ({ page }) => {
       test.skip(!(await canDrawScene(page)), "No WebGL 2 in this browser");
-      const textures = trackTextures(page);
+      const textures = trackTextures(page, "response");
       await page.goto("/");
-      await rail(page).scrollIntoViewIfNeeded();
-      // The page has not settled yet, and the stage stays unseen meanwhile, so the print never shows and is then swapped.
-      await page.waitForTimeout(1500);
-      await expect(rail(page)).toHaveAttribute("data-lanyard", "waiting");
-      await expect(scene(page)).toHaveCount(0);
-      await expect(rail(page).locator(".pass__card").first()).toHaveCSS("opacity", "0");
-      expect(textures).toEqual([]);
-      await page.mouse.move(40, 40);
-      await hung(page);
+      // No input at all (as on a phone): leaves "waiting" right after first paint instead of stalling for 3.5 s.
+      await expect(rail(page)).toHaveAttribute("data-lanyard", /^(loading|3d)$/, { timeout: 2_000 });
+      await expect(rail(page)).toHaveAttribute("data-lanyard", "3d", { timeout: 15_000 });
       await expect(scene(page)).toHaveCount(1);
-    });
-
-    test("the first scroll starts it too", async ({ page }) => {
-      test.skip(!(await canDrawScene(page)), "No WebGL 2 in this browser");
-      await page.goto("/");
-      await page.waitForTimeout(1000);
-      await expect(rail(page)).toHaveAttribute("data-lanyard", "waiting");
-      await page.evaluate(() => window.scrollBy(0, 1));
-      await expect(rail(page)).toHaveAttribute("data-lanyard", "3d", { timeout: 15_000 });
-    });
-
-    test("with no input at all, it starts once the page has settled", async ({ page }) => {
-      test.skip(!(await canDrawScene(page)), "No WebGL 2 in this browser");
-      await page.goto("/");
-      await expect(rail(page)).toHaveAttribute("data-lanyard", "3d", { timeout: 15_000 });
+      expect([...new Set(textures)].sort()).toEqual(["/lanyard/foil.webp", "/lanyard/webbing.webp"]);
     });
   });
 
