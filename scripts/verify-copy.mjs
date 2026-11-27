@@ -443,10 +443,10 @@ for (const [what, ids] of [["menu", siteCopy.menu.map(({ id }) => id)], ["Say he
     const changed = { ...story, figures: { ...story.figures, "what-changed": { ...figure, rows: figure.rows.map((row, at) => (at === index ? { ...row, ...replacement } : row)) } } };
     return roleStoryProblems(Object.values(roleStories).map((entry) => (entry.slug === story.slug ? changed : entry)));
   };
-  assert.match(scaleRow(0, { before: { label: "about two weeks, experienced", amount: 14 } })[0], /before side draws 14 working-days, but its words state 10/, "Two weeks are ten working days");
+  assert.match(scaleRow(0, { before: { label: "about two weeks", amount: 14 } })[0], /before side draws 14 working-days, but its words state 10/, "Two weeks are ten working days");
   assert.match(scaleRow(1, { before: { label: "30–40 min", amount: 40 } })[0], /before side draws 40 minutes, but its words state 30–40/, "A range is drawn as one");
   const comparison = (replacement) => workPanelProblems({ ...workPanels, bnp: { ...bnp, comparisons: [{ ...bnp.comparisons[0], ...replacement }, bnp.comparisons[1]] } });
-  assert.match(comparison({ after: { name: "Me, new to it", value: "an afternoon" } })[0], /writes "an afternoon"/, "A comparison's value is its scale row's");
+  assert.match(comparison({ after: { name: "With my phased agentic workflow", value: "an afternoon" } })[0], /writes "an afternoon"/, "A comparison's value is its scale row's");
   assert.match(comparison({ row: 4 })[0], /scale row 4/);
   assert.match(workPanelProblems({ ...workPanels, bnp: { ...bnp, figure: { value: "6 months", label: "from zero Rust to production code" } } })[0], /figure .* is not one of its Role story's evidence items/);
 }

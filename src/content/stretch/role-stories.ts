@@ -56,7 +56,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
           },
           {
             lead: "Give AI work phases.",
-            text: "I built a workflow where each stage has its own scoped agent: grill the problem, plan, build test-first, self-review, then a health review. Each agent only sees what that stage needs, which keeps it from skipping ahead.",
+            text: "I built a phased agentic workflow where each stage has its own scoped agent: grill the problem, plan, build test-first, self-review, then a health review. Each agent only sees what that stage needs, which keeps it from skipping ahead.",
           },
         ],
       },
@@ -89,8 +89,8 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
           {
             what: "Integrating a pricer",
             unit: "working-days",
-            before: { label: "about two weeks, experienced", amount: 10 },
-            after: { label: "a couple of days, new to it", amount: 2 },
+            before: { label: "about two weeks", amount: 10 },
+            after: { label: "a couple of days", amount: 2 },
           },
           {
             what: "The competition dashboard’s data load",
@@ -114,7 +114,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
     resume: [
       "Went from no C# to shipping production code independently in six months, and now own implementation and delivery as the team’s only C# engineer.",
       "Ported Java market-data loaders to C#, and took a stale data dependency out of live pricing behind a feature flag that defaults to off, with caching and an end-to-end test.",
-      "Built an AI workflow that gives each stage its own scoped agent. It took a pricer integration from about two weeks to a couple of days, and several teams across the department now use it.",
+      "Built a phased agentic workflow where each stage has its own scoped agent. It took a pricer integration from about two weeks to a couple of days, and several teams across the department now use it.",
       "Led a team of four to win the bank’s digitisation competition, co-building a dashboard that cut a 30–40 minute data load to under 5.",
     ],
     evidence: [

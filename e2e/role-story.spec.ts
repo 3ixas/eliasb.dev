@@ -265,7 +265,7 @@ for (const slug of roleStorySlugs) {
         await expect(scale.locator(".panel")).toHaveCSS("background-color", rgb(story.panel.field));
         await expect(scale.locator("figcaption")).toHaveText("Bars to scale. Two weeks is taken as ten working days.");
         await expect(scale.locator("h3")).toHaveText(["Integrating a pricer", "The competition dashboard’s data load"]);
-        await expect(scale).toContainText("about two weeks, experienced");
+        await expect(scale).toContainText("about two weeks");
         await expect(scale).toContainText("under 5 min");
       });
 

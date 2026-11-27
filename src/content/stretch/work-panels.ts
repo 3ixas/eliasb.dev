@@ -48,7 +48,7 @@ export const workPanels = {
     slug: "bnp-paribas",
     figure: { value: "6 months", label: "from zero C# to production code" },
     comparisons: [
-      { row: 0, before: { name: "An experienced engineer", value: "about two weeks" }, after: { name: "Me, new to it", value: "a couple of days" } },
+      { row: 0, before: { name: "Usually", value: "about two weeks" }, after: { name: "With my phased agentic workflow", value: "a couple of days" } },
       { row: 1, before: { name: "Before", value: "30–40 min" }, after: { name: "After", value: "under 5 min" } },
     ],
   } satisfies BnpPanel,
