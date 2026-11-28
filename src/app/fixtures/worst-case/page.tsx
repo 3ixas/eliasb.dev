@@ -102,7 +102,7 @@ const row = (key: string, overrides: Partial<Project>) => <ProjectRow key={key} 
 
 /** The pass for an employer of this name, in the current pass's colours. */
 const pass = (name: string, id: string) => (
-  <PassCard id={id} name={`Staff pass: ${name}`} record={{ ...passRecords["bnp-paribas"], short: name }} hang={passHang["bnp-paribas"]} role="Software engineer" dates="Jul 2025 – now" panel={roleStories["bnp-paribas"].panel} />
+  <PassCard id={id} name={`Staff pass: ${name}`} record={{ ...passRecords["bnp-paribas"], short: name }} hang={passHang["bnp-paribas"]} role="Software Engineer" dates="Jul 2025 – now" panel={roleStories["bnp-paribas"].panel} />
 );
 
 export default async function WorstCaseFixtures() {

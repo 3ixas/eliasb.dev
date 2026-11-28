@@ -32,7 +32,7 @@ export type DisplayFigure = { evidence: number; from: number };
 
 export type BnpPanel = {
   slug: "bnp-paribas";
-  /** "6 months" over "from zero C# to production code": matches BNP Paribas's evidence item. */
+  /** "6 months" over "from never writing C# to shipping production code": matches BNP Paribas's evidence item. */
   figure: { value: string; label: string };
   /** `title` names what the chart shows, above it (#457), so a reader knows before the caption. */
 
@@ -46,7 +46,7 @@ export const workPanels = {
   subheading: "History, then marketing, then code. Each move was towards the work I liked most.",
   bnp: {
     slug: "bnp-paribas",
-    figure: { value: "6 months", label: "from zero C# to production code" },
+    figure: { value: "6 months", label: "from never writing C# to shipping production code" },
     comparisons: [
       { row: 0, before: { name: "Usually", value: "about two weeks" }, after: { name: "With my phased agentic workflow", value: "a couple of days" } },
       { row: 1, before: { name: "Before", value: "30–40 min" }, after: { name: "After", value: "under 5 min" } },

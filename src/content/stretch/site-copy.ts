@@ -10,7 +10,7 @@
 import type { ProjectCategory, ProjectSlug } from "../projects";
 
 export const siteCopy = {
-  titleHome: "Elias Bennett, software engineer at BNP Paribas",
+  titleHome: "Elias Bennett, Software Engineer at BNP Paribas",
   /** Other pages: "{Page} · Elias Bennett". */
   title: (page: string) => `${page} · Elias Bennett`,
   description:

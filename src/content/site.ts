@@ -14,7 +14,7 @@ export const siteDescription = siteCopy.description;
 export const profile = {
   name: "Elias Bennett",
   shortName: "Elias",
-  role: "Software engineer",
+  role: "Software Engineer",
   location: "London",
   links: {
     email: "mailto:eliasthebennett@gmail.com",

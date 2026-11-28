@@ -39,7 +39,7 @@ test.describe("Contrast, measured from the rendered page", () => {
     const measured = normal(readings.map((reading) => reading.text).join(" "));
     const targets = [
       ...work.employers.map((employer) => passRecords[employer.slug].short),
-      "Software engineer",
+      "Software Engineer",
       work.headed.line.slice(0, 30),
       ...work.headed.bars.map((bar) => bar.title.slice(0, 30)),
       "London",

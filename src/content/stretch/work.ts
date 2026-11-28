@@ -124,7 +124,7 @@ export function headedProblems(bars: readonly HeadedBar[]): string[] {
       } else if (!allWords.has(String(months)) && (!word || !allWords.has(word))) {
         problems.push(`Where I’m headed: the ${bar.label} bar draws ${months} months, which its "So far" line does not state.`);
       }
-      if (!allWords.has("zero")) problems.push(`Where I’m headed: the ${bar.label} bar draws a start from zero, which its "So far" line does not mention.`);
+      if (!/\b(?:zero|never\s+writing)\b/i.test(bar.soFar.text)) problems.push(`Where I’m headed: the ${bar.label} bar draws a start from zero, which its "So far" line does not mention.`);
       if (!allWords.has("production")) problems.push(`Where I’m headed: the ${bar.label} bar draws production code, which its "So far" line does not mention.`);
     } else {
       if (!Number.isInteger(bar.drawn.value) || bar.drawn.value <= 0) {
@@ -175,8 +175,8 @@ export const work = {
         label: "Depth",
         title: "Knowing it well enough that people can rely on it.",
         soFar: {
-          text: "Six months from zero C# to production code, in a pricing engine of around 70 projects.",
-          restates: ["from zero C# to production code", "around 70 projects"],
+          text: "Six months from never writing C# to shipping production code, in a pricing engine of around 70 projects.",
+          restates: ["from never writing C# to shipping production code", "around 70 projects"],
         },
         source: { story: "bnp-paribas" },
         drawn: { kind: "months-to-prod", months: 6 },
