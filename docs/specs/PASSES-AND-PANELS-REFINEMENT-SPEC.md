@@ -71,7 +71,7 @@ Simplify the homepage opening (`src/components/site/opening.tsx`, `src/component
 **Acceptance:** Work heading stays below the fold at 1440 × 900 and 1280 × 720; only BNP Paribas pass renders in the opening on desktop and mobile; zero passes inside mobile Work panels; Three.js scene loads with real textures and falls back cleanly with reduced motion / no WebGL / no JS; `verify:share-assets` passes.
 
 #### R-45 Work panels: full-colour BNP Paribas, Joveen & Optegra with compact metric trays
-- **BNP Paribas:** full-width emerald `#00965e` panel with full-strength `#04140d` / `#03110a` ink, subtle `1 px` border, light translucent stat well (`6 months · from zero C# to production code`), and the two drawn scale comparisons (`Integrating a pricer`, `The competition dashboard's data load`). Monte Carlo simulation stays exclusively on the BNP Paribas Role story.
+- **BNP Paribas:** full-width emerald `#00965e` panel with full-strength `#04140d` / `#03110a` ink, subtle `1 px` border, light translucent stat well (`6 months · from never writing C# to shipping production code`), and the two drawn scale comparisons (`Integrating a pricer`, `The competition dashboard's data load`). Monte Carlo simulation stays exclusively on the BNP Paribas Role story.
 - **Joveen (`#1a1a1f`) & Optegra (`#07535b` / `#006765`):** side-by-side full-colour panels edged with subtle `1 px` grey hairlines in both themes, each pairing its employer heading, role/dates, and headline metric with a **compact 3-metric tray** (`520 ms → 230 ms`, `10 min → under 2`, `+30%`; `62% → 88%`, `−30%`, `+15%`) and story link, with shared row alignment so trays and links line up horizontally.
 
 **Affected files:** `src/components/site/work.tsx`, `src/app/work.css`.  

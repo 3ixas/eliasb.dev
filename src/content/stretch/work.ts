@@ -124,7 +124,7 @@ export function headedProblems(bars: readonly HeadedBar[]): string[] {
       } else if (!allWords.has(String(months)) && (!word || !allWords.has(word))) {
         problems.push(`Where I’m headed: the ${bar.label} bar draws ${months} months, which its "So far" line does not state.`);
       }
-      if (!allWords.has("zero") && !allWords.has("never")) problems.push(`Where I’m headed: the ${bar.label} bar draws a start from zero, which its "So far" line does not mention.`);
+      if (!/\b(?:zero|never\s+writing)\b/i.test(bar.soFar.text)) problems.push(`Where I’m headed: the ${bar.label} bar draws a start from zero, which its "So far" line does not mention.`);
       if (!allWords.has("production")) problems.push(`Where I’m headed: the ${bar.label} bar draws production code, which its "So far" line does not mention.`);
     } else {
       if (!Number.isInteger(bar.drawn.value) || bar.drawn.value <= 0) {

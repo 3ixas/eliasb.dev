@@ -170,7 +170,7 @@ The section title "Work" with the subheading "History, then marketing, then code
 
 Green, with a soft lift from the top left. In reading order:
 
-1. **The figure:** "Six months", "from zero C# to production code".
+1. **The figure:** "6 months", "from never writing C# to shipping production code" (live wording in `docs/content/redesign-copy.md`).
 2. **The simulation:** illustrative simulated paths from "Today" to "Horizon", a histogram of where they end on the right edge, and a dashed line at their average with a white label, "One price". Caption: "The engines run large simulation-based calculations across several asset classes. Thousands of possible market paths go in; a price and its risk come out."
 3. **Two comparisons** under a rule, bars to scale with both sides named (live labels in `docs/content/redesign-copy.md`): "Integrating a pricer": "Usually · about two weeks" against "With my phased agentic workflow · a couple of days" (reframed in [#578](https://github.com/3ixas/eliasb.dev/pull/578)); "The competition dashboard’s data load": "Before · 30–40 min" against "After · under 5 min".
 4. **The link:** "The BNP Paribas story →".

@@ -242,6 +242,7 @@ assert.match(headedProblems([{ ...headed.bars[2], soFar: { ...headed.bars[2].soF
 assert.match(headedProblems([{ ...headed.bars[1], drawn: { kind: "months-to-prod", months: 7 } }])[0], /Depth bar draws 7 months/);
 assert.match(headedProblems([{ ...headed.bars[1], drawn: { kind: "months-to-prod", months: 0 } }])[0], /Depth bar draws 0 months.*positive whole number/);
 assert.match(headedProblems([{ ...headed.bars[1], soFar: { ...headed.bars[1].soFar, text: "Six months to production code, in a pricing engine of around 70 projects." } }])[0], /Depth bar draws a start from zero/);
+assert.match(headedProblems([{ ...headed.bars[1], soFar: { ...headed.bars[1].soFar, text: "Six months, never missing a deadline, to production code, in a pricing engine of around 70 projects." } }])[0], /Depth bar draws a start from zero/);
 assert.match(headedProblems([{ ...headed.bars[1], soFar: { ...headed.bars[1].soFar, text: "Six months from never writing C# to shipping live code, in a pricing engine of around 70 projects." } }])[0], /Depth bar draws production code/);
 assert.match(headedProblems([{ ...headed.bars[2], drawn: { kind: "count-to-live", value: 58 } }])[0], /Range bar draws 58/);
 assert.match(headedProblems([{ ...headed.bars[2], soFar: { ...headed.bars[2].soFar, text: "Threshold, 57 user stories." } }])[0], /Range bar draws a live mark/);
