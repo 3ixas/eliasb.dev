@@ -8,7 +8,7 @@ Approved copy for the shipped Passes and panels site (first approved 8 October 2
 
 | Where | Copy |
 | --- | --- |
-| Page title (home) | Elias Bennett, software engineer at BNP Paribas |
+| Page title (home) | Elias Bennett, Software Engineer at BNP Paribas |
 | Page title (others) | {Page} · Elias Bennett |
 | Meta description (home) | I’m Elias, a software engineer in London. I build pricing and risk engines at BNP Paribas in C# and Java, and products of my own. |
 | Social image | ELIAS BENNETT · I build pricing and risk engines at BNP Paribas, and *products of my own.* |
@@ -51,7 +51,7 @@ Approved copy for the shipped Passes and panels site (first approved 8 October 2
 
 - Heading: Work
 - Subheading: History, then marketing, then code. Each move was towards the work I liked most.
-- BNP Paribas figure: 6 months · from zero C# to production code
+- BNP Paribas figure: 6 months · from never writing C# to shipping production code
 - Simulation heading: How the pricing engines work
 - Simulation: Today · Horizon · One price
 - Simulation controls: Run again · Paths · 10 · 100 · 1,000 · 10th–90th spread
@@ -110,7 +110,7 @@ Where I’m headed and How I work share one full-bleed `--band` section (R-48, R
 | Bar | Title | So far | Link |
 | --- | --- | --- | --- |
 | Judgement | Close enough to users to know what’s worth building. | At Optegra, split tests and dashboards guided what the engineers built next. | The Optegra story → |
-| Depth | Knowing it well enough that people can rely on it. | Six months from zero C# to production code, in a pricing engine of around 70 projects. | The BNP Paribas story → |
+| Depth | Knowing it well enough that people can rely on it. | Six months from never writing C# to shipping production code, in a pricing engine of around 70 projects. | The BNP Paribas story → |
 | Range | All the way, from first idea to how it gets used. | Threshold, from 57 user stories to a live site. | The Threshold case study → |
 
 ### How I work
@@ -222,23 +222,23 @@ Shared labels: ← Work · Next role · Evidence. Chapter rail landmark name (no
 
 | Part | Copy |
 | --- | --- |
-| Opening | Software engineer · Risk division · London · Jul 2025 – now |
+| Opening | Software Engineer · Risk division · London · Jul 2025 – now |
 | 01 Summary | I’m a software engineer in BNP Paribas’s risk division in London. I work in C# on the engines that price and risk-manage trades on CPU and GPU, and I’m the team’s only C# engineer. |
 | 02 The role | The engines run large simulation-based calculations across several asset classes. It’s a big codebase, around 70 projects, and some of the C# is translated to run on the GPU. I joined in July 2025 having never written C#. Today I own implementation and delivery on the C# side, from planning through review. |
 | 03 The problems | *Market data.* Loaders written in Java had to be ported to C#, pulling data from several sources into one place and checking it on the way. *A stale dependency.* The live pricing pipeline relied on a data file that was no longer reliably available in production. *Quant code.* Pricing code written by quantitative developers had to be integrated into the engine. *Two execution paths.* The same tests had to run on both CPU and GPU. |
 | 04 Decisions | *Ship the risky change behind a flag, switched off.* Removing the dependency touched live pricing, so I put the new path behind a feature flag that defaults to off, added caching and wrote an end-to-end test nobody had asked for. The architect’s view was that the thing to protect was the blast radius, not only correctness. I’d have called that a nice-to-have before; now it’s how I start. *Validate the data before trusting it.* The commodity loader was the harder one: ten file types, correlation groups, unit conversions and records linked to each other. I checked the links, so an orphaned record gets caught on load rather than showing up as a strange number in a simulation. *Give AI work phases.* I built a phased agentic workflow where each stage has its own scoped agent: grill the problem, plan, build test-first, self-review, then a health review. Each agent only sees what that stage needs, which keeps it from skipping ahead. |
-| 05 What changed | I used that workflow to integrate a pricer into the calculation engine in a couple of days. For an experienced integration engineer it takes about two weeks, and I was new to it. The bank’s digitisation competition is the other half of this. I led a team of four and co-built a dashboard from our users’ requirements, which cut a 30–40 minute data load to under 5. We won, out of five groups, and presented it to the Head of Risk Systems. · Evidence: Nov 2025 won the bank’s digitisation competition · 6 months from zero C# to production code |
+| 05 What changed | I used that workflow to integrate a pricer into the calculation engine in a couple of days. For an experienced integration engineer it takes about two weeks, and I was new to it. The bank’s digitisation competition is the other half of this. I led a team of four and co-built a dashboard from our users’ requirements, which cut a 30–40 minute data load to under 5. We won, out of five groups, and presented it to the Head of Risk Systems. · Evidence: Nov 2025 won the bank’s digitisation competition · 6 months from never writing C# to shipping production code |
 | 06 What I took with me | I was nominated as an AI Champion in the risk division, and the workflow is now used by several teams across the department. I also won a Take Ownership award. The habit underneath all of it: write down what you’re doing before you build it, and ship it so it’s safe to undo. |
 | Figures | Under 04 Decisions, the flag figure: Live pricing · today’s path / New path · no stale file · cached · off by default. Caption: Protect the blast radius. Under 05 What changed, two bars to scale: Integrating a pricer (Before · about two weeks / After · a couple of days) and The competition dashboard’s data load (Before · 30–40 min / After · under 5 min). Caption: Bars to scale. Two weeks is taken as ten working days. Under 06 What I took with me, the Take Ownership certificate, whole. Caption: Take Ownership · _nology · Q1 2026 · awarded May 2026. Alt: _nology’s Q1 2026 Take Ownership award certificate for Elias Bennett, citing his move into a C# role with no prior experience, production C# in pricing and risk systems, onboarding documentation and a winning digitisation project. |
-| Title | Software engineer at BNP Paribas · Elias Bennett |
+| Title | Software Engineer at BNP Paribas · Elias Bennett |
 | Meta description | I’m a software engineer in BNP Paribas’s risk division in London. I work in C# on the engines that price and risk-manage trades on CPU and GPU, and I’m the team’s only C# engineer. |
-| Social card | BNP Paribas · Software engineer · ELIAS BENNETT |
+| Social card | BNP Paribas · Software Engineer · ELIAS BENNETT |
 
 ### Joveen
 
 | Part | Copy |
 | --- | --- |
-| Opening | Full stack software engineer · Aug 2024 – Jun 2025 |
+| Opening | Full Stack Software Engineer · Aug 2024 – Jun 2025 |
 | 01 Summary | I was a full stack software engineer at Joveen, working on its e-commerce site in React, Java with Spring Boot and MySQL. |
 | 02 The role | I worked across the React front end, the Java API behind it and the MySQL database underneath. I was also on a coding bootcamp alongside the job. |
 | 03 The problems | Pages took too long to load. Some modules were still in PHP and had to move to Spring Boot. Layouts and features broke on some phones and browsers, and a key API was slower than it needed to be. |
@@ -246,15 +246,15 @@ Shared labels: ← Work · Next role · Evidence. Chapter rail landmark name (no
 | 05 What changed | Page load fell by 40% once the front end did less up front, and mobile retention rose by 30% after the cross-browser fixes. Indexes and rewritten queries took the key API’s p95 from 520 ms to 230 ms, and deploys went from 10 minutes to under 2. Cloud costs fell by 18%. · Evidence: −40% page load · Under 2 minutes to deploy, down from 10 · +30% mobile retention · 230 ms key API p95, down from 520 ms |
 | 06 What I took with me | Alongside the job I did freelance AI training, reviewing 1,000 code items across TypeScript, Python, Java, C# and SQL at 97% QA precision. It was my first sustained work with AI on code, and the start of the thread that leads to the workflow I built at BNP Paribas. |
 | Figures | Under 02 The role, the joveen.com homepage hero, desktop beside phone. Link: joveen.com. Alt (desktop): The joveen.com homepage on a desktop: the Joveen wordmark and menu above a hero for CliniCare skincare, with a Shop the Range button and a row of the range’s products. Alt (phone): The same joveen.com hero on a phone, stacked: the CliniCare line, the Shop the Range button and the products. Under 05 What changed, four bars to scale: Page load (After · −40%), Time to deploy (Before · 10 min / After · under 2 min), Mobile retention (After · +30%) and Key API p95 (Before · 520 ms / After · 230 ms). Caption: Bars to scale. A change in per cent is drawn from 100. |
-| Title | Full stack software engineer at Joveen · Elias Bennett |
+| Title | Full Stack Software Engineer at Joveen · Elias Bennett |
 | Meta description | I was a full stack software engineer at Joveen, working on its e-commerce site in React, Java with Spring Boot and MySQL. |
-| Social card | Joveen · Full stack software engineer · ELIAS BENNETT |
+| Social card | Joveen · Full Stack Software Engineer · ELIAS BENNETT |
 
 ### Optegra Eye Healthcare & Kensington Medical
 
 | Part | Copy |
 | --- | --- |
-| Opening | Marketing executive · Sep 2021 – Aug 2024 |
+| Opening | Marketing Executive · Sep 2021 – Aug 2024 |
 | 01 Summary | I was a marketing executive at Kensington Medical and Optegra Eye Healthcare, and the best part was working with the engineers who built our website. |
 | 02 The role | From September 2021 at Kensington Medical, and from October 2022 at Optegra, I did digital marketing: campaign analysis, split tests and analytics dashboards. I also worked with the engineers on the company website, scoping and ticketing fixes. |
 | 03 The problems | *Slow, uneven pages.* The Core Web Vitals pass rate was 62%, and page loads were slower than they needed to be. *No clear view of what worked.* We couldn’t easily tell which changes brought in consultations. |
@@ -262,9 +262,9 @@ Shared labels: ← Work · Next role · Evidence. Chapter rail landmark name (no
 | 05 What changed | The Core Web Vitals pass rate went from 62% to 88%. The p95 page-load time fell by 30%. Consultation conversion rose by 15%. · Evidence: 88% Core Web Vitals pass rate, up from 62% · −30% p95 page load · +15% consultation conversion |
 | 06 What I took with me | The click came in early 2024. A friend loved his work so much that even a hectic week sounded exciting, and I wanted that from mine. I started coding in my spare time, just to see, and by August 2024 I was doing it for a living. |
 | Figures | Under 02 The role, the Optegra homepage as it was on 5 June 2024. Link: Optegra’s homepage in June 2024, on the Wayback Machine. Alt: The Optegra homepage in June 2024: a sunset beach behind the headline Choose Our Top Rated Eye Hospitals, a booking panel for a free video or telephone consultation, and the Trustpilot and NHS marks. Under 04 Decisions, the dry AMD treatment launch page as it was on 13 June 2024. Link: Optegra’s dry AMD page in June 2024, on the Wayback Machine. Alt: Optegra’s dry AMD treatment page in June 2024: the headline Dry AMD Treatment, Available at our Central London and Manchester Eye Hospitals, Valeda Light Therapy, and a Request a Callback form. Under 05 What changed, three bars to scale: Core Web Vitals pass rate (Before · 62% / After · 88%), p95 page load (After · −30%) and Consultation conversion (After · +15%). Caption: Bars to scale. A change in per cent is drawn from 100. |
-| Title | Marketing executive at Optegra Eye Healthcare & Kensington Medical · Elias Bennett |
+| Title | Marketing Executive at Optegra Eye Healthcare & Kensington Medical · Elias Bennett |
 | Meta description | I was a marketing executive at Kensington Medical and Optegra Eye Healthcare, and the best part was working with the engineers who built our website. |
-| Social card | Optegra Eye Healthcare & Kensington Medical · Marketing executive · ELIAS BENNETT |
+| Social card | Optegra Eye Healthcare & Kensington Medical · Marketing Executive · ELIAS BENNETT |
 
 ## Machine surfaces
 
@@ -273,7 +273,7 @@ What only a machine or a screen reader is given (`src/content/markdown.ts`, `src
 | Surface | Line |
 | --- | --- |
 | llms.txt | # Elias Bennett |
-| llms.txt | > Software engineer in London. I build pricing and risk engines at BNP Paribas, and products of my own. |
+| llms.txt | > Software Engineer in London. I build pricing and risk engines at BNP Paribas, and products of my own. |
 | llms.txt | My personal site. The Markdown homepage below covers the whole site in plain text; the pages under it go deeper into each role and project. |
 | llms.txt | ## The site |
 | llms.txt | - [Homepage as Markdown](https://www.eliasb.dev/index.md): who I am, my work, what I make, how I work, off the clock and how to reach me |

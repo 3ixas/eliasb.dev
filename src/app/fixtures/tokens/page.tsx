@@ -32,7 +32,7 @@ const scale: { token: string; style: CSSProperties; text: string; measure?: true
   { token: "link", style: serif, text: "Everything I’ve built" },
   { token: "body", style: { ...sans, lineHeight: 1.5 }, text: opening.support, measure: true },
   { token: "ui", style: { ...sans, fontWeight: 500 }, text: "The BNP Paribas story" },
-  { token: "small", style: sans, text: "Software engineer · Jul 2025 – now" },
+  { token: "small", style: sans, text: "Software Engineer · Jul 2025 – now" },
   { token: "label", style: sans, text: "Valid · present" },
 ];
 

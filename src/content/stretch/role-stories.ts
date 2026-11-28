@@ -11,7 +11,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
   "bnp-paribas": {
     slug: "bnp-paribas",
     employer: "BNP Paribas",
-    role: "Software engineer",
+    role: "Software Engineer",
     number: "01",
     dates: "Jul 2025 – now",
     setting: "Risk division · London",
@@ -119,7 +119,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
     ],
     evidence: [
       { value: "Nov 2025", label: "won the bank’s digitisation competition" },
-      { value: "6 months", label: "from zero C# to production code" },
+      { value: "6 months", label: "from never writing C# to shipping production code" },
     ],
     // BNP's green, as a hue only (no logo). The light field takes near-black ink (5.0:1);
     // the dark field is the same hue deepened and takes light ink (11.4:1).
@@ -133,7 +133,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
   joveen: {
     slug: "joveen",
     employer: "Joveen",
-    role: "Full stack software engineer",
+    role: "Full Stack Software Engineer",
     number: "02",
     dates: "Aug 2024 – Jun 2025",
     sections: {
@@ -240,7 +240,7 @@ export const roleStories: Record<RoleStorySlug, RoleStory> = {
   optegra: {
     slug: "optegra",
     employer: "Optegra Eye Healthcare & Kensington Medical",
-    role: "Marketing executive",
+    role: "Marketing Executive",
     number: "03",
     dates: "Sep 2021 – Aug 2024",
     sections: {

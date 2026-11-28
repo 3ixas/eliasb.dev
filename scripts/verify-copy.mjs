@@ -242,7 +242,7 @@ assert.match(headedProblems([{ ...headed.bars[2], soFar: { ...headed.bars[2].soF
 assert.match(headedProblems([{ ...headed.bars[1], drawn: { kind: "months-to-prod", months: 7 } }])[0], /Depth bar draws 7 months/);
 assert.match(headedProblems([{ ...headed.bars[1], drawn: { kind: "months-to-prod", months: 0 } }])[0], /Depth bar draws 0 months.*positive whole number/);
 assert.match(headedProblems([{ ...headed.bars[1], soFar: { ...headed.bars[1].soFar, text: "Six months to production code, in a pricing engine of around 70 projects." } }])[0], /Depth bar draws a start from zero/);
-assert.match(headedProblems([{ ...headed.bars[1], soFar: { ...headed.bars[1].soFar, text: "Six months from zero C# to live code, in a pricing engine of around 70 projects." } }])[0], /Depth bar draws production code/);
+assert.match(headedProblems([{ ...headed.bars[1], soFar: { ...headed.bars[1].soFar, text: "Six months from never writing C# to shipping live code, in a pricing engine of around 70 projects." } }])[0], /Depth bar draws production code/);
 assert.match(headedProblems([{ ...headed.bars[2], drawn: { kind: "count-to-live", value: 58 } }])[0], /Range bar draws 58/);
 assert.match(headedProblems([{ ...headed.bars[2], soFar: { ...headed.bars[2].soFar, text: "Threshold, 57 user stories." } }])[0], /Range bar draws a live mark/);
 assert.match(headedProblems([{ ...headed.bars[0], soFar: { ...headed.bars[0].soFar, text: "At Optegra, dashboards guided what the engineers built next." } }])[0], /Judgement bar draws a split test/);
@@ -448,7 +448,7 @@ for (const [what, ids] of [["menu", siteCopy.menu.map(({ id }) => id)], ["Say he
   const comparison = (replacement) => workPanelProblems({ ...workPanels, bnp: { ...bnp, comparisons: [{ ...bnp.comparisons[0], ...replacement }, bnp.comparisons[1]] } });
   assert.match(comparison({ after: { name: "With my phased agentic workflow", value: "an afternoon" } })[0], /writes "an afternoon"/, "A comparison's value is its scale row's");
   assert.match(comparison({ row: 4 })[0], /scale row 4/);
-  assert.match(workPanelProblems({ ...workPanels, bnp: { ...bnp, figure: { value: "6 months", label: "from zero Rust to production code" } } })[0], /figure .* is not one of its Role story's evidence items/);
+  assert.match(workPanelProblems({ ...workPanels, bnp: { ...bnp, figure: { value: "6 months", label: "from never writing Rust to shipping production code" } } })[0], /figure .* is not one of its Role story's evidence items/);
 }
 
 // External host labels read as human names for known sites, and strip www. otherwise (#528).
